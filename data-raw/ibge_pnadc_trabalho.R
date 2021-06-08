@@ -6,9 +6,7 @@ library(tidyverse)
 library(haven)
 library(tibble)
 
-
-C:\Users\Francisco\Dropbox\Amazonia_Mercado_Trabalho\build\output
-
+# ATENCAO, DIRETORIOS PROVISORIOS!!!
 base1 <- read_dta("C:/Users/Francisco/Dropbox/Amazonia_Mercado_Trabalho/build/output/_estrutura_emprego_amazonia_legal.dta")
 base2 <- read_dta("C:/Users/Francisco/Dropbox/Amazonia_Mercado_Trabalho/build/output/_estrutura_emprego_resto_brasil.dta")
 
