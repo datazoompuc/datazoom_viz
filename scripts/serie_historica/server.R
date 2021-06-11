@@ -96,6 +96,11 @@ get_server <- function(files, param) {
     
     # Output gráfico
     output$plot <- renderPlotly({
+      browser()
+      
+      test <- input$color 
+      test2 <- input$x 
+      tes3 <- input$y 
       
       #random_inputs() #preenche inputs se estiverem vazios
       update_my_queryString()  #atualiza url com parametros dos inputs
@@ -152,12 +157,12 @@ get_server <- function(files, param) {
         # Monta gráfico
         
         fig_p <- plot_ly(
-          df,
+          df_p,
           type = "scatter",
           mode = 'lines',
-          x = ~ df$time,
+          x = ~ time,
           y = ~ y,
-          color = ~ df$id,
+          color = ~ id,
           colors = pallete
         )
         
