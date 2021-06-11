@@ -12,7 +12,7 @@ get_ui <- function(files, param) {
                      h2(class="plot_name", param$plot_name),
                      p(class="plot_desc", param$plot_desc),
                      hr(),
-                     p(class="vars", "VARIÁVEIS:"),
+                     p(class="vars", "VARI\u00C1VEIS:"),
                      
                      div(class="var_selec_group",
                          # Seleciona variável do eixo y
