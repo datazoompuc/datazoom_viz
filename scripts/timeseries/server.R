@@ -16,7 +16,7 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file)
     # Cria coluna de grupos
     df$group <- paste0(df[,param$group])
-    
+
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -26,7 +26,7 @@ get_server <- function(files, param) {
       updateSelectInput(session, 
                         "filter1", 
                         choices = param$filter_choices, 
-                        selected = sample(param$filter_choices,3)
+                        selected = sample(param$filter_choices,2) #2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
       
       selected <- sample(sample(param$y_choices,1)[[1]],1)
