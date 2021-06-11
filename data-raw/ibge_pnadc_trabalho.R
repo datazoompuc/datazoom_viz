@@ -41,4 +41,7 @@ temp_param_table <- tibble(
   subcategoria = "Trabalho"
   )
 
+temp_param_table$label[3] <- "Proporção de empregador"
+temp_param_table$label[1] <- "Proporção de empregados com carteira assinada"
+
 write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic.csv")
