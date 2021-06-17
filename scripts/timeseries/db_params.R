@@ -7,11 +7,11 @@ library(data.table)
 # Função para criar lista nomeada hierarquica dos grupos (para que as variáveis apareçam agrupadas no selectinput)
 grouped_list <- function(df) {
   #cria lista hierarquica a partir de dataframe, para os selecinputs
-  groups <- unique(df$group)
+  groups <- unique(df$var_group)
   grouped_list <- setNames(nm = groups,
                            lapply(groups, function(x)
-                             setNames(nm = df$label[which(df$group == x)],
-                                      as.list(df$var[which(df$group == x)])
+                             setNames(nm = df$label[which(df$var_group == x)],
+                                      as.list(df$var[which(df$var_group == x)])
                              )
                            )
   )

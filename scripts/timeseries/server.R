@@ -14,8 +14,6 @@ get_server <- function(files, param) {
     
     # Carrega dados
     df <- readRDS(files$db_file)
-    # Cria coluna de grupos
-    df$group <- paste0(df[,param$group])
 
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
@@ -138,13 +136,14 @@ get_server <- function(files, param) {
         x_col <- param$table[which(param$table$var == param$x_def),]
         y_col <- param$table[which(param$table$var == input$y),]
         id_col <- param$table[which(param$table$var == param$id_def), ]
+        color_col <- param$table[which(param$table$var == param$color_def), ]
         
         # Filtra dataframe com grupos selecionados
         df_filtered <- df[which(df$group %in% input$filter1),]
         
         df_p <- data.frame(df_filtered[x_col$var],
                            df_filtered[y_col$var],
-                           df_filtered["group",]
+                           df_filtered[color_col$var]
         )
         colnames(df_p) <- c("x", "y", "color")
         df_p$group <- df_filtered$group
