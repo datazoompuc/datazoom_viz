@@ -6,9 +6,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/timeseries/ui.R"
-files$server_script <- "scripts/timeseries/server.R"
-files$param_script <- "scripts/timeseries/db_params.R"
+files$ui_script <- "scripts/ts_ibge_pnadc_cnae/ui.R"
+files$server_script <- "scripts/ts_ibge_pnadc_cnae/server.R"
+files$param_script <- "scripts/ts_ibge_pnadc_cnae/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 

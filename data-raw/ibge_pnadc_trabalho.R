@@ -116,11 +116,11 @@ temp_param_table <- tibble(
 )
 
 temp_param_table$label[1] <- "Atividade econômica"
-temp_param_table$label[2] <- "Numéro de ocupados"
-temp_param_table$label[3] <- "Numéro de ocupados no setor formal"
-temp_param_table$label[4] <- "Numéro de ocupados no setor informal"
-temp_param_table$label[5] <- "Numéro de ocupados no setor público"
-temp_param_table$label[6] <- "Numéro de ocupados no setor privado"
+temp_param_table$label[2] <- "Número de ocupados"
+temp_param_table$label[3] <- "Número de ocupados no setor formal"
+temp_param_table$label[4] <- "Número de ocupados no setor informal"
+temp_param_table$label[5] <- "Número de ocupados no setor público"
+temp_param_table$label[6] <- "Número de ocupados no setor privado"
 temp_param_table$label[7] <- "Rendimento mensal médio"
 temp_param_table$label[8] <- "Rendimento mensal médio no setor formal"
 temp_param_table$label[9] <- "Rendimento mensal médio no setor informal"
@@ -128,6 +128,11 @@ temp_param_table$label[10] <- "Massa salarial"
 temp_param_table$label[11] <- "Estado"
 temp_param_table$label[12] <- "Trimestre-Ano"
 temp_param_table$label[13] <- "Fonte"
+
+temp_param_table$y[1] <- FALSE
+temp_param_table$y[11] <- FALSE
+temp_param_table$y[12] <- FALSE
+temp_param_table$y[13] <- FALSE
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_dinamismo_economico_dic.csv", fileEncoding = "UTF-8")

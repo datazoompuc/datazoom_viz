@@ -23,7 +23,7 @@ get_db_param <-
   function(param_filename = "param.csv", db_filename = "") {
     # Se arquivo de parametros não existe, cria um vazio
     if (!file.exists(param_filename)) {
-      temp_db <- read.csv(db_filename)
+      temp_db <- read.csv(db_filename, fileEncoding = "UTF-8") #Convenção importante = UTF-8 
       columns <- colnames(temp_db)
       rm(temp_db)
       temp_param_table <- data_frame(
@@ -41,7 +41,7 @@ get_db_param <-
       write.csv(temp_param_table, file = param_filename)
     }
     # Carrega arquivo de parâmetros
-    param_table <- fread(param_filename, encoding = "Latin-1")
+    param_table <- fread(param_filename, encoding = "UTF-8") #Convenção importante = UTF-8 
     
     # Cria lista de parâmetros
     param <- list(

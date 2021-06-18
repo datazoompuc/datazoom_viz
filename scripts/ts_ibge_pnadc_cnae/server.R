@@ -102,7 +102,7 @@ get_server <- function(files, param) {
         # Monta título a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
         
-        text <-  paste0("Variação temporal de ", y_col$label)
+        text <-  paste0("Variação trimestral de ", y_col$label)
       }
       
       text
@@ -112,7 +112,7 @@ get_server <- function(files, param) {
       if(is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <-  paste0("por município")
+        text <-  paste0("por Atividade econômica")
       }
       
       text
