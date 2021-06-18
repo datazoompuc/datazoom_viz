@@ -12,8 +12,8 @@ files$param_script <- "scripts/ts_ibge_pnadc_cnae/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
-files$param_file <- "data/ibge_pnadc_dinamismo_economico_dic.csv"
-files$db_file <- "data/ibge_pnadc_dinamismo_economico.rds"
+files$param_file <- "data/ibge_pnadc_cnae_dic.csv"
+files$db_file <- "data/ibge_pnadc_cnae.rds"
 
 # Carrega scripts
 source(files$param_script)
