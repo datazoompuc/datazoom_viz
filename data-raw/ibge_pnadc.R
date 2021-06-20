@@ -34,7 +34,7 @@ github_folder_path <- "Amazonia_Mercado_Trabalho/build/output/"  # set github st
 
 # call raw data
 base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
-base1 <- base1 %>% mutate(id = "Amazônia")
+base1 <- base1 %>% mutate(id = "Amazônia Legal")
 base2 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
 base2 <- base2 %>% mutate(id = "Restante do Brasil")
 
