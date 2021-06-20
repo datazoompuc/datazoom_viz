@@ -25,10 +25,13 @@ get_ui <- function(files, param) {
                          )
                      ),
                      
+                    #espaço vazio
+                    div(class="fakecheckbox",),
+                     
                      # Seleciona filtro de municípios
                      selectizeInput(
                        'filter1', 
-                       'Recorte de região geográfica', 
+                       'Recorte de região geográfica',  
                        choices = NULL,
                        multiple = TRUE, 
                        options = list(maxItems = 20),

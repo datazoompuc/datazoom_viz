@@ -197,10 +197,6 @@ get_server <- function(files, param) {
           zeroline = FALSE
         )
         
-        if (input$ylog & is.numeric(df_p$y)) {
-          y_axis_layout$type <- "log"
-        }
-        
         # Layout hover/tooltip
         tooltip <- list(
           bordercolor = "rgba(255, 255, 255, 1)",
