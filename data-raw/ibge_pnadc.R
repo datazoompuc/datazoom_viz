@@ -60,7 +60,8 @@ temp <-  temp %>%
   select(id, time, group, 
          taxa_de_desemprego, 
          taxa_de_ocupacao, 
-         taxa_de_participacao, 
+         taxa_de_participacao,
+         taxa_de_informalidade,
          taxa_de_desalento, 
          taxa_de_nemnem,
          n_de_desemprego,
@@ -95,19 +96,25 @@ temp_param_table <- tibble(
   )
 
 # label variables
-temp_param_table$label[1] <- "Proporção de empregados com carteira assinada"
+temp_param_table$label[1] <- "Recorte regional"
 temp_param_table$label[2] <- "Ano-Trimestre"
 temp_param_table$label[3] <- "Recorte regional"
-temp_param_table$label[4] <- "Taxa de desemprego" 
-temp_param_table$label[5] <- "Taxa de ocupação"
-temp_param_table$label[6] <- "Taxa de participação" 
-temp_param_table$label[7] <- "Taxa de desalentados"
-temp_param_table$label[8] <- "Taxa de nem-nem" 
-temp_param_table$label[9] <- "Número de desempregados"
-temp_param_table$label[10] <- "Número de ocupados"
-temp_param_table$label[11] <- "Número de informais"
-temp_param_table$label[12] <- "Número de desalentados"
-temp_param_table$label[13] <- "Número de nem-nem"
+temp_param_table$label[4] <- "Taxa de desemprego em relação a força de trabalho (%)" 
+temp_param_table$label[5] <- "Taxa de ocupação em relação a PIA (%)"
+temp_param_table$label[6] <- "Taxa de participação em relação a PIA (%)"
+temp_param_table$label[7] <- "Taxa de informalidade em relação aos ocupados (%)"
+temp_param_table$label[8] <- "Taxa de desalentados em relação a PIA (%)"
+temp_param_table$label[9] <- "Taxa de nem-nem em relação a PIA (%)" 
+temp_param_table$label[10] <- "Número de desempregados"
+temp_param_table$label[11] <- "Número de ocupados"
+temp_param_table$label[12] <- "Número de informais"
+temp_param_table$label[13] <- "Número de desalentados"
+temp_param_table$label[14] <- "Número de nem-nem"
+
+# block variables in graphs y-axis
+temp_param_table$y[1] <- FALSE # Recorte regional
+temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[3] <- FALSE # Recorte regional
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
