@@ -32,6 +32,13 @@ get_ui <- function(files, param) {
                        value = FALSE,
                        width = "100%"
                      ),
+                    # Seleciona eixo 
+                      checkboxInput(
+                      inputId = "y_option",
+                      "proporcinal ao trimestre inicial (*)",
+                      value = FALSE,
+                      width = "100%"
+                      ),
                      
                      # Seleciona filtro de municípios
                      selectizeInput(
