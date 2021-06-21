@@ -173,7 +173,7 @@ get_server <- function(files, param) {
                          y = ~y,
                          color = ~group,
                          type = "scatter", 
-                         mode = "lines",
+                         mode = "lines+markers",
                          text = ~tooltip
         )
         
