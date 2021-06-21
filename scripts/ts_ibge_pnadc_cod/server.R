@@ -39,7 +39,8 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?","y=",input$y,
-        "&","ylog=",input$ylog
+        "&","ylog=",input$ylog,
+        "&","y_option=",input$y_option
       )
       
       for (i in input$filter1) {
@@ -75,6 +76,11 @@ get_server <- function(files, param) {
         updateCheckboxInput(session, "ylog",
                             value = (query[['ylog']] == "TRUE"))
       }
+
+      if (!is.null(query[['y_option']])) {
+        updateCheckboxInput(session, "y_option",
+                            value = (query[['y_option']] == "TRUE"))
+      }
       
       selected <- unlist(query[names(query) == "filter"], use.names=FALSE)
       if (!is.null(query[['filter']])) {
@@ -103,6 +109,9 @@ get_server <- function(files, param) {
         y_col <- param$table[which(param$table$var == input$y), ]
         
         text <-  paste0("Variação trimestral de ", y_col$label)
+        if(input$y_option)  {
+          text <-  paste0("Variação trimestral de ", y_col$label, "*")
+        }
       }
       
       text
@@ -158,6 +167,15 @@ get_server <- function(files, param) {
           stop()
         }
         
+        # Alternativa de medida para y
+        if (input$y_option & is.numeric(df_p$y)) {
+          df_p <- df_p %>%
+            group_by(df_p$group) %>%
+            mutate(aux1 = first(y),
+                   y_option = (y/aux1)*100)
+          df_p$y <- df_p$y_option
+        }
+
         # Se a coluna de cor for toda NA, preenche com strings em branco
         if (all(is.na(df_p$color))) {
           df_p$color <- " "
@@ -205,6 +223,10 @@ get_server <- function(files, param) {
         
         if (input$ylog & is.numeric(df_p$y)) {
           y_axis_layout$type <- "log"
+        }
+
+        if (input$y_option) {
+          y_axis_layout$title <- paste0(y_col$label, "*")
         }
         
         # Layout hover/tooltip

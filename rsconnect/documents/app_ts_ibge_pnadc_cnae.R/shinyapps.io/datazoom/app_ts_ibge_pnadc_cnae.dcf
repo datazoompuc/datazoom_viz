@@ -5,10 +5,10 @@ account: datazoom
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4296479
-bundleId: 4737242
+bundleId: 4740456
 url: https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cnae/
-when: 1624234813.36629
-lastSyncTime: 1624234813.36629
+when: 1624301458.06413
+lastSyncTime: 1624301458.06413
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: .RData|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|data-raw/datazoom_amazonia.R|data-raw/ibge_pnadc.R|LICENSE|README.md
