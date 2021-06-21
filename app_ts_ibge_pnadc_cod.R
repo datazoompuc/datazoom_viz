@@ -32,7 +32,7 @@ param$group <- "group" #variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Conjunto de bases agregadas"
+param$plot_desc <- "Ocupações no Trabalho"
 
 # Outros parâmetros e configurações
 
