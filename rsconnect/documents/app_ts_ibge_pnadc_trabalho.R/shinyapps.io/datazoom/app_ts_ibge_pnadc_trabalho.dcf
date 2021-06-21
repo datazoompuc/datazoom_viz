@@ -1,0 +1,14 @@
+name: app_ts_ibge_pnadc_trabalho
+title: app_ts_ibge_pnadc_trabalho
+username:
+account: datazoom
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4296464
+bundleId: 4737271
+url: https://datazoom.shinyapps.io/app_ts_ibge_pnadc_trabalho/
+when: 1624235926.90733
+lastSyncTime: 1624235926.90733
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|data-raw/datazoom_amazonia.R|data-raw/ibge_pnadc.R|LICENSE|README.md
