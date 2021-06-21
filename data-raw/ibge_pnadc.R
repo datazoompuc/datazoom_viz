@@ -199,18 +199,19 @@ temp_param_table <- tibble(
 
 # label variables
 temp_param_table$label[1] <- "Atividade econômica"
-temp_param_table$label[2] <- "Número de ocupados"
-temp_param_table$label[3] <- "Número de ocupados no setor formal"
-temp_param_table$label[4] <- "Número de ocupados no setor informal"
-temp_param_table$label[5] <- "Número de ocupados no setor público"
-temp_param_table$label[6] <- "Número de ocupados no setor privado"
-temp_param_table$label[7] <- "Rendimento mensal médio"
-temp_param_table$label[8] <- "Rendimento mensal médio no setor formal"
-temp_param_table$label[9] <- "Rendimento mensal médio no setor informal"
-temp_param_table$label[10] <- "Massa salarial"
-temp_param_table$label[11] <- "Estado"
-temp_param_table$label[12] <- "Trimestre-Ano"
-temp_param_table$label[13] <- "Fonte"
+temp_param_table$label[2] <- "Trimestre-Ano"
+temp_param_table$label[3] <- "Atividade econômica"
+temp_param_table$label[4] <- "Número de ocupados"
+temp_param_table$label[5] <- "Número de ocupados no setor formal"
+temp_param_table$label[6] <- "Número de ocupados no setor informal"
+temp_param_table$label[7] <- "Número de ocupados no setor público"
+temp_param_table$label[8] <- "Número de ocupados no setor privado"
+temp_param_table$label[9] <- "Rendimento mensal médio"
+temp_param_table$label[10] <- "Rendimento mensal médio no setor formal"
+temp_param_table$label[11] <- "Rendimento mensal médio no setor informal"
+temp_param_table$label[12] <- "Massa salarial"
+temp_param_table$label[13] <- "Estado"
+
 
 # block variables in graphs y-axis
 temp_param_table$y[1] <- FALSE # Atividade econômica
@@ -301,18 +302,18 @@ temp_param_table <- tibble(
 
 # label variables
 temp_param_table$label[1] <- "Ocupação"
-temp_param_table$label[2] <- "Número de ocupados"
-temp_param_table$label[3] <- "Número de ocupados no setor formal"
-temp_param_table$label[4] <- "Número de ocupados no setor informal"
-temp_param_table$label[5] <- "Número de ocupados no setor público"
-temp_param_table$label[6] <- "Número de ocupados no setor privado"
-temp_param_table$label[7] <- "Rendimento mensal médio"
-temp_param_table$label[8] <- "Rendimento mensal médio no setor formal"
-temp_param_table$label[9] <- "Rendimento mensal médio no setor informal"
-temp_param_table$label[10] <- "Massa salarial"
-temp_param_table$label[11] <- "Estado"
-temp_param_table$label[12] <- "Trimestre-Ano"
-temp_param_table$label[13] <- "Fonte"
+temp_param_table$label[2] <- "Trimestre-Ano"
+temp_param_table$label[3] <- "Ocupação"
+temp_param_table$label[4] <- "Número de ocupados"
+temp_param_table$label[5] <- "Número de ocupados no setor formal"
+temp_param_table$label[6] <- "Número de ocupados no setor informal"
+temp_param_table$label[7] <- "Número de ocupados no setor público"
+temp_param_table$label[8] <- "Número de ocupados no setor privado"
+temp_param_table$label[9] <- "Rendimento mensal médio"
+temp_param_table$label[10] <- "Rendimento mensal médio no setor formal"
+temp_param_table$label[11] <- "Rendimento mensal médio no setor informal"
+temp_param_table$label[12] <- "Massa salarial"
+temp_param_table$label[13] <- "Estado"
 
 # block variables in graphs y-axis
 temp_param_table$y[1] <- FALSE # Ocupação
