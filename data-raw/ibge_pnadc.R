@@ -214,10 +214,10 @@ temp_param_table$label[13] <- "Estado"
 
 
 # block variables in graphs y-axis
-temp_param_table$y[1] <- FALSE # Atividade econômica
-temp_param_table$y[11] <- FALSE # Estado
-temp_param_table$y[12] <- FALSE # Trimestre-Ano
-temp_param_table$y[13] <- FALSE # Fonte
+temp_param_table$y[1] <- FALSE # Recorte regional
+temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[3] <- FALSE # "Atividade econômica"
+temp_param_table$y[13] <- FALSE # Estado
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
@@ -317,9 +317,9 @@ temp_param_table$label[13] <- "Estado"
 
 # block variables in graphs y-axis
 temp_param_table$y[1] <- FALSE # Ocupação
-temp_param_table$y[11] <- FALSE # Estado
-temp_param_table$y[12] <- FALSE # Trimestre-Ano
-temp_param_table$y[13] <- FALSE # Fonte
+temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[3] <- FALSE # Ocupação
+temp_param_table$y[13] <- FALSE # Estado
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
