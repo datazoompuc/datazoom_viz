@@ -14,44 +14,31 @@ get_ui <- function(files, param) {
                      hr(),
                      p(class="vars", "VARI\u00C1VEIS:"),
                      
-                     div(class="var_selec_group",
-                         # Seleciona variável do eixo y
-                         selectInput(
-                           inputId = "y",
-                           label = "eixo vertical (y)",
-                           choices = param$y_choices,
-                           selected = param$y_def,
-                           width = "100%"
-                         )
-                     ),
-                     
-                     # Seleciona eixo log
-                     checkboxInput(
-                       inputId = "ylog",
-                       "escala log",
-                       value = FALSE,
-                       width = "100%"
-                     ),
-                    # Seleciona eixo 
-                      checkboxInput(
-                        inputId = "y_option",
-                        "proporcinal ao trimestre inicial (*)",
-                        value = FALSE,
+                    div(class="var_selec_group",
+                      # Seleciona variável do eixo x
+                      selectInput(
+                        inputId = "x",
+                        label = "Ranking - eixo horizontal (x):",
+                        choices = param$x_choices,
+                        selected = param$x_def,
                         width = "100%"
-                        ),
-                     
-                     # Seleciona filtro de municípios
-                     selectizeInput(
-                       'filter1', 
-                       'Estado - Atividades econômicas', 
-                       choices = NULL,
-                       multiple = TRUE, 
-                       options = list(maxItems = 20),
-                       width = "100%"
-                     ),
-                     
-                     
-              ),
+                      )
+                      ),
+                      
+                   div(class="var_selec_group",
+                      # Seleciona variável de cor
+                      selectInput(
+                        inputId = "color",
+                        label = "Cor das barras:",
+                        choices = param$color_choices,
+                        selected = param$color_def,
+                        width = "100%"
+                      )
+                      ),
+                      #espaço vazio
+                      div(class="fakecheckbox",),
+           
+             ),
               column(9, class = "plotcol h-100",
                      textOutput("plot_title"),
                      textOutput("plot_subtitle"),
@@ -60,7 +47,7 @@ get_ui <- function(files, param) {
                        div(
                          class = "plotdiv w-100 h-100",
                          # Gráfico
-                         plotlyOutput("plot", width = "100%", height = "100%")
+                         plotlyOutput("plot", width = "100%", height = "100%") #%>% withSpinner()
                        )
                      )
               )
