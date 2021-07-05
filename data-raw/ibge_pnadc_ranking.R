@@ -62,18 +62,24 @@ temp$Ano <- NULL
 # groups at the level: Estado e Atividade Economica
 temp$group <- paste0(temp$UF," - ", temp$titulo)
 
-# change column order
-temp <-  temp %>% 
-  relocate(group, time)
 
 temp <-  temp %>% 
   group_by(titulo, time) %>%
+  arrange(titulo, time) %>%
   summarise(n_ocu_cnae = sum(n_ocu_cnae),
-            n_ocu_cnae_formal = sum(n_ocu_cnae),
-            n_ocu_cnae_informal = sum(n_ocu_cnae),
-            n_ocu_cnae_publico = sum(n_ocu_cnae),
-            n_ocu_cnae_privado = sum(n_ocu_cnae)) %>%
+            n_ocu_cnae_formal = sum(n_ocu_cnae_formal),
+            n_ocu_cnae_informal = sum(renda_informal),
+            n_ocu_cnae_publico = sum(n_ocu_cnae_publico),
+            n_ocu_cnae_privado = sum(n_ocu_cnae_privado)
+            ) %>%
   mutate(group = titulo)
+
+temp$titulo <- NULL
+temp$UF <- NULL
+
+# change column order
+temp <-  temp %>% 
+  relocate(group, time)
 
 # save data at rds format
 saveRDS(temp,
@@ -110,20 +116,18 @@ temp_param_table$label[4] <- "Número de ocupados no setor formal"
 temp_param_table$label[5] <- "Número de ocupados no setor informal"
 temp_param_table$label[6] <- "Número de ocupados no setor público"
 temp_param_table$label[7] <- "Número de ocupados no setor privado"
-temp_param_table$label[8] <- "Atividade econômica"
 
 # block variables in graphs y-axis
 temp_param_table$y[2] <- FALSE # Ano-Trimestre
 
 # block variables in graphs x-axis
-temp_param_table$x[2] <- FALSE # Atividade econômica
-temp_param_table$x[8] <- FALSE # Atividade econômica
+temp_param_table$x[2] <- FALSE # Ano-Trimestre
 
 # allow variables in graphs size and color-axis
 temp_param_table$size[1] <- TRUE # Atividade econômica
-temp_param_table$size[8] <- TRUE # Atividade econômica
 temp_param_table$color[1] <- TRUE # Atividade econômica
-temp_param_table$color[8] <- TRUE # Atividade econômica
+
+# allow variables in graphs size and color-axis
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cnae_dic.csv", fileEncoding = "UTF-8")
