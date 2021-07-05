@@ -189,6 +189,8 @@ temp_param_table <- tibble(
   x = TRUE,
   y = TRUE,
   color = TRUE,
+  size = TRUE,
+  slider = FALSE,
   label = columns,
   desc = columns,
   var_group = "IBGE - PNAD Contínua",
