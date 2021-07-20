@@ -32,7 +32,7 @@ param$text_def <- "Municipio" #variável padrão de texto
 param$id_def <- "CodIBGE" #variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Dados extraídos do PRODES - INPE"
+param$plot_desc <- "Compilação de dados ao nível municipal"
 
 # Outros parâmetros e configurações
 
