@@ -149,15 +149,16 @@ saveRDS(seeg,
 income <- readRDS(file = "data/income.rds")
 prodes <- readRDS(file = "data/prodes.rds")
 deter <- readRDS(file = "data/deter.rds")
-class(deter$CodIBGE) <-  'character'
 gdp <- readRDS(file = "data/gdp.rds")
 degrad <- readRDS(file = "data/degrad.rds")
+#ips <- readRDS(file = "data/ips.rds")
+#seeg <- readRDS(file = "data/seeg.rds")
 
 # edit data to merge
 class(gdp$Ano) <-  'numeric'
 class(gdp$CodIBGE) <-  'character'
 class(income$Ano) <-  'numeric'
-
+class(deter$CodIBGE) <-  'character'
 
 # merge all data
 dz_munic <- income %>%
@@ -180,14 +181,31 @@ dz_munic <- dz_munic %>% select(CodIBGE,
                                 Degradacao,
                                 Municipio)
 
-dz_munic$CodIBGE <- as.numeric(dz_munic$CodIBGE)
-dz_munic$Estado <- as.numeric(dz_munic$Estado)
+# edit data format
+class(dz_munic$CodIBGE)
+dz_munic$CodIBGE <- as.factor(dz_munic$CodIBGE)
+class(dz_munic$Estado)
+dz_munic$Estado <- as.factor(dz_munic$Estado)
 
 # convert time data to date
 dz_munic$Ano <- as.Date(as.yearqtr(dz_munic$Ano))
 
 # groups at the level: municipio
 dz_munic$group <- dz_munic$Municipio
+
+# unique rows
+dz_munic <- unique(dz_munic, by = c(Ano, CodIBGE, Estado))
+dz_munic <- dz_munic %>% group_by(CodIBGE) %>%
+  mutate(zzz = mean(is.na(Renda_media)))
+
+# replace NA with column mean for numeric variables that does not vary with time
+dz_munic <- dz_munic %>% 
+  group_by(CodIBGE) %>% 
+  mutate_at(vars(Renda_media, Renda_mediana),~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))  
+
+#
+dz_munic <- dz_munic %>%
+  arrange(CodIBGE, Ano)
 
 # save data
 saveRDS(dz_munic,
@@ -206,8 +224,8 @@ temp_param_table <- tibble(
   var = columns,
   x = TRUE,
   y = TRUE,
-  color = TRUE,
-  size = TRUE,
+  color = FALSE,
+  size = FALSE,
   slider = FALSE,
   label = columns,
   desc = columns,
@@ -288,10 +306,13 @@ temp_param_table$x[12] <- FALSE # "Município"
 
 # allow variables in graphs size, color, and slider-axis 
 temp_param_table$size[3] <- TRUE # "Estado"
-temp_param_table$size[4] <- TRUE # "Rendimento"
-temp_param_table$color[1] <- TRUE # "Código do município"
+temp_param_table$size[4] <- TRUE # "Renda média municipal"
+temp_param_table$size[5] <- TRUE # "Renda mediana municipal"
+
 temp_param_table$color[3] <- TRUE # "Estado"
-temp_param_table$color[4] <- TRUE # "Rendimento"
+temp_param_table$color[4] <- TRUE # "Renda média municipal"
+temp_param_table$color[5] <- TRUE # "Renda mediana municipal"
+
 temp_param_table$slider[2] <- TRUE # "Ano"
 
 # save csv in utf-8 encoding
