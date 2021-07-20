@@ -4,6 +4,9 @@
 
 #### Generate Data: INPE - PRODES: deforestation
 library(datazoom.amazonia)
+library(tidyverse)
+library(tibble)
+library(zoo)
 
 #### Generate Data: INPE - PRODES: deforestation
 prodes <- load_prodes(
@@ -136,3 +139,181 @@ seeg <- load_seeg(language = "pt")
 saveRDS(seeg,
      file = "./data/seeg.rds"
 )
+
+
+############################################
+##  Data Zoom Amazonia
+############################################
+
+# call data
+income <- readRDS(file = "data/income.rds")
+prodes <- readRDS(file = "data/prodes.rds")
+deter <- readRDS(file = "data/deter.rds")
+gdp <- readRDS(file = "data/gdp.rds")
+degrad <- readRDS(file = "data/degrad.rds")
+#ips <- readRDS(file = "data/ips.rds")
+#seeg <- readRDS(file = "data/seeg.rds")
+
+# edit data to merge
+class(gdp$Ano) <-  'numeric'
+class(gdp$CodIBGE) <-  'character'
+class(income$Ano) <-  'numeric'
+class(deter$CodIBGE) <-  'character'
+
+# merge all data
+dz_munic <- income %>%
+  full_join(prodes, by = c("CodIBGE","Ano", "Estado"))   %>%
+  full_join(deter, by = c("CodIBGE","Ano"))   %>%
+  full_join(gdp, by = c("CodIBGE","Ano", "Estado"))   %>%
+  full_join(degrad, by = c("CodIBGE","Ano", "Estado"))
+
+# edit final data
+dz_munic <- dz_munic %>% select(CodIBGE,
+                                Ano,
+                                Estado,
+                                Renda_media,
+                                Renda_mediana,
+                                Ocupados,
+                                Salario,
+                                Empregados,
+                                Firmas,
+                                Desmatado,
+                                Degradacao,
+                                Municipio)
+
+# edit data format
+class(dz_munic$CodIBGE)
+dz_munic$CodIBGE <- as.factor(dz_munic$CodIBGE)
+class(dz_munic$Estado)
+dz_munic$Estado <- as.factor(dz_munic$Estado)
+
+# convert time data to date
+dz_munic$Ano <- as.Date(as.yearqtr(dz_munic$Ano))
+
+# groups at the level: municipio
+dz_munic$group <- dz_munic$Municipio
+
+# unique rows
+dz_munic <- unique(dz_munic, by = c(Ano, CodIBGE, Estado))
+dz_munic <- dz_munic %>% group_by(CodIBGE) %>%
+  mutate(zzz = mean(is.na(Renda_media)))
+
+# replace NA with column mean for numeric variables that does not vary with time
+dz_munic <- dz_munic %>% 
+  group_by(CodIBGE) %>% 
+  mutate_at(vars(Renda_media, Renda_mediana),~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))  
+
+#
+dz_munic <- dz_munic %>%
+  arrange(CodIBGE, Ano)
+
+# save data
+saveRDS(dz_munic,
+        file = "./data/dz_munic.rds"
+)
+
+#####################
+# Build Dictionary 
+#####################
+
+# extract variables from data
+columns <- colnames(dz_munic)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Fonte de dados",
+  tipo = 1,
+  unidade = "Unidade de medida",
+  categoria= "Categoria principal", 
+  subcategoria = "Subcategoria"
+)
+
+# label variables
+temp_param_table$label[1] <- "Código do município"
+temp_param_table$label[2] <- "Ano"
+temp_param_table$label[3] <- "Estado"
+temp_param_table$label[4] <- "Renda média municipal"
+temp_param_table$label[5] <- "Renda mediana municipal"
+temp_param_table$label[6] <- "Número de pessoas ocupadas"
+temp_param_table$label[7] <- "Salário médio das pessas ocupadas"
+temp_param_table$label[8] <- "Número de pessoas empregadas"
+temp_param_table$label[9] <- "Número de firmas"
+temp_param_table$label[10] <- "Área desmatada"
+temp_param_table$label[11] <- "Área degradada"
+temp_param_table$label[12] <- "Município"
+
+# label data source
+temp_param_table$var_group[1] <- "Geral"
+temp_param_table$var_group[2] <- "Geral"
+temp_param_table$var_group[3] <- "Geral"
+temp_param_table$var_group[4] <- "IBGE"
+temp_param_table$var_group[5] <- "IBGE"
+temp_param_table$var_group[6] <- "IBGE"
+temp_param_table$var_group[7] <- "IBGE"
+temp_param_table$var_group[8] <- "IBGE"
+temp_param_table$var_group[9] <- "IBGE"
+temp_param_table$var_group[10] <- "INPE - PRODES"
+temp_param_table$var_group[11] <- "INPE - PRODES"
+temp_param_table$var_group[12] <- "Geral"
+
+# label data category
+temp_param_table$categoria[1] <- "Unidade geográfica"
+temp_param_table$categoria[2] <- "Unidade de tempo"
+temp_param_table$categoria[3] <- "Unidade geográfica"
+temp_param_table$categoria[4] <- "Economia"
+temp_param_table$categoria[5] <- "Economia"
+temp_param_table$categoria[6] <- "Economia"
+temp_param_table$categoria[7] <- "Economia"
+temp_param_table$categoria[8] <- "Economia"
+temp_param_table$categoria[9] <- "Economia"
+temp_param_table$categoria[10] <- "Meio ambiente"
+temp_param_table$categoria[11] <- "Meio ambiente"
+temp_param_table$categoria[12] <- "Unidade geográfica"
+
+
+# label data subcategory
+temp_param_table$subcategoria[1] <- "Município"
+temp_param_table$subcategoria[2] <- "Anual"
+temp_param_table$subcategoria[3] <- "Estado"
+temp_param_table$subcategoria[4] <- "Rendimento"
+temp_param_table$subcategoria[5] <- "Rendimento"
+temp_param_table$subcategoria[6] <- "Mercado de trabalho"
+temp_param_table$subcategoria[7] <- "Rendimento"
+temp_param_table$subcategoria[8] <- "Mercado de trabalho"
+temp_param_table$subcategoria[9] <- "Mercado de trabalho"
+temp_param_table$subcategoria[10] <- "Desmatamento"
+temp_param_table$subcategoria[11] <- "Degradação"
+temp_param_table$subcategoria[12] <- "Município"
+
+# block variables in graphs y-axis
+temp_param_table$y[1] <- FALSE # "Código do município"
+temp_param_table$y[2] <- FALSE # "Ano"
+temp_param_table$y[3] <- FALSE # "Estado"
+temp_param_table$y[12] <- FALSE # "Município"
+
+# block and variables in graphs x-axis
+temp_param_table$x[1] <- FALSE # "Código do município"
+temp_param_table$x[2] <- FALSE # "Ano"
+temp_param_table$x[12] <- FALSE # "Município"
+
+# allow variables in graphs size, color, and slider-axis 
+temp_param_table$size[3] <- TRUE # "Estado"
+temp_param_table$size[4] <- TRUE # "Renda média municipal"
+temp_param_table$size[5] <- TRUE # "Renda mediana municipal"
+
+temp_param_table$color[3] <- TRUE # "Estado"
+temp_param_table$color[4] <- TRUE # "Renda média municipal"
+temp_param_table$color[5] <- TRUE # "Renda mediana municipal"
+
+temp_param_table$slider[2] <- TRUE # "Ano"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/dz_munic_dic.csv", fileEncoding = "UTF-8")
