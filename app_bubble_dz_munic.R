@@ -23,10 +23,10 @@ source(files$server_script)
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
 param <- get_db_param(files$param_file, files$db_file) #carrega lista de variáveis e parâmetros
-param$x_def <- "" #variável padrão do eixo x
-param$y_def <- "" #variável padrão do eixo y
-param$color_def <- "" #variável padrão de cor
-param$size_def <- "" #variável padrão de tamanho
+param$x_def <- "Desmatado" #variável padrão do eixo x
+param$y_def <- "Salario" #variável padrão do eixo y
+param$color_def <- "Estado.x" #variável padrão de cor
+param$size_def <- "IPS" #variável padrão de tamanho
 param$slider_def <- "Ano" #variável padrão do slider
 param$text_def <- "Municipio" #variável padrão de texto
 param$id_def <- "CodIBGE" #variável padrão de id
