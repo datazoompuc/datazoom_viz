@@ -5,10 +5,10 @@ account: datazoom
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4403727
-bundleId: 4837641
+bundleId: 4846783
 url: https://datazoom.shinyapps.io/app_bubble_dz_munic/
-when: 1626785476.34245
-lastSyncTime: 1626785476.34245
+when: 1626983637.36509
+lastSyncTime: 1626983637.36509
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .RData|app_rk_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|data-raw/datazoom_amazonia.R|data-raw/ibge_pnadc.R|data-raw/ibge_pnadc_ranking.R|LICENSE|README.md
+ignoredFiles: .RData|app_rk_ibge_pnadc_cnae.R|app_rk_ibge_pnadc_cod.R|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|data-raw/datazoom_amazonia.R|data-raw/ibge_pnadc.R|data-raw/ibge_pnadc_ranking.R|LICENSE|README.md
