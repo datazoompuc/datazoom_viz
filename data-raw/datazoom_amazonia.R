@@ -151,7 +151,8 @@ prodes <- readRDS(file = "data/prodes.rds")
 deter <- readRDS(file = "data/deter.rds")
 gdp <- readRDS(file = "data/gdp.rds")
 degrad <- readRDS(file = "data/degrad.rds")
-#ips <- readRDS(file = "data/ips.rds")
+ips <- readRDS(file = "data/ips.rds")
+employment <- readRDS(file = "data/employment.rds")
 #seeg <- readRDS(file = "data/seeg.rds")
 
 # edit data to merge
@@ -159,18 +160,28 @@ class(gdp$Ano) <-  'numeric'
 class(gdp$CodIBGE) <-  'character'
 class(income$Ano) <-  'numeric'
 class(deter$CodIBGE) <-  'character'
+class(employment$CodIBGE) <-  'character'
+class(employment$Ano) <-  'numeric'
+class(ips$cod_municipio) <-  'character'
 
 # merge all data
 dz_munic <- income %>%
   full_join(prodes, by = c("CodIBGE","Ano", "Estado"))   %>%
   full_join(deter, by = c("CodIBGE","Ano"))   %>%
   full_join(gdp, by = c("CodIBGE","Ano", "Estado"))   %>%
-  full_join(degrad, by = c("CodIBGE","Ano", "Estado"))
+  full_join(degrad, by = c("CodIBGE","Ano", "Estado")) %>%
+  full_join(employment, by = c("CodIBGE","Ano")) %>% 
+  full_join(ips, by = c("CodIBGE" = "cod_municipio"))
+  
 
 # edit final data
+column(dz_munic)
+class(dz_munic)
+colnames(dz_munic)
+  
 dz_munic <- dz_munic %>% select(CodIBGE,
                                 Ano,
-                                Estado,
+                                Estado.x,
                                 Renda_media,
                                 Renda_mediana,
                                 Ocupados,
@@ -179,13 +190,14 @@ dz_munic <- dz_munic %>% select(CodIBGE,
                                 Firmas,
                                 Desmatado,
                                 Degradacao,
-                                Municipio)
+                                Municipio,
+                                IPS)
 
 # edit data format
 class(dz_munic$CodIBGE)
 dz_munic$CodIBGE <- as.factor(dz_munic$CodIBGE)
-class(dz_munic$Estado)
-dz_munic$Estado <- as.factor(dz_munic$Estado)
+class(dz_munic$Estado.x)
+dz_munic$Estado <- as.factor(dz_munic$Estado.x)
 
 # convert time data to date
 dz_munic$Ano <- as.Date(as.yearqtr(dz_munic$Ano))
@@ -195,8 +207,7 @@ dz_munic$group <- dz_munic$Municipio
 
 # unique rows
 dz_munic <- unique(dz_munic, by = c(Ano, CodIBGE, Estado))
-dz_munic <- dz_munic %>% group_by(CodIBGE) %>%
-  mutate(zzz = mean(is.na(Renda_media)))
+dz_munic <- dz_munic %>% group_by(CodIBGE)
 
 # replace NA with column mean for numeric variables that does not vary with time
 dz_munic <- dz_munic %>% 
@@ -249,6 +260,7 @@ temp_param_table$label[9] <- "Número de firmas"
 temp_param_table$label[10] <- "Área desmatada"
 temp_param_table$label[11] <- "Área degradada"
 temp_param_table$label[12] <- "Município"
+temp_param_table$label[13] <- "Índice de Progresso Social (IPS)"
 
 # label data source
 temp_param_table$var_group[1] <- "Geral"
@@ -263,6 +275,7 @@ temp_param_table$var_group[9] <- "IBGE"
 temp_param_table$var_group[10] <- "INPE - PRODES"
 temp_param_table$var_group[11] <- "INPE - PRODES"
 temp_param_table$var_group[12] <- "Geral"
+temp_param_table$var_group[13] <- "IMAZON"
 
 # label data category
 temp_param_table$categoria[1] <- "Unidade geográfica"
@@ -277,6 +290,7 @@ temp_param_table$categoria[9] <- "Economia"
 temp_param_table$categoria[10] <- "Meio ambiente"
 temp_param_table$categoria[11] <- "Meio ambiente"
 temp_param_table$categoria[12] <- "Unidade geográfica"
+temp_param_table$categoria[13] <- "Social"
 
 
 # label data subcategory
@@ -292,6 +306,7 @@ temp_param_table$subcategoria[9] <- "Mercado de trabalho"
 temp_param_table$subcategoria[10] <- "Desmatamento"
 temp_param_table$subcategoria[11] <- "Degradação"
 temp_param_table$subcategoria[12] <- "Município"
+temp_param_table$subcategoria[13] <- "Desenvolvimento"
 
 # block variables in graphs y-axis
 temp_param_table$y[1] <- FALSE # "Código do município"
@@ -305,13 +320,14 @@ temp_param_table$x[2] <- FALSE # "Ano"
 temp_param_table$x[12] <- FALSE # "Município"
 
 # allow variables in graphs size, color, and slider-axis 
-temp_param_table$size[3] <- TRUE # "Estado"
 temp_param_table$size[4] <- TRUE # "Renda média municipal"
 temp_param_table$size[5] <- TRUE # "Renda mediana municipal"
+temp_param_table$size[13] <- TRUE # "Índice de Progresso Social (IPS)"
 
 temp_param_table$color[3] <- TRUE # "Estado"
 temp_param_table$color[4] <- TRUE # "Renda média municipal"
 temp_param_table$color[5] <- TRUE # "Renda mediana municipal"
+temp_param_table$color[13] <- TRUE # "Índice de Progresso Social (IPS)""
 
 temp_param_table$slider[2] <- TRUE # "Ano"
 
