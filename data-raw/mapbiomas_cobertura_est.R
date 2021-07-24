@@ -24,7 +24,7 @@ data1$group <- data1$level_4
 data1$biome <- NULL
 data1$level_4 <- NULL
 
-colnames(data1) <- c("state", "area", "time", "group")
+colnames(data1) <- c("group", "area", "time", "group")
 
 
 
@@ -39,8 +39,8 @@ data2$group <- data2$level_3
 data2$biome <- NULL
 data2$level_3 <- NULL
 
-colnames(data2) <- c("state", "area", "time", "group")
-data2 <- aggregate(area ~ time + group + state, data2, sum)
+colnames(data2) <- c("group", "area", "time", "group")
+data2 <- aggregate(area ~ time + group + group, data2, sum)
 
 
 
@@ -55,8 +55,8 @@ data3$group <- data3$level_2
 data3$biome <- NULL
 data3$level_2 <- NULL
 
-colnames(data3) <- c("state", "area", "time", "group")
-data3 <- aggregate(area ~ time + group + state, data3, sum)
+colnames(data3) <- c("group", "area", "time", "group")
+data3 <- aggregate(area ~ time + group + group, data3, sum)
 
 
 
@@ -71,8 +71,8 @@ data4$group <- data4$level_1
 data4$biome <- NULL
 data4$level_1 <- NULL
 
-colnames(data4) <- c("state", "area", "time", "group")
-data4 <- aggregate(area ~ time + group + state, data4, sum)
+colnames(data4) <- c("group", "area", "time", "group")
+data4 <- aggregate(area ~ time + group + group, data4, sum)
 
 
 
@@ -87,20 +87,20 @@ data5$group <- data5$level_0
 data5$biome <- NULL
 data5$level_0 <- NULL
 
-colnames(data5) <- c("state", "area", "time", "group")
-data5 <- aggregate(area ~ time + group + state, data5, sum)
+colnames(data5) <- c("group", "area", "time", "group")
+data5 <- aggregate(area ~ time + group + group, data5, sum)
 
 
 
 data <- rbind(data1, data2, data3, data4, data5)
-datafinal <- reshape(data, idvar = c("state", "time"), timevar = "group", direction = "wide")
+datafinal <- reshape(data, idvar = c("group", "time"), timevar = "group", direction = "wide")
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
 sublabl <- labl[22:26]
 sublabl <- substr(sublabl, 5, 100)
 labl[22:26] <- sublabl
-colnames(datafinal) <- c("state", "time", labl)
+colnames(datafinal) <- c("group", "time", labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "datazoom_viz/data/mapbiomas_cobertura_est.rds")
 
