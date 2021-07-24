@@ -1,6 +1,17 @@
+############################################################
+#### Generate rds data in the folder ./data/ 
+############################################################
+
+library(datazoom.amazonia)
+library(tidyverse)
+library(tibble)
+library(zoo)
+library(readxl)
+
 dat <- load_mapbiomas_covering(space_aggregation = "state")
 colnames(dat)[colnames(dat) == "Leval_zero"] <- "level_0"
 
+saveRDS(dat, file = "datazoom_viz/data/mapbiomas_cobertura_est.rds")
 
 # Data for level_4
 data1 <- dat
@@ -9,14 +20,11 @@ data1$level_1 <- NULL
 data1$level_2 <- NULL
 data1$level_3 <- NULL
 
-data1$group <- paste(data1$biome, " - ",data1$state, " - ", data1$level_4)
+data1$group <- data1$level_4
 data1$biome <- NULL
-data1$state <- NULL
 data1$level_4 <- NULL
 
-colnames(data1) <- c("area", "year", "group")
-
-################################################################################################################
+colnames(data1) <- c("state", "area", "time", "group")
 
 
 
@@ -27,15 +35,12 @@ data2$level_1 <- NULL
 data2$level_2 <- NULL
 data2$level_4 <- NULL
 
-data2$group <- paste(data2$biome, " - ",data2$state, " - ", data2$level_3)
+data2$group <- data2$level_3
 data2$biome <- NULL
-data2$state <- NULL
 data2$level_3 <- NULL
 
-colnames(data2) <- c("area", "year", "group")
-data2 <- aggregate(area ~ year + group, data2, sum)
-
-################################################################################################################
+colnames(data2) <- c("state", "area", "time", "group")
+data2 <- aggregate(area ~ time + group + state, data2, sum)
 
 
 
@@ -46,15 +51,12 @@ data3$level_1 <- NULL
 data3$level_3 <- NULL
 data3$level_4 <- NULL
 
-data3$group <- paste(data3$biome, " - ",data3$state, " - ", data3$level_2)
+data3$group <- data3$level_2
 data3$biome <- NULL
-data3$state <- NULL
 data3$level_2 <- NULL
 
-colnames(data3) <- c("area", "year", "group")
-data3 <- aggregate(area ~ year + group, data3, sum)
-
-################################################################################################################
+colnames(data3) <- c("state", "area", "time", "group")
+data3 <- aggregate(area ~ time + group + state, data3, sum)
 
 
 
@@ -65,15 +67,12 @@ data4$level_2 <- NULL
 data4$level_3 <- NULL
 data4$level_4 <- NULL
 
-data4$group <- paste(data4$biome, " - ",data4$state, " - ", data4$level_1)
+data4$group <- data4$level_1
 data4$biome <- NULL
-data4$state <- NULL
 data4$level_1 <- NULL
 
-colnames(data4) <- c("area", "year", "group")
-data4 <- aggregate(area ~ year + group, data4, sum)
-
-################################################################################################################
+colnames(data4) <- c("state", "area", "time", "group")
+data4 <- aggregate(area ~ time + group + state, data4, sum)
 
 
 
@@ -84,17 +83,61 @@ data5$level_2 <- NULL
 data5$level_3 <- NULL
 data5$level_4 <- NULL
 
-data5$group <- paste(data5$biome, " - ",data5$state, " - ", data5$level_0)
+data5$group <- data5$level_0
 data5$biome <- NULL
-data5$state <- NULL
 data5$level_0 <- NULL
 
-colnames(data5) <- c("area", "year", "group")
-data5 <- aggregate(area ~ year + group, data5, sum)
-
-################################################################################################################
+colnames(data5) <- c("state", "area", "time", "group")
+data5 <- aggregate(area ~ time + group + state, data5, sum)
 
 
 
 data <- rbind(data1, data2, data3, data4, data5)
-saveRDS(data, "data/cobertura_est.rds")
+datafinal <- reshape(data, idvar = c("state", "time"), timevar = "group", direction = "wide")
+labl <- colnames(datafinal)
+labl <- labl[-c(1,2)]
+labl <- substr(labl, 6, 100)
+sublabl <- labl[22:26]
+sublabl <- substr(sublabl, 5, 100)
+labl[22:26] <- sublabl
+colnames(datafinal) <- c("state", "time", labl)
+datafinal[is.na(datafinal)] <- 0
+saveRDS(datafinal, "datazoom_viz/data/mapbiomas_cobertura_est.rds")
+
+
+
+#####################
+# Build Dictionary 
+#####################
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Mapbiomas",
+  tipo = 1,
+  unidade = "m^2",
+  categoria= "Meio ambiente", 
+  subcategoria = "Uso da terra"
+)
+
+temp_param_table$label[1] <- "UF"
+temp_param_table$label[2] <- "Ano"
+temp_param_table$desc[1] <- "UF"
+temp_param_table$desc[2] <- "Ano"
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 29))
+temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 29))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 29))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 29))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "datazoom_viz/data/mapbiomas_cobertura_est_dic.csv", fileEncoding = "UTF-8")
