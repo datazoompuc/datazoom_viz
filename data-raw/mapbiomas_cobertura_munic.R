@@ -1,4 +1,16 @@
+############################################################
+#### Generate rds data in the folder ./data/ 
+############################################################
+
+library(datazoom.amazonia)
+library(tidyverse)
+library(tibble)
+library(zoo)
+library(readxl)
+
 dat <- load_mapbiomas_covering(space_aggregation = "municipality")
+
+saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
 
 
 # Data for level_4
@@ -9,7 +21,7 @@ data1$level_1 <- NULL
 data1$level_2 <- NULL
 data1$level_3 <- NULL
 
-data1$group <- paste(data1$municipality, " - ",data1$state, " - ", data1$level_4)
+data1$group <- paste(data1$municipality, " - ",data1$state)
 data1$municipality <- NULL
 data1$state <- NULL
 data1$level_4 <- NULL
