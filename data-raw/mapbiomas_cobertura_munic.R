@@ -24,11 +24,8 @@ data1$level_3 <- NULL
 data1$group <- paste(data1$municipality, " - ",data1$state)
 data1$municipality <- NULL
 data1$state <- NULL
-data1$level_4 <- NULL
 
-colnames(data1) <- c("area", "year", "group")
-
-################################################################################################################
+colnames(data1) <- c("group", "area", "time", "municipality")
 
 
 
@@ -40,15 +37,12 @@ data2$level_1 <- NULL
 data2$level_2 <- NULL
 data2$level_4 <- NULL
 
-data2$group <- paste(data2$municipality, " - ",data2$state, " - ", data2$level_3)
+data2$group <- paste(data2$municipality, " - ",data2$state)
 data2$municipality <- NULL
 data2$state <- NULL
-data2$level_3 <- NULL
 
-colnames(data2) <- c("area", "year", "group")
-data2 <- aggregate(area ~ year + group, data2, sum)
-
-################################################################################################################
+colnames(data2) <- c("group", "area", "time", "municipality")
+data2 <- aggregate(area ~ time + group + municipality, data2, sum)
 
 
 
@@ -63,12 +57,9 @@ data3$level_4 <- NULL
 data3$group <- paste(data3$municipality, " - ",data3$state, " - ", data3$level_2)
 data3$municipality <- NULL
 data3$state <- NULL
-data3$level_2 <- NULL
 
-colnames(data3) <- c("area", "year", "group")
-data3 <- aggregate(area ~ year + group, data3, sum)
-
-################################################################################################################
+colnames(data3) <- c("group", "area", "time", "municipality")
+data3 <- aggregate(area ~ time + group + municipality, data3, sum)
 
 
 
@@ -83,12 +74,9 @@ data4$level_4 <- NULL
 data4$group <- paste(data4$municipality, " - ",data4$state, " - ", data4$level_1)
 data4$municipality <- NULL
 data4$state <- NULL
-data4$level_1 <- NULL
 
-colnames(data4) <- c("area", "year", "group")
-data4 <- aggregate(area ~ year + group, data4, sum)
-
-################################################################################################################
+colnames(data4) <- c("group", "area", "time", "municipality")
+data4 <- aggregate(area ~ time + group + municipality, data4, sum)
 
 
 
@@ -103,14 +91,58 @@ data5$level_4 <- NULL
 data5$group <- paste(data5$municipality, " - ",data5$state, " - ", data5$level_0)
 data5$municipality <- NULL
 data5$state <- NULL
-data5$level_0 <- NULL
 
-colnames(data5) <- c("area", "year", "group")
-data5 <- aggregate(area ~ year + group, data5, sum)
-
-################################################################################################################
+colnames(data5) <- c("group", "area", "time", "municipality")
+data5 <- aggregate(area ~ time + group + municipality, data5, sum)
 
 
 
 data <- rbind(data1, data2, data3, data4, data5)
-saveRDS(data, "data/cobertura_munic.rds")
+datafinal <- reshape(data, idvar = c("municipality", "time"), timevar = "group", direction = "wide")
+labl <- colnames(datafinal)
+labl <- labl[-c(1,2)]
+labl <- substr(labl, 6, 100)
+sublabl <- labl[23:27]
+sublabl <- substr(sublabl, 5, 100)
+labl[23:27] <- sublabl
+colnames(datafinal) <- c("group", "time", labl)
+datafinal[is.na(datafinal)] <- 0
+saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
+
+
+
+#####################
+# Build Dictionary 
+#####################
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Mapbiomas",
+  tipo = 1,
+  unidade = "m^2",
+  categoria= "Meio ambiente", 
+  subcategoria = "Uso da terra"
+)
+
+temp_param_table$label[1] <- "Municipio"
+temp_param_table$label[2] <- "Ano"
+temp_param_table$desc[1] <- "Municipio"
+temp_param_table$desc[2] <- "Ano"
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 30))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_dic.csv", fileEncoding = "UTF-8")
