@@ -54,7 +54,7 @@ data3$level_1 <- NULL
 data3$level_3 <- NULL
 data3$level_4 <- NULL
 
-data3$group <- paste(data3$municipality, " - ",data3$state, " - ", data3$level_2)
+data3$group <- paste(data3$municipality, " - ",data3$state)
 data3$municipality <- NULL
 data3$state <- NULL
 
@@ -71,7 +71,7 @@ data4$level_2 <- NULL
 data4$level_3 <- NULL
 data4$level_4 <- NULL
 
-data4$group <- paste(data4$municipality, " - ",data4$state, " - ", data4$level_1)
+data4$group <- paste(data4$municipality, " - ",data4$state)
 data4$municipality <- NULL
 data4$state <- NULL
 
@@ -88,7 +88,7 @@ data5$level_2 <- NULL
 data5$level_3 <- NULL
 data5$level_4 <- NULL
 
-data5$group <- paste(data5$municipality, " - ",data5$state, " - ", data5$level_0)
+data5$group <- paste(data5$municipality, " - ",data5$state)
 data5$municipality <- NULL
 data5$state <- NULL
 
