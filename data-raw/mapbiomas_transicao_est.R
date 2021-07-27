@@ -1,100 +1,82 @@
+############################################################
+#### Generate rds data in the folder ./data/ 
+############################################################
+
+library(datazoom.amazonia)
+library(tidyverse)
+library(tibble)
+library(zoo)
+library(readxl)
+
 dat <- load_mapbiomas_transition(space_aggregation = "state", transition_interval = 5)
-colnames(dat)[colnames(dat) == "Leval_zero"] <- "level_0"
+
+saveRDS(dat, file = "data/mapbiomas_transicao_est_raw.rds")
 
 
 # Data for level_4
 data1 <- dat
-data1$level_0 <- NULL
-data1$level_1 <- NULL
-data1$level_2 <- NULL
-data1$level_3 <- NULL
-
-data1$group <- paste(data1$biome, " - ",data1$state, " - ", data1$level_4)
 data1$biome <- NULL
-data1$state <- NULL
-data1$level_4 <- NULL
+data1$to <- NULL
+data1$to_level_0 <- NULL
+data1$to_level_1 <- NULL
+data1$to_level_2 <- NULL
+data1$to_level_3 <- NULL
+data1$from <- NULL
+data1$from_level_0 <- NULL
+data1$from_level_1 <- NULL
+data1$from_level_2 <- NULL
+data1$from_level_3 <- NULL
 
-colnames(data1) <- c("area", "year", "group")
+data1$group <- paste("From ", data1$from_level_4, " to ",data1$to_level_4)
+data1$to_level_4 <- NULL
+data1$from_level_4 <- NULL
 
-################################################################################################################
-
-
-
-# Data for level_3
-data2 <- dat
-data2$level_0 <- NULL
-data2$level_1 <- NULL
-data2$level_2 <- NULL
-data2$level_4 <- NULL
-
-data2$group <- paste(data2$biome, " - ",data2$state, " - ", data2$level_3)
-data2$biome <- NULL
-data2$state <- NULL
-data2$level_3 <- NULL
-
-colnames(data2) <- c("area", "year", "group")
-data2 <- aggregate(area ~ year + group, data2, sum)
-
-################################################################################################################
+colnames(data1) <- c("state", "area", "time", "group")
 
 
 
-# Data for level_2
-data3 <- dat
-data3$level_0 <- NULL
-data3$level_1 <- NULL
-data3$level_3 <- NULL
-data3$level_4 <- NULL
-
-data3$group <- paste(data3$biome, " - ",data3$state, " - ", data3$level_2)
-data3$biome <- NULL
-data3$state <- NULL
-data3$level_2 <- NULL
-
-colnames(data3) <- c("area", "year", "group")
-data3 <- aggregate(area ~ year + group, data3, sum)
-
-################################################################################################################
+datafinal <- reshape(data1, idvar = c("state", "time"), timevar = "group", direction = "wide")
+labl <- colnames(datafinal)
+labl <- labl[-c(1,2)]
+labl <- substr(labl, 6, 100)
+colnames(datafinal) <- c("group", "time", labl)
+datafinal[is.na(datafinal)] <- 0
+saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
 
 
 
-# Data for level_1
-data4 <- dat
-data4$level_0 <- NULL
-data4$level_2 <- NULL
-data4$level_3 <- NULL
-data4$level_4 <- NULL
+#####################
+# Build Dictionary 
+#####################
 
-data4$group <- paste(data4$biome, " - ",data4$state, " - ", data4$level_1)
-data4$biome <- NULL
-data4$state <- NULL
-data4$level_1 <- NULL
+# extract variables from data
+columns <- colnames(datafinal)
 
-colnames(data4) <- c("area", "year", "group")
-data4 <- aggregate(area ~ year + group, data4, sum)
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Mapbiomas",
+  tipo = 1,
+  unidade = "m^2",
+  categoria= "Meio ambiente", 
+  subcategoria = "Uso da terra"
+)
 
-################################################################################################################
+temp_param_table$label[1] <- "Estado"
+temp_param_table$label[2] <- "Intervalo"
+temp_param_table$desc[1] <- "Estado"
+temp_param_table$desc[2] <- "Intervalo"
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 231))
+temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 231))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 231))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 231))
 
-
-
-# Data for level_0
-data5 <- dat
-data5$level_1 <- NULL
-data5$level_2 <- NULL
-data5$level_3 <- NULL
-data5$level_4 <- NULL
-
-data5$group <- paste(data5$biome, " - ",data5$state, " - ", data5$level_0)
-data5$biome <- NULL
-data5$state <- NULL
-data5$level_0 <- NULL
-
-colnames(data5) <- c("area", "year", "group")
-data5 <- aggregate(area ~ year + group, data5, sum)
-
-################################################################################################################
-
-
-
-data <- rbind(data1, data2, data3, data4, data5)
-saveRDS(data, "data/cobertura_est.rds")
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/mapbiomas_transicao_est_dic.csv", fileEncoding = "UTF-8")
