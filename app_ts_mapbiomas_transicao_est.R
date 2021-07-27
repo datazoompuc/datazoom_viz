@@ -6,14 +6,14 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_mapbiomas_cobertura/ui.R"
-files$server_script <- "scripts/ts_mapbiomas_cobertura/server.R"
-files$param_script <- "scripts/ts_mapbiomas_cobertura/db_params.R"
+files$ui_script <- "scripts/ts_mapbiomas_transicao/ui.R"
+files$server_script <- "scripts/ts_mapbiomas_transicao/server.R"
+files$param_script <- "scripts/ts_mapbiomas_transicao/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
-files$param_file <- "data/mapbiomas_cobertura_dic.csv"
-files$db_file <- "data/mapbiomas_cobertura_est.rds"
+files$param_file <- "data/mapbiomas_transicao_est_dic.csv"
+files$db_file <- "data/mapbiomas_transicao_est.rds"
 
 # Carrega scripts
 source(files$param_script)
