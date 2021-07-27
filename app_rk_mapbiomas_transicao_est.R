@@ -10,8 +10,8 @@ files$ui_script <- "scripts/rk/ui.R"
 files$server_script <- "scripts/rk/server.R"
 files$param_script <- "scripts/rk/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/mapbiomas_cobertura_munic_dic.csv"
-files$db_file <- "data/mapbiomas_cobertura_munic.rds"
+files$param_file <- "data/mapbiomas_transicao_est_dic.csv"
+files$db_file <- "data/mapbiomas_transicao_est.rds"
 
 # Carrega scripts
 source(files$param_script)
