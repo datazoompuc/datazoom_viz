@@ -105,7 +105,7 @@ labl <- substr(labl, 6, 100)
 sublabl <- labl[23:27]
 sublabl <- substr(sublabl, 5, 100)
 labl[23:27] <- sublabl
-colnames(datafinal) <- c("group", "time", labl)
+colnames(datafinal) <- c("time", "group", labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
 

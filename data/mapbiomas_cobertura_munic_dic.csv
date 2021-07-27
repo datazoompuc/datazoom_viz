@@ -1,6 +1,6 @@
 "","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","group",TRUE,FALSE,FALSE,FALSE,FALSE,"Municipio","Municipio","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
-"2","time",TRUE,FALSE,FALSE,FALSE,FALSE,"Ano","Ano","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"1","time",TRUE,FALSE,FALSE,FALSE,FALSE,"Municipio","Municipio","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"2","group",TRUE,FALSE,FALSE,FALSE,FALSE,"Ano","Ano","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "3","Mosaic of Crops",TRUE,TRUE,TRUE,TRUE,TRUE,"Mosaic of Crops","Mosaic of Crops","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "4","Soy Beans",TRUE,TRUE,TRUE,TRUE,TRUE,"Soy Beans","Soy Beans","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "5","Pasture",TRUE,TRUE,TRUE,TRUE,TRUE,"Pasture","Pasture","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
