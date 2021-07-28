@@ -84,3 +84,79 @@ metadata_ppm_livestock_inventory= tibble::tibble(
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
+
+#animal_origin_production
+metadata_ppm_animal_origin_production= tibble::tibble(
+  var = dic_ppm_animal_origin_production$var_code,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = dic_ppm_animal_origin_production$var_pt,
+  source = "IBGE",
+  tipo = 1,
+  unidade = dic_ppm_animal_origin_production$unit_quantity,
+  unidade_valor= dic_ppm_animal_origin_production$unit_value,
+  categoria= "Pecuária", 
+  subcategoria = "Produtos Pecuários"
+) %>%
+  rbind(ano)%>%
+  rbind(geo_id)
+
+#sheep_farming 
+metadata_ppm_sheep_farming= tibble::tibble(
+  var = dic_ppm_sheep_farming$var_code,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = dic_ppm_sheep_farming$var_pt,
+  source = "IBGE",
+  tipo = 1,
+  unidade = dic_ppm_sheep_farming$unit_quantity,
+  unidade_valor= dic_ppm_sheep_farming$unit_value,
+  categoria= "Pecuária", 
+  subcategoria = "Atividade Pecuária"
+) %>%
+  rbind(ano)%>%
+  rbind(geo_id)
+
+#ppm_cow_farming 
+metadata_ppm_cow_farming= tibble::tibble(
+  var = dic_ppm_cow_farming$var_code,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = dic_ppm_cow_farming$var_pt,
+  source = "IBGE",
+  tipo = 1,
+  unidade = dic_ppm_cow_farming$unit_quantity,
+  unidade_valor= dic_ppm_cow_farming$unit_value,
+  categoria= "Pecuária", 
+  subcategoria = "Atividade Pecuária"
+) %>%
+  rbind(ano)%>%
+  rbind(geo_id)
+
+#ppm_aquaculture
+metadata_ppm_aquaculture= tibble::tibble(
+  var = dic_ppm_aquaculture$var_code,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = dic_ppm_aquaculture$var_pt,
+  source = "IBGE",
+  tipo = 1,
+  unidade = dic_ppm_aquaculture$unit_quantity,
+  unidade_valor= dic_ppm_aquaculture$unit_value,
+  categoria= "Pecuária", 
+  subcategoria = "Espécies - Aquicultura"
+) %>%
+  rbind(ano)%>%
+  rbind(geo_id)
