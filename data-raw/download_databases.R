@@ -12,7 +12,10 @@ ppm_state_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', 'st
 ppm_municipality_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
-
+##saving
+saveRDS(ppm_state_livestock_inventory,
+        file = "./data/ppm_state_livestock_inventory.rds"
+)
 
   #sheep_farming 
 
@@ -22,7 +25,10 @@ ppm_state_sheep_farming= load_ppm(dataset = 'ppm_sheep_farming', 'state', 1974:2
 ppm_municipality_sheep_farming= load_ppm(dataset = 'ppm_sheep_farming', 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_sheep_farming= load_dictionary(dataset = 'ppm_sheep_farming')
-
+##saving
+saveRDS(ppm_state_sheep_farming,
+        file = "./data/ppm_state_sheep_farming.rds"
+)
 
   #animal_origin_production 
 
@@ -32,6 +38,10 @@ ppm_state_animal_origin_production= load_ppm(dataset = 'ppm_animal_origin_produc
 ppm_municipality_animal_orig_production= load_ppm(dataset = 'ppm_animal_origin_production', 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')
+##saving
+saveRDS(ppm_state_animal_origin_production,
+        file = "./data/ppm_state_animal_origin_production.rds"
+)
 
   #ppm_cow_farming 
 
@@ -41,6 +51,10 @@ ppm_state_cow_farming= load_ppm(dataset = 'ppm_cow_farming', 'state', 1974:2019,
 ppm_municipality_cow_farming= load_ppm(dataset = 'ppm_cow_farming', 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_cow_farming= load_dictionary(dataset = 'ppm_cow_farming')
+##saving
+saveRDS(ppm_state_cow_farming,
+        file = "./data/ppm_state_cow_farming.rds"
+)
 
   #ppm_aquaculture
 
@@ -50,6 +64,10 @@ ppm_state_aquaculture= load_ppm(dataset = 'ppm_aquaculture', 'state', 1974:2019,
 ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')
+##saving
+saveRDS(ppm_state_aquaculture,
+        file = "./data/ppm_state_aquaculture.rds"
+)
 
 ### Generate data -> IBGE - PEVS
 
