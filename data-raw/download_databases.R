@@ -80,6 +80,9 @@ pevs_municipality_silviculture= load_pevs(dataset = 'pevs_silviculture', 'munici
 ##dictionary
 dic_pevs_silviculture= load_dictionary(dataset = 'pevs_silviculture')
 ##saving
+saveRDS(pevs_state_silviculture,
+        file = "./data/pevs_state_silviculture.rds"
+)
 
   #forest_crops
 
@@ -90,6 +93,9 @@ pevs_municipality_forest_crops= load_pevs(dataset = 'pevs_forest_crops', 'munici
 ##dictionary
 dic_pevs_forest_crops= load_dictionary(dataset = 'pevs_forest_crops')
 ##saving
+saveRDS(pevs_state_forest_crops,
+        file = "./data/pevs_state_forest_crops.rds"
+)
 
   #silviculture_area
 
@@ -100,6 +106,10 @@ pevs_municipality_silviculture_area= load_pevs(dataset = 'pevs_silviculture_area
 ##dictionary
 dic_pevs_silviculture_area= load_dictionary(dataset = 'pevs_silviculture_area')
 ##saving
+saveRDS(pevs_state_silviculture_area,
+        file = "./data/pevs_state_silviculture_area.rds"
+)
+
 
 
 
@@ -114,6 +124,9 @@ pam_municipality_all_crops= load_pam(dataset = 'pam_all_crops', 'municipality', 
 ##dictionary
 dic_pam_all_crops= load_dictionary(dataset= 'pam_all_crops')
 ##saving
+saveRDS(pam_state_all_crops,
+        file = "./data/pam_state_all_crops.rds"
+)
 
   #permanent_crops
 
