@@ -105,7 +105,15 @@ labl <- substr(labl, 6, 100)
 sublabl <- labl[23:27]
 sublabl <- substr(sublabl, 5, 100)
 labl[23:27] <- sublabl
-colnames(datafinal) <- c("time", "group", labl)
+translated_labl <- c("Mosaico de Cultivos", "Soja", "Pastagem", "Infraestrutura Urbana", "Formação de Floresta",
+                     "Pradaria", "Rios, Lagos ou Oceanos", "Não Observado", "Formação de Savana",
+                     "Outras áreas não vegetadas", "Plantação de Floresta", "Mineiração", "Cana-de-açúcar",
+                     "Mangue", "Salar", "Praia e Dunas", "Pântano", "Cultivos perenes",
+                     "Mosaico de Agricultura e Pecuária", "Cultivos temporários", "Agricultura",
+                     "Floresta Natural", "Floresta", "Formação Natural sem ser Floresta",
+                     "Fazenda", "Área não Vegetada", "Água", "Formação Antrópica", "Formação Natural",
+                     "Não Identificado")
+colnames(datafinal) <- c("time", "group", translated_labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
 
@@ -136,9 +144,9 @@ temp_param_table <- tibble(
 )
 
 temp_param_table$label[1] <- "Ano"
-temp_param_table$label[2] <- "MunicÃ­pio"
+temp_param_table$label[2] <- "Município"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$desc[2] <- "MunicÃ­pio"
+temp_param_table$desc[2] <- "Município"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 30))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 30))
 temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 30))
