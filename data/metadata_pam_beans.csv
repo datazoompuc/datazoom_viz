@@ -1,0 +1,7 @@
+"","var","x","y","color","size","slider","label","source","tipo","unidade","unidade_valor","unidade_area","categoria","subcategoria"
+"1","117991","TRUE","TRUE","FALSE","FALSE","FALSE","Feijao em Grao (Primeira Safra)","IBGE","1","Tons","None","Hectares","Agricultura","Espécies - Cultivo "
+"2","117992","TRUE","TRUE","FALSE","FALSE","FALSE","Feijao em Grao (Segunda Safra)","IBGE","1","Tons","None","Hectares","Agricultura","Espécies - Cultivo "
+"3","117993","TRUE","TRUE","FALSE","FALSE","FALSE","Feijao em Grao (Terceira Safra)","IBGE","1","Tons","None","Hectares","Agricultura","Espécies - Cultivo "
+"4","31693","TRUE","TRUE","FALSE","FALSE","FALSE","Feijao em Grao (Total)","IBGE","1","Tons","None","Hectares","Agricultura","Espécies - Cultivo "
+"5","ano","TRUE","TRUE","FALSE","FALSE","FALSE","Ano da Pesquisa","IBGE","1",NA,NA,NA,"Unidade de Tempo","Anual"
+"6","geo_id","TRUE","TRUE","FALSE","FALSE","FALSE","Identificador Geográfico","IBGE","1",NA,NA,NA,"Localização","Identificador Geográfico"

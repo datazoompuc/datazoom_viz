@@ -1,0 +1,6 @@
+"","var","x","y","color","size","slider","label","source","tipo","unidade","unidade_valor","unidade_area","categoria","subcategoria"
+"1","117987","TRUE","TRUE","FALSE","FALSE","FALSE","Amendoim em Casca (Primeira Safra)","IBGE","1","Tons","None","Hectares","Agricultura","Espécies - Cultivo "
+"2","117988","TRUE","TRUE","FALSE","FALSE","FALSE","Amendoim em Casca (Segunda Safra)","IBGE","1","Tons","None","Hectares","Agricultura","Espécies - Cultivo "
+"3","31693","TRUE","TRUE","FALSE","FALSE","FALSE","Amendoim em Casca (Total)","IBGE","1","Tons","None","Hectares","Agricultura","Espécies - Cultivo "
+"4","ano","TRUE","TRUE","FALSE","FALSE","FALSE","Ano da Pesquisa","IBGE","1",NA,NA,NA,"Unidade de Tempo","Anual"
+"5","geo_id","TRUE","TRUE","FALSE","FALSE","FALSE","Identificador Geográfico","IBGE","1",NA,NA,NA,"Localização","Identificador Geográfico"

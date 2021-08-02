@@ -16,6 +16,9 @@ dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory'
 saveRDS(ppm_state_livestock_inventory,
         file = "./data/ppm_state_livestock_inventory.rds"
 )
+saveRDS(ppm_municipality_livestock_inventory,
+        file = "./data/ppm_municipality_livestock_inventory.rds"
+)
 
   #sheep_farming 
 
@@ -189,3 +192,15 @@ saveRDS(pam_state_beans,
         file = "./data/pam_state_beans.rds"
 )
 
+### Generate data -> MAPBIOMAS 
+ 
+  #cover
+
+mapbiomas_cover= load_mapbiomas = function(dataset = mapbiomas_cover ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 1)
+  #transition
+  
+  #deforestation_regeneration
+
+  #irrigation
+
+  #grazing_quality
