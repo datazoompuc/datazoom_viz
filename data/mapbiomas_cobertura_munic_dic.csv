@@ -19,7 +19,7 @@
 "18","Praia e Dunas",TRUE,TRUE,FALSE,FALSE,TRUE,"Praia e Dunas","Praia e Dunas","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "19","Pântano",TRUE,TRUE,FALSE,FALSE,TRUE,"Pântano","Pântano","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "20","Cultivos perenes",TRUE,TRUE,FALSE,FALSE,TRUE,"Cultivos perenes","Cultivos perenes","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
-"21","Mosaico de Agricultura e Pecuária",TRUE,TRUE,FALSE,FALSE,TRUE,"Mosaico de Agricultura e Pecuária","Mosaico de Agricultura e Pecuária","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"21","Mosaico de Agricultura e Pastagem",TRUE,TRUE,FALSE,FALSE,TRUE,"Mosaico de Agricultura e Pastagem","Mosaico de Agricultura e Pastagem","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "22","Cultivos temporários",TRUE,TRUE,FALSE,FALSE,TRUE,"Cultivos temporários","Cultivos temporários","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "23","Agricultura",TRUE,TRUE,FALSE,FALSE,TRUE,"Agricultura","Agricultura","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "24","Floresta Natural",TRUE,TRUE,FALSE,FALSE,TRUE,"Floresta Natural","Floresta Natural","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
