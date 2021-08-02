@@ -135,13 +135,14 @@ temp_param_table <- tibble(
   subcategoria = "Uso da terra"
 )
 
-temp_param_table$label[1] <- "Municipio"
-temp_param_table$label[2] <- "Ano"
-temp_param_table$desc[1] <- "Municipio"
-temp_param_table$desc[2] <- "Ano"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$label[2] <- "Município"
+temp_param_table$desc[1] <- "Ano"
+temp_param_table$desc[2] <- "Município"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 30))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 30))
-temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 30))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 30))
+temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 30))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 30))
 
 # save csv in utf-8 encoding
