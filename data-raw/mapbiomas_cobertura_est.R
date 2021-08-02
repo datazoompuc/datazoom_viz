@@ -134,8 +134,9 @@ temp_param_table$label[1] <- "UF"
 temp_param_table$label[2] <- "Ano"
 temp_param_table$desc[1] <- "UF"
 temp_param_table$desc[2] <- "Ano"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 29))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 29))
-temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 29))
+temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 30))
 temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 29))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 29))
 
