@@ -109,7 +109,7 @@ translated_labl <- c("Mosaico de Cultivos", "Soja", "Pastagem", "Infraestrutura 
                      "Pradaria", "Rios, Lagos ou Oceanos", "Não Observado", "Formação de Savana",
                      "Outras áreas não vegetadas", "Plantação de Floresta", "Mineiração", "Cana-de-açúcar",
                      "Mangue", "Salar", "Praia e Dunas", "Pântano", "Cultivos perenes",
-                     "Mosaico de Agricultura e Pecuária", "Cultivos temporários", "Agricultura",
+                     "Mosaico de Agricultura e Pastagem", "Cultivos temporários", "Agricultura",
                      "Floresta Natural", "Floresta", "Formação Natural sem ser Floresta",
                      "Fazenda", "Área não Vegetada", "Água", "Formação Antrópica", "Formação Natural",
                      "Não Identificado")
