@@ -70,12 +70,12 @@ temp_param_table <- tibble(
 )
 
 temp_param_table$label[1] <- "Estado"
-temp_param_table$label[2] <- "Intervalo"
+temp_param_table$label[2] <- "Intervalo de tempo"
 temp_param_table$desc[1] <- "Estado"
-temp_param_table$desc[2] <- "Intervalo"
+temp_param_table$desc[2] <- "Intervalo de tempo"
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 231))
-temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 231))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 231))
+temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 232))
+temp_param_table$size <- c(rep(TRUE, 1), rep(FALSE, 232))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 231))
 
 # save csv in utf-8 encoding

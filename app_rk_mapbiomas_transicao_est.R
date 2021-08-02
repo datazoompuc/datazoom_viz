@@ -30,7 +30,7 @@ param$id_def <- "group" #variável padrão de id
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Tipo de Ocupação"
+param$plot_desc <- "Transição/mudança de cobertura e uso do solo"
 
 # Outros parâmetros e configurações
 
