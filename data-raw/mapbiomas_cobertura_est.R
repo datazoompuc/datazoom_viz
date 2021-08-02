@@ -100,7 +100,15 @@ labl <- substr(labl, 6, 100)
 sublabl <- labl[22:26]
 sublabl <- substr(sublabl, 5, 100)
 labl[22:26] <- sublabl
-colnames(datafinal) <- c("group", "time", labl)
+translated_labl <- c("Pastagem", "Formação de Floresta", "Pradaria", "Não Observado",
+                     "Outras áreas não vegetadas", "Infraestrutura Urbana", "Rios, Lagos ou Oceanos",
+                     "Mosaico de Cultivos", "Soja", "Plantação de Floresta", "Mangue", "Mineiração",
+                     "Cana-de-açúcar", "Formação de Savana", "Salar", "Praia e Dunas",
+                     "Mosaico de Agricultura e Pecuária", "Pântano", "Cultivos temporários",
+                     "Agricultura", "Floresta Natural", "Floresta", "Formação Natural sem ser Floresta",
+                     "Fazenda", "Área não Vegetada", "Água", "Formação Antrópica", "Formação Natural",
+                     "Não Identificado")
+colnames(datafinal) <- c("group", "time", translated_labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
 
