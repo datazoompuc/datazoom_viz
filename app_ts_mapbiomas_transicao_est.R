@@ -32,7 +32,7 @@ param$group <- "group" #variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amazonia"
-param$plot_desc <- "Uso da terra"
+param$plot_desc <- "Transição/mudança de cobertura e uso do solo"
 
 # Outros parâmetros e configurações
 

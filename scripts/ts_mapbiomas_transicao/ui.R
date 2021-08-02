@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
                      # Seleciona filtro de municÃ­pios
                      selectizeInput(
                        'filter1', 
-                       'Municipio - Tipo de uso', 
+                       'Subdivisão geográfica', 
                        choices = NULL,
                        multiple = TRUE, 
                        options = list(maxItems = 20),
