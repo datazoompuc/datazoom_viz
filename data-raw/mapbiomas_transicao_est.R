@@ -27,7 +27,47 @@ data1$from_level_1 <- NULL
 data1$from_level_2 <- NULL
 data1$from_level_3 <- NULL
 
-data1$group <- paste("From ", data1$from_level_4, " to ",data1$to_level_4)
+# Translation
+data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "Não Observado"
+data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "Formação de Floresta"
+data1$from_level_4[data1$from_level_4 == "Grassland"] <- "Pradaria"
+data1$from_level_4[data1$from_level_4 == "Pasture"] <- "Pastagem"
+data1$from_level_4[data1$from_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
+data1$from_level_4[data1$from_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
+data1$from_level_4[data1$from_level_4 == "Other Non Vegetated Area"] <- "Outras áreas não vegetadas"
+data1$from_level_4[data1$from_level_4 == "Magrove"] <- "Mangue"
+data1$from_level_4[data1$from_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
+data1$from_level_4[data1$from_level_4 == "Mining"] <- "Mineiração"
+data1$from_level_4[data1$from_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
+data1$from_level_4[data1$from_level_4 == "Soy Beans"] <- "Soja"
+data1$from_level_4[data1$from_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
+data1$from_level_4[data1$from_level_4 == "Savanna Formation"] <- "Formação de Savana"
+data1$from_level_4[data1$from_level_4 == "Beach and Dune"] <- "Praia e Dunas"
+data1$from_level_4[data1$from_level_4 == "Salt flat"] <- "Salar"
+data1$from_level_4[data1$from_level_4 == "Wetland"] <- "Pântano"
+data1$from_level_4[data1$from_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
+data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "Não Observado"
+data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "Formação de Floresta"
+data1$to_level_4[data1$to_level_4 == "Grassland"] <- "Pradaria"
+data1$to_level_4[data1$to_level_4 == "Pasture"] <- "Pastagem"
+data1$to_level_4[data1$to_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
+data1$to_level_4[data1$to_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
+data1$to_level_4[data1$to_level_4 == "Other Non Vegetated Area"] <- "Outras áreas não vegetadas"
+data1$to_level_4[data1$to_level_4 == "Magrove"] <- "Mangue"
+data1$to_level_4[data1$to_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
+data1$to_level_4[data1$to_level_4 == "Mining"] <- "Mineiração"
+data1$to_level_4[data1$to_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
+data1$to_level_4[data1$to_level_4 == "Soy Beans"] <- "Soja"
+data1$to_level_4[data1$to_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
+data1$to_level_4[data1$to_level_4 == "Savanna Formation"] <- "Formação de Savana"
+data1$to_level_4[data1$to_level_4 == "Beach and Dune"] <- "Praia e Dunas"
+data1$to_level_4[data1$to_level_4 == "Salt flat"] <- "Salar"
+data1$to_level_4[data1$to_level_4 == "Wetland"] <- "Pântano"
+data1$to_level_4[data1$to_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
+
+
+
+data1$group <- paste("De ", data1$from_level_4, " para ",data1$to_level_4)
 data1$to_level_4 <- NULL
 data1$from_level_4 <- NULL
 
@@ -70,12 +110,12 @@ temp_param_table <- tibble(
 )
 
 temp_param_table$label[1] <- "Estado"
-temp_param_table$label[2] <- "Intervalo"
+temp_param_table$label[2] <- "Intervalo de tempo"
 temp_param_table$desc[1] <- "Estado"
-temp_param_table$desc[2] <- "Intervalo"
+temp_param_table$desc[2] <- "Intervalo de tempo"
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 231))
-temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 231))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 231))
+temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 232))
+temp_param_table$size <- c(rep(TRUE, 1), rep(FALSE, 232))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 231))
 
 # save csv in utf-8 encoding
