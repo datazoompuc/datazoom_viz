@@ -8,9 +8,9 @@ library(tibble)
 library(zoo)
 library(readxl)
 
-dat <- load_mapbiomas_transition(space_aggregation = "municipality", transition_interval = 5)
+dat <- load_sigmine(space_aggregation = "municipality", language = "pt")
 
-saveRDS(dat, file = "data/mapbiomas_transicao_munic_raw.rds")
+saveRDS(dat, file = "data/sigmine_munic_raw.rds")
 
 
 # Data for level_4
