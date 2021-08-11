@@ -11,31 +11,25 @@ library(readxl)
 dat <- load_sigmine(space_aggregation = "municipality", language = "pt")
 
 saveRDS(dat, file = "data/sigmine_munic_raw.rds")
+dat <- readRDS(file = "data/sigmine_munic_raw.rds")
 
 
-# Data for level_4
-data1 <- dat
-data1$biome <- NULL
-data1$to <- NULL
-data1$to_level_0 <- NULL
-data1$to_level_1 <- NULL
-data1$to_level_2 <- NULL
-data1$to_level_3 <- NULL
-data1$from <- NULL
-data1$from_level_0 <- NULL
-data1$from_level_1 <- NULL
-data1$from_level_2 <- NULL
-data1$from_level_3 <- NULL
+data <- dat
+data$id <- NULL
+data$processo <- NULL
+data$fase <- NULL
+data$empresa <- NULL
+data$uso <- NULL
+data$DSProcesso <- NULL
+data$code_muni <- NULL
 
-data1$group <- paste("From ", data1$from_level_4, " to ",data1$to_level_4)
-data1$to_level_4 <- NULL
-data1$from_level_4 <- NULL
+data$group <- paste(data$municipio, "-",data$estado)
+data$municipio <- NULL
+data$estado <- NULL
 
-colnames(data1) <- c("state", "area", "time", "group")
+colnames(data) <- c("time", "mineral", "area", "group")
 
-
-
-datafinal <- reshape(data1, idvar = c("state", "time"), timevar = "group", direction = "wide")
+datafinal <- reshape(data, idvar = c("group", "time"), timevar = "mineral", direction = "wide")
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
