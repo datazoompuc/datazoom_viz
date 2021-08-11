@@ -29,13 +29,17 @@ data$estado <- NULL
 
 colnames(data) <- c("time", "mineral", "area", "group")
 
+data <- aggregate(area ~ time + mineral + group, data, sum)
+
 datafinal <- reshape(data, idvar = c("group", "time"), timevar = "mineral", direction = "wide")
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
 colnames(datafinal) <- c("group", "time", labl)
 datafinal[is.na(datafinal)] <- 0
-saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
+datafinal$TOTAL <- rowSums(as.data.frame(datafinal[,3:327]))
+
+saveRDS(datafinal, "data/sigmine_munic.rds")
 
 
 
@@ -56,21 +60,21 @@ temp_param_table <- tibble(
   slider = FALSE,
   label = columns,
   desc = columns,
-  var_group = "Mapbiomas",
+  var_group = "Sigmine",
   tipo = 1,
   unidade = "m^2",
-  categoria= "Meio ambiente", 
+  categoria= "Mineração", 
   subcategoria = "Uso da terra"
 )
 
-temp_param_table$label[1] <- "Estado"
-temp_param_table$label[2] <- "Intervalo"
-temp_param_table$desc[1] <- "Estado"
-temp_param_table$desc[2] <- "Intervalo"
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 231))
-temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 231))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 231))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 231))
+temp_param_table$label[1] <- "MUNICÍPIO"
+temp_param_table$label[2] <- "ANO"
+temp_param_table$desc[1] <- "MUNICÍPIO"
+temp_param_table$desc[2] <- "ANO"
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 326))
+temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 326))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 326))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 326))
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/mapbiomas_transicao_est_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/sigmine_munic_dic.csv", fileEncoding = "UTF-8")
