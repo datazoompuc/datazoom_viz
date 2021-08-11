@@ -38,7 +38,7 @@ labl <- substr(labl, 6, 100)
 colnames(datafinal) <- c("time", "group", labl)
 datafinal[is.na(datafinal)] <- 0
 datafinal$TOTAL <- rowSums(as.data.frame(datafinal[,3:327]))
-
+datafinal <- datafinal[order(datafinal$group, datafinal$time),]
 saveRDS(datafinal, "data/sigmine_munic.rds")
 
 
