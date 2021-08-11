@@ -1,6 +1,6 @@
 "","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","group",TRUE,FALSE,FALSE,FALSE,FALSE,"MUNICÍPIO","MUNICÍPIO","Sigmine",1,"m^2","Mineração","Uso da terra"
-"2","time",TRUE,FALSE,FALSE,FALSE,FALSE,"ANO","ANO","Sigmine",1,"m^2","Mineração","Uso da terra"
+"1","time",TRUE,FALSE,FALSE,FALSE,FALSE,"ANO","time","Sigmine",1,"m^2","Mineração","Uso da terra"
+"2","group",TRUE,FALSE,FALSE,FALSE,FALSE,"MUNICÍPIO","ANO","Sigmine",1,"m^2","Mineração","Uso da terra"
 "3","AREIA",TRUE,TRUE,TRUE,TRUE,TRUE,"AREIA","AREIA","Sigmine",1,"m^2","Mineração","Uso da terra"
 "4","ARGILA",TRUE,TRUE,TRUE,TRUE,TRUE,"ARGILA","ARGILA","Sigmine",1,"m^2","Mineração","Uso da terra"
 "5","CASCALHO",TRUE,TRUE,TRUE,TRUE,TRUE,"CASCALHO","CASCALHO","Sigmine",1,"m^2","Mineração","Uso da terra"

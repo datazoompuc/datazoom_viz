@@ -35,7 +35,7 @@ datafinal <- reshape(data, idvar = c("group", "time"), timevar = "mineral", dire
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
-colnames(datafinal) <- c("group", "time", labl)
+colnames(datafinal) <- c("time", "group", labl)
 datafinal[is.na(datafinal)] <- 0
 datafinal$TOTAL <- rowSums(as.data.frame(datafinal[,3:327]))
 
@@ -67,9 +67,9 @@ temp_param_table <- tibble(
   subcategoria = "Uso da terra"
 )
 
-temp_param_table$label[1] <- "MUNICÍPIO"
-temp_param_table$label[2] <- "ANO"
-temp_param_table$desc[1] <- "MUNICÍPIO"
+temp_param_table$label[2] <- "MUNICÍPIO"
+temp_param_table$label[1] <- "ANO"
+temp_param_table$desc[2] <- "MUNICÍPIO"
 temp_param_table$desc[2] <- "ANO"
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 326))
 temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 326))
