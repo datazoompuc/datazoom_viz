@@ -8,7 +8,7 @@ devtools::install_github(datazoompuc/datazoomamazonia)
 
 ##state
 ppm_state_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'state', 1974:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 ppm_municipality_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
@@ -24,7 +24,7 @@ saveRDS(ppm_municipality_livestock_inventory,
 
 ##state
 ppm_state_sheep_farming= load_ppm(dataset = 'ppm_sheep_farming', raw_data = FALSE, 'state', 1974:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 ppm_municipality_sheep_farming= load_ppm(dataset = 'ppm_sheep_farming', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_sheep_farming= load_dictionary(dataset = 'ppm_sheep_farming')
@@ -37,7 +37,7 @@ saveRDS(ppm_state_sheep_farming,
 
 ##state
 ppm_state_animal_origin_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'state', 1974:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 ppm_municipality_animal_orig_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')
@@ -50,7 +50,7 @@ saveRDS(ppm_state_animal_origin_production,
 
 ##state
 ppm_state_cow_farming= load_ppm(dataset = 'ppm_cow_farming', raw_data = FALSE, 'state', 1974:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 ppm_municipality_cow_farming= load_ppm(dataset = 'ppm_cow_farming', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_cow_farming= load_dictionary(dataset = 'ppm_cow_farming')
@@ -63,7 +63,7 @@ saveRDS(ppm_state_cow_farming,
 
 ##state
 ppm_state_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'state', 1974:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')
@@ -78,7 +78,7 @@ saveRDS(ppm_state_aquaculture,
 
 ##state
 pevs_state_silviculture= load_pevs(dataset = 'pevs_silviculture', raw_data = FALSE, 'state', 1986:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 pevs_municipality_silviculture= load_pevs(dataset = 'pevs_silviculture', raw_data = FALSE, 'municipality', 1986:2019, language = "pt")
 ##dictionary
 dic_pevs_silviculture= load_dictionary(dataset = 'pevs_silviculture')
@@ -91,7 +91,7 @@ saveRDS(pevs_state_silviculture,
 
 ##state
 pevs_state_forest_crops= load_pevs(dataset = 'pevs_forest_crops', raw_data = FALSE, 'state', 1986:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 pevs_municipality_forest_crops= load_pevs(dataset = 'pevs_forest_crops', raw_data = FALSE, 'municipality', 1986:2019, language = "pt")
 ##dictionary
 dic_pevs_forest_crops= load_dictionary(dataset = 'pevs_forest_crops')
@@ -104,7 +104,7 @@ saveRDS(pevs_state_forest_crops,
 
 ##state
 pevs_state_silviculture_area= load_pevs(dataset = 'pevs_silviculture_area', raw_data = FALSE, 'state', 1986:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 pevs_municipality_silviculture_area= load_pevs(dataset = 'pevs_silviculture_area', raw_data = FALSE, 'municipality', 1986:2019, language = "pt")
 ##dictionary
 dic_pevs_silviculture_area= load_dictionary(dataset = 'pevs_silviculture_area')
@@ -122,23 +122,88 @@ saveRDS(pevs_state_silviculture_area,
 
 ##state
 pam_state_all_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 pam_municipality_all_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_pam_all_crops= load_dictionary(dataset= 'pam_all_crops')
-##saving
-saveRDS(pam_state_all_crops,
-        file = "./data/pam_state_all_crops.rds"
-)
+#making data usable for datazoom viz 
+pam_state_all_crops= readRDS("data\\pam_state_all_crops.rds")
 
+pam_state_all_crops[is.na(pam_state_all_crops)] = 0
+  pam_state_all_crops= dplyr::rename(pam_state_all_crops, time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                            .data$geo_id == '27' ~ 'AL',
+                                            .data$geo_id == '16' ~ 'AP',
+                                            .data$geo_id == '13' ~ 'AM',
+                                            .data$geo_id == '29' ~ 'BA',
+                                            .data$geo_id == '23' ~ 'CE',
+                                            .data$geo_id == '53' ~ 'DF',
+                                            .data$geo_id == '32' ~ 'ES',
+                                            .data$geo_id == '52' ~ 'GO',
+                                            .data$geo_id == '21' ~ 'MA',
+                                            .data$geo_id == '51' ~ 'MT',
+                                            .data$geo_id == '50' ~ 'MS',
+                                            .data$geo_id == '31' ~ 'MG',
+                                            .data$geo_id == '15' ~ 'PA',
+                                            .data$geo_id == '25' ~ 'PB',
+                                            .data$geo_id == '41' ~ 'PR',
+                                            .data$geo_id == '26' ~ 'PE',
+                                            .data$geo_id == '22' ~ 'PI',
+                                            .data$geo_id == '24' ~ 'RN',
+                                            .data$geo_id == '43' ~ 'RS',
+                                            .data$geo_id == '33' ~ 'RJ',
+                                            .data$geo_id == '11' ~ 'RO',
+                                            .data$geo_id == '14' ~ 'RR',
+                                            .data$geo_id == '42' ~ 'SC',
+                                            .data$geo_id == '35' ~ 'SP',
+                                            .data$geo_id == '28' ~ 'SE',
+                                            .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+
+##saving 
+saveRDS(pam_state_all_crops,
+          file = "./data/pam_state_all_crops.rds"
+  )
+  
   #permanent_crops
 
 ##state
-pam_state_permanent_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
-##municipality
+pam_state_permanent_crops= load_pam(dataset = 'pam_permanent_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
+##municipality (ainda nao salvo)
 pam_municipality_permanent_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')
+#making data usable for datazoom viz
+pam_state_permanent_crops= readRDS("data\\pam_state_permanent_crops.rds")
+pam_state_permanent_crops[is.na(pam_state_permanent_crops)] = 0
+pam_state_permanent_crops=pam_state_permanent_crops%>%
+dplyr::rename(time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
 ##saving
 saveRDS(pam_state_permanent_crops,
         file = "./data/pam_state_permanent_crops.rds"
@@ -148,15 +213,47 @@ saveRDS(pam_state_permanent_crops,
 
 ##state
 pam_state_temporary_crops= load_pam(dataset = 'pam_temporary_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
-##municipality
+##municipality (ainda nao salvo)
 pam_municipality_temporary_crops= load_pam(dataset = 'pam_temporary_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_pam_temporary_crops= load_dictionary(dataset= 'pam_temporary_crops')
+##making data usable for datazoom viz
+pam_state_temporary_crops= readRDS("data\\pam_state_temporary_crops.rds")
+pam_state_temporary_crops=pam_state_temporary_crops%>%
+  dplyr::rename(time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+
+pam_state_temporary_crops[is.na(pam_state_temporary_crops)] = 0
 ##saving
 saveRDS(pam_state_temporary_crops,
         file = "./data/pam_state_temporary_crops.rds"
 )
-
 
   #pam_xx (xx= corn, potato, peanut, beans)
 
@@ -166,7 +263,7 @@ pam_state_potato= load_pam(dataset = 'pam_potato', raw_data = FALSE, 'state', 20
 pam_state_peanut= load_pam(dataset = 'pam_peanut', raw_data = FALSE, 'state', 2003:2019, language = "pt")
 pam_state_beans= load_pam(dataset = 'pam_beans', raw_data = FALSE, 'state', 2003:2019, language = "pt")
 
-##municipality
+##municipality (ainda nao salvo)
 pam_municipality_corn= load_pam(dataset = 'pam_corn', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
 pam_municipality_potato= load_pam(dataset = 'pam_potato', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
 pam_municipality_peanut= load_pam(dataset = 'pam_peanut', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
@@ -177,6 +274,125 @@ dic_pam_corn= load_dictionary(dataset= 'pam_corn')
 dic_pam_potato= load_dictionary(dataset= 'pam_potato')
 dic_pam_peanut= load_dictionary(dataset= 'pam_peanut')
 dic_pam_beans= load_dictionary(dataset= 'pam_beans')
+
+pam_state_corn= pam_state_corn%>%
+dplyr::rename(time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+pam_state_corn[is.na(pam_state_corn)] = 0
+
+pam_state_potato= pam_state_potato%>%
+dplyr::rename(time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+pam_state_peanut= pam_state_peanut%>%
+dplyr::rename(time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+pam_state_beans= pam_state_beans%>%
+dplyr::rename(time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
 
 ##saving
 saveRDS(pam_state_corn,
@@ -195,12 +411,56 @@ saveRDS(pam_state_beans,
 ### Generate data -> MAPBIOMAS 
  
   #cover
+mapbiomas_cover_0= load_mapbiomas(dataset = "mapbiomas_cover" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 0)
+mapbiomas_cover_1= load_mapbiomas(dataset = "mapbiomas_cover" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 1)
+mapbiomas_cover_2= load_mapbiomas(dataset = "mapbiomas_cover" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 2)
+mapbiomas_cover_3= load_mapbiomas(dataset = "mapbiomas_cover" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 3)
+mapbiomas_cover_4= load_mapbiomas(dataset = "mapbiomas_cover" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 4)
+#saving
+saveRDS(mapbiomas_cover_0,
+        file = "./data/mapbiomas_cover_0.rds"
+)
+saveRDS(mapbiomas_cover_1,
+        file = "./data/mapbiomas_cover_1.rds"
+)
+saveRDS(mapbiomas_cover_2,
+        file = "./data/mapbiomas_cover_2.rds"
+)
+saveRDS(mapbiomas_cover_3,
+        file = "./data/mapbiomas_cover_3.rds"
+)
+saveRDS(mapbiomas_cover_4,
+        file = "./data/mapbiomas_cover_4.rds"
+)
 
-mapbiomas_cover= load_mapbiomas = function(dataset = mapbiomas_cover ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 1)
   #transition
-  
+mapbiomas_transition= load_mapbiomas(dataset = "mapbiomas_transition" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 0)
+#saving
+saveRDS(mapbiomas_transition,
+        file = "./data/mapbiomas_transition.rds"
+)
+
   #deforestation_regeneration
-
+mapbiomas_deforestation_regeneration= load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 0)
+#saving
+saveRDS(mapbiomas_deforestation_regeneration,
+        file = "./data/mapbiomas_deforestation_regeneration.rds"
+)
   #irrigation
-
+mapbiomas_irrigation= load_mapbiomas(dataset = "mapbiomas_irrigation" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 0)
+#saving
+saveRDS(mapbiomas_irrigation,
+        file = "./data/mapbiomas_irrigation.rds"
+)
   #grazing_quality
+mapbiomas_grazing_quality= load_mapbiomas(dataset = "mapbiomas_grazing_quality" ,raw_data=FALSE,geo_level = 'state',time_period='all',language = 'pt',time_id = 'year',cover_level = 0)
+#saving
+saveRDS(mapbiomas_grazing_quality,
+        file = "./data/mapbiomas_grazing_quality.rds"
+)
+
+### Generate data -> DETER - INPE
+deter_cerrado= load_deter(dataset = 'Cerrado',raw_data=FALSE,geo_level = 'state', time_period='all',language = 'pt',time_id = 'year')
+deter_amazonia= load_deter(dataset = 'amazonia',raw_data=FALSE,geo_level = 'state', time_period='all',language = 'pt',time_id = 'year')
+
+degrad= load_degrad(raw_data = FALSE, language = 'pt')

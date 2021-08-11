@@ -1,9 +1,9 @@
 #creating and saving metadata for all the databases from the datazoom.amazonia R package
 
 ### Creating metadatabase -> IBGE - PEVS
-geo_id= c('geo_id', TRUE, TRUE, FALSE, FALSE, FALSE, 'Identificador Geográfico', 'IBGE', 1, NA, NA, 'Localização', 'Identificador Geográfico')
+geo_id= c('geo_id', TRUE, TRUE, FALSE, FALSE, FALSE, 'Identificador Geogr???fico', 'IBGE', 1, NA, NA, 'Localiza??????o', 'Identificador Geogr???fico')
 ano= c('ano', TRUE, TRUE, FALSE, FALSE, FALSE, 'Ano da Pesquisa', 'IBGE', 1, NA, NA, 'Unidade de Tempo', 'Anual')
-geo_id.= c('geo_id', TRUE, TRUE, FALSE, FALSE, FALSE, 'Identificador Geográfico', 'IBGE', 1, NA, NA, NA, 'Localização', 'Identificador Geográfico')
+geo_id.= c('geo_id', TRUE, TRUE, FALSE, FALSE, FALSE, 'Identificador Geogr???fico', 'IBGE', 1, NA, NA, NA, 'Localiza??????o', 'Identificador Geogr???fico')
 ano.= c('ano', TRUE, TRUE, FALSE, FALSE, FALSE, 'Ano da Pesquisa', 'IBGE', 1, NA, NA, NA, 'Unidade de Tempo', 'Anual')
 
 #silviculture
@@ -21,8 +21,8 @@ metadata_pevs_silviculture= tibble::tibble(
   tipo = 1,
   unidade = dic_pevs_silviculture$unit_quantity,
   unidade_valor= dic_pevs_silviculture$unit_value,
-  categoria= "Agropecuária", 
-  subcategoria = "Espécies - Extrativismo Vegetal"
+  categoria= "Agropecu???ria", 
+  subcategoria = "Esp???cies - Extrativismo Vegetal"
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -44,8 +44,8 @@ metadata_pevs_forest_crops= tibble::tibble(
   tipo = 1,
   unidade = dic_pevs_forest_crops$unit_quantity,
   unidade_valor= dic_pevs_forest_crops$unit_value,
-  categoria= "Agropecuária", 
-  subcategoria = "Espécies - Cultivo Florestal"
+  categoria= "Agropecu???ria", 
+  subcategoria = "Esp???cies - Cultivo Florestal"
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -68,8 +68,8 @@ metadata_pevs_silviculture_area= tibble::tibble(
   tipo = 1,
   unidade = dic_pevs_silviculture_area$unit_quantity,
   unidade_valor= dic_pevs_silviculture_area$unit_value,
-  categoria= "Agropecuária", 
-  subcategoria = "Área de Extrativismo Vegetal"
+  categoria= "Agropecu???ria", 
+  subcategoria = "???rea de Extrativismo Vegetal"
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -94,8 +94,8 @@ metadata_ppm_livestock_inventory= tibble::tibble(
   tipo = 1,
   unidade = dic_ppm_livestock_inventory$unit_quantity,
   unidade_valor= dic_ppm_livestock_inventory$unit_value,
-  categoria= "Pecuária", 
-  subcategoria = "Espécies - Criação"
+  categoria= "Pecu???ria", 
+  subcategoria = "Esp???cies - Cria??????o"
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -118,8 +118,8 @@ metadata_ppm_animal_origin_production= tibble::tibble(
   tipo = 1,
   unidade = dic_ppm_animal_origin_production$unit_quantity,
   unidade_valor= dic_ppm_animal_origin_production$unit_value,
-  categoria= "Pecuária", 
-  subcategoria = "Produtos Pecuários"
+  categoria= "Pecu???ria", 
+  subcategoria = "Produtos Pecu???rios"
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -142,8 +142,8 @@ metadata_ppm_sheep_farming= tibble::tibble(
   tipo = 1,
   unidade = dic_ppm_sheep_farming$unit_quantity,
   unidade_valor= dic_ppm_sheep_farming$unit_value,
-  categoria= "Pecuária", 
-  subcategoria = "Atividade Pecuária"
+  categoria= "Pecu???ria", 
+  subcategoria = "Atividade Pecu???ria"
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -166,8 +166,8 @@ metadata_ppm_cow_farming= tibble::tibble(
   tipo = 1,
   unidade = dic_ppm_cow_farming$unit_quantity,
   unidade_valor= dic_ppm_cow_farming$unit_value,
-  categoria= "Pecuária", 
-  subcategoria = "Atividade Pecuária"
+  categoria= "Pecu???ria", 
+  subcategoria = "Atividade Pecu???ria"
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -190,8 +190,8 @@ metadata_ppm_aquaculture= tibble::tibble(
   tipo = 1,
   unidade = dic_ppm_aquaculture$unit_quantity,
   unidade_valor= dic_ppm_aquaculture$unit_value,
-  categoria= "Pecuária", 
-  subcategoria = "Espécies - Aquicultura"
+  categoria= "Pecu???ria", 
+  subcategoria = "Esp???cies - Aquicultura"
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -202,22 +202,37 @@ write.csv(metadata_ppm_aquaculture, file = "./data/metadata_ppm_aquaculture.csv"
 ### Creating metadatabase -> IBGE - PAM
 
 #pam_all_crops
-dic_pam_all_crops= load_dictionary(dataset= 'pam_all_crops')
+dic_pam_all_crops= load_dictionary(dataset= 'pam_all_crops')%>%
+  arrange(var_code)
+label_all_crops= NULL
+label_all_crops=
+  for(i in 1:1){
+    label_all_crops= c(label_all_crops, rep(dic_pam_all_crops$var_pt[i],5))
+  }
+for(j in 2:67){
+  label_all_crops= c(label_all_crops, rep(dic_pam_all_crops$var_pt[j],5))
+}
+for(k in 68:71){
+  label_all_crops= c(label_all_crops, rep(dic_pam_all_crops$var_pt[k],4))
+}
+for(h in 72:72){
+  label_all_crops= c(label_all_crops, rep(dic_pam_all_crops$var_pt[h],5))
+}
 
+all_crops_var= colnames(pam_state_all_crops)
 metadata_pam_all_crops= tibble::tibble(
-  var = dic_pam_all_crops$var_code,
+  var = all_crops_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_pam_all_crops$var_pt,
+  label = c("Identificador Geografico", "Ano da Pesquisa", "Total", "Total", "Total",label_all_crops),
   source = "IBGE",
   tipo = 1,
-  unidade = dic_pam_all_crops$unit_quantity,
-  unidade_valor= dic_pam_all_crops$unit_value,
-  categoria= "Agricultura", 
-  subcategoria = "Espécies - Cultivo"
+  unidade = c(NA, NA, c('Hectares', 'Hectares', '1K BRL'), rep(c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares','1K BRL'),66), rep(c('Hectares','Tons','Kg/Hectares','1K BRL'),4), c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares','1K BRL')),
+  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",354)), 
+  subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",354))
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -241,7 +256,7 @@ metadata_pam_permanent_crops= tibble::tibble(
   unidade = dic_pam_permanent_crops$unit_quantity,
   unidade_valor= dic_pam_permanent_crops$unit_value,
   categoria= "Agricultura", 
-  subcategoria = "Espécies - Cultivo "
+  subcategoria = "Esp???cies - Cultivo "
 ) %>%
   rbind(ano)%>%
   rbind(geo_id)
@@ -250,122 +265,119 @@ write.csv(metadata_pam_permanent_crops, file = "./data/metadata_pam_permanent_cr
 
 
 #pam_temporary_crops
-dic_pam_temporary_crops= load_dictionary(dataset= 'pam_temporary_crops')
-
+dic_pam_temporary_crops= load_dictionary(dataset= 'pam_temporary_crops')%>%
+  arrange(var_code)
+label_temporary_crops= NULL
+label_temporary_crops=
+for(i in 1:1){
+  label_temporary_crops= c(label_temporary_crops, rep(dic_pam_temporary_crops$var_pt[i],3))  
+}
+for(j in 33:34){
+  label_temporary_crops= c(label_temporary_crops, rep(dic_pam_temporary_crops$var_pt[j],5))
+}
+for(k in 2:30){
+  label_temporary_crops= c(label_temporary_crops, rep(dic_pam_temporary_crops$var_pt[k],5))
+}
+for(h in 31:32){
+  label_temporary_crops= c(label_temporary_crops, rep(dic_pam_temporary_crops$var_pt[h],4))
+}
+temporary_crops_var= colnames(pam_state_temporary_crops)
 metadata_pam_temporary_crops= tibble::tibble(
-  var = dic_pam_temporary_crops$var_code,
+  var = temporary_crops_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_pam_temporary_crops$var_pt,
+  label = c('Identificador Geografico', 'Ano da Pesquisa', 'Total', 'Total', 'Total', label_temporary_crops),
   source = "IBGE",
   tipo = 1,
-  unidade = dic_pam_temporary_crops$unit_quantity,
-  unidade_valor= dic_pam_temporary_crops$unit_value,
-  categoria= "Agricultura", 
-  subcategoria = "Espécies - Cultivo "
-) %>%
-  rbind(ano)%>%
-  rbind(geo_id)
+  unidade = c(NA, NA, 'Hectares', 'Hectares', '1K BRL', rep(c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares', '1K BRL'),31), rep(c('Hectares', 'Tons', 'Kg/Hectares','1K BRL'),2)),
+  categoria= c('Localizacao','Unidade de Tempo',rep("Agricultura",166)), 
+  subcategoria = c('Identificador Geografico','Anual',rep("Especies - Cultivo",166))
+)
 #saving
 write.csv(metadata_pam_temporary_crops, file = "./data/metadata_pam_temporary_crops.csv", fileEncoding = "UTF-8")
 
-
-#pam_beans
 dic_pam_corn= load_dictionary(dataset= 'pam_corn')
 dic_pam_potato= load_dictionary(dataset= 'pam_potato')
 dic_pam_peanut= load_dictionary(dataset= 'pam_peanut')
 dic_pam_beans= load_dictionary(dataset= 'pam_beans')
 
+#pam_beans
+beans_var= colnames(pam_state_beans)
 metadata_pam_beans= tibble::tibble(
-  var = dic_pam_beans$var_code,
+  var = beans_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_pam_beans$var_pt,
+  label = c("Identificador Geografico", "Ano da Pesquisa", rep("Feijao em Grao (Primeira Safra)",4), rep("Feijao em Grao (Segunda Safra)",4), rep("Feijao em Grao (Terceira Safra)",4), rep("Feijao em Grao (Total)",4)),
   source = "IBGE",
   tipo = 1,
-  unidade = dic_pam_beans$unit_quantity,
-  unidade_valor= dic_pam_beans$unit_value,
-  unidade_area= dic_pam_beans$unit_area,
-  categoria= "Agricultura", 
-  subcategoria = "Espécies - Cultivo "
-) %>%
-  rbind(ano.)%>%
-  rbind(geo_id.)
+  unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),4)),
+  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",16)), 
+  subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
+)
 #saving
 write.csv(metadata_pam_beans, file = "./data/metadata_pam_beans.csv", fileEncoding = "UTF-8")
 
-
 #pam_corn
+corn_var= colnames(pam_state_corn)
 metadata_pam_corn= tibble::tibble(
-  var = dic_pam_corn$var_code,
+  var = corn_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_pam_corn$var_pt,
+  label = c("Identificador Geografico", "Ano da Pesquisa", rep("Milho em Grao (Primeira Safra)",4), rep("Milho em Grao (Segunda Safra)",4), rep("Feijao em Grao (Total)",4)),
   source = "IBGE",
   tipo = 1,
-  unidade = dic_pam_corn$unit_quantity,
-  unidade_valor= dic_pam_corn$unit_value,
-  unidade_area= dic_pam_corn$unit_area,
-  categoria= "Agricultura", 
-  subcategoria = "Espécies - Cultivo "
-) %>%
-  rbind(ano.)%>%
-  rbind(geo_id.)
+  unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),3)),
+  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",12)), 
+  subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
+)
 #saving
 write.csv(metadata_pam_corn, file = "./data/metadata_pam_corn.csv", fileEncoding = "UTF-8")
 
 
 #pam_potato
+potato_var= colnames(pam_state_potato)
 metadata_pam_potato= tibble::tibble(
-  var = dic_pam_potato$var_code,
+  var = potato_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_pam_potato$var_pt,
+  label = c("Identificador Geografico", "Ano da Pesquisa", rep("Batata Inglesa (Primeira Safra)",4), rep("Batata Inglesa (Segunda Safra)",4), rep("Batata Inglesa (Terceira Safra)",4), rep("Batata Inglesa (Total)",4)),
   source = "IBGE",
   tipo = 1,
-  unidade = dic_pam_potato$unit_quantity,
-  unidade_valor= dic_pam_potato$unit_value,
-  unidade_area= dic_pam_potato$unit_area,
-  categoria= "Agricultura", 
-  subcategoria = "Espécies - Cultivo "
-) %>%
-  rbind(ano.)%>%
-  rbind(geo_id.)
+  unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),4)),
+  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",16)), 
+  subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
+)
 #saving
 write.csv(metadata_pam_potato, file = "./data/metadata_pam_potato.csv", fileEncoding = "UTF-8")
 
 
 #pam_peanut
+peanut_var= colnames(pam_state_peanut)
 metadata_pam_peanut= tibble::tibble(
-  var = dic_pam_peanut$var_code,
+  var = peanut_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_pam_peanut$var_pt,
+  label = c("Identificador Geografico", "Ano da Pesquisa", rep("Amendoim em Casca (Primeira Safra)",4), rep("Amendoim em Casca (Segunda Safra)",4), rep("Amendoim em Casca (Total)",4)),
   source = "IBGE",
   tipo = 1,
-  unidade = dic_pam_peanut$unit_quantity,
-  unidade_valor= dic_pam_peanut$unit_value,
-  unidade_area= dic_pam_peanut$unit_area,
-  categoria= "Agricultura", 
-  subcategoria = "Espécies - Cultivo "
-) %>%
-  rbind(ano.)%>%
-  rbind(geo_id.)
+  unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),3)),
+  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",12)), 
+  subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
+)
 #saving
 write.csv(metadata_pam_peanut, file = "./data/metadata_pam_peanut.csv", fileEncoding = "UTF-8")
-
