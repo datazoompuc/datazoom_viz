@@ -19,6 +19,8 @@ grouped_list <- function(df) {
   return(grouped_list)
 }
 
+
+
 # Função para retornar parâmetros da base
 get_db_param <-
   function(param_filename = "param.csv", db_filename = "") {
@@ -42,6 +44,7 @@ get_db_param <-
       write.csv(temp_param_table, file = param_filename)
     }
     
+    
     # Carrega arquivo de parâmetros
     param_table <- fread(param_filename, encoding = "UTF-8")
     
@@ -52,7 +55,8 @@ get_db_param <-
       x_cols = param_table[which(param_table$x)],
       y_cols = param_table[which(param_table$y)],
       color_cols = param_table[which(param_table$color)],
-      size_cols = param_table[which(param_table$size)]
+      size_cols = param_table[which(param_table$size)],
+      slider_cols = param_table[which(param_table$slider)]
     )
     
     # Define escolhas agrupadas para cada selectinput
@@ -60,6 +64,7 @@ get_db_param <-
     param$y_choices <- append("",grouped_list(param$y_cols))
     param$color_choices <- append("",grouped_list(param$color_cols))
     param$size_choices <- append("",grouped_list(param$size_cols))
+    param$slider_choices <- append("",grouped_list(param$slider_cols))
     
     # Define coluna padrão para cada dimensão
     param$x_def <- ""

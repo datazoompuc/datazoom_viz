@@ -18,64 +18,23 @@ get_ui <- function(files, param) {
                          # Seleciona variável do eixo x
                          selectInput(
                            inputId = "x",
-                           label = "eixo horizontal (x)",
+                           label = "Seleciona variável (x)",
                            choices = param$x_choices,
                            selected = param$x_def,
                            width = "100%"
                          )
                      ),
-                     # Seleciona eixo log
-                     checkboxInput(
-                       inputId = "xlog",
-                       "escala log",
-                       value = FALSE,
-                       width = "100%"
-                       
-                     ),
                      
                      div(class="var_selec_group",
                          # Seleciona variável do eixo y
                          selectInput(
-                           inputId = "y",
-                           label = "eixo vertical (y)",
-                           choices = param$y_choices,
-                           selected = param$y_def,
+                           inputId = "date",
+                           label = "Data",
+                           choices = param$slider_choices,
+                           selected = param$slider_def,
                            width = "100%"
                          )
                      ),
-                     # Seleciona eixo log
-                     checkboxInput(
-                       inputId = "ylog",
-                       "escala log",
-                       value = FALSE,
-                       width = "100%"
-                       
-                     ),
-                     
-                     div(class="var_selec_group",
-                         # Seleciona variável de cor
-                         selectInput(
-                           inputId = "color",
-                           label = "Cor do marcador:",
-                           choices = param$color_choices,
-                           selected = param$color_def,
-                           width = "100%"
-                         )
-                     ),
-                     #espaço vazio
-                     div(class="fakecheckbox",),
-                     
-                     div(class="var_selec_group",
-                         # Seleciona variável de tamanho
-                         selectInput(
-                           inputId = "size",
-                           label = "Tamanho do marcador:",
-                           choices = param$size_choices,
-                           selected = param$size_def,
-                           width = "100%"
-                         )
-                     ),
-                     
                      
               ),
               column(9, class = "plotcol h-100",
@@ -85,8 +44,8 @@ get_ui <- function(files, param) {
                        class = "plotrow row justify-content-center flex-grow-1 w-100",
                        div(
                          class = "plotdiv w-100 h-100",
-                         # Gráfico
-                         plotlyOutput("plot", width = "100%", height = "100%") #%>% withSpinner()
+                         # Map
+                         leafletOutput("map") #%>% withSpinner()
                        )
                      )
               )
