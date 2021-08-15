@@ -201,7 +201,7 @@ write.csv(metadata_ppm_aquaculture, file = "./data/metadata_ppm_aquaculture.csv"
 
 ### Creating metadatabase -> IBGE - PAM
 
-#pam_all_crops
+#pam_all_crops f
 dic_pam_all_crops= load_dictionary(dataset= 'pam_all_crops')%>%
   arrange(var_code)
 met_all_crops= NULL
@@ -239,7 +239,7 @@ metadata_pam_all_crops= tibble::tibble(
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",354))
 )
 
-#saving
+#saving f
 write.csv(metadata_pam_all_crops, file = "./data/metadata_pam_all_crops.csv", fileEncoding = "UTF-8")
 
 
@@ -265,7 +265,7 @@ metadata_pam_permanent_crops= tibble::tibble(
 write.csv(metadata_pam_permanent_crops, file = "./data/metadata_pam_permanent_crops.csv", fileEncoding = "UTF-8")
 
 
-#pam_temporary_crops
+#pam_temporary_crops f
 dic_pam_temporary_crops= load_dictionary(dataset= 'pam_temporary_crops')%>%
   arrange(var_code)
 met_temporary_crops= NULL
@@ -283,7 +283,7 @@ for(h in 31:32){
   met_temporary_crops= c(met_temporary_crops, rep(dic_pam_temporary_crops$var_pt[h],4))
 }
 met_temporary_crops= c("Identificador Geografico", "Ano da Pesquisa", "Total", "Total", "Total",met_temporary_crops)
-vec_temporary= c(c('Area Colhida ', 'Area Plantada ','Valor '),rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio ','Valor '),31), rep(c('Area Colhida ', 'Quantidade ', 'Rendimento Medio','Valor'),2))
+vec_temporary= c(c('Area Colhida ', 'Area Plantada ','Valor '),rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio ','Valor '),31), rep(c('Area Colhida ', 'Quantidade ', 'Rendimento Medio ','Valor'),2))
 vec_temporary= c('','',vec_temporary)
 label_temporary_crops= paste0(vec_temporary,met_temporary_crops)
 
@@ -302,7 +302,7 @@ metadata_pam_temporary_crops= tibble::tibble(
   categoria= c('Localizacao','Unidade de Tempo',rep("Agricultura",166)), 
   subcategoria = c('Identificador Geografico','Anual',rep("Especies - Cultivo",166))
 )
-#saving
+#saving f
 write.csv(metadata_pam_temporary_crops, file = "./data/metadata_pam_temporary_crops.csv", fileEncoding = "UTF-8")
 
 dic_pam_corn= load_dictionary(dataset= 'pam_corn')
@@ -332,7 +332,7 @@ metadata_pam_beans= tibble::tibble(
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
 )
 
-#saving
+#saving f
 write.csv(metadata_pam_beans, file = "./data/metadata_pam_beans.csv", fileEncoding = "UTF-8")
 
 #pam_corn
@@ -356,7 +356,7 @@ metadata_pam_corn= tibble::tibble(
   categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",12)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
 )
-#saving
+#saving f
 write.csv(metadata_pam_corn, file = "./data/metadata_pam_corn.csv", fileEncoding = "UTF-8")
 
 
@@ -381,7 +381,7 @@ metadata_pam_potato= tibble::tibble(
   categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",16)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
 )
-#saving
+#saving f
 write.csv(metadata_pam_potato, file = "./data/metadata_pam_potato.csv", fileEncoding = "UTF-8")
 
 
@@ -406,5 +406,5 @@ metadata_pam_peanut= tibble::tibble(
   categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",12)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
 )
-#saving
+#saving f
 write.csv(metadata_pam_peanut, file = "./data/metadata_pam_peanut.csv", fileEncoding = "UTF-8")
