@@ -170,6 +170,21 @@ saveRDS(pam_state_all_crops,
 pam_state_permanent_crops= load_pam(dataset = 'pam_permanent_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
 ##municipality (ainda nao salvo)
 pam_municipality_permanent_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+ret3= data.frame()
+for(i in 1987:1997){
+  data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', i, language = "pt")
+  ret3= rbind(ret3,data)
+}
+ret4= data.frame()
+for(j in 1998:2009){
+  data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', j, language = "pt")
+  ret4= rbind(ret4,data)
+}
+ret5= data.frame()
+for(h in 2010:2019){
+  data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', h, language = "pt")
+  ret5= rbind(ret5,data)
+}
 ##dictionary
 dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')
 #making data usable for datazoom viz
@@ -304,7 +319,8 @@ dplyr::rename(time=.data$ano)%>%
                                          .data$geo_id == '35' ~ 'SP',
                                          .data$geo_id == '28' ~ 'SE',
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
-pam_state_corn[is.na(pam_state_corn)] = 0
+#ATT!!!!!, nao consigo converter NA em 0 por causa da classe das colunas
+pam_state_corn[is.na(as.numeric(pam_state_corn$area_colhida_v114253))] = 0
 
 pam_state_potato= pam_state_potato%>%
 dplyr::rename(time=.data$ano)%>%
@@ -407,6 +423,7 @@ saveRDS(pam_state_peanut,
 saveRDS(pam_state_beans,
         file = "./data/pam_state_beans.rds"
 )
+
 
 ### Generate data -> MAPBIOMAS 
  
