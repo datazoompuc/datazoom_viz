@@ -14,30 +14,103 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file)
     
     df_fixed_in_time <- reactive({
-      w <- df %>% filter(Ano == "input$date")
+      w <- df %>% filter(Ano == input$filter1)
       return(w)
     })
+    
+    # Cria opções para seleção de datas
+    param$filter_choices <- sort(unique(df$Ano))
+
+    # Funcão para preencher inputs com coluna/variável aleatória
+    random_inputs <- function( ) {
+      updateSelectInput(session, 
+                        "filter1", 
+                        choices = param$filter_choices, 
+                        selected = sample(param$filter_choices,1) #1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+      )
+      updateSelectInput(session, 
+                        "x", 
+                        choices = param$x_choices, 
+                        selected = sample(param$x_choices,1)
+      )
+    }
+    
+    # Função para atualizar url do app com parâmetros dos inputs
+    update_my_queryString <- function() {
+      q_string <- paste0(
+        "?","x=",input$x,
+        "&","filter=",input$filter1
+        )
+      
+      updateQueryString(q_string, mode = "replace")
+    }
+    
+    # Função para atualizar inputs a partir da URL
+    update_my_inputs <- function() {
+      #Pega parametros da url e atribui aos selectinputs
+      query <- parseQueryString(session$clientData$url_search)
+      
+      # Preenche filtro vazio
+      if (!is.null(query[['x']])) {
+        # se tem x na url atribui valor ao selecinput x
+        updateSelectInput(session, "x",
+                          choices = param$x_choices,
+                          selected = query[['x']])
+      }
+      
+      selected <- unlist(query[names(query) == "filter"], use.names=FALSE)
+      updateSelectizeInput(session, 
+                        "filter1", 
+                        choices = param$filter_choices,
+                        selected = selected
+      )
+      
+      #Pega parametros da url e atribui aos selectinputs
+      query <- parseQueryString(session$clientData$url_search)
+      
+      # Se query está vazia, preenche aleatório
+      if (is.null(query[['filter']]) && is.null(query[['x']]) ) {
+        random_inputs() #preenche inputs se estiverem vazios
+      }
+      
+    }    
     
     # Output título do gráfico
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if(is.null(input$x) || input$x == "" ) {
-        text <- " "
+      if(is.null(input$x) || input$x == "") {
+        text <- " errei aqui "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <-  paste0(x_col$label)
+        text <-  paste0("Variação trimestral de ", x_col$label, "no ano de :")
       }
       
       text
     })
+    output$plot_subtitle <- renderText({
+      # Se algum campo estiver vazio retorna texto vazio
+      if(is.null(input$x) || input$x == "") {
+        text <- " problema aqui"
+      } else {
+        text <-  paste0("por Atividade econômica")
+      }
+      
+      text
+    })    
     
     # Output gráfico
     output$map <- renderLeaflet({
       
+      #random_inputs() #preenche inputs se estiverem vazios
+      update_my_queryString()  #atualiza url com parametros dos inputs
+      
+      fig <- leaflet() %>%
+        addProviderTiles(provider = "Stamen.Watercolor") %>%
+        setView(-58, -7, zoom = 5) #inicia figura com gráfico em branco
+      
       tryCatch({
-        
         # Define paleta de cores
         pal1 <- pallete_continuous
         if(!is.numeric(df$x)){
@@ -51,10 +124,8 @@ get_server <- function(files, param) {
         # Monta html do tooltip
         labels <- paste0("qwer ") %>% 
           lapply(htmltools::HTML)
-        
-        browser()
-        
-        fig_p <- df_fixed_in_time() %>%   
+
+        fig_p <- df_fixed_in_time() %>%  
           st_transform(crs = "+init=epsg:4326") %>%
           leaflet() %>%
           addProviderTiles(provider = "Stamen.Watercolor") %>%
@@ -71,7 +142,7 @@ get_server <- function(files, param) {
                                                           bringToFront = TRUE)) %>%
           addLegend("bottomright", 
                     pal = pal, 
-                    values = ~ x, 
+                    values = ~x, 
                     title = "Desmatado titulo", 
                     opacity = 0.7)
         
@@ -79,14 +150,19 @@ get_server <- function(files, param) {
       },
       error = function(cond) {
         # se encontrar erro retorna fig em branco
-        print("plot error")
-        fig <- plotly_empty()
+        print("plot error 03")
       })
       fig
     })
     
     # Observa eventos
-  }
+    observe({
+      #Pega parametros da url e atribui aos selectinputs
+      query <- parseQueryString(session$clientData$url_search)
+      update_my_inputs()
+    })
+ 
+    }
   
   # Retorna objeto server
   server

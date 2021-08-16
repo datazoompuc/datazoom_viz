@@ -26,15 +26,16 @@ get_ui <- function(files, param) {
                      ),
                      
                      div(class="var_selec_group",
-                         # Seleciona variável do eixo y
-                         selectInput(
-                           inputId = "date",
-                           label = "Data",
-                           choices = param$slider_choices,
-                           selected = param$slider_def,
+                         # Seleciona variável do eixo de data
+                         selectizeInput(
+                           inputId = "filter1",
+                           label = "Ano referente",
+                           choices = NULL,
+                           multiple = FALSE,
                            width = "100%"
                          )
                      ),
+                     
                      
               ),
               column(9, class = "plotcol h-100",
@@ -50,8 +51,6 @@ get_ui <- function(files, param) {
                      )
               )
     ),
-    
-    
-    
+  
   )
 }

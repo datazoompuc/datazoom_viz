@@ -5,8 +5,6 @@ library(leaflet)
 library(sf)
 library(htmlwidgets)
 
-browser()
-
 
 # Define nome de arquivos a serem carregados
 files <- list()
