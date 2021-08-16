@@ -3,13 +3,12 @@
 ############################################################
 
 #### call packages
-library(datazoom.amazonia)
 library(tidyverse)
 library(tibble)
 library(zoo)
-library(geobr)
 library(sf)
-library(tigris) # geojoin
+library(geobr)
+library(fst) # fast, easy and flexible way to serialize data frames
 
 ####################
 # Edit data
@@ -50,14 +49,18 @@ map_dz_munic <- map_dz_munic %>% arrange(CodIBGE, Ano, Estado)
 # edit final data
 class(map_dz_munic)
 colnames(map_dz_munic)
+colnames(shapefile)
 
 # merge data with amazon municipalities shapefile
-map_dz_munic <- tigris::geo_join(shapefile, map_dz_munic, by_sp = 'cod_ibge', by_df = 'CodIBGE', how = 'inner')
+map_dz_munic <- sp::merge(shapefile, map_dz_munic, by.x = 'cod_ibge', by.y = 'CodIBGE')
+
+class(xxx)
 
 # convert time data to date
 map_dz_munic$Ano <- as.Date(as.yearqtr(map_dz_munic$Ano))
 
 # colnames(map_dz_munic)
+colnames(map_dz_munic)
 map_dz_munic <- map_dz_munic %>% select(fid,
                                 nm_municip,
                                 uf,
@@ -79,12 +82,29 @@ map_dz_munic$estado <- as.factor(map_dz_munic$uf)
 map_dz_munic$group <- map_dz_munic$nm_municip
 
 class(map_dz_munic)
+
+
+
+map_dz_munic <- sf::st_simplify(map_dz_munic, dTolerance = 100) #
+class(map_dz_munic)
+
   
 # save data
 saveRDS(map_dz_munic,
         file = "./data/map_dz_munic.rds"
 )
 
+# plot(map_dz_munic)
+
+# save data in fst
+# dat = map_dz_munic %>%
+#   tibble::as_tibble() %>%
+#   janitor::clean_names()
+
+# dat$geometry <- NULL 
+# fst_file <- paste0("./data/xxxmap_dz_munic.fst")
+# write_fst(dat, fst_file)
+# zzz <- read_fst(path = "data/xxxmap_dz_munic.fst")
 ##################################################################
 # Build Dictionary 
 ##################################################################
@@ -156,6 +176,8 @@ temp_param_table$var_group[15] <- "Geral"
 temp_param_table$categoria[1] <- "Unidade geográfica"
 temp_param_table$categoria[2] <- "Unidade de tempo"
 temp_param_table$categoria[3] <- "Unidade geográfica"
+temp_param_table$categoria[3] <- "Unidade geográfica"
+
 
 ##################################################################
 # label data subcategory
@@ -167,22 +189,22 @@ temp_param_table$subcategoria[3] <- "Estado"
 ##################################################################
 # block variables in graphs y-axis
 ##################################################################
-temp_param_table$y[1] <- FALSE # "C?digo do munic?pio"
+temp_param_table$y[1] <- FALSE # "Codigo do município"
 temp_param_table$y[2] <- FALSE # "nm_municip"
 temp_param_table$y[3] <- FALSE # "uf_x"
 temp_param_table$y[4] <- FALSE # 
-temp_param_table$y[9] <- FALSE # "ano"
+temp_param_table$y[9] <- FALSE # "Ano"
 temp_param_table$y[14] <- FALSE # 
 temp_param_table$y[15] <- FALSE # 
 
 ##################################################################
 # block and variables in graphs x-axis
 ##################################################################
-temp_param_table$x[1] <- FALSE # "C?digo do munic?pio"
+temp_param_table$x[1] <- FALSE # "Codigo do municipio"
 temp_param_table$x[2] <- FALSE # "nm_municip"
 temp_param_table$x[3] <- FALSE # "uf_x"
 temp_param_table$x[4] <- FALSE #  
-temp_param_table$y[9] <- FALSE # "ano"
+temp_param_table$y[9] <- FALSE # "Ano"
 temp_param_table$y[14] <- FALSE # 
 temp_param_table$y[15] <- FALSE # 
 
