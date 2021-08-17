@@ -12,13 +12,13 @@ get_ui <- function(files, param) {
                      h2(class="plot_name", param$plot_name),
                      p(class="plot_desc", param$plot_desc),
                      hr(),
-                     p(class="vars", "VARIÁVEIS:"),
+                     p(class="vars", "VARI\u00C1VEIS::"),
                      
                      div(class="var_selec_group",
                          # Seleciona variável do eixo x
                          selectInput(
                            inputId = "x",
-                           label = "Seleciona variável (x)",
+                           label = "Seleciona vari\u00c1vel (x)",
                            choices = param$x_choices,
                            selected = param$x_def,
                            width = "100%"
@@ -46,7 +46,7 @@ get_ui <- function(files, param) {
                        div(
                          class = "plotdiv w-100 h-100",
                          # Map
-                         leafletOutput("map") #%>% withSpinner()
+                         leafletOutput("map", width = "100%", height = "100%") #%>% withSpinner()
                        )
                      )
               )

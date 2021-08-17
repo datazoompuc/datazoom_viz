@@ -14,7 +14,9 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file)
     
     df_reactived <- reactive({
-      w <- df %>% filter(Ano == input$filter1)
+      w <- df %>% 
+      filter(Ano == input$filter1)
+      
       return(w)
     })
 
@@ -28,10 +30,11 @@ get_server <- function(files, param) {
                         choices = param$filter_choices, 
                         selected = sample(param$filter_choices,1) #1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
+      selected <- sample(sample(param$x_choices,1)[[1]],1)
       updateSelectInput(session, 
                         "x", 
                         choices = param$x_choices, 
-                        selected = sample(param$x_choices,1)
+                        selected = selected
       )
     }
     
@@ -84,7 +87,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <-  paste0("Variação trimestral de ", x_col$label, "no ano de :")
+        text <-  paste0("Amazônia Legal: ", x_col$label)
       }
       
       text
@@ -94,7 +97,7 @@ get_server <- function(files, param) {
       if(is.null(input$x) || input$x == "") {
         text <- " problema aqui"
       } else {
-        text <-  paste0("por Atividade econômica")
+        text <-  paste0("Mapa ", input$x )
       }
       
       text
@@ -103,32 +106,30 @@ get_server <- function(files, param) {
     # Output gráfico
     output$map <- renderLeaflet({
       
-      df_fixed_in_time <- df_reactived()
-      
       #random_inputs() #preenche inputs se estiverem vazios
       update_my_queryString()  #atualiza url com parametros dos inputs
       
       fig <- leaflet() %>%
         addProviderTiles(provider = "Stamen.Watercolor") %>%
         setView(-58, -7, zoom = 5) #inicia figura com gráfico em branco
-      
+  
       # Define paleta de cores
       pal1 <- pallete_continuous
-      if(!is.numeric(df$x)){
+      if(!is.numeric(df_reactived()[[input$x]])){
         pal1 <- pallete_discrete
       }
       
-      pal <- colorBin(palette = pal1, 9, domain = df$x)
+      pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
       
       tryCatch({
      
         # Monta mapa
         
         # Monta html do tooltip
-        labels <- paste0("qwer ") %>% 
+        labels <- paste0( "Valor correspondende: ",  df_reactived()[[input$x]] ) %>% 
           lapply(htmltools::HTML)
 
-        fig_p <- df_fixed_in_time %>%  
+        fig_p <- df_reactived() %>%  
           st_transform(crs = "+init=epsg:4326") %>%
           leaflet() %>%
           addProviderTiles(provider = "Stamen.Watercolor") %>%
@@ -137,7 +138,7 @@ get_server <- function(files, param) {
                       stroke = FALSE, 
                       smoothFactor = .5, 
                       fillOpacity = 0.7,
-                      fillColor = ~Pop,
+                      fillColor = ~pal(df_reactived()[[input$x]]),
                       highlightOptions = highlightOptions(weight = 5, 
                                                           fillOpacity = 1, 
                                                           color = "black", 
@@ -145,8 +146,8 @@ get_server <- function(files, param) {
                                                           bringToFront = TRUE)) %>%
           addLegend("bottomright", 
                     pal = pal, 
-                    values = ~Pop, 
-                    title = "Desmatado titulo", 
+                    values = ~df_reactived()[[input$x]], 
+                    title =  "main_title", 
                     opacity = 0.7)
         
         fig <- fig_p # retorna a figura do gráfico
