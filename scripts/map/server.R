@@ -13,11 +13,11 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
     
-    df_fixed_in_time <- reactive({
+    df_reactived <- reactive({
       w <- df %>% filter(Ano == input$filter1)
       return(w)
     })
-    
+
     # Cria opções para seleção de datas
     param$filter_choices <- sort(unique(df$Ano))
 
@@ -103,6 +103,8 @@ get_server <- function(files, param) {
     # Output gráfico
     output$map <- renderLeaflet({
       
+      df_fixed_in_time <- df_reactived()
+      
       #random_inputs() #preenche inputs se estiverem vazios
       update_my_queryString()  #atualiza url com parametros dos inputs
       
@@ -110,22 +112,23 @@ get_server <- function(files, param) {
         addProviderTiles(provider = "Stamen.Watercolor") %>%
         setView(-58, -7, zoom = 5) #inicia figura com gráfico em branco
       
+      # Define paleta de cores
+      pal1 <- pallete_continuous
+      if(!is.numeric(df$x)){
+        pal1 <- pallete_discrete
+      }
+      
+      pal <- colorBin(palette = pal1, 9, domain = df$x)
+      
       tryCatch({
-        # Define paleta de cores
-        pal1 <- pallete_continuous
-        if(!is.numeric(df$x)){
-          pal1 <- pallete_discrete
-        }
-        
+     
         # Monta mapa
-        
-        pal <- colorBin(palette = pal1, 9, domain = df$x)
         
         # Monta html do tooltip
         labels <- paste0("qwer ") %>% 
           lapply(htmltools::HTML)
 
-        fig_p <- df_fixed_in_time() %>%  
+        fig_p <- df_fixed_in_time %>%  
           st_transform(crs = "+init=epsg:4326") %>%
           leaflet() %>%
           addProviderTiles(provider = "Stamen.Watercolor") %>%
@@ -134,7 +137,7 @@ get_server <- function(files, param) {
                       stroke = FALSE, 
                       smoothFactor = .5, 
                       fillOpacity = 0.7,
-                      fillColor = ~pal(df_fixed_in_time()$x),
+                      fillColor = ~Pop,
                       highlightOptions = highlightOptions(weight = 5, 
                                                           fillOpacity = 1, 
                                                           color = "black", 
@@ -142,7 +145,7 @@ get_server <- function(files, param) {
                                                           bringToFront = TRUE)) %>%
           addLegend("bottomright", 
                     pal = pal, 
-                    values = ~x, 
+                    values = ~Pop, 
                     title = "Desmatado titulo", 
                     opacity = 0.7)
         
