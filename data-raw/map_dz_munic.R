@@ -54,8 +54,6 @@ colnames(shapefile)
 # merge data with amazon municipalities shapefile
 map_dz_munic <- sp::merge(shapefile, map_dz_munic, by.x = 'cod_ibge', by.y = 'CodIBGE')
 
-class(xxx)
-
 # convert time data to date
 map_dz_munic$Ano <- as.Date(as.yearqtr(map_dz_munic$Ano))
 

@@ -3,13 +3,11 @@
 ############################################################
 
 #### Generate Data: INPE - PRODES: deforestation
-library(datazoom.amazonia)
 library(tidyverse)
 library(tibble)
 library(zoo)
-library(geobr)
 library(sf)
-library(tigris) # geojoin
+library(sp)
 
 ####################
 # Edit data
@@ -21,6 +19,11 @@ library(tigris) # geojoin
 
 # read shapefile
 shapefile<-st_read('data/shapefiles/municipalities_legal_amazon.shp')
+
+# data too heavy (over 100mb)
+# solution: simplify geometry
+shapefile <- sf::st_simplify(shapefile, dTolerance = 100) 
+
 # plot(shapefile)
 # shapefile$cod_ibge
 
@@ -100,18 +103,25 @@ dz_munic <- dz_munic %>% arrange(CodIBGE, Ano, Estado)
 # edit final data
 class(dz_munic)
 colnames(dz_munic)
+colnames(dz_munic)
 
-# merge data with amazon municipalities shapefile
-dz_munic <- tigris::geo_join(shapefile, dz_munic, by_sp = 'cod_ibge', by_df = 'CodIBGE', how = 'inner')
+# edit data to merge
+class(dz_munic$Ano) <-  'numeric'
 
-dz_munic = dz_munic %>%
-  tibble::as_tibble() %>%
+# clean column names
+dz_munic <- dz_munic %>%
   janitor::clean_names()
 
-# colnames(dz_munic)
-dz_munic <- dz_munic %>% select(cod_ibge,
+# merge data with amazon municipalities shapefile
+map_dz_munic <- sp::merge(shapefile, dz_munic, by.x = 'cod_ibge', by.y = 'cod_ibge')
+
+# convert time data to date
+map_dz_munic$ano <- as.Date(as.yearqtr(map_dz_munic$ano))
+
+# colnames(map_dz_munic)
+dz_munic <- map_dz_munic %>% select(cod_ibge,
                                 nm_municip,
-                                uf_x,
+                                uf.x,
                                 ano,
                                 mean_income,
                                 median_income,
@@ -134,35 +144,30 @@ dz_munic <- dz_munic %>% select(cod_ibge,
                                 ips,
                                 geometry)
 
-dz_munic$estado <- dz_munic$uf_x
+dz_munic$estado <- dz_munic$uf.x
+
 # unique(dz_munic$uf_x)
-dz_munic <- dz_munic %>% dplyr::filter(estado == "AC" | estado == "AP" | estado == "AM" | estado == "PA" | estado == "MA" | estado == "RR" | estado == "RO" | estado == "MT" | estado == "TO") 
+# dz_munic <- dz_munic %>% dplyr::filter(estado == "AC" | estado == "AP" | estado == "AM" | estado == "PA" | estado == "MA" | estado == "RR" | estado == "RO" | estado == "MT" | estado == "TO") 
 class(dz_munic$cod_ibge)
 dz_munic$cod_ibge <- as.factor(dz_munic$cod_ibge)
 dz_munic$estado <- as.factor(dz_munic$estado)
 
-# convert time data to date
-dz_munic$ano <- as.Date(as.yearqtr(dz_munic$ano))
-
 # groups at the level: municipio
-dz_munic$group <- dz_munic$name_munic
+dz_munic$group <- dz_munic$nm_municip
 
 # unique rows
-dz_munic <- unique(dz_munic, by = c(ano, cod_ibge, estado))
-dz_munic <- dz_munic %>% group_by(cod_ibge)
+# dz_munic <- unique(dz_munic, by = c(ano, cod_ibge, estado))
+dz_munic <- dz_munic %>% group_by(cod_ibge, ano)
 
 # replace NA with column mean for numeric variables that does not vary with time
 dz_munic <- dz_munic %>% 
   group_by(cod_ibge) %>% 
   mutate_at(vars(mean_income, median_income, ips),~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))  
 
-#
+# arrange data by municipality and year
 dz_munic <- dz_munic %>%
   arrange(cod_ibge, ano)
 
-
-dz_munic$geometry <- NULL
-  
 # save data
 saveRDS(dz_munic,
         file = "./data/dz_munic.rds"
@@ -172,6 +177,7 @@ saveRDS(dz_munic,
 # Build Dictionary 
 #####################
 
+# call data
 dz_munic <- readRDS("./data/dz_munic.rds")
 
 # extract variables from data
@@ -189,7 +195,6 @@ temp_param_table <- tibble(
   label = columns,
   desc = columns,
   var_group = "Fonte de dados",
-  tipo = 1,
   unidade = "Unidade de medida",
   categoria= "Categoria principal", 
   subcategoria = "Subcategoria"
@@ -219,16 +224,40 @@ temp_param_table$label[20] <- "Salário médio das pessas ocupadas"
 temp_param_table$label[21] <- "Número de pessoas ocupadas"
 temp_param_table$label[22] <- "Número de firmas"
 temp_param_table$label[23] <- "Índice de Progresso Social (IPS)"
-temp_param_table$label[24] <- "Estado"
+temp_param_table$label[24] <- "Geometria"
+temp_param_table$label[25] <- "Estado"
 
+# unidade variables
+temp_param_table$unidade[4] <- "Ano"
+temp_param_table$unidade[5] <- "R$ em 2010"
+temp_param_table$unidade[6] <- "R$ em 2010"
+temp_param_table$unidade[7] <- "Km2"
+temp_param_table$unidade[8] <- "Km2"
+temp_param_table$unidade[9] <- "Km2"
+temp_param_table$unidade[10] <- "Km2"
+temp_param_table$unidade[11] <- "Km2"
+temp_param_table$unidade[12] <- "Km2"
+temp_param_table$unidade[13] <- "Km2"
+temp_param_table$unidade[14] <- "Km2"
+temp_param_table$unidade[15] <- "Km2"
+temp_param_table$unidade[16] <- ""
+temp_param_table$unidade[17] <- "R$"
+temp_param_table$unidade[18] <- "Pessoas"
+temp_param_table$unidade[19] <- "R$"
+temp_param_table$unidade[20] <- "R$"
+temp_param_table$unidade[21] <- "Pessoas"
+temp_param_table$unidade[22] <- "Firmas"
+temp_param_table$unidade[23] <- "Índice de 0 a 1"
+temp_param_table$unidade[24] <- "Geometria"
+temp_param_table$unidade[25] <- "Estado"
 
 # label data source
 temp_param_table$var_group[1] <- "Geral"
 temp_param_table$var_group[2] <- "Geral"
 temp_param_table$var_group[3] <- "Geral"
 temp_param_table$var_group[4] <- "Geral"
-temp_param_table$var_group[5] <- "IBGE"
-temp_param_table$var_group[6] <- "IBGE"
+temp_param_table$var_group[5] <- "IBGE - Censo 2010"
+temp_param_table$var_group[6] <- "IBGE - Censo 2010"
 temp_param_table$var_group[7] <- "INPE - PRODES"
 temp_param_table$var_group[8] <- "INPE - PRODES"
 temp_param_table$var_group[9] <- "INPE - PRODES"
@@ -246,8 +275,8 @@ temp_param_table$var_group[20] <- "IBGE"
 temp_param_table$var_group[21] <- "IBGE"
 temp_param_table$var_group[22] <- "IBGE"
 temp_param_table$var_group[23] <- "IMAZON"
-temp_param_table$var_group[24] <- "Geral"
-
+temp_param_table$var_group[24] <- "Terrabrasilis"
+temp_param_table$var_group[25] <- "Geral"
 
 # label data category
 temp_param_table$categoria[1] <- "Unidade geográfica"
@@ -274,6 +303,7 @@ temp_param_table$categoria[21] <- "Economia"
 temp_param_table$categoria[22] <- "Economia"
 temp_param_table$categoria[23] <- "Social"
 temp_param_table$categoria[24] <- "Unidade geográfica"
+temp_param_table$categoria[25] <- "Unidade geográfica"
 
 # label data subcategory
 temp_param_table$subcategoria[1] <- "Município"
@@ -296,7 +326,8 @@ temp_param_table$y[2] <- FALSE # "nm_municip"
 temp_param_table$y[3] <- FALSE # "uf_x"
 temp_param_table$y[4] <- FALSE # "ano"
 temp_param_table$y[16] <- FALSE # "munic_a_pio"
-temp_param_table$y[24] <- FALSE # "estado"
+temp_param_table$y[24] <- FALSE # "geometry"
+temp_param_table$y[25] <- FALSE # "estado"
 
 
 # block and variables in graphs x-axis
@@ -305,8 +336,8 @@ temp_param_table$x[2] <- FALSE # "nm_municip"
 temp_param_table$x[3] <- FALSE # "uf_x"
 temp_param_table$x[4] <- FALSE # "ano"
 temp_param_table$x[16] <- FALSE # "munic_a_pio"
-temp_param_table$x[24] <- TRUE # "estado"
-
+temp_param_table$x[24] <- FALSE # "geometry"
+temp_param_table$x[25] <- FALSE # "estado"
 
 # allow variables in graphs size, color, and slider-axis 
 temp_param_table$size[5] <- TRUE # "Renda média municipal"
@@ -317,7 +348,7 @@ temp_param_table$size[23] <- TRUE # "Índice de Progresso Social (IPS)"
 temp_param_table$color[5] <- TRUE # "Renda m?dia municipal"
 temp_param_table$color[6] <- TRUE # "Renda mediana municipal"
 temp_param_table$color[23] <- TRUE # "Índice de Progresso Social (IPS)""
-temp_param_table$color[24] <- TRUE # "Estado"
+temp_param_table$color[25] <- TRUE # "Estado"
 
 temp_param_table$slider[4] <- TRUE # "ano"
 
