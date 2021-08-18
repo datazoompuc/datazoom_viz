@@ -15,13 +15,13 @@ get_server <- function(files, param) {
     
     df_reactived <- reactive({
       w <- df %>% 
-      filter(Ano == input$filter1)
+      filter(ano == input$filter1)
       
       return(w)
     })
 
     # Cria opções para seleção de datas
-    param$filter_choices <- sort(unique(df$Ano))
+    param$filter_choices <- sort(unique(df$ano))
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function( ) {
@@ -83,11 +83,11 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if(is.null(input$x) || input$x == "") {
-        text <- " errei aqui "
+        text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <-  paste0("Amazônia Legal: ", x_col$label)
+        text <-  paste0("Mapa dos municípios da Amazônia Legal")
       }
       
       text
@@ -95,9 +95,11 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
       if(is.null(input$x) || input$x == "") {
-        text <- " problema aqui"
+        text <- "Nenhuma variável selecionada"
       } else {
-        text <-  paste0("Mapa ", input$x )
+        # Monta título a partir de variáveis selecionadas nos inputs
+        x_col <- param$table[which(param$table$var == input$x), ]
+        text <-  paste0("Variável selecionada: ", x_col$label )
       }
       
       text
@@ -110,7 +112,7 @@ get_server <- function(files, param) {
       update_my_queryString()  #atualiza url com parametros dos inputs
       
       fig <- leaflet() %>%
-        addProviderTiles(provider = "Stamen.Watercolor") %>%
+        addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
         setView(-58, -7, zoom = 5) #inicia figura com gráfico em branco
   
       # Define paleta de cores
@@ -119,6 +121,7 @@ get_server <- function(files, param) {
         pal1 <- pallete_discrete
       }
       
+      # Determina a paleta para as legendas
       pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
       
       tryCatch({
@@ -126,13 +129,18 @@ get_server <- function(files, param) {
         # Monta mapa
         
         # Monta html do tooltip
-        labels <- paste0( "Valor correspondende: ",  df_reactived()[[input$x]] ) %>% 
+        x_col <- param$table[which(param$table$var == input$x), ]
+        title_legend <- paste0("", x_col$label)
+        labels <- paste0("Nome do município: ", df_reactived()$nm_municip, "<br>", 
+          "Estado: ", df_reactived()$estado, "<br>", 
+          x_col$label,  ": ", df_reactived()[[input$x]], "<br>",
+          "Unidade de medida: ", x_col$unidade  ) %>% 
           lapply(htmltools::HTML)
 
         fig_p <- df_reactived() %>%  
           st_transform(crs = "+init=epsg:4326") %>%
           leaflet() %>%
-          addProviderTiles(provider = "Stamen.Watercolor") %>%
+          addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>% 
           setView(-58, -7, zoom = 5) %>%
           addPolygons(label = labels, 
                       stroke = FALSE, 
@@ -147,14 +155,14 @@ get_server <- function(files, param) {
           addLegend("bottomright", 
                     pal = pal, 
                     values = ~df_reactived()[[input$x]], 
-                    title =  "main_title", 
+                    title =  title_legend, 
                     opacity = 0.7)
         
         fig <- fig_p # retorna a figura do gráfico
       },
       error = function(cond) {
         # se encontrar erro retorna fig em branco
-        print("plot error 03")
+        print("Plot error in tryCatch environment")
       })
       fig
     })
