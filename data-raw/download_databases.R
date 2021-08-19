@@ -320,7 +320,10 @@ dplyr::rename(time=.data$ano)%>%
                                          .data$geo_id == '28' ~ 'SE',
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
 #ATT!!!!!, nao consigo converter NA em 0 por causa da classe das colunas
-pam_state_corn[is.na(as.numeric(pam_state_corn$area_colhida_v114253))] = 0
+#Veja se isso funciona
+pam_state_corn = lapply(pam_state_corn, as.numeric)
+pam_state_corn <- as.data.frame(pam_state_corn)
+pam_state_corn[is.na(pam_state_corn)] <- 0
 
 pam_state_potato= pam_state_potato%>%
 dplyr::rename(time=.data$ano)%>%
