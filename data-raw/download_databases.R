@@ -12,10 +12,41 @@ ppm_state_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw
 ppm_municipality_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
+##making data usable for datazoom viz
+ppm_state_livestock_inventory= dplyr::rename(ppm_state_livestock_inventory, time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+ppm_state_livestock_inventory[is.na(ppm_state_livestock_inventory)] = 0
+
 ##saving
 saveRDS(ppm_state_livestock_inventory,
         file = "./data/ppm_state_livestock_inventory.rds"
-)
+) #f
 saveRDS(ppm_municipality_livestock_inventory,
         file = "./data/ppm_municipality_livestock_inventory.rds"
 )
@@ -28,7 +59,37 @@ ppm_state_sheep_farming= load_ppm(dataset = 'ppm_sheep_farming', raw_data = FALS
 ppm_municipality_sheep_farming= load_ppm(dataset = 'ppm_sheep_farming', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_sheep_farming= load_dictionary(dataset = 'ppm_sheep_farming')
-##saving
+##making data usable for datazoom viz
+ppm_state_sheep_farming= dplyr::rename(ppm_state_sheep_farming, time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+ppm_state_sheep_farming[is.na(ppm_state_sheep_farming)] = 0
+##saving f
 saveRDS(ppm_state_sheep_farming,
         file = "./data/ppm_state_sheep_farming.rds"
 )
@@ -41,7 +102,38 @@ ppm_state_animal_origin_production= load_ppm(dataset = 'ppm_animal_origin_produc
 ppm_municipality_animal_orig_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')
-##saving
+##making data usable for datazoom viz
+ppm_state_animal_origin_production= dplyr::rename(ppm_state_animal_origin_production, time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+ppm_state_animal_origin_production[is.na(ppm_state_animal_origin_production)] = 0
+
+##saving f
 saveRDS(ppm_state_animal_origin_production,
         file = "./data/ppm_state_animal_origin_production.rds"
 )
@@ -54,7 +146,37 @@ ppm_state_cow_farming= load_ppm(dataset = 'ppm_cow_farming', raw_data = FALSE, '
 ppm_municipality_cow_farming= load_ppm(dataset = 'ppm_cow_farming', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_cow_farming= load_dictionary(dataset = 'ppm_cow_farming')
-##saving
+##making data usable for datazoom viz
+ppm_state_cow_farming = dplyr::rename(ppm_state_cow_farming , time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+ppm_state_cow_farming[is.na(ppm_state_cow_farming )] = 0
+##saving f
 saveRDS(ppm_state_cow_farming,
         file = "./data/ppm_state_cow_farming.rds"
 )
@@ -67,7 +189,37 @@ ppm_state_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, '
 ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')
-##saving
+##making data usable for datazoom viz
+ppm_state_aquaculture = dplyr::rename(ppm_state_aquaculture , time=.data$ano)%>%
+  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
+                                         .data$geo_id == '27' ~ 'AL',
+                                         .data$geo_id == '16' ~ 'AP',
+                                         .data$geo_id == '13' ~ 'AM',
+                                         .data$geo_id == '29' ~ 'BA',
+                                         .data$geo_id == '23' ~ 'CE',
+                                         .data$geo_id == '53' ~ 'DF',
+                                         .data$geo_id == '32' ~ 'ES',
+                                         .data$geo_id == '52' ~ 'GO',
+                                         .data$geo_id == '21' ~ 'MA',
+                                         .data$geo_id == '51' ~ 'MT',
+                                         .data$geo_id == '50' ~ 'MS',
+                                         .data$geo_id == '31' ~ 'MG',
+                                         .data$geo_id == '15' ~ 'PA',
+                                         .data$geo_id == '25' ~ 'PB',
+                                         .data$geo_id == '41' ~ 'PR',
+                                         .data$geo_id == '26' ~ 'PE',
+                                         .data$geo_id == '22' ~ 'PI',
+                                         .data$geo_id == '24' ~ 'RN',
+                                         .data$geo_id == '43' ~ 'RS',
+                                         .data$geo_id == '33' ~ 'RJ',
+                                         .data$geo_id == '11' ~ 'RO',
+                                         .data$geo_id == '14' ~ 'RR',
+                                         .data$geo_id == '42' ~ 'SC',
+                                         .data$geo_id == '35' ~ 'SP',
+                                         .data$geo_id == '28' ~ 'SE',
+                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+ppm_state_aquaculture[is.na(ppm_state_aquaculture)] = 0
+##saving f
 saveRDS(ppm_state_aquaculture,
         file = "./data/ppm_state_aquaculture.rds"
 )
@@ -126,9 +278,7 @@ pam_state_all_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'stat
 pam_municipality_all_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##dictionary
 dic_pam_all_crops= load_dictionary(dataset= 'pam_all_crops')
-#making data usable for datazoom viz 
-pam_state_all_crops= readRDS("data\\pam_state_all_crops.rds")
-
+#making data usable for datazoom viz f
 pam_state_all_crops[is.na(pam_state_all_crops)] = 0
   pam_state_all_crops= dplyr::rename(pam_state_all_crops, time=.data$ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
@@ -159,7 +309,7 @@ pam_state_all_crops[is.na(pam_state_all_crops)] = 0
                                             .data$geo_id == '28' ~ 'SE',
                                             .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
 
-##saving 
+##saving f
 saveRDS(pam_state_all_crops,
           file = "./data/pam_state_all_crops.rds"
   )
@@ -170,20 +320,25 @@ saveRDS(pam_state_all_crops,
 pam_state_permanent_crops= load_pam(dataset = 'pam_permanent_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
 ##municipality (ainda nao salvo)
 pam_municipality_permanent_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+ret= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:1983, language = "pt")
+ret2= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1984:1993, language = "pt")
+ret3= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1994:2003, language = "pt")
+ret4= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 2004:2019, language = "pt")
+
 ret3= data.frame()
-for(i in 1987:1997){
+for(i in 1986:1988){
   data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', i, language = "pt")
-  ret3= rbind(ret3,data)
+  ret3= bind_rows(ret3,data)
 }
 ret4= data.frame()
 for(j in 1998:2009){
   data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', j, language = "pt")
-  ret4= rbind(ret4,data)
+  ret4= bind_rows(ret4,data)
 }
 ret5= data.frame()
 for(h in 2010:2019){
   data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', h, language = "pt")
-  ret5= rbind(ret5,data)
+  ret5= bind_rows(ret5,data)
 }
 ##dictionary
 dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')
@@ -424,6 +579,12 @@ saveRDS(pam_state_beans,
         file = "./data/pam_state_beans.rds"
 )
 
+### Generate data -> SEEG
+seeg= load_seeg(dataset = "seeg", raw_data = TRUE,geo_level = "municipality",language = "pt")
+
+### Generate data -> CEMPRE - IBGE
+cempre_all <- load_cempre(dataset = "cempre", raw_data = TRUE, time_period = 2006:2019)
+
 
 ### Generate data -> MAPBIOMAS 
  
@@ -476,8 +637,3 @@ saveRDS(mapbiomas_grazing_quality,
         file = "./data/mapbiomas_grazing_quality.rds"
 )
 
-### Generate data -> DETER - INPE
-deter_cerrado= load_deter(dataset = 'Cerrado',raw_data=FALSE,geo_level = 'state', time_period='all',language = 'pt',time_id = 'year')
-deter_amazonia= load_deter(dataset = 'amazonia',raw_data=FALSE,geo_level = 'state', time_period='all',language = 'pt',time_id = 'year')
-
-degrad= load_degrad(raw_data = FALSE, language = 'pt')

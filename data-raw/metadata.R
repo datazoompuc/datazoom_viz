@@ -1,10 +1,6 @@
 #creating and saving metadata for all the databases from the datazoom.amazonia R package
 
 ### Creating metadatabase -> IBGE - PEVS
-geo_id= c('geo_id', TRUE, TRUE, FALSE, FALSE, FALSE, 'Identificador Geogr???fico', 'IBGE', 1, NA, NA, 'Localiza??????o', 'Identificador Geogr???fico')
-ano= c('ano', TRUE, TRUE, FALSE, FALSE, FALSE, 'Ano da Pesquisa', 'IBGE', 1, NA, NA, 'Unidade de Tempo', 'Anual')
-geo_id.= c('geo_id', TRUE, TRUE, FALSE, FALSE, FALSE, 'Identificador Geogr???fico', 'IBGE', 1, NA, NA, NA, 'Localiza??????o', 'Identificador Geogr???fico')
-ano.= c('ano', TRUE, TRUE, FALSE, FALSE, FALSE, 'Ano da Pesquisa', 'IBGE', 1, NA, NA, NA, 'Unidade de Tempo', 'Anual')
 
 #silviculture
 dic_pevs_silviculture= load_dictionary(dataset = 'pevs_silviculture')
@@ -81,103 +77,102 @@ write.csv(metadata_pevs_silviculture_area, file = "./data/metadata_pevs_silvicul
 
 #livestock_inventory
 dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
-
+aux= c('','', rep('Efetivo dos Rebanhos ',10))
+livestock_var= colnames(ppm_state_livestock_inventory)
+label_livestock= paste0(aux,c("Identificador Geografico", "Ano da Pesquisa", dic_ppm_livestock_inventory$var_pt[1:10]))
 metadata_ppm_livestock_inventory= tibble::tibble(
-  var = dic_ppm_livestock_inventory$var_code,
+  var = livestock_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_ppm_livestock_inventory$var_pt,
+  label = label_livestock,
   source = "IBGE",
   tipo = 1,
-  unidade = dic_ppm_livestock_inventory$unit_quantity,
-  unidade_valor= dic_ppm_livestock_inventory$unit_value,
-  categoria= "Pecu???ria", 
-  subcategoria = "Esp???cies - Cria??????o"
-) %>%
-  rbind(ano)%>%
-  rbind(geo_id)
-#saving
+  unidade = c(NA, NA, rep('Cabecas',10)),
+  categoria= c("Localização","Unidade de Tempo",rep("Pecuaria",10)), 
+  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',rep("Especies - Criacao",10))
+) 
+#saving f
 write.csv(metadata_ppm_livestock_inventory, file = "./data/metadata_ppm_livestock_inventory.csv", fileEncoding = "UTF-8")
 
 
 #animal_origin_production
-dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')
-
+dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')%>%
+  arrange(var_code)
+animal_var= colnames(ppm_state_animal_origin_production)
+vec= NULL
+for(i in 2:7){
+  vec= c(vec, rep(dic_ppm_animal_origin_production$var_pt[i],2))
+} 
+vec= c('','','',vec)
+aux= c("Identificador Geografico", "Ano da Pesquisa", 'Valor Total', rep(c('Quantidade ', 'Valor '),6))
+label_animal= paste0(aux,vec)
 metadata_ppm_animal_origin_production= tibble::tibble(
-  var = dic_ppm_animal_origin_production$var_code,
+  var = animal_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_ppm_animal_origin_production$var_pt,
+  label = label_animal,
   source = "IBGE",
   tipo = 1,
-  unidade = dic_ppm_animal_origin_production$unit_quantity,
-  unidade_valor= dic_ppm_animal_origin_production$unit_value,
-  categoria= "Pecu???ria", 
-  subcategoria = "Produtos Pecu???rios"
-) %>%
-  rbind(ano)%>%
-  rbind(geo_id)
-#saving
+  unidade = c(NA, NA, '1K BRL', '1K Liters', '1K BRL', 'Kg', '1K BRL', 'Kg', '1K BRL', '1K Dozens', '1K BRL', '1K Dozens', '1K BRL', 'Kg', '1K BRL'),
+  categoria= c("Localização","Unidade de Tempo",rep("Pecuaria",13)), 
+  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',rep("Produtos Pecuarios",13))
+)
+#saving f
 write.csv(metadata_ppm_animal_origin_production, file = "./data/metadata_ppm_animal_origin_production.csv", fileEncoding = "UTF-8")
 
 
 #sheep_farming 
 dic_ppm_sheep_farming= load_dictionary(dataset = 'ppm_sheep_farming')
-
+sheep_var= colnames(ppm_state_sheep_farming)
 metadata_ppm_sheep_farming= tibble::tibble(
-  var = dic_ppm_sheep_farming$var_code,
+  var = sheep_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_ppm_sheep_farming$var_pt,
+  label = c("Identificador Geografico", "Ano da Pesquisa",'Ovinos Tosquiados nos Estabelecimentos Agropecuarios'),
   source = "IBGE",
   tipo = 1,
-  unidade = dic_ppm_sheep_farming$unit_quantity,
-  unidade_valor= dic_ppm_sheep_farming$unit_value,
-  categoria= "Pecu???ria", 
-  subcategoria = "Atividade Pecu???ria"
-) %>%
-  rbind(ano)%>%
-  rbind(geo_id)
-#saving
+  unidade = c(NA, NA, 'Cabecas'),
+  categoria= c("Localização","Unidade de Tempo","Pecuaria"), 
+  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',"Atividade Pecuaria")
+) 
+#saving f
 write.csv(metadata_ppm_sheep_farming, file = "./data/metadata_ppm_sheep_farming.csv", fileEncoding = "UTF-8")
 
 
 #ppm_cow_farming 
 dic_ppm_cow_farming= load_dictionary(dataset = 'ppm_cow_farming')
-
+cow_var= colnames(ppm_state_cow_farming)
 metadata_ppm_cow_farming= tibble::tibble(
-  var = dic_ppm_cow_farming$var_code,
+  var = cow_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_ppm_cow_farming$var_pt,
+  label = c("Identificador Geografico", "Ano da Pesquisa",'Vacas Ordenhadas'),
   source = "IBGE",
   tipo = 1,
-  unidade = dic_ppm_cow_farming$unit_quantity,
-  unidade_valor= dic_ppm_cow_farming$unit_value,
-  categoria= "Pecu???ria", 
-  subcategoria = "Atividade Pecu???ria"
-) %>%
-  rbind(ano)%>%
-  rbind(geo_id)
-#saving
+  unidade = c(NA, NA, 'Cabecas'),
+  categoria= c("Localização","Unidade de Tempo","Pecuaria"), 
+  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',"Atividade Pecuaria")
+) 
+
+#saving f
 write.csv(metadata_ppm_cow_farming, file = "./data/metadata_ppm_cow_farming.csv", fileEncoding = "UTF-8")
 
 
 #ppm_aquaculture
 dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')
-
+aqua_var= colnames(ppm_state_aquaculture)
 metadata_ppm_aquaculture= tibble::tibble(
   var = dic_ppm_aquaculture$var_code,
   x = TRUE,
@@ -192,9 +187,7 @@ metadata_ppm_aquaculture= tibble::tibble(
   unidade_valor= dic_ppm_aquaculture$unit_value,
   categoria= "Pecu???ria", 
   subcategoria = "Esp???cies - Aquicultura"
-) %>%
-  rbind(ano)%>%
-  rbind(geo_id)
+)
 #saving
 write.csv(metadata_ppm_aquaculture, file = "./data/metadata_ppm_aquaculture.csv", fileEncoding = "UTF-8")
 
@@ -245,7 +238,7 @@ write.csv(metadata_pam_all_crops, file = "./data/metadata_pam_all_crops.csv", fi
 
 #pam_permanent_crops
 dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')
-
+permanent_crops_var= colnames(pam_state_permanent_crops)
 metadata_pam_permanent_crops= tibble::tibble(
   var = dic_pam_permanent_crops$var_code,
   x = TRUE,
