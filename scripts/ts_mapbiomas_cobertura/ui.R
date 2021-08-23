@@ -3,7 +3,7 @@
 # FuncÃ£o para retornar objeto server
 get_ui <- function(files, param) {
   div( # div geral
-    includeCSS(files$CSS_script), # IncluÃ script CSS
+    includeCSS(files$CSS_script), # Inclui script CSS
     class = "container-fluid h-100 d-flex flex-column apppanel",
     
     fluidRow( class = "mainrow h-100",
@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
                      # Seleciona filtro de municÃ­pios
                      selectizeInput(
                        'filter1', 
-                       'Subdivisão geográfica', 
+                       'SubdivisÃ£o geogrÃ¡fica', 
                        choices = NULL,
                        multiple = TRUE, 
                        options = list(maxItems = 20),

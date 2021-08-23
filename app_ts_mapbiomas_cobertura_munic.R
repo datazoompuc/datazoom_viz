@@ -31,7 +31,7 @@ param$text_def <- "group" #variável padrão de texto (quando mouse em cima)
 param$group <- "group" #variável de agrupamento
 
 
-param$plot_name <- "Data Zoom Amazonia"
+param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil"
 
 # Outros parâmetros e configurações
