@@ -343,8 +343,9 @@ for(h in 2010:2019){
 ##dictionary
 dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')
 #making data usable for datazoom viz
-pam_state_permanent_crops= readRDS("data\\pam_state_permanent_crops.rds")
-pam_state_permanent_crops[is.na(pam_state_permanent_crops)] = 0
+pam_state_permanent_crops = lapply(pam_state_permanent_crops, as.numeric)
+pam_state_permanent_crops <- as.data.frame(pam_state_permanent_crops)
+pam_state_permanent_crops[is.na(pam_state_permanent_crops)] <- 0
 pam_state_permanent_crops=pam_state_permanent_crops%>%
 dplyr::rename(time=.data$ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
@@ -374,7 +375,7 @@ dplyr::rename(time=.data$ano)%>%
                                          .data$geo_id == '35' ~ 'SP',
                                          .data$geo_id == '28' ~ 'SE',
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
-##saving
+##saving f
 saveRDS(pam_state_permanent_crops,
         file = "./data/pam_state_permanent_crops.rds"
 )
@@ -388,7 +389,9 @@ pam_municipality_temporary_crops= load_pam(dataset = 'pam_temporary_crops', raw_
 ##dictionary
 dic_pam_temporary_crops= load_dictionary(dataset= 'pam_temporary_crops')
 ##making data usable for datazoom viz
-pam_state_temporary_crops= readRDS("data\\pam_state_temporary_crops.rds")
+pam_state_temporary_crops = lapply(pam_state_temporary_crops, as.numeric)
+pam_state_temporary_crops <- as.data.frame(pam_state_temporary_crops)
+pam_state_temporary_crops[is.na(pam_state_temporary_crops)] <- 0
 pam_state_temporary_crops=pam_state_temporary_crops%>%
   dplyr::rename(time=.data$ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
@@ -420,7 +423,7 @@ pam_state_temporary_crops=pam_state_temporary_crops%>%
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
 
 pam_state_temporary_crops[is.na(pam_state_temporary_crops)] = 0
-##saving
+##saving f
 saveRDS(pam_state_temporary_crops,
         file = "./data/pam_state_temporary_crops.rds"
 )
@@ -445,6 +448,10 @@ dic_pam_potato= load_dictionary(dataset= 'pam_potato')
 dic_pam_peanut= load_dictionary(dataset= 'pam_peanut')
 dic_pam_beans= load_dictionary(dataset= 'pam_beans')
 
+##making data usable for datazoom viz
+pam_state_corn = lapply(pam_state_corn, as.numeric)
+pam_state_corn <- as.data.frame(pam_state_corn)
+pam_state_corn[is.na(pam_state_corn)] <- 0
 pam_state_corn= pam_state_corn%>%
 dplyr::rename(time=.data$ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
@@ -474,9 +481,11 @@ dplyr::rename(time=.data$ano)%>%
                                          .data$geo_id == '35' ~ 'SP',
                                          .data$geo_id == '28' ~ 'SE',
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
-#ATT!!!!!, nao consigo converter NA em 0 por causa da classe das colunas
-pam_state_corn[is.na(as.numeric(pam_state_corn$area_colhida_v114253))] = 0
 
+
+pam_state_potato = lapply(pam_state_potato, as.numeric)
+pam_state_potato <- as.data.frame(pam_state_potato)
+pam_state_potato[is.na(pam_state_potato)] <- 0
 pam_state_potato= pam_state_potato%>%
 dplyr::rename(time=.data$ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
@@ -506,6 +515,10 @@ dplyr::rename(time=.data$ano)%>%
                                          .data$geo_id == '35' ~ 'SP',
                                          .data$geo_id == '28' ~ 'SE',
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+
+pam_state_peanut = lapply(pam_state_peanut, as.numeric)
+pam_state_peanut <- as.data.frame(pam_state_peanut)
+pam_state_peanut[is.na(pam_state_peanut)] <- 0
 pam_state_peanut= pam_state_peanut%>%
 dplyr::rename(time=.data$ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
@@ -535,6 +548,10 @@ dplyr::rename(time=.data$ano)%>%
                                          .data$geo_id == '35' ~ 'SP',
                                          .data$geo_id == '28' ~ 'SE',
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+
+pam_state_beans = lapply(pam_state_beans, as.numeric)
+pam_state_beans <- as.data.frame(pam_state_beans)
+pam_state_beans[is.na(pam_state_beans)] <- 0
 pam_state_beans= pam_state_beans%>%
 dplyr::rename(time=.data$ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
@@ -565,7 +582,7 @@ dplyr::rename(time=.data$ano)%>%
                                          .data$geo_id == '28' ~ 'SE',
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
 
-##saving
+##saving f
 saveRDS(pam_state_corn,
         file = "./data/pam_state_corn.rds"
 )
@@ -580,12 +597,24 @@ saveRDS(pam_state_beans,
 )
 
 ### Generate data -> SEEG
-seeg= load_seeg(dataset = "seeg", raw_data = TRUE,geo_level = "municipality",language = "pt")
+seeg_municipality= load_seeg(dataset = "seeg", raw_data = TRUE,geo_level = "municipality",language = "pt")
 seeg_state= load_seeg(dataset = "seeg", raw_data = TRUE,geo_level = "state",language = "pt")
+saveRDS(seeg_municipality,
+        file = "./data/seeg_municipality.rds"
+)
+saveRDS(seeg_state,
+        file = "./data/seeg_state.rds"
+)
 
 ### Generate data -> CEMPRE - IBGE
-cempre_all <- load_cempre(dataset = "cempre", raw_data = TRUE, time_period = 2006:2019)
-
+cempre_municipality <- load_cempre(dataset = "cempre", raw_data = TRUE, time_period = 2006:2019)
+cempre_state <- load_cempre(dataset = "cempre", geo_level = 'state', raw_data = TRUE, time_period = 2019)
+saveRDS(cempre_municipality,
+        file = "./data/cempre_municipality.rds"
+)
+saveRDS(cempre_state,
+        file = "./data/cempre_state.rds"
+)
 
 ### Generate data -> MAPBIOMAS 
  
