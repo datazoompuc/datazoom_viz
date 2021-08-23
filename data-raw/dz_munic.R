@@ -22,7 +22,7 @@ shapefile<-st_read('data/shapefiles/municipalities_legal_amazon.shp')
 
 # data too heavy (over 100mb)
 # solution: simplify geometry
-shapefile <- sf::st_simplify(shapefile, dTolerance = 100) 
+shapefile <- sf::st_simplify(shapefile, dTolerance = 400) 
 
 # plot(shapefile)
 # shapefile$cod_ibge
