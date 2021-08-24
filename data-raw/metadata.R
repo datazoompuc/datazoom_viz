@@ -76,6 +76,8 @@ write.csv(metadata_pevs_silviculture_area, file = "./data/metadata_pevs_silvicul
 ### Creating metadatabase -> IBGE - PPM
 
 #livestock_inventory
+ppm_state_livestock_inventory= readRDS('data/ppm_state_livestock_inventory.rds')
+
 dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
 aux= c('','', rep('Efetivo dos Rebanhos ',10))
 livestock_var= colnames(ppm_state_livestock_inventory)
@@ -99,6 +101,9 @@ write.csv(metadata_ppm_livestock_inventory, file = "./data/metadata_ppm_livestoc
 
 
 #animal_origin_production
+ppm_state_animal_origin_production= readRDS('data/ppm_state_animal_origin_production.rds')
+
+
 dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')%>%
   arrange(var_code)
 animal_var= colnames(ppm_state_animal_origin_production)
@@ -128,6 +133,8 @@ write.csv(metadata_ppm_animal_origin_production, file = "./data/metadata_ppm_ani
 
 
 #sheep_farming 
+ppm_state_sheep_farming= readRDS('data/ppm_state_sheep_farming.rds')
+
 dic_ppm_sheep_farming= load_dictionary(dataset = 'ppm_sheep_farming')
 sheep_var= colnames(ppm_state_sheep_farming)
 metadata_ppm_sheep_farming= tibble::tibble(
@@ -149,6 +156,9 @@ write.csv(metadata_ppm_sheep_farming, file = "./data/metadata_ppm_sheep_farming.
 
 
 #ppm_cow_farming 
+ppm_state_cow_farming= readRDS('data/ppm_state_cow_farming.rds')
+
+
 dic_ppm_cow_farming= load_dictionary(dataset = 'ppm_cow_farming')
 cow_var= colnames(ppm_state_cow_farming)
 metadata_ppm_cow_farming= tibble::tibble(
@@ -171,10 +181,13 @@ write.csv(metadata_ppm_cow_farming, file = "./data/metadata_ppm_cow_farming.csv"
 
 
 #ppm_aquaculture
-dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')
+ppm_state_aquacultured= readRDS('data/ppm_state_aquaculture.rds')
+
+dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')%>%
+  dplyr::arrange(var_pt)
 aqua_var= colnames(ppm_state_aquaculture)
 metadata_ppm_aquaculture= tibble::tibble(
-  var = dic_ppm_aquaculture$var_code,
+  var = aqua_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
@@ -185,8 +198,8 @@ metadata_ppm_aquaculture= tibble::tibble(
   tipo = 1,
   unidade = dic_ppm_aquaculture$unit_quantity,
   unidade_valor= dic_ppm_aquaculture$unit_value,
-  categoria= "Pecu???ria", 
-  subcategoria = "Esp???cies - Aquicultura"
+  categoria= c("Localização","Unidade de Tempo" ,rep("Pecuaria",48)), 
+  subcategoria = c("Localização","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
 )
 #saving
 write.csv(metadata_ppm_aquaculture, file = "./data/metadata_ppm_aquaculture.csv", fileEncoding = "UTF-8")
@@ -195,6 +208,9 @@ write.csv(metadata_ppm_aquaculture, file = "./data/metadata_ppm_aquaculture.csv"
 ### Creating metadatabase -> IBGE - PAM
 
 #pam_all_crops f
+pam_state_all_crops= readRDS('data/pam_state_all_crops.rds')
+
+
 dic_pam_all_crops= load_dictionary(dataset= 'pam_all_crops')%>%
   arrange(var_code)
 met_all_crops= NULL
@@ -237,6 +253,9 @@ write.csv(metadata_pam_all_crops, file = "./data/metadata_pam_all_crops.csv", fi
 
 
 #pam_permanent_crops
+pam_state_permanent_crops= readRDS('data/pam_state_permanent_crops.rds')
+
+
 dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')
 permanent_crops_var= colnames(pam_state_permanent_crops)
 metadata_pam_permanent_crops= tibble::tibble(
@@ -259,6 +278,9 @@ write.csv(metadata_pam_permanent_crops, file = "./data/metadata_pam_permanent_cr
 
 
 #pam_temporary_crops f
+pam_state_temporary_crops= readRDS('data/pam_state_temporary_crops.rds')
+
+
 dic_pam_temporary_crops= load_dictionary(dataset= 'pam_temporary_crops')%>%
   arrange(var_code)
 met_temporary_crops= NULL
@@ -304,6 +326,9 @@ dic_pam_peanut= load_dictionary(dataset= 'pam_peanut')
 dic_pam_beans= load_dictionary(dataset= 'pam_beans')
 
 #pam_beans
+pam_state_beans= readRDS('data/pam_state_beans.rds')
+
+
 vec= rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio '),4)
 vec= c('','',vec)
 met_beans= c("Identificador Geografico", "Ano da Pesquisa", rep("Feijao em Grao (Primeira Safra)",4), rep("Feijao em Grao (Segunda Safra)",4), rep("Feijao em Grao (Terceira Safra)",4), rep("Feijao em Grao (Total)",4))
@@ -329,6 +354,9 @@ metadata_pam_beans= tibble::tibble(
 write.csv(metadata_pam_beans, file = "./data/metadata_pam_beans.csv", fileEncoding = "UTF-8")
 
 #pam_corn
+pam_state_corn= readRDS('data/pam_state_corn.rds')
+
+
 vec2= rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio '),3)
 vec2= c('','',vec2)
 met_corn=c("Identificador Geografico", "Ano da Pesquisa", rep("Milho em Grao (Primeira Safra)",4), rep("Milho em Grao (Segunda Safra)",4), rep("Feijao em Grao (Total)",4))
@@ -354,6 +382,9 @@ write.csv(metadata_pam_corn, file = "./data/metadata_pam_corn.csv", fileEncoding
 
 
 #pam_potato
+pam_state_potato= readRDS('data/pam_state_potato.rds')
+
+
 vec= rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio '),4)
 vec= c('','',vec)
 met_potato= c("Identificador Geografico", "Ano da Pesquisa", rep("Batata Inglesa (Primeira Safra)",4), rep("Batata Inglesa (Segunda Safra)",4), rep("Batata Inglesa (Terceira Safra)",4), rep("Batata Inglesa (Total)",4))
@@ -379,6 +410,9 @@ write.csv(metadata_pam_potato, file = "./data/metadata_pam_potato.csv", fileEnco
 
 
 #pam_peanut
+pam_state_peanut= readRDS('data/pam_state_peanut.rds')
+
+
 vec2= rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio '),3)
 vec2= c('','',vec2)
 met_peanut= c("Identificador Geografico", "Ano da Pesquisa", rep("Amendoim em Casca (Primeira Safra)",4), rep("Amendoim em Casca (Segunda Safra)",4), rep("Amendoim em Casca (Total)",4))

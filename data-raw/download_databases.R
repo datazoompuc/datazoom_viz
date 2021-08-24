@@ -219,6 +219,11 @@ ppm_state_aquaculture = dplyr::rename(ppm_state_aquaculture , time=.data$ano)%>%
                                          .data$geo_id == '28' ~ 'SE',
                                          .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
 ppm_state_aquaculture[is.na(ppm_state_aquaculture)] = 0
+ppm_state_aquaculture= ppm_state_aquaculture[,order(colnames(ppm_state_aquaculture))]
+ppm_state_aquaculture <- ppm_state_aquaculture %>%
+  dplyr::select(time, everything())
+ppm_state_aquaculture <- ppm_state_aquaculture %>%
+  dplyr::select(group, everything())
 ##saving f
 saveRDS(ppm_state_aquaculture,
         file = "./data/ppm_state_aquaculture.rds"
