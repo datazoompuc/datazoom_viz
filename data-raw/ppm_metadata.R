@@ -106,7 +106,7 @@ write.csv(metadata_ppm_cow_farming, file = "./data/metadata_ppm_cow_farming.csv"
 
 
 #ppm_aquaculture
-ppm_state_aquacultured= readRDS('data/ppm_state_aquaculture.rds')
+ppm_state_aquaculture= readRDS('data/ppm_state_aquaculture.rds')
 
 dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')%>%
   dplyr::arrange(var_pt)
