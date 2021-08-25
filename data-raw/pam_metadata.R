@@ -105,7 +105,7 @@ for(h in 31:32){
   met_temporary_crops= c(met_temporary_crops, rep(dic_pam_temporary_crops$var_pt[h],4))
 }
 met_temporary_crops= c("Identificador Geografico", "Ano da Pesquisa",met_temporary_crops)
-vec_temporary= c(c('Area Colhida ', 'Area Plantada ','Valor '),rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio ','Valor '),31), rep(c('Area Colhida ', 'Quantidade ', 'Rendimento Medio ','Valor'),2))
+vec_temporary= c(c('Area Colhida ', 'Area Plantada ','Valor '),rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio ','Valor '),31), rep(c('Area Colhida ', 'Quantidade ', 'Rendimento Medio ','Valor '),2))
 vec_temporary= c('','',vec_temporary)
 label_temporary_crops= paste0(vec_temporary,met_temporary_crops)
 
