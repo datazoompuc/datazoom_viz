@@ -110,7 +110,23 @@ ppm_state_aquacultured= readRDS('data/ppm_state_aquaculture.rds')
 
 dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')%>%
   dplyr::arrange(var_pt)
+vec= NULL
+for(i in 1:25){
+  vec= c(vec, rep(dic_ppm_aquaculture$var_pt[i],2))
+}
+vec= c('','',vec)
+aux= c("Identificador Geografico", "Ano da Pesquisa",rep(c('Producao da Aquicultura ', 'Valor da Producao '),25))
+label_aqua= paste0(aux,vec)
+label_aqua= label_aqua[-25]
 aqua_var= colnames(ppm_state_aquaculture)
+label_aqua= label_aqua[-44]
+
+unidade_aqua= c('','',rep(c('Kg','1K BRL'),25))
+unidade_aqua= unidade_aqua[-25]
+unidade_aqua= unidade_aqua[-44]
+unidade_aqua[17]= '1K'
+unidade_aqua[36]= '1K'
+
 metadata_ppm_aquaculture= tibble::tibble(
   var = aqua_var,
   x = TRUE,
@@ -118,13 +134,12 @@ metadata_ppm_aquaculture= tibble::tibble(
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_ppm_aquaculture$var_pt,
+  label = label_aqua,
   source = "IBGE",
   tipo = 1,
-  unidade = dic_ppm_aquaculture$unit_quantity,
-  unidade_valor= dic_ppm_aquaculture$unit_value,
+  unidade = unidade_aqua,
   categoria= c("Localização","Unidade de Tempo" ,rep("Pecuaria",48)), 
   subcategoria = c("Localização","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
 )
-#saving
+#saving f
 write.csv(metadata_ppm_aquaculture, file = "./data/metadata_ppm_aquaculture.csv", fileEncoding = "UTF-8")

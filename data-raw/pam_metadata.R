@@ -48,25 +48,42 @@ write.csv(metadata_pam_all_crops, file = "./data/metadata_pam_all_crops.csv", fi
 #pam_permanent_crops
 pam_state_permanent_crops= readRDS('data/pam_state_permanent_crops.rds')
 
+dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')%>%
+  dplyr::arrange(var_code)  
 
-dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')
+met_permanent_crops= NULL
+met_permanent_crops= c(met_permanent_crops, rep(dic_pam_permanent_crops$var_pt[1],3))  
+for(j in 2:35){
+  met_permanent_crops= c(met_permanent_crops, rep(dic_pam_permanent_crops$var_pt[j],5))
+}
+for(k in 36:37){
+  met_permanent_crops= c(met_permanent_crops, rep(dic_pam_permanent_crops$var_pt[k],4))
+}
+for(h in 38:39){
+  met_permanent_crops= c(met_permanent_crops, rep(dic_pam_permanent_crops$var_pt[h],5))
+}
+met_permanent_crops= c("Identificador Geografico", "Ano da Pesquisa",met_permanent_crops)
+vec_permanent= c(c('Area Colhida ', 'Valor ', 'Area Destinada a Colheita '),rep(c('Area Colhida ', 'Quantidade ', 'Rendimento Medio ','Valor ',  'Area Destinada a Colheita '),34), rep(c('Area Colhida ', 'Quantidade ', 'Rendimento Medio ','Valor '),2),rep(c('Area Colhida ', 'Quantidade ', 'Rendimento Medio ','Valor ',  'Area Destinada a Colheita '),2))
+vec_permanent= c('','', vec_permanent)
+label_permanent_crops= paste0(vec_permanent,met_permanent_crops)
+
+
 permanent_crops_var= colnames(pam_state_permanent_crops)
 metadata_pam_permanent_crops= tibble::tibble(
-  var = dic_pam_permanent_crops$var_code,
+  var = permanent_crops_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_pam_permanent_crops$var_pt,
+  label = label_permanent_crops,
   source = "IBGE",
   tipo = 1,
-  unidade = dic_pam_permanent_crops$unit_quantity,
-  unidade_valor= dic_pam_permanent_crops$unit_value,
-  categoria= "Agricultura", 
-  subcategoria = "Especies - Cultivo "
+  unidade = c(NA, NA, 'Hectares', '1K BRL', 'Hectares', rep(c('Hectares', 'Tons', 'Kg/Hectares', '1K BRL', 'Hectares'),34), rep(c('Hectares', 'Tons', 'Kg/Hectares','1K BRL'),2), rep(c('Hectares', 'Tons', 'Kg/Hectares','1K BRL', 'Hectares'),2)),
+  categoria= c('Localizacao','Unidade de Tempo',rep("Agricultura",191)), 
+  subcategoria = c('Identificador Geografico','Anual',rep("Especies - Cultivo",191))
 )
-#saving
+#saving f
 write.csv(metadata_pam_permanent_crops, file = "./data/metadata_pam_permanent_crops.csv", fileEncoding = "UTF-8")
 
 
@@ -75,12 +92,9 @@ pam_state_temporary_crops= readRDS('data/pam_state_temporary_crops.rds')
 
 
 dic_pam_temporary_crops= load_dictionary(dataset= 'pam_temporary_crops')%>%
-  arrange(var_code)
+  dplyr::arrange(var_code)
 met_temporary_crops= NULL
-met_temporary_crops=
-  for(i in 1:1){
-    met_temporary_crops= c(met_temporary_crops, rep(dic_pam_temporary_crops$var_pt[i],3))  
-  }
+met_temporary_crops= c(met_temporary_crops, rep(dic_pam_temporary_crops$var_pt[1],3)) 
 for(j in 33:34){
   met_temporary_crops= c(met_temporary_crops, rep(dic_pam_temporary_crops$var_pt[j],5))
 }
@@ -90,7 +104,7 @@ for(k in 2:30){
 for(h in 31:32){
   met_temporary_crops= c(met_temporary_crops, rep(dic_pam_temporary_crops$var_pt[h],4))
 }
-met_temporary_crops= c("Identificador Geografico", "Ano da Pesquisa", "Total", "Total", "Total",met_temporary_crops)
+met_temporary_crops= c("Identificador Geografico", "Ano da Pesquisa",met_temporary_crops)
 vec_temporary= c(c('Area Colhida ', 'Area Plantada ','Valor '),rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio ','Valor '),31), rep(c('Area Colhida ', 'Quantidade ', 'Rendimento Medio ','Valor'),2))
 vec_temporary= c('','',vec_temporary)
 label_temporary_crops= paste0(vec_temporary,met_temporary_crops)
