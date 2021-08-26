@@ -5,10 +5,10 @@ account: datazoom
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4296479
-bundleId: 4740456
+bundleId: 4967760
 url: https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cnae/
-when: 1624301458.06413
-lastSyncTime: 1624301458.06413
+when: 1629986194.1781
+lastSyncTime: 1629986194.1781
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .RData|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|data-raw/datazoom_amazonia.R|data-raw/ibge_pnadc.R|LICENSE|README.md
+ignoredFiles: app_bubble_dz_munic.R|app_map_dz_munic.R|app_rk_ibge_pnadc_cnae.R|app_rk_ibge_pnadc_cod.R|app_rk_mapbiomas_cobertura_est.R|app_rk_mapbiomas_cobertura_munic.R|app_rk_mapbiomas_transicao_est.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|app_ts_mapbiomas_cobertura_est.R|app_ts_mapbiomas_cobertura_munic.R|app_ts_mapbiomas_transicao_est.R|LICENSE|README.md|data-raw

@@ -10,11 +10,12 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
+  
+  # Carrega dados
+  df <- readRDS(files$db_file)
+  
   server <- function(input, output, session) {
-
-    # Carrega dados
-    df <- readRDS(files$db_file)
-
+    
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -74,7 +75,7 @@ get_server <- function(files, param) {
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x) || input$x == "" ||
         is.null(input$color) || input$color == "") {
-        text <- " "
+        text <- "Variável não selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
