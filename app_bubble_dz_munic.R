@@ -22,22 +22,22 @@ source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
-param <- get_db_param(files$param_file, files$db_file) #carrega lista de variáveis e parâmetros
-param$x_def <- "desmatado" #variável padrão do eixo x
-param$y_def <- "gd_ppc" #variável padrão do eixo y
-param$color_def <- "estado" #variável padrão de cor
-param$size_def <- "area_km2" #variável padrão de tamanho
-param$slider_def <- "ano" #variável padrão do slider
-param$text_def <- "nm_municip" #variável padrão de texto
-param$id_def <- "cod_ibge" #variável padrão de id
+param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
+param$x_def <- "desmatado" # variável padrão do eixo x
+param$y_def <- "gd_ppc" # variável padrão do eixo y
+param$color_def <- "estado" # variável padrão de cor
+param$size_def <- "area_km2" # variável padrão de tamanho
+param$slider_def <- "ano" # variável padrão do slider
+param$text_def <- "nm_municip" # variável padrão de texto
+param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Compilação de dados ao nível municipal"
 
 # Outros parâmetros e configurações
 
-#  --------------------------------  Roda a aplicação Shiny -------------------------------- 
-ui <- get_ui(files,param)
+#  --------------------------------  Roda a aplicação Shiny --------------------------------
+ui <- get_ui(files, param)
 server <- get_server(files, param)
 
 shinyApp(ui = ui, server = server)
