@@ -252,7 +252,6 @@ get_server <- function(files, param) {
             #toImageButtonOptions = list(format = "svg"),
             displaylogo = FALSE,
             modeBarButtonsToRemove = c(
-              "toImage",
               "lasso2d",
               "select2d",
               "hoverCompareCartesian"
