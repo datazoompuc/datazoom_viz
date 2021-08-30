@@ -11,13 +11,12 @@ library(sp)
 library(scales) # to use label_percent()
 
 ####################
-# Edit data
+# 1) Call and clean data
 ###################
 
-############################################
-##  Data Zoom Amazonia
-############################################
-
+###################
+# TERRABRASILIS
+###################
 # read shapefile
 shapefile<-st_read('data/shapefiles/municipalities_legal_amazon.shp')
 
@@ -28,13 +27,9 @@ shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
 # plot(shapefile)
 # shapefile$cod_ibge
 
-############################
-# Call data and edit to merge
-############################
-
 ###################
 # CENSUS
-##################
+###################
 income <- readRDS(file = "data/income.rds")
 income$Ano <- income$Year
 income <- income %>% 
@@ -54,18 +49,18 @@ income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
 
 ###################
 # INPE - PRODES
-##################
+###################
 prodes <- readRDS(file = "data/prodes.rds")
 prodes <- prodes %>%
   janitor::clean_names()
 
 # generate variable by the share of municipality total area
 prodes <- prodes %>%
-  mutate(prop_desmatado = percent(desmatado/area_km2),
-         prop_incremento = percent(incremento/area_km2),
-         prop_floresta = percent(floresta/area_km2),
-         prop_nao_floresta = percent(nao_floresta/area_km2),
-         prop_hidrografia = percent(hidrografia/area_km2)
+  mutate(prop_desmatado = desmatado/area_km2,
+         prop_incremento = incremento/area_km2,
+         prop_floresta = floresta/area_km2,
+         prop_nao_floresta = nao_floresta/area_km2,
+         prop_hidrografia = hidrografia/area_km2
          ) %>%
   select(cod_ibge, 
          ano, 
@@ -84,6 +79,9 @@ prodes <- prodes %>%
 # Identify and remove duplicate data
 prodes <- prodes %>% distinct(cod_ibge, ano, .keep_all = TRUE)
 
+###################
+# INPE - DETER
+###################
 # deter <- readRDS(file = "data/deter.rds")
 # deter$Estado <- deter$UF
 # class(deter$CodIBGE) <-  'character'
@@ -93,6 +91,9 @@ prodes <- prodes %>% distinct(cod_ibge, ano, .keep_all = TRUE)
 # Identify and remove duplicate data
 # deter <- deter %>% distinct(CodIBGE, Ano, .keep_all = TRUE) %>% arrange(CodIBGE, Ano)
 
+###################
+# IBGE - PIB
+###################
 gdp <- readRDS(file = "data/gdp.rds")
 gdp <- gdp %>%
   janitor::clean_names()
@@ -108,30 +109,47 @@ gdp$gd_ppc <- zoo::na.approx(gdp$gd_ppc)
 # Identify and remove duplicate data
 gdp <- gdp %>% distinct(cod_ibge, ano, .keep_all = TRUE) %>% arrange(cod_ibge, ano)
 # select relevant variables
-gdp <- gdp %>% select(cod_ibge, ano, pop, gdp, gd_ppc)
+gdp <- gdp %>% 
+  select(cod_ibge, ano, pop, gdp, gd_ppc) %>%
+  arrange(cod_ibge, ano)
 
+###################
+# INPE - DEGRAD
+##################
 # degrad <- readRDS(file = "data/degrad.rds")
 # degrad$Ano <- degrad$year
 # degrad$Year <- NULL
 
 ###################
 # IMAZON - IPS
-##################
+###################
 ips <- readRDS(file = "data/ips.rds")
 ips <- ips %>%
   janitor::clean_names()
 # Reshaping data.frame from long  to wide format
-ips <- ips %>% tidyr::pivot_wider(id_cols = c(cod_municipio, ano),  names_from = ano, names_prefix = "ips", values_from = ips)  
+ips <- ips %>% 
+  tidyr::pivot_wider(
+    id_cols = c(cod_municipio, ano),  
+    names_from = ano, 
+    names_prefix = "ips", 
+    values_from = ips
+    )  
 
 ###################
-# CEMPRE
-##################
+# IBGE - CEMPRE
+###################
 cempre_municipality <- readRDS(file = "data/cempre_municipality.rds")
 cempre_municipality <- cempre_municipality %>%
   janitor::clean_names()
 
 # Reshaping data.frame from long  to wide format
-cempre_municipality <- cempre_municipality %>% tidyr::pivot_wider(id_cols = c(municipio_codigo, ano),  names_from = variavel_codigo, names_prefix = "cempre", values_from = valor)  
+cempre_municipality <- cempre_municipality %>% 
+  tidyr::pivot_wider(
+    id_cols = c(municipio_codigo, ano),
+    names_from = variavel_codigo, 
+    names_prefix = "cempre", 
+    values_from = valor)  
+
 cempre_municipality$cod_ibge <- cempre_municipality$municipio_codigo
 cempre_municipality$cempre_n_empresas_organizacoes <- cempre_municipality$cempre2585
 cempre_municipality$cempre_n_ocupados <- cempre_municipality$cempre707
@@ -151,9 +169,15 @@ cempre_municipality <- cempre_municipality %>%
   ) %>%
   arrange(cod_ibge, ano) 
 
+###################
+# SEEG
+###################
+
 #seeg <- readRDS(file = "data/seeg.rds")
 
+###########################
 # edit data to merge
+###########################
 class(cempre_municipality$cod_ibge) <-  'character'
 class(prodes$cod_ibge) <-  'character'
 class(deter$cod_ibge) <-  'character'
@@ -170,7 +194,9 @@ class(degrad$ano) <-  'numeric'
 class(income$ano) <-  'numeric'
 class(ips$cod_municipio) <-  'character'
 
+###########################
 # merge all data
+###########################
 dz_munic <- income %>%
   full_join(prodes, by = c("cod_ibge"))   %>%
   full_join(gdp, by = c("cod_ibge","ano"))   %>%
@@ -181,7 +207,7 @@ dz_munic <- income %>%
 
 # colnames(dz_munic)
 dz_munic$name_munic <- dz_munic$name_munic.x
-dz_munic <- dz_munic %>% transform(Estado = ifelse(!is.na(Estado.x), Estado.x, Estado.y))
+dz_munic <- dz_munic %>% transform(estado = ifelse(!is.na(estado.x), estado.x, estado.y))
 
 # edit final data
 class(dz_munic)
@@ -194,7 +220,9 @@ class(dz_munic$ano) <-  'numeric'
 dz_munic <- dz_munic %>%
   janitor::clean_names()
 
+######################################################
 # merge data with amazon municipalities shapefile
+######################################################
 map_dz_munic <- sp::merge(shapefile, dz_munic, by.x = 'cod_ibge', by.y = 'cod_ibge')
 
 # convert time data to date
@@ -253,8 +281,8 @@ dz_munic <- dz_munic %>%
 # Identify and remove duplicate data
 # xxx <- dz_munic %>% distinct(cod_ibge, ano, .keep_all = TRUE)
 
-# drop municipalities from goias
-dz_munic <- dz_munic %>% filter(estado !="GO")
+# drop municipalities with empty geometry
+dz_munic = dz_munic[!st_is_empty(dz_munic),,drop=FALSE]
 
 # save data
 saveRDS(dz_munic,
@@ -351,8 +379,8 @@ temp_param_table$unidade[24] <- "Estabelecimentos"
 temp_param_table$unidade[25] <- "Pessoas"
 temp_param_table$unidade[26] <- "Pessoas"
 temp_param_table$unidade[27] <- "R$"
-temp_param_table$unidade[28] <- "Índice de 0 a 1"
-temp_param_table$unidade[29] <- "Índice de 0 a 1"
+temp_param_table$unidade[28] <- "Índice de 0 a 100"
+temp_param_table$unidade[29] <- "Índice de 0 a 100"
 temp_param_table$unidade[30] <- "Estado"
 temp_param_table$unidade[31] <- "Geometria"
 
