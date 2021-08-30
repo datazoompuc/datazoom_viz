@@ -8,11 +8,11 @@ pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
+
+  # Carrega dados
+  df <- readRDS(files$db_file)
+
   server <- function(input, output, session) {
-
-    # Carrega dados
-    df <- readRDS(files$db_file)
-
     df_reactived <- reactive({
       w <- df %>%
         filter(ano == input$filter1)
@@ -126,7 +126,7 @@ get_server <- function(files, param) {
 
       tryCatch(
         {
-
+          
           # Monta mapa
 
           # Monta html do tooltip
