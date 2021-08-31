@@ -7,14 +7,16 @@ library(data.table)
 
 # Função para criar lista nomeada hierarquica dos grupos (para que as variáveis apareçam agrupadas no selectinput)
 grouped_list <- function(df) {
-  #cria lista hierarquica a partir de dataframe, para os selecinputs
+  # cria lista hierarquica a partir de dataframe, para os selecinputs
   groups <- unique(df$var_group)
-  grouped_list <- setNames(nm = groups,
-                           lapply(groups, function(x)
-                             setNames(nm = df$label[which(df$var_group == x)],
-                                      as.list(df$var[which(df$var_group == x)])
-                             )
-                           )
+  grouped_list <- setNames(
+    nm = groups,
+    lapply(groups, function(x) {
+      setNames(
+        nm = df$label[which(df$var_group == x)],
+        as.list(df$var[which(df$var_group == x)])
+      )
+    })
   )
   return(grouped_list)
 }
@@ -38,13 +40,13 @@ get_db_param <-
         desc = columns,
         group = ""
       )
-      
+
       write.csv(temp_param_table, file = param_filename)
     }
-    
+
     # Carrega arquivo de parâmetros
     param_table <- fread(param_filename, encoding = "UTF-8")
-    
+
     # Cria lista de parâmetros
     param <- list(
       table = param_table, # copia tabela de parâmetros na lista
@@ -54,13 +56,13 @@ get_db_param <-
       color_cols = param_table[which(param_table$color)],
       size_cols = param_table[which(param_table$size)]
     )
-    
+
     # Define escolhas agrupadas para cada selectinput
-    param$x_choices <- append("",grouped_list(param$x_cols))
-    param$y_choices <- append("",grouped_list(param$y_cols))
-    param$color_choices <- append("",grouped_list(param$color_cols))
-    param$size_choices <- append("",grouped_list(param$size_cols))
-    
+    param$x_choices <- append("", grouped_list(param$x_cols))
+    param$y_choices <- append("", grouped_list(param$y_cols))
+    param$color_choices <- append("", grouped_list(param$color_cols))
+    param$size_choices <- append("", grouped_list(param$size_cols))
+
     # Define coluna padrão para cada dimensão
     param$x_def <- ""
     param$y_def <- ""
@@ -68,7 +70,7 @@ get_db_param <-
     param$color_def <- ""
     param$text_def <- ""
     param$slider_def <- ""
-    
+
     # Retorna lista de parâmetros
     param
   }

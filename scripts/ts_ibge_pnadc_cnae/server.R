@@ -103,7 +103,7 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if(is.null(input$y) || input$y == "") {
-        text <- " "
+        text <- "Variável não selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
@@ -253,7 +253,6 @@ get_server <- function(files, param) {
             #toImageButtonOptions = list(format = "svg"),
             displaylogo = FALSE,
             modeBarButtonsToRemove = c(
-              "toImage",
               "lasso2d",
               "select2d",
               "hoverCompareCartesian"

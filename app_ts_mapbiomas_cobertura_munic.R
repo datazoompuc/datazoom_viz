@@ -22,23 +22,23 @@ source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
-param <- get_db_param(files$param_file, files$db_file) #carrega lista de variáveis e parâmetros
-param$x_def <- "time" #variável padrão do eixo x
-param$y_def <- "" #variável padrão do eixo y
+param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
+param$x_def <- "time" # variável padrão do eixo x
+param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
-param$color_def <- "group" #variável padrão de cor
-param$text_def <- "group" #variável padrão de texto (quando mouse em cima)
-param$group <- "group" #variável de agrupamento
+param$color_def <- "group" # variável padrão de cor
+param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
+param$group <- "group" # variável de agrupamento
 
 
-param$plot_name <- "Data Zoom Amazonia"
+param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil"
 
 # Outros parâmetros e configurações
 
 
-#  --------------------------------  Roda a aplicação Shiny -------------------------------- 
-ui <- get_ui(files,param)
+#  --------------------------------  Roda a aplicação Shiny --------------------------------
+ui <- get_ui(files, param)
 server <- get_server(files, param)
 
 shinyApp(ui = ui, server = server)
