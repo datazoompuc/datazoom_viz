@@ -7,6 +7,12 @@ library(datazoom.amazonia)
 #livestock_inventory
 ppm_state_livestock_inventory= readRDS('data/ppm_state_livestock_inventory.rds')
 
+## ATENÇÃO!!!
+## load_dictionary não é uma função que nativa do R e também não é encontrado mesmo quando
+## o pacote datazoom.amazonia é chamado. 
+## Por isso, todos as linhas que possuem load_dictionary não é replicável!
+## É precico consertar isso, para que qualquer computador consiga replicar o codigo.
+
 dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
 aux= c('','', rep('Efetivo dos Rebanhos ',10))
 livestock_var= colnames(ppm_state_livestock_inventory)
