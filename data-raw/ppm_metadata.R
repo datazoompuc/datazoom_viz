@@ -87,7 +87,7 @@ metadata_ppm_sheep_farming= tibble::tibble(
   subcategoria = c('Identificador Geográfico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 #saving f
-write.csv(metadata_ppm_sheep_farming, file = "./data/metadata_ppm_state_sheep_farming.rds.csv", fileEncoding = "UTF-8")
+write.csv(metadata_ppm_sheep_farming, file = "./data/metadata_ppm_state_sheep_farming.rds", fileEncoding = "UTF-8")
 
 
 #ppm_cow_farming 
