@@ -96,24 +96,26 @@ write.csv(metadata_pevs_forest_crops, file = "./data/metadata_pevs_forest_crops.
 pevs_state_silviculture_area= readRDS('data\\pevs_state_silviculture_area.rds')
 
 
-dic_pevs_silviculture_area= load_dictionary(dataset = 'pevs_silviculture_area')
+dic_pevs_silviculture_area= load_dictionary(dataset = 'pevs_silviculture_area')%>%
+  arrange(var_code)
+
+silviculture_area_var= colnames(pevs_state_silviculture_area)
+label_silviculture_area= dic_pevs_silviculture_area$var_pt 
+label_silviculture_area= c("Identificador Geografico", "Ano da Pesquisa",label_silviculture_area)
 
 metadata_pevs_silviculture_area= tibble::tibble(
-  var = dic_pevs_silviculture_area$var_code,
+  var = silviculture_area_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = dic_pevs_silviculture_area$var_pt,
+  label = label_silviculture_area,
   source = "IBGE",
   tipo = 1,
-  unidade = dic_pevs_silviculture_area$unit_quantity,
-  unidade_valor= dic_pevs_silviculture_area$unit_value,
-  categoria= "Agropecu???ria", 
-  subcategoria = "???rea de Extrativismo Vegetal"
-) %>%
-  rbind(ano)%>%
-  rbind(geo_id)
-#saving
+  unidade = c('','', rep('Hectares',4)),
+  categoria= c('Localizacao','Unidade de Tempo',rep("Agricultura",4)), 
+  subcategoria =  c('Identificador Geografico','Anual',rep("Area de Extrativismo Vegetal",4))
+) 
+#saving f
 write.csv(metadata_pevs_silviculture_area, file = "./data/metadata_pevs_silviculture_area.csv", fileEncoding = "UTF-8")
