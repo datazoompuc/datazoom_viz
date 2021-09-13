@@ -55,21 +55,7 @@ ret2= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1984
 ret3= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1994:2003, language = "pt")
 ret4= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 2004:2019, language = "pt")
 
-ret3= data.frame()
-for(i in 1986:1988){
-  data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', i, language = "pt")
-  ret3= bind_rows(ret3,data)
-}
-ret4= data.frame()
-for(j in 1998:2009){
-  data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', j, language = "pt")
-  ret4= bind_rows(ret4,data)
-}
-ret5= data.frame()
-for(h in 2010:2019){
-  data= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', h, language = "pt")
-  ret5= bind_rows(ret5,data)
-}
+
 ##dictionary
 dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')
 #making data usable for datazoom viz
