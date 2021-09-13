@@ -81,6 +81,7 @@ dz_state <- dz_state %>%
   janitor::clean_names()
 
 # convert time data to date
+class(dz_state$ano) <- 'numeric'
 dz_state$ano <- as.Date(as.yearqtr(dz_state$ano), format = "%Y")
 
 # colnames(dz_state)
@@ -93,7 +94,7 @@ class(dz_state)
 colnames(dz_state)
 
 # remove unnecessary columns
-dz_state <- subset( dz_state, select = -c(time, time_x, group, time_y, time_y_y, time_x_x) )
+dz_state <- subset( dz_state, select = -c(time, time_x, time_y, time_y_y, time_x_x) )
 
 # keep only uf from amazon
 dz_state <- dz_state %>% dplyr::filter(estado == "AC" | estado == "AP" | estado == "AM" | estado == "PA" | estado == "MA" | estado == "RR" | estado == "RO" | estado == "MT" | estado == "TO") 
@@ -136,8 +137,6 @@ label_livestock[! label_livestock %in% c("Efetivo dos Rebanhos: Suino - Matrizes
 
 label_livestock <- subset(label_livestock, select = -c("Efetivo dos Rebanhos: Suino - Matrizes de Suinos") )
 
-
-
 #animal_origin_production
 dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')%>%
   arrange(var_code)
@@ -166,7 +165,7 @@ for(i in 1:25){
   vec= c(vec, rep(dic_ppm_aquaculture$var_pt[i],2))
 }
 
-aux= c(rep(c('Producao da Aquicultura ', 'Valor da Producao '),25))
+aux= c(rep(c('Producao da Aquicultura ', 'Valor da produção '),25))
 label_aquaculture= paste0(aux,vec)
 
 # generate dictionary
@@ -180,10 +179,10 @@ temp_param_table <- tibble(
   geometry = FALSE,
   label = columns, # c(label_livestock, label_animal_origin_production, label_cow_farming, label_aquaculture)
   desc = columns,
-  source = c(rep("Geral",2), rep("IBGE - PPM",73)),
+  source = c(rep("Geral",3), rep("IBGE - PPM - Efetivo dos rebanhos",10), rep("IBGE - PPM - Origem animal",13), rep("IBGE - PPM - Criação de ovelhas",1), rep("IBGE - PPM - Criação de vacas",1), rep("IBGE - PPM - Aquicultura",48)),
   unidade = "Unidade de medida",
-  categoria= c(rep("Geral",2), rep("Produção",73)), # c("Localização", "Unidade de Tempo", rep("Pecuaria",10)), 
-  subcategoria = c(rep("Geral",2), rep("Criação animal",73))
+  categoria= c(rep("Geral",3), rep("Produção",73)), # c("Localização", "Unidade de Tempo", rep("Pecuaria",10)), 
+  subcategoria = c(rep("Geral",3), rep("Criação animal",73))
 )
 
 # Label
@@ -214,54 +213,66 @@ temp_param_table$label[temp_param_table$var== "quant_v2687"] <- "Quantidade Mel 
 temp_param_table$label[temp_param_table$var== "valor_v2687"] <- "Valor Mel de abelha"
 temp_param_table$label[temp_param_table$var== "ovinos_tosquiados_nos_estabelecimentos_agropecuarios"] <- "Ovinos tosquiados"
 temp_param_table$label[temp_param_table$var== "vacas_ordenhadas"] <- "Vacas ordenhadas"
-temp_param_table$label[temp_param_table$var== "alevinos_producao_da_aquicultura"] <- "Producao da Aquicultura Alevinos"
-temp_param_table$label[temp_param_table$var== "alevinos_valor_da_producao"] <- "Valor da Producao Alevinos"
-temp_param_table$label[temp_param_table$var== "camarao_producao_da_aquicultura"] <- "Producao da Aquicultura Camarao"
-temp_param_table$label[temp_param_table$var== "camarao_valor_da_producao"] <- "Valor da Producao Camarao"
-temp_param_table$label[temp_param_table$var== "carpa_producao_da_aquicultura"] <- "Producao da Aquicultura Carpa"
-temp_param_table$label[temp_param_table$var== "carpa_valor_da_producao"] <- "Valor da Producao Carpa"
-temp_param_table$label[temp_param_table$var== "curimata_curimbata_producao_da_aquicultura"] <- "Producao da Aquicultura Curimata, curimbata"
-temp_param_table$label[temp_param_table$var== "curimata_curimbata_valor_da_producao"] <- "Valor da Producao Curimata, curimbata"
-temp_param_table$label[temp_param_table$var== "dourado_producao_da_aquicultura"] <- "Producao da Aquicultura Dourado"
-temp_param_table$label[temp_param_table$var== "dourado_valor_da_producao"] <- "Valor da Producao Dourado"
-temp_param_table$label[temp_param_table$var== "jatuarana_piabanha_e_piracanjuba_producao_da_aquicultura"] <- "Producao da Aquicultura Jatuarana, piabanha e piracanjuba"
-temp_param_table$label[temp_param_table$var== "jatuarana_piabanha_e_piracanjuba_valor_da_producao"] <- "Valor da Producao Jatuarana, piabanha e piracanjuba"
-temp_param_table$label[temp_param_table$var== "lambari_producao_da_aquicultura"] <- "Producao da Aquicultura Lambari"
-temp_param_table$label[temp_param_table$var== "lambari_valor_da_producao"] <- "Valor da Producao Lambari"
-temp_param_table$label[temp_param_table$var== "larvas_e_pos_larvas_de_camarao_producao_da_aquicultura"] <- "Producao da Aquicultura Larvas e pos-larvas de camarao"
-temp_param_table$label[temp_param_table$var== "larvas_e_pos_larvas_de_camarao_valor_da_producao"] <- "Valor da Producao Larvas e pos-larvas de camarao"
-temp_param_table$label[temp_param_table$var== "matrinxa_producao_da_aquicultura"] <- "Producao da Aquicultura Matrinxa"
-temp_param_table$label[temp_param_table$var== "matrinxa_valor_da_producao"] <- "Valor da Producao Matrinxa"
-temp_param_table$label[temp_param_table$var== "ostras_vieiras_e_mexilhoes_producao_da_aquicultura"] <- "Producao da Aquicultura Ostras, vieiras e mexilhoes"
-temp_param_table$label[temp_param_table$var== "ostras_vieiras_e_mexilhoes_valor_da_producao"] <- "Valor da Producao Ostras, vieiras e mexilhoes"
-temp_param_table$label[temp_param_table$var== "outros_peixes_producao_da_aquicultura"] <- "Producao da Aquicultura Outros peixes"
-temp_param_table$label[temp_param_table$var== "outros_peixes_valor_da_producao"] <- "Valor da Producao Outros peixes"
-temp_param_table$label[temp_param_table$var== "outros_produtos_ra_jacare_siri_caranguejo_lagosta_etc_valor_da_producao"] <- "Valor da Producao Outros produtos (ra, jacare, siri, caranguejo, lagosta, etc)"
-temp_param_table$label[temp_param_table$var== "pacu_e_patinga_producao_da_aquicultura"] <- "Producao da Aquicultura Pacu e patinga"
-temp_param_table$label[temp_param_table$var== "pacu_e_patinga_valor_da_producao"] <- "Valor da Producao Pacu e patinga"
-temp_param_table$label[temp_param_table$var== "piau_piapara_piaucu_piava_producao_da_aquicultura"] <- "Producao da Aquicultura Piau, piapara, piaucu, piava"
-temp_param_table$label[temp_param_table$var== "piau_piapara_piaucu_piava_valor_da_producao"] <- "Valor da Producao Piau, piapara, piaucu, piava"
-temp_param_table$label[temp_param_table$var== "pintado_cachara_cachapira_e_pintachara_surubim_producao_da_aquicultura"] <- "Producao da Aquicultura Pintado, cachara, cachapira e pintachara, surubim"
-temp_param_table$label[temp_param_table$var== "pintado_cachara_cachapira_e_pintachara_surubim_valor_da_producao"] <- "Valor da Producao Pintado, cachara, cachapira e pintachara, surubim"
-temp_param_table$label[temp_param_table$var== "pirapitinga_producao_da_aquicultura"] <- "Producao da Aquicultura Pirapitinga"
-temp_param_table$label[temp_param_table$var== "pirapitinga_valor_da_producao"] <- "Valor da Producao Pirapitinga"
-temp_param_table$label[temp_param_table$var== "pirarucu_producao_da_aquicultura"] <- "Producao da Aquicultura Pirarucu"
-temp_param_table$label[temp_param_table$var== "pirarucu_valor_da_producao"] <- "Valor da Producao Pirarucu"
-temp_param_table$label[temp_param_table$var== "sementes_de_moluscos_producao_da_aquicultura"] <- "Producao da Aquicultura Sementes de moluscos"
-temp_param_table$label[temp_param_table$var== "sementes_de_moluscos_valor_da_producao"] <- "Valor da Producao Sementes de moluscos"
-temp_param_table$label[temp_param_table$var== "tambacu_tambatinga_producao_da_aquicultura"] <- "Producao da Aquicultura Tambacu, tambatinga"
-temp_param_table$label[temp_param_table$var== "tambacu_tambatinga_valor_da_producao"] <- "Valor da Producao Tambacu, tambatinga"
-temp_param_table$label[temp_param_table$var== "tambaqui_producao_da_aquicultura"] <- "Producao da Aquicultura Tambaqui"
-temp_param_table$label[temp_param_table$var== "tambaqui_valor_da_producao"] <- "Valor da Producao Tambaqui"
-temp_param_table$label[temp_param_table$var== "tilapia_producao_da_aquicultura"] <- "Producao da Aquicultura Tilapia"
-temp_param_table$label[temp_param_table$var== "tilapia_valor_da_producao"] <- "Valor da Producao Tilapia"
-temp_param_table$label[temp_param_table$var== "total_valor_da_producao"] <- "Producao da Aquicultura Total"
-temp_param_table$label[temp_param_table$var== "traira_e_trairao_producao_da_aquicultura"] <- "Valor da Producao Total"
-temp_param_table$label[temp_param_table$var== "traira_e_trairao_valor_da_producao"] <- "Producao da Aquicultura Traira e trairao"
-temp_param_table$label[temp_param_table$var== "truta_producao_da_aquicultura"] <- "Producao da Aquicultura Truta"
-temp_param_table$label[temp_param_table$var== "truta_valor_da_producao"] <- "Valor da Producao Truta"
-temp_param_table$label[temp_param_table$var== "tucunare_producao_da_aquicultura"] <- "Producao da Aquicultura Tucunare"
-temp_param_table$label[temp_param_table$var== "tucunare_valor_da_producao"] <- "Valor da Producao Tucunare"
+temp_param_table$label[temp_param_table$var== "alevinos_producao_da_aquicultura"] <- "Produção da Aquicultura Alevinos"
+temp_param_table$label[temp_param_table$var== "alevinos_valor_da_producao"] <- "Valor da produção Alevinos"
+temp_param_table$label[temp_param_table$var== "camarao_producao_da_aquicultura"] <- "Produção da Aquicultura Camarao"
+temp_param_table$label[temp_param_table$var== "camarao_valor_da_producao"] <- "Valor da produção Camarao"
+temp_param_table$label[temp_param_table$var== "carpa_producao_da_aquicultura"] <- "Produção da Aquicultura Carpa"
+temp_param_table$label[temp_param_table$var== "carpa_valor_da_producao"] <- "Valor da produção Carpa"
+temp_param_table$label[temp_param_table$var== "curimata_curimbata_producao_da_aquicultura"] <- "Produção da Aquicultura Curimata, curimbata"
+temp_param_table$label[temp_param_table$var== "curimata_curimbata_valor_da_producao"] <- "Valor da produção Curimata, curimbata"
+temp_param_table$label[temp_param_table$var== "dourado_producao_da_aquicultura"] <- "Produção da Aquicultura Dourado"
+temp_param_table$label[temp_param_table$var== "dourado_valor_da_producao"] <- "Valor da produção Dourado"
+temp_param_table$label[temp_param_table$var== "jatuarana_piabanha_e_piracanjuba_producao_da_aquicultura"] <- "Produção da Aquicultura Jatuarana, piabanha e piracanjuba"
+temp_param_table$label[temp_param_table$var== "jatuarana_piabanha_e_piracanjuba_valor_da_producao"] <- "Valor da produção Jatuarana, piabanha e piracanjuba"
+temp_param_table$label[temp_param_table$var== "lambari_producao_da_aquicultura"] <- "Produção da Aquicultura Lambari"
+temp_param_table$label[temp_param_table$var== "lambari_valor_da_producao"] <- "Valor da produção Lambari"
+temp_param_table$label[temp_param_table$var== "larvas_e_pos_larvas_de_camarao_producao_da_aquicultura"] <- "Produção da Aquicultura Larvas e pos-larvas de camarao"
+temp_param_table$label[temp_param_table$var== "larvas_e_pos_larvas_de_camarao_valor_da_producao"] <- "Valor da produção Larvas e pos-larvas de camarao"
+temp_param_table$label[temp_param_table$var== "matrinxa_producao_da_aquicultura"] <- "Produção da Aquicultura Matrinxa"
+temp_param_table$label[temp_param_table$var== "matrinxa_valor_da_producao"] <- "Valor da produção Matrinxa"
+temp_param_table$label[temp_param_table$var== "ostras_vieiras_e_mexilhoes_producao_da_aquicultura"] <- "Produção da Aquicultura Ostras, vieiras e mexilhoes"
+temp_param_table$label[temp_param_table$var== "ostras_vieiras_e_mexilhoes_valor_da_producao"] <- "Valor da produção Ostras, vieiras e mexilhoes"
+temp_param_table$label[temp_param_table$var== "outros_peixes_producao_da_aquicultura"] <- "Produção da Aquicultura Outros peixes"
+temp_param_table$label[temp_param_table$var== "outros_peixes_valor_da_producao"] <- "Valor da produção Outros peixes"
+temp_param_table$label[temp_param_table$var== "outros_produtos_ra_jacare_siri_caranguejo_lagosta_etc_valor_da_producao"] <- "Valor da produção Outros produtos (ra, jacare, siri, caranguejo, lagosta, etc)"
+temp_param_table$label[temp_param_table$var== "pacu_e_patinga_producao_da_aquicultura"] <- "Produção da Aquicultura Pacu e patinga"
+temp_param_table$label[temp_param_table$var== "pacu_e_patinga_valor_da_producao"] <- "Valor da produção Pacu e patinga"
+temp_param_table$label[temp_param_table$var== "piau_piapara_piaucu_piava_producao_da_aquicultura"] <- "Produção da Aquicultura Piau, piapara, piaucu, piava"
+temp_param_table$label[temp_param_table$var== "piau_piapara_piaucu_piava_valor_da_producao"] <- "Valor da produção Piau, piapara, piaucu, piava"
+temp_param_table$label[temp_param_table$var== "pintado_cachara_cachapira_e_pintachara_surubim_producao_da_aquicultura"] <- "Produção da Aquicultura Pintado, cachara, cachapira e pintachara, surubim"
+temp_param_table$label[temp_param_table$var== "pintado_cachara_cachapira_e_pintachara_surubim_valor_da_producao"] <- "Valor da produção Pintado, cachara, cachapira e pintachara, surubim"
+temp_param_table$label[temp_param_table$var== "pirapitinga_producao_da_aquicultura"] <- "Produção da Aquicultura Pirapitinga"
+temp_param_table$label[temp_param_table$var== "pirapitinga_valor_da_producao"] <- "Valor da produção Pirapitinga"
+temp_param_table$label[temp_param_table$var== "pirarucu_producao_da_aquicultura"] <- "Produção da Aquicultura Pirarucu"
+temp_param_table$label[temp_param_table$var== "pirarucu_valor_da_producao"] <- "Valor da produção Pirarucu"
+temp_param_table$label[temp_param_table$var== "sementes_de_moluscos_producao_da_aquicultura"] <- "Produção da Aquicultura Sementes de moluscos"
+temp_param_table$label[temp_param_table$var== "sementes_de_moluscos_valor_da_producao"] <- "Valor da produção Sementes de moluscos"
+temp_param_table$label[temp_param_table$var== "tambacu_tambatinga_producao_da_aquicultura"] <- "Produção da Aquicultura Tambacu, tambatinga"
+temp_param_table$label[temp_param_table$var== "tambacu_tambatinga_valor_da_producao"] <- "Valor da produção Tambacu, tambatinga"
+temp_param_table$label[temp_param_table$var== "tambaqui_producao_da_aquicultura"] <- "Produção da Aquicultura Tambaqui"
+temp_param_table$label[temp_param_table$var== "tambaqui_valor_da_producao"] <- "Valor da produção Tambaqui"
+temp_param_table$label[temp_param_table$var== "tilapia_producao_da_aquicultura"] <- "Produção da Aquicultura Tilapia"
+temp_param_table$label[temp_param_table$var== "tilapia_valor_da_producao"] <- "Valor da produção Tilapia"
+temp_param_table$label[temp_param_table$var== "total_valor_da_producao"] <- "Produção da Aquicultura Total"
+temp_param_table$label[temp_param_table$var== "traira_e_trairao_producao_da_aquicultura"] <- "Valor da produção Total"
+temp_param_table$label[temp_param_table$var== "traira_e_trairao_valor_da_producao"] <- "Produção da Aquicultura Traira e trairao"
+temp_param_table$label[temp_param_table$var== "truta_producao_da_aquicultura"] <- "Produção da Aquicultura Truta"
+temp_param_table$label[temp_param_table$var== "truta_valor_da_producao"] <- "Valor da produção Truta"
+temp_param_table$label[temp_param_table$var== "tucunare_producao_da_aquicultura"] <- "Produção da Aquicultura Tucunare"
+temp_param_table$label[temp_param_table$var== "tucunare_valor_da_producao"] <- "Valor da produção Tucunare"
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var== "estado"] <- FALSE
+temp_param_table$y[temp_param_table$var== "ano"] <- FALSE
+temp_param_table$y[temp_param_table$var== "group"] <- FALSE
+
+# block and variables in graphs x-axis
+temp_param_table$x[temp_param_table$var== "estado"] <- FALSE
+temp_param_table$x[temp_param_table$var== "group"] <- FALSE
+
+# allow variables in graphs size, color, and slider-axis 
+temp_param_table$slider[temp_param_table$var== "ano"]  <- TRUE
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_state_dic.csv", fileEncoding = "UTF-8")
