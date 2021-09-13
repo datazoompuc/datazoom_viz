@@ -15,49 +15,7 @@ library(scales) # to use label_percent()
 ###################
 
 ###################
-# TERRABRASILIS
-###################
-# read shapefile
-# shapefile<-st_read('data/shapefiles/municipalities_legal_amazon.shp')
-
-# data too heavy (over 100mb)
-# solution: simplify geometry
-# shapefile <- sf::st_simplify(shapefile, dTolerance = 400) 
-
-# plot(shapefile)
-# shapefile$group
-
-###################
-# PPM
-###################
-ppm_state_animal_origin_production <- readRDS(file = "data/ppm_state_animal_origin_production.rds")
-
-ppm_state_animal_origin_production$ano <- ppm_state_animal_origin_production$time
-ppm_state_animal_origin_production <- ppm_state_animal_origin_production %>% 
-  janitor::clean_names() 
-
-###################
-# INPE - PRODES
-###################
-###################
-ppm_state_aquaculture <- readRDS(file = "data/ppm_state_aquaculture.rds")
-
-ppm_state_aquaculture$ano <- ppm_state_aquaculture$time
-ppm_state_aquaculture <- ppm_state_aquaculture %>% 
-  janitor::clean_names() 
-
-###################
-# INPE - PRODES
-###################
-###################
-ppm_state_cow_farming <- readRDS(file = "data/ppm_state_cow_farming.rds")
-
-ppm_state_cow_farming$ano <- ppm_state_cow_farming$time
-ppm_state_cow_farming <- ppm_state_cow_farming %>% 
-  janitor::clean_names() 
-###################
-# INPE - PRODES
-###################
+# PPM ppm_state_livestock_inventory
 ###################
 ppm_state_livestock_inventory <- readRDS(file = "data/ppm_state_livestock_inventory.rds")
 
@@ -66,105 +24,93 @@ ppm_state_livestock_inventory <- ppm_state_livestock_inventory %>%
   janitor::clean_names() 
 
 ###################
-# INPE - PRODES
+# PPM ppm_state_animal_origin_production
 ###################
+ppm_state_animal_origin_production <- readRDS(file = "data/ppm_state_animal_origin_production.rds")
+
+ppm_state_animal_origin_production$ano <- ppm_state_animal_origin_production$time
+ppm_state_animal_origin_production <- ppm_state_animal_origin_production %>% 
+  janitor::clean_names() 
+
+
+###################
+# PPM ppm_state_sheep_farming
 ###################
 ppm_state_sheep_farming <- readRDS(file = "data/ppm_state_sheep_farming.rds")
 
 ppm_state_sheep_farming$ano <- ppm_state_sheep_farming$time
 ppm_state_sheep_farming <- ppm_state_sheep_farming %>% 
   janitor::clean_names() 
+
+###################
+# PPM ppm_state_cow_farming
+###################
+ppm_state_cow_farming <- readRDS(file = "data/ppm_state_cow_farming.rds")
+
+ppm_state_cow_farming$ano <- ppm_state_cow_farming$time
+ppm_state_cow_farming <- ppm_state_cow_farming %>% 
+  janitor::clean_names() 
+
+###################
+# PPM ppm_state_aquaculture
+###################
+ppm_state_aquaculture <- readRDS(file = "data/ppm_state_aquaculture.rds")
+
+ppm_state_aquaculture$ano <- ppm_state_aquaculture$time
+ppm_state_aquaculture <- ppm_state_aquaculture %>% 
+  janitor::clean_names() 
+
 ###########################
 # edit data to merge
 ###########################
-#class(ppm_state_sheep_farming$group) <-  'character'
 #class(ppm_state_sheep_farming$group) <-  'character'
 
 ###########################
 # merge all data
 ###########################
-dz_state <- ppm_state_animal_origin_production %>%
-  full_join(ppm_state_aquaculture, by = c("group","ano"))   %>%
-  full_join(ppm_state_cow_farming, by = c("group","ano"))   %>%
-  full_join(ppm_state_livestock_inventory, by = c("group","ano")) %>% 
-  full_join(ppm_state_sheep_farming, by = c("group","ano")) %>% 
+dz_state <- ppm_state_livestock_inventory %>%
+  full_join(ppm_state_animal_origin_production, by = c("group","ano"))   %>%
+  full_join(ppm_state_sheep_farming, by = c("group","ano"))   %>%
+  full_join(ppm_state_cow_farming, by = c("group","ano")) %>% 
+  full_join(ppm_state_aquaculture, by = c("group","ano")) %>% 
   arrange(group, ano) %>%
   relocate(group, ano)
-
-# edit final data
-class(dz_state)
-colnames(dz_state)
-
-# edit data to merge
-class(dz_state$ano) <-  'numeric'
 
 # clean column names
 dz_state <- dz_state %>%
   janitor::clean_names()
 
-######################################################
-# merge data with amazon municipalities shapefile
-######################################################
-map_dz_state <- sp::merge(shapefile, dz_state, by.x = 'group', by.y = 'group')
-
 # convert time data to date
-map_dz_state$ano <- as.Date(as.yearqtr(map_dz_state$ano), format = "%Y")
+dz_state$ano <- as.Date(as.yearqtr(dz_state$ano), format = "%Y")
 
-# colnames(map_dz_state)
-dz_state <- map_dz_state %>% select(group,
-                                    nm_municip,
-                                    uf,
-                                    ano,
-                                    employed_census2000,
-                                    employed_census2010,
-                                    mean_income_census2000,
-                                    mean_income_census2010,
-                                    median_income_census2000,
-                                    median_income_census2010,
-                                    desmatado,
-                                    incremento,
-                                    floresta,
-                                    nao_floresta,
-                                    hidrografia,
-                                    prop_desmatado,
-                                    prop_incremento,prop_floresta,
-                                    prop_nao_floresta,
-                                    prop_hidrografia,
-                                    pop,gdp,
-                                    gd_ppc,
-                                    cempre_n_empresas_organizacoes,
-                                    cempre_n_ocupados,
-                                    cempre_n_ocupados_assalariados,
-                                    cempre_salarios_remuneracoes,
-                                    ips2018,
-                                    ips2014,
-                                    geometry)
+# colnames(dz_state)
+lala <- colnames(dz_state)
+dz_state <- dz_state %>% select(all_of(lala))
+dz_state$estado <- dz_state$group
 
+# edit final data
+class(dz_state)
+colnames(dz_state)
 
-dz_state$estado <- dz_state$uf
+# remove unnecessary columns
+dz_state <- subset( dz_state, select = -c(time, time_x, group, time_y, time_y_y, time_x_x) )
 
-# unique(dz_state$uf_x)
-# dz_state <- dz_state %>% dplyr::filter(estado == "AC" | estado == "AP" | estado == "AM" | estado == "PA" | estado == "MA" | estado == "RR" | estado == "RO" | estado == "MT" | estado == "TO") 
-class(dz_state$group)
-dz_state$group <- as.factor(dz_state$group)
+# keep only uf from amazon
+dz_state <- dz_state %>% dplyr::filter(estado == "AC" | estado == "AP" | estado == "AM" | estado == "PA" | estado == "MA" | estado == "RR" | estado == "RO" | estado == "MT" | estado == "TO") 
+class(dz_state$estado)
 dz_state$estado <- as.factor(dz_state$estado)
 
-# groups at the level: municipio
-dz_state$group <- dz_state$nm_municip
-
 # unique rows
-# dz_state <- unique(dz_state, by = c(ano, group, estado))
-dz_state <- dz_state %>% group_by(group, ano)
+dz_state <- unique(dz_state, by = c(estado, ano))
+dz_state <- dz_state %>% group_by(estado, ano)
 
 # arrange data by municipality and year
 dz_state <- dz_state %>%
-  arrange(group, ano)
+  arrange(estado, ano) %>%
+  relocate(estado, ano)
 
 # Identify and remove duplicate data
-# xxx <- dz_state %>% distinct(group, ano, .keep_all = TRUE)
-
-# drop municipalities with empty geometry
-dz_state = dz_state[!st_is_empty(dz_state),,drop=FALSE]
+dz_state <- dz_state %>% distinct(estado, ano, .keep_all = TRUE)
 
 # save data
 saveRDS(dz_state,
@@ -181,6 +127,48 @@ dz_state <- readRDS("./data/dz_state.rds")
 # extract variables from data
 columns <- colnames(dz_state)
 
+#livestock_inventory
+dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
+aux= c(rep('Efetivo dos Rebanhos: ',11))
+label_livestock = paste0(aux, c(dic_ppm_livestock_inventory$var_pt[1:11]))
+# remove missing columns in dz_state
+label_livestock[! label_livestock %in% c("Efetivo dos Rebanhos: Suino - Matrizes de Suinos")]
+
+label_livestock <- subset(label_livestock, select = -c("Efetivo dos Rebanhos: Suino - Matrizes de Suinos") )
+
+
+
+#animal_origin_production
+dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')%>%
+  arrange(var_code)
+
+vec= NULL
+for(i in 2:7){
+  vec= c(vec, rep(dic_ppm_animal_origin_production$var_pt[i],2))
+} 
+vec= c('',vec)
+aux= c('Valor Total', rep(c('Quantidade ', 'Valor '),6))
+label_animal_origin_production= paste0(aux,vec)
+
+#sheep_farming 
+dic_ppm_sheep_farming= load_dictionary(dataset = 'ppm_sheep_farming')
+label_sheep_farming = c(dic_ppm_sheep_farming$var_pt[1:1])
+
+#ppm_cow_farming 
+dic_ppm_cow_farming= load_dictionary(dataset = 'ppm_cow_farming')
+label_cow_farming = c(dic_ppm_cow_farming$var_pt[1:1])
+
+#ppm_aquaculture
+dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')%>%
+  dplyr::arrange(var_pt)
+vec= NULL
+for(i in 1:25){
+  vec= c(vec, rep(dic_ppm_aquaculture$var_pt[i],2))
+}
+
+aux= c(rep(c('Producao da Aquicultura ', 'Valor da Producao '),25))
+label_aquaculture= paste0(aux,vec)
+
 # generate dictionary
 temp_param_table <- tibble(
   var = columns,
@@ -190,233 +178,90 @@ temp_param_table <- tibble(
   size = FALSE,
   slider = FALSE,
   geometry = FALSE,
-  label = columns,
+  label = columns, # c(label_livestock, label_animal_origin_production, label_cow_farming, label_aquaculture)
   desc = columns,
-  var_group = "Fonte de dados",
+  source = c(rep("Geral",2), rep("IBGE - PPM",73)),
   unidade = "Unidade de medida",
-  categoria= "Categoria principal", 
-  subcategoria = "Subcategoria"
+  categoria= c(rep("Geral",2), rep("Produção",73)), # c("Localização", "Unidade de Tempo", rep("Pecuaria",10)), 
+  subcategoria = c(rep("Geral",2), rep("Criação animal",73))
 )
 
-# label variables
-temp_param_table$label[1] <- "Código do município"
-temp_param_table$label[2] <- "Nome do município"
-temp_param_table$label[3] <- "Estado"
-temp_param_table$label[4] <- "Ano"
-# Census data
-temp_param_table$label[5] <- "Número de ocupados - Censo 2000"
-temp_param_table$label[6] <- "Número de ocupados - Censo 2010"
-temp_param_table$label[7] <- "Rendimento médio - Censo 2000"
-temp_param_table$label[8] <- "Rendimento médio - Censo 2010"
-temp_param_table$label[9] <- "Rendimento mediano - Censo 2000"
-temp_param_table$label[10] <- "Rendimento mediano - Censo 2010"
-#INPE-PRODES
-temp_param_table$label[11] <- "Área total desmatada"
-temp_param_table$label[12] <- "Área total de incremento de desmatamento"
-temp_param_table$label[13] <- "Área total de floresta"
-temp_param_table$label[14] <- "Área total de não-floresta"
-temp_param_table$label[15] <- "Área total de hidrografia"
-temp_param_table$label[16] <- "Proporção de desmatamento na área do município"
-temp_param_table$label[17] <- "Proporção de incremento de desmatamento na área do município"
-temp_param_table$label[18] <- "Proporção de floresta na área do município"
-temp_param_table$label[19] <- "Proporção de não-floresta na área do município"
-temp_param_table$label[20] <- "Proporção de hidrografia na área do município"
-# IBGE
-temp_param_table$label[21] <- "População"
-temp_param_table$label[22] <- "PIB"
-temp_param_table$label[23] <- "PIB percapita"
-# CEMPRE
-temp_param_table$label[24] <- "Número de empresas e outras organizações"
-temp_param_table$label[25] <- "Número de pessoas ocupadas"
-temp_param_table$label[26] <- "Número de pessoas ocupadas assalariadas"
-temp_param_table$label[27] <- "Salários e outras remunerações"
-# IPS
-temp_param_table$label[28] <- "IPS 2018"
-temp_param_table$label[29] <- "IPS 2014"
-temp_param_table$label[30] <- "Estado"
-temp_param_table$label[31] <- "Geometria"
-
-# unidade variables
-temp_param_table$unidade[4] <- "Ano"
-temp_param_table$unidade[5] <- "Pessoas"
-temp_param_table$unidade[6] <- "Pessoas"
-temp_param_table$unidade[7] <- "R$ em 2000"
-temp_param_table$unidade[8] <- "R$ em 2010"
-temp_param_table$unidade[9] <- "R$ em 2000"
-temp_param_table$unidade[10] <- "R$ em 2010"
-temp_param_table$unidade[11] <- "Km2"
-temp_param_table$unidade[12] <- "Km2"
-temp_param_table$unidade[13] <- "Km2"
-temp_param_table$unidade[14] <- "Km2"
-temp_param_table$unidade[15] <- "Km2"
-temp_param_table$unidade[16] <- "%"
-temp_param_table$unidade[17] <- "%"
-temp_param_table$unidade[18] <- "%"
-temp_param_table$unidade[19] <- "%"
-temp_param_table$unidade[20] <- "%"
-temp_param_table$unidade[21] <- "Pessoas"
-temp_param_table$unidade[22] <- "R$"
-temp_param_table$unidade[23] <- "R$"
-temp_param_table$unidade[24] <- "Estabelecimentos"
-temp_param_table$unidade[25] <- "Pessoas"
-temp_param_table$unidade[26] <- "Pessoas"
-temp_param_table$unidade[27] <- "R$"
-temp_param_table$unidade[28] <- "Índice de 0 a 100"
-temp_param_table$unidade[29] <- "Índice de 0 a 100"
-temp_param_table$unidade[30] <- "Estado"
-temp_param_table$unidade[31] <- "Geometria"
-
-# var_group variables
-temp_param_table$var_group[1] <- "Geral"
-temp_param_table$var_group[2] <- "Geral"
-temp_param_table$var_group[3] <- "Geral"
-temp_param_table$var_group[4] <- "Geral"
-temp_param_table$var_group[5] <- "IBGE - Censo 2000"
-temp_param_table$var_group[6] <- "IBGE - Censo 2010"
-temp_param_table$var_group[7] <- "IBGE - Censo 2000"
-temp_param_table$var_group[8] <- "IBGE - Censo 2010"
-temp_param_table$var_group[9] <- "IBGE - Censo 2000"
-temp_param_table$var_group[10] <- "IBGE - Censo 2010"
-temp_param_table$var_group[11] <- "INPE - PRODES"
-temp_param_table$var_group[12] <- "INPE - PRODES"
-temp_param_table$var_group[13] <- "INPE - PRODES"
-temp_param_table$var_group[14] <- "INPE - PRODES"
-temp_param_table$var_group[15] <- "INPE - PRODES"
-temp_param_table$var_group[16] <- "INPE - PRODES"
-temp_param_table$var_group[17] <- "INPE - PRODES"
-temp_param_table$var_group[18] <- "INPE - PRODES"
-temp_param_table$var_group[19] <- "INPE - PRODES"
-temp_param_table$var_group[20] <- "INPE - PRODES"
-temp_param_table$var_group[21] <- "IBGE - CEMPRE"
-temp_param_table$var_group[22] <- "IBGE - CEMPRE"
-temp_param_table$var_group[23] <- "IBGE - CEMPRE"
-temp_param_table$var_group[24] <- "IBGE - CEMPRE"
-temp_param_table$var_group[25] <- "IBGE - CEMPRE"
-temp_param_table$var_group[26] <- "IBGE - CEMPRE"
-temp_param_table$var_group[27] <- "IBGE - CEMPRE"
-temp_param_table$var_group[28] <- "IMAZON"
-temp_param_table$var_group[29] <- "IMAZON"
-temp_param_table$var_group[30] <- "Geral"
-temp_param_table$var_group[31] <- "Terrabrasilis"
-
-# label data category
-temp_param_table$categoria[1] <- "Unidade geográfica"
-temp_param_table$categoria[2] <- "Unidade geográfica"
-temp_param_table$categoria[3] <- "Unidade geográfica"
-temp_param_table$categoria[4] <- "Unidade de tempo"
-# Census data
-temp_param_table$categoria[5] <- "Mercado de trabalho"
-temp_param_table$categoria[6] <- "Mercado de trabalho"
-temp_param_table$categoria[7] <- "Mercado de trabalho"
-temp_param_table$categoria[8] <- "Mercado de trabalho"
-temp_param_table$categoria[9] <- "Mercado de trabalho"
-temp_param_table$categoria[10] <- "Mercado de trabalho"
-#INPE-PRODES
-temp_param_table$categoria[11] <- "Meio ambiente"
-temp_param_table$categoria[12] <- "Meio ambiente"
-temp_param_table$categoria[13] <- "Meio ambiente"
-temp_param_table$categoria[14] <- "Meio ambiente"
-temp_param_table$categoria[15] <- "Meio ambiente"
-temp_param_table$categoria[16] <- "Meio ambiente"
-temp_param_table$categoria[17] <- "Meio ambiente"
-temp_param_table$categoria[18] <- "Meio ambiente"
-temp_param_table$categoria[19] <- "Meio ambiente"
-temp_param_table$categoria[20] <- "Meio ambiente"
-# IBGE
-temp_param_table$categoria[21] <- "Demografia"
-temp_param_table$categoria[22] <- "Economia"
-temp_param_table$categoria[23] <- "Economia"
-# CEMPRE
-temp_param_table$categoria[24] <- "Economia"
-temp_param_table$categoria[25] <- "Mercado de trabalho"
-temp_param_table$categoria[26] <- "Mercado de trabalho"
-temp_param_table$categoria[27] <- "Mercado de trabalho"
-# IPS
-temp_param_table$categoria[28] <- "Social"
-temp_param_table$categoria[29] <- "Social"
-temp_param_table$categoria[30] <- "Unidade geográfica"
-temp_param_table$categoria[31] <- "Unidade geográfica"
-
-# subcategoria variables
-temp_param_table$subcategoria[1] <- "Município"
-temp_param_table$subcategoria[2] <- "Município"
-temp_param_table$subcategoria[3] <- "Estado"
-temp_param_table$subcategoria[4] <- "Tempo"
-# Census data
-temp_param_table$subcategoria[5] <- "Trabalho"
-temp_param_table$subcategoria[6] <- "Trabalho"
-temp_param_table$subcategoria[7] <- "Rendimento"
-temp_param_table$subcategoria[8] <- "Rendimento"
-temp_param_table$subcategoria[9] <- "Rendimento"
-temp_param_table$subcategoria[10] <- "Rendimento"
-#INPE-PRODES
-temp_param_table$subcategoria[11] <- "Desmatamento"
-temp_param_table$subcategoria[12] <- "Desmatamento"
-temp_param_table$subcategoria[13] <- "Floresta"
-temp_param_table$subcategoria[14] <- "Geografia"
-temp_param_table$subcategoria[15] <- "Geografia"
-temp_param_table$subcategoria[16] <- "Desmatamento"
-temp_param_table$subcategoria[17] <- "Desmatamento"
-temp_param_table$subcategoria[18] <- "Floresta"
-temp_param_table$subcategoria[19] <- "Geografia"
-temp_param_table$subcategoria[20] <- "Geografia"
-# IBGE
-temp_param_table$subcategoria[21] <- "População"
-temp_param_table$subcategoria[22] <- "Desenvolvimento"
-temp_param_table$subcategoria[23] <- "Desenvolvimento"
-# CEMPRE
-temp_param_table$subcategoria[24] <- "Produção"
-temp_param_table$subcategoria[25] <- "Trabalho"
-temp_param_table$subcategoria[26] <- "Trabalho"
-temp_param_table$subcategoria[27] <- "Rendimento"
-# IPS
-temp_param_table$subcategoria[28] <- "Desenvolvimento"
-temp_param_table$subcategoria[29] <- "Desenvolvimento"
-temp_param_table$subcategoria[30] <- "Estado"
-temp_param_table$subcategoria[31] <- "Geografia"
-
-# block variables in graphs y-axis
-temp_param_table$y[1] <- FALSE # "Código do município"
-temp_param_table$y[2] <- FALSE # "nm_municip"
-temp_param_table$y[3] <- FALSE # "uf_x"
-temp_param_table$y[4] <- FALSE # "ano"
-
-temp_param_table$y[30] <- FALSE # "geometry"
-temp_param_table$y[31] <- FALSE # "estado"
-
-
-# block and variables in graphs x-axis
-temp_param_table$x[1] <- FALSE # "Código do município"
-temp_param_table$x[2] <- FALSE # "nm_municip"
-temp_param_table$x[3] <- FALSE # "uf_x"
-temp_param_table$x[4] <- FALSE # "ano"
-temp_param_table$x[30] <- FALSE # "geometry"
-temp_param_table$x[31] <- FALSE # "estado"
-
-# allow variables in graphs size, color, and slider-axis 
-temp_param_table$size[5] <- TRUE # 
-temp_param_table$size[6] <- TRUE # 
-temp_param_table$size[7] <- TRUE #
-temp_param_table$size[8] <- TRUE #
-temp_param_table$size[9] <- TRUE #
-temp_param_table$size[10] <- TRUE #
-temp_param_table$size[21] <- TRUE #
-
-temp_param_table$size[28] <- TRUE # "Índice de Progresso Social (IPS)"
-temp_param_table$size[29] <- TRUE # "Índice de Progresso Social (IPS)"
-temp_param_table$color[5] <- TRUE # 
-temp_param_table$color[6] <- TRUE # 
-temp_param_table$color[7] <- TRUE #
-temp_param_table$color[8] <- TRUE #
-temp_param_table$color[9] <- TRUE #
-temp_param_table$color[10] <- TRUE #
-temp_param_table$color[21] <- TRUE #
-
-temp_param_table$color[28] <- TRUE # "Índice de Progresso Social (IPS)"
-temp_param_table$color[29] <- TRUE # "Índice de Progresso Social (IPS)"
-temp_param_table$color[30] <- TRUE # "Estado"
-
-temp_param_table$slider[4] <- TRUE # "ano"
+# Label
+temp_param_table$label[temp_param_table$var== "estado"] <- "Estado"
+temp_param_table$label[temp_param_table$var== "ano"] <- "Ano"
+temp_param_table$label[temp_param_table$var== "bovino_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Bovino"
+temp_param_table$label[temp_param_table$var== "bubalino_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Bubalino"
+temp_param_table$label[temp_param_table$var== "equino_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Equino"
+temp_param_table$label[temp_param_table$var== "suino_total_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Suino - Total"
+temp_param_table$label[temp_param_table$var== "caprino_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Caprino"
+temp_param_table$label[temp_param_table$var== "ovino_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Ovino"
+temp_param_table$label[temp_param_table$var== "galinaceos_total_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Galinaceos - Total"
+temp_param_table$label[temp_param_table$var== "galinaceos_galinhas_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Galinaceos - Galinha"
+temp_param_table$label[temp_param_table$var== "codornas_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Codornas"
+temp_param_table$label[temp_param_table$var== "suino_matrizes_de_suinos_efetivo_dos_rebanhos"] <- "Efetivo dos Rebanhos: Suino - Matrizes de Suinos"
+temp_param_table$label[temp_param_table$var== "valor_v0"] <- "Valor Total"
+temp_param_table$label[temp_param_table$var== "quant_v2682"] <- "Quantidade Leite"
+temp_param_table$label[temp_param_table$var== "valor_v2682"] <- "Valor Leite"
+temp_param_table$label[temp_param_table$var== "quant_v2683"] <- "Quantidade casulos do bicho-da-seda"
+temp_param_table$label[temp_param_table$var== "valor_v2683"] <- "Valor casulos do bicho-da-seda"
+temp_param_table$label[temp_param_table$var== "quant_v2684"] <- "Quantidade La"
+temp_param_table$label[temp_param_table$var== "valor_v2684"] <- "Valor La"
+temp_param_table$label[temp_param_table$var== "quant_v2685"] <- "Quantidade ovos de galinha"
+temp_param_table$label[temp_param_table$var== "valor_v2685"] <- "Valor ovos de galinha"
+temp_param_table$label[temp_param_table$var== "quant_v2686"] <- "Quantidade Ovos de codorna"
+temp_param_table$label[temp_param_table$var== "valor_v2686"] <- "Valor Ovos de codorna"
+temp_param_table$label[temp_param_table$var== "quant_v2687"] <- "Quantidade Mel de abelha"
+temp_param_table$label[temp_param_table$var== "valor_v2687"] <- "Valor Mel de abelha"
+temp_param_table$label[temp_param_table$var== "ovinos_tosquiados_nos_estabelecimentos_agropecuarios"] <- "Ovinos tosquiados"
+temp_param_table$label[temp_param_table$var== "vacas_ordenhadas"] <- "Vacas ordenhadas"
+temp_param_table$label[temp_param_table$var== "alevinos_producao_da_aquicultura"] <- "Producao da Aquicultura Alevinos"
+temp_param_table$label[temp_param_table$var== "alevinos_valor_da_producao"] <- "Valor da Producao Alevinos"
+temp_param_table$label[temp_param_table$var== "camarao_producao_da_aquicultura"] <- "Producao da Aquicultura Camarao"
+temp_param_table$label[temp_param_table$var== "camarao_valor_da_producao"] <- "Valor da Producao Camarao"
+temp_param_table$label[temp_param_table$var== "carpa_producao_da_aquicultura"] <- "Producao da Aquicultura Carpa"
+temp_param_table$label[temp_param_table$var== "carpa_valor_da_producao"] <- "Valor da Producao Carpa"
+temp_param_table$label[temp_param_table$var== "curimata_curimbata_producao_da_aquicultura"] <- "Producao da Aquicultura Curimata, curimbata"
+temp_param_table$label[temp_param_table$var== "curimata_curimbata_valor_da_producao"] <- "Valor da Producao Curimata, curimbata"
+temp_param_table$label[temp_param_table$var== "dourado_producao_da_aquicultura"] <- "Producao da Aquicultura Dourado"
+temp_param_table$label[temp_param_table$var== "dourado_valor_da_producao"] <- "Valor da Producao Dourado"
+temp_param_table$label[temp_param_table$var== "jatuarana_piabanha_e_piracanjuba_producao_da_aquicultura"] <- "Producao da Aquicultura Jatuarana, piabanha e piracanjuba"
+temp_param_table$label[temp_param_table$var== "jatuarana_piabanha_e_piracanjuba_valor_da_producao"] <- "Valor da Producao Jatuarana, piabanha e piracanjuba"
+temp_param_table$label[temp_param_table$var== "lambari_producao_da_aquicultura"] <- "Producao da Aquicultura Lambari"
+temp_param_table$label[temp_param_table$var== "lambari_valor_da_producao"] <- "Valor da Producao Lambari"
+temp_param_table$label[temp_param_table$var== "larvas_e_pos_larvas_de_camarao_producao_da_aquicultura"] <- "Producao da Aquicultura Larvas e pos-larvas de camarao"
+temp_param_table$label[temp_param_table$var== "larvas_e_pos_larvas_de_camarao_valor_da_producao"] <- "Valor da Producao Larvas e pos-larvas de camarao"
+temp_param_table$label[temp_param_table$var== "matrinxa_producao_da_aquicultura"] <- "Producao da Aquicultura Matrinxa"
+temp_param_table$label[temp_param_table$var== "matrinxa_valor_da_producao"] <- "Valor da Producao Matrinxa"
+temp_param_table$label[temp_param_table$var== "ostras_vieiras_e_mexilhoes_producao_da_aquicultura"] <- "Producao da Aquicultura Ostras, vieiras e mexilhoes"
+temp_param_table$label[temp_param_table$var== "ostras_vieiras_e_mexilhoes_valor_da_producao"] <- "Valor da Producao Ostras, vieiras e mexilhoes"
+temp_param_table$label[temp_param_table$var== "outros_peixes_producao_da_aquicultura"] <- "Producao da Aquicultura Outros peixes"
+temp_param_table$label[temp_param_table$var== "outros_peixes_valor_da_producao"] <- "Valor da Producao Outros peixes"
+temp_param_table$label[temp_param_table$var== "outros_produtos_ra_jacare_siri_caranguejo_lagosta_etc_valor_da_producao"] <- "Valor da Producao Outros produtos (ra, jacare, siri, caranguejo, lagosta, etc)"
+temp_param_table$label[temp_param_table$var== "pacu_e_patinga_producao_da_aquicultura"] <- "Producao da Aquicultura Pacu e patinga"
+temp_param_table$label[temp_param_table$var== "pacu_e_patinga_valor_da_producao"] <- "Valor da Producao Pacu e patinga"
+temp_param_table$label[temp_param_table$var== "piau_piapara_piaucu_piava_producao_da_aquicultura"] <- "Producao da Aquicultura Piau, piapara, piaucu, piava"
+temp_param_table$label[temp_param_table$var== "piau_piapara_piaucu_piava_valor_da_producao"] <- "Valor da Producao Piau, piapara, piaucu, piava"
+temp_param_table$label[temp_param_table$var== "pintado_cachara_cachapira_e_pintachara_surubim_producao_da_aquicultura"] <- "Producao da Aquicultura Pintado, cachara, cachapira e pintachara, surubim"
+temp_param_table$label[temp_param_table$var== "pintado_cachara_cachapira_e_pintachara_surubim_valor_da_producao"] <- "Valor da Producao Pintado, cachara, cachapira e pintachara, surubim"
+temp_param_table$label[temp_param_table$var== "pirapitinga_producao_da_aquicultura"] <- "Producao da Aquicultura Pirapitinga"
+temp_param_table$label[temp_param_table$var== "pirapitinga_valor_da_producao"] <- "Valor da Producao Pirapitinga"
+temp_param_table$label[temp_param_table$var== "pirarucu_producao_da_aquicultura"] <- "Producao da Aquicultura Pirarucu"
+temp_param_table$label[temp_param_table$var== "pirarucu_valor_da_producao"] <- "Valor da Producao Pirarucu"
+temp_param_table$label[temp_param_table$var== "sementes_de_moluscos_producao_da_aquicultura"] <- "Producao da Aquicultura Sementes de moluscos"
+temp_param_table$label[temp_param_table$var== "sementes_de_moluscos_valor_da_producao"] <- "Valor da Producao Sementes de moluscos"
+temp_param_table$label[temp_param_table$var== "tambacu_tambatinga_producao_da_aquicultura"] <- "Producao da Aquicultura Tambacu, tambatinga"
+temp_param_table$label[temp_param_table$var== "tambacu_tambatinga_valor_da_producao"] <- "Valor da Producao Tambacu, tambatinga"
+temp_param_table$label[temp_param_table$var== "tambaqui_producao_da_aquicultura"] <- "Producao da Aquicultura Tambaqui"
+temp_param_table$label[temp_param_table$var== "tambaqui_valor_da_producao"] <- "Valor da Producao Tambaqui"
+temp_param_table$label[temp_param_table$var== "tilapia_producao_da_aquicultura"] <- "Producao da Aquicultura Tilapia"
+temp_param_table$label[temp_param_table$var== "tilapia_valor_da_producao"] <- "Valor da Producao Tilapia"
+temp_param_table$label[temp_param_table$var== "total_valor_da_producao"] <- "Producao da Aquicultura Total"
+temp_param_table$label[temp_param_table$var== "traira_e_trairao_producao_da_aquicultura"] <- "Valor da Producao Total"
+temp_param_table$label[temp_param_table$var== "traira_e_trairao_valor_da_producao"] <- "Producao da Aquicultura Traira e trairao"
+temp_param_table$label[temp_param_table$var== "truta_producao_da_aquicultura"] <- "Producao da Aquicultura Truta"
+temp_param_table$label[temp_param_table$var== "truta_valor_da_producao"] <- "Valor da Producao Truta"
+temp_param_table$label[temp_param_table$var== "tucunare_producao_da_aquicultura"] <- "Producao da Aquicultura Tucunare"
+temp_param_table$label[temp_param_table$var== "tucunare_valor_da_producao"] <- "Valor da Producao Tucunare"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_state_dic.csv", fileEncoding = "UTF-8")
