@@ -32,7 +32,7 @@ param$group <- "estado" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Produção Econômia por Estado"
+param$plot_desc <- "Produção Econômica por Estado"
 
 # Outros parâmetros e configurações
 
