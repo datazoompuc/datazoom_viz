@@ -1,7 +1,17 @@
 ### Creating metadatabase -> IBGE - PPM
 
+# call packages
+library(tidyverse)
+library(datazoom.amazonia)
+
 #livestock_inventory
 ppm_state_livestock_inventory= readRDS('data/ppm_state_livestock_inventory.rds')
+
+## ATENÇÃO!!!
+## load_dictionary não é uma função que nativa do R e também não é encontrado mesmo quando
+## o pacote datazoom.amazonia é chamado. 
+## Por isso, todos as linhas que possuem load_dictionary não é replicável!
+## É precico consertar isso, para que qualquer computador consiga replicar o codigo.
 
 dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
 aux= c('','', rep('Efetivo dos Rebanhos ',10))
@@ -22,7 +32,7 @@ metadata_ppm_livestock_inventory= tibble::tibble(
   subcategoria = c('Identificador Geográfico','Ano da Pesquisa',rep("Especies - Criacao",10))
 ) 
 #saving f
-write.csv(metadata_ppm_livestock_inventory, file = "./data/metadata_ppm_livestock_inventory.csv", fileEncoding = "UTF-8")
+write.csv(metadata_ppm_livestock_inventory, file = "./data/metadata_ppm_state_livestock_inventory.csv", fileEncoding = "UTF-8")
 
 
 #animal_origin_production
@@ -54,7 +64,7 @@ metadata_ppm_animal_origin_production= tibble::tibble(
   subcategoria = c('Identificador Geográfico','Ano da Pesquisa',rep("Produtos Pecuarios",13))
 )
 #saving f
-write.csv(metadata_ppm_animal_origin_production, file = "./data/metadata_ppm_animal_origin_production.csv", fileEncoding = "UTF-8")
+write.csv(metadata_ppm_animal_origin_production, file = "./data/metadata_ppm_state_animal_origin_production.csv", fileEncoding = "UTF-8")
 
 
 #sheep_farming 
@@ -77,7 +87,7 @@ metadata_ppm_sheep_farming= tibble::tibble(
   subcategoria = c('Identificador Geográfico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 #saving f
-write.csv(metadata_ppm_sheep_farming, file = "./data/metadata_ppm_sheep_farming.csv", fileEncoding = "UTF-8")
+write.csv(metadata_ppm_sheep_farming, file = "./data/metadata_ppm_state_sheep_farming.rds", fileEncoding = "UTF-8")
 
 
 #ppm_cow_farming 
@@ -102,7 +112,7 @@ metadata_ppm_cow_farming= tibble::tibble(
 ) 
 
 #saving f
-write.csv(metadata_ppm_cow_farming, file = "./data/metadata_ppm_cow_farming.csv", fileEncoding = "UTF-8")
+write.csv(metadata_ppm_cow_farming, file = "./data/metadata_ppm_state_cow_farming.csv", fileEncoding = "UTF-8")
 
 
 #ppm_aquaculture
@@ -142,4 +152,4 @@ metadata_ppm_aquaculture= tibble::tibble(
   subcategoria = c("Localização","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
 )
 #saving f
-write.csv(metadata_ppm_aquaculture, file = "./data/metadata_ppm_aquaculture.csv", fileEncoding = "UTF-8")
+write.csv(metadata_ppm_aquaculture, file = "./data/metadata_ppm_state_aquaculture.csv", fileEncoding = "UTF-8")
