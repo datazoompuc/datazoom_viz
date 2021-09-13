@@ -1,6 +1,6 @@
 "","var","x","y","color","size","slider","label","source","tipo","unidade","categoria","subcategoria"
-"1","group",TRUE,TRUE,FALSE,FALSE,FALSE,"Identificador Geografico","IBGE",1,"","LocalizaÃ§Ã£o","LocalizaÃ§Ã£o"
-"2","time",TRUE,TRUE,FALSE,FALSE,FALSE,"Ano da Pesquisa","IBGE",1,"","Unidade de Tempo","Unidade de Tempo"
+"1","group",TRUE,TRUE,FALSE,FALSE,FALSE,"Identificador Geografico","IBGE",1,"","Localizaçao","Identificador Geografico"
+"2","time",TRUE,TRUE,FALSE,FALSE,FALSE,"Ano da Pesquisa","IBGE",1,"","Unidade de Tempo","Ano da Pesquisa"
 "3","alevinos_producao_da_aquicultura",TRUE,TRUE,FALSE,FALSE,FALSE,"Producao da Aquicultura Alevinos","IBGE",1,"Kg","Pecuaria","Especies - Aquicultura"
 "4","alevinos_valor_da_producao",TRUE,TRUE,FALSE,FALSE,FALSE,"Valor da Producao Alevinos","IBGE",1,"1K BRL","Pecuaria","Especies - Aquicultura"
 "5","camarao_producao_da_aquicultura",TRUE,TRUE,FALSE,FALSE,FALSE,"Producao da Aquicultura Camarao","IBGE",1,"Kg","Pecuaria","Especies - Aquicultura"

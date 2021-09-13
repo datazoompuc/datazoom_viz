@@ -230,8 +230,8 @@ metadata_ppm_livestock_inventory= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep('Cabecas',10)),
-  categoria= c("Localização","Unidade de Tempo",rep("Pecuaria",10)), 
-  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',rep("Especies - Criacao",10))
+  categoria= c("Localizacao","Unidade de Tempo",rep("Pecuaria",10)), 
+  subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Especies - Criacao",10))
 ) 
 #saving f
 write.csv(metadata_ppm_livestock_inventory, file = "./data/ppm_state_livestock_inventory_dic.csv", fileEncoding = "UTF-8")

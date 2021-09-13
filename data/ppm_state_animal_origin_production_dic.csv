@@ -1,5 +1,5 @@
 "","var","x","y","color","size","slider","label","source","tipo","unidade","categoria","subcategoria"
-"1","group",TRUE,TRUE,FALSE,FALSE,FALSE,"Identificador Geografico","IBGE",1,NA,"LocalizaÃ§Ã£o","Identificador GeogrÃ¡fico"
+"1","group",TRUE,TRUE,FALSE,FALSE,FALSE,"Identificador Geografico","IBGE",1,NA,"Localizaçao","Identificador Geografico"
 "2","time",TRUE,TRUE,FALSE,FALSE,FALSE,"Ano da Pesquisa","IBGE",1,NA,"Unidade de Tempo","Ano da Pesquisa"
 "3","valor_v0",TRUE,TRUE,FALSE,FALSE,FALSE,"Valor Total","IBGE",1,"1K BRL","Pecuaria","Produtos Pecuarios"
 "4","quant_v2682",TRUE,TRUE,FALSE,FALSE,FALSE,"Quantidade Leite","IBGE",1,"1K Liters","Pecuaria","Produtos Pecuarios"
