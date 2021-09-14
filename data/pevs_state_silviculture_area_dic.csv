@@ -1,0 +1,7 @@
+"","var","x","y","color","size","slider","label","source","tipo","unidade","categoria","subcategoria"
+"1","group",TRUE,TRUE,FALSE,FALSE,FALSE,"Identificador Geografico","IBGE",1,"","Localizacao","Identificador Geografico"
+"2","time",TRUE,TRUE,FALSE,FALSE,FALSE,"Ano da Pesquisa","IBGE",1,"","Unidade de Tempo","Anual"
+"3","area_v0",TRUE,TRUE,FALSE,FALSE,FALSE,"Total","IBGE",1,"Hectares","Agricultura","Area de Extrativismo Vegetal"
+"4","area_v39326",TRUE,TRUE,FALSE,FALSE,FALSE,"Eucalipto","IBGE",1,"Hectares","Agricultura","Area de Extrativismo Vegetal"
+"5","area_v39327",TRUE,TRUE,FALSE,FALSE,FALSE,"Pinus","IBGE",1,"Hectares","Agricultura","Area de Extrativismo Vegetal"
+"6","area_v39328",TRUE,TRUE,FALSE,FALSE,FALSE,"Outras Especies","IBGE",1,"Hectares","Agricultura","Area de Extrativismo Vegetal"
