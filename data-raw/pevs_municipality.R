@@ -1,5 +1,44 @@
-### Creating metadatabase -> IBGE - PEVS
+##########
+### Generate data -> IBGE - PEVS
+##########
+## Agregation level - MUNICIPALITY
 
+#silviculture  
+
+##municipality (ainda nao salvo)
+pevs_municipality_silviculture= load_pevs(dataset = 'pevs_silviculture', raw_data = FALSE, 'municipality', 1986:2019, language = "pt")
+
+##making data usable for datazoom viz
+##saving 
+saveRDS(pevs_municipality_silviculture,
+        file = "./data/pevs_municipality_silviculture.rds"
+)
+
+
+#forest_crops
+
+##municipality (ainda nao salvo)
+pevs_municipality_forest_crops= load_pevs(dataset = 'pevs_forest_crops', raw_data = FALSE, 'municipality', 1986:2019, language = "pt")
+##making data usable for datazoom viz
+
+##saving f
+saveRDS(pevs_municipality_forest_crops,
+        file = "./data/pevs_municipality_forest_crops.rds"
+)
+
+#silviculture_area
+
+##municipality (ainda nao salvo)
+pevs_municipality_silviculture_area= load_pevs(dataset = 'pevs_silviculture_area', raw_data = FALSE, 'municipality', 1986:2019, language = "pt")
+##making data usable for datazoom viz
+##saving f
+saveRDS(pevs_municipality_silviculture_area,
+        file = "./data/pevs_municipality_silviculture_area.rds"
+)
+
+#########
+### Creating metadatabase -> IBGE - PEVS
+#########
 #silviculture
 pevs_state_silviculture= readRDS('data\\pevs_state_silviculture.rds')
 
@@ -38,8 +77,8 @@ metadata_pevs_silviculture= tibble::tibble(
   categoria= c('Localizacao','Unidade de Tempo',rep("Agricultura",43)), 
   subcategoria = c('Identificador Geografico','Anual',rep("Especies - Extrativismo Vegetal",43))
 )
-#saving f
-write.csv(metadata_pevs_silviculture, file = "./data/metadata_pevs_silviculture.csv", fileEncoding = "UTF-8")
+#saving 
+write.csv(metadata_pevs_silviculture, file = "./data/pevs_municipality_silviculture_dic.csv", fileEncoding = "UTF-8")
 
 #forest_crops
 pevs_state_forest_crops= readRDS('data\\pevs_state_forest_crops.rds')
@@ -89,7 +128,7 @@ metadata_pevs_forest_crops= tibble::tibble(
   subcategoria = c('Identificador Geografico','Anual',rep("Especies - Cultivo Florestal",105))
 )
 #saving f
-write.csv(metadata_pevs_forest_crops, file = "./data/metadata_pevs_forest_crops.csv", fileEncoding = "UTF-8")
+write.csv(metadata_pevs_forest_crops, file = "./data/pevs_municipality_forest_crops_dic.csv", fileEncoding = "UTF-8")
 
 
 #silviculture_area
@@ -118,4 +157,4 @@ metadata_pevs_silviculture_area= tibble::tibble(
   subcategoria =  c('Identificador Geografico','Anual',rep("Area de Extrativismo Vegetal",4))
 ) 
 #saving f
-write.csv(metadata_pevs_silviculture_area, file = "./data/metadata_pevs_silviculture_area.csv", fileEncoding = "UTF-8")
+write.csv(metadata_pevs_silviculture_area, file = "./data/pevs_municipality_silviculture_area_dic.csv", fileEncoding = "UTF-8")

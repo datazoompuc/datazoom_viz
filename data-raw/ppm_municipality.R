@@ -8,35 +8,6 @@
 ##municipality (ainda nao salvo)
 ppm_municipality_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##making data usable for datazoom viz
-ppm_state_livestock_inventory= dplyr::rename(ppm_state_livestock_inventory, time=.data$ano)%>%
-  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
-                                         .data$geo_id == '27' ~ 'AL',
-                                         .data$geo_id == '16' ~ 'AP',
-                                         .data$geo_id == '13' ~ 'AM',
-                                         .data$geo_id == '29' ~ 'BA',
-                                         .data$geo_id == '23' ~ 'CE',
-                                         .data$geo_id == '53' ~ 'DF',
-                                         .data$geo_id == '32' ~ 'ES',
-                                         .data$geo_id == '52' ~ 'GO',
-                                         .data$geo_id == '21' ~ 'MA',
-                                         .data$geo_id == '51' ~ 'MT',
-                                         .data$geo_id == '50' ~ 'MS',
-                                         .data$geo_id == '31' ~ 'MG',
-                                         .data$geo_id == '15' ~ 'PA',
-                                         .data$geo_id == '25' ~ 'PB',
-                                         .data$geo_id == '41' ~ 'PR',
-                                         .data$geo_id == '26' ~ 'PE',
-                                         .data$geo_id == '22' ~ 'PI',
-                                         .data$geo_id == '24' ~ 'RN',
-                                         .data$geo_id == '43' ~ 'RS',
-                                         .data$geo_id == '33' ~ 'RJ',
-                                         .data$geo_id == '11' ~ 'RO',
-                                         .data$geo_id == '14' ~ 'RR',
-                                         .data$geo_id == '42' ~ 'SC',
-                                         .data$geo_id == '35' ~ 'SP',
-                                         .data$geo_id == '28' ~ 'SE',
-                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
-ppm_state_livestock_inventory[is.na(ppm_state_livestock_inventory)] = 0
 
 ##saving
 
