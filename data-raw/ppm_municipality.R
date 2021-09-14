@@ -110,8 +110,8 @@ metadata_ppm_livestock_inventory= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep('Cabecas',10)),
-  categoria= c("Localização","Unidade de Tempo",rep("Pecuaria",10)), 
-  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',rep("Especies - Criacao",10))
+  categoria= c("Localiza�ao","Unidade de Tempo",rep("Pecuaria",10)), 
+  subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Especies - Criacao",10))
 ) 
 #saving f
 write.csv(metadata_ppm_livestock_inventory, file = "./data/ppm_municipality_livestock_inventory_dic.csv", fileEncoding = "UTF-8")
@@ -142,8 +142,8 @@ metadata_ppm_animal_origin_production= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, '1K BRL', '1K Liters', '1K BRL', 'Kg', '1K BRL', 'Kg', '1K BRL', '1K Dozens', '1K BRL', '1K Dozens', '1K BRL', 'Kg', '1K BRL'),
-  categoria= c("Localização","Unidade de Tempo",rep("Pecuaria",13)), 
-  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',rep("Produtos Pecuarios",13))
+  categoria= c("Localiza�ao","Unidade de Tempo",rep("Pecuaria",13)), 
+  subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Produtos Pecuarios",13))
 )
 #saving f
 write.csv(metadata_ppm_animal_origin_production, file = "./data/ppm_municipality_animal_origin_production_dic.csv", fileEncoding = "UTF-8")
@@ -165,8 +165,8 @@ metadata_ppm_sheep_farming= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, 'Cabecas'),
-  categoria= c("Localização","Unidade de Tempo","Pecuaria"), 
-  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',"Atividade Pecuaria")
+  categoria= c("Localiza�ao","Unidade de Tempo","Pecuaria"), 
+  subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 #saving f
 write.csv(metadata_ppm_sheep_farming, file = "./data/ppm_municipality_sheep_farming.csv", fileEncoding = "UTF-8")
@@ -189,8 +189,8 @@ metadata_ppm_cow_farming= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, 'Cabecas'),
-  categoria= c("Localização","Unidade de Tempo","Pecuaria"), 
-  subcategoria = c('Identificador Geográfico','Ano da Pesquisa',"Atividade Pecuaria")
+  categoria= c("Localiza�ao","Unidade de Tempo","Pecuaria"), 
+  subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 
 #saving f
@@ -230,8 +230,8 @@ metadata_ppm_aquaculture= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = unidade_aqua,
-  categoria= c("Localização","Unidade de Tempo" ,rep("Pecuaria",48)), 
-  subcategoria = c("Localização","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
+  categoria= c("Localiza�ao","Unidade de Tempo" ,rep("Pecuaria",48)), 
+  subcategoria = c("Localiza�ao","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
 )
 #saving f
 write.csv(metadata_ppm_aquaculture, file = "./data/ppm_municipality_aquaculture_dic.csv", fileEncoding = "UTF-8")

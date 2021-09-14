@@ -1,6 +1,70 @@
-### Creating metadatabase -> IBGE - PAM
+##########
+### Generate data -> IBGE - PPM
+##########
+## Agregation level - MUNICIPALITY
 
-#pam_all_crops f
+#all_crops
+
+##municipality (ainda nao salvo)
+pam_municipality_all_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+#making data usable for datazoom viz f
+
+##saving 
+saveRDS(pam_municipality_all_crops,
+        file = "./data/pam_municipality_all_crops.rds"
+)
+
+#permanent_crops
+
+##municipality (ainda nao salvo)
+pam_municipality_permanent_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+#making data usable for datazoom viz
+##saving 
+saveRDS(pam_municipality_permanent_crops,
+        file = "./data/pam_municipality_permanent_crops.rds"
+)
+
+#temporary_crops
+
+##municipality (ainda nao salvo)
+pam_municipality_temporary_crops= load_pam(dataset = 'pam_temporary_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+##making data usable for datazoom viz
+##saving f
+saveRDS(pam_municipality_temporary_crops,
+        file = "./data/pam_municipality_temporary_crops.rds"
+)
+
+#pam_xx (xx= corn, potato, peanut, beans)
+
+##municipality (ainda nao salvo)
+pam_municipality_corn= load_pam(dataset = 'pam_corn', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+pam_municipality_potato= load_pam(dataset = 'pam_potato', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+pam_municipality_peanut= load_pam(dataset = 'pam_peanut', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+pam_municipality_beans= load_pam(dataset = 'pam_beans', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+
+##making data usable for datazoom viz
+
+##saving 
+saveRDS(pam_municipality_corn,
+        file = "./data/pam_municipality_corn.rds"
+)
+saveRDS(pam_municipality_potato,
+        file = "./data/pam_municipality_potato.rds"
+)
+saveRDS(pam_municipality_peanut,
+        file = "./data/pam_municipality_peanut.rds"
+)
+saveRDS(pam_municipality_beans,
+        file = "./data/pam_municipality_beans.rds"
+)
+
+
+
+#########
+### Creating metadatabase -> IBGE - PAM
+#########
+
+#pam_all_crops 
 pam_state_all_crops= readRDS('data/pam_state_all_crops.rds')
 
 
@@ -37,12 +101,12 @@ metadata_pam_all_crops= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, c('Hectares', 'Hectares', '1K BRL'), rep(c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares','1K BRL'),66), rep(c('Hectares','Tons','Kg/Hectares','1K BRL'),4), c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares','1K BRL')),
-  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",354)), 
+  categoria= c("Localiza�ao","Unidade de Tempo" , rep("Agricultura",354)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",354))
 )
 
-#saving f
-write.csv(metadata_pam_all_crops, file = "./data/metadata_pam_all_crops.csv", fileEncoding = "UTF-8")
+#saving 
+write.csv(metadata_pam_all_crops, file = "./data/pam_municipality_all_crops_dic.csv", fileEncoding = "UTF-8")
 
 
 #pam_permanent_crops
@@ -83,11 +147,11 @@ metadata_pam_permanent_crops= tibble::tibble(
   categoria= c('Localizacao','Unidade de Tempo',rep("Agricultura",191)), 
   subcategoria = c('Identificador Geografico','Anual',rep("Especies - Cultivo",191))
 )
-#saving f
-write.csv(metadata_pam_permanent_crops, file = "./data/metadata_pam_permanent_crops.csv", fileEncoding = "UTF-8")
+#saving 
+write.csv(metadata_pam_permanent_crops, file = "./data/pam_municipality_permanent_crops.csv", fileEncoding = "UTF-8")
 
 
-#pam_temporary_crops f
+#pam_temporary_crops 
 pam_state_temporary_crops= readRDS('data/pam_state_temporary_crops.rds')
 
 
@@ -124,8 +188,8 @@ metadata_pam_temporary_crops= tibble::tibble(
   categoria= c('Localizacao','Unidade de Tempo',rep("Agricultura",166)), 
   subcategoria = c('Identificador Geografico','Anual',rep("Especies - Cultivo",166))
 )
-#saving f
-write.csv(metadata_pam_temporary_crops, file = "./data/metadata_pam_temporary_crops.csv", fileEncoding = "UTF-8")
+#saving 
+write.csv(metadata_pam_temporary_crops, file = "./data/pam_municipality_temporary_crops_dic.csv", fileEncoding = "UTF-8")
 
 dic_pam_corn= load_dictionary(dataset= 'pam_corn')
 dic_pam_potato= load_dictionary(dataset= 'pam_potato')
@@ -153,12 +217,12 @@ metadata_pam_beans= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),4)),
-  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",16)), 
+  categoria= c("Localiza�ao","Unidade de Tempo" , rep("Agricultura",16)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
 )
 
-#saving f
-write.csv(metadata_pam_beans, file = "./data/metadata_pam_beans.csv", fileEncoding = "UTF-8")
+#saving 
+write.csv(metadata_pam_beans, file = "./data/pam_municipality_beans_dic.csv", fileEncoding = "UTF-8")
 
 #pam_corn
 pam_state_corn= readRDS('data/pam_state_corn.rds')
@@ -181,11 +245,11 @@ metadata_pam_corn= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),3)),
-  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",12)), 
+  categoria= c("Localiza�ao","Unidade de Tempo" , rep("Agricultura",12)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
 )
-#saving f
-write.csv(metadata_pam_corn, file = "./data/metadata_pam_corn.csv", fileEncoding = "UTF-8")
+#saving 
+write.csv(metadata_pam_corn, file = "./data/pam_municipality_corn_dic.csv", fileEncoding = "UTF-8")
 
 
 #pam_potato
@@ -209,11 +273,11 @@ metadata_pam_potato= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),4)),
-  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",16)), 
+  categoria= c("Localiza�ao","Unidade de Tempo" , rep("Agricultura",16)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
 )
-#saving f
-write.csv(metadata_pam_potato, file = "./data/metadata_pam_potato.csv", fileEncoding = "UTF-8")
+#saving 
+write.csv(metadata_pam_potato, file = "./data/pam_municipality_potato_dic.csv", fileEncoding = "UTF-8")
 
 
 #pam_peanut
@@ -237,8 +301,8 @@ metadata_pam_peanut= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),3)),
-  categoria= c("Localização","Unidade de Tempo" , rep("Agricultura",12)), 
+  categoria= c("Localiza�ao","Unidade de Tempo" , rep("Agricultura",12)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
 )
-#saving f
-write.csv(metadata_pam_peanut, file = "./data/metadata_pam_peanut.csv", fileEncoding = "UTF-8")
+#saving 
+write.csv(metadata_pam_peanut, file = "./data/pam_municipality_peanut_dic.csv", fileEncoding = "UTF-8")
