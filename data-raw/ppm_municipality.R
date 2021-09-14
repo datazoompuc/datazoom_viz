@@ -51,7 +51,7 @@ saveRDS(ppm_municipality_cow_farming,
 #ppm_aquaculture
 
 ##municipality (ainda nao salvo)
-ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'municipality', 2013:2019, language = "pt")
 ##making data usable for datazoom viz
 
 ##saving 
