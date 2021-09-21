@@ -24,7 +24,7 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "ano" # variável padrão do eixo x
-param$y_def <- "desmatado" # variável padrão do eixo y
+param$y_def <- "" # variável padrão do eixo y
 param$color_def <- "ano" # variável padrão de cor
 param$slider_def <- "ano" # variável padrão do slider
 param$text_def <- "nm_municip" # variável padrão de texto
@@ -36,6 +36,10 @@ param$plot_desc <- "Compilação de dados ao nível municipal"
 
 # Outros parâmetros e configurações
 param$y_choices$`Fonte de dados` <- NULL
+param$y_choices$IMAZON <- NULL
+param$y_choices$`IBGE - Censo 2000` <- NULL
+param$y_choices$`IBGE - Censo 2010` <- NULL
+param$y_choices[[1]] <- NULL
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
