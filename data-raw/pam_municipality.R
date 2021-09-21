@@ -1,5 +1,5 @@
 ##########
-### Generate data -> IBGE - PPM
+### Generate data -> IBGE - PAM
 ##########
 ## Agregation level - MUNICIPALITY
 

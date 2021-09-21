@@ -208,6 +208,17 @@ saveRDS(ppm_state_aquaculture,
         file = "./data/ppm_state_aquaculture.rds"
 )
 
+### aggregating all datasets
+ppm_state= ppm_state_livestock_inventory%>%
+  dplyr::left_join(ppm_state_animal_origin_production, by= c('group','time'))%>%
+  dplyr::left_join(ppm_state_sheep_farming, by= c('group','time'))%>%
+  dplyr::left_join(ppm_state_cow_farming, by= c('group','time'))%>%
+  dplyr::left_join(ppm_state_aquaculture, by= c('group','time'))
+##saving f
+saveRDS(ppm_state,
+        file = "./data/ppm_state.rds"
+)
+
 #########
 ### Creating metadatabase -> IBGE - PPM
 #########
@@ -215,9 +226,14 @@ saveRDS(ppm_state_aquaculture,
 #livestock_inventory
 ppm_state_livestock_inventory= readRDS('data/ppm_state_livestock_inventory.rds')
 
-dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')
+dic_ppm_livestock_inventory= load_dictionary(dataset = 'ppm_livestock_inventory')%>%
+  arrange(var_pt)
 aux= c('','', rep('Efetivo dos Rebanhos ',10))
 livestock_var= colnames(ppm_state_livestock_inventory)
+livestock_var= livestock_var[-1]
+livestock_var= livestock_var[-1]
+livestock_var= sort(livestock_var)
+livestock_var= c('group', 'time', livestock_var)
 label_livestock= paste0(aux,c("Identificador Geografico", "Ano da Pesquisa", dic_ppm_livestock_inventory$var_pt[1:10]))
 metadata_ppm_livestock_inventory= tibble::tibble(
   var = livestock_var,
@@ -230,7 +246,7 @@ metadata_ppm_livestock_inventory= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep('Cabecas',10)),
-  categoria= c("Localizacao","Unidade de Tempo",rep("Pecuaria",10)), 
+  categoria= c("Localizaçao","Unidade de Tempo",rep("Pecuaria",10)), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Especies - Criacao",10))
 ) 
 #saving f
@@ -355,3 +371,26 @@ metadata_ppm_aquaculture= tibble::tibble(
 )
 #saving f
 write.csv(metadata_ppm_aquaculture, file = "./data/ppm_state_aquaculture_dic.csv", fileEncoding = "UTF-8")
+
+###aggregating all metadatas
+
+metadata_ppm_animal_origin_production= metadata_ppm_animal_origin_production[-1,]
+metadata_ppm_animal_origin_production= metadata_ppm_animal_origin_production[-1,]
+
+metadata_ppm_sheep_farming= metadata_ppm_sheep_farming[-1,]
+metadata_ppm_sheep_farming= metadata_ppm_sheep_farming[-1,]
+
+metadata_ppm_cow_farming= metadata_ppm_cow_farming[-1,]
+metadata_ppm_cow_farming= metadata_ppm_cow_farming[-1,]
+
+metadata_ppm_aquaculture= metadata_ppm_aquaculture[-1,]
+metadata_ppm_aquaculture= metadata_ppm_aquaculture[-1,]
+
+metadata_ppm= metadata_ppm_livestock_inventory%>%
+  dplyr::bind_rows(metadata_ppm_animal_origin_production)%>%
+  dplyr::bind_rows(metadata_ppm_sheep_farming)%>%
+  dplyr::bind_rows(metadata_ppm_cow_farming)%>%
+  dplyr::bind_rows(metadata_ppm_aquaculture)
+
+#saving f
+write.csv(metadata_ppm, file = "./data/ppm_state_dic.csv", fileEncoding = "UTF-8")
