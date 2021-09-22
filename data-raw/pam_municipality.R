@@ -148,7 +148,7 @@ metadata_pam_permanent_crops= tibble::tibble(
   subcategoria = c('Identificador Geografico','Anual',rep("Especies - Cultivo",191))
 )
 #saving 
-write.csv(metadata_pam_permanent_crops, file = "./data/pam_municipality_permanent_crops.csv", fileEncoding = "UTF-8")
+write.csv(metadata_pam_permanent_crops, file = "./data/pam_municipality_permanent_crops_dic.csv", fileEncoding = "UTF-8")
 
 
 #pam_temporary_crops 
