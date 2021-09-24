@@ -11,9 +11,8 @@ saveRDS(dat, file = "data/comex_munic_raw.rds")
 dat$mes <- NULL
 dat$cod_sh4 <- NULL
 
-
-colnames(data2) <- c("state", "area", "time", "group")
-data2 <- aggregate(area ~ time + state + group, data2, sum)
+dat <- filter(dat, uf %in% c("RO", "AM", "PA", "RR", "MT", "MA", "AC", "AP", "TO"))
+data <- aggregate(kg_liquido + valor_fob ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
 
 
 
