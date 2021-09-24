@@ -3,16 +3,20 @@
 ############################################################
 
 library(datazoom.amazonia)
+library(magrittr)
 
 dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2021, raw_data = FALSE)
+
+tipos <- c("RO", "AM", "PA", "RR", "MT", "MA", "AC", "AP", "TO")
+`%notin%` <- Negate(`%in%`)
+dat <- dat[!(dat$uf %notin% tipos),]
 
 saveRDS(dat, file = "data/comex_munic_raw.rds")
 
 dat$mes <- NULL
 dat$cod_sh4 <- NULL
 
-dat <- filter(dat, uf %in% c("RO", "AM", "PA", "RR", "MT", "MA", "AC", "AP", "TO"))
-data <- aggregate(kg_liquido + valor_fob ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
+data <- aggregate(cbind(kg_liquido, valor_fob) ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
 
 
 
