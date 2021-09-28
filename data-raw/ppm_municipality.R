@@ -79,6 +79,8 @@ saveRDS(ppm_municipality_cow_farming,
 ##municipality (ainda nao salvo)
 ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'municipality', 2013:2019, language = "pt")
 ##making data usable for datazoom viz
+label_aqua= Hmisc::label(ppm_municipality_aquaculture) # for generating metadata
+
 ppm_municipality_aquaculture = lapply(ppm_municipality_aquaculture, as.numeric)
 ppm_municipality_aquaculture <- as.data.frame(ppm_municipality_aquaculture)
 ppm_municipality_aquaculture[is.na(ppm_municipality_aquaculture)] <- 0
@@ -221,8 +223,13 @@ vec= c('','',vec)
 aux= c("Identificador Geografico", "Ano da Pesquisa",rep(c('Producao da Aquicultura ', 'Valor da Producao '),25))
 label_aqua= paste0(aux,vec)
 label_aqua= label_aqua[-25]
-aqua_var= colnames(ppm_municipality_aquaculture)
 label_aqua= label_aqua[-44]
+
+label_aqua[1]= "Identificador Geografico"
+label_aqua[2]= "Ano da Pesquisa"
+label_aqua[4]= "Total"
+
+aqua_var= colnames(ppm_municipality_aquaculture)
 
 unidade_aqua= c('','',rep(c('Kg','1K BRL'),25))
 unidade_aqua= unidade_aqua[-25]
@@ -230,6 +237,22 @@ unidade_aqua= unidade_aqua[-44]
 unidade_aqua[17]= '1K'
 unidade_aqua[36]= '1K'
 
+vec= rep('',50)
+unidade_aqua= rep('', 50)
+for(i in 1:50){
+  quant= startsWith(aqua_var,'quant')
+  valor= startsWith(aqua_var,'valor')
+  if(quant[i]==TRUE){
+    unidade_aqua[i]= 'Kg'
+    vec[i]= 'Producao da Aquicultura '
+  }
+  else if(valor[i]==TRUE){
+    unidade_aqua[i]= '1K BRL'
+    vec[i]= 'Valor da Producao '
+  }
+}
+
+label_aqua= paste0(vec,label_aqua)
 metadata_ppm_aquaculture= tibble::tibble(
   var = aqua_var,
   x = TRUE,
@@ -244,5 +267,7 @@ metadata_ppm_aquaculture= tibble::tibble(
   categoria= c("Localizaçao","Unidade de Tempo" ,rep("Pecuaria",48)), 
   subcategoria = c("Localizaçao","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
 )
+
+meta
 #saving 
 write.csv(metadata_ppm_aquaculture, file = "./data/ppm_municipality_aquaculture_dic.csv", fileEncoding = "UTF-8")
