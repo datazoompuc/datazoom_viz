@@ -69,7 +69,7 @@ munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
 ppm_municipality_cow_farming$geo_id= plyr::mapvalues(ppm_municipality_cow_farming$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
 ppm_municipality_cow_farming= dplyr::rename(ppm_municipality_cow_farming , time=.data$ano, group=.data$geo_id)
 
-##saving 
+##saving f
 saveRDS(ppm_municipality_cow_farming,
         file = "./data/ppm_municipality_cow_farming.rds"
 )
@@ -166,7 +166,7 @@ write.csv(metadata_ppm_animal_origin_production, file = "./data/ppm_municipality
 ppm_municipality_sheep_farming= readRDS('data/ppm_municipality_sheep_farming.rds')
 
 dic_ppm_sheep_farming= load_dictionary(dataset = 'ppm_sheep_farming')
-sheep_var= colnames(ppm_state_sheep_farming)
+sheep_var= colnames(ppm_municipality_sheep_farming)
 metadata_ppm_sheep_farming= tibble::tibble(
   var = sheep_var,
   x = TRUE,
@@ -181,8 +181,8 @@ metadata_ppm_sheep_farming= tibble::tibble(
   categoria= c("Localizaçao","Unidade de Tempo","Pecuaria"), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
-#saving 
-write.csv(metadata_ppm_sheep_farming, file = "./data/ppm_municipality_sheep_farming.csv", fileEncoding = "UTF-8")
+#saving f
+write.csv(metadata_ppm_sheep_farming, file = "./data/ppm_municipality_sheep_farming_dic.csv", fileEncoding = "UTF-8")
 
 
 #ppm_cow_farming 
@@ -213,29 +213,11 @@ write.csv(metadata_ppm_cow_farming, file = "./data/ppm_municipality_cow_farming_
 #ppm_aquaculture
 ppm_municipality_aquaculture= readRDS('data/ppm_municipality_aquaculture.rds')
 
-dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')%>%
-  dplyr::arrange(var_pt)
-vec= NULL
-for(i in 1:25){
-  vec= c(vec, rep(dic_ppm_aquaculture$var_pt[i],2))
-}
-vec= c('','',vec)
-aux= c("Identificador Geografico", "Ano da Pesquisa",rep(c('Producao da Aquicultura ', 'Valor da Producao '),25))
-label_aqua= paste0(aux,vec)
-label_aqua= label_aqua[-25]
-label_aqua= label_aqua[-44]
-
 label_aqua[1]= "Identificador Geografico"
 label_aqua[2]= "Ano da Pesquisa"
 label_aqua[4]= "Total"
 
 aqua_var= colnames(ppm_municipality_aquaculture)
-
-unidade_aqua= c('','',rep(c('Kg','1K BRL'),25))
-unidade_aqua= unidade_aqua[-25]
-unidade_aqua= unidade_aqua[-44]
-unidade_aqua[17]= '1K'
-unidade_aqua[36]= '1K'
 
 vec= rep('',50)
 unidade_aqua= rep('', 50)
@@ -268,6 +250,5 @@ metadata_ppm_aquaculture= tibble::tibble(
   subcategoria = c("Localizaçao","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
 )
 
-meta
-#saving 
+#saving f
 write.csv(metadata_ppm_aquaculture, file = "./data/ppm_municipality_aquaculture_dic.csv", fileEncoding = "UTF-8")
