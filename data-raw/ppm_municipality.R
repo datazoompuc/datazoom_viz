@@ -47,10 +47,19 @@ saveRDS(ppm_municipality_sheep_farming,
 #animal_origin_production 
 
 ##municipality (ainda nao salvo)
-ppm_municipality_animal_orig_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
-##making data usable for datazoom viz
+ppm_municipality_animal_origin_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 
-##saving 
+##making data usable for datazoom viz
+ppm_municipality_animal_origin_production = lapply(ppm_municipality_animal_origin_production, as.numeric)
+ppm_municipality_animal_origin_production <- as.data.frame(ppm_municipality_animal_origin_production)
+ppm_municipality_animal_origin_production[is.na(ppm_municipality_animal_origin_production)] <- 0
+
+munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
+  dplyr::select('Código Município Completo', 'Nome_Município')
+ppm_municipality_animal_origin_production$geo_id= plyr::mapvalues(ppm_municipality_animal_origin_production$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+ppm_municipality_animal_origin_production= dplyr::rename(ppm_municipality_animal_origin_production , time=.data$ano, group=.data$geo_id)
+
+##saving f
 saveRDS(ppm_municipality_animal_origin_production,
         file = "./data/ppm_municipality_animal_origin_production.rds"
 )
@@ -131,12 +140,12 @@ write.csv(metadata_ppm_livestock_inventory, file = "./data/ppm_municipality_live
 
 
 #animal_origin_production
-ppm_state_animal_origin_production= readRDS('data/ppm_state_animal_origin_production.rds')
+ppm_municipality_animal_origin_production= readRDS('data/ppm_municipality_animal_origin_production.rds')
 
 
 dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')%>%
   arrange(var_code)
-animal_var= colnames(ppm_state_animal_origin_production)
+animal_var= colnames(ppm_municipality_animal_origin_production)
 vec= NULL
 for(i in 2:7){
   vec= c(vec, rep(dic_ppm_animal_origin_production$var_pt[i],2))
@@ -158,7 +167,7 @@ metadata_ppm_animal_origin_production= tibble::tibble(
   categoria= c("Localizaçao","Unidade de Tempo",rep("Pecuaria",13)), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Produtos Pecuarios",13))
 )
-#saving 
+#saving f
 write.csv(metadata_ppm_animal_origin_production, file = "./data/ppm_municipality_animal_origin_production_dic.csv", fileEncoding = "UTF-8")
 
 
