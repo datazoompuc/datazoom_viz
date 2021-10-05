@@ -47,10 +47,19 @@ saveRDS(ppm_municipality_sheep_farming,
 #animal_origin_production 
 
 ##municipality (ainda nao salvo)
-ppm_municipality_animal_orig_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
-##making data usable for datazoom viz
+ppm_municipality_animal_origin_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 
-##saving 
+##making data usable for datazoom viz
+ppm_municipality_animal_origin_production = lapply(ppm_municipality_animal_origin_production, as.numeric)
+ppm_municipality_animal_origin_production <- as.data.frame(ppm_municipality_animal_origin_production)
+ppm_municipality_animal_origin_production[is.na(ppm_municipality_animal_origin_production)] <- 0
+
+munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
+  dplyr::select('Código Município Completo', 'Nome_Município')
+ppm_municipality_animal_origin_production$geo_id= plyr::mapvalues(ppm_municipality_animal_origin_production$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+ppm_municipality_animal_origin_production= dplyr::rename(ppm_municipality_animal_origin_production , time=.data$ano, group=.data$geo_id)
+
+##saving f
 saveRDS(ppm_municipality_animal_origin_production,
         file = "./data/ppm_municipality_animal_origin_production.rds"
 )
@@ -60,8 +69,16 @@ saveRDS(ppm_municipality_animal_origin_production,
 ##municipality (ainda nao salvo)
 ppm_municipality_cow_farming= load_ppm(dataset = 'ppm_cow_farming', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
 ##making data usable for datazoom viz
+ppm_municipality_cow_farming = lapply(ppm_municipality_cow_farming, as.numeric)
+ppm_municipality_cow_farming <- as.data.frame(ppm_municipality_cow_farming)
+ppm_municipality_cow_farming[is.na(ppm_municipality_cow_farming)] <- 0
 
-##saving 
+munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
+  dplyr::select('Código Município Completo', 'Nome_Município')
+ppm_municipality_cow_farming$geo_id= plyr::mapvalues(ppm_municipality_cow_farming$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+ppm_municipality_cow_farming= dplyr::rename(ppm_municipality_cow_farming , time=.data$ano, group=.data$geo_id)
+
+##saving f
 saveRDS(ppm_municipality_cow_farming,
         file = "./data/ppm_municipality_cow_farming.rds"
 )
@@ -71,10 +88,30 @@ saveRDS(ppm_municipality_cow_farming,
 ##municipality (ainda nao salvo)
 ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'municipality', 2013:2019, language = "pt")
 ##making data usable for datazoom viz
+label_aqua= Hmisc::label(ppm_municipality_aquaculture) # for generating metadata
 
-##saving 
+ppm_municipality_aquaculture = lapply(ppm_municipality_aquaculture, as.numeric)
+ppm_municipality_aquaculture <- as.data.frame(ppm_municipality_aquaculture)
+ppm_municipality_aquaculture[is.na(ppm_municipality_aquaculture)] <- 0
+
+munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
+  dplyr::select('Código Município Completo', 'Nome_Município')
+ppm_municipality_aquaculture$geo_id= plyr::mapvalues(ppm_municipality_aquaculture$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+ppm_municipality_aquaculture= dplyr::rename(ppm_municipality_aquaculture , time=.data$ano, group=.data$geo_id)
+
+##saving f
 saveRDS(ppm_municipality_aquaculture,
         file = "./data/ppm_municipality_aquaculture.rds"
+)
+### aggregating all datasets
+ppm_municipality= ppm_municipality_livestock_inventory%>%
+  dplyr::left_join(ppm_municipality_animal_origin_production, by= c('group','time'))%>%
+  dplyr::left_join(ppm_municipality_sheep_farming, by= c('group','time'))%>%
+  dplyr::left_join(ppm_municipality_cow_farming, by= c('group','time'))%>%
+  dplyr::left_join(ppm_municipality_aquaculture, by= c('group','time'))
+##saving f
+saveRDS(ppm_municipality,
+        file = "./data/ppm_municipality.rds"
 )
 
 ##############
@@ -113,12 +150,12 @@ write.csv(metadata_ppm_livestock_inventory, file = "./data/ppm_municipality_live
 
 
 #animal_origin_production
-ppm_state_animal_origin_production= readRDS('data/ppm_state_animal_origin_production.rds')
+ppm_municipality_animal_origin_production= readRDS('data/ppm_municipality_animal_origin_production.rds')
 
 
 dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')%>%
   arrange(var_code)
-animal_var= colnames(ppm_state_animal_origin_production)
+animal_var= colnames(ppm_municipality_animal_origin_production)
 vec= NULL
 for(i in 2:7){
   vec= c(vec, rep(dic_ppm_animal_origin_production$var_pt[i],2))
@@ -140,7 +177,7 @@ metadata_ppm_animal_origin_production= tibble::tibble(
   categoria= c("Localizaçao","Unidade de Tempo",rep("Pecuaria",13)), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Produtos Pecuarios",13))
 )
-#saving 
+#saving f
 write.csv(metadata_ppm_animal_origin_production, file = "./data/ppm_municipality_animal_origin_production_dic.csv", fileEncoding = "UTF-8")
 
 
@@ -148,7 +185,7 @@ write.csv(metadata_ppm_animal_origin_production, file = "./data/ppm_municipality
 ppm_municipality_sheep_farming= readRDS('data/ppm_municipality_sheep_farming.rds')
 
 dic_ppm_sheep_farming= load_dictionary(dataset = 'ppm_sheep_farming')
-sheep_var= colnames(ppm_state_sheep_farming)
+sheep_var= colnames(ppm_municipality_sheep_farming)
 metadata_ppm_sheep_farming= tibble::tibble(
   var = sheep_var,
   x = TRUE,
@@ -163,16 +200,16 @@ metadata_ppm_sheep_farming= tibble::tibble(
   categoria= c("Localizaçao","Unidade de Tempo","Pecuaria"), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
-#saving 
-write.csv(metadata_ppm_sheep_farming, file = "./data/ppm_municipality_sheep_farming.csv", fileEncoding = "UTF-8")
+#saving f
+write.csv(metadata_ppm_sheep_farming, file = "./data/ppm_municipality_sheep_farming_dic.csv", fileEncoding = "UTF-8")
 
 
 #ppm_cow_farming 
-ppm_state_cow_farming= readRDS('data/ppm_state_cow_farming.rds')
+ppm_municipality_cow_farming= readRDS('data/ppm_municipality_cow_farming.rds')
 
 
 dic_ppm_cow_farming= load_dictionary(dataset = 'ppm_cow_farming')
-cow_var= colnames(ppm_state_cow_farming)
+cow_var= colnames(ppm_municipality_cow_farming)
 metadata_ppm_cow_farming= tibble::tibble(
   var = cow_var,
   x = TRUE,
@@ -188,32 +225,37 @@ metadata_ppm_cow_farming= tibble::tibble(
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 
-#saving 
+#saving f
 write.csv(metadata_ppm_cow_farming, file = "./data/ppm_municipality_cow_farming_dic.csv", fileEncoding = "UTF-8")
 
 
 #ppm_aquaculture
-ppm_state_aquaculture= readRDS('data/ppm_state_aquaculture.rds')
+ppm_municipality_aquaculture= readRDS('data/ppm_municipality_aquaculture.rds')
 
-dic_ppm_aquaculture= load_dictionary(dataset = 'ppm_aquaculture')%>%
-  dplyr::arrange(var_pt)
-vec= NULL
-for(i in 1:25){
-  vec= c(vec, rep(dic_ppm_aquaculture$var_pt[i],2))
+#the label_aqua vector comes from the labels in the original data generated by datazoom.amazonia
+#check #ppm_municipality in the data generation section above
+label_aqua[1]= "Identificador Geografico"
+label_aqua[2]= "Ano da Pesquisa"
+label_aqua[4]= "Total"
+
+aqua_var= colnames(ppm_municipality_aquaculture)
+
+vec= rep('',50)
+unidade_aqua= rep('', 50)
+for(i in 1:50){
+  quant= startsWith(aqua_var,'quant')
+  valor= startsWith(aqua_var,'valor')
+  if(quant[i]==TRUE){
+    unidade_aqua[i]= 'Kg'
+    vec[i]= 'Producao da Aquicultura '
+  }
+  else if(valor[i]==TRUE){
+    unidade_aqua[i]= '1K BRL'
+    vec[i]= 'Valor da Producao '
+  }
 }
-vec= c('','',vec)
-aux= c("Identificador Geografico", "Ano da Pesquisa",rep(c('Producao da Aquicultura ', 'Valor da Producao '),25))
-label_aqua= paste0(aux,vec)
-label_aqua= label_aqua[-25]
-aqua_var= colnames(ppm_state_aquaculture)
-label_aqua= label_aqua[-44]
 
-unidade_aqua= c('','',rep(c('Kg','1K BRL'),25))
-unidade_aqua= unidade_aqua[-25]
-unidade_aqua= unidade_aqua[-44]
-unidade_aqua[17]= '1K'
-unidade_aqua[36]= '1K'
-
+label_aqua= paste0(vec,label_aqua)
 metadata_ppm_aquaculture= tibble::tibble(
   var = aqua_var,
   x = TRUE,
@@ -228,5 +270,29 @@ metadata_ppm_aquaculture= tibble::tibble(
   categoria= c("Localizaçao","Unidade de Tempo" ,rep("Pecuaria",48)), 
   subcategoria = c("Localizaçao","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
 )
-#saving 
+
+#saving f
 write.csv(metadata_ppm_aquaculture, file = "./data/ppm_municipality_aquaculture_dic.csv", fileEncoding = "UTF-8")
+
+###aggregating all metadatas
+
+metadata_ppm_animal_origin_production= metadata_ppm_animal_origin_production[-1,]
+metadata_ppm_animal_origin_production= metadata_ppm_animal_origin_production[-1,]
+
+metadata_ppm_sheep_farming= metadata_ppm_sheep_farming[-1,]
+metadata_ppm_sheep_farming= metadata_ppm_sheep_farming[-1,]
+
+metadata_ppm_cow_farming= metadata_ppm_cow_farming[-1,]
+metadata_ppm_cow_farming= metadata_ppm_cow_farming[-1,]
+
+metadata_ppm_aquaculture= metadata_ppm_aquaculture[-1,]
+metadata_ppm_aquaculture= metadata_ppm_aquaculture[-1,]
+
+metadata_ppm= metadata_ppm_livestock_inventory%>%
+  dplyr::bind_rows(metadata_ppm_animal_origin_production)%>%
+  dplyr::bind_rows(metadata_ppm_sheep_farming)%>%
+  dplyr::bind_rows(metadata_ppm_cow_farming)%>%
+  dplyr::bind_rows(metadata_ppm_aquaculture)
+
+#saving f
+write.csv(metadata_ppm, file = "./data/ppm_municipality_dic.csv", fileEncoding = "UTF-8")
