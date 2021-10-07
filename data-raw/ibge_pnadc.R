@@ -11,7 +11,6 @@ library(tidyverse)
 library(haven)
 library(tibble)
 library(zoo)
-library(datazoom.social)
 
 # update dates 
 #dates <- list(c(1, 2012), c(2, 2012))
@@ -29,21 +28,52 @@ library(datazoom.social)
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/Francisco/Dropbox/" # set actual user data path
+user_folder_path <- "D:/Dropbox/" # set actual user data path
 github_folder_path <- "Amazonia_Mercado_Trabalho/build/output/"  # set github structure path 
 
 # call raw data
 base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
 base1 <- base1 %>% mutate(id = "Amazônia Legal")
+
 base2 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
 base2 <- base2 %>% mutate(id = "Restante do Brasil")
 
+base3 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_rondonia.dta"))
+base3 <- base3 %>% mutate(id = "Rondônia")
+
+base4 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_acre.dta"))
+base4 <- base4 %>% mutate(id = "Acre")
+
+base5 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonas.dta"))
+base5 <- base5 %>% mutate(id = "Amazonas")
+
+base6 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_roraima.dta"))
+base6 <- base6 %>% mutate(id = "Roraima")
+
+base7 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_para.dta"))
+base7 <- base7 %>% mutate(id = "Pará")
+
+base8 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amapa.dta"))
+base8 <- base8 %>% mutate(id = "Amapá")
+
+base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_tocantins.dta"))
+base9 <- base9 %>% mutate(id = "Tocantins")
+
 # append all data 
 temp <- rbind(base1, base2)
+temp <- rbind(temp, base2)
+temp <- rbind(temp, base3)
+temp <- rbind(temp, base4)
+temp <- rbind(temp, base5)
+temp <- rbind(temp, base6)
+temp <- rbind(temp, base7)
+temp <- rbind(temp, base8)
+temp <- rbind(temp, base9)
 
 # convert time data to quarterly
 temp <- temp %>% 
   mutate(time = paste0(temp$Ano, "-",temp$Trimestre))
+
 temp$time <- as.Date(as.yearqtr(temp$time))
 temp$Trimestre <- NULL
 temp$Ano <- NULL
@@ -56,6 +86,7 @@ temp <-  temp %>%
   relocate(id, time, group)
 
 # select relevant variables
+colnames(temp)
 temp <-  temp %>% 
   select(id, time, group, 
          taxa_de_desemprego, 
@@ -64,12 +95,29 @@ temp <-  temp %>%
          taxa_de_informalidade,
          taxa_de_desalento, 
          taxa_de_nemnem,
-         n_de_desemprego,
-         n_de_ocupacao,
-         n_de_informalidade,
-         n_de_desalento,
-         n_de_nemnem
-         )
+         prop_empregadoCC,
+         prop_empregadoSC,
+         prop_empregador,
+         prop_cpropriaC,
+         prop_cpropriaNc,
+         prop_militar
+         ) %>%
+  mutate( # format decimals
+    taxa_de_desemprego = format(round(taxa_de_desemprego, 2), nsmall = 2),
+    taxa_de_ocupacao = format(round(taxa_de_ocupacao, 2), nsmall = 2),
+    taxa_de_participacao = format(round(taxa_de_participacao, 2), nsmall = 2),
+    taxa_de_informalidade = format(round(taxa_de_informalidade, 2), nsmall = 2),
+    taxa_de_desalento = format(round(taxa_de_desalento, 2), nsmall = 2),
+    taxa_de_nemnem = format(round(taxa_de_nemnem, 2), nsmall = 2),
+    prop_empregadoCC = format(round(prop_empregadoCC, 2), nsmall = 2),
+    prop_empregadoSC = format(round(prop_empregadoSC, 2), nsmall = 2),
+    prop_empregador = format(round(prop_empregador, 2), nsmall = 2),
+    prop_cpropriaC = format(round(prop_cpropriaC, 2), nsmall = 2),
+    prop_cpropriaNc = format(round(prop_cpropriaNc, 2), nsmall = 2),
+    prop_militar = format(round(prop_militar, 2), nsmall = 2)
+  ) %>%
+  group_by(id) %>%
+  arrange(id, time)
 
 # save at rds format
 saveRDS(temp,
@@ -78,6 +126,9 @@ saveRDS(temp,
 #####################
 # Build Dictionary 
 #####################
+
+# call data
+temp <- readRDS("./data/ibge_pnadc_trabalho.rds")
 
 # extract variables from data
 columns <- colnames(temp)
@@ -96,25 +147,26 @@ temp_param_table <- tibble(
   )
 
 # label variables
-temp_param_table$label[1] <- "Recorte regional"
-temp_param_table$label[2] <- "Ano-Trimestre"
-temp_param_table$label[3] <- "Recorte regional"
-temp_param_table$label[4] <- "Taxa de desemprego em relação a força de trabalho (%)" 
-temp_param_table$label[5] <- "Taxa de ocupação em relação a PIA (%)"
-temp_param_table$label[6] <- "Taxa de participação em relação a PIA (%)"
-temp_param_table$label[7] <- "Taxa de informalidade em relação aos ocupados (%)"
-temp_param_table$label[8] <- "Taxa de desalentados em relação a PIA (%)"
-temp_param_table$label[9] <- "Taxa de nem-nem em relação a PIA (%)" 
-temp_param_table$label[10] <- "Número de desempregados"
-temp_param_table$label[11] <- "Número de ocupados"
-temp_param_table$label[12] <- "Número de informais"
-temp_param_table$label[13] <- "Número de desalentados"
-temp_param_table$label[14] <- "Número de nem-nem"
+temp_param_table$label[temp_param_table$var== "id"] <- "Recorte regional"
+temp_param_table$label[temp_param_table$var== "time"] <- "Ano-Trimestre"
+temp_param_table$label[temp_param_table$var== "group"] <- "Recorte regional"
+temp_param_table$label[temp_param_table$var== "taxa_de_desemprego"] <- "Taxa de desemprego em relação a força de trabalho (%)"
+temp_param_table$label[temp_param_table$var== "taxa_de_ocupacao"] <- "Taxa de ocupação em relação a PIA (%)"
+temp_param_table$label[temp_param_table$var== "taxa_de_participacao"] <- "Taxa de participação em relação a PIA (%)"
+temp_param_table$label[temp_param_table$var== "taxa_de_informalidade"] <- "Taxa de informalidade em relação aos ocupados (%)"
+temp_param_table$label[temp_param_table$var== "taxa_de_desalento"] <- "Taxa de desalentados em relação a PIA (%)"
+temp_param_table$label[temp_param_table$var== "taxa_de_nemnem"] <- "Taxa de nem-nem em relação a PIA (%)"
+temp_param_table$label[temp_param_table$var== "prop_empregadoCC"] <- "Proporção de trabalhadores com carteira em relação aos ocupados (%)"
+temp_param_table$label[temp_param_table$var== "prop_empregadoSC"] <- "Proporção de trabalhadores sem carteira em relação aos ocupados (%)"
+temp_param_table$label[temp_param_table$var== "prop_empregador"] <- "Proporção de empregadores em relação aos ocupados (%)"
+temp_param_table$label[temp_param_table$var== "prop_cpropriaC"] <- "Proporção de conta própria que contribui em relação aos ocupados (%)"
+temp_param_table$label[temp_param_table$var== "prop_cpropriaNc"] <- "Proporção de conta própria que não contribui em relação aos ocupados (%)"
+temp_param_table$label[temp_param_table$var== "prop_militar"] <- "Proporção servidores públicos e militares em relação aos ocupados (%)"
 
 # block variables in graphs y-axis
-temp_param_table$y[1] <- FALSE # Recorte regional
-temp_param_table$y[2] <- FALSE # Ano-Trimestre
-temp_param_table$y[3] <- FALSE # Recorte regional
+temp_param_table$y[temp_param_table$var== "id"]  <- FALSE
+temp_param_table$y[temp_param_table$var== "time"]  <- FALSE
+temp_param_table$y[temp_param_table$var== "group"]  <- FALSE
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
