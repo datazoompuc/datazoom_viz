@@ -24,7 +24,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
         "filter1",
         choices = param$filter_choices,
-        selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        selected = sample(param$filter_choices, 1) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
 
       selected <- sample(sample(param$y_choices, 1)[[1]], 1)
@@ -96,7 +96,7 @@ get_server <- function(files, param) {
         # Monta título a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0("Variação trimestral de ", y_col$label)
+        text <- paste0("Evolução trimestral de ", y_col$label)
       }
 
       text
