@@ -35,7 +35,7 @@ get_ui <- function(files, param) {
         # Seleciona eixo
         checkboxInput(
           inputId = "y_option",
-          "proporcinal ao trimestre inicial (*)",
+          "proporcional ao trimestre inicial (*)",
           value = FALSE,
           width = "100%"
         ),
