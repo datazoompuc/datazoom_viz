@@ -1,0 +1,4 @@
+"","var","x","y","color","size","slider","label","source","tipo","unidade","categoria","subcategoria"
+"1","group",TRUE,TRUE,FALSE,FALSE,FALSE,"Identificador Geografico","IBGE",1,NA,"Localizaçao","Identificador Geografico"
+"2","time",TRUE,TRUE,FALSE,FALSE,FALSE,"Ano da Pesquisa","IBGE",1,NA,"Unidade de Tempo","Ano da Pesquisa"
+"3","num_v107",TRUE,TRUE,FALSE,FALSE,FALSE,"Vacas Ordenhadas","IBGE",1,"Cabecas","Pecuaria","Atividade Pecuaria"

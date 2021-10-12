@@ -24,7 +24,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
         "filter1",
         choices = param$filter_choices,
-        selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        selected = sample(param$filter_choices, 1) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
 
       selected <- sample(sample(param$y_choices, 1)[[1]], 1)
@@ -96,7 +96,7 @@ get_server <- function(files, param) {
         # Monta título a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0("Variação trimestral de ", y_col$label)
+        text <- paste0("Evolução trimestral de ", y_col$label)
       }
 
       text
@@ -162,8 +162,11 @@ get_server <- function(files, param) {
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
-            x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", df_p$y, "<br>"
+            x_col$label, ": ", paste0('T', quarter(df_p$x), '-', year(df_p$x)),"<br>",
+            y_col$label, ": ", format(df_p$y, scientific = FALSE,
+                                      digits = 2,
+                                      decimal.mark = ",", 
+                                      big.mark = "."), "<br>"
           )
 
           # Define paleta de cores
@@ -176,7 +179,8 @@ get_server <- function(files, param) {
             color = ~group,
             type = "scatter",
             mode = "lines+markers",
-            text = ~tooltip
+            text = ~tooltip,
+            hoverinfo = "text"
           )
 
           # Layout eixos

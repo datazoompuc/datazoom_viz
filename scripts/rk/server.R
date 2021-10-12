@@ -276,7 +276,8 @@ get_server <- function(files, param) {
                 buttons = list(
                   list(
                     method = "animate",
-                    label = "<U+25B6>",
+                    #label = "<U+25B6>",
+                    label = ">",
                     args = list(
                       NA, # primeiro arg vazio para play
                       list(
@@ -390,7 +391,8 @@ get_server <- function(files, param) {
         }
       )
       fig
-    })
+    }) %>%
+      bindCache(input$x, input$color)
 
     # Observa eventos
     observe({

@@ -31,7 +31,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          "Recorte de região geográfica",
+          "Recorte regional",
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
