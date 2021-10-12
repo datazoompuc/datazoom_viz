@@ -16,7 +16,12 @@ saveRDS(dat, file = "data/comex_munic_raw.rds")
 dat$mes <- NULL
 dat$cod_sh4 <- NULL
 
-data <- aggregate(cbind(kg_liquido, valor_fob) ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
+data_kg <- aggregate(kg_liquido ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
+data_val <- aggregate(valor_fob ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
+
+datafinal_kg <- reshape(data_kg, idvar = c("ano", "uf", "cod_municipio", "cod_pais"), timevar = "nome_sh4", direction = "wide")
+datafinal_val <- reshape(data, idvar = c("state", "time"), timevar = "group", direction = "wide")
+
 
 # Trocar países e municípios de código para nome
 
