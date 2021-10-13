@@ -1,6 +1,5 @@
 # Cache
 cache_folder <- "./cache/app_rk_ibge_pnadc_cnae/"
-unlink(cache_folder)  # clear cache
 shinyOptions(cache = cachem::cache_disk(cache_folder))
 
 # Carrega bibliotecas

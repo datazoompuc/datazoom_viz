@@ -178,7 +178,10 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            x_col$label, ": ", df_p$x, "<br>",
+            x_col$label, ": ", format(df_p$x, scientific = FALSE,
+                                      digits = 2,
+                                      decimal.mark = ",", 
+                                      big.mark = "."), "<br>",
             y_col$label, ": ", df_p$y, "<br>",
             color_col$label, ": ", df_p$color
           )
@@ -276,8 +279,7 @@ get_server <- function(files, param) {
                 buttons = list(
                   list(
                     method = "animate",
-                    #label = "<U+25B6>",
-                    label = ">",
+                    label = "\u25B6",
                     args = list(
                       NA, # primeiro arg vazio para play
                       list(
