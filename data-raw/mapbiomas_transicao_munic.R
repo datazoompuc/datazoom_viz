@@ -156,4 +156,4 @@ temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 460))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 460))
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/mapbiomas_transicao_est_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/mapbiomas_transicao_munic_dic.csv", fileEncoding = "UTF-8")
