@@ -12,10 +12,26 @@ dat <- load_mapbiomas_transition(space_aggregation = "municipality", transition_
 
 saveRDS(dat, file = "data/mapbiomas_transicao_munic_raw.rds")
 
+filter_year_diff <- function(dat, year_diff){
+  vec_col <- c()
+  for(i in 16:ncol(dat)){
+    nome <- colnames(dat)[i]
+    anoi <- as.numeric(substring(nome,2,5))
+    anof <- as.numeric(substring(nome,10,14))
+    if(anof - anoi != year_diff){
+      vec_col <- c(vec_col, -i)
+    }
+  }
+  dat_filtered <- dat[, vec_col]
+  return(dat_filtered)
+}
+dat <- filter_year_diff(dat, 5)
+
+
 
 # Data for level_4
 data1 <- dat
-data1$biome <- NULL
+data1$territory_id <- NULL
 data1$to <- NULL
 data1$to_level_0 <- NULL
 data1$to_level_1 <- NULL
@@ -27,21 +43,76 @@ data1$from_level_1 <- NULL
 data1$from_level_2 <- NULL
 data1$from_level_3 <- NULL
 
-data1$group <- paste("From ", data1$from_level_4, " to ",data1$to_level_4)
+# Translation
+data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "Não Observado"
+data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "Formação de Floresta"
+data1$from_level_4[data1$from_level_4 == "Grassland"] <- "Pradaria"
+data1$from_level_4[data1$from_level_4 == "Pasture"] <- "Pastagem"
+data1$from_level_4[data1$from_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
+data1$from_level_4[data1$from_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
+data1$from_level_4[data1$from_level_4 == "Other Non Vegetated Area"] <- "Outras áreas não vegetadas"
+data1$from_level_4[data1$from_level_4 == "Magrove"] <- "Mangue"
+data1$from_level_4[data1$from_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
+data1$from_level_4[data1$from_level_4 == "Mining"] <- "Mineiração"
+data1$from_level_4[data1$from_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
+data1$from_level_4[data1$from_level_4 == "Soy Beans"] <- "Soja"
+data1$from_level_4[data1$from_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
+data1$from_level_4[data1$from_level_4 == "Savanna Formation"] <- "Formação de Savana"
+data1$from_level_4[data1$from_level_4 == "Beach and Dune"] <- "Praia e Dunas"
+data1$from_level_4[data1$from_level_4 == "Salt flat"] <- "Salar"
+data1$from_level_4[data1$from_level_4 == "Wetland"] <- "Pântano"
+data1$from_level_4[data1$from_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
+data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "Não Observado"
+data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "Formação de Floresta"
+data1$to_level_4[data1$to_level_4 == "Grassland"] <- "Pradaria"
+data1$to_level_4[data1$to_level_4 == "Pasture"] <- "Pastagem"
+data1$to_level_4[data1$to_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
+data1$to_level_4[data1$to_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
+data1$to_level_4[data1$to_level_4 == "Other Non Vegetated Area"] <- "Outras áreas não vegetadas"
+data1$to_level_4[data1$to_level_4 == "Magrove"] <- "Mangue"
+data1$to_level_4[data1$to_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
+data1$to_level_4[data1$to_level_4 == "Mining"] <- "Mineiração"
+data1$to_level_4[data1$to_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
+data1$to_level_4[data1$to_level_4 == "Soy Beans"] <- "Soja"
+data1$to_level_4[data1$to_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
+data1$to_level_4[data1$to_level_4 == "Savanna Formation"] <- "Formação de Savana"
+data1$to_level_4[data1$to_level_4 == "Beach and Dune"] <- "Praia e Dunas"
+data1$to_level_4[data1$to_level_4 == "Salt flat"] <- "Salar"
+data1$to_level_4[data1$to_level_4 == "Wetland"] <- "Pântano"
+data1$to_level_4[data1$to_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
+
+
+data1$group <- paste("De ", data1$from_level_4, " para ",data1$to_level_4)
 data1$to_level_4 <- NULL
 data1$from_level_4 <- NULL
+data1$munic <- paste(data1$municipality, " - ",data1$state)
+data1$municipality <- NULL
+data1$state <- NULL
 
-colnames(data1) <- c("state", "area", "time", "group")
+to_long <- function(data1){
+  aux3 <- data.frame()
+  for(j in 1:(ncol(data1)-2)){
+    aux1 <- data1 %>% select(group, munic)
+    nome <- colnames(data1)[j]
+    anoi <- as.numeric(substring(nome,2,5))
+    anof <- as.numeric(substring(nome,10,14))
+    year <- paste("Entre ", anoi, " e ", anof)
+    vect <- rep(year, nrow(data1))
+    aux2 <- cbind(data1[,j], aux1, vect)
+    colnames(aux2) <- c("area", "group", "municipality", "time")
+    aux3 <- rbind(aux3, aux2)
+  }
+  return(aux3)
+}
+data1 <- to_long(data1)
 
-
-
-datafinal <- reshape(data1, idvar = c("state", "time"), timevar = "group", direction = "wide")
+datafinal <- reshape(data1, idvar = c("municipality", "time"), timevar = "group", direction = "wide")
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
 colnames(datafinal) <- c("group", "time", labl)
 datafinal[is.na(datafinal)] <- 0
-saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
+saveRDS(datafinal, "data/mapbiomas_transicao_munic_5.rds")
 
 
 
