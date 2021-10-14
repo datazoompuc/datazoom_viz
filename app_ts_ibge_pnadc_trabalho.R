@@ -23,7 +23,7 @@ param <- get_db_param(files$param_file, files$db_file) # carrega lista de variá
 param$x_def <- "time" # variável padrão do eixo x
 param$y_def <- "taxa_de_desemprego" # variável padrão do eixo y
 param$slider_def <- "time"
-param$color_def <- "id" # variável padrão de cor
+param$color_def <- "composicao_demografica" # variável padrão de cor
 param$text_def <- "id" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "id" # variável de agrupamento
 

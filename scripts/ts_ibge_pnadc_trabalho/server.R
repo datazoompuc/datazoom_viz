@@ -10,14 +10,26 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
+  
+  # Carrega dados
+  df <- readRDS(files$db_file)
+  
   server <- function(input, output, session) {
-
-    # Carrega dados
-    df <- readRDS(files$db_file)
+    
+    # filtra dados de composicao demografica
+    df_reactived <- reactive({
+      
+      w <- df %>%
+        filter(composicao_demografica == input$filter_composicao_demografica)
+      
+      return(w)
+    })
 
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
+    
+    param$filter_composicao_demografica_choices <- sort(unique(df$composicao_demografica))
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
@@ -25,6 +37,13 @@ get_server <- function(files, param) {
         "filter1",
         choices = param$filter_choices,
         selected = sample(param$filter_choices, 1) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+      )
+      
+      selected_composicao_demografica <- sample(sample(param$filter_composicao_demografica_choices, 1)[[1]], 1)
+      updateSelectInput(session,
+                        "filter_composicao_demografica",
+                        choices = param$filter_composicao_demografica_choices,
+                        selected = selected_composicao_demografica
       )
 
       selected <- sample(sample(param$y_choices, 1)[[1]], 1)
@@ -96,7 +115,7 @@ get_server <- function(files, param) {
         # Monta título a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0("Evolução trimestral de ", y_col$label)
+        text <- paste0(y_col$label)
       }
 
       text
@@ -104,9 +123,10 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$y) || input$y == "") {
-        text <- " "
+        text <- "Variável no eixo Y não selecionada"
       } else {
-        text <- paste0("por recorte regional")
+
+        text <- paste0("por recorte regional e ", input$filter_composicao_demografica)
       }
 
       text
@@ -134,7 +154,7 @@ get_server <- function(files, param) {
           color_col <- param$table[which(param$table$var == param$color_def), ]
 
           # Filtra dataframe com grupos selecionados
-          df_filtered <- df[which(df$group %in% input$filter1), ]
+          df_filtered <- df_reactived()[which(df_reactived()$group %in% input$filter1), ]
 
           df_p <- data.frame(
             df_filtered[x_col$var],
@@ -162,7 +182,8 @@ get_server <- function(files, param) {
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
-            x_col$label, ": ", paste0('T', quarter(df_p$x), '-', year(df_p$x)),"<br>",
+            x_col$label, ": ", paste0(year(df_p$x), '-', 'T', quarter(df_p$x)),"<br>",
+            "Grupo: ", paste0(input$filter_composicao_demografica),"<br>",
             y_col$label, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
