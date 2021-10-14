@@ -27,8 +27,6 @@ filter_year_diff <- function(dat, year_diff){
 }
 dat <- filter_year_diff(dat, 5)
 
-
-
 # Data for level_4
 data1 <- dat
 data1$territory_id <- NULL
@@ -62,6 +60,10 @@ data1$from_level_4[data1$from_level_4 == "Beach and Dune"] <- "Praia e Dunas"
 data1$from_level_4[data1$from_level_4 == "Salt flat"] <- "Salar"
 data1$from_level_4[data1$from_level_4 == "Wetland"] <- "Pântano"
 data1$from_level_4[data1$from_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
+data1$from_level_4[data1$from_level_4 == "Perennial Crops"] <- "Cultivos temporários"
+data1$from_level_4[data1$from_level_4 == "Rocky outcrop"] <- "Afloramento rochoso"
+data1$from_level_4[data1$from_level_4 == "Aquaculture"] <- "Aquacultura"
+data1$from_level_4[data1$from_level_4 == "Other Non Forest Natural Formation"] <- "Outras Formações Naturais não Florestais"
 data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "Não Observado"
 data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "Formação de Floresta"
 data1$to_level_4[data1$to_level_4 == "Grassland"] <- "Pradaria"
@@ -80,6 +82,10 @@ data1$to_level_4[data1$to_level_4 == "Beach and Dune"] <- "Praia e Dunas"
 data1$to_level_4[data1$to_level_4 == "Salt flat"] <- "Salar"
 data1$to_level_4[data1$to_level_4 == "Wetland"] <- "Pântano"
 data1$to_level_4[data1$to_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
+data1$to_level_4[data1$to_level_4 == "Perennial Crops"] <- "Cultivos temporários"
+data1$to_level_4[data1$to_level_4 == "Rocky outcrop"] <- "Afloramento rochoso"
+data1$to_level_4[data1$to_level_4 == "Aquaculture"] <- "Aquacultura"
+data1$to_level_4[data1$to_level_4 == "Other Non Forest Natural Formation"] <- "Outras Formações Naturais não Florestais"
 
 
 data1$group <- paste("De ", data1$from_level_4, " para ",data1$to_level_4)
