@@ -138,7 +138,7 @@ ips <- ips %>%
 ###################
 # IBGE - CEMPRE
 ###################
-cempre_municipality <- readRDS(file = "data/cempre_municipality.rds")
+cempre_municipality <- readRDS(file = "data/cempre_municipality_dza.rds")
 cempre_municipality <- cempre_municipality %>%
   janitor::clean_names()
 
@@ -175,6 +175,19 @@ cempre_municipality <- cempre_municipality %>%
 
 #seeg <- readRDS(file = "data/seeg.rds")
 
+###################
+#PPM
+###################
+
+ppm_livestock <- readRDS(file = 'data/ppm_municipality_livestock_inventory.rds')
+
+munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
+  dplyr::select('Código Município Completo', 'Nome_Município')
+ppm_livestock$group= plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município , to = munics$`Código Município Completo`)
+
+ppm_livestock= ppm_livestock%>%
+  dplyr::filter(time >= 2000)
+
 ###########################
 # edit data to merge
 ###########################
@@ -202,6 +215,7 @@ dz_munic <- income %>%
   full_join(gdp, by = c("cod_ibge","ano"))   %>%
   full_join(cempre_municipality, by = c("cod_ibge","ano")) %>% 
   full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
+  full_join(ppm_livestock, by = c('cod_ibge' = 'group', 'ano' = 'time'))%>%
   arrange(cod_ibge, ano) %>%
   relocate(cod_ibge, ano)
 
@@ -256,7 +270,17 @@ dz_munic <- map_dz_munic %>% select(cod_ibge,
                                     cempre_salarios_remuneracoes,
                                     ips2018,
                                     ips2014,
-                                    geometry)
+                                    geometry,
+                                    num_v2670,
+                                    num_v2672,
+                                    num_v2675,
+                                    num_v2677,
+                                    num_v2680,
+                                    num_v2681,
+                                    num_v32793,
+                                    num_v32794,
+                                    num_v32795,
+                                    num_v32796)
 
 
 dz_munic$estado <- dz_munic$uf
@@ -283,6 +307,10 @@ dz_munic <- dz_munic %>%
 
 # drop municipalities with empty geometry
 dz_munic = dz_munic[!st_is_empty(dz_munic),,drop=FALSE]
+
+#limiting decimal places
+dz_munic= dz_munic %>% 
+  mutate(across(where(is.numeric), ~ round(., digits = 1)))
 
 # save data
 saveRDS(dz_munic,
@@ -535,6 +563,21 @@ temp_param_table$color[29] <- TRUE # "Índice de Progresso Social (IPS)"
 temp_param_table$color[30] <- TRUE # "Estado"
 
 temp_param_table$slider[4] <- TRUE # "ano"
+
+#filtering the ppm obs, because there is already a .csv dictionary for ppm livestock inventory
+temp_param_table= temp_param_table%>%
+  filter(!startsWith(.data$var, 'num'))
+
+metappm= read.csv(file = 'data/ppm_municipality_livestock_inventory_dic.csv')
+metappm <- metappm%>%
+  dplyr::mutate(geometry = FALSE, desc= var)%>%
+  dplyr::rename(var_group = source)%>%
+  dplyr::select(-X, - tipo)
+metappm= metappm[-1,]
+metappm= metappm[-1,]
+metappm$var_group= 'IBGE - PPM'
+
+temp_param_table= dplyr::bind_rows(temp_param_table, metappm)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_dic.csv", fileEncoding = "UTF-8")
