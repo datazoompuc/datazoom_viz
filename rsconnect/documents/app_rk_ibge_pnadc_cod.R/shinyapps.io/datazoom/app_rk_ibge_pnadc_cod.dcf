@@ -5,10 +5,10 @@ account: datazoom
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4413018
-bundleId: 4967830
+bundleId: 5135320
 url: https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cod/
-when: 1629987019.62616
-lastSyncTime: 1629987019.62616
+when: 1634143577.94853
+lastSyncTime: 1634143577.94853
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: app_bubble_dz_munic.R|app_map_dz_munic.R|app_rk_ibge_pnadc_cnae.R|app_rk_mapbiomas_cobertura_est.R|app_rk_mapbiomas_cobertura_munic.R|app_rk_mapbiomas_transicao_est.R|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|app_ts_mapbiomas_cobertura_est.R|app_ts_mapbiomas_cobertura_munic.R|app_ts_mapbiomas_transicao_est.R|LICENSE|README.md|data-raw
+ignoredFiles: app_bubble_dz_munic.R|app_map_dz_munic.R|app_rk_ibge_pnadc_cnae.R|app_rk_mapbiomas_cobertura_est.R|app_rk_mapbiomas_cobertura_munic.R|app_rk_mapbiomas_transicao_est.R|app_rkstatic_dz_munic.R|app_ts_dz_munic.R|app_ts_dz_state.R|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|app_ts_mapbiomas_cobertura_est.R|app_ts_mapbiomas_cobertura_munic.R|app_ts_mapbiomas_transicao_est.R|LICENSE|README.md|data-raw

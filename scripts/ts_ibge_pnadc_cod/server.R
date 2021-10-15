@@ -190,8 +190,11 @@ get_server <- function(files, param) {
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
-            x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", df_p$y, "<br>"
+            x_col$label, ": ", paste0('T', quarter(df_p$x), '-', year(df_p$x)),"<br>",
+            y_col$label, ": ", format(df_p$y, scientific = FALSE,
+                                      digits = 2,
+                                      decimal.mark = ",", 
+                                      big.mark = "."), "<br>"
           )
 
           # Define paleta de cores
@@ -204,7 +207,8 @@ get_server <- function(files, param) {
             color = ~group,
             type = "scatter",
             mode = "lines",
-            text = ~tooltip
+            text = ~tooltip,
+            hoverinfo = "text"
           )
 
           # Layout eixos
