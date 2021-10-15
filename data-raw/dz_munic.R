@@ -310,7 +310,12 @@ dz_munic = dz_munic[!st_is_empty(dz_munic),,drop=FALSE]
 
 #limiting decimal places
 dz_munic= dz_munic %>% 
-  mutate(across(where(is.numeric), ~ round(., digits = 1)))
+  mutate(across(where(is.numeric) & !c(.data$prop_desmatado, .data$prop_floresta, .data$prop_incremento
+                                       , .data$prop_hidrografia, .data$prop_nao_floresta), ~ round(., digits = 1)))
+#for the variables with proportions, limiting to 4 decimal places
+dz_munic= dz_munic %>% 
+  mutate(across(c(.data$prop_desmatado, .data$prop_floresta, .data$prop_incremento,
+           .data$prop_hidrografia, .data$prop_nao_floresta), ~ round(., digits = 4)))
 
 # save data
 saveRDS(dz_munic,
