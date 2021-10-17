@@ -35,6 +35,8 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Compilação de dados ao nível municipal"
 
 # Outros parâmetros e configurações
+param$x_choices$`Fonte de dados` <- NULL
+param$x_choices[[1]] <- NULL
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
