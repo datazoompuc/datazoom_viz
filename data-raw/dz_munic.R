@@ -332,10 +332,10 @@ dz_munic <- dz_munic %>%
   ), ~ round(., digits = 4)))
 
 # convert time data to date
-dz_munic$newdate <- as.Date(as.yearqtr(dz_munic$ano), format = "%Y")
-dz_munic$newdate <- strptime(as.character(dz_munic$newdate), "%Y-%m-%d")
-dz_munic$ano <- format(dz_munic$newdate, "%Y")
-dz_munic$newdate <- NULL
+# dz_munic$newdate <- as.Date(as.yearqtr(dz_munic$ano), format = "%Y")
+# dz_munic$newdate <- strptime(as.character(dz_munic$newdate), "%Y-%m-%d")
+# dz_munic$ano <- year(as.Date(as.yearqtr(dz_munic$ano), format = "%Y"))
+# dz_munic$newdate <- NULL
 
 # save data
 saveRDS(dz_munic,
