@@ -485,7 +485,7 @@ temp_param_table$var_group[temp_param_table$var == "num_v32794"] <- "IBGE - PPM"
 temp_param_table$var_group[temp_param_table$var == "num_v32795"] <- "IBGE - PPM"
 temp_param_table$var_group[temp_param_table$var == "num_v32796"] <- "IBGE - PPM"
 temp_param_table$var_group[temp_param_table$var == "geometry"] <- "Terrabrasilis"
-temp_param_table$var_group[temp_param_table$var == "estado"] <- ""
+temp_param_table$var_group[temp_param_table$var == "estado"] <- "Geral"
 temp_param_table$var_group[temp_param_table$var == "group"] <- ""
 
 # label data category
@@ -578,6 +578,7 @@ temp_param_table$y[temp_param_table$var == "ano"] <- FALSE # "ano"
 temp_param_table$y[temp_param_table$var == "geometry"] <- FALSE # "geometry"
 temp_param_table$y[temp_param_table$var == "group"] <- FALSE # "estado"
 temp_param_table$y[temp_param_table$var == "estado"] <- FALSE # "estado"
+temp_param_table$y[temp_param_table$var == "group"] <- FALSE 
 
 # block and variables in graphs x-axis
 temp_param_table$x[temp_param_table$var == "cod_ibge"] <- FALSE # "Código do município"
@@ -586,6 +587,7 @@ temp_param_table$x[temp_param_table$var == "uf"] <- FALSE # "uf_x"
 temp_param_table$x[temp_param_table$var == "ano"] <- FALSE # "ano"
 temp_param_table$x[temp_param_table$var == "geometry"] <- FALSE # "geometry"
 temp_param_table$x[temp_param_table$var == "estado"] <- FALSE # "estado"
+temp_param_table$x[temp_param_table$var == "group"] <- FALSE 
 
 # allow variables in graphs size, color, and slider-axis
 temp_param_table$size[temp_param_table$var == "employed_census2000"] <- TRUE #
@@ -606,7 +608,8 @@ temp_param_table$color[temp_param_table$var == "median_income_census2000"] <- TR
 temp_param_table$color[temp_param_table$var == "median_income_census2010"] <- TRUE #
 temp_param_table$color[temp_param_table$var == "ips2014"] <- TRUE #
 temp_param_table$color[temp_param_table$var == "ips2018"] <- TRUE #
-temp_param_table$color[temp_param_table$var == "uf"] <- TRUE # "Estado"
+temp_param_table$color[temp_param_table$var == "pop"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "estado"] <- TRUE #
 
 temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
 

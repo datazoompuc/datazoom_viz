@@ -14,6 +14,7 @@ get_server <- function(files, param) {
 
     # Carrega dados
     df <- readRDS(files$db_file)
+    df$geometry <- NULL
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
@@ -179,8 +180,6 @@ get_server <- function(files, param) {
             df[id_col$var]
           )
 
-
-
           colnames(df_p) <- c("x", "y", "color", "size", "slider", "text", "id")
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
@@ -259,7 +258,7 @@ get_server <- function(files, param) {
                 buttons = list(
                   list(
                     method = "animate",
-                    label = "<U+25B6>",
+                    label = "▶",
                     args = list(
                       NA, # primeiro arg vazio para play
                       list(
