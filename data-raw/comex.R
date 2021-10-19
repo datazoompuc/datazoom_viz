@@ -13,6 +13,9 @@ dat <- dat[!(dat$uf %notin% tipos),]
 
 saveRDS(dat, file = "data/comex_munic_raw.rds")
 
+aux1 <- readRDS("data/auxiliar_cod_pais.rds")
+aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
+
 dat$mes <- NULL
 dat$cod_sh4 <- NULL
 
