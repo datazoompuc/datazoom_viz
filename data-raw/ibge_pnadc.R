@@ -284,21 +284,15 @@ temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria4"] <- "
 temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria5"] <- "Faixa étaria entre 40 e 49 anos"
 temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria6"] <- "Faixa étaria entre 50 e 59 anos"
 temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria7"] <- "Faixa étaria maior que 60 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_genero2"] <- "Gênero mulher"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_genero1"] <- "Gênero homem"
+temp$composicao_demografica[temp$composicao_demografica == "faixa_genero2"] <- "Sexo feminino"
+temp$composicao_demografica[temp$composicao_demografica == "faixa_genero1"] <- "Sexo masculino"
 
-# ensure decimal with 1 digit only
+# limiting decimal places
 temp <- temp %>%
-  mutate( # format decimals
-    taxa_de_desemprego = format(round(taxa_de_desemprego, 1), nsmall = 1),
-    taxa_de_ocupacao = format(round(taxa_de_ocupacao, 1), nsmall = 1),
-    taxa_de_participacao = format(round(taxa_de_participacao, 1), nsmall = 1),
-    taxa_de_informalidade = format(round(taxa_de_informalidade, 1), nsmall = 1),
-    taxa_de_desalento = format(round(taxa_de_desalento, 1), nsmall = 1),
-    taxa_de_nemnem = format(round(taxa_de_nemnem, 1), nsmall = 1)
-  ) %>%
+  mutate(across(where(is.numeric), ~ as.numeric(formatC(.,digits = 2, format = "f")))) %>%
   group_by(id, composicao_demografica) %>%
   arrange(id, composicao_demografica, time)
+
 
 # save at rds format
 saveRDS(temp,
@@ -621,8 +615,8 @@ temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria4"] <- "
 temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria5"] <- "Faixa étaria entre 40 e 49 anos"
 temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria6"] <- "Faixa étaria entre 50 e 59 anos"
 temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria7"] <- "Faixa étaria maior que 60 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_genero2"] <- "Gênero mulher"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_genero1"] <- "Gênero homem"
+temp$composicao_demografica[temp$composicao_demografica == "faixa_genero2"] <- "Sexo feminino"
+temp$composicao_demografica[temp$composicao_demografica == "faixa_genero1"] <- "Sexo masculino"
 
 # ensure decimal with 1 digit only
 temp <- temp %>%
