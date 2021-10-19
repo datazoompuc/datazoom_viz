@@ -4,6 +4,8 @@
 
 library(datazoom.amazonia)
 library(magrittr)
+library(tidyverse)
+library(stringr)
 
 dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2021, raw_data = FALSE)
 
@@ -15,6 +17,11 @@ saveRDS(dat, file = "data/comex_munic_raw.rds")
 
 aux1 <- readRDS("data/auxiliar_cod_pais.rds")
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
+
+dat$cod_pais <- as.numeric(dat$cod_pais)
+aux1$SISCOMEX <- as.numeric(aux1$SISCOMEX)
+
+dat$cod_pais <- str_replace_all(dat$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
 
 dat$mes <- NULL
 dat$cod_sh4 <- NULL
