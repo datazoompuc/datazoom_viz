@@ -1,4 +1,6 @@
 library(readxl)
+library(tidyverse)
+library(stringr)
 
 dat <- readRDS("data/mapbiomas_cobertura_munic_raw.rds")
 
@@ -115,14 +117,14 @@ labl <- substr(labl, 6, 100)
 sublabl <- labl[23:27]
 sublabl <- substr(sublabl, 5, 100)
 labl[23:27] <- sublabl
-translated_labl <- c("Mosaico de Cultivos", "Soja", "Pastagem", "Infraestrutura Urbana", "Formação de Floresta",
-                     "Pradaria", "Rios, Lagos ou Oceanos", "Não Observado", "Formação de Savana",
-                     "Outras áreas não vegetadas", "Plantação de Floresta", "Mineiração", "Cana-de-açúcar",
-                     "Mangue", "Salar", "Praia e Dunas", "Pântano", "Cultivos perenes",
-                     "Mosaico de Agricultura e Pastagem", "Cultivos temporários", "Agricultura",
-                     "Floresta Natural", "Floresta", "Formação Natural sem ser Floresta",
-                     "Fazenda", "Área não Vegetada", "Água", "Formação Antrópica", "Formação Natural",
-                     "Não Identificado")
+translated_labl <- c("Mosaico de Cultivos", "Soja", "Pastagem", "Infraestrutura Urbana", "FormaÃ§Ã£o de Floresta",
+                     "Pradaria", "Rios, Lagos ou Oceanos", "NÃ£o Observado", "FormaÃ§Ã£o de Savana",
+                     "Outras Ã¡reas nÃ£o vegetadas", "PlantaÃ§Ã£o de Floresta", "MineiraÃ§Ã£o", "Cana-de-aÃ§Ãºcar",
+                     "Mangue", "Salar", "Praia e Dunas", "PÃ¢ntano", "Cultivos perenes",
+                     "Mosaico de Agricultura e Pastagem", "Cultivos temporÃ¡rios", "Agricultura",
+                     "Floresta Natural", "Floresta", "FormaÃ§Ã£o Natural sem ser Floresta",
+                     "Fazenda", "Ãrea nÃ£o Vegetada", "Ãgua", "FormaÃ§Ã£o AntrÃ³pica", "FormaÃ§Ã£o Natural",
+                     "NÃ£o Identificado")
 colnames(datafinal) <- c("time", "group", translated_labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic_percentual.rds")
