@@ -22,6 +22,7 @@ dat$cod_pais <- as.numeric(dat$cod_pais)
 aux1$SISCOMEX <- as.numeric(aux1$SISCOMEX)
 
 dat$cod_pais <- str_replace_all(dat$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
+dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux$AR_MUN_2020, aux$CD_GCMUN))
 
 dat$mes <- NULL
 dat$cod_sh4 <- NULL
