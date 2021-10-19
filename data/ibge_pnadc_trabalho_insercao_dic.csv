@@ -8,4 +8,5 @@
 "7","prop_cpropriaC",TRUE,TRUE,TRUE,"Proporção de conta própria que contribui em relação aos ocupados (%)","prop_cpropriaC","IBGE - PNAD Contínua","Economia","Inserção no Trabalho"
 "8","prop_cpropriaNc",TRUE,TRUE,TRUE,"Proporção de conta própria que não contribui em relação aos ocupados (%)","prop_cpropriaNc","IBGE - PNAD Contínua","Economia","Inserção no Trabalho"
 "9","prop_militar",TRUE,TRUE,TRUE,"Proporção servidores públicos e militares em relação aos ocupados (%)","prop_militar","IBGE - PNAD Contínua","Economia","Inserção no Trabalho"
-"10","group",TRUE,FALSE,TRUE,"Recorte regional","group","IBGE - PNAD Contínua","Economia","Inserção no Trabalho"
+"10","taxa_de_informalidade",TRUE,TRUE,TRUE,"Taxa de informalidade (%)","taxa_de_informalidade","IBGE - PNAD Contínua","Economia","Inserção no Trabalho"
+"11","group",TRUE,FALSE,TRUE,"Recorte regional","group","IBGE - PNAD Contínua","Economia","Inserção no Trabalho"

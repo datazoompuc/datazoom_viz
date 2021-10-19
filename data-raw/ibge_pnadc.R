@@ -51,6 +51,9 @@ base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pess
 base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_tocantins.dta"))
 base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas")
 
+base10 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_matogrosso.dta"))
+base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas")
+
 # append all data
 temp <- rbind(base1, base2)
 temp <- rbind(temp, base2)
@@ -61,6 +64,7 @@ temp <- rbind(temp, base6)
 temp <- rbind(temp, base7)
 temp <- rbind(temp, base8)
 temp <- rbind(temp, base9)
+temp <- rbind(temp, base10)
 
 # convert time data to quarterly
 temp <- temp %>%
@@ -289,7 +293,7 @@ temp$composicao_demografica[temp$composicao_demografica == "faixa_genero1"] <- "
 
 # limiting decimal places
 temp <- temp %>%
-  mutate(across(where(is.numeric), ~ as.numeric(formatC(.,digits = 2, format = "f")))) %>%
+  mutate(across(where(is.numeric), ~ as.numeric(formatC(., digits = 2, format = "f")))) %>%
   group_by(id, composicao_demografica) %>%
   arrange(id, composicao_demografica, time)
 
@@ -382,6 +386,9 @@ base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pess
 base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_tocantins.dta"))
 base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas")
 
+base10 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_matogrosso.dta"))
+base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas")
+
 # append all data
 temp <- rbind(base1, base2)
 temp <- rbind(temp, base2)
@@ -392,6 +399,7 @@ temp <- rbind(temp, base6)
 temp <- rbind(temp, base7)
 temp <- rbind(temp, base8)
 temp <- rbind(temp, base9)
+temp <- rbind(temp, base10)
 
 # convert time data to quarterly
 temp <- temp %>%
@@ -403,6 +411,19 @@ temp$Ano <- NULL
 
 # generate variables for each demographic composition
 temp1 <- temp %>% mutate(
+  taxa_de_informalidade_faixa_genero1 = ((n_de_informal_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
+  taxa_de_informalidade_faixa_genero2 = ((n_de_informal_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
+  taxa_de_informalidade_faixa_educ1 = ((n_de_informal_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
+  taxa_de_informalidade_faixa_educ2 = ((n_de_informal_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
+  taxa_de_informalidade_faixa_educ3 = ((n_de_informal_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
+  taxa_de_informalidade_faixa_educ4 = ((n_de_informal_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
+  taxa_de_informalidade_faixa_educ5 = ((n_de_informal_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
+  taxa_de_informalidade_faixa_etaria2 = ((n_de_informal_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
+  taxa_de_informalidade_faixa_etaria3 = ((n_de_informal_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
+  taxa_de_informalidade_faixa_etaria4 = ((n_de_informal_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
+  taxa_de_informalidade_faixa_etaria5 = ((n_de_informal_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
+  taxa_de_informalidade_faixa_etaria6 = ((n_de_informal_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
+  taxa_de_informalidade_faixa_etaria7 = ((n_de_informal_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100,
   prop_empregadoCC_faixa_genero1 = ((n_de_empregadoCC_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
   prop_empregadoCC_faixa_genero2 = ((n_de_empregadoCC_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
   prop_empregadoCC_faixa_educ1 = ((n_de_empregadoCC_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
@@ -484,6 +505,21 @@ temp1 <- temp %>% mutate(
 )
 
 # convert every data set from wide to long format and then merge altogether
+taxa_de_informalidade_por_faixa <- tidyr::pivot_longer(temp1,
+  cols = starts_with("taxa_de_informalidade_"),
+  names_to = "composicao",
+  names_prefix = "taxa_de_informalidade_",
+  values_to = "xxx",
+  names_repair = "minimal"
+) %>%
+  select("time", "id", "composicao", starts_with("xx")) %>%
+  rename(
+    taxa_de_informalidade = xxx,
+    composicao_demografica = composicao
+  ) %>%
+  group_by(composicao_demografica) %>%
+  arrange(id, composicao_demografica, time)
+
 prop_empregadoCC_por_faixa <- tidyr::pivot_longer(temp1,
   cols = starts_with("prop_empregadoCC_"),
   names_to = "composicao",
@@ -581,18 +617,20 @@ merge_datasets <- right_join(merge_datasets, prop_empregador_por_faixa, by = myc
 merge_datasets <- right_join(merge_datasets, prop_cpropriaC_por_faixa, by = mycolnames)
 merge_datasets <- right_join(merge_datasets, prop_cpropriaNc_por_faixa, by = mycolnames)
 merge_datasets <- right_join(merge_datasets, prop_militar_por_faixa, by = mycolnames)
+merge_datasets <- right_join(merge_datasets, taxa_de_informalidade_por_faixa, by = mycolnames)
 
 new_data <- bind_rows(temp, merge_datasets) %>%
   select(
     id,
     composicao_demografica,
-    time,,
+    time,
     prop_empregadoCC,
     prop_empregadoSC,
     prop_empregador,
     prop_cpropriaC,
     prop_cpropriaNc,
-    prop_militar
+    prop_militar,
+    taxa_de_informalidade
   ) %>%
   group_by(id, composicao_demografica) %>%
   arrange(id, composicao_demografica, time)
@@ -618,16 +656,9 @@ temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria7"] <- "
 temp$composicao_demografica[temp$composicao_demografica == "faixa_genero2"] <- "Sexo feminino"
 temp$composicao_demografica[temp$composicao_demografica == "faixa_genero1"] <- "Sexo masculino"
 
-# ensure decimal with 1 digit only
+# limiting decimal places
 temp <- temp %>%
-  mutate( # format decimals
-    prop_empregadoCC = format(round(prop_empregadoCC, 1), nsmall = 1),
-    prop_empregadoSC = format(round(prop_empregadoSC, 1), nsmall = 1),
-    prop_empregador = format(round(prop_empregador, 1), nsmall = 1),
-    prop_cpropriaC = format(round(prop_cpropriaC, 1), nsmall = 1),
-    prop_cpropriaNc = format(round(prop_cpropriaNc, 1), nsmall = 1),
-    prop_militar = format(round(prop_militar, 1), nsmall = 1)
-  ) %>%
+  mutate(across(where(is.numeric), ~ as.numeric(formatC(., digits = 2, format = "f")))) %>%
   group_by(id, composicao_demografica) %>%
   arrange(id, composicao_demografica, time)
 
@@ -670,6 +701,7 @@ temp_param_table$label[temp_param_table$var == "prop_empregador"] <- "Proporçã
 temp_param_table$label[temp_param_table$var == "prop_cpropriaC"] <- "Proporção de conta própria que contribui em relação aos ocupados (%)"
 temp_param_table$label[temp_param_table$var == "prop_cpropriaNc"] <- "Proporção de conta própria que não contribui em relação aos ocupados (%)"
 temp_param_table$label[temp_param_table$var == "prop_militar"] <- "Proporção servidores públicos e militares em relação aos ocupados (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_informalidade"] <- "Taxa de informalidade (%)"
 
 # block variables in graphs y-axis
 temp_param_table$y[temp_param_table$var == "id"] <- FALSE
