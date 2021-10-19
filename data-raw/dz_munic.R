@@ -120,6 +120,52 @@ gdp <- gdp %>%
   select(cod_ibge, ano, pop, gdp, gd_ppc) %>%
   arrange(cod_ibge, ano)
 
+# deflacionar gdp (ano base 2021)
+gdp$gdp_deflacionado <- gdp$gdp
+gdp$gd_ppc_deflacionado <- gdp$gd_ppc
+
+gdp$gd_ppc_deflacionado[gdp$ano == 2002] <- gdp$gd_ppc_deflacionado[gdp$ano == 2002] * 3.059410125
+gdp$gd_ppc_deflacionado[gdp$ano == 2003] <- gdp$gd_ppc_deflacionado[gdp$ano == 2003] * 2.67274462
+gdp$gd_ppc_deflacionado[gdp$ano == 2004] <- gdp$gd_ppc_deflacionado[gdp$ano == 2004] * 2.481488406
+gdp$gd_ppc_deflacionado[gdp$ano == 2005] <- gdp$gd_ppc_deflacionado[gdp$ano == 2005] * 2.310353402
+gdp$gd_ppc_deflacionado[gdp$ano == 2006] <- gdp$gd_ppc_deflacionado[gdp$ano == 2006] * 2.185765931
+gdp$gd_ppc_deflacionado[gdp$ano == 2007] <- gdp$gd_ppc_deflacionado[gdp$ano == 2007] * 2.122353953
+gdp$gd_ppc_deflacionado[gdp$ano == 2008] <- gdp$gd_ppc_deflacionado[gdp$ano == 2008] * 2.029766565
+gdp$gd_ppc_deflacionado[gdp$ano == 2009] <- gdp$gd_ppc_deflacionado[gdp$ano == 2009] * 1.917780744
+gdp$gd_ppc_deflacionado[gdp$ano == 2010] <- gdp$gd_ppc_deflacionado[gdp$ano == 2010] * 1.833581122
+gdp$gd_ppc_deflacionado[gdp$ano == 2011] <- gdp$gd_ppc_deflacionado[gdp$ano == 2011] * 1.729907957
+gdp$gd_ppc_deflacionado[gdp$ano == 2012] <- gdp$gd_ppc_deflacionado[gdp$ano == 2012] * 1.62863921
+gdp$gd_ppc_deflacionado[gdp$ano == 2013] <- gdp$gd_ppc_deflacionado[gdp$ano == 2013] * 1.534218261
+gdp$gd_ppc_deflacionado[gdp$ano == 2014] <- gdp$gd_ppc_deflacionado[gdp$ano == 2014] * 1.453063703
+gdp$gd_ppc_deflacionado[gdp$ano == 2015] <- gdp$gd_ppc_deflacionado[gdp$ano == 2015] * 1.356257603
+gdp$gd_ppc_deflacionado[gdp$ano == 2016] <- gdp$gd_ppc_deflacionado[gdp$ano == 2016] * 1.225100709
+gdp$gd_ppc_deflacionado[gdp$ano == 2017] <- gdp$gd_ppc_deflacionado[gdp$ano == 2017] * 1.162841975
+gdp$gd_ppc_deflacionado[gdp$ano == 2018] <- gdp$gd_ppc_deflacionado[gdp$ano == 2018] * 1.130563082
+gdp$gd_ppc_deflacionado[gdp$ano == 2019] <- gdp$gd_ppc_deflacionado[gdp$ano == 2019] * 1.089420805
+gdp$gd_ppc_deflacionado[gdp$ano == 2020] <- gdp$gd_ppc_deflacionado[gdp$ano == 2020] * 1.045591981
+gdp$gd_ppc_deflacionado[gdp$ano == 2021] <- gdp$gd_ppc_deflacionado[gdp$ano == 2021] * 1.0
+
+gdp$gdp_deflacionado[gdp$ano == 2002] <- gdp$gdp_deflacionado[gdp$ano == 2002] * 3.059410125
+gdp$gdp_deflacionado[gdp$ano == 2003] <- gdp$gdp_deflacionado[gdp$ano == 2003] * 2.67274462
+gdp$gdp_deflacionado[gdp$ano == 2004] <- gdp$gdp_deflacionado[gdp$ano == 2004] * 2.481488406
+gdp$gdp_deflacionado[gdp$ano == 2005] <- gdp$gdp_deflacionado[gdp$ano == 2005] * 2.310353402
+gdp$gdp_deflacionado[gdp$ano == 2006] <- gdp$gdp_deflacionado[gdp$ano == 2006] * 2.185765931
+gdp$gdp_deflacionado[gdp$ano == 2007] <- gdp$gdp_deflacionado[gdp$ano == 2007] * 2.122353953
+gdp$gdp_deflacionado[gdp$ano == 2008] <- gdp$gdp_deflacionado[gdp$ano == 2008] * 2.029766565
+gdp$gdp_deflacionado[gdp$ano == 2009] <- gdp$gdp_deflacionado[gdp$ano == 2009] * 1.917780744
+gdp$gdp_deflacionado[gdp$ano == 2010] <- gdp$gdp_deflacionado[gdp$ano == 2010] * 1.833581122
+gdp$gdp_deflacionado[gdp$ano == 2011] <- gdp$gdp_deflacionado[gdp$ano == 2011] * 1.729907957
+gdp$gdp_deflacionado[gdp$ano == 2012] <- gdp$gdp_deflacionado[gdp$ano == 2012] * 1.62863921
+gdp$gdp_deflacionado[gdp$ano == 2013] <- gdp$gdp_deflacionado[gdp$ano == 2013] * 1.534218261
+gdp$gdp_deflacionado[gdp$ano == 2014] <- gdp$gdp_deflacionado[gdp$ano == 2014] * 1.453063703
+gdp$gdp_deflacionado[gdp$ano == 2015] <- gdp$gdp_deflacionado[gdp$ano == 2015] * 1.356257603
+gdp$gdp_deflacionado[gdp$ano == 2016] <- gdp$gdp_deflacionado[gdp$ano == 2016] * 1.225100709
+gdp$gdp_deflacionado[gdp$ano == 2017] <- gdp$gdp_deflacionado[gdp$ano == 2017] * 1.162841975
+gdp$gdp_deflacionado[gdp$ano == 2018] <- gdp$gdp_deflacionado[gdp$ano == 2018] * 1.130563082
+gdp$gdp_deflacionado[gdp$ano == 2019] <- gdp$gdp_deflacionado[gdp$ano == 2019] * 1.089420805
+gdp$gdp_deflacionado[gdp$ano == 2020] <- gdp$gdp_deflacionado[gdp$ano == 2020] * 1.045591981
+gdp$gdp_deflacionado[gdp$ano == 2021] <- gdp$gdp_deflacionado[gdp$ano == 2021] * 1.0
+
 ###################
 # INPE - DEGRAD
 ##################
@@ -273,6 +319,8 @@ dz_munic <- map_dz_munic %>% select(
   prop_hidrografia,
   pop, gdp,
   gd_ppc,
+  gdp_deflacionado,
+  gd_ppc_deflacionado,
   cempre_n_empresas_organizacoes,
   cempre_n_ocupados,
   cempre_n_ocupados_assalariados,
@@ -391,8 +439,10 @@ temp_param_table$label[temp_param_table$var == "prop_floresta"] <- "Proporção 
 temp_param_table$label[temp_param_table$var == "prop_nao_floresta"] <- "Proporção de não-floresta na área do município"
 temp_param_table$label[temp_param_table$var == "prop_hidrografia"] <- "Proporção de hidrografia na área do município"
 temp_param_table$label[temp_param_table$var == "pop"] <- "População"
-temp_param_table$label[temp_param_table$var == "gdp"] <- "PIB"
-temp_param_table$label[temp_param_table$var == "gd_ppc"] <- "PIB percapita"
+temp_param_table$label[temp_param_table$var == "gdp"] <- "PIB nominal"
+temp_param_table$label[temp_param_table$var == "gd_ppc"] <- "PIB percapita nominal"
+temp_param_table$label[temp_param_table$var == "gdp_deflacionado"] <- "PIB real (R$ 2021)"
+temp_param_table$label[temp_param_table$var == "gd_ppc_deflacionado"] <- "PIB percapita real (R$ 2021)"
 temp_param_table$label[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "Número de empresas e outras organizações"
 temp_param_table$label[temp_param_table$var == "cempre_n_ocupados"] <- "Número de pessoas ocupadas"
 temp_param_table$label[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "Número de pessoas ocupadas assalariadas"
@@ -433,6 +483,8 @@ temp_param_table$unidade[temp_param_table$var == "prop_hidrografia"] <- "%"
 temp_param_table$unidade[temp_param_table$var == "pop"] <- "Pessoas"
 temp_param_table$unidade[temp_param_table$var == "gdp"] <- "R$"
 temp_param_table$unidade[temp_param_table$var == "gd_ppc"] <- "R$"
+temp_param_table$unidade[temp_param_table$var == "gdp_deflacionado"] <- "R$"
+temp_param_table$unidade[temp_param_table$var == "gd_ppc_deflacionado"] <- "R$"
 temp_param_table$unidade[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "Estabelecimentos"
 temp_param_table$unidade[temp_param_table$var == "cempre_n_ocupados"] <- "Pessoas"
 temp_param_table$unidade[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "Pessoas"
@@ -474,6 +526,8 @@ temp_param_table$var_group[temp_param_table$var == "prop_hidrografia"] <- "INPE 
 temp_param_table$var_group[temp_param_table$var == "pop"] <- "IBGE - CEMPRE"
 temp_param_table$var_group[temp_param_table$var == "gdp"] <- "IBGE - CEMPRE"
 temp_param_table$var_group[temp_param_table$var == "gd_ppc"] <- "IBGE - CEMPRE"
+temp_param_table$var_group[temp_param_table$var == "gdp_deflacionado"] <- "IBGE - CEMPRE"
+temp_param_table$var_group[temp_param_table$var == "gd_ppc_deflacionado"] <- "IBGE - CEMPRE"
 temp_param_table$var_group[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "IBGE - CEMPRE"
 temp_param_table$var_group[temp_param_table$var == "cempre_n_ocupados"] <- "IBGE - CEMPRE"
 temp_param_table$var_group[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "IBGE - CEMPRE"
@@ -515,6 +569,8 @@ temp_param_table$categoria[temp_param_table$var == "prop_hidrografia"] <- "Meio 
 temp_param_table$categoria[temp_param_table$var == "pop"] <- "Demografia"
 temp_param_table$categoria[temp_param_table$var == "gdp"] <- "Economia"
 temp_param_table$categoria[temp_param_table$var == "gd_ppc"] <- "Economia"
+temp_param_table$categoria[temp_param_table$var == "gdp_deflacionado"] <- "Economia"
+temp_param_table$categoria[temp_param_table$var == "gd_ppc_deflacionado"] <- "Economia"
 temp_param_table$categoria[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "Mercado de trabalho"
 temp_param_table$categoria[temp_param_table$var == "cempre_n_ocupados"] <- "Mercado de trabalho"
 temp_param_table$categoria[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "Mercado de trabalho"
@@ -556,6 +612,8 @@ temp_param_table$subcategoria[temp_param_table$var == "prop_hidrografia"] <- "Ge
 temp_param_table$subcategoria[temp_param_table$var == "pop"] <- "População"
 temp_param_table$subcategoria[temp_param_table$var == "gdp"] <- "Desenvolvimento"
 temp_param_table$subcategoria[temp_param_table$var == "gd_ppc"] <- "Desenvolvimento"
+temp_param_table$subcategoria[temp_param_table$var == "gdp_deflacionado"] <- "Desenvolvimento"
+temp_param_table$subcategoria[temp_param_table$var == "gd_ppc_deflacionado"] <- "Desenvolvimento"
 temp_param_table$subcategoria[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "Empresa"
 temp_param_table$subcategoria[temp_param_table$var == "cempre_n_ocupados"] <- "Trabalho"
 temp_param_table$subcategoria[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "Trabalho"
