@@ -50,6 +50,7 @@ param$x_choices$`INPE - PRODES`$`Área total desmatada` <- NULL
 param$x_choices$`INPE - PRODES`$`Área total de floresta` <- NULL
 param$x_choices$`INPE - PRODES`$`Área total de não-floresta` <- NULL
 param$x_choices$`INPE - PRODES`$`Área total de hidrografia` <- NULL
+param$x_choices$`IBGE - PPM` <- NULL
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

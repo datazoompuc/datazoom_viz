@@ -27,13 +27,16 @@ get_ui <- function(files, param) {
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
-          sliderInput("slider", 
-                      label = "Intervalo de tempo:", 
-                      min = as.Date("2000-01-01","%Y-%m-%d"), 
-                      max = as.Date("2019-01-01","%Y-%m-%d"), 
-                      value = c(as.Date("2000-01-01","%Y-%m-%d"), 
-                                as.Date("2019-01-01","%Y-%m-%d")),
-                      timeFormat = "%Y"),
+          sliderInput("slider",
+            label = "Intervalo de tempo:",
+            min = as.Date("2000-01-01", "%Y-%m-%d"),
+            max = as.Date("2019-01-01", "%Y-%m-%d"),
+            value = c(
+              as.Date("2000-01-01", "%Y-%m-%d"),
+              as.Date("2019-01-01", "%Y-%m-%d")
+            ),
+            timeFormat = "%Y"
+          ),
         ),
         # Seleciona filtro
         selectInput(

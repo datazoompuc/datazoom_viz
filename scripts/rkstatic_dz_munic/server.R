@@ -10,48 +10,51 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
-  
+
   # Carrega dados
   df <- readRDS(files$db_file)
   df$geometry <- NULL
-  
+
   server <- function(input, output, session) {
-    
-    
+
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$uf))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-    
-    
+
+
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      updateSelectInput(session,
-                        "filter1",
-                        choices = param$filter_choices,
-                        selected = param$filter_choices
-      )
+
+      # se input está vazio preenche com valor aleatório da lista de colunas
+      if (is.null(input$filter1)) {
+        updateSelectInput(session,
+          "filter1",
+          choices = param$filter_choices,
+          selected = param$filter_choices
+        )
+      }
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
         "?", "x=", input$x,
-        "&", "slider=", input$slider[1], 
+        "&", "slider=", input$slider[1],
         "&", "slider=", input$slider[2]
       )
-      
+
       for (i in input$filter1) {
         q_string <- paste0(
           q_string,
           "&", "filter=", i
         )
       }
-      
-      
+
+
       updateQueryString(q_string, mode = "replace")
     }
-    
-    
+
+
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       # Pega parametros da url e atribui aos selectinputs
@@ -68,21 +71,21 @@ get_server <- function(files, param) {
       selected <- unlist(query[names(query) == "slider"], use.names = FALSE)
       if (!is.null(query[["slider"]])) {
         updateSliderInput(session,
-                          "slider",
-                          value = as.Date(selected,"%Y-%m-%d"),
-                          timeFormat = "%Y"
+          "slider",
+          value = as.Date(selected, "%Y-%m-%d"),
+          timeFormat = "%Y"
         )
       }
-      
-      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-      if (!is.null(query[["filter"]])) {
+
+
+      selected <- unlist(query[names(query) == "filter1"], use.names = FALSE)
+      if (!is.null(query[["filter1"]])) {
         updateSelectInput(session,
-                          "filter1",
-                          choices = param$filter_choices,
-                          selected = selected
+          "filter1",
+          choices = param$filter_choices,
+          selected = selected
         )
       }
-      
     }
 
 
@@ -105,34 +108,27 @@ get_server <- function(files, param) {
       text <- " "
 
       # Monta título a partir de variáveis selecionadas nos inputs
-        color_col <- param$table[which(param$table$var == "nm_municip"), ]
-        text <- paste0("Amazônia Legal")
+      color_col <- param$table[which(param$table$var == "nm_municip"), ]
+      text <- paste0("Amazônia Legal")
 
       text
     })
 
+
     # Output gráfico
     output$plot <- renderPlotly({
-      
-      random_inputs()
       update_my_queryString() # atualiza url com parametros dos inputs
-      
-      df <- df %>% filter(year(ano) >= year(input$slider[1]) & 
-                            year(ano) <= year(input$slider[2])) %>% 
-        filter(uf %in% input$filter1) %>% 
-        group_by(cod_ibge, nm_municip, uf, group) %>% 
-        summarise(incremento = sum(incremento, na.rm = TRUE),
-                  prop_incremento = sum(prop_incremento, na.rm = TRUE))
-      
+
+      random_inputs() # preenche inputs se estiverem vazios
 
       fig <- plotly_empty() # inicia figura com gráfico em branco
 
       tryCatch(
         {
-          
+
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$x) || input$x == "" || 
-              is.null(input$filter1) || length(input$filter1) < 1) {
+          if (is.null(input$x) || input$x == "" ||
+            is.null(input$filter1) || length(input$filter1) < 1) {
             fig <- plotly_empty()
             stop()
           }
@@ -149,18 +145,33 @@ get_server <- function(files, param) {
           y_col$var <- "rank"
           y_col$label <- "Ranking"
 
+
+          df_reactived <- reactive({
+            w <- df %>%
+              filter(year(ano) >= year(input$slider[1]) &
+                year(ano) <= year(input$slider[2])) %>%
+              filter(uf %in% input$filter1) %>%
+              group_by(cod_ibge, nm_municip, uf, group) %>%
+              summarise(
+                incremento = sum(incremento, na.rm = TRUE),
+                prop_incremento = sum(prop_incremento, na.rm = TRUE)
+              )
+
+            return(w)
+          })
+
           df_p <- data.frame(
-            df[x_col$var],
+            df_reactived()[x_col$var],
             NA,
-            df[color_col$var],
-            df["group"],
-            df["group"],
-            df[id_col$var]
+            df_reactived()[color_col$var],
+            df_reactived()["group"],
+            df_reactived()["group"],
+            df_reactived()[id_col$var]
           )
-          
+
           colnames(df_p) <- c("x", "y", "color", "text", "group", "id")
-          
-          
+
+
           # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
 
