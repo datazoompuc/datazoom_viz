@@ -14,6 +14,7 @@ tipos <- c("RO", "AM", "PA", "RR", "MT", "MA", "AC", "AP", "TO")
 dat <- dat[!(dat$uf %notin% tipos),]
 
 saveRDS(dat, file = "data/comex_munic_raw.rds")
+dat <- readRDS(file = "data/comex_munic_raw.rds")
 
 aux1 <- readRDS("data/auxiliar_cod_pais.rds")
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
