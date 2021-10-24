@@ -24,15 +24,14 @@ dat$cod_pais <- as.numeric(dat$cod_pais)
 aux1$SISCOMEX <- as.numeric(aux1$SISCOMEX)
 
 dat$cod_pais <- str_replace_all(dat$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
-dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux$AR_MUN_2020, aux$CD_GCMUN))
+dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
 
 dat$mes <- NULL
 dat$cod_sh4 <- NULL
+dat$kg_liquido <- NULL
 
-data_kg <- aggregate(kg_liquido ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
 data_val <- aggregate(valor_fob ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
 
-datafinal_kg <- reshape(data_kg, idvar = c("ano", "uf", "cod_municipio", "cod_pais"), timevar = "nome_sh4", direction = "wide")
 datafinal_val <- reshape(data, idvar = c("state", "time"), timevar = "group", direction = "wide")
 
 
