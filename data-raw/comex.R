@@ -18,6 +18,7 @@ dat <- readRDS(file = "data/comex_munic_raw.rds")
 
 aux1 <- readRDS("data/auxiliar_cod_pais.rds")
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
+aux3 <- readRDS("data/auxiliar_cod_municipais.rds")
 
 dat$cod_pais <- as.numeric(dat$cod_pais)
 aux1$SISCOMEX <- as.numeric(aux1$SISCOMEX)
