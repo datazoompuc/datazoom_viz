@@ -26,13 +26,18 @@ aux1$SISCOMEX <- as.numeric(aux1$SISCOMEX)
 dat$cod_pais <- str_replace_all(dat$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
 
+
+
+# por país
 dat$mes <- NULL
 dat$cod_sh4 <- NULL
 dat$kg_liquido <- NULL
+dat$uf <- NULL
+dat$cod_municipio <- NULL
 
-data_val <- aggregate(valor_fob ~ ano + cod_pais + uf + cod_municipio + nome_sh4, dat, sum)
+data_val_pais <- aggregate(valor_fob ~ ano + cod_pais + nome_sh4, dat, sum)
 
-datafinal_val <- reshape(data, idvar = c("state", "time"), timevar = "group", direction = "wide")
+datafinal_val_pais <- reshape(data, idvar = c("state", "time"), timevar = "group", direction = "wide")
 
 
 # Trocar países e municípios de código para nome
