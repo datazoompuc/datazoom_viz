@@ -15,13 +15,13 @@ get_server <- function(files, param) {
   server <- function(input, output, session) {
     df_reactived <- reactive({
       w <- df %>%
-        filter(ano == input$filter1)
+        filter(year(ano) == input$filter1)
 
       return(w)
     })
 
     # Cria opções para seleção de datas
-    param$filter_choices <- sort(unique(df$ano))
+    param$filter_choices <- sort(unique(year(df$ano)))
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
