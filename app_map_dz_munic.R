@@ -13,7 +13,7 @@ files$server_script <- "scripts/map/server.R"
 files$param_script <- "scripts/map/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/dz_munic_dic.csv"
-files$db_file <- "data/dz_munic.rds"
+files$db_file <- "data/dz_munic_simplified.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -37,6 +37,9 @@ param$plot_desc <- "Compilação de dados ao nível municipal"
 # Outros parâmetros e configurações
 param$x_choices$`Fonte de dados` <- NULL
 param$x_choices[[1]] <- NULL
+param$x_choices$`IBGE - Censo 2000` <- NULL
+param$x_choices$`IBGE - Censo 2010` <- NULL
+param$x_choices$IMAZON <- NULL
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
