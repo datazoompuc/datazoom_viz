@@ -1,0 +1,80 @@
+############################################################
+#### Generate rds data in the folder ./data/ 
+############################################################
+
+library(datazoom.amazonia)
+library(tidyverse)
+library(tibble)
+library(zoo)
+library(readxl)
+
+dat <- load_sigmine(space_aggregation = "municipality", language = "pt")
+
+saveRDS(dat, file = "data/sigmine_munic_raw.rds")
+dat <- readRDS(file = "data/sigmine_munic_raw.rds")
+
+
+data <- dat
+data$id <- NULL
+data$processo <- NULL
+data$fase <- NULL
+data$empresa <- NULL
+data$uso <- NULL
+data$DSProcesso <- NULL
+data$code_muni <- NULL
+
+data$group <- paste(data$municipio, "-",data$estado)
+data$municipio <- NULL
+data$estado <- NULL
+
+colnames(data) <- c("time", "mineral", "area", "group")
+
+data <- aggregate(area ~ time + mineral + group, data, sum)
+
+datafinal <- reshape(data, idvar = c("group", "time"), timevar = "mineral", direction = "wide")
+labl <- colnames(datafinal)
+labl <- labl[-c(1,2)]
+labl <- substr(labl, 6, 100)
+colnames(datafinal) <- c("time", "group", labl)
+datafinal[is.na(datafinal)] <- 0
+datafinal$TOTAL <- rowSums(as.data.frame(datafinal[,3:327]))
+datafinal <- datafinal[order(datafinal$group, datafinal$time),]
+saveRDS(datafinal, "data/sigmine_munic.rds")
+
+
+
+#####################
+# Build Dictionary 
+#####################
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Sigmine",
+  tipo = 1,
+  unidade = "m^2",
+  categoria= "Mineração", 
+  subcategoria = "Uso da terra"
+)
+
+temp_param_table$label[2] <- "MUNICÍPIO"
+temp_param_table$label[1] <- "ANO"
+temp_param_table$desc[2] <- "MUNICÍPIO"
+temp_param_table$desc[2] <- "ANO"
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 326))
+temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 326))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 326))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 326))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/sigmine_munic_dic.csv", fileEncoding = "UTF-8")
