@@ -176,7 +176,7 @@ cempre_municipality <- cempre_municipality %>%
 #seeg <- readRDS(file = "data/seeg.rds")
 
 ###################
-#PPM
+#PPM - IBGE
 ###################
 
 ppm_livestock <- readRDS(file = 'data/ppm_municipality_livestock_inventory.rds')
@@ -187,6 +187,15 @@ ppm_livestock$group= plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Mun
 
 ppm_livestock= ppm_livestock%>%
   dplyr::filter(time >= 2000)
+
+###################
+#PAM - IBGE
+###################
+
+pam_municipality_all_crops_2000_19= readRDS('data/pam_municipality_all_crops_2000_19.rds')
+pam_municipality_all_crops_2000_19= pam_municipality_all_crops_2000_19%>%
+  dplyr::select(.data$geo_id, .data$ano, dplyr::ends_with('40124'), dplyr::ends_with('40102'), dplyr::ends_with('40122'), dplyr::ends_with('40119') )
+
 
 ###########################
 # edit data to merge
