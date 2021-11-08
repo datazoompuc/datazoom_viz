@@ -390,6 +390,12 @@ saveRDS(dz_munic,
   file = "./data/dz_munic.rds"
 )
 
+# save simplified sf for faster maps
+dz_munic_simp <- rmapshaper::ms_simplify(dz_munic, keep_shapes = TRUE)
+saveRDS(dz_munic_simp,
+        file = "./data/dz_munic_simplified.rds"
+)
+
 #####################
 # Build Dictionary
 #####################
