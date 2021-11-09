@@ -51,7 +51,8 @@ labl <- colnames(datafinal_val_pais)
 labl <- labl[-c(1)]
 labl <- substr(labl, 7, 100)
 colnames(datafinal_val_pais) <- c("time", labl)
-datafinal_val_pais$group <- rep("Amazônia", 25)
+group <- rep("Amazônia", 25)
+datafinal_val_pais <- cbind(group, datafinal_val_pais)
 
 saveRDS(datafinal_val_pais, "data/comex_exp_tot_sh2.rds")
 
@@ -203,11 +204,11 @@ temp_param_table$label[98] <- "Região"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[98] <- "Região"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(FALSE, rep(TRUE, 96), FALSE)
-temp_param_table$y <- c(FALSE, rep(TRUE, 96), FALSE)
-temp_param_table$color <- c(rep(FALSE, 97), TRUE)
-temp_param_table$size <- c(FALSE, rep(TRUE, 96), FALSE)
-temp_param_table$slider <- c(FALSE, rep(TRUE, 96), FALSE)
+temp_param_table$x <- c(FALSE, FALSE, rep(TRUE, 96))
+temp_param_table$y <- c(FALSE, FALSE, rep(TRUE, 96))
+temp_param_table$color <- c(TRUE, rep(FALSE, 97))
+temp_param_table$size <- c(FALSE, FALSE, rep(TRUE, 96))
+temp_param_table$slider <- c(FALSE, FALSE, rep(TRUE, 96))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_tot_sh2_dic.csv", fileEncoding = "UTF-8")
