@@ -25,11 +25,6 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = sample(param$filter_choices, 1) # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
-      )
       selected <- sample(sample(param$x_choices, 1)[[1]], 1)
       updateSelectInput(session,
         "x",

@@ -27,13 +27,17 @@ get_ui <- function(files, param) {
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo de data
-          selectizeInput(
-            inputId = "filter1",
-            label = "Ano referente",
-            choices = NULL,
-            multiple = FALSE,
-            width = "100%"
-          )
+          sliderInput(inputId = "filter1",
+                      label = "Ano referente",
+                      min = 2000,
+                      max = 2019,
+                      value = 2000,
+                      step = 1,
+                      width = "100%",
+                      animate = animationOptions(interval = 2000,
+                                                 playButton = "\u25B6",
+                                                 pauseButton = "\u23F8"),
+                      sep = "")
         ),
       ),
       column(9,
