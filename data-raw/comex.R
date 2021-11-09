@@ -26,18 +26,33 @@ aux1$SISCOMEX <- as.numeric(aux1$SISCOMEX)
 dat$cod_pais <- str_replace_all(dat$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
 
+matriz <- dat
+
 
 
 # por país
 dat$mes <- NULL
-dat$cod_sh4 <- NULL
+dat$nome_sh4 <- NULL
 dat$kg_liquido <- NULL
 dat$uf <- NULL
 dat$cod_municipio <- NULL
+dat$cod_pais <- NULL
 
-data_val_pais <- aggregate(valor_fob ~ ano + cod_pais + nome_sh4, dat, sum)
+dat$cod_sh4 <- as.numeric(dat$cod_sh4)
+dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 
-datafinal_val_pais <- reshape(data, idvar = c("state", "time"), timevar = "group", direction = "wide")
+data_val_pais <- aggregate(valor_fob ~ ano + cod_sh4, dat, sum)
+colnames(data_val_pais) <- c("time", "type", "value")
+
+datafinal_val_pais <- reshape(data_val_pais, idvar = c("time"), timevar = "type", direction = "wide")
+labl <- colnames(datafinal_val_pais)
+labl <- labl[-c(1)]
+labl <- substr(labl, 8, 100)
+colnames(datafinal_val_pais) <- c("time", labl)
+datafinal_val_pais$group <- rep("Amazonia", 25)
+
+saveRDS(datafinal_val_pais, "data/comex_exp_tot_sh2.rds")
+
 
 
 # Trocar países e municípios de código para nome
