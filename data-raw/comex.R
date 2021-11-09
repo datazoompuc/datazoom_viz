@@ -200,10 +200,10 @@ temp_param_table <- tibble(
   subcategoria = "Comércio exterior"
 )
 
-temp_param_table$label[98] <- "Região"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[98] <- "Região"
-temp_param_table$desc[1] <- "Ano"
+temp_param_table$label[1] <- "Região"
+temp_param_table$label[2] <- "Ano"
+temp_param_table$desc[1] <- "Região"
+temp_param_table$desc[2] <- "Ano"
 temp_param_table$x <- c(FALSE, FALSE, rep(TRUE, 96))
 temp_param_table$y <- c(FALSE, FALSE, rep(TRUE, 96))
 temp_param_table$color <- c(TRUE, rep(FALSE, 97))
