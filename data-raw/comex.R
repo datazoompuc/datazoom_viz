@@ -38,18 +38,20 @@ dat$uf <- NULL
 dat$cod_municipio <- NULL
 dat$cod_pais <- NULL
 
-dat$cod_sh4 <- as.numeric(dat$cod_sh4)
-dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
-
 data_val_pais <- aggregate(valor_fob ~ ano + cod_sh4, dat, sum)
+
+data_val_pais$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais$cod_sh4))
+aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
+data_val_pais$cod_sh4 <- str_replace_all(data_val_pais$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
+
 colnames(data_val_pais) <- c("time", "type", "value")
 
 datafinal_val_pais <- reshape(data_val_pais, idvar = c("time"), timevar = "type", direction = "wide")
 labl <- colnames(datafinal_val_pais)
 labl <- labl[-c(1)]
-labl <- substr(labl, 8, 100)
+labl <- substr(labl, 7, 100)
 colnames(datafinal_val_pais) <- c("time", labl)
-datafinal_val_pais$group <- rep("Amazonia", 25)
+datafinal_val_pais$group <- rep("Amazônia", 25)
 
 saveRDS(datafinal_val_pais, "data/comex_exp_tot_sh2.rds")
 
@@ -197,15 +199,15 @@ temp_param_table <- tibble(
   subcategoria = "Comércio exterior"
 )
 
-temp_param_table$label[169] <- "Região"
+temp_param_table$label[98] <- "Região"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[169] <- "Região"
+temp_param_table$desc[98] <- "Região"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(FALSE, rep(TRUE, 167), FALSE)
-temp_param_table$y <- c(FALSE, rep(TRUE, 167), FALSE)
-temp_param_table$color <- c(rep(FALSE, 168), TRUE)
-temp_param_table$size <- c(FALSE, rep(TRUE, 167), FALSE)
-temp_param_table$slider <- c(FALSE, rep(TRUE, 167), FALSE)
+temp_param_table$x <- c(FALSE, rep(TRUE, 96), FALSE)
+temp_param_table$y <- c(FALSE, rep(TRUE, 96), FALSE)
+temp_param_table$color <- c(rep(FALSE, 97), TRUE)
+temp_param_table$size <- c(FALSE, rep(TRUE, 96), FALSE)
+temp_param_table$slider <- c(FALSE, rep(TRUE, 96), FALSE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_tot_sh2_dic.csv", fileEncoding = "UTF-8")
