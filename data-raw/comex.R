@@ -44,17 +44,20 @@ data_val_pais$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
 data_val_pais$cod_sh4 <- str_replace_all(data_val_pais$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 
-colnames(data_val_pais) <- c("time", "type", "value")
+colnames(data_val_pais) <- c("time", "group", "value")
 
-datafinal_val_pais <- reshape(data_val_pais, idvar = c("time"), timevar = "type", direction = "wide")
-labl <- colnames(datafinal_val_pais)
-labl <- labl[-c(1)]
-labl <- substr(labl, 7, 100)
-colnames(datafinal_val_pais) <- c("time", labl)
-group <- rep("Amazônia", 25)
-datafinal_val_pais <- cbind(group, datafinal_val_pais)
+data_val_pais$time <- as.numeric(data_val_pais$time)
+data_val_pais <- aggregate(value ~ time + group, data_val_pais, sum)
 
-saveRDS(datafinal_val_pais, "data/comex_exp_tot_sh2.rds")
+#datafinal_val_pais <- reshape(data_val_pais, idvar = c("group"), timevar = "time", direction = "wide")
+#labl <- colnames(datafinal_val_pais)
+#labl <- labl[-c(1)]
+#labl <- substr(labl, 7, 100)
+#colnames(datafinal_val_pais) <- c("time", labl)
+#group <- rep("Amazônia", 25)
+#datafinal_val_pais <- cbind(group, datafinal_val_pais)
+
+saveRDS(data_val_pais, "data/comex_exp_tot_sh2.rds")
 
 
 
