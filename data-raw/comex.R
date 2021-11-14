@@ -203,15 +203,17 @@ temp_param_table <- tibble(
   subcategoria = "Comércio exterior"
 )
 
-temp_param_table$label[1] <- "Região"
-temp_param_table$label[2] <- "Ano"
-temp_param_table$desc[1] <- "Região"
-temp_param_table$desc[2] <- "Ano"
-temp_param_table$x <- c(FALSE, FALSE, rep(TRUE, 96))
-temp_param_table$y <- c(FALSE, FALSE, rep(TRUE, 96))
-temp_param_table$color <- c(TRUE, rep(FALSE, 97))
-temp_param_table$size <- c(FALSE, FALSE, rep(TRUE, 96))
-temp_param_table$slider <- c(FALSE, FALSE, rep(TRUE, 96))
+temp_param_table$label[2] <- "Região"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$label[3] <- "Valor"
+temp_param_table$desc[2] <- "Região"
+temp_param_table$desc[1] <- "Ano"
+temp_param_table$desc[3] <- "Valor"
+temp_param_table$x <- c(FALSE, FALSE, TRUE)
+temp_param_table$y <- c(FALSE, FALSE, TRUE)
+temp_param_table$color <- c(FALSE, TRUE, FALSE)
+temp_param_table$size <- c(FALSE, FALSE, TRUE)
+temp_param_table$slider <- c(FALSE, FALSE, TRUE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_tot_sh2_dic.csv", fileEncoding = "UTF-8")
