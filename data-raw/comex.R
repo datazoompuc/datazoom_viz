@@ -96,6 +96,9 @@ colnames(datafinal_val_sh2) <- c("time", "group", labl)
 datafinal_val_munic[is.na(datafinal_val_munic)] <- 0
 datafinal_val_sh2[is.na(datafinal_val_sh2)] <- 0
 
+datafinal_val_munic <- datafinal_val_munic[order(datafinal_val_munic$group, datafinal_val_munic$time),]
+datafinal_val_sh2 <- datafinal_val_sh2[order(datafinal_val_sh2$group, datafinal_val_sh2$time),]
+
 saveRDS(datafinal_val_munic, "data/comex_exp_munic_sh2.rds")
 saveRDS(datafinal_val_sh2, "data/comex_exp_sh2_munic.rds")
 
