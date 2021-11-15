@@ -376,7 +376,7 @@ temp_param_table$label[2] <- "Município"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "Município"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 22))
+temp_param_table$x <- c(rep(TRUE, 2), rep(FALSE, 22))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 22))
 temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 22))
 temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 22))
