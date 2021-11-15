@@ -178,6 +178,44 @@ temp_param_table <- tibble(
   subcategoria = "Comércio exterior"
 )
 
+temp_param_table$label[2] <- "Produção sh2"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "Produção sh2"
+temp_param_table$desc[1] <- "Ano"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 417))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 417))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 417))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 417))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 417))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_dic.csv", fileEncoding = "UTF-8")
+
+
+
+### exportação municipal da amazônia por tipo sh2
+datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Comex",
+  tipo = 1,
+  unidade = "R$",
+  categoria= "Economia", 
+  subcategoria = "Comércio exterior"
+)
+
 temp_param_table$label[2] <- "Município"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "Município"
@@ -190,6 +228,8 @@ temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 167))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_dic.csv", fileEncoding = "UTF-8")
+
+
 
 
 ### exportação total da amazônia por tipo sh2
