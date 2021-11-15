@@ -194,7 +194,7 @@ write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_dic.csv", fileEncod
 
 
 ### exportação municipal da amazônia por tipo sh2
-datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
+datafinal <- readRDS(file = "data/comex_exp_sh2_munic.rds")
 
 # extract variables from data
 columns <- colnames(datafinal)
@@ -220,14 +220,14 @@ temp_param_table$label[2] <- "Município"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "Município"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 167))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 167))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 167))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 167))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 167))
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 96))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/comex_exp_sh2_munic_dic.csv", fileEncoding = "UTF-8")
 
 
 
