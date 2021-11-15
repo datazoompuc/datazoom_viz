@@ -172,7 +172,7 @@ datafinal_val_munic[is.na(datafinal_val_munic)] <- 0
 datafinal_val_sec[is.na(datafinal_val_sec)] <- 0
 
 datafinal_val_munic <- datafinal_val_munic[order(datafinal_val_munic$group, datafinal_val_munic$time),]
-datafinal_val_sec <- datafinal_val_sec[order(datafinal_val_sec$group, datafinal_val_sec$time),]
+datafinal_val_sec <- datafinal_val_sec[order(datafinal_val_sec$time, datafinal_val_sec$group),]
 
 saveRDS(datafinal_val_munic, "data/comex_exp_munic_sec.rds")
 saveRDS(datafinal_val_sec, "data/comex_exp_sec_munic.rds")
