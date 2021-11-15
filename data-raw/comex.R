@@ -69,20 +69,32 @@ dat$kg_liquido <- NULL
 dat$uf <- NULL
 dat$cod_pais <- NULL
 
-dat$cod_sh4 <- as.numeric(dat$cod_sh4)
+dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio, dat, sum)
+
+dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
+aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
 dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
 
-data_val_pais <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio, dat, sum)
-colnames(data_val_pais) <- c("time", "type", "group", "value")
+data_val <- dat
+colnames(data_val) <- c("time", "type", "group", "value")
+data_val <- aggregate(value ~ time + type + group, data_val, sum)
 
-datafinal_val_pais <- reshape(data_val_pais, idvar = c("time", "group"), timevar = "type", direction = "wide")
-labl <- colnames(datafinal_val_pais)
+datafinal_val_munic <- reshape(data_val, idvar = c("time", "type"), timevar = "group", direction = "wide")
+datafinal_val_sh2 <- reshape(data_val, idvar = c("time", "group"), timevar = "type", direction = "wide")
+
+labl <- colnames(datafinal_val_munic)
 labl <- labl[-c(1,2)]
-labl <- substr(labl, 8, 100)
-colnames(datafinal_val_pais) <- c("time", "group", labl)
+labl <- substr(labl, 7, 100)
+colnames(datafinal_val_munic) <- c("time", "group", labl)
 
-saveRDS(datafinal_val_pais, "data/comex_exp_munic_sh2.rds")
+labl <- colnames(datafinal_val_sh2)
+labl <- labl[-c(1,2)]
+labl <- substr(labl, 7, 100)
+colnames(datafinal_val_sh2) <- c("time", "group", labl)
+
+saveRDS(datafinal_val_munic, "data/comex_exp_munic_sh2.rds")
+saveRDS(datafinal_val_sh2, "data/comex_exp_sh2_munic.rds")
 
 
 
