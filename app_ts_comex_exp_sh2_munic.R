@@ -6,9 +6,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_comex/ui.R"
-files$server_script <- "scripts/ts_comex/server.R"
-files$param_script <- "scripts/ts_comex/db_params.R"
+files$ui_script <- "scripts/ts_mapbiomas_cobertura/ui.R"
+files$server_script <- "scripts/ts_mapbiomas_cobertura/server.R"
+files$param_script <- "scripts/ts_mapbiomas_cobertura/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
