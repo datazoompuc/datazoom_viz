@@ -4,7 +4,12 @@
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Incluí script CSS
-    tags$style(type = "text/css", "
+    tags$style(type = "text/css", 
+      # remove o ultimo ano no slider (2018 e 2019 estavam um em cima do outro)
+      # remove tracos intermediarios do slider
+      # move botao de play para a esquerda e para baixo
+      # aumenta tamanho do botao de play
+      "
       .irs-grid-text.js-grid-text-10 {display: none;}
       .irs-grid-pol.small {display: none;}
       .slider-animate-container {width: 5%; margin-top: 1px;}
