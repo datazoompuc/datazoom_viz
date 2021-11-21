@@ -4,7 +4,6 @@
 ## Agregation level - MUNICIPALITY
 
 #seeg_farming
-
 seeg_municipality_farming= load_seeg(dataset = 'seeg_farming', geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_farming= seeg_municipality_farming%>%
   dplyr::rename(time= .data$Ano, group= .data$municipio)%>%

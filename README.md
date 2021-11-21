@@ -1,4 +1,5 @@
 General View:
+
 The datazoom_viz repository is used for developing visualizations in shiny R codes and fueling the https://datazoomamazonia.com.br/ website.
 
 Repository organization:
@@ -7,4 +8,4 @@ Repository organization:
  
  - "./data-raw": contains .R scripts that generates both the .rds databases and the .csv files that are recorded in the "./data" directory. In order to generate the databases, the scripts use the datazoom.amazonia R package, developed by the Datazoom team. Each .R script is responsible for generating the .rds and .csv files for specific geographic aggregation of the researches. 
  
- - "./scripts": 
+ - "./scripts": contains .R scripts that generate the visualizations using the Shiny Apps technology.
