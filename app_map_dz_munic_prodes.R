@@ -32,14 +32,15 @@ param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Compilação de dados ao nível municipal"
+param$plot_desc <- "Compilação de dados ao nível municipal (PRODES)"
+param$app <- "INPE - PRODES"
+
+param$year_inicio <- 2000
+param$year_final <- 2019
 
 # Outros parâmetros e configurações
-param$x_choices$`Fonte de dados` <- NULL
-param$x_choices[[1]] <- NULL
-param$x_choices$`IBGE - Censo 2000` <- NULL
-param$x_choices$`IBGE - Censo 2010` <- NULL
-param$x_choices$IMAZON <- NULL
+param$x_choices <- param$x_choices[param$app]
+
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
