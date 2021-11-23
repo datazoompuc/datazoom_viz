@@ -117,7 +117,7 @@ get_server <- function(files, param) {
       }
 
       # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
+      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
 
       tryCatch(
         {
