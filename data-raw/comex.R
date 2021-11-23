@@ -202,13 +202,6 @@ data_val_pais_sec <- data_val_pais_sec[!(data_val_pais_sec$cod_pais %in% c("015"
 colnames(data_val_pais) <- c("time", "group", "value")
 colnames(data_val_pais_sec) <- c("time", "group", "type", "value")
 
-datafinal_val_pais <- reshape(data_val_pais, idvar = c("time"), timevar = "group", direction = "wide")
-labl <- colnames(datafinal_val_pais)
-labl <- labl[-c(1)]
-labl <- substr(labl, 7, 100)
-colnames(datafinal_val_pais) <- c("time", labl)
-datafinal_val_pais$group <- rep("Amazonia", 25)
-
 saveRDS(datafinal_val_pais, "data/comex_exp_tot_pais.rds")
 
 datafinal_val_pais_sec <- reshape(data_val_pais_sec, idvar = c("time", "type"), timevar = "group", direction = "wide")
