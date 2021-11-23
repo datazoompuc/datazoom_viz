@@ -224,8 +224,8 @@ labl <- labl[-c(1,2)]
 labl <- substr(labl, 7, 100)
 colnames(datafinal_val_pais_munic) <- c("time", "group", labl)
 
-saveRDS(datafinal_val_pais_sec, "data/comex_exp_pais_sec_munic.rds")
-saveRDS(datafinal_val_pais_munic, "data/comex_exp_pais_munic_sec.rds")
+saveRDS(datafinal_val_pais_sec, "data/comex_exp_sec_pais.rds")
+saveRDS(datafinal_val_pais_munic, "data/comex_exp_pais_sec.rds")
 
 
 
@@ -427,7 +427,7 @@ write.csv(temp_param_table, file = "data/comex_exp_tot_sh2_dic.csv", fileEncodin
 
 
 ### exportação por pais da amazônia por tipo sec
-datafinal <- readRDS(file = "data/comex_exp_pais_sec_munic.rds")
+datafinal <- readRDS(file = "data/comex_exp_sec_pais.rds")
 
 # extract variables from data
 columns <- colnames(datafinal)
@@ -460,12 +460,12 @@ temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 221))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 221))
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_pais_sec_munic_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/comex_exp_sec_pais_dic.csv", fileEncoding = "UTF-8")
 
 
 
 ### exportação por pais da amazônia por tipo sec
-datafinal <- readRDS(file = "data/comex_exp_pais_munic_sec.rds")
+datafinal <- readRDS(file = "data/comex_exp_pais_sec.rds")
 
 # extract variables from data
 columns <- colnames(datafinal)
@@ -498,7 +498,7 @@ temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 22))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 22))
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_pais_munic_sec_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/comex_exp_pais_sec_dic.csv", fileEncoding = "UTF-8")
 
 
 
