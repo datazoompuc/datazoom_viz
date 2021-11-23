@@ -113,10 +113,26 @@ dz_state <- dz_state %>%
 # Identify and remove duplicate data
 dz_state <- dz_state %>% distinct(estado, ano, .keep_all = TRUE)
 
+
 # save data
 saveRDS(dz_state,
         file = "./data/dz_state.rds"
 )
+
+# Add Map data
+### (NAO SALVEI POR CIMA DO DZ_STATE PARA NAO QUEBRAR VIZ ANTERIORES)
+states_geo <- geobr::read_state(simplified = FALSE) %>% 
+  select(estado = abbrev_state, geom)
+
+dz_state <- left_join(dz_state, states_geo)
+st_geometry(dz_state) <- dz_state$geom
+
+# save simplified sf for faster maps
+dz_state_simp <- rmapshaper::ms_simplify(dz_state, keep_shapes = TRUE)
+saveRDS(dz_state_simp,
+        file = "./data/dz_state_simplified.rds"
+)
+
 
 #####################
 # Build Dictionary 
