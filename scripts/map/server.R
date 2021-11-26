@@ -10,7 +10,7 @@ pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "
 get_server <- function(files, param) {
 
   # Carrega dados
-  df <- readRDS(files$db_file)
+  df <- readRDS(files$db_file) %>% st_transform(crs = "+init=epsg:4326")
 
   server <- function(input, output, session) {
     df_reactived <- reactive({
@@ -135,8 +135,7 @@ get_server <- function(files, param) {
           ) %>%
             lapply(htmltools::HTML)
 
-          fig_p <- df_reactived() %>%
-            st_transform(crs = "+init=epsg:4326") %>%
+          fig_p <- df_reactived() %>% 
             leaflet() %>%
             addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
             setView(-58, -7, zoom = 5) %>%
