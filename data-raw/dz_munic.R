@@ -230,7 +230,7 @@ cempre_municipality <- cempre_municipality %>%
 # seeg <- readRDS(file = "data/seeg.rds")
 
 ###################
-# PPM
+#PPM - IBGE
 ###################
 
 ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
@@ -239,27 +239,58 @@ munics <- readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls") %>%
   dplyr::select("Código Município Completo", "Nome_Município")
 ppm_livestock$group <- plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município, to = munics$`Código Município Completo`)
 
-ppm_livestock <- ppm_livestock %>%
-  dplyr::filter(time >= 2000)
+ppm_livestock= ppm_livestock%>%
+  dplyr::filter(time >= 2000)%>%
+  dplyr::select(group, time, num_v2670, num_v32794, num_v32796)
+
+###################
+#PAM - IBGE
+###################
+
+# ##GENERATING ALL CROPS DATA FOR 2000 TO 2019 AND SELECTING SPECIFIC VARIABLES -> soja, arroz, milho e mandioca
+# pam_municipality_all_crops_2000_19= datazoom.amazonia::load_pam(dataset = 'pam_all_crops', raw_data = FALSE, geo_level = 'municipality', time_period = 2000:2010, language = 'pt')
+# pam_municipality_all_crops_2011_19= datazoom.amazonia::load_pam(dataset = 'pam_all_crops', raw_data = FALSE, geo_level = 'municipality', time_period = 2011:2019, language = 'pt')
+# 
+# pam_municipality_all_crops_2000_10 = lapply(pam_municipality_all_crops_2000_10, as.numeric)
+# pam_municipality_all_crops_2000_10 <- as.data.frame(pam_municipality_all_crops_2000_10)
+# pam_municipality_all_crops_2000_10$geo_id = as.character(pam_municipality_all_crops_2000_10$geo_id)
+# pam_municipality_all_crops_2000_10$ano = as.character(pam_municipality_all_crops_2000_10$ano)
+# 
+# pam_municipality_all_crops_2011_19 = lapply(pam_municipality_all_crops_2011_19, as.numeric)
+# pam_municipality_all_crops_2011_19 <- as.data.frame(pam_municipality_all_crops_2011_19)
+# pam_municipality_all_crops_2011_19$geo_id = as.character(pam_municipality_all_crops_2011_19$geo_id)
+# pam_municipality_all_crops_2011_19$ano = as.character(pam_municipality_all_crops_2011_19$ano)
+# 
+# pam_municipality_all_crops_2000_19= bind_rows(pam_municipality_all_crops_2000_10, pam_municipality_all_crops_2011_19)
+# 
+# # selecting most relevant variables: soja=v40124, arroz=v40102, milho=v40122, mandioca=v40119
+# pam_municipality_all_crops_2000_19= pam_municipality_all_crops_2000_19%>%
+#   dplyr::select(.data$geo_id, .data$ano, dplyr::ends_with('40124'), dplyr::ends_with('40102'), dplyr::ends_with('40122'), dplyr::ends_with('40119') )
+# 
+# saveRDS(pam_municipality_all_crops_2000_19, "data/pam_municipality_all_crops_2000_19.rds")
+
+pam_municipality_all_crops_2000_19= readRDS('data/pam_municipality_all_crops_2000_19.rds')
+pam_municipality_all_crops_2000_19[is.na(pam_municipality_all_crops_2000_19)] <- 0  
 
 ###########################
 # edit data to merge
 ###########################
-class(cempre_municipality$cod_ibge) <- "character"
-class(prodes$cod_ibge) <- "character"
-class(deter$cod_ibge) <- "character"
-class(gdp$cod_ibge) <- "character"
-class(degrad$cod_ibge) <- "character"
-class(ips$cod_municipio) <- "character"
-class(income$cod_ibge) <- "character"
-class(cempre_municipality$ano) <- "numeric"
+class(cempre_municipality$cod_ibge) <-  'character'
+class(prodes$cod_ibge) <-  'character'
+class(deter$cod_ibge) <-  'character'
+class(gdp$cod_ibge) <-  'character'
+class(degrad$cod_ibge) <-  'character'
+class(ips$cod_municipio) <-  'character'
+class(income$cod_ibge) <-  'character'
+class(cempre_municipality$ano) <-  'numeric'
 
-class(prodes$ano) <- "numeric"
-class(deter$ano) <- "numeric"
-class(gdp$ano) <- "numeric"
-class(degrad$ano) <- "numeric"
-class(income$ano) <- "numeric"
-class(ips$cod_municipio) <- "character"
+class(prodes$ano) <-  'numeric'
+class(deter$ano) <-  'numeric'
+class(gdp$ano) <-  'numeric'
+class(degrad$ano) <-  'numeric'
+class(income$ano) <-  'numeric'
+class(ips$cod_municipio) <-  'character'
+class(pam_municipality_all_crops_2000_19$ano) <- 'numeric'
 
 ###########################
 # merge all data
@@ -269,7 +300,8 @@ dz_munic <- income %>%
   full_join(gdp, by = c("cod_ibge", "ano")) %>%
   full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
   full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
-  full_join(ppm_livestock, by = c("cod_ibge" = "group", "ano" = "time")) %>%
+  full_join(ppm_livestock, by = c('cod_ibge' = 'group', 'ano' = 'time'))%>%
+  full_join(pam_municipality_all_crops_2000_19, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano'))%>%
   arrange(cod_ibge, ano) %>%
   relocate(cod_ibge, ano)
 
@@ -297,48 +329,45 @@ map_dz_munic <- sp::merge(shapefile, dz_munic, by.x = "cod_ibge", by.y = "cod_ib
 map_dz_munic$ano <- as.Date(as.yearqtr(map_dz_munic$ano), format = "%Y")
 
 # colnames(map_dz_munic)
-dz_munic <- map_dz_munic %>% select(
-  cod_ibge,
-  nm_municip,
-  uf,
-  ano,
-  employed_census2000,
-  employed_census2010,
-  mean_income_census2000,
-  mean_income_census2010,
-  median_income_census2000,
-  median_income_census2010,
-  desmatado,
-  incremento,
-  floresta,
-  nao_floresta,
-  hidrografia,
-  prop_desmatado,
-  prop_incremento, prop_floresta,
-  prop_nao_floresta,
-  prop_hidrografia,
-  pop, gdp,
-  gd_ppc,
-  gdp_deflacionado,
-  gd_ppc_deflacionado,
-  cempre_n_empresas_organizacoes,
-  cempre_n_ocupados,
-  cempre_n_ocupados_assalariados,
-  cempre_salarios_remuneracoes,
-  ips2018,
-  ips2014,
-  geometry,
-  num_v2670,
-  num_v2672,
-  num_v2675,
-  num_v2677,
-  num_v2680,
-  num_v2681,
-  num_v32793,
-  num_v32794,
-  num_v32795,
-  num_v32796
-)
+dz_munic <- map_dz_munic %>% select(cod_ibge,
+                                    nm_municip,
+                                    uf,
+                                    ano,
+                                    employed_census2000,
+                                    employed_census2010,
+                                    mean_income_census2000,
+                                    mean_income_census2010,
+                                    median_income_census2000,
+                                    median_income_census2010,
+                                    desmatado,
+                                    incremento,
+                                    floresta,
+                                    nao_floresta,
+                                    hidrografia,
+                                    prop_desmatado,
+                                    prop_incremento,prop_floresta,
+                                    prop_nao_floresta,
+                                    prop_hidrografia,
+                                    pop,gdp,
+                                    gd_ppc,
+                                    cempre_n_empresas_organizacoes,
+                                    cempre_n_ocupados,
+                                    cempre_n_ocupados_assalariados,
+                                    cempre_salarios_remuneracoes,
+                                    ips2018,
+                                    ips2014,
+                                    geometry,
+                                    num_v2670,
+                                    num_v32794,
+                                    num_v32796,
+                                    area_plantada_dest_colheita_v40124,
+                                    quant_v40124,
+                                    area_plantada_dest_colheita_v40102,
+                                    quant_v40102,
+                                    area_plantada_dest_colheita_v40122,
+                                    quant_v40122,
+                                    area_plantada_dest_colheita_v40119,
+                                    quant_v40119)
 
 
 dz_munic$estado <- dz_munic$uf
@@ -650,7 +679,7 @@ temp_param_table$y[temp_param_table$var == "group"] <- FALSE # "estado"
 temp_param_table$y[temp_param_table$var == "estado"] <- FALSE # "estado"
 temp_param_table$y[temp_param_table$var == "group"] <- FALSE 
 
-# block and variables in graphs x-axis
+# block variables in graphs x-axis
 temp_param_table$x[temp_param_table$var == "cod_ibge"] <- FALSE # "Código do município"
 temp_param_table$x[temp_param_table$var == "nm_municip"] <- FALSE # "nm_municip"
 temp_param_table$x[temp_param_table$var == "uf"] <- FALSE # "uf_x"
@@ -658,6 +687,20 @@ temp_param_table$x[temp_param_table$var == "ano"] <- FALSE # "ano"
 temp_param_table$x[temp_param_table$var == "geometry"] <- FALSE # "geometry"
 temp_param_table$x[temp_param_table$var == "estado"] <- FALSE # "estado"
 temp_param_table$x[temp_param_table$var == "group"] <- FALSE 
+
+#filtering the ppm obs, because there is already a .csv dictionary for ppm livestock inventory
+temp_param_table= temp_param_table%>%
+  dplyr::filter(!startsWith(.data$var, 'num'))
+#adding ppm dictionary
+metappm= read.csv(file = 'data/ppm_municipality_livestock_inventory_dic.csv')
+metappm <- metappm%>%
+  dplyr::mutate(geometry = FALSE, desc= var)%>%
+  dplyr::rename(var_group = source)%>%
+  dplyr::select(-X, - tipo)%>%
+  dplyr::filter(endsWith(.data$var, 'v2670')|endsWith(.data$var, 'v32794')|endsWith(.data$var, 'v32796'))
+metappm$var_group= 'IBGE - PPM'
+
+temp_param_table= dplyr::bind_rows(temp_param_table, metappm)
 
 # allow variables in graphs size, color, and slider-axis
 temp_param_table$size[temp_param_table$var == "employed_census2000"] <- TRUE #
@@ -682,6 +725,26 @@ temp_param_table$color[temp_param_table$var == "pop"] <- TRUE #
 temp_param_table$color[temp_param_table$var == "estado"] <- TRUE #
 
 temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
+
+
+#filtering the pam obs, because there is already a .csv dictionary for ppm livestock inventory
+temp_param_table= temp_param_table%>%
+  dplyr::filter(!startsWith(.data$var, 'quant'))%>%
+  dplyr::filter(!startsWith(.data$var, 'area_plantada_dest_colheita'))
+
+
+#adding pam dictionary
+metapam= read.csv(file = 'data/pam_state_all_crops_dic.csv')
+metapam <- metapam%>%
+  dplyr::mutate(geometry = FALSE, desc= var)%>%
+  dplyr::rename(var_group = source)%>%
+  dplyr::select(-X, - tipo)%>%
+  dplyr::filter(endsWith(.data$var, 'v40124')|endsWith(.data$var, 'v40102')|endsWith(.data$var, 'v40122')|endsWith(.data$var, 'v40119'))%>%
+  dplyr::filter(startsWith(.data$var, 'quant')|startsWith(.data$var, 'area_plantada_dest_colheita'))
+metapam$var_group= 'IBGE - PAM'
+
+temp_param_table= dplyr::bind_rows(temp_param_table, metapam)
+
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_dic.csv", fileEncoding = "UTF-8")
