@@ -128,10 +128,10 @@ get_server <- function(files, param) {
           x_col <- param$table[which(param$table$var == input$x), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
-            "Nome do município: ", df_reactived()$nm_municip, "<br>",
-            "Estado: ", df_reactived()$estado, "<br>",
-            x_col$label, ": ", df_reactived()[[input$x]], "<br>",
-            "Unidade de medida: ", x_col$unidade
+            "Nome do município: <b>", df_reactived()$nm_municip, "</b> <br>",
+            "Estado: <b>", df_reactived()$estado, "</b> <br>",
+            x_col$label, ": <b>", df_reactived()[[input$x]], "</b> <br>",
+            "Unidade de medida: <b>", x_col$unidade, "</b>"
           ) %>%
             lapply(htmltools::HTML)
 

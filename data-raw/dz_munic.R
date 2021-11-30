@@ -377,7 +377,7 @@ dz_munic <- dz_munic %>%
   mutate(across(c(
     .data$prop_desmatado, .data$prop_floresta, .data$prop_incremento,
     .data$prop_hidrografia, .data$prop_nao_floresta
-  ), ~ round(., digits = 4)))
+  ), ~ round(. * 100, digits = 1)))
 
 # convert time data to date
 # dz_munic$newdate <- as.Date(as.yearqtr(dz_munic$ano), format = "%Y")
