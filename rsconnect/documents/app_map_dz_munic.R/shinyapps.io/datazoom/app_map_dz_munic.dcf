@@ -1,14 +1,14 @@
 name: app_map_dz_munic
-title: app_map_dz_munic
+title:
 username:
 account: datazoom
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4505004
-bundleId: 4980640
+bundleId: 5258029
 url: https://datazoom.shinyapps.io/app_map_dz_munic/
-when: 1630331809.53605
-lastSyncTime: 1630331809.53605
+when: 1637070472.24692
+lastSyncTime: 1637070472.24692
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: app_bubble_dz_munic.R|app_rk_ibge_pnadc_cnae.R|app_rk_ibge_pnadc_cod.R|app_rk_mapbiomas_cobertura_est.R|app_rk_mapbiomas_cobertura_munic.R|app_rk_mapbiomas_transicao_est.R|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|app_ts_mapbiomas_cobertura_est.R|app_ts_mapbiomas_cobertura_munic.R|app_ts_mapbiomas_transicao_est.R|LICENSE|README.md|data-raw
+ignoredFiles: app_bubble_dz_munic.R|app_rk_ibge_pnadc_cnae.R|app_rk_ibge_pnadc_cod.R|app_rk_mapbiomas_cobertura_est.R|app_rk_mapbiomas_cobertura_munic.R|app_rk_mapbiomas_cobertura_munic_percentual.R|app_rk_mapbiomas_transicao_est.R|app_rk_mapbiomas_transicao_munic_5.R|app_rk_sigmine_munic.R|app_rkstatic_dz_munic.R|app_ts_dz_munic.R|app_ts_dz_state.R|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|app_ts_ibge_pnadc_trabalho_insercao.R|app_ts_mapbiomas_cobertura_est.R|app_ts_mapbiomas_cobertura_munic.R|app_ts_mapbiomas_cobertura_munic_percentual.R|app_ts_mapbiomas_transicao_est.R|app_ts_mapbiomas_transicao_munic_5.R|app_ts_sigmine_munic.R|LICENSE|README.md|cache|data-raw

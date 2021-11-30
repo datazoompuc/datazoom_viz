@@ -1,3 +1,7 @@
+# Cache
+cache_folder <- "./cache/app_rk_ibge_pnadc_cnae/"
+shinyOptions(cache = cachem::cache_disk(cache_folder))
+
 # Carrega bibliotecas
 library(shiny)
 library(ggplot2)
@@ -33,6 +37,7 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Atividades Econômicas"
 
 # Outros parâmetros e configurações
+param$x_choices$`IBGE - PNAD Contínua`$`Atividade econômica` <- NULL
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

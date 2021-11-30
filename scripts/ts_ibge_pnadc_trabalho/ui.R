@@ -31,10 +31,21 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          "Recorte de região geográfica",
+          "Selecione recorte regional",
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
+          width = "100%"
+        ),
+        
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        
+        # Seleciona composicao demografica
+        selectInput(
+          "filter_composicao_demografica",
+          "Selecione grupos",
+          choices = param$filter_composicao_demografica_choices,
           width = "100%"
         ),
       ),

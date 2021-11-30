@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(lubridate)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -24,9 +25,9 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "desmatado" # variável padrão do eixo x
-param$y_def <- "gd_ppc" # variável padrão do eixo y
+param$y_def <- "gd_ppc_deflacionado" # variável padrão do eixo y
 param$color_def <- "estado" # variável padrão de cor
-param$size_def <- "area_km2" # variável padrão de tamanho
+param$size_def <- "pop" # variável padrão de tamanho
 param$slider_def <- "ano" # variável padrão do slider
 param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id

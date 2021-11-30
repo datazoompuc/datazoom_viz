@@ -35,6 +35,7 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Ocupações no Trabalho"
 
 # Outros parâmetros e configurações
+param$y_choices[[1]] <- NULL
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

@@ -1,0 +1,14 @@
+name: app_ts_ibge_pnadc_trabalho_insercao
+title: app_ts_ibge_pnadc_trabalho_insercao
+username:
+account: datazoom
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4878905
+bundleId: 5154017
+url: https://datazoom.shinyapps.io/app_ts_ibge_pnadc_trabalho_insercao/
+when: 1634645934.09863
+lastSyncTime: 1634645934.09863
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: app_bubble_dz_munic.R|app_map_dz_munic.R|app_rk_ibge_pnadc_cnae.R|app_rk_ibge_pnadc_cod.R|app_rk_mapbiomas_cobertura_est.R|app_rk_mapbiomas_cobertura_munic.R|app_rk_mapbiomas_transicao_est.R|app_rkstatic_dz_munic.R|app_ts_dz_munic.R|app_ts_dz_state.R|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|app_ts_mapbiomas_cobertura_est.R|app_ts_mapbiomas_cobertura_munic.R|app_ts_mapbiomas_transicao_est.R|LICENSE|README.md|cache|data-raw

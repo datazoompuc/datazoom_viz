@@ -14,6 +14,7 @@ get_server <- function(files, param) {
 
     # Carrega dados
     df <- readRDS(files$db_file)
+    df$geometry <- NULL
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
@@ -179,8 +180,6 @@ get_server <- function(files, param) {
             df[id_col$var]
           )
 
-
-
           colnames(df_p) <- c("x", "y", "color", "size", "slider", "text", "id")
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
@@ -200,7 +199,7 @@ get_server <- function(files, param) {
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
-            "(", df_p$slider, ")", "<br><br>",
+            "(", lubridate::year(df_p$slider), ")", "<br><br>",
             x_col$label, ": ", df_p$x, "<br>",
             y_col$label, ": ", df_p$y, "<br>",
             size_col$label, ": ", df_p$size, "<br>",
@@ -225,7 +224,7 @@ get_server <- function(files, param) {
             size = ~size,
             color = ~color,
             colors = pallete,
-            frame = ~slider,
+            frame = ~slider %>% lubridate::year(),
             ids = ~id,
             text = ~tooltip,
             hoverinfo = "text",
@@ -259,7 +258,7 @@ get_server <- function(files, param) {
                 buttons = list(
                   list(
                     method = "animate",
-                    label = "<U+25B6>",
+                    label = "▶",
                     args = list(
                       NA, # primeiro arg vazio para play
                       list(

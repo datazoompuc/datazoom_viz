@@ -15,21 +15,16 @@ get_server <- function(files, param) {
   server <- function(input, output, session) {
     df_reactived <- reactive({
       w <- df %>%
-        filter(ano == input$filter1)
+        filter(year(ano) == input$filter1)
 
       return(w)
     })
 
     # Cria opções para seleção de datas
-    param$filter_choices <- sort(unique(df$ano))
+    param$filter_choices <- sort(unique(year(df$ano)))
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = sample(param$filter_choices, 1) # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
-      )
       selected <- sample(sample(param$x_choices, 1)[[1]], 1)
       updateSelectInput(session,
         "x",
@@ -122,7 +117,7 @@ get_server <- function(files, param) {
       }
 
       # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
+      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
 
       tryCatch(
         {
