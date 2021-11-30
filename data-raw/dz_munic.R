@@ -679,7 +679,14 @@ temp_param_table$y[temp_param_table$var == "group"] <- FALSE # "estado"
 temp_param_table$y[temp_param_table$var == "estado"] <- FALSE # "estado"
 temp_param_table$y[temp_param_table$var == "group"] <- FALSE 
 
-# block and variables in graphs x-axis
+# block variables in graphs x-axis
+temp_param_table$x[temp_param_table$var == "cod_ibge"] <- FALSE # "Código do município"
+temp_param_table$x[temp_param_table$var == "nm_municip"] <- FALSE # "nm_municip"
+temp_param_table$x[temp_param_table$var == "uf"] <- FALSE # "uf_x"
+temp_param_table$x[temp_param_table$var == "ano"] <- FALSE # "ano"
+temp_param_table$x[temp_param_table$var == "geometry"] <- FALSE # "geometry"
+temp_param_table$x[temp_param_table$var == "estado"] <- FALSE # "estado"
+temp_param_table$x[temp_param_table$var == "group"] <- FALSE 
 
 #filtering the ppm obs, because there is already a .csv dictionary for ppm livestock inventory
 temp_param_table= temp_param_table%>%
