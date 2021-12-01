@@ -391,7 +391,9 @@ saveRDS(dz_munic,
 )
 
 # save simplified sf for faster maps
-dz_munic_simp <- rmapshaper::ms_simplify(dz_munic, keep_shapes = TRUE)
+dz_munic_simp <- rmapshaper::ms_simplify(dz_munic, 
+                                         keep_shapes = TRUE, 
+                                         keep = 0.01)
 readr::write_rds(dz_munic_simp,
         file = "./data/dz_munic_simplified.rds"
 )
