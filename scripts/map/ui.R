@@ -47,7 +47,7 @@ get_ui <- function(files, param) {
                       value = 2000,
                       step = 1,
                       width = "100%",
-                      animate = animationOptions(interval = 2000,
+                      animate = animationOptions(interval = 3000,
                                                  playButton = "\u25B6",
                                                  pauseButton = "\u23F8"),
                       sep = "")
