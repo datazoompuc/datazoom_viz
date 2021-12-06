@@ -42,6 +42,10 @@ param$x_choices$`IBGE - Censo 2010` <- NULL
 param$x_choices$IMAZON <- NULL
 param$x_choices$Geral <- NULL
 
+param$year_inicio <- 2000
+param$year_final <- 2019
+
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
