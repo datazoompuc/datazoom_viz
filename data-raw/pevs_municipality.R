@@ -17,9 +17,17 @@ saveRDS(pevs_municipality_silviculture,
 
 #forest_crops
 
-##municipality (ainda nao salvo)
+##municipality 
 pevs_municipality_forest_crops= load_pevs(dataset = 'pevs_forest_crops', raw_data = FALSE, 'municipality', 1986:2019, language = "pt")
 ##making data usable for datazoom viz
+pevs_municipality_forest_crops = lapply(pevs_municipality_forest_crops, as.numeric)
+pevs_municipality_forest_crops <- as.data.frame(pevs_municipality_forest_crops)
+pevs_municipality_forest_crops[is.na(pevs_municipality_forest_crops)] <- 0
+
+munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
+  dplyr::select('Código Município Completo', 'Nome_Município')
+pevs_municipality_forest_crops$geo_id= plyr::mapvalues(pevs_municipality_forest_crops$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+pevs_municipality_forest_crops= dplyr::rename(pevs_municipality_forest_crops , time=.data$ano, group=.data$geo_id)
 
 ##saving f
 saveRDS(pevs_municipality_forest_crops,
