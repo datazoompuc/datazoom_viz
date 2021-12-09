@@ -123,7 +123,7 @@ get_server <- function(files, param) {
       if (is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <- paste0("por Estado")
+        text <- paste0("por hectare")
       }
 
       text
