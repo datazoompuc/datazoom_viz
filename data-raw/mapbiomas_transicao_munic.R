@@ -13,6 +13,9 @@ dat <- load_mapbiomas_transition(space_aggregation = "municipality", transition_
 saveRDS(dat, file = "data/mapbiomas_transicao_munic_raw.rds")
 dat <- readRDS(file = "data/mapbiomas_transicao_munic_raw.rds")
 
+dat <- dat[(dat$state %in% c("AC", "RO", "RR", "AM", "PA", "AP", "TO", "MT", "MA")),]
+
+
 filter_year_diff <- function(dat, year_diff){
   vec_col <- c()
   for(i in 16:ncol(dat)){
@@ -119,6 +122,8 @@ labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
 colnames(datafinal) <- c("group", "time", labl)
 datafinal[is.na(datafinal)] <- 0
+datafinal <- datafinal[order(datafinal$group, datafinal$time),]
+datafinal[,3:279] <- round(datafinal[,3:279], digits = 2)
 saveRDS(datafinal, "data/mapbiomas_transicao_munic_5.rds")
 
 
