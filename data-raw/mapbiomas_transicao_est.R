@@ -82,6 +82,7 @@ labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
 colnames(datafinal) <- c("group", "time", labl)
 datafinal[is.na(datafinal)] <- 0
+datafinal[,3:233] <- round(datafinal[,3:233], digits = 2)
 saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
 
 
