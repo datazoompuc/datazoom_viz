@@ -13,6 +13,9 @@ dat <- load_mapbiomas_transition(space_aggregation = "municipality", transition_
 saveRDS(dat, file = "data/mapbiomas_transicao_munic_raw.rds")
 dat <- readRDS(file = "data/mapbiomas_transicao_munic_raw.rds")
 
+dat <- dat[(dat$state %in% c("AC", "RO", "RR", "AM", "PA", "AP", "TO", "MT", "MA")),]
+
+
 filter_year_diff <- function(dat, year_diff){
   vec_col <- c()
   for(i in 16:ncol(dat)){
