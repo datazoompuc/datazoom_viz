@@ -11,6 +11,7 @@ library(readxl)
 dat <- load_mapbiomas_transition(space_aggregation = "municipality", transition_interval = 5)
 
 saveRDS(dat, file = "data/mapbiomas_transicao_munic_raw.rds")
+dat <- readRDS(file = "data/mapbiomas_transicao_munic_raw.rds")
 
 filter_year_diff <- function(dat, year_diff){
   vec_col <- c()
@@ -88,7 +89,7 @@ data1$to_level_4[data1$to_level_4 == "Aquaculture"] <- "Aquacultura"
 data1$to_level_4[data1$to_level_4 == "Other Non Forest Natural Formation"] <- "Outras Formações Naturais não Florestais"
 
 
-data1$group <- paste("De ", data1$from_level_4, " para ",data1$to_level_4)
+data1$group <- paste(data1$from_level_4, " para ",data1$to_level_4)
 data1$to_level_4 <- NULL
 data1$from_level_4 <- NULL
 data1$munic <- paste(data1$municipality, " - ",data1$state)
