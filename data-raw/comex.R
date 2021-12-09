@@ -518,6 +518,8 @@ temp_param_table <- tibble(
   subcategoria = "Comércio exterior"
 )
 
+temp_param_table <- rbind(temp_param_table[1,], temp_param_table[223,], temp_param_table[2:222,])
+
 temp_param_table$label[2] <- "País"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "País"
