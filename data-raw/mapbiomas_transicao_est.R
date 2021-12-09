@@ -11,6 +11,7 @@ library(readxl)
 dat <- load_mapbiomas_transition(space_aggregation = "state", transition_interval = 5)
 
 saveRDS(dat, file = "data/mapbiomas_transicao_est_raw.rds")
+dat <- readRDS("data/mapbiomas_transicao_est_raw.rds")
 
 
 # Data for level_4
@@ -67,7 +68,7 @@ data1$to_level_4[data1$to_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mo
 
 
 
-data1$group <- paste("De ", data1$from_level_4, " para ",data1$to_level_4)
+data1$group <- paste(data1$from_level_4, " para ",data1$to_level_4)
 data1$to_level_4 <- NULL
 data1$from_level_4 <- NULL
 
