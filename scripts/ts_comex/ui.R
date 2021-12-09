@@ -3,7 +3,7 @@
 # Funcão para retornar objeto server
 get_ui <- function(files, param) {
   div( # div geral
-    includeCSS(files$CSS_script), # Incluí script CSS
+    includeCSS(files$CSS_script), # Inclu? script CSS
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
@@ -35,7 +35,7 @@ get_ui <- function(files, param) {
         # Seleciona eixo
         checkboxInput(
           inputId = "y_option",
-          "proporcional ao trimestre inicial (*)",
+          "proporcional ao ano inicial (*)",
           value = FALSE,
           width = "100%"
         ),
@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          "Estado - Atividades econômicas",
+          "Subdivis�o geogr�fica",
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
