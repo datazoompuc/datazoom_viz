@@ -202,7 +202,8 @@ data_val_pais_sec <- data_val_pais_sec[!(data_val_pais_sec$cod_pais %in% c("015"
 colnames(data_val_pais) <- c("time", "group", "value")
 colnames(data_val_pais_sec) <- c("time", "group", "type", "value")
 
-saveRDS(datafinal_val_pais, "data/comex_exp_tot_pais.rds")
+data_val_pais <- data_val_pais[order(data_val_pais$group, data_val_pais$time),]
+saveRDS(data_val_pais, "data/comex_exp_tot_pais.rds")
 
 datafinal_val_pais_sec <- reshape(data_val_pais_sec, idvar = c("time", "type"), timevar = "group", direction = "wide")
 datafinal_val_pais_munic <- reshape(data_val_pais_sec, idvar = c("time", "group"), timevar = "type", direction = "wide")
@@ -518,17 +519,18 @@ temp_param_table <- tibble(
   subcategoria = "Comércio exterior"
 )
 
-temp_param_table <- rbind(temp_param_table[1,], temp_param_table[223,], temp_param_table[2:222,])
-
 temp_param_table$label[2] <- "País"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "País"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 221))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 221))
+temp_param_table$label[3] <- "Valor"
+temp_param_table$desc[3] <- "Valor"
+
+temp_param_table$x <- c(rep(FALSE, 2), TRUE)
+temp_param_table$y <- c(rep(FALSE, 2), TRUE)
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), FALSE)
+temp_param_table$size <- c(rep(FALSE, 2), TRUE)
+temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_tot_pais_dic.csv", fileEncoding = "UTF-8")
