@@ -406,7 +406,7 @@ dz_munic <- dz_munic %>%
   mutate(across(c(
     .data$prop_desmatado, .data$prop_floresta, .data$prop_incremento,
     .data$prop_hidrografia, .data$prop_nao_floresta
-  ), ~ round(., digits = 4)))
+  ), ~ round(. * 100, digits = 1)))
 
 # convert time data to date
 # dz_munic$newdate <- as.Date(as.yearqtr(dz_munic$ano), format = "%Y")
@@ -420,8 +420,10 @@ saveRDS(dz_munic,
 )
 
 # save simplified sf for faster maps
-dz_munic_simp <- rmapshaper::ms_simplify(dz_munic, keep_shapes = TRUE)
-saveRDS(dz_munic_simp,
+dz_munic_simp <- rmapshaper::ms_simplify(dz_munic, 
+                                         keep_shapes = TRUE, 
+                                         keep = 0.01)
+readr::write_rds(dz_munic_simp,
         file = "./data/dz_munic_simplified.rds"
 )
 

@@ -10,7 +10,7 @@ pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "
 get_server <- function(files, param) {
 
   # Carrega dados
-  df <- readRDS(files$db_file)
+  df <- readRDS(files$db_file) %>% st_transform(crs = "+init=epsg:4326")
 
   server <- function(input, output, session) {
     df_reactived <- reactive({
@@ -128,15 +128,14 @@ get_server <- function(files, param) {
           x_col <- param$table[which(param$table$var == input$x), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
-            "Nome do município: ", df_reactived()$nm_municip, "<br>",
-            "Estado: ", df_reactived()$estado, "<br>",
-            x_col$label, ": ", df_reactived()[[input$x]], "<br>",
-            "Unidade de medida: ", x_col$unidade
+            "Nome do município: <b>", df_reactived()$nm_municip, "</b> <br>",
+            "Estado: <b>", df_reactived()$estado, "</b> <br>",
+            x_col$label, ": <b>", df_reactived()[[input$x]], "</b> <br>",
+            "Unidade de medida: <b>", x_col$unidade, "</b>"
           ) %>%
             lapply(htmltools::HTML)
 
-          fig_p <- df_reactived() %>%
-            st_transform(crs = "+init=epsg:4326") %>%
+          fig_p <- df_reactived() %>% 
             leaflet() %>%
             addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
             setView(-58, -7, zoom = 5) %>%

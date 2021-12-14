@@ -42,12 +42,12 @@ get_ui <- function(files, param) {
           # Seleciona variável do eixo de data
           sliderInput(inputId = "filter1",
                       label = "Ano referente",
-                      min = 2000,
-                      max = 2019,
+                      min = param$year_inicio,
+                      max = param$year_final,
                       value = 2000,
                       step = 1,
                       width = "100%",
-                      animate = animationOptions(interval = 2000,
+                      animate = animationOptions(interval = 3000,
                                                  playButton = "\u25B6",
                                                  pauseButton = "\u23F8"),
                       sep = "")
