@@ -1,0 +1,6 @@
+"","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
+"1","group",TRUE,FALSE,FALSE,FALSE,FALSE,"Estado","Estado","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"2","from",FALSE,FALSE,FALSE,FALSE,FALSE,"from","from","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"3","to",FALSE,FALSE,FALSE,FALSE,FALSE,"to","to","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"4","area",FALSE,FALSE,FALSE,FALSE,FALSE,"area","area","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"5","time",FALSE,TRUE,FALSE,FALSE,FALSE,"Intervalo de tempo","Intervalo de tempo","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
