@@ -66,15 +66,16 @@ dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
 dat$kg_liquido <- NULL
-dat$uf <- NULL
 dat$cod_pais <- NULL
 
-dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio, dat, sum)
+dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio + uf, dat, sum)
 
 dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
 dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
+dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
+dat$uf <- NULL
 
 data_val <- dat
 colnames(data_val) <- c("time", "type", "group", "value")
@@ -141,15 +142,16 @@ dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
 dat$kg_liquido <- NULL
-dat$uf <- NULL
 dat$cod_pais <- NULL
 
-dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio, dat, sum)
+dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio + uf, dat, sum)
 
 dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
-dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SEC_POR, aux2$CO_SH4))
+dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
+dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
+dat$uf <- NULL
 
 data_val <- dat
 colnames(data_val) <- c("time", "type", "group", "value")
