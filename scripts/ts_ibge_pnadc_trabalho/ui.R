@@ -45,7 +45,8 @@ get_ui <- function(files, param) {
         selectInput(
           "filter_composicao_demografica",
           "Selecione grupos",
-          choices = param$filter_composicao_demografica_choices,
+          choices = NULL,
+          selected = "Todas as pessoas",
           width = "100%"
         ),
       ),

@@ -33,13 +33,13 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      updateSelectInput(session,
+      updateSelectizeInput(session,
         "filter1",
         choices = param$filter_choices,
         selected = sample(param$filter_choices, 1) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
       
-      selected_composicao_demografica <- sample(sample(param$filter_composicao_demografica_choices, 1)[[1]], 1)
+      selected_composicao_demografica <- sample(param$filter_composicao_demografica_choices, 1)
       updateSelectInput(session,
                         "filter_composicao_demografica",
                         choices = param$filter_composicao_demografica_choices,
@@ -57,7 +57,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "y=", input$y
+        "?", "y=", input$y,
+        "&", "filter_composicao=", input$filter_composicao_demografica
       )
 
       for (i in input$filter1) {
@@ -74,9 +75,14 @@ get_server <- function(files, param) {
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       # Preenche filtro vazio
-      updateSelectInput(session,
+      updateSelectizeInput(session,
         "filter1",
         choices = param$filter_choices,
+        selected = NULL
+      )
+      updateSelectInput(session,
+        "filter_composicao_demografica",
+        choices = param$filter_composicao_demografica_choices,
         selected = NULL
       )
 
@@ -90,9 +96,16 @@ get_server <- function(files, param) {
         )
       }
 
+      if (!is.null(query[["filter_composicao"]])) {
+        updateSelectInput(session, "filter_composicao",
+          choices = param$filter_composicao_demografica_choices,
+          selected = query[["filter_composicao"]]
+        )
+      }
+
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       if (!is.null(query[["filter"]])) {
-        updateSelectInput(session,
+        updateSelectizeInput(session,
           "filter1",
           choices = param$filter_choices,
           selected = selected
@@ -100,7 +113,8 @@ get_server <- function(files, param) {
       }
 
       # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter"]]) && is.null(query[["y"]])) {
+      if (is.null(query[["filter"]]) && is.null(query[["y"]])
+          && is.null(query[["filter_composicao"]])) {
         random_inputs() # preenche inputs se estiverem vazios
       }
     }
@@ -141,6 +155,8 @@ get_server <- function(files, param) {
         {
           # Se algum campo estiver vazio retorna gráfico vazio
           if (is.null(input$y) || input$y == "" ||
+              is.null(input$filter_composicao_demografica) || 
+              input$filter_composicao_demografica == "" ||
             is.null(input$filter1) || length(input$filter1) < 1) {
             fig <- plotly_empty()
             stop()
