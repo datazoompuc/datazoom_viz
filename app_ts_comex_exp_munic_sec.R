@@ -32,7 +32,7 @@ param$group <- "group" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amazonia"
-param$plot_desc <- "Comércio exterior na Amazônia (COMEX)"
+param$plot_desc <- "Comercio exterior na Amazonia (COMEX): Valor da exportacao de produtos por municipio"
 
 # Outros parâmetros e configurações
 
