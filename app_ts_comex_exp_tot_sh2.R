@@ -6,9 +6,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_comex/ui.R"
-files$server_script <- "scripts/ts_comex/server.R"
-files$param_script <- "scripts/ts_comex/db_params.R"
+files$ui_script <- "scripts/ts_comex_exp_tot_sh2/ui.R"
+files$server_script <- "scripts/ts_comex_exp_tot_sh2/server.R"
+files$param_script <- "scripts/ts_comex_exp_tot_sh2/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
@@ -24,15 +24,15 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "time" # variável padrão do eixo x
-param$y_def <- "" # variável padrão do eixo y
+param$y_def <- "value" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 
 
-param$plot_name <- "Data Zoom Amazonia"
-param$plot_desc <- "Comércio exterior na Amazônia"
+param$plot_name <- "Data Zoom Amazônia"
+param$plot_desc <- "Comércio exterior na Amazônia (COMEX): Valor da exportação de produtos por município"
 
 # Outros parâmetros e configurações
 

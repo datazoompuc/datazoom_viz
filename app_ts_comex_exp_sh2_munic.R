@@ -6,9 +6,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_comex/ui.R"
-files$server_script <- "scripts/ts_comex/server.R"
-files$param_script <- "scripts/ts_comex/db_params.R"
+files$ui_script <- "scripts/ts_comex_exp_sh2_munic/ui.R"
+files$server_script <- "scripts/ts_comex_exp_sh2_munic/server.R"
+files$param_script <- "scripts/ts_comex_exp_sh2_munic/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
@@ -31,8 +31,8 @@ param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 
 
-param$plot_name <- "Data Zoom Amazonia"
-param$plot_desc <- "Comércio exterior na Amazônia"
+param$plot_name <- "Data Zoom Amazônia"
+param$plot_desc <- "Comércio exterior na Amazônia (COMEX): Valor da exportação de produtos por município"
 
 # Outros parâmetros e configurações
 
