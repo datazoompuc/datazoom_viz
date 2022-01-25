@@ -191,7 +191,7 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", df_p$y, "<br>"
+            y_col$label, ": R$", df_p$y, "<br>"
           )
 
           # Define paleta de cores
@@ -204,7 +204,8 @@ get_server <- function(files, param) {
             color = ~group,
             type = "scatter",
             mode = "lines",
-            text = ~tooltip
+            text = ~tooltip,
+            hovertemplate = ~tooltip
           )
 
           # Layout eixos
@@ -248,8 +249,7 @@ get_server <- function(files, param) {
               font = f1,
               xaxis = x_axis_layout,
               yaxis = y_axis_layout,
-              showlegend = TRUE,
-              hoverlabel = tooltip
+              showlegend = TRUE
             )
 
           #  Configura botões do plotly
