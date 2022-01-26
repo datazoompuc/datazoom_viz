@@ -18,7 +18,7 @@ get_ui <- function(files, param) {
           # Seleciona variÃ¡vel do eixo y
           selectInput(
             inputId = "y",
-            label = "Categorias da exportação (agregação da SEC)",
+            label = "Categorias da exporta\u00e7\u00e3o (agrega\u00e7\u00e3o da SEC)",
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municÃ­pios
         selectizeInput(
           "filter1",
-          "Países destino das exportações",
+          "Países destino das exporta\u00e7\u00f5es",
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),

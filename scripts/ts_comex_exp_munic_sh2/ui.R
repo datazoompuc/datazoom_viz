@@ -18,7 +18,7 @@ get_ui <- function(files, param) {
           # Seleciona variÃ¡vel do eixo y
           selectInput(
             inputId = "y",
-            label = "Municípios da Amazônia",
+            label = "Munic\u00edpios da Amaz\u00f4nia",
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municÃ­pios
         selectizeInput(
           "filter1",
-          "Categorias da exportação (agregação SH2)",
+          "Categorias da exporta\u00e7\u00e3o (agrega\u00e7\u00e3o do SH2)",
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
