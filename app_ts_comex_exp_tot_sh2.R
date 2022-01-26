@@ -31,8 +31,8 @@ param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 
 
-param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Comércio exterior na Amazônia (COMEX): Valor da exportação de produtos total da Amazônia Legal"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos total da Amaz\u00f4nia Legal"
 
 # Outros parâmetros e configurações
 

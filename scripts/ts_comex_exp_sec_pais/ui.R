@@ -1,13 +1,13 @@
 #  -------------------------------- Define UI --------------------------------
 
-# Funcão para retornar objeto server
+# FuncÃ£o para retornar objeto server
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Inclu? script CSS
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
-      column(3, # dimensão da coluna do bootstrap
+      column(3, # dimensÃ£o da coluna do bootstrap
         class = "menucol",
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
@@ -15,10 +15,10 @@ get_ui <- function(files, param) {
         p(class = "vars", "VARI\u00C1VEIS:"),
         div(
           class = "var_selec_group",
-          # Seleciona variável do eixo y
+          # Seleciona variÃ¡vel do eixo y
           selectInput(
             inputId = "y",
-            label = "Pa�ses destino das exporta��es",
+            label = "Pa\u00edses destino das exporta\u00e7\u00f5es",
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -40,10 +40,10 @@ get_ui <- function(files, param) {
           width = "100%"
         ),
 
-        # Seleciona filtro de municípios
+        # Seleciona filtro de municÃ­pios
         selectizeInput(
           "filter1",
-          "Categorias da exporta��o (agrega��o da SEC)",
+          "Categorias da exporta\u00e7\u00e3o (agrega\u00e7\u00e3o da SEC)",
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
@@ -54,11 +54,11 @@ get_ui <- function(files, param) {
         class = "plotcol h-100",
         textOutput("plot_title"),
         textOutput("plot_subtitle"),
-        div( # row do gráfico
+        div( # row do grÃ¡fico
           class = "plotrow row justify-content-center flex-grow-1 w-100",
           div(
             class = "plotdiv w-100 h-100",
-            # Gráfico
+            # GrÃ¡fico
             plotlyOutput("plot", width = "100%", height = "100%")
           )
         )
