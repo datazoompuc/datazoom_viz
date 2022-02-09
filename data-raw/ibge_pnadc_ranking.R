@@ -21,7 +21,7 @@ library(datazoom.social)
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/Francisco/Dropbox/Datazoom/" # set actual user data path
+user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
 github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/"  # set github structure path 
 
 # call raw data
@@ -68,7 +68,7 @@ temp <-  temp %>%
   arrange(titulo, time) %>%
   summarise(n_ocu_cnae = sum(n_ocu_cnae),
             n_ocu_cnae_formal = sum(n_ocu_cnae_formal),
-            n_ocu_cnae_informal = sum(renda_informal),
+            n_ocu_cnae_informal = sum(n_ocu_cnae_informal),
             n_ocu_cnae_publico = sum(n_ocu_cnae_publico),
             n_ocu_cnae_privado = sum(n_ocu_cnae_privado)
             ) %>%
@@ -109,23 +109,23 @@ temp_param_table <- tibble(
 )
 
 # label variables
-temp_param_table$label[1] <- "Atividade econômica"
-temp_param_table$label[2] <- "Trimestre-Ano"
-temp_param_table$label[3] <- "Número de ocupados"
-temp_param_table$label[4] <- "Número de ocupados no setor formal"
-temp_param_table$label[5] <- "Número de ocupados no setor informal"
-temp_param_table$label[6] <- "Número de ocupados no setor público"
-temp_param_table$label[7] <- "Número de ocupados no setor privado"
+temp_param_table$label[temp_param_table$var == "group"] <- "Atividade econômica"
+temp_param_table$label[temp_param_table$var == "time"] <- "Trimestre-Ano"
+temp_param_table$label[temp_param_table$var == "n_ocu_cnae"] <- "Número de ocupados"
+temp_param_table$label[temp_param_table$var == "n_ocu_cnae_formal"] <- "Número de ocupados no setor formal"
+temp_param_table$label[temp_param_table$var == "n_ocu_cnae_informal"] <- "Número de ocupados no setor informal"
+temp_param_table$label[temp_param_table$var == "n_ocu_cnae_publico"] <- "Número de ocupados no setor público"
+temp_param_table$label[temp_param_table$var == "n_ocu_cnae_privado"] <- "Número de ocupados no setor privado"
 
 # block variables in graphs y-axis
-temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[temp_param_table$var == "time"] <- FALSE # Ano-Trimestre
 
 # block variables in graphs x-axis
-temp_param_table$x[2] <- FALSE # Ano-Trimestre
+temp_param_table$x[temp_param_table$var == "time"] <- FALSE # Ano-Trimestre
 
 # allow variables in graphs size and color-axis
-temp_param_table$size[1] <- TRUE # Atividade econômica
-temp_param_table$color[1] <- TRUE # Atividade econômica
+temp_param_table$size[temp_param_table$var == "group"] <- TRUE # Atividade econômica
+temp_param_table$color[temp_param_table$var == "group"] <- TRUE # Atividade econômica
 
 # allow variables in graphs size and color-axis
 
@@ -141,7 +141,7 @@ write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cnae_dic.csv", fil
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/Francisco/Dropbox/Datazoom/" # set actual user data path
+user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
 github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/"  # set github structure path 
 
 # call raw data
@@ -188,7 +188,7 @@ temp <-  temp %>%
   arrange(titulo, time) %>%
   summarise(n_ocu_cod = sum(n_ocu_cod),
             n_ocu_cod_formal = sum(n_ocu_cod_formal),
-            n_ocu_cod_informal = sum(renda_informal),
+            n_ocu_cod_informal = sum(n_ocu_cod_informal),
             n_ocu_cod_publico = sum(n_ocu_cod_publico),
             n_ocu_cod_privado = sum(n_ocu_cod_privado)
             ) %>%
@@ -229,23 +229,24 @@ temp_param_table <- tibble(
 )
 
 # label variables
-temp_param_table$label[1] <- "Tipo de ocupação"
-temp_param_table$label[2] <- "Trimestre-Ano"
-temp_param_table$label[3] <- "Número de ocupados"
-temp_param_table$label[4] <- "Número de ocupados no setor formal"
-temp_param_table$label[5] <- "Número de ocupados no setor informal"
-temp_param_table$label[6] <- "Número de ocupados no setor público"
-temp_param_table$label[7] <- "Número de ocupados no setor privado"
+temp_param_table$label[temp_param_table$var == "group"] <- "Tipo de ocupação"
+temp_param_table$label[temp_param_table$var == "time"] <- "Trimestre-Ano"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod"] <- "Número de ocupados"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod_formal"] <- "Número de ocupados no setor formal"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod_informal"] <- "Número de ocupados no setor informal"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod_publico"] <- "Número de ocupados no setor público"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod_privado"] <- "Número de ocupados no setor privado"
+
 
 # block variables in graphs y-axis
-temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[temp_param_table$var == "time"] <- FALSE # Ano-Trimestre
 
 # block variables in graphs x-axis
-temp_param_table$x[2] <- FALSE # Ano-Trimestre
+temp_param_table$x[temp_param_table$var == "time"] <- FALSE # Ano-Trimestre
 
 # allow variables in graphs size and color-axis
-temp_param_table$size[1] <- TRUE # Atividade econômica
-temp_param_table$color[1] <- TRUE # Atividade econômica
+temp_param_table$size[temp_param_table$var == "group"] <- TRUE # Atividade econômica
+temp_param_table$color[temp_param_table$var == "group"] <- TRUE # Atividade econômica
 
 # allow variables in graphs size and color-axis
 
