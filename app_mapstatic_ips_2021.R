@@ -23,24 +23,19 @@ source(files$server_script)
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "" # variável padrão do eixo x
+param$x_def <- "ips_amazonia_2021" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$color_def <- "" # variável padrão de cor
 param$size_def <- "" # variável padrão de tamanho
-param$slider_def <- "ano" # variável padrão do slider
+param$slider_def <- "" # variável padrão do slider
 param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
-param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Compilação de dados ao nível municipal"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Dados compilados do Instituto do Homem e do Meio Ambiente da Amaz\u00f4nia (Imazon)"
 
 # Outros parâmetros e configurações
-# param$x_choices$`Fonte de dados` <- NULL
-# param$x_choices[[1]] <- NULL
-# param$x_choices$`INPE - PRODES` <- NULL
-# param$x_choices$`IBGE - CEMPRE` <- NULL
-# param$x_choices$`IBGE - PPM` <- NULL
-# param$x_choices$`IBGE - PAM` <- NULL
+param$x_choices[[1]] <- NULL
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

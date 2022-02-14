@@ -1,8 +1,8 @@
 # -------------------------------- Define lógica do server --------------------------------
 
 # Paleta de cores
-pallete_discrete <- c("#fcff84", "#ffcf48", "#c3ff83", "#007e47", "#00596d", "#4fdf94", "#99b0c8", "#261c4e", "#000098", "#c368b1", "#60458c", "#757575")
-pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "#33638d", "#287d8e", "#238a8d", "#1f968b", "#20a387", "#29af7f", "#3cbb75", "#55c667", "#73d055", "#95d840", "#b8de29", "#dce319", "#fde725") # Viridis
+pallete_discrete <- c("#757575", "#60458c", "#c368b1", "#000098", "#261c4e", "#99b0c8", "#4fdf94", "#00596d", "#007e47", "#c3ff83", "#ffcf48", "#fcff84")
+pallete_continuous <- c("#fde725","#dce319", "#b8de29", "#95d840", "#73d055", "#55c667", "#3cbb75", "#29af7f", "#20a387", "#1f968b", "#238a8d", "#287d8e", "#33638d", "#39568c", "#404788", "#453781", "#481567", "#440154") # Viridis inverse
 
 # Fontes
 
@@ -66,7 +66,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Mapa dos municípios da Amazônia Legal")
+        text <- paste0("Mapa dos munic\u00edpios da Amaz\u00f4nia Legal")
       }
 
       text
@@ -74,11 +74,11 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x) || input$x == "") {
-        text <- "Nenhuma variável selecionada"
+        text <- "Nenhuma vari\u00e1vel selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Variável selecionada: ", x_col$label)
+        text <- paste0("Vari\u00e1vel selecionada: ", x_col$label)
       }
 
       text
@@ -112,10 +112,10 @@ get_server <- function(files, param) {
           x_col <- param$table[which(param$table$var == input$x), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
-            "Nome do município: ", df$nm_municip, "<br>",
-            "Estado: ", df$estado, "<br>",
-            x_col$label, ": ", df[[input$x]], "<br>",
-            "Unidade de medida: ", x_col$unidade
+            "Nome do munic\u00edpio: ", "<b>", df$nm_municip, "</b><br>",
+            "Estado: ", "<b>", df$uf, "</b><br>",
+            x_col$label, ": ", "<b>", df[[input$x]], "</b><br>",
+            "Unidade de medida: ", "<b>", x_col$unidade, "</b><br>"
           ) %>%
             lapply(htmltools::HTML)
 

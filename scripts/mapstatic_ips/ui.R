@@ -29,7 +29,7 @@ get_ui <- function(files, param) {
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = "Seleciona variável (x)",
+            label = "Seleciona vari\u00e1vel",
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
