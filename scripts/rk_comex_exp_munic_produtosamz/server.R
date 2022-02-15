@@ -13,7 +13,8 @@ get_server <- function(files, param) {
   
   # Carrega dados
   df <- readRDS(files$db_file) %>% 
-    select(time, group, starts_with("Cacau")) %>% 
+    select(time, group, starts_with("Cocos"), 
+           starts_with("Madeira"), starts_with("Cacau")) %>% 
     right_join(tidyr::expand(., time, group))
    
   df[is.na(df)] <- 0

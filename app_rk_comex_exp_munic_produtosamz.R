@@ -10,12 +10,12 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/app_rk_comex_exp_munic_produtosamz/ui.R"
-files$server_script <- "scripts/app_rk_comex_exp_munic_produtosamz/server.R"
-files$param_script <- "scripts/app_rk_comex_exp_munic_produtosamz/db_params.R"
+files$ui_script <- "scripts/rk_comex_exp_munic_produtosamz/ui.R"
+files$server_script <- "scripts/rk_comex_exp_munic_produtosamz/server.R"
+files$param_script <- "scripts/rk_comex_exp_munic_produtosamz/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/comex_exp_sh2_munic_dic.csv"
-files$db_file <- "data/comex_exp_sh2_munic.rds"
+files$param_file <- "data/comex_exp_sh4_munic_dic.csv"
+files$db_file <- "data/comex_exp_sh4_munic.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -37,7 +37,11 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "municípios que mais exportam produtos da Amazônia Legal"
 
 # Outros parâmetros e configurações
-param$x_choices <- param$x_choices$Comex$`Cacau e suas preparações`
+param$x_choices[[1]] <- NULL
+param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados`, 
+                              param$x_choices$Comex$`Cacau inteiro ou partido, em bruto ou torrado`,
+                              param$x_choices$Comex$`Madeira em bruto, mesmo descascada, desalburnada ou esquadriada`
+                              )
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
