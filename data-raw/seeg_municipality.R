@@ -141,7 +141,7 @@ seeg_municipality_land_dic= tibble::tibble(
   subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 9), 'Identificador Geografico','Emissão de Gases de Efeito Estufa')
 )
 #saving f
-write.csv(metadata_seeg_municipality_land, file = "./data/seeg_municipality_land_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_municipality_land_dic, file = "./data/seeg_municipality_land_dic.csv", fileEncoding = "UTF-8")
 
 #seeg_residuals
 seeg_municipality_residuals= readRDS('data/seeg_municipality_residuals.rds')
