@@ -6,8 +6,7 @@
 #seeg_farming
 seeg_municipality_farming= load_seeg(dataset = 'seeg_farming', geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_farming= seeg_municipality_farming%>%
-  dplyr::rename(time= .data$Ano, group= .data$municipio)%>%
-  dplyr::select(-territorio,-ibge)
+  dplyr::rename(time= .data$Ano, group= .data$municipio)
 ##saving f
 saveRDS(seeg_municipality_farming,
         'data/seeg_municipality_farming.rds'
@@ -26,8 +25,7 @@ saveRDS(seeg_municipality_industry,
 #seeg_energy
 seeg_municipality_energy= load_seeg(dataset = "seeg_energy", geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_energy= seeg_municipality_energy%>%
-  dplyr::rename(time= .data$Ano, group= .data$municipio)%>%
-  dplyr::select(-territorio,-ibge)
+  dplyr::rename(time= .data$Ano, group= .data$municipio)
 
 ##saving f
 saveRDS(seeg_municipality_energy,
@@ -37,8 +35,7 @@ saveRDS(seeg_municipality_energy,
 #seeg_land
 seeg_municipality_land= load_seeg(dataset = "seeg_land", geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_land= seeg_municipality_land%>%
-  dplyr::rename(time= .data$Ano, group= .data$municipio)%>%
-  dplyr::select(-territorio,-ibge)
+  dplyr::rename(time= .data$Ano, group= .data$municipio)
 
 ##saving f
 saveRDS(seeg_municipality_land,
@@ -48,8 +45,7 @@ saveRDS(seeg_municipality_land,
 #seeg_residuals
 seeg_municipality_residuals= load_seeg(dataset = "seeg_residuals", geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_residuals= seeg_municipality_residuals%>%
-  dplyr::rename(time= .data$Ano, group= .data$municipio)%>%
-  dplyr::select(-territorio,-ibge)
+  dplyr::rename(time= .data$Ano, group= .data$municipio)
 
 ##saving f
 saveRDS(seeg_municipality_residuals,
