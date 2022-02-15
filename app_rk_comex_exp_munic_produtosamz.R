@@ -1,5 +1,5 @@
 # Cache
-cache_folder <- "./cache/app_rk_comex_exp_munic_cacau/"
+cache_folder <- "./cache/app_rk_comex_exp_munic_produtosamz/"
 shinyOptions(cache = cachem::cache_disk(cache_folder))
 
 # Carrega bibliotecas
@@ -10,9 +10,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk_comex_exp_munic_cacau/ui.R"
-files$server_script <- "scripts/rk_comex_exp_munic_cacau/server.R"
-files$param_script <- "scripts/rk_comex_exp_munic_cacau/db_params.R"
+files$ui_script <- "scripts/app_rk_comex_exp_munic_produtosamz/ui.R"
+files$server_script <- "scripts/app_rk_comex_exp_munic_produtosamz/server.R"
+files$param_script <- "scripts/app_rk_comex_exp_munic_produtosamz/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/comex_exp_sh2_munic_dic.csv"
 files$db_file <- "data/comex_exp_sh2_munic.rds"
@@ -34,7 +34,7 @@ param$id_def <- "group" # variável padrão de id
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "municípios que mais exportam Cacau e suas preparações"
+param$plot_desc <- "municípios que mais exportam produtos da Amazônia Legal"
 
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices$Comex$`Cacau e suas preparações`
