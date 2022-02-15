@@ -13,7 +13,9 @@ get_server <- function(files, param) {
   server <- function(input, output, session) {
 
     # Carrega dados
-    df <- readRDS(files$db_file)
+    df <- readRDS(files$db_file) %>% 
+      filter(emissores != "Lavouras Cultivadas sob Sistema Convencional") %>% 
+      filter(emissores != "Lavouras Cultivadas sob Sistema Plantio Direto")
     
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
