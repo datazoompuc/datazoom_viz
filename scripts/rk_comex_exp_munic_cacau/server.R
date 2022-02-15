@@ -14,8 +14,7 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file) %>% 
     select(time, group, starts_with("Cacau")) %>% 
-    right_join(tidyr::expand(., time, group)) %>% 
-    filter(time >= 2004)
+    right_join(tidyr::expand(., time, group))
    
   df[is.na(df)] <- 0
   
@@ -219,7 +218,7 @@ get_server <- function(files, param) {
             # ),
             hoverinfo = "text",
             visible = TRUE
-          )
+          ) %>% animation_opts(redraw = TRUE, transition = 500)
 
           # adiciona barras
           fig_p <- fig_p %>% add_segments(
@@ -293,9 +292,10 @@ get_server <- function(files, param) {
                       NA, # primeiro arg vazio para play
                       list(
                         mode = "immediate",
-                        transition = list(duration = 3000, easing = "linear", redraw = TRUE),
+                        transition = list(duration = 1000, easing = "linear", 
+                                          redraw = TRUE),
                         fromcurrent = TRUE,
-                        frame = list(redraw = TRUE, duration = 3000)
+                        frame = list(redraw = TRUE, duration = 1500)
                       )
                     )
                   ),
@@ -319,12 +319,12 @@ get_server <- function(files, param) {
             # Pula animação para último frame (custom JS)
             first_frame <- min(df_p$slider)
             last_frame <- max(df_p$slider)
-            #fig_p <- fig_p %>% onRender("
-            #function(el,x,data){
-            #  Plotly.animate(el, data, {frame: [{duration: 0}]})
-            #}",
-            #  data = c(first_frame, last_frame)
-            #)
+            fig_p <- fig_p %>% onRender("
+            function(el,x,data){
+              Plotly.animate(el, data, {frame: [{duration: 0}]})
+            }",
+              data = c(first_frame, last_frame)
+            )
           }
 
 

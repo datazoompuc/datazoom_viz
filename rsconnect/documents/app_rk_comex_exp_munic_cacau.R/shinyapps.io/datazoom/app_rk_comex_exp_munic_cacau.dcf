@@ -5,10 +5,10 @@ account: datazoom
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5653207
-bundleId: 5578982
+bundleId: 5581291
 url: https://datazoom.shinyapps.io/app_rk_comex_exp_munic_cacau/
-when: 1644875591.80371
-lastSyncTime: 1644875591.80371
+when: 1644936385.90092
+lastSyncTime: 1644936385.90092
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: app_bubble_dz_munic.R|app_map_dz_munic_cempre.R|app_map_dz_munic_ppm.R|app_map_dz_munic_prodes.R|app_map_dz_state.R|app_mapstatic_dz_munic.R|app_rk_comex_exp_paises.R|app_rk_ibge_pnadc_cnae.R|app_rk_ibge_pnadc_cod.R|app_rk_mapbiomas_cobertura_est.R|app_rk_mapbiomas_cobertura_munic.R|app_rk_mapbiomas_cobertura_munic_percentual.R|app_rk_mapbiomas_transicao_est.R|app_rk_mapbiomas_transicao_munic_5.R|app_rk_sigmine_munic.R|app_rkstatic_dz_munic.R|app_tab_mapbiomas_transicao_est.R|app_ts_comex_exp_munic_sec.R|app_ts_comex_exp_munic_sh2.R|app_ts_comex_exp_pais_sec.R|app_ts_comex_exp_sec_munic.R|app_ts_comex_exp_sec_pais.R|app_ts_comex_exp_sh2_munic.R|app_ts_comex_exp_tot_pais.R|app_ts_comex_exp_tot_sh2.R|app_ts_dz_munic.R|app_ts_dz_state.R|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_cod.R|app_ts_ibge_pnadc_trabalho.R|app_ts_ibge_pnadc_trabalho_insercao.R|app_ts_mapbiomas_cobertura_est.R|app_ts_mapbiomas_cobertura_munic.R|app_ts_mapbiomas_cobertura_munic_percentual.R|app_ts_mapbiomas_transicao_est.R|app_ts_mapbiomas_transicao_munic_5.R|app_ts_seeg_state_energy.R|app_ts_seeg_state_farming.R|app_ts_seeg_state_industry.R|app_ts_sigmine_munic.R|LICENSE|README.md|data-raw

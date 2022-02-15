@@ -215,7 +215,7 @@ get_server <- function(files, param) {
             #  line = list(width = 1, color = 'white')
             # ),
             hoverinfo = "text"
-          )
+          ) %>% animation_opts(redraw = TRUE, transition = 500)
 
           # adiciona barras
           fig_p <- fig_p %>% add_segments(
@@ -312,12 +312,12 @@ get_server <- function(files, param) {
             # Pula animação para último frame (custom JS)
             first_frame <- min(df_p$slider)
             last_frame <- max(df_p$slider)
-            #fig_p <- fig_p %>% onRender("
-            #function(el,x,data){
-            #  Plotly.animate(el, data, {frame: [{duration: 0}]})
-            #}",
-            #  data = c(first_frame, last_frame)
-            #)
+            fig_p <- fig_p %>% onRender("
+            function(el,x,data){
+              Plotly.animate(el, data, {frame: [{duration: 0}]})
+            }",
+              data = c(first_frame, last_frame)
+            )
           }
 
 
