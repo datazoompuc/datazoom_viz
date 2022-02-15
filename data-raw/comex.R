@@ -66,15 +66,16 @@ dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
 dat$kg_liquido <- NULL
-dat$uf <- NULL
 dat$cod_pais <- NULL
 
-dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio, dat, sum)
+dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio + uf, dat, sum)
 
 dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
 dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
+dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
+dat$uf <- NULL
 
 data_val <- dat
 colnames(data_val) <- c("time", "type", "group", "value")
@@ -141,15 +142,16 @@ dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
 dat$kg_liquido <- NULL
-dat$uf <- NULL
 dat$cod_pais <- NULL
 
-dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio, dat, sum)
+dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio + uf, dat, sum)
 
 dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
-dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SEC_POR, aux2$CO_SH4))
+dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
+dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
+dat$uf <- NULL
 
 data_val <- dat
 colnames(data_val) <- c("time", "type", "group", "value")
@@ -186,15 +188,18 @@ dat$kg_liquido <- NULL
 dat$uf <- NULL
 dat$cod_municipio <- NULL
 
-dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
-aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
-dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SEC_POR, aux2$CO_SH4))
-dat$cod_pais <- sprintf("%03d", as.numeric(dat$cod_pais))
-aux1$SISCOMEX <- sprintf("%03d", as.numeric(aux1$SISCOMEX))
-dat$cod_pais <- str_replace_all(dat$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
-
 data_val_pais <- aggregate(valor_fob ~ ano + cod_pais, dat, sum)
 data_val_pais_sec <- aggregate(valor_fob ~ ano + cod_pais + cod_sh4, dat, sum)
+
+aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
+data_val_pais$cod_pais <- sprintf("%03d", as.numeric(data_val_pais$cod_pais))
+aux1$SISCOMEX <- sprintf("%03d", as.numeric(aux1$SISCOMEX))
+data_val_pais$cod_pais <- str_replace_all(data_val_pais$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
+
+data_val_pais_sec$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais_sec$cod_sh4))
+data_val_pais_sec$cod_sh4 <- str_replace_all(data_val_pais_sec$cod_sh4, setNames(aux2$NO_SEC_POR, aux2$CO_SH4))
+data_val_pais_sec$cod_pais <- sprintf("%03d", as.numeric(data_val_pais_sec$cod_pais))
+data_val_pais_sec$cod_pais <- str_replace_all(data_val_pais_sec$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
 
 data_val_pais <- data_val_pais[!(data_val_pais$cod_pais %in% c("015", "042", "150", "388", "489", "693", "790", "990")),]
 data_val_pais_sec <- data_val_pais_sec[!(data_val_pais_sec$cod_pais %in% c("015", "042", "150", "388", "489", "693", "790", "990")),]
@@ -254,11 +259,11 @@ temp_param_table$label[2] <- "Produção sh2"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "Produção sh2"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 417))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 417))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 417))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 417))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 417))
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_dic.csv", fileEncoding = "UTF-8")
@@ -330,11 +335,11 @@ temp_param_table$label[2] <- "Produção sec"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "Produção sec"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 417))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 417))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 417))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 417))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 417))
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sec_dic.csv", fileEncoding = "UTF-8")
@@ -368,11 +373,11 @@ temp_param_table$label[2] <- "Município"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "Município"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 22))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 22))
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 96))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_sec_munic_dic.csv", fileEncoding = "UTF-8")
