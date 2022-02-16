@@ -31,8 +31,8 @@ param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 
 
-param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Ocupações no Trabalho"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Dados compilados sobre tipo de ocupa\u00e7\u00f5es no trabalho gerados a partir da PNAD Cont\u00ednua Trimestral - IBGE"
 
 # Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL
