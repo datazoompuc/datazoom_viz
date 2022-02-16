@@ -28,8 +28,8 @@ param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando 
 param$group <- "group" # variável de agrupamento
 
 # Descrição da visualização no eixo de opções
-param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Atividades Econômicas"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Dados compilados sobre atividades econ\u00f4micas gerados a partir da PNAD Cont\u00ednua Trimestral - IBGE"
 
 # Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL

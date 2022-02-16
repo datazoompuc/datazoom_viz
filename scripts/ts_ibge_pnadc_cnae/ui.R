@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          "Estado - Atividades econômicas",
+          "Estado - Atividades Econ\u00f4micas",
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
