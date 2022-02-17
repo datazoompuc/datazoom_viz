@@ -6,7 +6,8 @@
 #livestock_inventory
 
 ##municipality 
-ppm_municipality_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+ppm_municipality_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality', 1974:2020, language = "pt")
+ppm_livestock2020= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality',2020, language = "pt")
 
 ##making data usable for datazoom viz
 ppm_municipality_livestock_inventory = lapply(ppm_municipality_livestock_inventory, as.numeric)
@@ -14,8 +15,8 @@ ppm_municipality_livestock_inventory <- as.data.frame(ppm_municipality_livestock
 ppm_municipality_livestock_inventory[is.na(ppm_municipality_livestock_inventory)] <- 0
 
 munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('Código Município Completo', 'Nome_Município')
-ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+  dplyr::select('CÃ³digo MunicÃ­pio Completo', 'Nome_MunicÃ­pio')
+ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
 ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , time=.data$ano, group=.data$geo_id)
 
 
@@ -35,8 +36,8 @@ ppm_municipality_sheep_farming <- as.data.frame(ppm_municipality_sheep_farming)
 ppm_municipality_sheep_farming[is.na(ppm_municipality_sheep_farming)] <- 0
 
 munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('Código Município Completo', 'Nome_Município')
-ppm_municipality_sheep_farming$geo_id= plyr::mapvalues(ppm_municipality_sheep_farming$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
+ppm_municipality_sheep_farming$geo_id= plyr::mapvalues(ppm_municipality_sheep_farming$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
 ppm_municipality_sheep_farming= dplyr::rename(ppm_municipality_sheep_farming , time=.data$ano, group=.data$geo_id)
 
 ##saving f
@@ -55,8 +56,8 @@ ppm_municipality_animal_origin_production <- as.data.frame(ppm_municipality_anim
 ppm_municipality_animal_origin_production[is.na(ppm_municipality_animal_origin_production)] <- 0
 
 munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('Código Município Completo', 'Nome_Município')
-ppm_municipality_animal_origin_production$geo_id= plyr::mapvalues(ppm_municipality_animal_origin_production$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
+ppm_municipality_animal_origin_production$geo_id= plyr::mapvalues(ppm_municipality_animal_origin_production$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
 ppm_municipality_animal_origin_production= dplyr::rename(ppm_municipality_animal_origin_production , time=.data$ano, group=.data$geo_id)
 
 ##saving f
@@ -74,8 +75,8 @@ ppm_municipality_cow_farming <- as.data.frame(ppm_municipality_cow_farming)
 ppm_municipality_cow_farming[is.na(ppm_municipality_cow_farming)] <- 0
 
 munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('Código Município Completo', 'Nome_Município')
-ppm_municipality_cow_farming$geo_id= plyr::mapvalues(ppm_municipality_cow_farming$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
+ppm_municipality_cow_farming$geo_id= plyr::mapvalues(ppm_municipality_cow_farming$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
 ppm_municipality_cow_farming= dplyr::rename(ppm_municipality_cow_farming , time=.data$ano, group=.data$geo_id)
 
 ##saving f
@@ -95,8 +96,8 @@ ppm_municipality_aquaculture <- as.data.frame(ppm_municipality_aquaculture)
 ppm_municipality_aquaculture[is.na(ppm_municipality_aquaculture)] <- 0
 
 munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('Código Município Completo', 'Nome_Município')
-ppm_municipality_aquaculture$geo_id= plyr::mapvalues(ppm_municipality_aquaculture$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
+ppm_municipality_aquaculture$geo_id= plyr::mapvalues(ppm_municipality_aquaculture$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
 ppm_municipality_aquaculture= dplyr::rename(ppm_municipality_aquaculture , time=.data$ano, group=.data$geo_id)
 
 ##saving f
@@ -142,7 +143,7 @@ metadata_ppm_livestock_inventory= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep('Cabecas',10)),
-  categoria= c("Localizaçao","Unidade de Tempo",rep("Pecuaria",10)), 
+  categoria= c("Localiza?ao","Unidade de Tempo",rep("Pecuaria",10)), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Especies - Criacao",10))
 ) 
 #saving f
@@ -174,7 +175,7 @@ metadata_ppm_animal_origin_production= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, '1K BRL', '1K Liters', '1K BRL', 'Kg', '1K BRL', 'Kg', '1K BRL', '1K Dozens', '1K BRL', '1K Dozens', '1K BRL', 'Kg', '1K BRL'),
-  categoria= c("Localizaçao","Unidade de Tempo",rep("Pecuaria",13)), 
+  categoria= c("Localiza?ao","Unidade de Tempo",rep("Pecuaria",13)), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Produtos Pecuarios",13))
 )
 #saving f
@@ -197,7 +198,7 @@ metadata_ppm_sheep_farming= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, 'Cabecas'),
-  categoria= c("Localizaçao","Unidade de Tempo","Pecuaria"), 
+  categoria= c("Localiza?ao","Unidade de Tempo","Pecuaria"), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 #saving f
@@ -221,7 +222,7 @@ metadata_ppm_cow_farming= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, 'Cabecas'),
-  categoria= c("Localizaçao","Unidade de Tempo","Pecuaria"), 
+  categoria= c("Localiza?ao","Unidade de Tempo","Pecuaria"), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 
@@ -267,8 +268,8 @@ metadata_ppm_aquaculture= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = unidade_aqua,
-  categoria= c("Localizaçao","Unidade de Tempo" ,rep("Pecuaria",48)), 
-  subcategoria = c("Localizaçao","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
+  categoria= c("Localiza?ao","Unidade de Tempo" ,rep("Pecuaria",48)), 
+  subcategoria = c("Localiza?ao","Unidade de Tempo" ,rep("Especies - Aquicultura",48))
 )
 
 #saving f
