@@ -32,8 +32,8 @@ param$slider_def <- "ano" # variável padrão do slider
 param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
-param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Compilação de dados ao nível municipal"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Compila\u00e7\u00e3o de dados ao n\u00edvel municipal"
 
 # Outros parâmetros e configurações
 
