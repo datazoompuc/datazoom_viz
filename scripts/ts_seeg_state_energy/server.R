@@ -14,7 +14,8 @@ get_server <- function(files, param) {
 
     # Carrega dados
     df <- readRDS(files$db_file) %>% 
-      filter(processos_geradores_emissoes != "Nao Identificado")
+      filter(processos_geradores_emissoes != "Nao Identificado") %>% 
+      filter(processos_geradores_emissoes != "Producao de Combustiveis")
     
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))

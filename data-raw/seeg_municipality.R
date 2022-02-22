@@ -6,8 +6,7 @@
 #seeg_farming
 seeg_municipality_farming= load_seeg(dataset = 'seeg_farming', geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_farming= seeg_municipality_farming%>%
-  dplyr::rename(time= .data$Ano, group= .data$municipio)%>%
-  dplyr::select(-territorio,-ibge)
+  dplyr::rename(time= .data$Ano, group= .data$municipio)
 ##saving f
 saveRDS(seeg_municipality_farming,
         'data/seeg_municipality_farming.rds'
@@ -26,8 +25,7 @@ saveRDS(seeg_municipality_industry,
 #seeg_energy
 seeg_municipality_energy= load_seeg(dataset = "seeg_energy", geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_energy= seeg_municipality_energy%>%
-  dplyr::rename(time= .data$Ano, group= .data$municipio)%>%
-  dplyr::select(-territorio,-ibge)
+  dplyr::rename(time= .data$Ano, group= .data$municipio)
 
 ##saving f
 saveRDS(seeg_municipality_energy,
@@ -37,8 +35,7 @@ saveRDS(seeg_municipality_energy,
 #seeg_land
 seeg_municipality_land= load_seeg(dataset = "seeg_land", geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_land= seeg_municipality_land%>%
-  dplyr::rename(time= .data$Ano, group= .data$municipio)%>%
-  dplyr::select(-territorio,-ibge)
+  dplyr::rename(time= .data$Ano, group= .data$municipio)
 
 ##saving f
 saveRDS(seeg_municipality_land,
@@ -48,8 +45,7 @@ saveRDS(seeg_municipality_land,
 #seeg_residuals
 seeg_municipality_residuals= load_seeg(dataset = "seeg_residuals", geo_level = 'municipality', raw_data = FALSE, language = 'pt')
 seeg_municipality_residuals= seeg_municipality_residuals%>%
-  dplyr::rename(time= .data$Ano, group= .data$municipio)%>%
-  dplyr::select(-territorio,-ibge)
+  dplyr::rename(time= .data$Ano, group= .data$municipio)
 
 ##saving f
 saveRDS(seeg_municipality_residuals,
@@ -65,37 +61,37 @@ saveRDS(seeg_municipality_residuals,
 seeg_municipality_farming= readRDS('data/seeg_municipality_farming.rds')
 farming_var= colnames(seeg_municipality_farming)
 
-metadata_seeg_municipality_farming= tibble::tibble(
+seeg_municipality_farming_dic= tibble::tibble(
   var = farming_var,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = c('Ano da Pesquisa', 'Identificador Geográfico', 'Setor Econômico', 'Processo de Geração das Emissões', 'Fonte de Emissões', 'Emissores', 'Gás Emitido', 'Atividade Econômica', 'Produto', 'Valor', 'Emissores Diretos/Indiretos', 'Tipo de Emissão', 'Emissão/Remoção'),
+  label = c('Ano da Pesquisa', 'Identificador Geográfico','Estado','Código IBGE', 'Setor Econômico', 'Processo de Geração das Emissões', 'Fonte de Emissões', 'Emissores', 'Gás Emitido', 'Atividade Econômica', 'Produto', 'Valor', 'Emissores Diretos/Indiretos', 'Tipo de Emissão', 'Emissão/Remoção'),
   source = "SEEG - Observatório do Clima",
   tipo = 1,
-  unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas',NA,NA,NA),
-  categoria= c("Unidade de Tempo","Localizaçao", rep('Meio Ambiente', 11)), 
-  subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 11))
+  unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas',NA,NA,NA),
+  categoria= c("Unidade de Tempo","Localização","Localização","Localização", rep('Meio Ambiente', 11)), 
+  subcategoria = c('Ano da Pesquisa', 'Identificador Geográfico', 'Identificador Geográfico', 'Identificador Geográfico', rep('Emissão de Gases de Efeito Estufa', 11))
 )
 
 #saving f
-write.csv(metadata_seeg_municipality_farming, file = "./data/seeg_municipality_farming_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_municipality_farming_dic, file = "./data/seeg_municipality_farming_dic.csv", fileEncoding = "UTF-8")
 
 
 #seeg_industry
 seeg_municipality_industry= readRDS('data/seeg_municipality_industry.rds')
 industry_var= colnames(seeg_state_industry)
 
-metadata_seeg_municipality_industry= tibble::tibble(
+seeg_municipality_industry_dic= tibble::tibble(
   var = farming_var ,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = label_animal,
+  label = c('Ano da Pesquisa', 'Identificador Geográfico', 'Setor Econômico', 'Processo de Geração das Emissões','Produção Geradora das Emissões','Emissores', 'Gás Emitido', 'Atividade Econômica', 'Produto', 'Valor','Emissão'),
   source = "SEEG - Observatório do Clima",
   tipo = 1,
   unidade = ,
@@ -109,61 +105,61 @@ write.csv(metadata_seeg_municipality_industry, file = "./data/seeg_municipality_
 seeg_municipality_energy= readRDS('data/seeg_municipality_energy.rds')
 energy_var= colnames(seeg_municipality_energy)
 
-metadata_seeg_municipality_energy= tibble::tibble(
+seeg_municipality_energy_dic= tibble::tibble(
   var = energy_var ,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = c('Ano da Pesquisa', 'Identificador Geogr?fico', 'Setor Econ?mico','Tipo de Emiss?o',  'Processo de Gera??o das Emiss?es', 'Atividade Econ?mica', 'Fonte de Emiss?es', 'Emissores', 'Emiss?o/Remo??o Bunker', 'G?s Emitido',  'Produto', 'Valor'),
-  source = "SEEG - Observat?rio do Clima",
+  label = c('Ano da Pesquisa', 'Identificador Geográfico','Estado', 'Setor Econômico','Tipo de Emissão',  'Processo de Geração das Emissões', 'Atividade Econômica', 'Fonte de Emissões', 'Emissores', 'Emissão Bunker', 'Gás Emitido','Código IBGE', 'Produto', 'Valor'),
+  source = "SEEG - Observatório do Clima",
   tipo = 1,
-  unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas'),
-  categoria= c("Unidade de Tempo","Localiza?ao", rep('Meio Ambiente', 10)), 
-  subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emiss?o de Gases de Efeito Estufa', 10))
+  unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas'),
+  categoria= c("Unidade de Tempo","Localização","Localização", rep('Meio Ambiente', 8),"Localização", rep('Meio Ambiente', 2)), 
+  subcategoria = c('Ano da Pesquisa', 'Identificador Geográfico', 'Identificador Geográfico', rep('Emissão de Gases de Efeito Estufa', 8), 'Identificador Geográfico', rep('Emissão de Gases de Efeito Estufa', 2))
 )
 #saving f
-write.csv(metadata_seeg_municipality_energy, file = "./data/seeg_municipality_energy_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_municipality_energy_dic, file = "./data/seeg_municipality_energy_dic.csv", fileEncoding = "UTF-8")
 
 #seeg_land
 seeg_municipality_land= readRDS('data/seeg_municipality_land.rds')
 land_var= colnames(seeg_municipality_land)
 
-metadata_seeg_municipality_land= tibble::tibble(
+seeg_municipality_land_dic= tibble::tibble(
   var = land_var ,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = c('Ano da Pesquisa', 'Identificador Geográfico', 'Setor', 'Processo de Geração das Emissões', 'Atividade Econômica', 'Bioma', 'Área Bioma', 'Local da Atividade Geradora','Atividade Geradora','Emissão/Remoção', 'Gás Emitido', 'Valor'),
+  label = c('Ano da Pesquisa', 'Identificador Geográfico','Estado', 'Setor', 'Processo de Geração das Emissões', 'Atividade Econômica', 'Bioma', 'Área Bioma', 'Local da Atividade Geradora','Atividade Geradora','Emissão/Remoção', 'Gás Emitido','Código IBGE', 'Valor'),
   source = "SEEG - Observatório do Clima",
   tipo = 1,
-  unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas'),
-  categoria= c("Unidade de Tempo","Localizaçao", rep('Meio Ambiente', 10)), 
-  subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
+  unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas'),
+  categoria= c("Unidade de Tempo","Localizaçao","Localizaçao", rep('Meio Ambiente', 9),"Localizaçao","Meio Ambiente"), 
+  subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 9), 'Identificador Geografico','Emissão de Gases de Efeito Estufa')
 )
 #saving f
-write.csv(metadata_seeg_municipality_land, file = "./data/seeg_municipality_land_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_municipality_land_dic, file = "./data/seeg_municipality_land_dic.csv", fileEncoding = "UTF-8")
 
 #seeg_residuals
 seeg_municipality_residuals= readRDS('data/seeg_municipality_residuals.rds')
 residuals_var= colnames(seeg_municipality_residuals)
 
-metadata_seeg_municipality_residuals= tibble::tibble(
+seeg_municipality_residuals_dic= tibble::tibble(
   var = residuals_var ,
   x = TRUE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
   slider = FALSE,
-  label = c('Ano da Pesquisa', 'Identificador Geográfico', 'Setor','Categoria de Emissão', 'Processo de Geração das Emissões','Atividade Geradora','Categoria dos Processos Geradores', 'Atividade Econômica', 'Produto', 'Valor','Emissão/Remoção Bunker', 'Gás Emitido'),
+  label = c('Ano da Pesquisa', 'Identificador Geográfico','Estado','Código IBGE','Setor','Categoria de Emissão', 'Processo de Geração das Emissões','Atividade Geradora','Categoria dos Processos Geradores', 'Atividade Econômica', 'Produto', 'Valor','Emissão/Remoção Bunker', 'Gás Emitido'),
   source = "SEEG - Observatório do Clima",
   tipo = 1,
-  unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas',NA,NA),
-  categoria= c("Unidade de Tempo","Localizaçao", rep('Meio Ambiente', 10)), 
-  subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
+  unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas',NA,NA),
+  categoria= c("Unidade de Tempo","Localizaçao","Localizaçao","Localizaçao", rep('Meio Ambiente', 10)), 
+  subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', 'Identificador Geografico', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
 )
 #saving f
-write.csv(metadata_seeg_municipality_residuals, file = "./data/seeg_municipality_residuals_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_municipality_residuals_dic, file = "./data/seeg_municipality_residuals_dic.csv", fileEncoding = "UTF-8")

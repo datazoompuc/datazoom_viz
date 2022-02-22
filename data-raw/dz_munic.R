@@ -99,6 +99,37 @@ prodes <- prodes %>% distinct(cod_ibge, ano, .keep_all = TRUE)
 # IBGE - PIB
 ###################
 # gdp <- readRDS(file = "data/pib_municipality_dza.rds") # necessario atualizar com esses dados aqui
+
+#código da atualização para incluir dados de 2018 e 2019
+# gdp10_19_= read.csv2("data/pibsmunics10_19_.csv")
+# 
+# gdp18_19= gdp10_19_%>%
+#   dplyr::filter(Ano >= 2018)%>%
+#   dplyr::filter(Amazônia.Legal == 'Sim')%>%
+#   dplyr::select(Código.do.Município,
+#                 Nome.do.Município,
+#                 Sigla.da.Unidade.da.Federação,
+#                 Ano, 
+#                 Produto.Interno.Bruto...a.preços.correntes..R..1.000.,
+#                 Produto.Interno.Bruto.per.capita...a.preços.correntes..R..1.00.)%>%
+#   tidyr::unite(Município, Nome.do.Município,Sigla.da.Unidade.da.Federação, sep=" - ")
+# 
+# class(gdp18_19$Produto.Interno.Bruto...a.preços.correntes..R..1.000.)= 'numeric'
+# class(gdp18_19$Produto.Interno.Bruto.per.capita...a.preços.correntes..R..1.00.)= 'numeric'
+# 
+# gdp18_19= gdp18_19%>%
+#   dplyr::mutate(Pop= round(1000*Produto.Interno.Bruto...a.preços.correntes..R..1.000./Produto.Interno.Bruto.per.capita...a.preços.correntes..R..1.00.),
+#                 .before= Produto.Interno.Bruto.per.capita...a.preços.correntes..R..1.00.)%>%
+#   dplyr::arrange(Código.do.Município)%>%
+#   dplyr::mutate(X= 12353:13896, .before= Código.do.Município)
+# 
+# colnames(gdp18_19)= colnames(gdp_og)
+# gdpatt= dplyr::bind_rows(gdp_og, gdp18_19)%>%
+#   dplyr::arrange(CodIBGE)
+# gdpatt$X= 1:13896
+# 
+# saveRDS(gdpatt, file = "data/gdp.rds")
+
 gdp <- readRDS(file = "data/gdp.rds")
 gdp <- gdp %>%
   janitor::clean_names()
@@ -367,7 +398,9 @@ dz_munic <- map_dz_munic %>% select(cod_ibge,
                                     area_plantada_dest_colheita_v40122,
                                     quant_v40122,
                                     area_plantada_dest_colheita_v40119,
-                                    quant_v40119)
+                                    quant_v40119,
+                                    gdp_deflacionado,
+                                    gd_ppc_deflacionado)
 
 
 dz_munic$estado <- dz_munic$uf
@@ -477,9 +510,9 @@ temp_param_table$label[temp_param_table$var == "prop_nao_floresta"] <- "Proporç
 temp_param_table$label[temp_param_table$var == "prop_hidrografia"] <- "Proporção de hidrografia na área do município"
 temp_param_table$label[temp_param_table$var == "pop"] <- "População"
 temp_param_table$label[temp_param_table$var == "gdp"] <- "PIB nominal"
-temp_param_table$label[temp_param_table$var == "gd_ppc"] <- "PIB percapita nominal"
+temp_param_table$label[temp_param_table$var == "gd_ppc"] <- "PIB per capita nominal"
 temp_param_table$label[temp_param_table$var == "gdp_deflacionado"] <- "PIB real (R$ 2021)"
-temp_param_table$label[temp_param_table$var == "gd_ppc_deflacionado"] <- "PIB percapita real (R$ 2021)"
+temp_param_table$label[temp_param_table$var == "gd_ppc_deflacionado"] <- "PIB per capita real (R$ 2021)"
 temp_param_table$label[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "Número de empresas e outras organizações"
 temp_param_table$label[temp_param_table$var == "cempre_n_ocupados"] <- "Número de pessoas ocupadas"
 temp_param_table$label[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "Número de pessoas ocupadas assalariadas"
@@ -518,10 +551,10 @@ temp_param_table$unidade[temp_param_table$var == "prop_floresta"] <- "%"
 temp_param_table$unidade[temp_param_table$var == "prop_nao_floresta"] <- "%"
 temp_param_table$unidade[temp_param_table$var == "prop_hidrografia"] <- "%"
 temp_param_table$unidade[temp_param_table$var == "pop"] <- "Pessoas"
-temp_param_table$unidade[temp_param_table$var == "gdp"] <- "R$"
+temp_param_table$unidade[temp_param_table$var == "gdp"] <- "1000 R$"
 temp_param_table$unidade[temp_param_table$var == "gd_ppc"] <- "R$"
-temp_param_table$unidade[temp_param_table$var == "gdp_deflacionado"] <- "R$"
-temp_param_table$unidade[temp_param_table$var == "gd_ppc_deflacionado"] <- "R$"
+temp_param_table$unidade[temp_param_table$var == "gdp_deflacionado"] <- "1000 R$"
+temp_param_table$unidade[temp_param_table$var == "gd_ppc_deflacionado"] <- "1000 R$"
 temp_param_table$unidade[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "Estabelecimentos"
 temp_param_table$unidade[temp_param_table$var == "cempre_n_ocupados"] <- "Pessoas"
 temp_param_table$unidade[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "Pessoas"
@@ -560,11 +593,11 @@ temp_param_table$var_group[temp_param_table$var == "prop_incremento"] <- "INPE -
 temp_param_table$var_group[temp_param_table$var == "prop_floresta"] <- "INPE - PRODES"
 temp_param_table$var_group[temp_param_table$var == "prop_nao_floresta"] <- "INPE - PRODES"
 temp_param_table$var_group[temp_param_table$var == "prop_hidrografia"] <- "INPE - PRODES"
-temp_param_table$var_group[temp_param_table$var == "pop"] <- "IBGE - CEMPRE"
-temp_param_table$var_group[temp_param_table$var == "gdp"] <- "IBGE - CEMPRE"
-temp_param_table$var_group[temp_param_table$var == "gd_ppc"] <- "IBGE - CEMPRE"
-temp_param_table$var_group[temp_param_table$var == "gdp_deflacionado"] <- "IBGE - CEMPRE"
-temp_param_table$var_group[temp_param_table$var == "gd_ppc_deflacionado"] <- "IBGE - CEMPRE"
+temp_param_table$var_group[temp_param_table$var == "pop"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "gdp"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "gd_ppc"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "gdp_deflacionado"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "gd_ppc_deflacionado"] <- "IBGE"
 temp_param_table$var_group[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "IBGE - CEMPRE"
 temp_param_table$var_group[temp_param_table$var == "cempre_n_ocupados"] <- "IBGE - CEMPRE"
 temp_param_table$var_group[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "IBGE - CEMPRE"

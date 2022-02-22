@@ -103,14 +103,14 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if(is.null(input$y) || input$y == "") {
-        text <- "Variável não selecionada"
+        text <- "Vari\u00e1vel n\u00e3o selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
         
-        text <-  paste0("Variação trimestral de ", y_col$label)
+        text <-  paste0("Evolu\u00e7\u00e3o trimestral de ", y_col$label)
         if(input$y_option)  {
-          text <-  paste0("Variação trimestral de ", y_col$label, "*")
+          text <-  paste0("Evolu\u00e7\u00e3o trimestral de ", y_col$label, "*")
         }
       }
       
@@ -121,7 +121,7 @@ get_server <- function(files, param) {
       if(is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <-  paste0("por Atividade econômica")
+        text <-  paste0("por atividade econ\u00f4mica")
       }
       
       text

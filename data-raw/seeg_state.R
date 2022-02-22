@@ -53,6 +53,7 @@ saveRDS(seeg_state_residuals,
         'data/seeg_state_residuals.rds'
 )
 
+
 #########
 ### Creating metadatabase -> SEEG
 #########
@@ -62,7 +63,7 @@ saveRDS(seeg_state_residuals,
 seeg_state_farming= readRDS('data/seeg_state_farming.rds')
 farming_var= colnames(seeg_state_farming)
 
-metadata_seeg_state_farming= tibble::tibble(
+seeg_state_farming_dic= tibble::tibble(
   var = farming_var,
   x = TRUE,
   y = TRUE,
@@ -85,7 +86,7 @@ write.csv(metadata_seeg_state_farming, file = "./data/seeg_state_farming_dic.csv
 seeg_state_industry= readRDS('data/seeg_state_industry.rds')
 industry_var= colnames(seeg_state_industry)
 
-metadata_seeg_state_industry= tibble::tibble(
+seeg_state_industry_dic= tibble::tibble(
   var = industry_var ,
   x = TRUE,
   y = TRUE,
@@ -103,10 +104,10 @@ metadata_seeg_state_industry= tibble::tibble(
 write.csv(metadata_seeg_state_industry, file = "./data/seeg_state_industry_dic.csv", fileEncoding = "UTF-8")
 
 #seeg_energy
-seeg_state_energy= readRDS('data/seeg_state_energy.rds')
+seeg_state_energy_og= readRDS('data/seeg_state_energy.rds')
 energy_var= colnames(seeg_state_energy)
 
-metadata_seeg_state_energy= tibble::tibble(
+seeg_state_energy_dic= tibble::tibble(
   var = energy_var ,
   x = TRUE,
   y = TRUE,
@@ -127,7 +128,7 @@ write.csv(metadata_seeg_state_energy, file = "./data/seeg_state_energy_dic.csv",
 seeg_state_land= readRDS('data/seeg_state_land.rds')
 land_var= colnames(seeg_state_land)
 
-metadata_seeg_state_land= tibble::tibble(
+seeg_state_land_dic= tibble::tibble(
   var = land_var ,
   x = TRUE,
   y = TRUE,
@@ -148,7 +149,7 @@ write.csv(metadata_seeg_state_land, file = "./data/seeg_state_land_dic.csv", fil
 seeg_state_residuals= readRDS('data/seeg_state_residuals.rds')
 residuals_var= colnames(seeg_state_residuals)
 
-metadata_seeg_state_residuals= tibble::tibble(
+seeg_state_residuals_dic= tibble::tibble(
   var = residuals_var ,
   x = TRUE,
   y = TRUE,
