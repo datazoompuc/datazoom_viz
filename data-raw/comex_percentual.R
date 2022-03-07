@@ -31,8 +31,7 @@ aux <- readRDS("data/auxiliar_cod_sh4.rds")
 aux$CO_SH4 <- sprintf("%04d", as.numeric(aux$CO_SH4))
 data$cod_sh4 <- str_replace_all(data$cod_sh4, setNames(aux$NO_SH4_POR, aux$CO_SH4))
 
-data$ano <- NULL
-
+colnames(data) <- c("time", "group", "value")
 saveRDS(data, "data/comex_exp_perc_sh4_sel.rds")
 
 
@@ -59,15 +58,17 @@ temp_param_table <- tibble(
   subcategoria = "Comércio exterior"
 )
 
-temp_param_table$label[1] <- "Produto (SH4)"
-temp_param_table$label[2] <- "Valor"
-temp_param_table$desc[1] <- "Produto (SH4)"
-temp_param_table$desc[2] <- "Valor"
-temp_param_table$x <- c(FALSE, TRUE)
-temp_param_table$y <- c(FALSE, TRUE)
-temp_param_table$color <- c(TRUE, FALSE)
-temp_param_table$size <- c(FALSE, TRUE)
-temp_param_table$slider <- c(FALSE, TRUE)
+temp_param_table$label[2] <- "Produto (SH4)"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$label[3] <- "Valor"
+temp_param_table$desc[2] <- "Produto (SH4)"
+temp_param_table$desc[1] <- "Ano"
+temp_param_table$desc[3] <- "Valor"
+temp_param_table$x <- c(FALSE, FALSE, TRUE)
+temp_param_table$y <- c(FALSE, FALSE, TRUE)
+temp_param_table$color <- c(FALSE, TRUE, FALSE)
+temp_param_table$size <- c(FALSE, FALSE, TRUE)
+temp_param_table$slider <- c(FALSE, FALSE, TRUE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic.csv", fileEncoding = "UTF-8")
