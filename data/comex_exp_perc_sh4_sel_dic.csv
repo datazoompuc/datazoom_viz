@@ -1,0 +1,3 @@
+"","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
+"1","group",FALSE,FALSE,TRUE,FALSE,FALSE,"Produto (SH4)","Produto (SH4)","Comex",1,"R$","Economia","Comércio exterior"
+"2","value",TRUE,TRUE,FALSE,TRUE,TRUE,"Valor","Valor","Comex",1,"R$","Economia","Comércio exterior"
