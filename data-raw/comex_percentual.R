@@ -53,7 +53,7 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "%",
   categoria= "Economia", 
   subcategoria = "Comércio exterior"
 )

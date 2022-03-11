@@ -14,11 +14,13 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file)
   
-  # Reduzir nome dos grupos
+  # Reduzir nome dos grupos e passar para %
   df <- df %>% 
-    mutate(group = ifelse(nchar(group) >= 40,
+    mutate(lab = group,
+           group = ifelse(nchar(group) >= 40,
                           paste0(substr(group, 1, 40), "..."),
-                          group))
+                          group),
+           value = value * 100)
   
   server <- function(input, output, session) {
     
@@ -86,7 +88,7 @@ get_server <- function(files, param) {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
 
-        text <- paste0("Ranking de ", x_col$label)
+        text <- "Ranking da Proporção das Exportações Mundiais vindas da Amazônia"
       }
 
       text
@@ -142,10 +144,11 @@ get_server <- function(files, param) {
             df[color_col$var],
             df["group"],
             df["group"],
-            df[id_col$var]
+            df[id_col$var],
+            df["lab"]
           )
 
-          colnames(df_p) <- c("x", "y", "color", "text", "group", "id")
+          colnames(df_p) <- c("x", "y", "color", "text", "group", "id", "lab")
 
           # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
@@ -180,13 +183,13 @@ get_server <- function(files, param) {
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
-            "<b>", df_p$text, "</b><br>",
+            "<b>", df_p$lab, "</b><br>",
             x_col$label, ": ", format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
             y_col$label, ": ", df_p$y, "<br>",
-            color_col$label, ": ", df_p$color
+            "Unidade de medida: <b>", x_col$unidade, "</b>"
           )
 
           # Define paleta de cores

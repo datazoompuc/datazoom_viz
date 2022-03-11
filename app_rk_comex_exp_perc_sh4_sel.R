@@ -29,7 +29,7 @@ param$id_def <- "group" # variável padrão de id
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil"
+param$plot_desc <- "Comércio exterior na Amazônia (COMEX): Valor da exportação de produtos"
 
 # Outros parâmetros e configurações
 
