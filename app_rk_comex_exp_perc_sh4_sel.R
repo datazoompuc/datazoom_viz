@@ -32,6 +32,9 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Comércio exterior na Amazônia (COMEX): Valor da exportação de produtos"
 
 # Outros parâmetros e configurações
+param$filter_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos")
+param$filter_def <- c("Produtos Compativeis com a Floresta")
+
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

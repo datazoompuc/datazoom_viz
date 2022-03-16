@@ -2,3 +2,4 @@
 "1","time",FALSE,FALSE,FALSE,FALSE,FALSE,"Ano","Ano","Comex",1,"%","Economia","Comércio exterior"
 "2","group",FALSE,FALSE,TRUE,FALSE,FALSE,"Produto (SH4)","Produto (SH4)","Comex",1,"%","Economia","Comércio exterior"
 "3","value",TRUE,TRUE,FALSE,TRUE,TRUE,"Valor","Valor","Comex",1,"%","Economia","Comércio exterior"
+"4","floresta",FALSE,FALSE,FALSE,FALSE,FALSE,"Floresta","Produtos Compatíveis com a Floresta","Comex",1,"%","Economia","Comércio exterior"

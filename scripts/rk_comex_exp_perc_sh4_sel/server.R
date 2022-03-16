@@ -12,10 +12,7 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
   
   # Carrega dados
-  df <- readRDS(files$db_file)
-  
-  # Reduzir nome dos grupos e passar para %
-  df <- df %>% 
+  df <- readRDS(files$db_file) %>% 
     mutate(lab = group,
            group = ifelse(nchar(group) >= 40,
                           paste0(substr(group, 1, 40), "..."),
@@ -24,6 +21,18 @@ get_server <- function(files, param) {
   
   server <- function(input, output, session) {
     
+    df_reactived <- reactive({
+    
+      # filtrar para produtos da floresta
+      if(input$filter == "Produtos Compativeis com a Floresta") {
+        w <- df %>% filter(floresta)
+      } else {
+        w <- df
+      }
+      
+      return(w)
+    })
+    
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -31,17 +40,10 @@ get_server <- function(files, param) {
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       # se input está vazio preenche com valor aleatório da lista de colunas
-      if (input$x == "") {
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = sample(param$x_cols$var, 1)
-        )
-      }
-
-      if (input$color == "") {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = sample(param$color_cols$var, 1)
+      if (input$filter == "") {
+        updateSelectInput(session, "filter",
+          choices = param$filter_choices,
+          selected = sample(param$filter_choices, 1)
         )
       }
     }
@@ -49,8 +51,7 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "x=", input$x,
-        "&", "color=", input$color
+        "?", "filter=", input$filter
       )
       updateQueryString(q_string, mode = "replace")
     }
@@ -60,18 +61,10 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
-      if (!is.null(query[["x"]])) {
-        # se tem x na url atribui valor ao selecinput x
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = query[["x"]]
-        )
-      }
-
-      if (!is.null(query[["color"]])) {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = query[["color"]]
+      if (!is.null(query[["filter"]])) {
+        updateSelectInput(session, "filter",
+          choices = param$filter_choices,
+          selected = query[["filter"]]
         )
       }
     }
@@ -81,13 +74,10 @@ get_server <- function(files, param) {
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "" ||
-        is.null(input$color) || input$color == "") {
+      if (is.null(input$filter) || input$filter == "") {
         text <- "Variável não selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
-
         text <- "Ranking da Proporção das Exportações Mundiais vindas da Amazônia"
       }
 
@@ -97,11 +87,10 @@ get_server <- function(files, param) {
       text <- " "
 
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$color) || input$color == "") {
+      if (is.null(input$filter) || input$filter == "") {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        color_col <- param$table[which(param$table$var == input$color), ]
         text <- paste0("Amazônia Legal")
       }
 
@@ -120,17 +109,16 @@ get_server <- function(files, param) {
         {
 
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$x) || input$x == "" ||
-            is.null(input$color) || input$color == "") {
+          if (is.null(input$filter) || input$filter == "") {
             fig <- plotly_empty()
             stop()
           }
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == input$x), ]
-          color_col <- param$table[which(param$table$var == input$color), ]
-          slider_col <- param$table[which(param$table$var == param$slider_def), ]
-          text_col <- param$table[which(param$table$var == param$text_def), ]
+          x_col <- param$table[which(param$table$var == "value"), ]
+          color_col <- param$table[which(param$table$var == "group"), ]
+          slider_col <- param$table[which(param$table$var == "NA"), ]
+          text_col <- param$table[which(param$table$var == "group"), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
 
           # Cria coluna vazia para o ranking
@@ -138,6 +126,8 @@ get_server <- function(files, param) {
           y_col$var <- "rank"
           y_col$label <- "Ranking"
 
+          df <- df_reactived()
+          
           df_p <- data.frame(
             df[x_col$var],
             NA,
@@ -398,8 +388,7 @@ get_server <- function(files, param) {
         }
       )
       fig
-    }) %>%
-      bindCache(input$x, input$color)
+    }) 
 
     # Observa eventos
     observe({

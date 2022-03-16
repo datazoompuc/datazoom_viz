@@ -15,23 +15,12 @@ get_ui <- function(files, param) {
         p(class = "vars", "VARI\u00C1VEIS:"),
         div(
           class = "var_selec_group",
-          # Seleciona variável do eixo x
-          selectInput(
-            inputId = "x",
-            label = "Ranking - eixo horizontal (x):",
-            choices = param$x_choices,
-            selected = param$x_def,
-            width = "100%"
-          )
-        ),
-        div(
-          class = "var_selec_group",
           # Seleciona variável de cor
           selectInput(
-            inputId = "color",
-            label = "Cor das barras:",
-            choices = param$color_choices,
-            selected = param$color_def,
+            inputId = "filter",
+            label = "Tipos de Produto:",
+            choices = param$filter_choices,
+            selected = param$filter_def,
             width = "100%"
           )
         ),
