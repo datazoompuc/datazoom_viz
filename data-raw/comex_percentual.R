@@ -71,7 +71,7 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "%",
+  unidade = "% das exportações mundiais",
   categoria= "Economia", 
   subcategoria = "Comércio exterior"
 )
