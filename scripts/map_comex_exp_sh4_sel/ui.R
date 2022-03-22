@@ -4,17 +4,6 @@
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Incluí script CSS
-    tags$style(type = "text/css", 
-      # remove o ultimo ano no slider (2018 e 2019 estavam um em cima do outro)
-      # remove tracos intermediarios do slider
-      # move botao de play para a esquerda e para baixo
-      # aumenta tamanho do botao de play
-      "
-      .irs-grid-text.js-grid-text-10 {display: none;}
-      .irs-grid-pol.small {display: none;}
-      .slider-animate-container {width: 5%; margin-top: 1px;}
-      .slider-animate-button {font-size: 20px;}
-    "),
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
@@ -26,31 +15,12 @@ get_ui <- function(files, param) {
         p(class = "vars", "VARI\u00C1VEIS::"),
         div(
           class = "var_selec_group",
-          # Seleciona variável do eixo x
-          selectInput(
-            inputId = "x",
-            label = "Seleciona variável (x)",
-            choices = param$x_choices,
-            selected = param$x_def,
-            width = "100%"
-          )
-        ),
-        # espaço vazio
-        div(class = "fakecheckbox", ),
-        div(
-          class = "var_selec_group",
           # Seleciona variável do eixo de data
-          sliderInput(inputId = "filter1",
+          selectInput(inputId = "filter1",
                       label = "Ano referente",
-                      min = param$year_inicio,
-                      max = param$year_final,
-                      value = param$year_final,
-                      step = 1,
-                      width = "100%",
-                      animate = animationOptions(interval = 3000,
-                                                 playButton = "\u25B6",
-                                                 pauseButton = "\u23F8"),
-                      sep = "")
+                      choices = param$year_inicio:param$year_final,
+                      selected = param$year_final,
+                      width = "100%")
         ),
       ),
       column(9,

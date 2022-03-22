@@ -28,18 +28,12 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      selected <- sample(sample(param$x_choices, 1)[[1]], 1)
-      updateSelectInput(session,
-        "x",
-        choices = param$x_choices,
-        selected = selected
-      )
+      
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "x=", input$x,
         "&", "filter=", input$filter1
       )
 
@@ -52,14 +46,6 @@ get_server <- function(files, param) {
       query <- parseQueryString(session$clientData$url_search)
 
       # Preenche filtro vazio
-      if (!is.null(query[["x"]])) {
-        # se tem x na url atribui valor ao selecinput x
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = query[["x"]]
-        )
-      }
-
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       updateSelectizeInput(session,
         "filter1",
@@ -71,7 +57,7 @@ get_server <- function(files, param) {
       query <- parseQueryString(session$clientData$url_search)
 
       # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter"]]) && is.null(query[["x"]])) {
+      if (is.null(query[["filter"]])) {
         random_inputs() # preenche inputs se estiverem vazios
       }
     }
@@ -80,11 +66,10 @@ get_server <- function(files, param) {
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "") {
+      if (is.null(input$filter1) || input$filter1 == "") {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
         text <- paste0("Mapa dos municípios da Amazônia Legal")
       }
 
@@ -92,12 +77,11 @@ get_server <- function(files, param) {
     })
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "") {
+      if (is.null(input$filter1) || input$filter1 == "") {
         text <- "Nenhuma variável selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Variável selecionada: ", x_col$label)
+        text <- "Principal produto exportado"
       }
 
       text
@@ -115,26 +99,25 @@ get_server <- function(files, param) {
 
       # Define paleta de cores
       pal1 <- pallete_continuous
-      if (!is.numeric(df_reactived()[[input$x]])) {
+      if (!is.numeric(df_reactived()[["produto_principal"]])) {
         pal1 <- pallete_discrete
       }
 
       # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
+      pal <- colorFactor(palette = pal1, domain = df[["produto_principal"]])
 
       tryCatch(
         {
           
           # Monta mapa
-
+          
           # Monta html do tooltip
-          x_col <- param$table[which(param$table$var == input$x), ]
+          x_col <- param$table[which(param$table$var == "produto_principal"), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
             "Nome do município: <b>", df_reactived()$nm_municip, "</b> <br>",
             "Estado: <b>", df_reactived()$uf, "</b> <br>",
-            x_col$label, ": <b>", df_reactived()[[input$x]], "</b> <br>",
-            "Unidade de medida: <b>", x_col$unidade, "</b>"
+            x_col$label, ": <b>", df_reactived()[["produto_principal"]], "</b> <br>"
           ) %>%
             lapply(htmltools::HTML)
 
@@ -148,7 +131,7 @@ get_server <- function(files, param) {
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = 0.7,
-              fillColor = ~ pal(df_reactived()[[input$x]]),
+              fillColor = ~ pal(df_reactived()[["produto_principal"]]),
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -159,7 +142,7 @@ get_server <- function(files, param) {
             ) %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df_reactived()[[input$x]],
+              values = ~ df_reactived()[["produto_principal"]],
               title = title_legend,
               opacity = 0.7
             )

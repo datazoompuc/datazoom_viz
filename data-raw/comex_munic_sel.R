@@ -47,8 +47,21 @@ agg_dat <- dat %>%
   complete(time, cod_ibge, group) %>% 
   replace_na(list(value = 0)) %>% 
   filter(!is.na(group), !is.na(time), !is.na(cod_ibge)) %>% 
-  pivot_wider(names_from = group, values_from = value)
+  pivot_wider(names_from = group, values_from = value) %>% 
+  rowwise() %>%
+  mutate(maximo_produto = max(c_across(`Cacau inteiro ou partido, em bruto ou torrado`:`Sumos de frutas (incluidos os mostos de uvas) ou de produtos horticolas, nao fermentados, sem adicao de alcool, com ou sem adicao de acucar ou de outros edulcorantes`)))
 
+agg_dat$produto_principal <- 
+  agg_dat %>% 
+  select(`Cacau inteiro ou partido, em bruto ou torrado`:`Sumos de frutas (incluidos os mostos de uvas) ou de produtos horticolas, nao fermentados, sem adicao de alcool, com ou sem adicao de acucar ou de outros edulcorantes`) %>% 
+  {names(.)[max.col(.)]}
+
+agg_dat <- agg_dat %>% 
+  mutate(produto_principal = ifelse(maximo_produto == 0, NA, produto_principal)) %>% 
+  mutate(lab = produto_principal,
+         produto_principal = ifelse(nchar(produto_principal) >= 40,
+                                    paste0(substr(produto_principal, 1, 40), "..."),
+                                    produto_principal))
 
 # merge with shape --------------------------------------------------------
 data <- sp::merge(shapefile, agg_dat) %>% 
@@ -94,11 +107,12 @@ temp_param_table <- tibble(
 temp_param_table$label <- temp_param_table$var
 temp_param_table$label[1] <- "Ano"
 temp_param_table$label[2] <- "Municipio"
-temp_param_table$x <- c(FALSE, FALSE, rep(TRUE, 16))
-temp_param_table$y <- c(FALSE, FALSE, rep(TRUE, 16))
-temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 16))
-temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 16))
-temp_param_table$slider <- c(TRUE, FALSE, rep(FALSE, 16))
+temp_param_table$label[20] <- "Principal produto exportado"
+temp_param_table$x <- c(FALSE, FALSE, rep(TRUE, 18), FALSE)
+temp_param_table$y <- c(FALSE, FALSE, rep(TRUE, 18), FALSE)
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 18), FALSE)
+temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 18), FALSE)
+temp_param_table$slider <- c(TRUE, FALSE, rep(FALSE, 18), FALSE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_sel_dic.csv", fileEncoding = "UTF-8")
