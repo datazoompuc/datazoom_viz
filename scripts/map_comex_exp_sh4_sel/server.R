@@ -28,7 +28,11 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      
+      updateSelectizeInput(session,
+                           "filter1",
+                           choices = param$filter_choices,
+                           selected = param$year_final
+      )
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
@@ -81,7 +85,7 @@ get_server <- function(files, param) {
         text <- "Nenhuma variável selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        text <- "Principal produto exportado"
+        text <- "Principal produto exportado compatível com a floresta"
       }
 
       text
