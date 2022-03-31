@@ -61,6 +61,50 @@ saveRDS(data_val_pais, "data/comex_exp_tot_sh2.rds")
 
 
 
+# exportação municipal da amazônia por tipo sh4
+dat <- matriz
+dat$mes <- NULL
+dat$nome_sh4 <- NULL
+dat$kg_liquido <- NULL
+dat$cod_pais <- NULL
+
+dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio + uf, dat, sum)
+
+dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
+aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
+dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH4_POR, aux2$CO_SH4))
+dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
+dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
+dat$uf <- NULL
+
+data_val <- dat
+colnames(data_val) <- c("time", "type", "group", "value")
+data_val <- aggregate(value ~ time + type + group, data_val, sum)
+
+datafinal_val_munic <- reshape(data_val, idvar = c("time", "type"), timevar = "group", direction = "wide")
+datafinal_val_sh2 <- reshape(data_val, idvar = c("time", "group"), timevar = "type", direction = "wide")
+
+labl <- colnames(datafinal_val_munic)
+labl <- labl[-c(1,2)]
+labl <- substr(labl, 7, 100)
+colnames(datafinal_val_munic) <- c("time", "group", labl)
+
+labl <- colnames(datafinal_val_sh2)
+labl <- labl[-c(1,2)]
+labl <- substr(labl, 7, 100)
+colnames(datafinal_val_sh2) <- c("time", "group", labl)
+
+datafinal_val_munic[is.na(datafinal_val_munic)] <- 0
+datafinal_val_sh2[is.na(datafinal_val_sh2)] <- 0
+
+datafinal_val_munic <- datafinal_val_munic[order(datafinal_val_munic$group, datafinal_val_munic$time),]
+datafinal_val_sh2 <- datafinal_val_sh2[order(datafinal_val_sh2$group, datafinal_val_sh2$time),]
+
+saveRDS(datafinal_val_munic, "data/comex_exp_munic_sh4.rds")
+saveRDS(datafinal_val_sh2, "data/comex_exp_sh4_munic.rds")
+
+
+
 # exportação municipal da amazônia por tipo sh2
 dat <- matriz
 dat$mes <- NULL
@@ -231,6 +275,82 @@ saveRDS(datafinal_val_pais_munic, "data/comex_exp_pais_sec.rds")
 #####################
 # Build Dictionary 
 #####################
+
+### exportação municipal da amazônia por tipo sh4
+datafinal <- readRDS(file = "data/comex_exp_munic_sh4.rds")
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Comex",
+  tipo = 1,
+  unidade = "R$",
+  categoria= "Economia", 
+  subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Produção sh4"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "Produção sh4"
+temp_param_table$desc[1] <- "Ano"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_dic.csv", fileEncoding = "UTF-8")
+
+
+
+### exportação municipal da amazônia por tipo sh4
+datafinal <- readRDS(file = "data/comex_exp_sh4_munic.rds")
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Comex",
+  tipo = 1,
+  unidade = "R$",
+  categoria= "Economia", 
+  subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Município"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[1] <- "Ano"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 1103))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 1103))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 1103))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 1103))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 1103))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_sh4_munic_dic.csv", fileEncoding = "UTF-8")
+
+
 
 ### exportação municipal da amazônia por tipo sh2
 datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
