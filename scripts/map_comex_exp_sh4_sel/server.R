@@ -20,6 +20,14 @@ get_server <- function(files, param) {
       w <- df %>%
         filter(time == input$filter1)
 
+      if (input$x == "Produtos Compativeis com a Floresta") {
+          w <- w %>% 
+            filter(floresta)
+      } else {
+        w <- w %>% 
+          filter(!floresta)
+      }
+      
       return(w)
     })
 
@@ -85,7 +93,7 @@ get_server <- function(files, param) {
         text <- "Nenhuma variável selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        text <- "Principal produto exportado compatível com a floresta"
+        text <- paste0("Principal produto exportado: ", input$x)
       }
 
       text
@@ -121,7 +129,9 @@ get_server <- function(files, param) {
           labels <- paste0(
             "Nome do município: <b>", df_reactived()$nm_municip, "</b> <br>",
             "Estado: <b>", df_reactived()$uf, "</b> <br>",
-            x_col$label, ": <b>", df_reactived()[["produto_principal"]], "</b> <br>"
+            x_col$label, ": <b>", df_reactived()[["produto_principal"]], "</b> <br>",
+            "Valor", ": ", df_reactived()$maximo_produto, "<br>",
+            "Unidade de medida: <b>", "% das exportações da Amazônia no ano", "</b>"
           ) %>%
             lapply(htmltools::HTML)
 

@@ -63,8 +63,75 @@ agg_dat <- agg_dat %>%
                                     paste0(substr(produto_principal, 1, 40), "..."),
                                     produto_principal))
 
+
+# aggregate with all products ---------------------------------------------
+agg_dat_all <- dat %>% 
+  group_by(ano, cod_municipio, nome_sh4) %>% 
+  summarise(value = sum(valor_fob)) %>% 
+  ungroup() %>% 
+  rename(time = ano, cod_ibge = cod_municipio, group = nome_sh4) %>% 
+  right_join(munis) %>% 
+  complete(time, cod_ibge, group) %>% 
+  replace_na(list(value = 0)) %>% 
+  filter(!is.na(group), !is.na(time), !is.na(cod_ibge)) %>% 
+  pivot_wider(names_from = group, values_from = value) %>% 
+  rowwise() %>%
+  mutate(maximo_produto_todos = max(c_across(`<<Tecidos turcos>>, exceto os artefactos da posicao 5806; tecidos tufados, exceto os artefactos da posicao 5703`:`Zinco em formas brutas`)))
+
+agg_dat_all$produto_principal_todos <- 
+  agg_dat_all %>% 
+  select(`<<Tecidos turcos>>, exceto os artefactos da posicao 5806; tecidos tufados, exceto os artefactos da posicao 5703`:`Zinco em formas brutas`) %>% 
+  {names(.)[max.col(.)]}
+
+agg_dat_all <- agg_dat_all %>% 
+  mutate(produto_principal_todos = ifelse(maximo_produto_todos == 0, NA, produto_principal_todos)) %>% 
+  mutate(lab_todos = produto_principal_todos,
+         produto_principal_todos = ifelse(nchar(produto_principal_todos) >= 40,
+                                    paste0(substr(produto_principal_todos, 1, 40), "..."),
+                                           produto_principal_todos))
+
+
+# join tables -------------------------------------------------------------
+agg_dat_selcolumns <- agg_dat %>% 
+  select(time, cod_ibge, maximo_produto, produto_principal, lab) %>% 
+  mutate(floresta = TRUE)
+
+agg_dat_all_selcolumns <- agg_dat_all %>% 
+  select(time, cod_ibge, 
+         maximo_produto = maximo_produto_todos, 
+         produto_principal = produto_principal_todos, 
+         lab = lab_todos) %>% 
+  mutate(floresta = FALSE)
+
+df_final <- rbind(agg_dat_selcolumns, agg_dat_all_selcolumns) %>% 
+  data.frame() %>% 
+  tibble()
+  
+
+# value as relative -------------------------------------------------------
+total_value_amz <- dat %>% 
+  group_by(ano, nome_sh4) %>% 
+  summarise(value = sum(valor_fob))
+
+change_to_relative_value <- function(valor, ano_produto, produto) {
+  
+  valor_total <- total_value_amz %>% 
+    filter(nome_sh4 == produto, ano == ano_produto) %>% 
+    pull(value)
+  
+  return((valor/valor_total) * 100)
+  
+}
+
+df_final <- df_final %>% 
+  rowwise() %>% 
+  mutate(maximo_produto = ifelse(maximo_produto != 0,
+                                 change_to_relative_value(maximo_produto, time, lab),
+                                 0))
+
+
 # merge with shape --------------------------------------------------------
-data <- sp::merge(shapefile, agg_dat) %>% 
+data <- sp::merge(shapefile, data.frame(df_final)) %>% 
   select(-fid, -cd_geocmu)
 
 st_geometry(data) <- data$geometry
@@ -84,7 +151,7 @@ saveRDS(data, "data/comex_exp_munic_sh4_sel.rds")
 
 # dictionary --------------------------------------------------------------
 # extract variables from data
-columns <- colnames(agg_dat)
+columns <- colnames(df_final)
 
 # generate dictionary
 temp_param_table <- tibble(
@@ -99,7 +166,7 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "% das exportações da Amazônia no ano",
   categoria= "Economia", 
   subcategoria = "Comercio exterior"
 )
@@ -107,12 +174,14 @@ temp_param_table <- tibble(
 temp_param_table$label <- temp_param_table$var
 temp_param_table$label[1] <- "Ano"
 temp_param_table$label[2] <- "Municipio"
-temp_param_table$label[20] <- "Principal produto exportado"
-temp_param_table$x <- c(FALSE, FALSE, rep(TRUE, 18), FALSE)
-temp_param_table$y <- c(FALSE, FALSE, rep(TRUE, 18), FALSE)
-temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 18), FALSE)
-temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 18), FALSE)
-temp_param_table$slider <- c(TRUE, FALSE, rep(FALSE, 18), FALSE)
+temp_param_table$label[3] <- "Valor relativo do principal produto exportado"
+temp_param_table$label[4] <- "Principal produto exportado"
+temp_param_table$label[6] <- "Produtos Compatíveis com a Floresta"
+temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
+temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
+temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE)
+temp_param_table$size <- c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$slider <- c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_sel_dic.csv", fileEncoding = "UTF-8")

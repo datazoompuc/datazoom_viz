@@ -23,7 +23,7 @@ source(files$server_script)
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "" # variável padrão do eixo x
+param$x_def <- "Produtos Compativeis com a Floresta" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$color_def <- "" # variável padrão de cor
 param$size_def <- "" # variável padrão de tamanho
@@ -35,7 +35,7 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Comércio exterior na Amazônia (COMEX): Valor da exportação de produtos"
 
 # Outros parâmetros e configurações
-param$x_choices[[1]] <- NULL
+param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos")
 param$year_inicio <- 1997
 param$year_final <- 2021
 
