@@ -28,12 +28,12 @@ param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
 
 # Descrição da visualização no eixo de opções
-param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Comércio exterior na Amazônia (COMEX): Valor da exportação de produtos"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX) em rela\u00e7\u00e3o ao comércio internacional (BACI): Propor\u00e7\u00e3o do valor da exporta\u00e7\u00e3o de produtos"
 
 # Outros parâmetros e configurações
-param$filter_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos")
-param$filter_def <- c("Produtos Compativeis com a Floresta")
+param$filter_choices <- c("Produtos Compat\u00edveis com a Floresta", "Todos os Produtos")
+param$filter_def <- c("Produtos Compat\u00edveis com a Floresta")
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
