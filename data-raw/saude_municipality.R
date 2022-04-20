@@ -8,7 +8,11 @@ library(readxl)
 df <- read_csv("data/ext_data/saude/Dados A Saude na Amazonia Legal/dados_mun/df_mun.csv") %>% 
   select(-N) %>% 
   rename(cod_ibge = cod_mun) %>% 
-  distinct()
+  distinct() %>% 
+  mutate(d_am_legal = factor(d_am_legal, levels = c(0, 1), labels = c("Não", "Sim")),
+         d_hidro_oper = factor(d_hidro_oper, levels = c(0, 1), labels = c("Não", "Sim")),
+         d_min_ilegal = factor(d_min_ilegal, levels = c(0, 1), labels = c("Não", "Sim"))
+         )
 
 dz_munic <- read_rds("data/dz_munic.rds") %>% 
   sf::st_drop_geometry() %>% 
@@ -45,11 +49,11 @@ temp_param_table <- tibble(
   geometry = FALSE,
   label = columns,
   desc = columns,
-  var_group = "Saude",
+  var_group = "Saúde - DATASUS",
   tipo = 1,
   unidade = "",
   categoria= "Social", 
-  subcategoria = "Saude"
+  subcategoria = "Saúde"
 )
 
 temp_param_table$label <- temp_param_table$var

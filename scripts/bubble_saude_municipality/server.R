@@ -200,9 +200,21 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            size_col$label, ": ", df_p$size, "<br>",
+            x_col$label, ": ", format(df_p$x, 
+                                      scientific = FALSE,
+                                      digits = 2,
+                                      decimal.mark = ",", 
+                                      big.mark = "."), "<br>",
+            y_col$label, ": ", format(df_p$y, 
+                                      scientific = FALSE,
+                                      digits = 2,
+                                      decimal.mark = ",", 
+                                      big.mark = "."), "<br>",
+            size_col$label, ": ", format(df_p$size, 
+                                         scientific = FALSE,
+                                         digits = 2,
+                                         decimal.mark = ",", 
+                                         big.mark = "."), "<br>",
             color_col$label, ": ", df_p$color
           )
 
