@@ -131,8 +131,12 @@ get_server <- function(files, param) {
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
             "Nome do município: <b>", df_reactived()$nm_municip, "</b> <br>",
-            "Estado: <b>", df_reactived()$estado, "</b> <br>",
-            x_col$label, ": <b>", df_reactived()[[input$x]], "</b> <br>",
+            "Estado: <b>", df_reactived()$uf, "</b> <br>",
+            x_col$label, ": <b>", format(df_reactived()[[input$x]], 
+                                         scientific = FALSE,
+                                         digits = 2,
+                                         decimal.mark = ",", 
+                                         big.mark = "."), "</b> <br>",
             "Unidade de medida: <b>", x_col$unidade, "</b>"
           ) %>%
             lapply(htmltools::HTML)
