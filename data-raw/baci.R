@@ -2,12 +2,6 @@ library(tidyverse)
 library(datazoom.amazonia)
 
 #dados finais divergindo um pouco do bruno
-# > max(abs(exp_mun_raw$valor_total-world_trade$total))
-# [1] 2435674
-# > mean(abs(exp_mun_raw$valor_total-world_trade$total))
-# [1] 463724.7
-# > sd(abs(exp_mun_raw$valor_total-world_trade$total))
-# [1] 590322.8
 
 ### 2019 DATA
 #BACI
