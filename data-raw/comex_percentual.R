@@ -95,9 +95,9 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "% das exporta??es mundiais",
+  unidade = "% das exporta\u00e7\u00f5es mundiais",
   categoria= "Economia", 
-  subcategoria = "Com?rcio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
 temp_param_table$label[2] <- "Produto (SH4)"
@@ -107,7 +107,7 @@ temp_param_table$label[4] <- "Floresta"
 temp_param_table$desc[2] <- "Produto (SH4)"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$desc[3] <- "Valor"
-temp_param_table$desc[4] <- "Produtos Compat?veis com a Floresta"
+temp_param_table$desc[4] <- "Produtos Compat\u00edveis com a Floresta"
 temp_param_table$x <- c(FALSE, FALSE, TRUE, FALSE)
 temp_param_table$y <- c(FALSE, FALSE, TRUE, FALSE)
 temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE)
