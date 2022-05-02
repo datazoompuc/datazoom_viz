@@ -144,6 +144,28 @@ data <- rmapshaper::ms_simplify(data,
                                 keep_shapes = TRUE, 
                                 keep = 0.01)
 
+#simplifying forest products names to fit the map
+data= data%>%
+  mutate(lab= case_when(lab == "Peixes vivos" ~ "Peixes vivos",
+                        lab == "Peixes frescos ou refrigerados, exceto os files de peixes e outra carne de peixes da posicao 03.04" ~ "Peixes frescos/refrigerados, exceto filés",
+                        lab == "Peixes congelados, exceto os files de peixes e outra carne de peixes da posicao 03.04" ~ "Peixes congelados, exceto filés",
+                        lab == "Files de peixes e outra carne de peixes (mesmo picada), frescos, refrigerados ou congelados" ~ "Filés de peixe e outras carnes",
+                        lab == "Peixes secos, salgados ou em salmoura; peixes defumados, mesmo cozidos antes ou durante a defumacao; farinhas, pos e pellets, de peixe, proprios para alimentacao humana" ~ "Peixes secos, salgados ou cozidos",
+                        lab == "Crustaceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crustaceos com casca, cozidos em agua ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, po e pellets de crustaceos, pr" ~ "Crustaceos vivos ou não, para alimento",
+                        lab == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Cocos e castanhas do Brasil e de caju",
+                        lab == "Frutas, nao cozidas ou cozidas em agua ou vapor, congeladas, mesmo adicionadas de acucar ou de outros edulcorantes" ~ "Frutas cozidas ou não, misturadas ou não",
+                        lab == "Pimenta (do genero Piper); pimentos dos generos Capsicum ou Pimenta, secos ou triturados ou em po" ~ "Pimentas secas ou trituradas",
+                        lab == "Outras sementes e frutos oleaginosos, mesmo triturados" ~ "Outras sementes e oleaginosos",
+                        lab == "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (balsamos por exemplo), naturais" ~ "Gomas e resinas naturais",
+                        lab == "Oleo de palma e respectivas fraccoes, mesmo refinados, mas nao quimicamente modificados" ~ "Óleo de palma não modificado",
+                        lab == "Outras gorduras e oleos vegetais (incluido o oleo de jojoba) e respectivas fraccoes, fixos, mesmo refinados, mas nao quimicamente modificados" ~ "Outras gorduras e óleos vegetais",
+                        lab == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Cacau bruto ou torrado",
+                        lab == "Frutas e outras partes comestiveis de plantas, preparadas ou conservadas de outro modo, com ou sem adicao de acucar ou de outros edulcorantes ou de alcool, nao especificadas nem compreendidas noutras posicoes" ~ "Frutas e outros comestíveis de planta",
+                        lab == "Sumos de frutas (incluidos os mostos de uvas) ou de produtos horticolas, nao fermentados, sem adicao de alcool, com ou sem adicao de acucar ou de outros edulcorantes" ~ "Sumos de frutas, com ou sem aditivos",
+                        TRUE ~ lab))
+
+data$produto_principal = data$lab
+
 colnames(data) <- cols
 
 saveRDS(data, "data/comex_exp_munic_sh4_sel.rds")

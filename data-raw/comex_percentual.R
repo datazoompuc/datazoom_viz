@@ -3,6 +3,8 @@ library(magrittr)
 library(tidyverse)
 library(stringr)
 
+
+###SH4
 dat <- readRDS(file = "data/comex_munic_raw.rds")
 
 dat$mes <- NULL
