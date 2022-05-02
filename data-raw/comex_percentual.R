@@ -35,24 +35,45 @@ data$cod_sh4 <- str_replace_all(data$cod_sh4, setNames(aux$NO_SH4_POR, aux$CO_SH
 
 data <- data %>% 
   mutate(floresta = ifelse(cod_sh4 %in% c("Peixes vivos",
-                                          "Peixes frescos ou refrigerados, exceto os fil?s de peixes e outra carne de peixes da posi??o 03.04",
-                                          "Peixes congelados, exceto os fil?s de peixes e outra carne de peixes da posi??o 03.04",
-                                          "Fil?s de peixes e outra carne de peixes (mesmo picada), frescos, refrigerados ou congelados",
-                                          "Peixes secos, salgados ou em salmoura; peixes defumados, mesmo cozidos antes ou durante a defuma??o; farinhas, p?s e pellets, de peixe, pr?prios para alimenta??o humana",
-                                          "Crust?ceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crust?ceos com casca, cozidos em ?gua ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, p? e pellets de crust?ceos, pr",
+                                          "Peixes frescos ou refrigerados, exceto os filés de peixes e outra carne de peixes da posição 03.04",
+                                          "Peixes congelados, exceto os filés de peixes e outra carne de peixes da posição 03.04",
+                                          "Filés de peixes e outra carne de peixes (mesmo picada), frescos, refrigerados ou congelados",
+                                          "Peixes secos, salgados ou em salmoura; peixes defumados, mesmo cozidos antes ou durante a defumação; farinhas, pós e pellets, de peixe, próprios para alimentação humana",
+                                          "Crustáceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crustáceos com casca, cozidos em água ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, pó e pellets de crustáceos, pr",
                                           "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
-                                          "Frutas, n?o cozidas ou cozidas em ?gua ou vapor, congeladas, mesmo adicionadas de a??car ou de outros edulcorantes",
-                                          "Pimenta (do g?nero Piper); pimentos dos g?neros Capsicum ou Pimenta, secos ou triturados ou em p?",
+                                          "Frutas, não cozidas ou cozidas em água ou vapor, congeladas, mesmo adicionadas de açúcar ou de outros edulcorantes",
+                                          "Pimenta (do gênero Piper); pimentos dos gêneros Capsicum ou Pimenta, secos ou triturados ou em pó",
                                           "Outras sementes e frutos oleaginosos, mesmo triturados",
-                                          "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (b?lsamos por exemplo), naturais",
-                                          "?leo de palma e respectivas frac??es, mesmo refinados, mas n?o quimicamente modificados",
-                                          "Outras gorduras e ?leos vegetais (inclu?do o ?leo de jojoba) e respectivas frac??es, fixos, mesmo refinados, mas n?o quimicamente modificados",
+                                          "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (bálsamos por exemplo), naturais",
+                                          "Óleo de palma e respectivas fracções, mesmo refinados, mas não quimicamente modificados",
+                                          "Outras gorduras e óleos vegetais (incluído o óleo de jojoba) e respectivas fracções, fixos, mesmo refinados, mas não quimicamente modificados",
                                           "Cacau inteiro ou partido, em bruto ou torrado",
-                                          "Frutas e outras partes comest?veis de plantas, preparadas ou conservadas de outro modo, com ou sem adi??o de a??car ou de outros edulcorantes ou de ?lcool, n?o especificadas nem compreendidas noutras posi??es",
-                                          "Sumos de frutas (inclu?dos os mostos de uvas) ou de produtos hort?colas, n?o fermentados, sem adi??o de ?lcool, com ou sem adi??o de a??car ou de outros edulcorantes"),
+                                          "Frutas e outras partes comestíveis de plantas, preparadas ou conservadas de outro modo, com ou sem adição de açúcar ou de outros edulcorantes ou de álcool, não especificadas nem compreendidas noutras posições",
+                                          "Sumos de frutas (incluídos os mostos de uvas) ou de produtos hortícolas, não fermentados, sem adição de álcool, com ou sem adição de açúcar ou de outros edulcorantes"),
                            TRUE, FALSE))
 
+
 colnames(data) <- c("time", "group", "value", "floresta")
+
+data= data%>%
+  mutate(group= case_when(group == "Peixes vivos" ~ "Peixes vivos",
+                        group == "Peixes frescos ou refrigerados, exceto os filés de peixes e outra carne de peixes da posição 03.04" ~ "Peixes frescos/refrigerados, exceto filés",
+                        group == "Peixes congelados, exceto os filés de peixes e outra carne de peixes da posição 03.04" ~ "Peixes congelados, exceto filés",
+                        group == "Filés de peixes e outra carne de peixes (mesmo picada), frescos, refrigerados ou congelados" ~ "Filés de peixe e outras carnes",
+                        group == "Peixes secos, salgados ou em salmoura; peixes defumados, mesmo cozidos antes ou durante a defumação; farinhas, pós e pellets, de peixe, próprios para alimentação humana" ~ "Peixes secos, salgados ou cozidos",
+                        group == "Crustáceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crustáceos com casca, cozidos em água ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, pó e pellets de crustáceos, pr" ~ "Crustaceos vivos ou não, para alimento",
+                        group == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Cocos e castanhas do Brasil e de caju",
+                        group == "Frutas, não cozidas ou cozidas em água ou vapor, congeladas, mesmo adicionadas de açúcar ou de outros edulcorantes" ~ "Frutas cozidas ou não, misturadas ou não",
+                        group == "Pimenta (do gênero Piper); pimentos dos gêneros Capsicum ou Pimenta, secos ou triturados ou em pó" ~ "Pimentas secas ou trituradas",
+                        group == "Outras sementes e frutos oleaginosos, mesmo triturados" ~ "Outras sementes e oleaginosos",
+                        group == "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (bálsamos por exemplo), naturais" ~ "Gomas e resinas naturais",
+                        group == "Óleo de palma e respectivas fracções, mesmo refinados, mas não quimicamente modificados" ~ "Óleo de palma não modificado",
+                        group == "Outras gorduras e óleos vegetais (incluído o óleo de jojoba) e respectivas fracções, fixos, mesmo refinados, mas não quimicamente modificados" ~ "Outras gorduras e óleos vegetais",
+                        group == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Cacau bruto ou torrado",
+                        group == "Frutas e outras partes comestíveis de plantas, preparadas ou conservadas de outro modo, com ou sem adição de açúcar ou de outros edulcorantes ou de álcool, não especificadas nem compreendidas noutras posições" ~ "Frutas e outros comestíveis de planta",
+                        group == "Sumos de frutas (incluídos os mostos de uvas) ou de produtos hortícolas, não fermentados, sem adição de álcool, com ou sem adição de açúcar ou de outros edulcorantes" ~ "Sumos de frutas, com ou sem aditivos",
+                        TRUE ~ group))
+
 saveRDS(data, "data/comex_exp_perc_sh4_sel.rds")
 
 
