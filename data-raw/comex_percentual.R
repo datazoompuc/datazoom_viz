@@ -42,7 +42,7 @@ data <- data %>%
                                           "Crustáceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crustáceos com casca, cozidos em água ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, pó e pellets de crustáceos, pr",
                                           "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
                                           "Frutas, não cozidas ou cozidas em água ou vapor, congeladas, mesmo adicionadas de açúcar ou de outros edulcorantes",
-                                          "Pimenta (do gênero Piper); pimentos dos gêneros Capsicum ou Pimenta, secos ou triturados ou em pó",
+                                          'Pimenta (do género Piper); pimentos dos géneros Capsicum ou Pimenta, secos ou triturados ou em pó',
                                           "Outras sementes e frutos oleaginosos, mesmo triturados",
                                           "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (bálsamos por exemplo), naturais",
                                           "Óleo de palma e respectivas fracções, mesmo refinados, mas não quimicamente modificados",
