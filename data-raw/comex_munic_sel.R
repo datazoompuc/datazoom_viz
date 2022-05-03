@@ -173,6 +173,7 @@ saveRDS(data, "data/comex_exp_munic_sh4_sel.rds")
 
 # dictionary --------------------------------------------------------------
 # extract variables from data
+df_final <- readRDS(file = "data/comex_exp_munic_sh4_sel.rds")
 columns <- colnames(df_final)
 
 # generate dictionary
@@ -188,9 +189,9 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "% das exportações da Amazônia no ano",
+  unidade = "% das exporta\u00e7\u00f5es mundiais",
   categoria= "Economia", 
-  subcategoria = "Comercio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
 temp_param_table$label <- temp_param_table$var
@@ -198,7 +199,7 @@ temp_param_table$label[1] <- "Ano"
 temp_param_table$label[2] <- "Municipio"
 temp_param_table$label[3] <- "Valor relativo do principal produto exportado"
 temp_param_table$label[4] <- "Principal produto exportado"
-temp_param_table$label[6] <- "Produtos Compatíveis com a Floresta"
+temp_param_table$label[6] <- "Produtos Compat\u00edveis com a Floresta"
 temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
 temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
 temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE)
