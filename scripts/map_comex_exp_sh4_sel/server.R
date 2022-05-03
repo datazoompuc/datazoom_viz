@@ -130,8 +130,11 @@ get_server <- function(files, param) {
             "Nome do município: <b>", df_reactived()$nm_municip, "</b> <br>",
             "Estado: <b>", df_reactived()$uf, "</b> <br>",
             x_col$label, ": <b>", df_reactived()[["produto_principal"]], "</b> <br>",
-            "Valor", ": ", df_reactived()$maximo_produto, "<br>",
-            "Unidade de medida: <b>", "% das exportações da Amazônia no ano", "</b>"
+            "Valor", ": ", format(df_reactived()$maximo_produto, scientific = FALSE,
+                                  digits = 2,
+                                  decimal.mark = ",", 
+                                  big.mark = "."), "<br>",
+            "Unidade de medida: <b>", "% das exportações do produto vindas da Amazônia no ano", "</b>"
           ) %>%
             lapply(htmltools::HTML)
 
