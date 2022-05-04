@@ -47,7 +47,7 @@ get_ui <- function(files, param) {
           choices = sort(param$uf_choices),
           selected = param$uf_def,
           multiple = TRUE,
-          options = list(maxItems = 20),
+          options = list(maxItems = 20, plugins = list('remove_button')),
           width = "100%"
         ),
         # Seleciona filtro
@@ -57,7 +57,7 @@ get_ui <- function(files, param) {
           choices = param$munic_def,
           selected = param$munic_def,
           multiple = TRUE,
-          options = list(maxItems = 20),
+          options = list(maxItems = 20, plugins = list('remove_button')),
           width = "100%"
         ),
       ),

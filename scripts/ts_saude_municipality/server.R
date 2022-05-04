@@ -17,7 +17,7 @@ get_server <- function(files, param) {
     
     # Cria opções para seleção de grupos
     param$filter_choices <- reactive({
-      df$municipio[stringr::str_detect(df$municipio, purrr::reduce(input$uf, paste, sep = "|"))] # selecionar municipios dos estados escolhidos],
+      df$municipio[stringr::str_detect(df$municipio, purrr::reduce(input$uf, paste, sep = "|", .init = "_"))] # selecionar municipios dos estados escolhidos],
     })
     
     # Funcão para preencher inputs com coluna/variável aleatória
@@ -33,7 +33,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
         "filter1",
         choices = param$filter_choices(),
-        selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        selected = sample(param$filter_choices(), 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
 
       selected <- sample(sample(param$y_choices, 1)[[1]], 1)
