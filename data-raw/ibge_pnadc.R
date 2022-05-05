@@ -720,7 +720,7 @@ write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_insercao_dic.csv"
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/Francisco/Dropbox/Datazoom/" # set actual user data path
+user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
 github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
 
 # call raw data
@@ -826,7 +826,7 @@ write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic.csv", fileEncodin
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/Francisco/Dropbox/Datazoom/" # set actual user data path
+user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
 github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
 
 # call raw data

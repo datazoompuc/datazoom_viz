@@ -22,7 +22,7 @@ library(datazoom.social)
 
 # set path to raw data
 user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
-github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/"  # set github structure path 
+github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
 
 # call raw data
 base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ac_numero_ocupados_por_atividade_2digitos.dta"))
@@ -142,7 +142,7 @@ write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cnae_dic.csv", fil
 
 # set path to raw data
 user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
-github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/"  # set github structure path 
+github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
 
 # call raw data
 base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ac_numero_ocupados_por_ocupacao_2digitos.dta"))
