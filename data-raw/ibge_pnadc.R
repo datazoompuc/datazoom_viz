@@ -25,34 +25,34 @@ github_folder_path <- "Amazonia_Mercado_Trabalho/build/output/" # set github str
 
 # call raw data
 base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
-base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas")
+base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas (PIA)")
 
 base2 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
-base2 <- base2 %>% mutate(id = "Restante do Brasil", composicao_demografica = "Todas as pessoas")
+base2 <- base2 %>% mutate(id = "Restante do Brasil", composicao_demografica = "Todas as pessoas (PIA)")
 
 base3 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_rondonia.dta"))
-base3 <- base3 %>% mutate(id = "Rondônia", composicao_demografica = "Todas as pessoas")
+base3 <- base3 %>% mutate(id = "Rondônia", composicao_demografica = "Todas as pessoas (PIA)")
 
 base4 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_acre.dta"))
-base4 <- base4 %>% mutate(id = "Acre", composicao_demografica = "Todas as pessoas")
+base4 <- base4 %>% mutate(id = "Acre", composicao_demografica = "Todas as pessoas (PIA)")
 
 base5 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonas.dta"))
-base5 <- base5 %>% mutate(id = "Amazonas", composicao_demografica = "Todas as pessoas")
+base5 <- base5 %>% mutate(id = "Amazonas", composicao_demografica = "Todas as pessoas (PIA)")
 
 base6 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_roraima.dta"))
-base6 <- base6 %>% mutate(id = "Roraima", composicao_demografica = "Todas as pessoas")
+base6 <- base6 %>% mutate(id = "Roraima", composicao_demografica = "Todas as pessoas (PIA)")
 
 base7 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_para.dta"))
-base7 <- base7 %>% mutate(id = "Pará", composicao_demografica = "Todas as pessoas")
+base7 <- base7 %>% mutate(id = "Pará", composicao_demografica = "Todas as pessoas (PIA)")
 
 base8 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amapa.dta"))
-base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pessoas")
+base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pessoas (PIA)")
 
 base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_tocantins.dta"))
-base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas")
+base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas (PIA)")
 
 base10 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_matogrosso.dta"))
-base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas")
+base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas (PIA)")
 
 # append all data
 temp <- rbind(base1, base2)
@@ -360,34 +360,34 @@ github_folder_path <- "Amazonia_Mercado_Trabalho/build/output/" # set github str
 
 # call raw data
 base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
-base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas")
+base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas (PIA)")
 
 base2 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
-base2 <- base2 %>% mutate(id = "Restante do Brasil", composicao_demografica = "Todas as pessoas")
+base2 <- base2 %>% mutate(id = "Restante do Brasil", composicao_demografica = "Todas as pessoas (PIA)")
 
 base3 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_rondonia.dta"))
-base3 <- base3 %>% mutate(id = "Rondônia", composicao_demografica = "Todas as pessoas")
+base3 <- base3 %>% mutate(id = "Rondônia", composicao_demografica = "Todas as pessoas (PIA)")
 
 base4 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_acre.dta"))
-base4 <- base4 %>% mutate(id = "Acre", composicao_demografica = "Todas as pessoas")
+base4 <- base4 %>% mutate(id = "Acre", composicao_demografica = "Todas as pessoas (PIA)")
 
 base5 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonas.dta"))
-base5 <- base5 %>% mutate(id = "Amazonas", composicao_demografica = "Todas as pessoas")
+base5 <- base5 %>% mutate(id = "Amazonas", composicao_demografica = "Todas as pessoas (PIA)")
 
 base6 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_roraima.dta"))
-base6 <- base6 %>% mutate(id = "Roraima", composicao_demografica = "Todas as pessoas")
+base6 <- base6 %>% mutate(id = "Roraima", composicao_demografica = "Todas as pessoas (PIA)")
 
 base7 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_para.dta"))
-base7 <- base7 %>% mutate(id = "Pará", composicao_demografica = "Todas as pessoas")
+base7 <- base7 %>% mutate(id = "Pará", composicao_demografica = "Todas as pessoas (PIA)")
 
 base8 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amapa.dta"))
-base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pessoas")
+base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pessoas (PIA)")
 
 base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_tocantins.dta"))
-base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas")
+base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas (PIA)")
 
 base10 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_matogrosso.dta"))
-base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas")
+base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas (PIA)")
 
 # append all data
 temp <- rbind(base1, base2)
@@ -720,7 +720,7 @@ write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_insercao_dic.csv"
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/Francisco/Dropbox/Datazoom/" # set actual user data path
+user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
 github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
 
 # call raw data
@@ -826,7 +826,7 @@ write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic.csv", fileEncodin
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/Francisco/Dropbox/Datazoom/" # set actual user data path
+user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
 github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
 
 # call raw data
