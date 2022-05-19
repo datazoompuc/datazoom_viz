@@ -111,12 +111,12 @@ get_server <- function(files, param) {
 
       # Define paleta de cores
       pal1 <- pallete_continuous
-      if (!is.numeric(df_reactived()[["produto_principal"]])) {
+      if (!is.numeric(df_reactived()[["nome_sh2"]])) {
         pal1 <- pallete_discrete
       }
 
       # Determina a paleta para as legendas
-      pal <- colorFactor(palette = pal1, domain = df[["produto_principal"]])
+      pal <- colorFactor(palette = pal1, domain = df[["nome_sh2"]])
 
       tryCatch(
         {
@@ -148,7 +148,7 @@ get_server <- function(files, param) {
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = 0.7,
-              fillColor = ~ pal(df_reactived()[["produto_principal"]]),
+              fillColor = ~ pal(df_reactived()[["nome_sh2"]]),
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -159,8 +159,8 @@ get_server <- function(files, param) {
             ) %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df_reactived()[["produto_principal"]],
-              title = title_legend,
+              values = ~ df_reactived()[["nome_sh2"]],
+              title = "Categoria do Principal Produto",
               opacity = 0.7
             )
 

@@ -115,9 +115,8 @@ df_final <- rbind(agg_dat_selcolumns, agg_dat_all_selcolumns) %>%
   
 
 #add sh4 code -------------------------------------------------------------
-df_final= df_final %>%
+df_final <- df_final %>%
   left_join(sh4)
-
 
 
 # value as relative -------------------------------------------------------
@@ -144,11 +143,16 @@ df_final <- df_final %>%
 
 
 ###sh2 code and sh2 name columns
-df_final$cod_sh2= gsub('.{2}$', '', df_final$cod_sh4)
+df_final$cod_sh2 <- gsub('.{2}$', '', df_final$cod_sh4)
 
-df_final$cod_sh2= as.numeric(df_final$cod_sh2)
-df_final$nome_sh2= df_final$cod_sh2
-df_final$nome_sh2= plyr::mapvalues(df_final$nome_sh2, from = aux$CO_SH2, to = aux$NO_SH2_POR)
+df_final$cod_sh2 <- as.numeric(df_final$cod_sh2)
+df_final$nome_sh2 <- df_final$cod_sh2
+df_final$nome_sh2 <- plyr::mapvalues(df_final$nome_sh2, from = aux$CO_SH2, to = aux$NO_SH2_POR)
+
+df_final$nome_sh2 <- ifelse(nchar(df_final$nome_sh2) >= 40,
+                            paste0(substr(df_final$nome_sh2, 1, 40), "..."),
+                            df_final$nome_sh2)
+
 
 
 # merge with shape --------------------------------------------------------
