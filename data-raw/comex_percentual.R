@@ -77,7 +77,7 @@ data= data%>%
 saveRDS(data, "data/comex_exp_perc_sh4_sel.rds")
 
 
-### exporta??o total da amaz?nia por tipo sh2
+### exporta??o total da amaz?nia por tipo sh4
 datafinal <- readRDS(file = "data/comex_exp_perc_sh4_sel.rds")
 
 # extract variables from data
