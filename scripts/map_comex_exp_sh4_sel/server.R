@@ -46,6 +46,7 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
+        "?", "x=", input$x,
         "&", "filter=", input$filter1
       )
 
