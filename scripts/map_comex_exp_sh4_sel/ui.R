@@ -62,12 +62,12 @@ get_ui <- function(files, param) {
                # mudando tamanho da legenda no leaflet
                tags$style(type = "text/css", 
                           ".leaflet .legend {
-                 line-height: 15px;
-                 font-size: 15px;
+                 line-height: 14px;
+                 font-size: 14px;
                  }",
                  ".leaflet .legend i{
-                width: 15px;
-                height: 15px;
+                width: 14px;
+                height: 14px;
                  }"
                 ),
                class = "plotrow row justify-content-center flex-grow-1 w-100",
