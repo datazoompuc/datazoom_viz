@@ -130,7 +130,8 @@ get_server <- function(files, param) {
           labels <- paste0(
             "Nome do município: <b>", df_reactived()$nm_municip, "</b> <br>",
             "Estado: <b>", df_reactived()$uf, "</b> <br>",
-            x_col$label, ": <b>", df_reactived()[["produto_principal"]], "</b> <br>",
+            "Principal Produto", ": <b>", df_reactived()[["produto_principal"]], "</b> <br>",
+            "Categoria do Principal Produto", ": <b>", df_reactived()[["nome_sh2"]], "</b> <br>",
             "Valor", ": ", format(df_reactived()$maximo_produto, scientific = FALSE,
                                   digits = 2,
                                   decimal.mark = ",", 
