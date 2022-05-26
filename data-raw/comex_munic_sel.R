@@ -149,9 +149,9 @@ df_final$cod_sh2 <- as.numeric(df_final$cod_sh2)
 df_final$nome_sh2 <- df_final$cod_sh2
 df_final$nome_sh2 <- plyr::mapvalues(df_final$nome_sh2, from = aux$CO_SH2, to = aux$NO_SH2_POR)
 
-df_final$nome_sh2 <- ifelse(nchar(df_final$nome_sh2) >= 40,
-                            paste0(substr(df_final$nome_sh2, 1, 40), "..."),
-                            df_final$nome_sh2)
+# df_final$nome_sh2 <- ifelse(nchar(df_final$nome_sh2) >= 40,
+#                             paste0(substr(df_final$nome_sh2, 1, 40), "..."),
+#                             df_final$nome_sh2)
 
 
 
@@ -169,7 +169,7 @@ data <- rmapshaper::ms_simplify(data,
                                 keep_shapes = TRUE, 
                                 keep = 0.01)
 
-#simplifying forest products names to fit the map
+#simplifying products' names to fit the map
 {
 data= data%>%
   mutate(lab= case_when(lab == "Peixes vivos" ~ "Peixes vivos",
@@ -344,6 +344,48 @@ data= data%>%
                         lab == "Turborreactores, turbopropulsores e outras turbinas a gas" ~ "Turborreatores e outras turbinas a gás",
                         lab == "Veiculos automoveis para transporte de mercadorias" ~ "Automóveis para transporte de mercadorias",
                         TRUE ~ lab)) 
+  
+data= data%>%
+  mutate(nome_sh2= case_when(nome_sh2 == "Brinquedos, jogos, artigos para divertimento ou para esporte; suas partes e acessórios" ~ "Brinquedos, jogos e artigos para esporte"  ,
+                              nome_sh2 == "Calçados, polainas e artefatos semelhantes; suas partes" ~ "Calçados, polainas e semelhantes" ,
+                              nome_sh2 == "Combustíveis minerais, óleos minerais e produtos da sua destilação; matérias betuminosas; ceras minerais" ~ "Combustíveis, óleos e ceras minerais" ,
+                              nome_sh2 == "Ferramentas, artefatos de cutelaria e talheres, e suas partes, de metais comuns" ~ "Ferramentas, cutelaria e talheres" ,
+                              nome_sh2 == "Frutas; cascas de frutos cítricos e de melões" ~ "Frutas, cascas de cítricos e de melões" ,
+                              nome_sh2 == "Gomas, resinas e outros sucos e extratos vegetais" ~ "Gomas resinas e outros extratos vegetais",
+                              nome_sh2 == "Gorduras e óleos animais ou vegetais; produtos da sua dissociação; gorduras alimentares elaboradas; ceras de origem animal ou vegetal" ~ "Gorduras e óleos animais ou vegetais" ,
+                              nome_sh2 == "Instrumentos e aparelhos de óptica, de fotografia, de cinematografia, de medida, de controle ou de precisão; instrumentos e aparelhos médico-cirúrgicos; suas partes e acessórios" ~ "Aparelhos médicos, fotografia e de medida",
+                              nome_sh2 == "Instrumentos musicais; suas partes e acessórios" ~ "Instrumentos musicais e suas partes",
+                              nome_sh2 == "Leite e lacticínios; ovos de aves; mel natural; produtos comestíveis de origem animal, não especificados nem compreendidos noutros Capítulos" ~ "Leite, ovos, mel e outros de origem animal",
+                              nome_sh2 == "Máquinas, aparelhos e materiais elétricos, e suas partes; aparelhos de gravação ou de reprodução de som, aparelhos de gravação ou de reprodução de imagens e de som em televisão, e suas partes e acessórios" ~ "Aparelhos de som e imagem",
+                              nome_sh2 == "Matérias albuminóides; produtos à base de amidos ou de féculas modificados; colas; enzimas"   ~ "Produtos de amido, enzimas, albuminóides" ,
+                              nome_sh2 == "Matérias para entrançar e outros produtos de origem vegetal, não especificados nem compreendidos noutros Capítulos" ~ "Outros produtos de origem vegetal" ,
+                              nome_sh2 == "Móveis; mobiliário médico-cirúrgico, colchões, almofadas e semelhantes; aparelhos de iluminação não especificados nem compreendidos em outros capítulos; anúncios, cartazes ou tabuletas e placas indicadoras luminosos, e artigos semelhantes; Construções Pré" ~ "Mobiliário, iluminação, entre outros",
+                              nome_sh2 == "Objetos de arte, de coleção e antiguidades" ~ "Objetos de arte, coleção e antiguidades",
+                              nome_sh2 == "Obras de couro; artigos de correeiro ou de seleiro; artigos de viagem, bolsas e artefatos semelhantes; obras de tripa" ~ "Obras de couro, tripa, bolsas e outros" ,
+                              nome_sh2 == "Obras de pedra, gesso, cimento, amianto, mica ou de matérias semelhantes" ~ "Obras de pedra, cimento, gesso e outros" ,
+                              nome_sh2 == "Óleos essenciais e resinóides; produtos de perfumaria ou de toucador preparados e preparações cosméticas" ~ "Óleos essenciais, perfumaria e cosméticos",
+                              nome_sh2 == "Outros artefatos têxteis confeccionados; sortidos; artefatos de matérias têxteis, calçados, chapéus e artefatos de uso semelhante, usados; trapos" ~ "Artefatos têxteis, chapéus e calçados" ,
+                              nome_sh2 == "Outros metais comuns; ceramais (cermets); obras dessas matérias" ~ "Outros metais comuns e suas obras" ,
+                              nome_sh2 == "Outros produtos de origem animal, não especificados nem compreendidos noutros Capítulos" ~ "Outros produtos de origem animal" ,
+                              nome_sh2 == "Pastas de madeira ou de outras matérias fibrosas celulósicas; papel ou cartão para reciclar (desperdícios e aparas)." ~ "Pastas de madeira e papel para reciclar",
+                              nome_sh2 == "Peixes e crustáceos, moluscos e outros invertebrados aquáticos" ~ "Peixes e invertebrados aquáticos",
+                              nome_sh2 == "Peles, exceto as peles com pelo, e couros" ~ "Peles, exceto as com pelo, e couros"  ,
+                              nome_sh2 == "Penas e penugem preparadas e suas obras; flores artificiais; obras de cabelo" ~ "Penas e suas obras e flores artificais",
+                              nome_sh2 == "Pérolas naturais ou cultivadas, pedras preciosas ou semipreciosas e semelhantes, metais preciosos, metais folheados ou chapeados de metais preciosos (plaquê), e suas obras; bijuterias; moedas" ~ "Pedras e metais preciosos, bijuterias" ,
+                              nome_sh2 == "Preparações de carne, de peixes ou de crustáceos, de moluscos ou de outros invertebrados aquáticos" ~ "Preparações de carne, peixes e outros",
+                              nome_sh2 == "Preparações de produtos hortícolas, de frutas ou de outras partes de plantas" ~ "Preparações de vegetais, frutas e outros" ,
+                              nome_sh2 == "Produtos da indústria de moagem; malte; amidos e féculas; inulina; glúten de trigo" ~ "Produtos de moagem, amidos e féculas",
+                              nome_sh2 == "Produtos hortícolas, plantas, raízes e tubérculos, comestíveis." ~ "Produtos hortícolas e plantas, comestíveis",
+                              nome_sh2 == "Produtos químicos inorgânicos; compostos inorgânicos ou orgânicos de metais preciosos, de elementos radioativos, de metais das terras raras ou de isótopos" ~ "Produtos químicos inorgânicos",
+                              nome_sh2 == "Reatores nucleares, caldeiras, máquinas, aparelhos e instrumentos mecânicos, e suas partes" ~ "Reatores, caldeiras e aparelhos mecânicos",
+                              nome_sh2 == "Resíduos e desperdícios das indústrias alimentares; alimentos preparados para animais" ~ "Desperdícios das indústrias alimentares",
+                              nome_sh2 == "Sabões, agentes orgânicos de superfície, preparações para lavagem, preparações lubrificantes, ceras artificiais, ceras preparadas, produtos de conservação e limpeza, velas e artigos semelhantes, massas ou pastas para modelar, \"ceras\" para dentistas e Comp" ~ "Sabões, ceras e produtos de limpeza",
+                              nome_sh2 == "Sal; enxofre; terras e pedras; gesso, cal e cimento" ~ "Sal, enxofre, cimento, terras e pedras",
+                              nome_sh2 == "Sementes e frutos oleaginosos; grãos, sementes e frutos diversos; plantas industriais ou medicinais; palhas e forragens" ~ "Sementes, grãos e frutos diversos",
+                              nome_sh2 == "Veículos automóveis, tratores, ciclos e outros veículos terrestres, suas partes e acessórios" ~ "Veículos terrestres",
+                              nome_sh2 == "Vestuário e seus acessórios, de malha" ~ "Vestuário, de malha",
+                              nome_sh2 == "Vestuário e seus acessórios, exceto de Malha" ~ "Vestuário, exceto de malha",
+                              TRUE ~ nome_sh2))
 }
 data$produto_principal = data$lab
 
