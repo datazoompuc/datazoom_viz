@@ -46,6 +46,7 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
+        "?", "x=", input$x,
         "&", "filter=", input$filter1
       )
 
@@ -111,12 +112,12 @@ get_server <- function(files, param) {
 
       # Define paleta de cores
       pal1 <- pallete_continuous
-      if (!is.numeric(df_reactived()[["produto_principal"]])) {
+      if (!is.numeric(df_reactived()[["nome_sh2"]])) {
         pal1 <- pallete_discrete
       }
 
       # Determina a paleta para as legendas
-      pal <- colorFactor(palette = pal1, domain = df[["produto_principal"]])
+      pal <- colorFactor(palette = pal1, domain = df[["nome_sh2"]])
 
       tryCatch(
         {
@@ -129,7 +130,8 @@ get_server <- function(files, param) {
           labels <- paste0(
             "Nome do município: <b>", df_reactived()$nm_municip, "</b> <br>",
             "Estado: <b>", df_reactived()$uf, "</b> <br>",
-            x_col$label, ": <b>", df_reactived()[["produto_principal"]], "</b> <br>",
+            "Principal Produto", ": <b>", df_reactived()[["produto_principal"]], "</b> <br>",
+            "Categoria do Principal Produto", ": <b>", df_reactived()[["nome_sh2"]], "</b> <br>",
             "Valor", ": ", format(df_reactived()$maximo_produto, scientific = FALSE,
                                   digits = 2,
                                   decimal.mark = ",", 
@@ -148,7 +150,7 @@ get_server <- function(files, param) {
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = 0.7,
-              fillColor = ~ pal(df_reactived()[["produto_principal"]]),
+              fillColor = ~ pal(df_reactived()[["nome_sh2"]]),
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -159,8 +161,8 @@ get_server <- function(files, param) {
             ) %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df_reactived()[["produto_principal"]],
-              title = title_legend,
+              values = ~ df_reactived()[["nome_sh2"]],
+              title = "Categoria do Principal Produto",
               opacity = 0.7
             )
 

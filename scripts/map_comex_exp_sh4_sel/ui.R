@@ -58,6 +58,18 @@ get_ui <- function(files, param) {
              textOutput("plot_title"),
              textOutput("plot_subtitle"),
              div( # row do gráfico
+               
+               # mudando tamanho da legenda no leaflet
+               tags$style(type = "text/css", 
+                          ".leaflet .legend {
+                 line-height: 12px;
+                 font-size: 12px;
+                 }",
+                 ".leaflet .legend i{
+                width: 12px;
+                height: 12px;
+                 }"
+                ),
                class = "plotrow row justify-content-center flex-grow-1 w-100",
                div(
                  class = "plotdiv w-100 h-100",

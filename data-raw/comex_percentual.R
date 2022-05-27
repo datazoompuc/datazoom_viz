@@ -3,6 +3,8 @@ library(magrittr)
 library(tidyverse)
 library(stringr)
 
+
+###SH4
 dat <- readRDS(file = "data/comex_munic_raw.rds")
 
 dat$mes <- NULL
@@ -21,10 +23,11 @@ data <- data[data$ano=="2019",]
 data <- data[data$cod_sh4<="2100",]
 data <- data[data$valor_fob>=1000000,]
 
-world_trade <- readRDS("data/auxiliar_exportacoes_totais_produtos_selecionados.rds")
+#this data from world trade was generated in data-raw/baci.R
+world_trade <- readRDS("data/auxiliar_exportacoes_totais_produtos_sh4_selecionados_baci19.rds")
 
 data$valor_fob <- data$valor_fob/1000
-data$valor_fob <- data$valor_fob/world_trade$total
+data$valor_fob <- data$valor_fob/world_trade$valor_total
 
 aux <- readRDS("data/auxiliar_cod_sh4.rds")
 aux$CO_SH4 <- sprintf("%04d", as.numeric(aux$CO_SH4))
@@ -32,28 +35,49 @@ data$cod_sh4 <- str_replace_all(data$cod_sh4, setNames(aux$NO_SH4_POR, aux$CO_SH
 
 data <- data %>% 
   mutate(floresta = ifelse(cod_sh4 %in% c("Peixes vivos",
-                                          "Peixes frescos ou refrigerados, exceto os filÈs de peixes e outra carne de peixes da posiÁ„o 03.04",
-                                          "Peixes congelados, exceto os filÈs de peixes e outra carne de peixes da posiÁ„o 03.04",
-                                          "FilÈs de peixes e outra carne de peixes (mesmo picada), frescos, refrigerados ou congelados",
-                                          "Peixes secos, salgados ou em salmoura; peixes defumados, mesmo cozidos antes ou durante a defumaÁ„o; farinhas, pÛs e pellets, de peixe, prÛprios para alimentaÁ„o humana",
-                                          "Crust·ceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crust·ceos com casca, cozidos em ·gua ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, pÛ e pellets de crust·ceos, pr",
+                                          "Peixes frescos ou refrigerados, exceto os fil√©s de peixes e outra carne de peixes da posi√ß√£o 03.04",
+                                          "Peixes congelados, exceto os fil√©s de peixes e outra carne de peixes da posi√ß√£o 03.04",
+                                          "Fil√©s de peixes e outra carne de peixes (mesmo picada), frescos, refrigerados ou congelados",
+                                          "Peixes secos, salgados ou em salmoura; peixes defumados, mesmo cozidos antes ou durante a defuma√ß√£o; farinhas, p√≥s e pellets, de peixe, pr√≥prios para alimenta√ß√£o humana",
+                                          "Crust√°ceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crust√°ceos com casca, cozidos em √°gua ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, p√≥ e pellets de crust√°ceos, pr",
                                           "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
-                                          "Frutas, n„o cozidas ou cozidas em ·gua ou vapor, congeladas, mesmo adicionadas de aÁ˙car ou de outros edulcorantes",
-                                          "Pimenta (do gÈnero Piper); pimentos dos gÈneros Capsicum ou Pimenta, secos ou triturados ou em pÛ",
+                                          "Frutas, n√£o cozidas ou cozidas em √°gua ou vapor, congeladas, mesmo adicionadas de a√ß√∫car ou de outros edulcorantes",
+                                          'Pimenta (do g√©nero Piper); pimentos dos g√©neros Capsicum ou Pimenta, secos ou triturados ou em p√≥',
                                           "Outras sementes e frutos oleaginosos, mesmo triturados",
-                                          "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (b·lsamos por exemplo), naturais",
-                                          "”leo de palma e respectivas fracÁıes, mesmo refinados, mas n„o quimicamente modificados",
-                                          "Outras gorduras e Ûleos vegetais (incluÌdo o Ûleo de jojoba) e respectivas fracÁıes, fixos, mesmo refinados, mas n„o quimicamente modificados",
+                                          "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (b√°lsamos por exemplo), naturais",
+                                          "√ìleo de palma e respectivas frac√ß√µes, mesmo refinados, mas n√£o quimicamente modificados",
+                                          "Outras gorduras e √≥leos vegetais (inclu√≠do o √≥leo de jojoba) e respectivas frac√ß√µes, fixos, mesmo refinados, mas n√£o quimicamente modificados",
                                           "Cacau inteiro ou partido, em bruto ou torrado",
-                                          "Frutas e outras partes comestÌveis de plantas, preparadas ou conservadas de outro modo, com ou sem adiÁ„o de aÁ˙car ou de outros edulcorantes ou de ·lcool, n„o especificadas nem compreendidas noutras posiÁıes",
-                                          "Sumos de frutas (incluÌdos os mostos de uvas) ou de produtos hortÌcolas, n„o fermentados, sem adiÁ„o de ·lcool, com ou sem adiÁ„o de aÁ˙car ou de outros edulcorantes"),
+                                          "Frutas e outras partes comest√≠veis de plantas, preparadas ou conservadas de outro modo, com ou sem adi√ß√£o de a√ß√∫car ou de outros edulcorantes ou de √°lcool, n√£o especificadas nem compreendidas noutras posi√ß√µes",
+                                          "Sumos de frutas (inclu√≠dos os mostos de uvas) ou de produtos hort√≠colas, n√£o fermentados, sem adi√ß√£o de √°lcool, com ou sem adi√ß√£o de a√ß√∫car ou de outros edulcorantes"),
                            TRUE, FALSE))
 
+
 colnames(data) <- c("time", "group", "value", "floresta")
+
+data= data%>%
+  mutate(group= case_when(group == "Peixes vivos" ~ "Peixes vivos",
+                        group == "Peixes frescos ou refrigerados, exceto os fil√©s de peixes e outra carne de peixes da posi√ß√£o 03.04" ~ "Peixes frescos/refrigerados, exceto fil√©s",
+                        group == "Peixes congelados, exceto os fil√©s de peixes e outra carne de peixes da posi√ß√£o 03.04" ~ "Peixes congelados, exceto fil√©s",
+                        group == "Fil√©s de peixes e outra carne de peixes (mesmo picada), frescos, refrigerados ou congelados" ~ "Fil√©s de peixe e outras carnes",
+                        group == "Peixes secos, salgados ou em salmoura; peixes defumados, mesmo cozidos antes ou durante a defuma√ß√£o; farinhas, p√≥s e pellets, de peixe, pr√≥prios para alimenta√ß√£o humana" ~ "Peixes secos, salgados ou cozidos",
+                        group == "Crust√°ceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crust√°ceos com casca, cozidos em √°gua ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, p√≥ e pellets de crust√°ceos, pr" ~ "Crustaceos vivos ou n√£o, para alimento",
+                        group == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Cocos e castanhas do Brasil e de caju",
+                        group == "Frutas, n√£o cozidas ou cozidas em √°gua ou vapor, congeladas, mesmo adicionadas de a√ß√∫car ou de outros edulcorantes" ~ "Frutas cozidas ou n√£o, misturadas ou n√£o",
+                        group == "Pimenta (do g√™nero Piper); pimentos dos g√™neros Capsicum ou Pimenta, secos ou triturados ou em p√≥" ~ "Pimentas secas ou trituradas",
+                        group == "Outras sementes e frutos oleaginosos, mesmo triturados" ~ "Outras sementes e oleaginosos",
+                        group == "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (b√°lsamos por exemplo), naturais" ~ "Gomas e resinas naturais",
+                        group == "√ìleo de palma e respectivas frac√ß√µes, mesmo refinados, mas n√£o quimicamente modificados" ~ "√ìleo de palma n√£o modificado",
+                        group == "Outras gorduras e √≥leos vegetais (inclu√≠do o √≥leo de jojoba) e respectivas frac√ß√µes, fixos, mesmo refinados, mas n√£o quimicamente modificados" ~ "Outras gorduras e √≥leos vegetais",
+                        group == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Cacau bruto ou torrado",
+                        group == "Frutas e outras partes comest√≠veis de plantas, preparadas ou conservadas de outro modo, com ou sem adi√ß√£o de a√ß√∫car ou de outros edulcorantes ou de √°lcool, n√£o especificadas nem compreendidas noutras posi√ß√µes" ~ "Frutas e outros comest√≠veis de planta",
+                        group == "Sumos de frutas (inclu√≠dos os mostos de uvas) ou de produtos hort√≠colas, n√£o fermentados, sem adi√ß√£o de √°lcool, com ou sem adi√ß√£o de a√ß√∫car ou de outros edulcorantes" ~ "Sumos de frutas, com ou sem aditivos",
+                        TRUE ~ group))
+
 saveRDS(data, "data/comex_exp_perc_sh4_sel.rds")
 
 
-### exportaÁ„o total da amazÙnia por tipo sh2
+### exporta√ß√£o total da amaz√¥nia por tipo sh4
 datafinal <- readRDS(file = "data/comex_exp_perc_sh4_sel.rds")
 
 # extract variables from data
@@ -71,24 +95,45 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "% das exportaÁıes mundiais",
+  unidade = "% das exporta\u00e7\u00f5es mundiais",
   categoria= "Economia", 
-  subcategoria = "ComÈrcio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Produto (SH4)"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$label[3] <- "Valor"
-temp_param_table$label[4] <- "Floresta"
-temp_param_table$desc[2] <- "Produto (SH4)"
-temp_param_table$desc[1] <- "Ano"
-temp_param_table$desc[3] <- "Valor"
-temp_param_table$desc[4] <- "Produtos CompatÌveis com a Floresta"
-temp_param_table$x <- c(FALSE, FALSE, TRUE, FALSE)
-temp_param_table$y <- c(FALSE, FALSE, TRUE, FALSE)
-temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE)
-temp_param_table$size <- c(FALSE, FALSE, TRUE, FALSE)
-temp_param_table$slider <- c(FALSE, FALSE, TRUE, FALSE)
+temp_param_table$label[temp_param_table$var == "group"] <- "Produto (SH4)"
+temp_param_table$label[temp_param_table$var == "time"] <- "Ano"
+temp_param_table$label[temp_param_table$var == "value"] <- "Valor"
+temp_param_table$label[temp_param_table$var == "floresta"] <- "Floresta"
+
+temp_param_table$desc[temp_param_table$var == "group"] <- "Produto (SH4)"
+temp_param_table$desc[temp_param_table$var == "time"] <- "Ano"
+temp_param_table$desc[temp_param_table$var == "value"] <- "Valor"
+temp_param_table$desc[temp_param_table$var == "floresta"] <- "Produtos Compat\u00edveis com a Floresta"
+
+temp_param_table$x[temp_param_table$var == "group"] <- FALSE
+temp_param_table$x[temp_param_table$var == "time"] <- FALSE
+temp_param_table$x[temp_param_table$var == "value"] <- TRUE
+temp_param_table$x[temp_param_table$var == "floresta"] <- FALSE
+
+temp_param_table$y[temp_param_table$var == "group"] <- FALSE
+temp_param_table$y[temp_param_table$var == "time"] <- FALSE
+temp_param_table$y[temp_param_table$var == "value"] <- TRUE
+temp_param_table$y[temp_param_table$var == "floresta"] <- FALSE
+
+temp_param_table$color[temp_param_table$var == "group"] <- TRUE
+temp_param_table$color[temp_param_table$var == "time"] <- FALSE
+temp_param_table$color[temp_param_table$var == "value"] <- FALSE
+temp_param_table$color[temp_param_table$var == "floresta"] <- FALSE
+
+temp_param_table$size[temp_param_table$var == "group"] <- FALSE
+temp_param_table$size[temp_param_table$var == "time"] <- FALSE
+temp_param_table$size[temp_param_table$var == "value"] <- TRUE
+temp_param_table$size[temp_param_table$var == "floresta"] <- FALSE
+
+temp_param_table$slider[temp_param_table$var == "group"] <- FALSE
+temp_param_table$slider[temp_param_table$var == "time"] <- FALSE
+temp_param_table$slider[temp_param_table$var == "value"] <- TRUE
+temp_param_table$slider[temp_param_table$var == "floresta"] <- FALSE
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic.csv", fileEncoding = "UTF-8")
