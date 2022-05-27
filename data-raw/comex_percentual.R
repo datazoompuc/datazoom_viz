@@ -77,7 +77,7 @@ data= data%>%
 saveRDS(data, "data/comex_exp_perc_sh4_sel.rds")
 
 
-### exporta??o total da amaz?nia por tipo sh4
+### exportação total da amazônia por tipo sh4
 datafinal <- readRDS(file = "data/comex_exp_perc_sh4_sel.rds")
 
 # extract variables from data
@@ -100,19 +100,40 @@ temp_param_table <- tibble(
   subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Produto (SH4)"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$label[3] <- "Valor"
-temp_param_table$label[4] <- "Floresta"
-temp_param_table$desc[2] <- "Produto (SH4)"
-temp_param_table$desc[1] <- "Ano"
-temp_param_table$desc[3] <- "Valor"
-temp_param_table$desc[4] <- "Produtos Compat\u00edveis com a Floresta"
-temp_param_table$x <- c(FALSE, FALSE, TRUE, FALSE)
-temp_param_table$y <- c(FALSE, FALSE, TRUE, FALSE)
-temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE)
-temp_param_table$size <- c(FALSE, FALSE, TRUE, FALSE)
-temp_param_table$slider <- c(FALSE, FALSE, TRUE, FALSE)
+temp_param_table$label[temp_param_table$var == "group"] <- "Produto (SH4)"
+temp_param_table$label[temp_param_table$var == "time"] <- "Ano"
+temp_param_table$label[temp_param_table$var == "value"] <- "Valor"
+temp_param_table$label[temp_param_table$var == "floresta"] <- "Floresta"
+
+temp_param_table$desc[temp_param_table$var == "group"] <- "Produto (SH4)"
+temp_param_table$desc[temp_param_table$var == "time"] <- "Ano"
+temp_param_table$desc[temp_param_table$var == "value"] <- "Valor"
+temp_param_table$desc[temp_param_table$var == "floresta"] <- "Produtos Compat\u00edveis com a Floresta"
+
+temp_param_table$x[temp_param_table$var == "group"] <- FALSE
+temp_param_table$x[temp_param_table$var == "time"] <- FALSE
+temp_param_table$x[temp_param_table$var == "value"] <- TRUE
+temp_param_table$x[temp_param_table$var == "floresta"] <- FALSE
+
+temp_param_table$y[temp_param_table$var == "group"] <- FALSE
+temp_param_table$y[temp_param_table$var == "time"] <- FALSE
+temp_param_table$y[temp_param_table$var == "value"] <- TRUE
+temp_param_table$y[temp_param_table$var == "floresta"] <- FALSE
+
+temp_param_table$color[temp_param_table$var == "group"] <- TRUE
+temp_param_table$color[temp_param_table$var == "time"] <- FALSE
+temp_param_table$color[temp_param_table$var == "value"] <- FALSE
+temp_param_table$color[temp_param_table$var == "floresta"] <- FALSE
+
+temp_param_table$size[temp_param_table$var == "group"] <- FALSE
+temp_param_table$size[temp_param_table$var == "time"] <- FALSE
+temp_param_table$size[temp_param_table$var == "value"] <- TRUE
+temp_param_table$size[temp_param_table$var == "floresta"] <- FALSE
+
+temp_param_table$slider[temp_param_table$var == "group"] <- FALSE
+temp_param_table$slider[temp_param_table$var == "time"] <- FALSE
+temp_param_table$slider[temp_param_table$var == "value"] <- TRUE
+temp_param_table$slider[temp_param_table$var == "floresta"] <- FALSE
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic.csv", fileEncoding = "UTF-8")

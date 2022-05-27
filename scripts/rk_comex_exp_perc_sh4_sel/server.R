@@ -24,7 +24,7 @@ get_server <- function(files, param) {
     df_reactived <- reactive({
     
       # filtrar para produtos da floresta
-      if(input$filter == "Produtos Compativeis com a Floresta") {
+      if(input$filter == "Produtos Compat\u00edveis com a Floresta") {
         w <- df %>% filter(floresta)
       } else {
         w <- df
@@ -75,10 +75,10 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$filter) || input$filter == "") {
-        text <- "Variável não selecionada"
+        text <- "Vari\u00e1vel n\u00e3o selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        text <- "Ranking da Proporção das Exportações Mundiais vindas da Amazônia"
+        text <- "Ranking da Propor\u00e7\u00e3o das Exporta\u00e7\u00f5es Mundiais Vindas da Amaz\u00f4nia"
       }
 
       text
@@ -91,7 +91,7 @@ get_server <- function(files, param) {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        text <- paste0("Amazônia Legal")
+        text <- paste0("Amaz\u00f4nia Legal")
       }
 
       text
