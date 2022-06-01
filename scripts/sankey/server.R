@@ -40,6 +40,11 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
+      if (!is.null(query[["ano"]])) {
+        updateSelectInput(session, "x",
+          selected = query[["ano"]]
+        )
+      }
       if (!is.null(query[["y"]])) {
         updateSelectInput(session, "y",
           choices = param$y_choices,
