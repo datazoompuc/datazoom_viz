@@ -29,7 +29,7 @@ matriz <- dat
 
 
 
-# exportação total da amazônia por tipo sh2
+# exporta??o total da amaz?nia por tipo sh2
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -54,14 +54,14 @@ data_val_pais <- aggregate(value ~ time + group, data_val_pais, sum)
 #labl <- labl[-c(1)]
 #labl <- substr(labl, 7, 100)
 #colnames(datafinal_val_pais) <- c("time", labl)
-#group <- rep("Amazônia", 25)
+#group <- rep("Amaz?nia", 25)
 #datafinal_val_pais <- cbind(group, datafinal_val_pais)
 
 saveRDS(data_val_pais, "data/comex_exp_tot_sh2.rds")
 
 
 
-# exportação municipal da amazônia por tipo sh4
+# exporta??o municipal da amaz?nia por tipo sh4
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -105,7 +105,7 @@ saveRDS(datafinal_val_sh2, "data/comex_exp_sh4_munic.rds")
 
 
 
-# exportação municipal da amazônia por tipo sh2
+# exporta??o municipal da amaz?nia por tipo sh2
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -149,7 +149,7 @@ saveRDS(datafinal_val_sh2, "data/comex_exp_sh2_munic.rds")
 
 
 
-# exportação total da amazônia por tipo sec
+# exporta??o total da amaz?nia por tipo sec
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -174,14 +174,14 @@ data_val_pais <- aggregate(value ~ time + group, data_val_pais, sum)
 #labl <- labl[-c(1)]
 #labl <- substr(labl, 7, 100)
 #colnames(datafinal_val_pais) <- c("time", labl)
-#group <- rep("Amazônia", 25)
+#group <- rep("Amaz?nia", 25)
 #datafinal_val_pais <- cbind(group, datafinal_val_pais)
 
 saveRDS(data_val_pais, "data/comex_exp_tot_sec.rds")
 
 
 
-# exportação municipal da amazônia por tipo sec
+# exporta??o municipal da amaz?nia por tipo sec
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -224,7 +224,7 @@ saveRDS(datafinal_val_munic, "data/comex_exp_munic_sec.rds")
 saveRDS(datafinal_val_sec, "data/comex_exp_sec_munic.rds")
 
 
-# exportação total da amazônia por pais
+# exporta??o total da amaz?nia por pais
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -276,7 +276,7 @@ saveRDS(datafinal_val_pais_munic, "data/comex_exp_pais_sec.rds")
 # Build Dictionary 
 #####################
 
-### exportação municipal da amazônia por tipo sh4
+### exporta??o municipal da amaz?nia por tipo sh4
 datafinal <- readRDS(file = "data/comex_exp_munic_sh4.rds")
 
 # extract variables from data
@@ -294,14 +294,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Produção sh4"
+temp_param_table$label[2] <- "Produ\u00e7\u00e3o sh4"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produção sh4"
+temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sh4"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
@@ -314,7 +314,7 @@ write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_dic.csv", fileEncod
 
 
 
-### exportação municipal da amazônia por tipo sh4
+### exporta??o municipal da amaz?nia por tipo sh4
 datafinal <- readRDS(file = "data/comex_exp_sh4_munic.rds")
 
 # extract variables from data
@@ -332,14 +332,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Município"
+temp_param_table$label[2] <- "Munic\u00edpio"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[2] <- "Munic\u00edpio"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 1103))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 1103))
@@ -352,7 +352,7 @@ write.csv(temp_param_table, file = "data/comex_exp_sh4_munic_dic.csv", fileEncod
 
 
 
-### exportação municipal da amazônia por tipo sh2
+### exporta??o municipal da amaz?nia por tipo sh2
 datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
 
 # extract variables from data
@@ -370,14 +370,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Produção sh2"
+temp_param_table$label[2] <- "Produ\u00e7\u00e3o sh2"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produção sh2"
+temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sh2"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
@@ -390,7 +390,7 @@ write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_dic.csv", fileEncod
 
 
 
-### exportação municipal da amazônia por tipo sh2
+### exporta??o municipal da amaz?nia por tipo sh2
 datafinal <- readRDS(file = "data/comex_exp_sh2_munic.rds")
 
 # extract variables from data
@@ -408,14 +408,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Município"
+temp_param_table$label[2] <- "Munic\u00edpio"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[2] <- "Munic\u00edpio"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
@@ -428,7 +428,7 @@ write.csv(temp_param_table, file = "data/comex_exp_sh2_munic_dic.csv", fileEncod
 
 
 
-### exportação municipal da amazônia por tipo sec
+### exporta??o municipal da amaz?nia por tipo sec
 datafinal <- readRDS(file = "data/comex_exp_munic_sec.rds")
 
 # extract variables from data
@@ -446,14 +446,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Produção sec"
+temp_param_table$label[2] <- "Produ\u00e7\u00e3o sec"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produção sec"
+temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sec"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
@@ -466,7 +466,7 @@ write.csv(temp_param_table, file = "data/comex_exp_munic_sec_dic.csv", fileEncod
 
 
 
-### exportação municipal da amazônia por tipo sec
+### exporta??o municipal da amaz?nia por tipo sec
 datafinal <- readRDS(file = "data/comex_exp_sec_munic.rds")
 
 # extract variables from data
@@ -484,14 +484,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Município"
+temp_param_table$label[2] <- "Munic\u00edpio"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[2] <- "Munic\u00edpio"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
@@ -505,7 +505,7 @@ write.csv(temp_param_table, file = "data/comex_exp_sec_munic_dic.csv", fileEncod
 
 
 
-### exportação total da amazônia por tipo sh2
+### exporta??o total da amaz?nia por tipo sh2
 datafinal <- readRDS(file = "data/comex_exp_tot_sh2.rds")
 
 # extract variables from data
@@ -523,15 +523,15 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Região"
+temp_param_table$label[2] <- "Regi\u00e3o"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$label[3] <- "Valor"
-temp_param_table$desc[2] <- "Região"
+temp_param_table$desc[2] <- "Regi\u00e3o"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$desc[3] <- "Valor"
 temp_param_table$x <- c(FALSE, FALSE, TRUE)
@@ -545,7 +545,7 @@ write.csv(temp_param_table, file = "data/comex_exp_tot_sh2_dic.csv", fileEncodin
 
 
 
-### exportação por pais da amazônia por tipo sec
+### exporta??o por pais da amaz?nia por tipo sec
 datafinal <- readRDS(file = "data/comex_exp_sec_pais.rds")
 
 # extract variables from data
@@ -563,14 +563,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "País"
+temp_param_table$label[2] <- "Pa\u00eds"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "País"
+temp_param_table$desc[2] <- "Pa\u00eds"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 221))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 221))
@@ -583,7 +583,7 @@ write.csv(temp_param_table, file = "data/comex_exp_sec_pais_dic.csv", fileEncodi
 
 
 
-### exportação por pais da amazônia por tipo sec
+### exporta??o por pais da amaz?nia por tipo sec
 datafinal <- readRDS(file = "data/comex_exp_pais_sec.rds")
 
 # extract variables from data
@@ -601,14 +601,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "País"
+temp_param_table$label[2] <- "Pa\u00eds"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "País"
+temp_param_table$desc[2] <- "Pa\u00eds"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 22))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 22))
@@ -621,7 +621,7 @@ write.csv(temp_param_table, file = "data/comex_exp_pais_sec_dic.csv", fileEncodi
 
 
 
-### exportação por pais da amazônia total
+### exporta??o por pais da amaz?nia total
 datafinal <- readRDS(file = "data/comex_exp_tot_pais.rds")
 
 # extract variables from data
@@ -639,14 +639,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "País"
+temp_param_table$label[2] <- "Pa\u00eds"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "País"
+temp_param_table$desc[2] <- "Pa\u00eds"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$label[3] <- "Valor"
 temp_param_table$desc[3] <- "Valor"
