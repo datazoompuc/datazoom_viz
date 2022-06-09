@@ -21,7 +21,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
         "y",
         choices = param$y_choices,
-        selected = selected
+        selected = param$y_def
       )
     }
 
@@ -126,12 +126,6 @@ get_server <- function(files, param) {
             df_p$color <- " "
           }
 
-          # Monta html do tooltip
-          df_p$tooltip <- paste0(
-            "<b>", df_p$text, "</b><br>",
-            y_col$label, ": R$", df_p$y, "<br>"
-          )
-
           # Define paleta de cores
           pallete <- pallete_discrete
 
@@ -139,25 +133,28 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
             type = "sankey",
             orientation = "h",
-            valueformat = ".0f",
-            valuesuffix = " US$",
+            valueformat = ".2f",
+            valuesuffix = " milhões US$",
+            hoverlabel = list(namelength = -1),
             
             node = list(
               label = c("Amazônia", df_p$group), # label de origem, label de destino
               color = pallete_discrete[3],
-              hovertemplate = " ",
+              hovertemplate = "<b> %{label} </b>",
               pad = 15,
               thickness = 10,
               line = list(
                 color = "black",
                 width = 0.5
-              )
+              ),
+              x = c(-0.001, rep(NA, nrow(df_p))), # definir posicao do node "Amazonia"
+              y = c(0.5, rep(NA, nrow(df_p))) # definir posicao do node "Amazonia"
             ),
             
             link = list(
               source = rep(0, nrow(df_p)), # repetir mesma source para todos
               target = 1:nrow(df_p), # definir todos os países destino como target
-              value = df_p$y, # valor das exportações
+              value = df_p$y / 1e6, # valor das exportações (milhões)
               hoverinfo = "none"
             )
           )

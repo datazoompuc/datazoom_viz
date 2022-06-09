@@ -24,7 +24,7 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "time" # variável padrão do eixo x
-param$y_def <- "" # variável padrão do eixo y
+param$y_def <- "Produtos do reino vegetal" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
