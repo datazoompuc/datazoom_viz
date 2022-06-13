@@ -1,11 +1,11 @@
 # packages ----------------------------------------------------------------
 library(tidyverse)
 #library(datazoom.amazonia)
-devtools::load_all("./../datazoom.amazonia")
+devtools::load_all("./../datazoom.amazonia") # While load_datasus hasn't been pushed to main
 
 # load data ---------------------------------------------------------------
 
-# To reduce memory use, each year is downloaded and aggregated separately
+# To avoid taking up all the RAM, each year is downloaded and aggregated separately
 
 df_all <- map_dfr(
   1996:2020, 
@@ -106,8 +106,10 @@ df_fetal <- map_dfr(
 
 dz_munic <- read_rds("data/dz_munic.rds") %>% 
   sf::st_drop_geometry() %>% 
+  mutate(ano = lubridate::year(ano)) %>%
   filter(ano >= 1996 & ano <= 2020) %>% 
   distinct() %>% 
+  mutate(code_muni = as.character(cod_ibge)) %>%
   select(!employed_census2000:median_income_census2010) # remove Census variables
 
 # joining all causes of death ---------------------------------------------
@@ -119,11 +121,18 @@ df <- list(
   df_maternal,
   df_fetal
 ) %>%
-  reduce(full_join, by = c("code_muni", "year"))
+  map(
+    . %>%
+      ungroup() %>%
+      select(code_muni, ano, starts_with("t_")) %>%
+      mutate(across(starts_with("_t"), ~ replace(., is.na(.), 0)))
+  ) %>%
+  reduce(full_join, by = c("code_muni", "ano")) %>%
+  mutate(across(code_muni, as.character))
 
 # merge with dz_munic -----------------------------------------------------
 data <- inner_join(dz_munic, df, by = c("code_muni", "ano"))
 
 
 # export ------------------------------------------------------------------
-saveRDS(data, "data/dz_munic_saude.rds")
+saveRDS(data, "data/dz_munic_mortalidade.rds")
