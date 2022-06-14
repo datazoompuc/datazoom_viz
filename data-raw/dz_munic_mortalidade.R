@@ -131,8 +131,56 @@ df <- list(
   mutate(across(code_muni, as.character))
 
 # merge with dz_munic -----------------------------------------------------
-data <- inner_join(dz_munic, df, by = c("code_muni", "ano"))
+data <- inner_join(dz_munic, df, by = c("code_muni", "ano")) %>%
+  ungroup() %>%
+  mutate(cod_ibge = as.numeric(code_muni)) %>%
+  select(-code_muni)
 
 
 # export ------------------------------------------------------------------
 saveRDS(data, "data/dz_munic_mortalidade.rds")
+
+# dictionary --------------------------------------------------------------
+columns <- names(data)
+
+# for the non-datasus variables
+dic_dz_munic <- read_csv(file = 'data/dz_munic_dic.csv') %>% 
+  filter(var %in% columns) %>% 
+  select(-`...1`)
+
+# building health dictionary
+dic_mortalidade <- load_dictionary("datasus_sim") %>%
+  filter(is_cid_code) %>%
+  select("var" = name_pt, "label" = label_pt)
+
+# Adding external causes, infantile, maternal, and fetal deaths manually since they aren't in the original database
+dic_mortalidade <- dic_mortalidade %>%
+  bind_rows(
+    tribble(~ var, ~ label,
+            "t_infantil", "Mortes infantis",
+            "t_maternal", "Mortes maternas",
+            "t_fetal", "Mortes fetais")
+  )
+
+# Adding the remainder of the dictionary columns
+
+dic_mortalidade <- dic_mortalidade %>%
+  mutate(var = var,
+         x = TRUE,
+         y = TRUE,
+         color = FALSE,
+         size = FALSE,
+         slider = FALSE,
+         geometry = FALSE,
+         label = label,
+         desc = var,
+         var_group = "Saúde - DATASUS",
+         unidade = NA,
+         categoria = "Social",
+         subcategoria = "Saúde")
+
+# join dictionaries
+temp_param_table <- rbind(dic_dz_munic, dic_mortalidade)
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/dz_munic_mortalidade_dic.csv", fileEncoding = "UTF-8")
