@@ -52,6 +52,14 @@ get_ui <- function(files, param) {
                                                       pauseButton = "\u23F8"),
                            sep = "")
              ),
+             # espaço vazio
+             div(class = "fakecheckbox", ),
+             div(
+               shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
+                                   icon = icon("expand"), 
+                                   class = "btn-primary",
+                                   onclick = "window.open('https://datazoom.shinyapps.io/app_map_comex_exp_sh4_sel/', '_blank')")
+             ),
       ),
       column(9,
              class = "plotcol h-100",
