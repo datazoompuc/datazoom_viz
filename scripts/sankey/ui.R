@@ -9,6 +9,12 @@ get_ui <- function(files, param) {
       class = "mainrow h-100",
       column(3, # dimensão da coluna do bootstrap
         class = "menucol",
+        
+        # muda cor do background (#007e47, #00596d, #99b0c8, #757575)
+        tags$style('.menucol {
+                             background-color: #007e47;
+              }'),
+        
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),

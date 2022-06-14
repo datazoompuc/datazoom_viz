@@ -126,6 +126,10 @@ get_server <- function(files, param) {
             df_p$color <- " "
           }
 
+          # Ordenar data.frame  
+          df_p <- df_p %>%
+            arrange(desc(y))
+          
           # Define paleta de cores
           pallete <- pallete_discrete
 
@@ -139,7 +143,10 @@ get_server <- function(files, param) {
             
             node = list(
               label = c("Amazônia", df_p$group), # label de origem, label de destino
-              color = pallete_discrete[3],
+              color = c(pallete[4], 
+                        rep(pallete[3], 5),
+                        rep(pallete[2], 5),
+                        rep(pallete[1], nrow(df_p) - 10)), # cores para cada node
               hovertemplate = "<b> %{label} </b>",
               pad = 15,
               thickness = 10,
