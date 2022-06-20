@@ -136,6 +136,15 @@ data <- inner_join(dz_munic, df, by = c("code_muni", "ano")) %>%
   mutate(cod_ibge = as.numeric(code_muni)) %>%
   select(-code_muni)
 
+# manipulations -----------------------------------------------------------
+
+# mortality per 100k residents
+
+data <- data %>%
+  mutate(across(starts_with("t_"),
+                ~ 10^5 * ./pop))
+
+# adjusted mortality by age ??
 
 # export ------------------------------------------------------------------
 saveRDS(data, "data/dz_munic_mortalidade.rds")
@@ -160,6 +169,17 @@ dic_mortalidade <- dic_mortalidade %>%
             "t_infantil", "Mortes infantis",
             "t_maternal", "Mortes maternas",
             "t_fetal", "Mortes fetais")
+  )
+
+# Changing label format
+
+dic_mortalidade <- dic_mortalidade %>%
+  mutate(
+    label = paste0(
+      "Mortalidade por ",
+      tolower(label),
+      " por 100 mil habitantes"
+    )
   )
 
 # Adding the remainder of the dictionary columns
