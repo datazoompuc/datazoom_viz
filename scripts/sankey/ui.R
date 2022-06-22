@@ -13,7 +13,7 @@ get_ui <- function(files, param) {
         # muda cor do background (#007e47, #00596d, #99b0c8, #757575)
         tags$style('.menucol {
                              background-color: #007e47;
-              }'),
+              }',),
         
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
@@ -43,6 +43,12 @@ get_ui <- function(files, param) {
         ),
         # espaço vazio
         div(class = "fakecheckbox", ),
+        div(
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
+                              icon = icon("expand"), 
+                              class = "btn-primary",
+                              onclick = "window.open('https://datazoom.shinyapps.io/app_sankey_comex_exp_pais_sec/', '_blank')")
+        ),
       ),
       column(9,
         class = "plotcol h-100",
