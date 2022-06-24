@@ -15,6 +15,14 @@ get_ui <- function(files, param) {
                              background-color: #007e47;
               }',),
         
+        # muda cor do botao 
+        tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+                      background-color: #93be4f !important;
+                      border-color: #93be4f !important;
+          }',),
+        
+        
+        
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
