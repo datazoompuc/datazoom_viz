@@ -12,13 +12,13 @@ get_ui <- function(files, param) {
         
         # muda cor do background (#007e47, #00596d, #99b0c8, #757575)
         tags$style('.menucol {
-                             background-color: #007e47;
+                             background-color: #73C373;
               }',),
         
         # muda cor do botao 
         tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
-                      background-color: #93be4f !important;
-                      border-color: #93be4f !important;
+                      background-color: #5FB37E !important;
+                      border-color: #5FB37E !important;
           }',),
         
         
