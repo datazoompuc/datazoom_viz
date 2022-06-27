@@ -10,7 +10,7 @@ get_ui <- function(files, param) {
       column(3, # dimensão da coluna do bootstrap
         class = "menucol",
         
-        # muda cor do background (#007e47, #00596d, #99b0c8, #757575)
+        # muda cor do background
         tags$style('.menucol {
                              background-color: #73C373;
               }',),
