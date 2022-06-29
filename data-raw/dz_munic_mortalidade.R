@@ -1,11 +1,12 @@
 # packages ----------------------------------------------------------------
 library(tidyverse)
-#library(datazoom.amazonia)
-devtools::load_all("./../datazoom.amazonia") # While load_datasus hasn't been pushed to main
+library(datazoom.amazonia)
 
 # load data ---------------------------------------------------------------
 
 # To avoid taking up all the RAM, each year is downloaded and aggregated separately
+
+# SIM - DO data
 
 df_all <- map_dfr(
   1996:2020, 
@@ -28,6 +29,8 @@ df_all <- df_all %>%
   drop_na(code_muni) %>%
   select(-t_causas_externas)
 
+# SIM - DOEXT data
+
 df_external_causes <- map_dfr(
   1996:2020, 
   
@@ -46,6 +49,8 @@ df_external_causes <- map_dfr(
     summarise(across(starts_with("t_"), sum)) %>%
     rename("t_causas_externas" = t_total)
 ) 
+
+# SIM - DOINF data
 
 df_infantil <- map_dfr(
   1996:2020, 
@@ -66,6 +71,8 @@ df_infantil <- map_dfr(
     rename("t_infantil" = t_total)
 )
 
+# SIM - DOMAT data
+
 df_maternal <- map_dfr(
   1996:2020, 
   
@@ -84,6 +91,8 @@ df_maternal <- map_dfr(
     summarise(across(starts_with("t_"), sum)) %>%
     rename("t_infantil" = t_total)
 )
+
+# SIM - DOFET data
 
 df_fetal <- map_dfr(
   1996:2020, 
@@ -104,6 +113,26 @@ df_fetal <- map_dfr(
     rename("t_fetal" = t_total)
 )
 
+# CNES - LT (Leitos) data
+
+df_cnes_lt <- map_dfr(
+  2005:2020, 
+  
+  ~ load_datasus(
+    dataset = "datasus_cnes_lt",
+    time_period = .x,
+    states = c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "BA", "MS", "MT", "GO"),
+    raw_data = FALSE,
+    keep_all = FALSE,
+    language = "pt"
+  ) %>%
+    filter(legal_amazon == 1) %>%
+    rename("ano" = year) %>%
+    select(code_muni, code_state, abbrev_state, ano, n_leitos_existentes, n_leitos_sus, n_leitos_nao_sus) %>%
+    group_by(code_muni, code_state, abbrev_state, ano) %>%
+    summarise(across(starts_with("n_"), sum))
+)
+
 dz_munic <- read_rds("data/dz_munic.rds") %>% 
   sf::st_drop_geometry() %>% 
   mutate(ano = lubridate::year(ano)) %>%
@@ -112,7 +141,7 @@ dz_munic <- read_rds("data/dz_munic.rds") %>%
   mutate(code_muni = as.character(cod_ibge)) %>%
   select(!employed_census2000:median_income_census2010) # remove Census variables
 
-# joining all causes of death ---------------------------------------------
+# joining all causes of death + hospital beds ------------------------------------------
 
 df <- list(
   df_all,
@@ -125,10 +154,19 @@ df <- list(
     . %>%
       ungroup() %>%
       select(code_muni, ano, starts_with("t_")) %>%
-      mutate(across(starts_with("_t"), ~ replace(., is.na(.), 0)))
+      mutate(across(starts_with("t_"), ~ replace(., is.na(.), 0)))
   ) %>%
   reduce(full_join, by = c("code_muni", "ano")) %>%
   mutate(across(code_muni, as.character))
+
+# Joining CNES LT
+
+df <- df_cnes_lt %>%
+  ungroup() %>%
+  select(code_muni_ano, starts_with("n_")) %>%
+  mutate(across(starts_with("n_"), ~ replace(., is.na(.), 0))) %>%
+  mutate(across(code_muni, as.character)) %>%
+  full_join(df, ., by = c("code_muni", "ano"))
 
 # merge with dz_munic -----------------------------------------------------
 data <- inner_join(dz_munic, df, by = c("code_muni", "ano")) %>%
@@ -158,28 +196,61 @@ dic_dz_munic <- read_csv(file = 'data/dz_munic_dic.csv') %>%
   select(-`...1`)
 
 # building health dictionary
-dic_mortalidade <- load_dictionary("datasus_sim") %>%
-  filter(is_cid_code) %>%
-  select("var" = name_pt, "label" = label_pt)
-
-# Adding external causes, infantile, maternal, and fetal deaths manually since they aren't in the original database
-dic_mortalidade <- dic_mortalidade %>%
-  bind_rows(
-    tribble(~ var, ~ label,
-            "t_infantil", "Mortes infantis",
-            "t_maternal", "Mortes maternas",
-            "t_fetal", "Mortes fetais")
-  )
-
-# Changing label format
-
-dic_mortalidade <- dic_mortalidade %>%
-  mutate(
-    label = paste0(
-      "Mortalidade por ",
-      tolower(label),
-      " por 100 mil habitantes"
-    )
+dic_mortalidade <- tribble(
+  ~var, ~label, ~var_group
+  "t_total", "Mortalidade bruta por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_causas_externas", "Mortalidade por causas externas por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_cardiovascular", "Mortalidade por doen\u00e7as do aparelho circulat\u00f3rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_respiratorio", "Mortalidade por doen\u00e7as do aparelho respirat\u00f3rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_infecciosas", "Mortalidade por algumas doen\u00e7as infecciosas e parasit\u00e1rias por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_neoplasias", "Mortalidade por neoplasias por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_cancer_mama", "Mortalidade por neoplasia maligna da mama por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_cancer_colo_utero", "Mortalidade por neoplasia maligna do colo do \u00fatero por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_comunicaveis", "Mortalidade por doen\u00e7as comunic\u00e1veis por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_nao_comunicaveis", "Mortalidade por doen\u00e7as n\u00e3o comunic\u00e1veis por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_diabetes", "Mortalidade por diabetes mellitus por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_malaria", "Mortalidade por mal\u00e1ria por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_aids", "Mortalidade por doen\u00e7a por HIV por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_autoprovocadas", "Mortalidade por les\u00e7es autoprovocadas voluntariamente por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_agressoes", "Mortalidade por agress\u00e7es por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_acidentes", "Mortalidade por acidentes por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_transporte", "Mortalidade por acidentes de transporte por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_pedestre", "Mortalidade de pedestres em acidentes de transporte por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_motociclista", "Mortalidade de motociclistas em acidentes de transporte por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_ciclista", "Mortalidade de ciclistas em acidentes de transporte por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  
+  "t_srag", "S\u00edndrome respirat\u00f3ria aguda grave por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_cigarro_eletronico", "Transtorno relacionados a uso de vaporizador ou cigarro eletr\u00f4nico por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_covid_identificada", "COVID-19, v\u00edrus identificado por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_covid_nao_identificada", "COVID-19, v\u00edrus n\u00e3o identificado por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_covid_historico", "Hist\u00f3rico pessoal de COVID-19 por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_pos_covid", "Condi\u00e7\u00e3o p\u00f3s-COVID por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_inflamacao_covid", "S\u00edndrome inflamat\u00f3ria multissist\u00eamica associada a COVID-19 por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  
+  "t_infantil", "Mortalidade infantil", "Saúde - DATASUS - SIM",
+  "t_maternal", "Mortalidade materna", "Saúde - DATASUS - SIM",
+  "t_fetal", "Mortalidade fetal", "Saúde - DATASUS - SIM",
+  
+  "t_sangue", "Mortalidade por doen\u00e7as do  por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_endocrinas", "Mortalidade por doen\u00e7as end\u00f3crinas, nutricionais de metab\u00f3licas por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_mentais", "Mortalidade por transtornos mentais e comportamentais por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_nervoso", "Mortalidade por doen\u00e7as do sistema nervoso por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_olho", "Mortalidade por doen\u00e7as do olho e anexos por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_ouvido", "Mortalidade por doen\u00e7as do ouvido e da ap\u00f3fise mastoide por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_digestivo", "Mortalidade por doen\u00e7as do aparelho digestivo por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_pele", "Mortalidade por doen\u00e7as da pele por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_osteomuscular", "Mortalidade por doen\u00e7as do sistema osteomuscular e do tecido conjuntivo por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_genitourinario", "Mortalidade por doen\u00e7as do aparelho genitourin\u00e1rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_gravidez", "Mortalidade decorrente de gravidez, parto, ou puerp\u00e9rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_perinatal", "Mortalidade por algumas afec\u00e7oes originadas no perinatal por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_malformacoes", "Mortalidade por malforma\u00e7\u00f5es cong\u00eanitas, deformidades e anomalias cromoss\u00f4micas por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_anormais", "Mortalidade por sintomas, sinais e achados anormais de exames cl\u00ednicos e de laborat\u00f3rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_lesoes", "Mortalidade por les\u00f5es, envenenamentos e algumas outras causas externas por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_influencia", "Mortalidade por fatores que exercem influ\u00eancia sobre o contato com servi\u00e7os de sa\u00fade por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  
+  "n_leitos_existentes", "N\u00famero de leitos existentes",  "Saúde - DATASUS - CNES",
+  "n_leitos_sus", "N\u00famero de leitos dispon\u00edveis para o SUS",  "Saúde - DATASUS - CNES",
+  "n_leitos_nao_sus", "N\u00famero de leitos n\u00e3o dispon\u00edveis para o SUS",  "Saúde - DATASUS - CNES",
   )
 
 # Adding the remainder of the dictionary columns
@@ -194,7 +265,7 @@ dic_mortalidade <- dic_mortalidade %>%
          geometry = FALSE,
          label = label,
          desc = var,
-         var_group = "Saúde - DATASUS",
+         var_group = var_group,
          unidade = NA,
          categoria = "Social",
          subcategoria = "Saúde")
