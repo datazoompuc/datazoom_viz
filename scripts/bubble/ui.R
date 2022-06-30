@@ -9,6 +9,18 @@ get_ui <- function(files, param) {
       class = "mainrow h-100",
       column(3, # dimensão da coluna do bootstrap
         class = "menucol",
+        
+        # muda cor do background
+        tags$style('.menucol {
+                             background-color: #414683;
+              }',),
+        
+        # muda cor do botao 
+        tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+                          background-color: #423379 !important;
+                          border-color: #423379 !important;
+              }',),
+        
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
@@ -72,6 +84,15 @@ get_ui <- function(files, param) {
             selected = param$size_def,
             width = "100%"
           )
+        ),
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        
+        div(
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
+                              icon = icon("expand"), 
+                              class = "btn-primary",
+                              onclick = "window.open('https://datazoom.shinyapps.io/app_bubble_dz_munic/', '_blank')")
         ),
       ),
       column(9,
