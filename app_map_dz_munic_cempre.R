@@ -8,7 +8,7 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/map/ui.R"
+files$ui_script <- "scripts/map_dz_munic_cempre/ui.R"
 files$server_script <- "scripts/map/server.R"
 files$param_script <- "scripts/map/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
