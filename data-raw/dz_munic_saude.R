@@ -89,7 +89,7 @@ df_maternal <- map_dfr(
     select(code_muni, code_state, abbrev_state, ano, t_total) %>%
     group_by(code_muni, code_state, abbrev_state, ano) %>%
     summarise(across(starts_with("t_"), sum)) %>%
-    rename("t_infantil" = t_total)
+    rename("t_maternal" = t_total)
 )
 
 # SIM - DOFET data
@@ -163,9 +163,10 @@ df <- list(
 
 df <- df_cnes_lt %>%
   ungroup() %>%
-  select(code_muni_ano, starts_with("n_")) %>%
+  select(code_muni, ano, starts_with("n_")) %>%
   mutate(across(starts_with("n_"), ~ replace(., is.na(.), 0))) %>%
   mutate(across(code_muni, as.character)) %>%
+  mutate(across(ano, as.numeric)) %>%
   full_join(df, ., by = c("code_muni", "ano"))
 
 # merge with dz_munic -----------------------------------------------------
@@ -176,19 +177,18 @@ data <- inner_join(dz_munic, df, by = c("code_muni", "ano")) %>%
 
 # manipulations -----------------------------------------------------------
 
-# mortality per 100k residents
+# mortality and beds per 100k residents
 
 data <- data %>%
-  mutate(across(starts_with("t_"),
+  mutate(across(c(starts_with("t_"), starts_with("n_")),
                 ~ 10^5 * ./pop))
 
 # adjusted mortality by age ??
 
 # export ------------------------------------------------------------------
-saveRDS(data, "data/dz_munic_mortalidade.rds")
+saveRDS(data, "data/dz_munic_saude.rds")
 
 # dictionary --------------------------------------------------------------
-columns <- names(data)
 
 # for the non-datasus variables
 dic_dz_munic <- read_csv(file = 'data/dz_munic_dic.csv') %>% 
@@ -197,7 +197,7 @@ dic_dz_munic <- read_csv(file = 'data/dz_munic_dic.csv') %>%
 
 # building health dictionary
 dic_mortalidade <- tribble(
-  ~var, ~label, ~var_group
+  ~var, ~label, ~var_group,
   "t_total", "Mortalidade bruta por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_causas_externas", "Mortalidade por causas externas por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_cardiovascular", "Mortalidade por doen\u00e7as do aparelho circulat\u00f3rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
@@ -205,7 +205,7 @@ dic_mortalidade <- tribble(
   "t_infecciosas", "Mortalidade por algumas doen\u00e7as infecciosas e parasit\u00e1rias por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_neoplasias", "Mortalidade por neoplasias por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_cancer_mama", "Mortalidade por neoplasia maligna da mama por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_cancer_colo_utero", "Mortalidade por neoplasia maligna do colo do \u00fatero por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_cancer_colo_do_utero", "Mortalidade por neoplasia maligna do colo do \u00fatero por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_comunicaveis", "Mortalidade por doen\u00e7as comunic\u00e1veis por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_nao_comunicaveis", "Mortalidade por doen\u00e7as n\u00e3o comunic\u00e1veis por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_diabetes", "Mortalidade por diabetes mellitus por 100 mil habitantes", "Saúde - DATASUS - SIM",
@@ -248,9 +248,9 @@ dic_mortalidade <- tribble(
   "t_lesoes", "Mortalidade por les\u00f5es, envenenamentos e algumas outras causas externas por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_influencia", "Mortalidade por fatores que exercem influ\u00eancia sobre o contato com servi\u00e7os de sa\u00fade por 100 mil habitantes", "Saúde - DATASUS - SIM",
   
-  "n_leitos_existentes", "N\u00famero de leitos existentes",  "Saúde - DATASUS - CNES",
-  "n_leitos_sus", "N\u00famero de leitos dispon\u00edveis para o SUS",  "Saúde - DATASUS - CNES",
-  "n_leitos_nao_sus", "N\u00famero de leitos n\u00e3o dispon\u00edveis para o SUS",  "Saúde - DATASUS - CNES",
+  "n_leitos_existentes", "N\u00famero de leitos existentes por 100 mil habitantes",  "Saúde - DATASUS - CNES",
+  "n_leitos_sus", "N\u00famero de leitos dispon\u00edveis para o SUS por 100 mil habitantes",  "Saúde - DATASUS - CNES",
+  "n_leitos_nao_sus", "N\u00famero de leitos n\u00e3o dispon\u00edveis para o SUS por 100 mil habitantes",  "Saúde - DATASUS - CNES",
   )
 
 # Adding the remainder of the dictionary columns
@@ -274,4 +274,4 @@ dic_mortalidade <- dic_mortalidade %>%
 temp_param_table <- rbind(dic_dz_munic, dic_mortalidade)
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/dz_munic_mortalidade_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/dz_munic_saude_dic.csv", fileEncoding = "UTF-8")

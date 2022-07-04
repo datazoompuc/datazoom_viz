@@ -23,7 +23,7 @@ source(files$server_script)
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "t_mortalidade_adj" # variável padrão do eixo x
+param$x_def <- "t_total" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$color_def <- "" # variável padrão de cor
 param$size_def <- "" # variável padrão de tamanho
@@ -34,7 +34,7 @@ param$id_def <- "cod_ibge" # variável padrão de id
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Saúde na Amazônia: Mortalidade ao nível municipal"
 
-param$year_inicio <- 2008
+param$year_inicio <- 2006
 param$year_final <- 2019
 
 # Outros parâmetros e configurações

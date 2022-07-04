@@ -25,7 +25,7 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "desmatado" # variável padrão do eixo x
-param$y_def <- "t_mortalidade_adj" # variável padrão do eixo y
+param$y_def <- "t_total" # variável padrão do eixo y
 param$color_def <- "estado" # variável padrão de cor
 param$size_def <- "pop" # variável padrão de tamanho
 param$slider_def <- "ano" # variável padrão do slider
