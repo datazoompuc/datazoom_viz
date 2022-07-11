@@ -27,7 +27,7 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      selected <- "t_mortalidade_adj"
+      selected <- "t_total"
       updateSelectInput(session,
         "x",
         choices = param$x_choices,
@@ -84,7 +84,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Mapa dos municípios da Amazônia Legal")
+        text <- paste0("Mapa dos munic\u00edpios da Amaz\u00f4nia Legal")
       }
 
       text
@@ -96,7 +96,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Variável selecionada: ", x_col$label)
+        text <- paste0("Vari\u00e1vel selecionada: ", x_col$label)
       }
 
       text

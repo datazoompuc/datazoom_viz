@@ -31,8 +31,8 @@ param$slider_def <- "ano" # variável padrão do slider
 param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
-param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Saúde na Amazônia: Mortalidade ao nível municipal"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Sa\u00fade na Amaz\u00f4nia: Mortalidade ao n\u00edvel municipal"
 
 param$year_inicio <- 2006
 param$year_final <- 2019
