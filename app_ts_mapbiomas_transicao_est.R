@@ -35,6 +35,7 @@ param$plot_name <- "Data Zoom Amazonia"
 param$plot_desc <- "Transição/mudança de cobertura e uso do solo"
 
 # Outros parâmetros e configurações
+param$y_choices[[1]] <- NULL
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

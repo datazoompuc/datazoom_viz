@@ -9,6 +9,18 @@ get_ui <- function(files, param) {
       class = "mainrow h-100",
       column(3, # dimensÃ£o da coluna do bootstrap
         class = "menucol",
+        
+        # muda cor do background
+        tags$style('.menucol {
+                             background-color: #41878C;
+              }',),
+        
+        # muda cor do botao 
+        tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+                          background-color: #40768B !important;
+                          border-color: #40768B !important;
+              }',),
+        
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
@@ -48,6 +60,16 @@ get_ui <- function(files, param) {
           multiple = TRUE,
           options = list(maxItems = 20),
           width = "100%"
+        ),
+        
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        
+        div(
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
+                              icon = icon("expand"), 
+                              class = "btn-primary",
+                              onclick = "window.open('https://datazoom.shinyapps.io/app_ts_comex_exp_tot_sh2/', '_blank')")
         ),
       ),
       column(9,

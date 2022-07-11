@@ -7,7 +7,7 @@ library(lubridate)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/bubble/ui.R"
+files$ui_script <- "scripts/bubble_dz_munic_saude/ui.R"
 files$server_script <- "scripts/bubble_dz_munic_saude/server.R"
 files$param_script <- "scripts/bubble/db_params.R"
 

@@ -6,14 +6,14 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_mapbiomas_transicao/ui.R"
-files$server_script <- "scripts/ts_mapbiomas_transicao/server.R"
-files$param_script <- "scripts/ts_mapbiomas_transicao/db_params.R"
+files$ui_script <- "scripts/sankey/ui.R"
+files$server_script <- "scripts/sankey/server.R"
+files$param_script <- "scripts/sankey/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
-files$param_file <- "data/mapbiomas_transicao_munic_dic.csv"
-files$db_file <- "data/mapbiomas_transicao_munic_5.rds"
+files$param_file <- "data/comex_exp_pais_sec_dic.csv"
+files$db_file <- "data/comex_exp_pais_sec.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -24,17 +24,20 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "time" # variável padrão do eixo x
-param$y_def <- "area" # variável padrão do eixo y
+param$y_def <- "Produtos do reino vegetal" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 
 
-param$plot_name <- "Data Zoom Amazonia"
-param$plot_desc <- "Transição/mudança de cobertura e uso do solo"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos por  pa\u00eds de destino"
 
 # Outros parâmetros e configurações
+param$y_choices[[1]] <- NULL
+param$year_inicio <- 1997
+param$year_final <- 2021
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

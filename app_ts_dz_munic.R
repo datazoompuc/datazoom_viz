@@ -6,7 +6,7 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts/ui.R"
+files$ui_script <- "scripts/ts_dz_munic/ui.R"
 files$server_script <- "scripts/ts_dz_munic/server.R"
 files$param_script <- "scripts/ts_dz_munic/db_params.R"
 
