@@ -185,6 +185,21 @@ data <- data %>%
 
 # adjusted mortality by age ??
 
+# removing variables that never appear
+# (not all CID codes are actually used for deaths)
+
+total_deaths <- data %>%
+  summarise(across(c(starts_with("t_"), starts_with("n_")), ~ sum(., na.rm = TRUE)))
+
+drop_vars <- total_deaths %>%
+  pivot_longer(everything()) %>%
+  filter(value == 0) %>%
+  select(name) %>%
+  unlist()
+
+data <- data %>%
+  select(-any_of(drop_vars))
+
 # export ------------------------------------------------------------------
 saveRDS(data, "data/dz_munic_saude.rds")
 
@@ -192,7 +207,7 @@ saveRDS(data, "data/dz_munic_saude.rds")
 
 # for the non-datasus variables
 dic_dz_munic <- read_csv(file = 'data/dz_munic_dic.csv') %>% 
-  filter(var %in% columns) %>% 
+  filter(var %in% names(data)) %>% 
   select(-`...1`)
 
 # building health dictionary
@@ -211,27 +226,27 @@ dic_mortalidade <- tribble(
   "t_diabetes", "Mortalidade por diabetes mellitus por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_malaria", "Mortalidade por mal\u00e1ria por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_aids", "Mortalidade por doen\u00e7a por HIV por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_autoprovocadas", "Mortalidade por les\u00e7es autoprovocadas voluntariamente por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_agressoes", "Mortalidade por agress\u00e7es por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_autoprovocadas", "Mortalidade por les\u00f5es autoprovocadas voluntariamente por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_agressoes", "Mortalidade por agress\u00f5es por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_acidentes", "Mortalidade por acidentes por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_transporte", "Mortalidade por acidentes de transporte por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_pedestre", "Mortalidade de pedestres em acidentes de transporte por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_motociclista", "Mortalidade de motociclistas em acidentes de transporte por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_ciclista", "Mortalidade de ciclistas em acidentes de transporte por 100 mil habitantes", "Saúde - DATASUS - SIM",
   
-  "t_srag", "S\u00edndrome respirat\u00f3ria aguda grave por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_cigarro_eletronico", "Transtorno relacionados a uso de vaporizador ou cigarro eletr\u00f4nico por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_covid_identificada", "COVID-19, v\u00edrus identificado por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_covid_nao_identificada", "COVID-19, v\u00edrus n\u00e3o identificado por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_covid_historico", "Hist\u00f3rico pessoal de COVID-19 por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_pos_covid", "Condi\u00e7\u00e3o p\u00f3s-COVID por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_inflamacao_covid", "S\u00edndrome inflamat\u00f3ria multissist\u00eamica associada a COVID-19 por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_srag", "Mortalidade por s\u00edndrome respirat\u00f3ria aguda grave por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_cigarro_eletronico", "Mortalidade por transtornos relacionados a uso de vaporizador ou cigarro eletr\u00f4nico por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_covid_identificada", "Mortalidade por COVID-19 com v\u00edrus identificado por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_covid_nao_identificada", "Mortalidade por COVID-19 com v\u00edrus n\u00e3o identificado por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_covid_historico", "Mortalidade por hist\u00f3rico pessoal de COVID-19 por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_pos_covid", "Mortalidade por condi\u00e7\u00e3o p\u00f3s-COVID por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_inflamacao_covid", "Mortalidade por s\u00edndrome inflamat\u00f3ria multissist\u00eamica associada a COVID-19 por 100 mil habitantes", "Saúde - DATASUS - SIM",
   
-  "t_infantil", "Mortalidade infantil", "Saúde - DATASUS - SIM",
-  "t_maternal", "Mortalidade materna", "Saúde - DATASUS - SIM",
-  "t_fetal", "Mortalidade fetal", "Saúde - DATASUS - SIM",
+  "t_infantil", "Mortalidade infantil por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_maternal", "Mortalidade materna por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_fetal", "Mortalidade fetal por 100 mil habitantes", "Saúde - DATASUS - SIM",
   
-  "t_sangue", "Mortalidade por doen\u00e7as do  por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_sangue", "Mortalidade por doen\u00e7as do sangue por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_endocrinas", "Mortalidade por doen\u00e7as end\u00f3crinas, nutricionais de metab\u00f3licas por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_mentais", "Mortalidade por transtornos mentais e comportamentais por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_nervoso", "Mortalidade por doen\u00e7as do sistema nervoso por 100 mil habitantes", "Saúde - DATASUS - SIM",
@@ -242,7 +257,7 @@ dic_mortalidade <- tribble(
   "t_osteomuscular", "Mortalidade por doen\u00e7as do sistema osteomuscular e do tecido conjuntivo por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_genitourinario", "Mortalidade por doen\u00e7as do aparelho genitourin\u00e1rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_gravidez", "Mortalidade decorrente de gravidez, parto, ou puerp\u00e9rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
-  "t_perinatal", "Mortalidade por algumas afec\u00e7oes originadas no perinatal por 100 mil habitantes", "Saúde - DATASUS - SIM",
+  "t_perinatal", "Mortalidade por algumas afec\u00e7\u00f5es originadas no perinatal por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_malformacoes", "Mortalidade por malforma\u00e7\u00f5es cong\u00eanitas, deformidades e anomalias cromoss\u00f4micas por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_anormais", "Mortalidade por sintomas, sinais e achados anormais de exames cl\u00ednicos e de laborat\u00f3rio por 100 mil habitantes", "Saúde - DATASUS - SIM",
   "t_lesoes", "Mortalidade por les\u00f5es, envenenamentos e algumas outras causas externas por 100 mil habitantes", "Saúde - DATASUS - SIM",
@@ -252,6 +267,9 @@ dic_mortalidade <- tribble(
   "n_leitos_sus", "N\u00famero de leitos dispon\u00edveis para o SUS por 100 mil habitantes",  "Saúde - DATASUS - CNES",
   "n_leitos_nao_sus", "N\u00famero de leitos n\u00e3o dispon\u00edveis para o SUS por 100 mil habitantes",  "Saúde - DATASUS - CNES",
   )
+
+dic_mortalidade <- dic_mortalidade %>%
+  filter(var %in% names(data))
 
 # Adding the remainder of the dictionary columns
 
