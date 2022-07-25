@@ -6,18 +6,49 @@
 #livestock_inventory
 
 ##municipality 
-ppm_municipality_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality', 1974:2020, language = "pt")
-ppm_livestock2020= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality',2020, language = "pt")
+## Provided time period that is supporter, otherwise there is error
+### split the data base 
+ppm_municipality_livestock_inventory1= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                1974:1980, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory2= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                1981:2000, 
+                                                language = "pt")
+
+
+ppm_municipality_livestock_inventory3= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                2001:2020, 
+                                                language = "pt")
 
 ##making data usable for datazoom viz
-ppm_municipality_livestock_inventory = lapply(ppm_municipality_livestock_inventory, as.numeric)
-ppm_municipality_livestock_inventory <- as.data.frame(ppm_municipality_livestock_inventory)
-ppm_municipality_livestock_inventory[is.na(ppm_municipality_livestock_inventory)] <- 0
+ppm_municipality_livestock_inventory1 = lapply(ppm_municipality_livestock_inventory1, as.numeric)
+ppm_municipality_livestock_inventory2 = lapply(ppm_municipality_livestock_inventory2, as.numeric)
+ppm_municipality_livestock_inventory3 = lapply(ppm_municipality_livestock_inventory3, as.numeric)
+
+ppm_municipality_livestock_inventory1 <- as.data.frame(ppm_municipality_livestock_inventory1)
+ppm_municipality_livestock_inventory2 <- as.data.frame(ppm_municipality_livestock_inventory2)
+ppm_municipality_livestock_inventory3 <- as.data.frame(ppm_municipality_livestock_inventory3)
+
+ppm_municipality_livestock_inventory1[is.na(ppm_municipality_livestock_inventory1)] <- 0
+ppm_municipality_livestock_inventory2[is.na(ppm_municipality_livestock_inventory2)] <- 0
+ppm_municipality_livestock_inventory3[is.na(ppm_municipality_livestock_inventory3)] <- 0
 
 munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
   dplyr::select('Código Município Completo', 'Nome_Município')
-ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
-ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , time=.data$ano, group=.data$geo_id)
+
+ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, 
+  from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
+
+ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , 
+  time=.data$ano, 
+  group=.data$geo_id)
 
 
 ##saving f
