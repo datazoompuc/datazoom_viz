@@ -3,6 +3,11 @@
 ##########
 ## Agregation level - MUNICIPALITY
 
+
+#### Packages
+library(tidyverse)
+library(datazoom.amazonia)
+
 #livestock_inventory
 
 ##municipality 
@@ -17,34 +22,42 @@ ppm_municipality_livestock_inventory1= load_ppm(dataset = 'ppm_livestock_invento
 ppm_municipality_livestock_inventory2= load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
-                                                1981:2000, 
+                                                1981:1990, 
                                                 language = "pt")
-
 
 ppm_municipality_livestock_inventory3= load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
-                                                2001:2020, 
+                                                1991:2000, 
                                                 language = "pt")
 
+ppm_municipality_livestock_inventory4= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                2001:2010, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory5= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                2011:2020, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory6= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                2021, 
+                                                language = "pt")
+##append datasets
+ppm_municipality_livestock_inventory <- rbind(ppm_municipality_livestock_inventory1,
+                                              ppm_municipality_livestock_inventory2,
+                                              ppm_municipality_livestock_inventory3,
+                                              ppm_municipality_livestock_inventory4,
+                                              ppm_municipality_livestock_inventory5,
+                                              ppm_municipality_livestock_inventory6)
 ##making data usable for datazoom viz
-ppm_municipality_livestock_inventory1 = lapply(ppm_municipality_livestock_inventory1, as.numeric)
-ppm_municipality_livestock_inventory2 = lapply(ppm_municipality_livestock_inventory2, as.numeric)
-ppm_municipality_livestock_inventory3 = lapply(ppm_municipality_livestock_inventory3, as.numeric)
-
-ppm_municipality_livestock_inventory1 <- as.data.frame(ppm_municipality_livestock_inventory1)
-ppm_municipality_livestock_inventory2 <- as.data.frame(ppm_municipality_livestock_inventory2)
-ppm_municipality_livestock_inventory3 <- as.data.frame(ppm_municipality_livestock_inventory3)
-
-ppm_municipality_livestock_inventory1[is.na(ppm_municipality_livestock_inventory1)] <- 0
-ppm_municipality_livestock_inventory2[is.na(ppm_municipality_livestock_inventory2)] <- 0
-ppm_municipality_livestock_inventory3[is.na(ppm_municipality_livestock_inventory3)] <- 0
-
-munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('Código Município Completo', 'Nome_Município')
-
-ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, 
-  from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
+ppm_municipality_livestock_inventory = lapply(ppm_municipality_livestock_inventory, as.numeric)
+ppm_municipality_livestock_inventory1[is.na(ppm_municipality_livestock_inventory)] <- 0
 
 ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , 
   time=.data$ano, 
