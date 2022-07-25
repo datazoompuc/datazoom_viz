@@ -40,28 +40,36 @@ ppm_municipality_livestock_inventory4= load_ppm(dataset = 'ppm_livestock_invento
 ppm_municipality_livestock_inventory5= load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
-                                                2011:2020, 
+                                                2011:2019, 
                                                 language = "pt")
 
 ppm_municipality_livestock_inventory6= load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
-                                                2021, 
+                                                2020, 
                                                 language = "pt")
 ##append datasets
-ppm_municipality_livestock_inventory <- rbind(ppm_municipality_livestock_inventory1,
-                                              ppm_municipality_livestock_inventory2,
-                                              ppm_municipality_livestock_inventory3,
-                                              ppm_municipality_livestock_inventory4,
-                                              ppm_municipality_livestock_inventory5,
-                                              ppm_municipality_livestock_inventory6)
-##making data usable for datazoom viz
-ppm_municipality_livestock_inventory = lapply(ppm_municipality_livestock_inventory, as.numeric)
-ppm_municipality_livestock_inventory1[is.na(ppm_municipality_livestock_inventory)] <- 0
 
-ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , 
-  time=.data$ano, 
-  group=.data$geo_id)
+xxx <- bind_rows(ppm_municipality_livestock_inventory1, 
+                 ppm_municipality_livestock_inventory2, 
+                 ppm_municipality_livestock_inventory3, 
+                 ppm_municipality_livestock_inventory4, 
+)
+
+# something went wrong with bind_rows with ppm_municipality_livestock_inventory5
+# I had to workraround
+zzz <- ppm_municipality_livestock_inventory5 %>% 
+  select(colnames(xxx)) 
+
+ppm_municipality_livestock_inventory <- bind_rows(zzz, xxx)
+
+##making data usable for datazoom viz
+##convert dataframe to list
+ppm_municipality_livestock_inventory = lapply(ppm_municipality_livestock_inventory, as.numeric)
+ppm_municipality_livestock_inventory[is.na(ppm_municipality_livestock_inventory)] <- 0
+
+# convert back list to dataframe
+ppm_municipality_livestock_inventory <- as.data.frame(do.call(cbind,ppm_municipality_livestock_inventory))
 
 
 ##saving f
