@@ -16,49 +16,10 @@ library(datazoom.amazonia)
 ###################
 
 ###################
-# TERRABRASILIS
-###################
-# read shapefile
-shapefile <- st_read("data/shapefiles/municipalities_legal_amazon.shp")
-
-# data too heavy (over 100mb)
-# solution: simplify geometry
-shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
-
-# plot(shapefile)
-# shapefile$cod_ibge
-
-###################
 #PPM - IBGE
 ###################
 
-#ppm_municipality_livestock_inventory1= load_ppm(dataset = 'ppm_livestock_inventory', 
-#                                                raw_data = FALSE, 'municipality', 
-#                                                1985:1999, 
-#                                                language = "pt")
-
-ppm_municipality_livestock_inventory1= load_ppm(dataset = 'ppm_livestock_inventory', 
-                                                raw_data = FALSE, 
-                                                'municipality', 
-                                                1999, 
-                                                language = "pt")
-
-
-#ppm_municipality_livestock_inventory2= load_ppm(dataset = 'ppm_livestock_inventory', 
-#                                               raw_data = FALSE, 'municipality', 
-#                                               2000:2020, 
-#                                               language = "pt")
-
-
 ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
-
-
-ppm_livestock$group <- plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município, to = munics$`Código Município Completo`)
-
-ppm_livestock= ppm_livestock%>%
-  dplyr::filter(time >= 2000)%>%
-  dplyr::select(group, time, num_v2670, num_v32794, num_v32796)
-
 
 ###################
 #MAPBIONMAS - COBERTURA
@@ -76,14 +37,14 @@ data_frame_mapbiomas <-datazoom.amazonia::load_mapbiomas(dataset = "mapbiomas_co
 class(data_frame_mapbiomas$territory_id ) <- 'numeric'
 class(data_frame_mapbiomas$year) <- 'numeric'
 
-class(ppm_municipality_livestock_inventory1$geo_id) <- 'numeric'
-class(ppm_municipality_livestock_inventory1$ano) <- 'numeric'
+class(ppm_livestock$geo_id) <- 'numeric'
+class(ppm_livestock$ano) <- 'numeric'
 
 ###########################
 # merge all data
 ###########################
 dz_munic_ppm_mapbiomas <- data_frame_mapbiomas %>%
-  full_join(ppm_municipality_livestock_inventory1, 
+  full_join(ppm_livestock, 
             by = c('territory_id' = 'geo_id', 'year' = 'ano')
             ) 
 
@@ -188,7 +149,7 @@ temp_param_table$unidade[temp_param_table$var == "cod_ibge"] <- ""
 temp_param_table$unidade[temp_param_table$var == "nm_municip"] <- ""
 temp_param_table$unidade[temp_param_table$var == "uf"] <- ""
 temp_param_table$unidade[temp_param_table$var == "ano"] <- "Ano"
-temp_param_table$unidade[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Rebano bovino por hectare de pastagem"
+temp_param_table$unidade[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Rebano bovino por área (ha) de pastagem"
 
 # var_group variables
 temp_param_table$var_group[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "IBGE - PPM e MAPBIOMAS"
