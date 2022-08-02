@@ -4,6 +4,7 @@
 
 #### Packages
 library(tidyverse)
+library(readxl)
 library(tibble)
 library(zoo)
 library(sf)
@@ -105,6 +106,21 @@ dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
     .data$n_bovino_por_area_pastagem
   ), ~ round(., digits = 2)))
 
+# adding regions
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
+  mutate(regiao= case_when(uf == 'AC' | uf == 'AM' | uf == 'AP' | uf == 'PA' | uf == 'RO' | uf == 'RR' | uf == 'TO' ~ "Norte",
+                           uf == 'AL' | uf == 'BA' | uf == 'CE' | uf == 'MA' | uf == 'PI' | uf == 'PB' | uf == 'RN' | uf == 'SE' ~ "Nordeste",
+                           uf == 'MS' | uf == 'MT' | uf == 'GO' | uf == 'DF' ~ "Centro-Oeste",
+                           uf == 'ES' | uf == 'MG' | uf == 'RJ' | uf == 'SP' ~ "Sudeste",
+                           uf == 'PR' | uf == 'RS' | uf == 'SC' ~ "Sul"))
+
+# adding legal_amazon dummy
+legal_amazon <- read_excel("data/lista_de_municipios_Amazonia_Legal_2021.xlsx")
+legal_amazon <- legal_amazon$CD_MUN
+
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
+  mutate(legal_amazon= case_when(cod_ibge %in% legal_amazon ~ TRUE,
+                                 TRUE ~ FALSE))
 # save data
 readr::write_rds(dz_munic_ppm_mapbiomas,
         file = "./data/dz_munic_ppm_mapbiomas.rds"
