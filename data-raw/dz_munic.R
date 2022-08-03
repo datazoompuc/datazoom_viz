@@ -40,7 +40,7 @@ class(income$ano) <- "numeric"
 # Reshaping data.frame from long  to wide format
 income <- income %>%
   tidyr::pivot_wider(
-    id_cols = c(cod_ibge, ano),
+    id_cols = c(cod_ibge),
     names_from = ano,
     names_prefix = "census",
     values_from = c(employed, mean_income, median_income)
