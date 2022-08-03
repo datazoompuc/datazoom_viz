@@ -157,6 +157,8 @@ temp_param_table <- tibble(
 temp_param_table$label[temp_param_table$var == "cod_ibge"] <- "C\u00f3digo do município"
 temp_param_table$label[temp_param_table$var == "nm_municip"] <- "Nome do município"
 temp_param_table$label[temp_param_table$var == "uf"] <- "Estado"
+temp_param_table$label[temp_param_table$var == "regiao"] <- "Região"
+temp_param_table$label[temp_param_table$var == "legal_amazon"] <- "Amazônia Legal"
 temp_param_table$label[temp_param_table$var == "ano"] <- "Ano"
 temp_param_table$label[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Rebanho por área de pasto"
 
@@ -164,6 +166,8 @@ temp_param_table$label[temp_param_table$var == "n_bovino_por_area_pastagem"] <- 
 temp_param_table$unidade[temp_param_table$var == "cod_ibge"] <- ""
 temp_param_table$unidade[temp_param_table$var == "nm_municip"] <- ""
 temp_param_table$unidade[temp_param_table$var == "uf"] <- ""
+temp_param_table$unidade[temp_param_table$var == "regiao"] <- ""
+temp_param_table$unidade[temp_param_table$var == "legal_amazon"] <- ""
 temp_param_table$unidade[temp_param_table$var == "ano"] <- "Ano"
 temp_param_table$unidade[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Rebano bovino por área (ha) de pastagem"
 
