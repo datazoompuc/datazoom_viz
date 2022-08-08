@@ -65,7 +65,7 @@ prodes <- prodes %>%
     prop_hidrografia = hidrografia / area_km2
   ) %>%
   select(
-    cod_ibge,
+    cod_munic_ibge,
     ano,
     desmatado,
     incremento,
@@ -78,10 +78,10 @@ prodes <- prodes %>%
     prop_nao_floresta,
     prop_hidrografia
   ) %>%
-  arrange(cod_ibge, ano)
+  arrange(cod_munic_ibge, ano)
 
 # Identify and remove duplicate data
-prodes <- prodes %>% distinct(cod_ibge, ano, .keep_all = TRUE)
+prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 
 ###################
 # INPE - DETER
@@ -327,7 +327,7 @@ class(pam_municipality_all_crops_2000_19$ano) <- 'numeric'
 # merge all data
 ###########################
 dz_munic <- income %>%
-  full_join(prodes, by = c("cod_ibge")) %>%
+  full_join(prodes, by = c("cod_ibge" = "cod_munic_ibge")) %>%
   full_join(gdp, by = c("cod_ibge", "ano")) %>%
   full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
   full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
