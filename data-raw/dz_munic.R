@@ -266,13 +266,13 @@ cempre_municipality <- cempre_municipality %>%
 
 ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
 
-munics <- readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls") %>%
-  dplyr::select("Código Município Completo", "Nome_Município")
-ppm_livestock$group <- plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município, to = munics$`Código Município Completo`)
+#munics <- readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls") %>%
+ # dplyr::select("Código Município Completo", "Nome_Município")
+#ppm_livestock$group <- plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município, to = munics$`Código Município Completo`)
 
 ppm_livestock= ppm_livestock%>%
-  dplyr::filter(time >= 2000)%>%
-  dplyr::select(group, time, num_v2670, num_v32794, num_v32796)
+  dplyr::filter(ano >= 2000)%>%
+  dplyr::select(geo_id, ano, num_v2670, num_v32794, num_v32796)
 
 ###################
 #PAM - IBGE
@@ -306,20 +306,24 @@ pam_municipality_all_crops_2000_19[is.na(pam_municipality_all_crops_2000_19)] <-
 ###########################
 # edit data to merge
 ###########################
+class(income$cod_ibge) <-  'character'
+class(ppm_livestock$geo_id) <-  'character'
 class(cempre_municipality$cod_ibge) <-  'character'
-class(prodes$cod_ibge) <-  'character'
-class(deter$cod_ibge) <-  'character'
+class(prodes$cod_munic_ibge) <-  'character'
+#class(deter$cod_ibge) <-  'character'
 class(gdp$cod_ibge) <-  'character'
-class(degrad$cod_ibge) <-  'character'
+#class(degrad$cod_ibge) <-  'character'
 class(ips$cod_municipio) <-  'character'
 class(income$cod_ibge) <-  'character'
-class(cempre_municipality$ano) <-  'numeric'
+#class(ppm_livestock$group) <-  'character'
 
+
+class(cempre_municipality$ano) <-  'numeric'
 class(prodes$ano) <-  'numeric'
-class(deter$ano) <-  'numeric'
+#class(deter$ano) <-  'numeric'
 class(gdp$ano) <-  'numeric'
-class(degrad$ano) <-  'numeric'
-class(income$ano) <-  'numeric'
+#class(degrad$ano) <-  'numeric'
+#class(income$ano) <-  'numeric'
 class(ips$cod_municipio) <-  'character'
 class(pam_municipality_all_crops_2000_19$ano) <- 'numeric'
 
@@ -331,8 +335,8 @@ dz_munic <- income %>%
   full_join(gdp, by = c("cod_ibge", "ano")) %>%
   full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
   full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
-  full_join(ppm_livestock, by = c('cod_ibge' = 'group', 'ano' = 'time'))%>%
-  full_join(pam_municipality_all_crops_2000_19, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano'))%>%
+  full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
+  full_join(pam_municipality_all_crops_2000_19, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
   arrange(cod_ibge, ano) %>%
   relocate(cod_ibge, ano)
 
