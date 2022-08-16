@@ -3,21 +3,73 @@
 ##########
 ## Agregation level - MUNICIPALITY
 
+
+#### Packages
+library(tidyverse)
+library(datazoom.amazonia)
+
 #livestock_inventory
 
 ##municipality 
-ppm_municipality_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality', 1974:2020, language = "pt")
-ppm_livestock2020= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'municipality',2020, language = "pt")
+## Provided time period that is supporter, otherwise there is error
+### split the data base 
+ppm_municipality_livestock_inventory1= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                1974:1980, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory2= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                1981:1990, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory3= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                1991:2000, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory4= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                2001:2010, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory5= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                2011:2019, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory6= load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                2020, 
+                                                language = "pt")
+##append datasets
+
+xxx <- bind_rows(ppm_municipality_livestock_inventory1, 
+                 ppm_municipality_livestock_inventory2, 
+                 ppm_municipality_livestock_inventory3, 
+                 ppm_municipality_livestock_inventory4, 
+)
+
+# something went wrong with bind_rows with ppm_municipality_livestock_inventory5
+# I had to workraround
+zzz <- ppm_municipality_livestock_inventory5 %>% 
+  select(colnames(xxx)) 
+
+ppm_municipality_livestock_inventory <- bind_rows(zzz, xxx)
 
 ##making data usable for datazoom viz
+##convert dataframe to list
 ppm_municipality_livestock_inventory = lapply(ppm_municipality_livestock_inventory, as.numeric)
-ppm_municipality_livestock_inventory <- as.data.frame(ppm_municipality_livestock_inventory)
 ppm_municipality_livestock_inventory[is.na(ppm_municipality_livestock_inventory)] <- 0
 
-munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('Código Município Completo', 'Nome_Município')
-ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
-ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , time=.data$ano, group=.data$geo_id)
+# convert back list to dataframe
+ppm_municipality_livestock_inventory <- as.data.frame(do.call(cbind,ppm_municipality_livestock_inventory))
 
 
 ##saving f
