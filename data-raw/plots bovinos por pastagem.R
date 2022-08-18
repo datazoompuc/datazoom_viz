@@ -59,6 +59,12 @@ ppm_mapbiomas_ne= ppm_mapbiomas19%>%
 ppm_mapbiomas_co= ppm_mapbiomas19%>%
   filter(regiao=="Centro-Oeste")
 
+legal_true= ppm_mapbiomas19%>%
+  filter(legal_amazon== TRUE)
+
+legal_false= ppm_mapbiomas19%>%
+  filter(legal_amazon== FALSE)
+
 ###ploting histogram for each region
 ggplot()+
   geom_histogram(data= ppm_mapbiomas_ne, aes(x=log), bins = 30)+
@@ -80,6 +86,15 @@ ggplot()+
   geom_histogram(data= ppm_mapbiomas_co, aes(x=log), bins = 30)+
   ggtitle("Número de Bovino/Hectares de Área de Pastagem (Centro-Oeste)")
 
+ggplot()+
+  geom_histogram(data= legal_true, aes(x=log), bins = 30)+
+  ggtitle("Número de Bovino/Hectares de Área de Pastagem (Amazônia Legal)")
+
+ggplot()+
+  geom_histogram(data= legal_false, aes(x=log), bins = 30)+
+  ggtitle("Número de Bovino/Hectares de Área de Pastagem (Fora da Amazônia Legal)")
+
+
 
 #means for each state
 medias= ppm_mapbiomas19%>%
@@ -94,4 +109,9 @@ ggplot(data= medias)+
 ggplot(data= ppm_mapbiomas19)+
   geom_boxplot(aes(x= regiao, y= log))+
   xlab("Regiões")+
+  ylab("Bovinos / Hectare de Pastagem")
+
+ggplot(data= ppm_mapbiomas19)+
+  geom_boxplot(aes(x= legal_amazon, y= log))+
+  xlab("Amazônia Legal")+
   ylab("Bovinos / Hectare de Pastagem")
