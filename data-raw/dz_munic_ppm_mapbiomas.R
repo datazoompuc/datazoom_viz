@@ -108,11 +108,11 @@ dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
 
 # adding regions
 dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
-  mutate(regiao= case_when(uf == 'AC' | uf == 'AM' | uf == 'AP' | uf == 'PA' | uf == 'RO' | uf == 'RR' | uf == 'TO' ~ "Norte",
-                           uf == 'AL' | uf == 'BA' | uf == 'CE' | uf == 'MA' | uf == 'PI' | uf == 'PB' | uf == 'PE' | uf == 'RN' | uf == 'SE' ~ "Nordeste",
-                           uf == 'MS' | uf == 'MT' | uf == 'GO' | uf == 'DF' ~ "Centro-Oeste",
-                           uf == 'ES' | uf == 'MG' | uf == 'RJ' | uf == 'SP' ~ "Sudeste",
-                           uf == 'PR' | uf == 'RS' | uf == 'SC' ~ "Sul"))
+  mutate(regiao= case_when(uf %in% c('AC','AM','AP','PA','RO','RR','TO') ~ "Norte",
+                           uf %in% c('AL','BA','CE','MA','PI','PB','PE','RN','SE') ~ "Nordeste",
+                           uf %in% c('MS','MT','GO','DF') ~ "Centro-Oeste",
+                           uf %in% c('ES','MG','RJ','SP') ~ "Sudeste",
+                           uf %in% c('PR','RS','SC') ~ "Sul"))
 
 # adding legal_amazon dummy
 legal_amazon <- read_excel("data/lista_de_municipios_Amazonia_Legal_2021.xlsx")
