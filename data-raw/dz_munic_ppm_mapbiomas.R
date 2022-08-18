@@ -109,7 +109,7 @@ dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
 # adding regions
 dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
   mutate(regiao= case_when(uf == 'AC' | uf == 'AM' | uf == 'AP' | uf == 'PA' | uf == 'RO' | uf == 'RR' | uf == 'TO' ~ "Norte",
-                           uf == 'AL' | uf == 'BA' | uf == 'CE' | uf == 'MA' | uf == 'PI' | uf == 'PB' | uf == 'RN' | uf == 'SE' ~ "Nordeste",
+                           uf == 'AL' | uf == 'BA' | uf == 'CE' | uf == 'MA' | uf == 'PI' | uf == 'PB' | uf == 'PE' | uf == 'RN' | uf == 'SE' ~ "Nordeste",
                            uf == 'MS' | uf == 'MT' | uf == 'GO' | uf == 'DF' ~ "Centro-Oeste",
                            uf == 'ES' | uf == 'MG' | uf == 'RJ' | uf == 'SP' ~ "Sudeste",
                            uf == 'PR' | uf == 'RS' | uf == 'SC' ~ "Sul"))
