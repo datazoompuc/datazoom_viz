@@ -213,7 +213,7 @@ ips <- ips %>%
 # Reshaping data.frame from long  to wide format
 ips <- ips %>%
   tidyr::pivot_wider(
-    id_cols = c(cod_municipio, ano),
+    id_cols = c(cod_municipio),
     names_from = ano,
     names_prefix = "ips",
     values_from = ips
@@ -341,8 +341,8 @@ dz_munic <- income %>%
   relocate(cod_ibge, ano)
 
 # colnames(dz_munic)
-dz_munic$name_munic <- dz_munic$name_munic.x
-dz_munic <- dz_munic %>% transform(estado = ifelse(!is.na(estado.x), estado.x, estado.y))
+#dz_munic$name_munic <- dz_munic$name_munic.x
+#dz_munic <- dz_munic %>% transform(estado = ifelse(!is.na(estado.x), estado.x, estado.y))
 
 # edit final data
 class(dz_munic)
