@@ -39,6 +39,19 @@ ppm_mapbiomas19= ppm_mapbiomas19 %>%
 #applying log
 ppm_mapbiomas19$log= log(ppm_mapbiomas19$n_bovino_por_area_pastagem)
 
+### plotting overlaying histograms for each region
+fig <- plot_ly(alpha = 0.6, )
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Sul"])
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Sudeste"])
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Centro-Oeste"])
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Nordeste"])
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Norte"])
+fig <- fig %>% layout(barmode = "overlay")
+
+fig
+
+
+
 
 # ppm_mapbiomas19= ppm_mapbiomas%>%
 #   filter(n_bovino_por_area_pastagem>=10)
@@ -94,15 +107,6 @@ ggplot()+
   geom_histogram(data= legal_false, aes(x=log), bins = 30)+
   ggtitle("Número de Bovino/Hectares de Área de Pastagem (Fora da Amazônia Legal)")
 
-fig <- plot_ly(alpha = 0.6)
-fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Sul"])
-fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Sudeste"])
-fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Centro-Oeste"])
-fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Nordeste"])
-fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Norte"])
-fig <- fig %>% layout(barmode = "overlay")
-
-fig
 
 #means for each state
 medias= ppm_mapbiomas19%>%
