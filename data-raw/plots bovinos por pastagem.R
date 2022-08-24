@@ -1,5 +1,5 @@
 library(tidyverse)
-
+library(plotly)
 
 ###filtering for a single year
 ppm_mapbiomas= readRDS("./data/dz_munic_ppm_mapbiomas.rds")
@@ -94,7 +94,15 @@ ggplot()+
   geom_histogram(data= legal_false, aes(x=log), bins = 30)+
   ggtitle("Número de Bovino/Hectares de Área de Pastagem (Fora da Amazônia Legal)")
 
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Sul"])
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Sudeste"])
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Centro-Oeste"])
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Nordeste"])
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Norte"])
+fig <- fig %>% layout(barmode = "overlay")
 
+fig
 
 #means for each state
 medias= ppm_mapbiomas19%>%
