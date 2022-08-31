@@ -7,7 +7,7 @@ library(datazoom.amazonia)
 
 prodes <- load_prodes(raw_data = F, 
                       time_period = 2000:2021, 
-                      language = "port"
+                      language = "pt"
                       )
 
 #saving 
