@@ -26,7 +26,7 @@ ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
 #MAPBIONMAS - COBERTURA
 ###################
 
-data_frame_mapbiomas <-datazoom.amazonia::load_mapbiomas(dataset = "mapbiomas_cover",
+data_frame_mapbiomas <- datazoom.amazonia::load_mapbiomas(dataset = "mapbiomas_cover",
                                                          cover_level = "4",
                                                          geo_level = "municipality", 
                                                          raw_data = FALSE)
@@ -115,11 +115,13 @@ dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
                            uf %in% c('PR','RS','SC') ~ "Sul"))
 
 # adding legal_amazon dummy
-legal_amazon <- read_excel("data/lista_de_municipios_Amazonia_Legal_2021.xlsx")
-legal_amazon <- legal_amazon$CD_MUN
+legal_amazon <- datazoom.amazonia::municipalities
+legal_amazon <- legal_amazon%>%
+  filter(legal_amazon == 1)
+legal_amazon <- legal_amazon$code_muni
 
 dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
-  mutate(legal_amazon= case_when(cod_ibge %in% legal_amazon ~ TRUE,
+  mutate(legal_amazon= case_when(code_muni %in% legal_amazon ~ TRUE,
                                  TRUE ~ FALSE))
 # save data
 readr::write_rds(dz_munic_ppm_mapbiomas,

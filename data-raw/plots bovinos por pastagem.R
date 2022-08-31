@@ -40,7 +40,7 @@ ppm_mapbiomas19= ppm_mapbiomas19 %>%
 ppm_mapbiomas19$log= log(ppm_mapbiomas19$n_bovino_por_area_pastagem)
 
 ### plotting overlaying histograms for each region
-fig <- plot_ly(alpha = 0.6, )
+fig <- plot_ly(alpha = 0.6)
 fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Sul"])
 fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Sudeste"])
 fig <- fig %>% add_histogram(x = ppm_mapbiomas19$log[ppm_mapbiomas19$regiao == "Centro-Oeste"])
@@ -50,6 +50,8 @@ fig <- fig %>% layout(barmode = "overlay")
 
 fig
 
+fig <- plot_ly(alpha = 0.6)
+fig <- fig %>% add_histogram(x = ppm_mapbiomas19$n_bovino_por_area_pastagem[ppm_mapbiomas19$regiao == "Sul"])
 
 
 
