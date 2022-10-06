@@ -151,16 +151,6 @@ get_server <- function(files, param) {
             df_p$color <- " "
           }
 
-          # Monta html do tooltip
-          df_p$tooltip <- paste0(
-            "<b>", df_p$text, "</b><br>",
-            "Número de Bovino/Hectares de Área de Pastagem", ": ", 
-            format(df_p$y, scientific = FALSE,
-                                      digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>"
-          )
-
           # Define paleta de cores
           pallete <- pallete_discrete
 
@@ -265,7 +255,9 @@ get_server <- function(files, param) {
           
           # Layout eixos
           x_axis_layout <- list(
-            title = "Bovinos/Hectares de Área de Pastagem",
+            title = ifelse(input$ylog, 
+                           "Log(Número de Bovino/Hectares de Área de Pastagem + 1)", 
+                           "Bovinos/Hectares de Área de Pastagem"),
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
