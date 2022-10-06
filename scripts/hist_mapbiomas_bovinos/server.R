@@ -16,23 +16,19 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file) %>% 
       filter(!is.na(uf))
     
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$uf))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       updateSelectInput(session,
         "filter1",
         choices = param$filter_choices,
-        selected = sample(param$filter_choices, 2) # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        selected = c("Amazônia Legal", "Fora da Amazônia Legal") # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "x=", "a"
+        "?", "ylog=", input$ylog
       )
       
       for (i in input$filter1) {
@@ -56,6 +52,12 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
+      if (!is.null(query[["ylog"]])) {
+        updateCheckboxInput(session, "ylog",
+                            value = (query[["ylog"]] == "TRUE")
+        )
+      }
+      
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       if (!is.null(query[["filter"]])) {
         updateSelectInput(session,
@@ -163,21 +165,41 @@ get_server <- function(files, param) {
           pallete <- pallete_discrete
 
           # Monta gráfico
-          fig_p <- plot_ly(df_p,
-            x = ~y,
-            color = ~group,
-            colors = pallete,
-            type = "histogram",
-            frame = ~slider,
-            textposition = "middle right",
-            showlegend = TRUE,
-            # marker = list(
-            #  opacity = 0.5,
-            #  line = list(width = 1, color = 'white')
-            # ),
-            hoverinfo = "text",
-            hovertemplate = "Número de Municípios: %{y}<br>Número de Bovino/Hectares de Área de Pastagem: %{x}"
-          )
+          ### Aplicando log(x+1)
+          if (input$ylog) {
+            fig_p <- plot_ly(df_p,
+                             x = ~log10(y+1),
+                             color = ~group,
+                             colors = pallete,
+                             type = "histogram",
+                             frame = ~slider,
+                             textposition = "middle right",
+                             showlegend = TRUE,
+                             # marker = list(
+                             #  opacity = 0.5,
+                             #  line = list(width = 1, color = 'white')
+                             # ),
+                             hoverinfo = "text",
+                             hovertemplate = "Número de Municípios: %{y}<br>Log(Número de Bovino/Hectares de Área de Pastagem + 1): %{x}"
+            )
+          } else {
+            fig_p <- plot_ly(df_p,
+                             x = ~y,
+                             color = ~group,
+                             colors = pallete,
+                             type = "histogram",
+                             frame = ~slider,
+                             textposition = "middle right",
+                             showlegend = TRUE,
+                             # marker = list(
+                             #  opacity = 0.5,
+                             #  line = list(width = 1, color = 'white')
+                             # ),
+                             hoverinfo = "text",
+                             hovertemplate = "Número de Municípios: %{y}<br>Número de Bovino/Hectares de Área de Pastagem: %{x}"
+            )
+          }
+          
 
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {

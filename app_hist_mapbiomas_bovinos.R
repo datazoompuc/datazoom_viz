@@ -35,7 +35,9 @@ param$plot_desc <- "Distribuição dos Municípios de acordo com Bovino/Hectares
 
 
 # Outros parâmetros e configurações
-
+param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal"),
+                             "Regiões" = list("Centro-Oeste", "Nordeste", "Norte", "Sudeste", "Sul"),
+                             "Estados" = owdbr::uflist()$UF)
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
