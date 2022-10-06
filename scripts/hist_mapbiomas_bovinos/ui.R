@@ -35,6 +35,15 @@ get_ui <- function(files, param) {
             multiple = TRUE,
             width = "100%")
         ),
+        
+        # Seleciona eixo log
+        checkboxInput(
+          inputId = "ylog",
+          "escala log(x+1)",
+          value = TRUE,
+          width = "100%"
+        ),
+        
         # espaço vazio
         div(class = "fakecheckbox", ),
         
