@@ -39,6 +39,9 @@ param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora d
                              "Regiões" = list("Centro-Oeste", "Nordeste", "Norte", "Sudeste", "Sul"),
                              "Estados" = owdbr::uflist()$UF)
 
+param$year_inicio <- 1985
+param$year_final <- 2019
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)

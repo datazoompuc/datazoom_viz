@@ -4,6 +4,17 @@
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Inclu? script CSS
+    tags$style(type = "text/css", 
+               # remove o ultimo ano no slider (2018 e 2019 estavam um em cima do outro)
+               # remove tracos intermediarios do slider
+               # move botao de play para a esquerda e para baixo
+               # aumenta tamanho do botao de play
+               "
+      .irs-grid-text.js-grid-text-10 {display: none;}
+      .irs-grid-pol.small {display: none;}
+      .slider-animate-container {width: 5%; margin-top: 1px;}
+      .slider-animate-button {font-size: 20px;}
+    "),
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
@@ -42,6 +53,19 @@ get_ui <- function(files, param) {
           "escala log(x+1)",
           value = TRUE,
           width = "100%"
+        ),
+        
+        div(
+          class = "var_selec_group",
+          # Seleciona variável do eixo de data
+          sliderInput(inputId = "filter_ano",
+                      label = "Ano referente",
+                      min = param$year_inicio,
+                      max = param$year_final,
+                      value = param$year_final,
+                      step = 1,
+                      width = "100%",
+                      sep = "")
         ),
         
         # espaço vazio

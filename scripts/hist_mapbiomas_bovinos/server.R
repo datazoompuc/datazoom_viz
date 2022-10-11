@@ -1,8 +1,9 @@
 # -------------------------------- Define lógica do server --------------------------------
 
 # Paleta de cores
-pallete_discrete <- c("#fcff84", "#c3ff83", "#007e47", "#00596d", "#4fdf94", "#99b0c8", "#261c4e", "#000098", "#c368b1", "#60458c", "#757575")
+pallete_discrete <- c("#fcff84", "#ffcf48", "#c3ff83", "#007e47", "#00596d", "#4fdf94", "#99b0c8", "#261c4e", "#000098", "#c368b1", "#60458c", "#757575")
 pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "#33638d", "#287d8e", "#238a8d", "#1f968b", "#20a387", "#29af7f", "#3cbb75", "#55c667", "#73d055", "#95d840", "#b8de29", "#dce319", "#fde725") # Viridis
+pallete_discrete <- sort(pallete_discrete)
 
 # Fontes
 f1 <- list(family = "Roboto", size = 14, color = "rgb(0, 0, 0)")
@@ -28,7 +29,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "ylog=", input$ylog
+        "?", "ylog=", input$ylog,
+        "&", "ano=", input$filter_ano
       )
       
       for (i in input$filter1) {
@@ -64,6 +66,14 @@ get_server <- function(files, param) {
                           "filter1",
                           choices = param$filter_choices,
                           selected = selected
+        )
+      }
+      
+      selected <- unlist(query[names(query) == "ano"], use.names = FALSE)
+      if (!is.null(query[["ano"]])) {
+        updateSliderInput(session,
+                          "filter_ano",
+                          value = selected
         )
       }
 
@@ -127,6 +137,7 @@ get_server <- function(files, param) {
 
           # Filtra dataframe com grupos selecionados
           df_filtered <- df[which(df$uf %in% input$filter1), ]
+          df_filtered <- df_filtered %>% filter(ano == input$filter_ano)
           
           df_p <- data.frame(
             df_filtered[x_col$var],
@@ -288,7 +299,8 @@ get_server <- function(files, param) {
               xaxis = x_axis_layout,
               yaxis = y_axis_layout,
               showlegend = TRUE,
-              hoverlabel = tooltip
+              hoverlabel = tooltip,
+              bargap = 0.1
             )
         
           #  Configura botões do plotly
