@@ -6,13 +6,27 @@
 library(tidyverse)
 library(datazoom.amazonia)
 library(janitor)
+library(sf)
 
 # Download data
 
 imazon_amazon_pressure <- load_imazon(dataset = "imazon_shp", raw_data = TRUE, geo_level = "municipality", language = "pt") %>%
   janitor::clean_names()
 
-
+# data too  heavy
+# keep with mininal variables
+# colnames(imazon_amazon_pressure)
+imazon_amazon_pressure <- imazon_amazon_pressure %>%
+  sf::st_drop_geometry() %>% 
+  mutate(code_muni = as.character(cd_geocmu)) %>%
+  select(nm_municip, code_muni, area, uf, front_2020)
+  
+# Name codes of "front_2020"
+imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==0]  <- "Não florestal"
+imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==1]  <- "Desmatada"
+imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==2]  <- "Florestal sob pressão"
+imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==3]  <- "Florestal"
+  
 #saving 
 saveRDS(imazon_amazon_pressure,
         file = "./data/imazon_amazon_pressure.rds"
@@ -60,4 +74,4 @@ temp_param_table$label[temp_param_table$var == "cod_ibge"] <- "Código IBGE"
 # allow variables in graphs size, color, and slider-axis
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/imazon_amazon_pressure.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "./data/imazon_amazon_pressure_dic.csv", fileEncoding = "UTF-8")
