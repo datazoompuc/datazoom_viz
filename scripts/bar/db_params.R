@@ -52,8 +52,8 @@ get_db_param <-
       # define colunas possíveis para cada dimensão
       x_cols = param_table[which(param_table$x)],
       y_cols = param_table[which(param_table$y)],
-      color_cols = param_table[which(param_table$color)] # ,
-      # size_cols = param_table[which(param_table$size)]
+      color_cols = param_table[which(param_table$color)]  ,
+      size_cols = param_table[which(param_table$size)]
     )
 
     # Define escolhas agrupadas para cada selectinput

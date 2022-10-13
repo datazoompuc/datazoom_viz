@@ -26,10 +26,9 @@ source(files$server_script)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "front_2020_label" # variável padrão do eixo x
 param$y_def <- "desmatado" # variável padrão do eixo y
-param$color_def <- "front_2020" # variável padrão de cor
-param$color_def <- "group" # variável padrão de cor
-param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
-param$group <- "group" # variável de agrupamento
+param$color_def <- "front_2020_label" # variável padrão de cor
+param$text_def <- "front_2020_label" # variável padrão de texto (quando mouse em cima)
+param$group <- "front_2020_label" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"

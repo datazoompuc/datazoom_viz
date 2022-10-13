@@ -15,22 +15,24 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
 
+    browser()
+
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
-      updateSelectInput(session,
-        "y",
-        choices = param$y_choices,
-        selected = param$y_def
-      )
+         updateSelectInput(session, 
+          "y",
+          choices = param$y_def,
+          selected = param$y_def 
+        )
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
+
       q_string <- paste0(
         "?", "y=", input$y
       )
-
+      
       updateQueryString(q_string, mode = "replace")
     }
 
@@ -39,14 +41,24 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
+      if (!is.null(query[["x"]])) {
+        # se tem x na url atribui valor ao selecinput x
+        updateSelectInput(session, 
+          "x",
+          choices = param$x_choices,
+          selected = query[["x"]]
+        )
+      }
+
       if (!is.null(query[["y"]])) {
-        updateSelectInput(session, "y",
+        updateSelectInput(session, 
+          "y",
           choices = param$y_choices,
           selected = query[["y"]]
         )
       }
 
-      # Se query está vazia, preenche aleatório
+     # Se query está vazia, preenche aleatório
       if (is.null(query[["y"]])) {
         random_inputs() # preenche inputs se estiverem vazios
       }
@@ -57,22 +69,24 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$y) || input$y == "") {
-        text <- " "
+        text <- "Variável não selecionada"
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0("", y_col$label)
+        text <- paste0("Ranking de", y_col$label)
       }
 
       text
     })
+
+    # Output subtitulo do gráfico
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$y) || input$y == "") {
-        text <- " "
+        text <- "Subtitulo "
       } else {
-        text <- paste0("")
+        text <- paste0("Subtitulo lala")
       }
 
       text
@@ -80,56 +94,69 @@ get_server <- function(files, param) {
 
     # Output gráfico
     output$plot <- renderPlotly({
+
+      browser()
+
       update_my_queryString() # atualiza url com parametros dos inputs
 
+      #random_inputs()
+
       fig <- plotly_empty() # inicia figura com gráfico em branco
+
       tryCatch(
         {
           # Se algum campo estiver vazio retorna gráfico vazio
           if (is.null(input$y) || input$y == "") {
             fig <- plotly_empty()
+            print("Y variable empty")
             stop()
           }
 
+          browser()
+
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           y_col <- param$table[which(param$table$var == input$y), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
-
-          # Filtra dataframe com ano selecionado
-          df_filtered <- df
+          x_col <- param$table[which(param$table$var == param$x_def), ]
+          text_col <- param$table[which(param$table$var == param$text_def), ]
+          id_col <- param$table[which(param$table$var == param$id_def), ]          
 
           df_p <- data.frame(
-            df_filtered[y_col$var],
-            df_filtered[color_col$var]            
+            df[y_col$var],
+            df[x_col$var]
           )
-          colnames(df_p) <- c("y", "color")
-          df_p$group <- df_filtered$group
-          df_p$text <- df_filtered$group
-          df_p$front_2020 <- df_filtered$front_2020
+
+          colnames(df_p) <- c("y_variable", "x_variable")
+          
+          df_p$group <- df$group
+          df_p$text <- df$group
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$y)), ]
+          df_p <- df_p[which(!is.na(df_p$y_variable)), ]
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
+            print("database empty")
             stop()
           }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
+          if (all(is.na(df_p$x_variable))) {
+            df_p$x_variable <- " "
+            print("x variable empty")
           }
 
           # Define paleta de cores
           pallete <- pallete_discrete
 
           # Monta gráfico
-          fig_p <- plot_ly(df_p,            
+          fig_p <- plot_ly(
+            df_p,            
             type = "bar",
-            x = ~front_2020
-            y = ~input$y
-            hoverlabel = list(namelength = -1)
+            x = ~x_variable,
+            y = ~y_variable,
+            colors = pallete,
+            hoverlabel = "text"
           )
 
           # Layout eixos

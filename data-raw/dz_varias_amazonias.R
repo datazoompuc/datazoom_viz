@@ -148,6 +148,9 @@ dz_varias_amazonias <- dz_varias_amazonias %>% group_by(front_2020, front_2020_l
 # Filtra colunas onde são NA
 dz_varias_amazonias <- dz_varias_amazonias[which(!is.na(dz_varias_amazonias$front_2020)), ]
 
+# Filtra colunas onde são NA
+dz_varias_amazonias$groups <- dz_varias_amazonias$front_2020_label
+
 # save data
 saveRDS(dz_varias_amazonias,
   file = "./data/dz_varias_amazonias.rds"
@@ -166,7 +169,7 @@ columns <- colnames(dz_munic)
 # generate dictionary
 temp_param_table <- tibble(
   var = columns,
-  x = TRUE,
+  x = FALSE,
   y = TRUE,
   color = FALSE,
   size = FALSE,
@@ -174,11 +177,42 @@ temp_param_table <- tibble(
   geometry = FALSE,
   label = columns,
   desc = columns,
+  groups = columns,
   var_group = "Fonte de dados",
   unidade = "Unidade de medida",
   categoria = "Categoria principal",
   subcategoria = "Subcategoria"
 )
+
+# label variables
+temp_param_table$label[temp_param_table$var == "front_2020"] <- "Categoria"
+temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Descrição de categorias"
+temp_param_table$label[temp_param_table$var == "desmatado"] <- "Área total desmatada"
+
+# unidade de medida das variaveis
+temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km2"
+
+# var_group variables
+temp_param_table$var_group[temp_param_table$var == "desmatado"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "ips2018"] <- "IMAZON"
+
+# label data category
+temp_param_table$categoria[temp_param_table$var == "desmatado"] <- "Meio ambiente"
+
+# subcategoria variables
+temp_param_table$subcategoria[temp_param_table$var == "desmatado"] <- "Desmatamento"
+
+# allow variables in graphs size, color, and slider-axis
+temp_param_table$color[temp_param_table$var == "front_2020"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "front_2020_label"] <- TRUE #
+
+# allow variables in graphs x-axis
+temp_param_table$x[temp_param_table$var == "front_2020"] <- TRUE
+temp_param_table$x[temp_param_table$var == "front_2020_label"] <- TRUE # 
+
+# disablle variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "front_2020"] <- FALSE
+temp_param_table$y[temp_param_table$var == "front_2020_label"] <- FALSE # 
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_varias_amazonias_dic.csv", fileEncoding = "UTF-8")
