@@ -7,13 +7,13 @@ library(data.table)
 # Função para criar lista nomeada hierarquica dos grupos (para que as variáveis apareçam agrupadas no selectinput)
 grouped_list <- function(df) {
   # cria lista hierarquica a partir de dataframe, para os selecinputs
-  groups <- unique(df$source)
+  groups <- unique(df$var_group)
   grouped_list <- setNames(
     nm = groups,
     lapply(groups, function(x) {
       setNames(
-        nm = df$label[which(df$source == x)],
-        as.list(df$var[which(df$source == x)])
+        nm = df$label[which(df$var_group == x)],
+        as.list(df$var[which(df$var_group == x)])
       )
     })
   )
@@ -59,8 +59,9 @@ get_db_param <-
     # Define escolhas agrupadas para cada selectinput
     param$x_choices <- append("", grouped_list(param$x_cols))
     param$y_choices <- append("", grouped_list(param$y_cols))
-    #param$color_choices <- append("", grouped_list(param$color_cols))
-    ## param$size_choices <- append("",grouped_list(param$size_cols))
+    param$color_choices <- append("", grouped_list(param$color_cols))
+    param$size_choices <- append("",grouped_list(param$size_cols))
+    
 
     # Define coluna padrão para cada dimensão
     param$x_def <- ""

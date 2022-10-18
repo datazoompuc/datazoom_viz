@@ -15,14 +15,12 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
 
-    browser()
-
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
          updateSelectInput(session, 
           "y",
-          choices = param$y_def,
-          selected = param$y_def 
+          choices = param$y_choices,
+          selected = sample(param$y_cols$var, 1)
         )
     }
 
@@ -74,7 +72,7 @@ get_server <- function(files, param) {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0("Ranking de", y_col$label)
+        text <- paste0("Variável selecionada: ", y_col$label)
       }
 
       text
@@ -84,9 +82,9 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$y) || input$y == "") {
-        text <- "Subtitulo "
+        text <- ""
       } else {
-        text <- paste0("Subtitulo lala")
+        text <- paste0("Fonte de dados: ", param$var_group)
       }
 
       text
@@ -94,8 +92,6 @@ get_server <- function(files, param) {
 
     # Output gráfico
     output$plot <- renderPlotly({
-
-      browser()
 
       update_my_queryString() # atualiza url com parametros dos inputs
 
@@ -112,8 +108,6 @@ get_server <- function(files, param) {
             stop()
           }
 
-          browser()
-
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           y_col <- param$table[which(param$table$var == input$y), ]
           x_col <- param$table[which(param$table$var == param$x_def), ]
@@ -127,8 +121,6 @@ get_server <- function(files, param) {
 
           colnames(df_p) <- c("y_variable", "x_variable")
           
-          df_p$group <- df$group
-          df_p$text <- df$group
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$y_variable)), ]
@@ -146,20 +138,49 @@ get_server <- function(files, param) {
             print("x variable empty")
           }
 
-          # Define paleta de cores
-          pallete <- pallete_discrete
+          # Monta html do tooltip
+          df_p$tooltip <- paste0(
+            x_col$label, ": ", df_p$x, "<br>",
+            y_col$label, ": ", df_p$y, "<br>"
+          )
 
+          # Define paleta de cores
+          pallete <- pallete_continuous
+          if (!is.numeric(df_p$color)) {
+            pallete <- pallete_discrete
+          }
+
+          #browser()
+
+          # Monta gráfico
+          sizes <- c(100, 2000)
+          
           # Monta gráfico
           fig_p <- plot_ly(
             df_p,            
             type = "bar",
             x = ~x_variable,
             y = ~y_variable,
+            color = ~x_variable,
             colors = pallete,
-            hoverlabel = "text"
+            text = ~tooltip,
+            hoverlabel = "text",
+            marker = list(
+              opacity = 0.5,
+              line = list(width = 1, color = "white")
+            )
           )
 
           # Layout eixos
+          x_axis_layout <- list(
+            title = x_col$label,
+            titlefont = f1,
+            tickfont = f2,
+            automargin = FALSE,
+            autorange = TRUE,
+            showgrid = FALSE,
+            zeroline = FALSE
+          )
           y_axis_layout <- list(
             title = y_col$label,
             titlefont = f1,
@@ -181,8 +202,10 @@ get_server <- function(files, param) {
           fig_p <- fig_p %>%
             layout(
               font = f1,
+              xaxis = x_axis_layout,
               yaxis = y_axis_layout,
-              showlegend = TRUE
+              showlegend = TRUE,
+              hoverlabel = tooltip
             )
 
           #  Configura botões do plotly

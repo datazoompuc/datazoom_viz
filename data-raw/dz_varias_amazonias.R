@@ -185,19 +185,32 @@ temp_param_table <- tibble(
 )
 
 # label variables
-temp_param_table$label[temp_param_table$var == "front_2020"] <- "Categoria"
-temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Descrição de categorias"
-temp_param_table$label[temp_param_table$var == "desmatado"] <- "Área total desmatada"
+temp_param_table$label[temp_param_table$var == "front_2020"] <- "Categoria numérica de munic\u00edpio"
+temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Categoria de munic\u00edpio"
+temp_param_table$label[temp_param_table$var == "ips2018"] <- "IPS 2018"
+temp_param_table$label[temp_param_table$var == "desmatado"] <- "\u00c1rea total desmatada"
+temp_param_table$label[temp_param_table$var == "area_colhida_v40124"] <- "\u00c1rea colhida de soja"
+temp_param_table$label[temp_param_table$var == "num_v2670"] <- "Efetivo dos Rebanhos Bovino"
 
 # unidade de medida das variaveis
+temp_param_table$unidade[temp_param_table$var == "ips2018"] <- "Índice de 0 a 100"
 temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km2"
+temp_param_table$unidade[temp_param_table$var == "area_colhida_v40124"] <- "Km2"
+temp_param_table$unidade[temp_param_table$var == "num_v2670"] <- "Cabeça de animais"
+
 
 # var_group variables
 temp_param_table$var_group[temp_param_table$var == "desmatado"] <- "INPE - PRODES"
 temp_param_table$var_group[temp_param_table$var == "ips2018"] <- "IMAZON"
+temp_param_table$var_group[temp_param_table$var == "area_colhida_v40124"] <- "IBGE - PAM"
+temp_param_table$var_group[temp_param_table$var == "num_v2670"] <- "IBGE - PPM"
+
 
 # label data category
 temp_param_table$categoria[temp_param_table$var == "desmatado"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "ips2018"] <- "Social"
+temp_param_table$categoria[temp_param_table$var == "area_colhida_v40124"] <- "Agricultura"
+temp_param_table$categoria[temp_param_table$var == "num_v2670"] <- "Pecuária"
 
 # subcategoria variables
 temp_param_table$subcategoria[temp_param_table$var == "desmatado"] <- "Desmatamento"
