@@ -23,22 +23,18 @@ imazon_amazon_pressure$cod_munic_ibge <- imazon_amazon_pressure$code_muni
 class(imazon_amazon_pressure$cod_munic_ibge) <-  'character'
 
 ###################
-# IMAZON - IPS
+# IMAZON - IPS 2021
 ###################
-ips <- readRDS(file = "data/ips.rds")
-ips <- ips %>%
-  janitor::clean_names()
-# Reshaping data.frame from long  to wide format
-ips <- ips %>%
-  tidyr::pivot_wider(
-    id_cols = c(cod_municipio),
-    names_from = ano,
-    names_prefix = "ips",
-    values_from = ips
-  )
 
-ips$cod_munic_ibge <- ips$cod_municipio
-class(ips$cod_munic_ibge) <-  'character'
+ips <- readRDS(file = "data/ips_2021.rds")
+ips <- ips %>%
+  janitor::clean_names() %>%
+  select(cod_ibge, ips_amazonia_2021)
+
+# drop latitude and longitude info
+ips <- ips %>% st_drop_geometry()
+
+ips$cod_munic_ibge <- ips$cod_ibge
 
 ###################
 #PPM - IBGE
@@ -46,29 +42,34 @@ class(ips$cod_munic_ibge) <-  'character'
 ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
 
 ppm_livestock= ppm_livestock%>%
-  dplyr::filter(ano >= 2000)%>%
-  dplyr::select(geo_id, ano, num_v2670, num_v32794, num_v32796)
+  dplyr::filter(ano == 2019)%>% # filtra apenas para um ano específico. no caso, o último que é 2019
+  dplyr::select(geo_id, num_v2670)
 
 ppm_livestock$cod_munic_ibge <- ppm_livestock$geo_id
 class(ppm_livestock$cod_munic_ibge) <-  'character'
-class(ppm_livestock$ano) <-  'character'
+
 
 ###################
-#PAM - IBGE
+#PAM - IBGE - SOJA
 ###################
 pam_municipality_all_crops_2000_19= readRDS('data/pam_municipality_all_crops_2000_19.rds')
-pam_municipality_all_crops_2000_19[is.na(pam_municipality_all_crops_2000_19)] <- 0  
+pam_municipality_all_crops_2000_19[is.na(pam_municipality_all_crops_2000_19)] <- 0
+
+pam_municipality_all_crops_2000_19 <- pam_municipality_all_crops_2000_19%>%
+  dplyr::filter(ano == "2019") %>%  # filtra apenas para um ano específico. no caso, o último que é 2019
+  dplyr::select(geo_id, quant_v40124)
+  
+
 pam_municipality_all_crops_2000_19$cod_munic_ibge <- pam_municipality_all_crops_2000_19$geo_id
 class(pam_municipality_all_crops_2000_19$cod_munic_ibge) <-  'character'
-class(pam_municipality_all_crops_2000_19$ano) <-  'character'
 
 ###################
 #PIB - IBGE
 ###################
-pib <- readRDS(file = "data/pib_municipality_dza.rds")
-pib$cod_munic_ibge <- pib$municipio_codigo
-class(pib$cod_munic_ibge) <-  'character'
-class(pib$ano) <-  'character'
+#pib <- readRDS(file = "data/pib_municipality_dza.rds")
+#pib$cod_munic_ibge <- pib$municipio_codigo
+#class(pib$cod_munic_ibge) <-  'character'
+#class(pib$ano) <-  'character'
 
 ###################
 # INPE - PRODES
@@ -102,17 +103,17 @@ prodes <- prodes %>%
   ) %>%
   arrange(cod_munic_ibge, ano)
 
+prodes <- prodes %>% 
+  dplyr::filter(ano == "2021") # filtra apenas para um ano específico. no caso, o último que é 2021
+  
 # Identify and remove duplicate data
 prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 class(prodes$cod_munic_ibge) <-  'character'
 class(prodes$ano) <-  'character'
 
-
 ###########################
 # edit data to merge
 ###########################
-
-
 
 #class(deter$ano) <-  'numeric'
 
@@ -123,9 +124,8 @@ class(prodes$ano) <-  'character'
 dz_varias_amazonias <- imazon_amazon_pressure %>%
   full_join(ips, by = c("cod_munic_ibge")) %>%
   full_join(pam_municipality_all_crops_2000_19, by = c("cod_munic_ibge")) %>%
-  full_join(pib, by = c("cod_munic_ibge", "ano")) %>%
-  full_join(ppm_livestock, by = c('cod_munic_ibge', 'ano')) %>%
-  full_join(prodes, by = c('cod_munic_ibge' , 'ano')) %>%
+    full_join(ppm_livestock, by = c('cod_munic_ibge')) %>%
+  full_join(prodes, by = c('cod_munic_ibge')) %>%
   arrange(cod_munic_ibge, ano) %>%
   relocate(cod_munic_ibge, ano)
 
@@ -137,19 +137,17 @@ dz_varias_amazonias$estado <- dz_varias_amazonias$uf
 # collapse data at level of amazon categories
 # that is, at 1) "Não florestal", 2) "Desmatada", 3) "Florestal sob pressão", 4) "Florestal"
 dz_varias_amazonias <- dz_varias_amazonias %>% group_by(front_2020, front_2020_label) %>% 
-  summarise(ips2018 = weighted.mean(ips2018, w = area, na.rm = TRUE),
-            area_colhida_v40124 = weighted.mean(area_colhida_v40124, w = area, na.rm = TRUE),
-            desmatado = weighted.mean(desmatado, w = area, na.rm = TRUE),
-            valor = weighted.mean(valor, w = area, na.rm = TRUE),
-            num_v2670 = weighted.mean(num_v2670, w = area, na.rm = TRUE),
-            soma_colhida_v40124 = sum(area_colhida_v40124, na.rm = TRUE)
-  )
+  summarise(ips_amazonia_2021 = mean(ips_amazonia_2021, na.rm = TRUE),
+            quant_v40124 = sum(quant_v40124, na.rm = TRUE),
+            prop_desmatado = weighted.mean(prop_desmatado, w = area, na.rm = TRUE),
+            prop_floresta = weighted.mean(prop_floresta, w = area, na.rm = TRUE),
+            desmatado = sum(desmatado, na.rm = TRUE),
+            floresta = sum(floresta, na.rm = TRUE),
+            num_v2670 = sum(num_v2670, na.rm = TRUE)
+            )
 
 # Filtra colunas onde são NA
 dz_varias_amazonias <- dz_varias_amazonias[which(!is.na(dz_varias_amazonias$front_2020)), ]
-
-# Filtra colunas onde são NA
-dz_varias_amazonias$groups <- dz_varias_amazonias$front_2020_label
 
 # save data
 saveRDS(dz_varias_amazonias,
@@ -161,10 +159,10 @@ saveRDS(dz_varias_amazonias,
 #####################
 
 # call data
-dz_munic <- readRDS("./data/dz_varias_amazonias.rds")
+dz_varias_amazonias.rds <- readRDS("./data/dz_varias_amazonias.rds")
 
 # extract variables from data
-columns <- colnames(dz_munic)
+columns <- colnames(dz_varias_amazonias.rds)
 
 # generate dictionary
 temp_param_table <- tibble(
@@ -179,6 +177,7 @@ temp_param_table <- tibble(
   desc = columns,
   groups = columns,
   var_group = "Fonte de dados",
+  source = "Fonte de dados",
   unidade = "Unidade de medida",
   categoria = "Categoria principal",
   subcategoria = "Subcategoria"
@@ -187,33 +186,71 @@ temp_param_table <- tibble(
 # label variables
 temp_param_table$label[temp_param_table$var == "front_2020"] <- "Categoria numérica de munic\u00edpio"
 temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Categoria de munic\u00edpio"
-temp_param_table$label[temp_param_table$var == "ips2018"] <- "IPS 2018"
+
+temp_param_table$label[temp_param_table$var == "ips_amazonia_2021"] <- "Indice de Progresso Social 2021"
+
 temp_param_table$label[temp_param_table$var == "desmatado"] <- "\u00c1rea total desmatada"
-temp_param_table$label[temp_param_table$var == "area_colhida_v40124"] <- "\u00c1rea colhida de soja"
-temp_param_table$label[temp_param_table$var == "num_v2670"] <- "Efetivo dos Rebanhos Bovino"
+temp_param_table$label[temp_param_table$var == "floresta"] <- "\u00c1rea total florestal"
+temp_param_table$label[temp_param_table$var == "prop_desmatado"] <- "Proporção média de desmatamento pela \u00c1rea"
+temp_param_table$label[temp_param_table$var == "prop_floresta"] <- "Proporção média de floresta pela \u00c1rea"
+
+temp_param_table$label[temp_param_table$var == "quant_v40124"] <- "Quantidade de soja"
+temp_param_table$label[temp_param_table$var == "num_v2670"] <- "Quantidade de rebanho bovino"
 
 # unidade de medida das variaveis
-temp_param_table$unidade[temp_param_table$var == "ips2018"] <- "Índice de 0 a 100"
-temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km2"
-temp_param_table$unidade[temp_param_table$var == "area_colhida_v40124"] <- "Km2"
-temp_param_table$unidade[temp_param_table$var == "num_v2670"] <- "Cabeça de animais"
+temp_param_table$unidade[temp_param_table$var == "ips_amazonia_2021"] <- "Índice de 0 a 100"
+temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km2 em 2021"
+temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km2 em 2021"
 
+temp_param_table$unidade[temp_param_table$var == "prop_desmatado"] <- "Percentual em 2021"
+temp_param_table$unidade[temp_param_table$var == "prop_floresta"] <- "Percentual em 2021"
+
+temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- "Grãos em 2019"
+temp_param_table$unidade[temp_param_table$var == "num_v2670"] <- "Cabeça de animais em 2019"
 
 # var_group variables
+temp_param_table$var_group[temp_param_table$var == "front_2020"] <- "IMAZON"
+temp_param_table$var_group[temp_param_table$var == "front_2020_label"] <- "IMAZON"
+temp_param_table$var_group[temp_param_table$var == "ips_amazonia_2021"] <- "IMAZON"
 temp_param_table$var_group[temp_param_table$var == "desmatado"] <- "INPE - PRODES"
-temp_param_table$var_group[temp_param_table$var == "ips2018"] <- "IMAZON"
-temp_param_table$var_group[temp_param_table$var == "area_colhida_v40124"] <- "IBGE - PAM"
+temp_param_table$var_group[temp_param_table$var == "floresta"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_desmatado"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_floresta"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "quant_v40124"] <- "IBGE - PAM"
 temp_param_table$var_group[temp_param_table$var == "num_v2670"] <- "IBGE - PPM"
 
+# label data source
+temp_param_table$source[temp_param_table$var == "front_2020"] <- "IMAZON"
+temp_param_table$source[temp_param_table$var == "front_2020_label"] <- "IMAZON"
+temp_param_table$source[temp_param_table$var == "ips_amazonia_2021"] <- "IMAZON"
+temp_param_table$source[temp_param_table$var == "desmatado"] <- "INPE - PRODES"
+temp_param_table$source[temp_param_table$var == "floresta"] <- "INPE - PRODES"
+temp_param_table$source[temp_param_table$var == "prop_desmatado"] <- "INPE - PRODES"
+temp_param_table$source[temp_param_table$var == "prop_floresta"] <- "INPE - PRODES"
+temp_param_table$source[temp_param_table$var == "quant_v40124"] <- "IBGE - PAM"
+temp_param_table$source[temp_param_table$var == "num_v2670"] <- "IBGE - PPM"
 
-# label data category
+# categoria variables
+temp_param_table$categoria[temp_param_table$var == "front_2020"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "front_2020_label"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "ips_amazonia_2021"] <- "Social"
 temp_param_table$categoria[temp_param_table$var == "desmatado"] <- "Meio ambiente"
-temp_param_table$categoria[temp_param_table$var == "ips2018"] <- "Social"
-temp_param_table$categoria[temp_param_table$var == "area_colhida_v40124"] <- "Agricultura"
+temp_param_table$categoria[temp_param_table$var == "floresta"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "prop_desmatado"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "prop_floresta"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "quant_v40124"] <- "Agricultura"
 temp_param_table$categoria[temp_param_table$var == "num_v2670"] <- "Pecuária"
 
 # subcategoria variables
+temp_param_table$subcategoria[temp_param_table$var == "front_2020"] <- "Meio ambiente"
+temp_param_table$subcategoria[temp_param_table$var == "front_2020_label"] <- "Meio ambiente"
+temp_param_table$subcategoria[temp_param_table$var == "ips_amazonia_2021"] <- "Social"
 temp_param_table$subcategoria[temp_param_table$var == "desmatado"] <- "Desmatamento"
+temp_param_table$subcategoria[temp_param_table$var == "floresta"] <- "Floresta"
+temp_param_table$subcategoria[temp_param_table$var == "prop_desmatado"] <- "Desmatamento"
+temp_param_table$subcategoria[temp_param_table$var == "prop_floresta"] <- "Floresta"
+temp_param_table$subcategoria[temp_param_table$var == "quant_v40124"] <- "Agricultura"
+temp_param_table$subcategoria[temp_param_table$var == "num_v2670"] <- "Pecuária"
 
 # allow variables in graphs size, color, and slider-axis
 temp_param_table$color[temp_param_table$var == "front_2020"] <- TRUE #

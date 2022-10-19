@@ -71,7 +71,6 @@ get_server <- function(files, param) {
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
-
         text <- paste0("Variável selecionada: ", y_col$label)
       }
 
@@ -84,7 +83,9 @@ get_server <- function(files, param) {
       if (is.null(input$y) || input$y == "") {
         text <- ""
       } else {
-        text <- paste0("Fonte de dados: ", param$var_group)
+        # Monta titulo a partir de variáveis selecionadas nos inputs
+        y_col <- param$table[which(param$table$var == input$y), ]
+        text <- paste0("Fonte de dados: ", y_col$source)
       }
 
       text
@@ -94,8 +95,6 @@ get_server <- function(files, param) {
     output$plot <- renderPlotly({
 
       update_my_queryString() # atualiza url com parametros dos inputs
-
-      #random_inputs()
 
       fig <- plotly_empty() # inicia figura com gráfico em branco
 
@@ -138,10 +137,13 @@ get_server <- function(files, param) {
             print("x variable empty")
           }
 
+
           # Monta html do tooltip
           df_p$tooltip <- paste0(
-            x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", df_p$y, "<br>"
+            "<b>",df_p$text,"</b><br>",
+            x_col$label, ":  <b>", df_p$x, "</b><br>",
+            y_col$label, ":  <b>", format(df_p$y, scientific = FALSE, digits = 2, decimal.mark = ",", big.mark = "."),  "</b><br>",
+            "Unidade de medida: <b>", y_col$unidade, "</b></b>"
           )
 
           # Define paleta de cores
