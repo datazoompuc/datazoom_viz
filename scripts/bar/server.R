@@ -67,11 +67,11 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$y) || input$y == "") {
-        text <- "Variável não selecionada"
+        text <- "Vari\u00e1vel n\u00e3o selecionada"
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
-        text <- paste0("Variável selecionada: ", y_col$label)
+        text <- paste0("Vari\u00e1vel selecionada: ", y_col$label)
       }
 
       text
