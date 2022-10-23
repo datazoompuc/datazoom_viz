@@ -22,10 +22,10 @@ imazon_amazon_pressure <- imazon_amazon_pressure %>%
   select(nm_municip, code_muni, area, uf, front_2020)
   
 # Name codes of "front_2020"
-imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==0]  <- "Não florestal"
-imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==1]  <- "Desmatada"
-imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==2]  <- "Florestal sob pressão"
-imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==3]  <- "Florestal"
+imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==0]  <- "Municípios não florestais"
+imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==1]  <- "Municípios sob pressão de desmatamento"
+imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==2]  <- "Municípios desmatados"
+imazon_amazon_pressure$front_2020_label[imazon_amazon_pressure$front_2020==3]  <- "Municípios florestais"
   
 #saving 
 saveRDS(imazon_amazon_pressure,

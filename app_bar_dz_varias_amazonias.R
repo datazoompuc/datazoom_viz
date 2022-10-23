@@ -13,8 +13,8 @@ files$param_script <- "scripts/bar/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
-files$param_file <- "data/dz_varias_amazonias_dic.csv"
-files$db_file <- "data/dz_varias_amazonias.rds"
+files$param_file <- "data/dz_varias_amazonias_cross_section_dic.csv"
+files$db_file <- "data/dz_varias_amazonias_cross_section.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -32,7 +32,7 @@ param$group <- "front_2020_label" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Compila\u00e7\u00e3o de dados ao n\u00edvel municipal"
+param$plot_desc <- "Diferença entre várias amaz\u00f4nias em indicadores mais recentes"
 
 # Outros parâmetros e configurações
 
