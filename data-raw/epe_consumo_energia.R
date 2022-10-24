@@ -35,9 +35,9 @@ db_consumo_outros = readxl::read_xls(path = ".//data-raw//bases viz energia CPI/
 #############
 
 #Consumidores totais
-db_consumidores_totais = readxl::read_xls(path = "C://Users//laura//OneDrive//Laura//economia//pibic//datazoom_viz//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = "CONSUMIDORES TOTAIS")
+db_consumidores_totais = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = "CONSUMIDORES TOTAIS")
 
 #Consumidores por classe
-db_consumidores_residencial = readxl::read_xls(path = "C://Users//laura//OneDrive//Laura//economia//pibic//datazoom_viz//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = "CONSUMIDORES RESIDENCIAIS")
+db_consumidores_residencial = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = "CONSUMIDORES RESIDENCIAIS")
 
 #############
