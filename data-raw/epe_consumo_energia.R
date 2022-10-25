@@ -13,67 +13,46 @@ library(tidyverse)
 library(readxl)
 ############
 
-#Consumo
-############
 
-#Consumo total
-db_consumo_total = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls")
-colnames(db_consumo_total) = c("Sistema", 1:12, "Total")
-
-db_limpa_consumo_total = db_consumo_total[db_consumo_total$Sistema == "Sistemas Isolados",] %>%  drop_na() %>%
-  slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
-  mutate(Ano = 2021:2004) %>%
-  mutate(Ano = as.numeric(Ano)) %>%
-  select(Ano, Total) #tira "Sistema" que e igual a "Sistemas Isolados" em todas as observacoes
+# funcao para limpar dados de consumo -----------------------------------------------
+limpa_consumo <- function(sheet_name) {
+   
+  # le dados de consumo
+  raw_df <- readxl::read_xls(path = "data-raw/bases viz energia CPI/sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls",
+                             sheet = sheet_name)
   
+  # troca nome das colunas
+  colnames(raw_df) <- c("Sistema", 1:12, "Total")
+  
+  # limpa
+  clean_df <- raw_df[raw_df$Sistema == "Sistemas Isolados", ] %>%  
+    drop_na() %>%
+    slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
+    mutate(Ano = 2021:2004) %>%
+    mutate(Ano = as.numeric(Ano)) %>%
+    select(Ano, Total) %>%
+    mutate(tipo_consumo = sheet_name) # adiciona coluna para tipo de consumo
+  
+  return(clean_df)
+  
+}
 
+
+# roda funcao -----------------------------------------------------------------------
+# Consumo total
+db_consumo_total <- limpa_consumo("TOTAL")
 
 #Consumo por residencial, industrial, comercial e outros
-db_consumo_residencial = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = 2)
-colnames(db_consumo_residencial) = c("Sistema", 1:12, "Total")
+db_consumo_residencial <- limpa_consumo("RESIDENCIAL")
 
-db_limpa_consumo_residencial = db_consumo_residencial[db_consumo_residencial$Sistema == "Sistemas Isolados",] %>%  drop_na() %>%
-  slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
-  mutate(Ano = 2021:2004) %>%
-  mutate(Ano = as.numeric(Ano)) %>%
-  select(Ano, Total) #tira "Sistema" que e igual a "Sistemas Isolados" em todas as observacoes
+db_consumo_industrial <- limpa_consumo("INDUSTRIAL")
 
+db_consumo_comercial <- limpa_consumo("COMERCIAL")
 
-db_consumo_industrial = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = 3)
-colnames(db_consumo_industrial) = c("Sistema", 1:12, "Total")
-
-db_limpa_consumo_industrial = db_consumo_industrial[db_consumo_industrial$Sistema == "Sistemas Isolados",] %>%  drop_na() %>%
-  slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
-  mutate(Ano = 2021:2004) %>%
-  mutate(Ano = as.numeric(Ano)) %>%
-  select(Ano, Total) #tira "Sistema" que e igual a "Sistemas Isolados" em todas as observacoes
+db_consumo_outros <- limpa_consumo("OUTROS")
 
 
-db_consumo_comercial = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = 4)
-colnames(db_consumo_comercial) = c("Sistema", 1:12, "Total")
-
-db_limpa_consumo_comercial = db_consumo_comercial[db_consumo_comercial$Sistema == "Sistemas Isolados",] %>%  drop_na() %>%
-  slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
-  mutate(Ano = 2021:2004) %>%
-  mutate(Ano = as.numeric(Ano)) %>%
-  select(Ano, Total) #tira "Sistema" que e igual a "Sistemas Isolados" em todas as observacoes
-
-
-db_consumo_outros = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = 5)
-colnames(db_consumo_outros) = c("Sistema", 1:12, "Total")
-
-db_limpa_consumo_outros = db_consumo_outros[db_consumo_outros$Sistema == "Sistemas Isolados",] %>%  drop_na() %>%
-  slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
-  mutate(Ano = 2021:2004) %>%
-  mutate(Ano = as.numeric(Ano)) %>%
-  select(Ano, Total) #tira "Sistema" que e igual a "Sistemas Isolados" em todas as observacoes
-
-
-#############
-
-#Consumidores
-#############
-
+# dados de consumidores -------------------------------------------------------------
 #Consumidores totais
 db_consumidores_totais = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = "CONSUMIDORES TOTAIS", skip = 2)
 colnames(db_consumidores_totais) = c("Sistema", 1:12)
