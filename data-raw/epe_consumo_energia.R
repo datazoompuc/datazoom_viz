@@ -25,7 +25,8 @@ limpa_consumo <- function(sheet_name) {
   colnames(raw_df) <- c("Sistema", 1:12, "Total")
   
   # limpa
-  clean_df <- raw_df[raw_df$Sistema == "Sistemas Isolados", ] %>%  
+  clean_df <- raw_df %>%
+    filter(Sistema == "Sistemas Isolados") %>%  
     drop_na() %>%
     slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
     mutate(Ano = 2021:2004) %>%
@@ -42,18 +43,15 @@ limpa_consumo <- function(sheet_name) {
 # Consumo total
 db_consumo_total <- limpa_consumo("TOTAL")
 
-#Consumo por residencial, industrial, comercial e outros
+# Consumo por residencial, industrial, comercial e outros
 db_consumo_residencial <- limpa_consumo("RESIDENCIAL")
-
 db_consumo_industrial <- limpa_consumo("INDUSTRIAL")
-
 db_consumo_comercial <- limpa_consumo("COMERCIAL")
-
 db_consumo_outros <- limpa_consumo("OUTROS")
 
 
 # dados de consumidores -------------------------------------------------------------
-#Consumidores totais
+# Consumidores totais
 db_consumidores_totais = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = "CONSUMIDORES TOTAIS", skip = 2)
 colnames(db_consumidores_totais) = c("Sistema", 1:12)
 
