@@ -41,3 +41,5 @@ db_consumidores_totais = readxl::read_xls(path = ".//data-raw//bases viz energia
 db_consumidores_residencial = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = "CONSUMIDORES RESIDENCIAIS")
 
 #############
+
+#É um arquivo de excel, com muito espaço em branco e, em uma mesma sheet, várias tabelas uma em cima da outra referente a vários anos. Pensei em limpar usando o range da função de que puxa as bases (read_xls) e criar para cada uma, uma nova coluna referente àquele ano. Porém, o Artur sugeriu mexer pelo excel mesmo para poupar esforço. 
