@@ -32,7 +32,7 @@ limpa_consumo <- function(sheet_name) {
     mutate(Ano = 2021:2004) %>%
     mutate(Ano = as.numeric(Ano)) %>%
     select(Ano, Total) %>%
-    mutate(tipo_consumo = sheet_name) # adiciona coluna para tipo de consumo
+    mutate(tipo_consumo = paste0("CONSUMO ", sheet_name)) # adiciona coluna para tipo de consumo
   
   return(clean_df)
   
@@ -48,6 +48,11 @@ db_consumo_residencial <- limpa_consumo("RESIDENCIAL")
 db_consumo_industrial <- limpa_consumo("INDUSTRIAL")
 db_consumo_comercial <- limpa_consumo("COMERCIAL")
 db_consumo_outros <- limpa_consumo("OUTROS")
+
+# bind all
+db_consumo <- bind_rows(list(db_consumo_total, db_consumo_residencial, 
+                             db_consumo_industrial, db_consumo_comercial, 
+                             db_consumo_outros))
 
 
 # dados de consumidores -------------------------------------------------------------
