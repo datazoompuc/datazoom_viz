@@ -75,5 +75,43 @@ db_limpa_consumidores_totais = db_consumidores_totais %>%
 #Consumidores por classe
 db_consumidores_residencial = readxl::read_xls(path = ".//data-raw//bases viz energia CPI//sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls", sheet = "CONSUMIDORES RESIDENCIAIS")
 
-#############
+# export ------------------------------------------------------------------
+saveRDS(db_consumo, "data/consumo_energia.rds")
 
+
+# dictionary --------------------------------------------------------------
+
+# extract variables from data
+columns_db_consumo <- colnames(db_consumo)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns_db_consumo,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  geometry = FALSE,
+  label = columns_db_consumo,
+  desc = columns_db_consumo,
+  var_group = "Energia - EPE",
+  tipo = 1,
+  unidade = "",
+  categoria= "Economia", 
+  subcategoria = "Energia"
+)
+
+temp_param_table$label <- temp_param_table$var
+temp_param_table$label[1] <- "Ano"
+temp_param_table$label[2] <- "Consumo (MWh)"
+temp_param_table$label[3] <- "Categoria"
+  
+temp_param_table$x <- c(TRUE, FALSE, FALSE)
+temp_param_table$y <- c(FALSE, TRUE, FALSE)
+temp_param_table$color <- c(FALSE, FALSE, TRUE)
+temp_param_table$size <- c(FALSE, FALSE, TRUE)
+temp_param_table$slider <- c(FALSE, FALSE, FALSE)
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/consumo_energia_dic.csv", fileEncoding = "UTF-8")

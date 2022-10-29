@@ -1,0 +1,4 @@
+"","var","x","y","color","size","slider","geometry","label","desc","var_group","tipo","unidade","categoria","subcategoria"
+"1","Ano",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,"Ano","Ano","Energia - EPE",1,"","Economia","Energia"
+"2","Total",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Consumo (MWh)","Total","Energia - EPE",1,"","Economia","Energia"
+"3","tipo_consumo",FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,"Categoria","tipo_consumo","Energia - EPE",1,"","Economia","Energia"
