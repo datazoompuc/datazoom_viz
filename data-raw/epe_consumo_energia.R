@@ -54,47 +54,6 @@ db_consumo <- bind_rows(list(db_consumo_total, db_consumo_residencial,
                              db_consumo_industrial, db_consumo_comercial, 
                              db_consumo_outros))
 
-# export ------------------------------------------------------------------
-saveRDS(db_consumo, "data/consumo_energia.rds")
-
-
-# dictionary --------------------------------------------------------------
-
-# extract variables from data
-columns_db_consumo <- colnames(db_consumo)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns_db_consumo,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  geometry = FALSE,
-  label = columns_db_consumo,
-  desc = columns_db_consumo,
-  var_group = "Energia - EPE",
-  tipo = 1,
-  unidade = "",
-  categoria= "Economia", 
-  subcategoria = "Energia"
-)
-
-temp_param_table$label <- temp_param_table$var
-temp_param_table$label[1] <- "Ano"
-temp_param_table$label[2] <- "Consumo (MWh)"
-temp_param_table$label[3] <- "Categoria"
-  
-temp_param_table$x <- c(TRUE, FALSE, FALSE)
-temp_param_table$y <- c(FALSE, TRUE, FALSE)
-temp_param_table$color <- c(FALSE, FALSE, TRUE)
-temp_param_table$size <- c(FALSE, FALSE, TRUE)
-temp_param_table$slider <- c(FALSE, FALSE, FALSE)
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/consumo_energia_dic.csv", fileEncoding = "UTF-8")
-
 # dados de consumidores -------------------------------------------------------------
 # funcao para limpar dados de consumo -----------------------------------------------
 limpa_consumidores <- function(sheet_name) {
@@ -115,7 +74,7 @@ limpa_consumidores <- function(sheet_name) {
     select(Ano, Quantidade) %>% #tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
     mutate(Ano = as.numeric(Ano), Quantidade = as.numeric(Quantidade)) %>%
     group_by(Ano) %>%
-    dplyr::summarise(valor = mean(Quantidade)) %>%
+    dplyr::summarise(media = mean(Quantidade)) %>%
     mutate(tipo = sheet_name) # adiciona coluna para tipo de consumidor
   
   return(clean_df)
@@ -132,50 +91,8 @@ db_consumidores_residencial <- limpa_consumidores("CONSUMIDORES RESIDENCIAIS")
 # bind all
 db_consumidores <- bind_rows(list(db_consumidores_total, db_consumidores_residencial))
 
-# export ------------------------------------------------------------------
-saveRDS(db_consumidores, "data/consumidores_energia.rds")
-
-
-# dictionary --------------------------------------------------------------
-
-# extract variables from data
-columns_db_consumidores <- colnames(db_consumidores)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns_db_consumidores,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  geometry = FALSE,
-  label = columns_db_consumidores,
-  desc = columns_db_consumidores,
-  var_group = "Energia - EPE",
-  tipo = 1,
-  unidade = "",
-  categoria= "Economia", 
-  subcategoria = "Energia"
-)
-
-temp_param_table$label <- temp_param_table$var
-temp_param_table$label[1] <- "Ano"
-temp_param_table$label[2] <- "Média de consumidores"
-temp_param_table$label[3] <- "Categoria"
-
-temp_param_table$x <- c(TRUE, FALSE, FALSE)
-temp_param_table$y <- c(FALSE, TRUE, FALSE)
-temp_param_table$color <- c(FALSE, FALSE, TRUE)
-temp_param_table$size <- c(FALSE, FALSE, TRUE)
-temp_param_table$slider <- c(FALSE, FALSE, FALSE)
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/consumidores_energia_dic.csv", fileEncoding = "UTF-8")
-
-
-#tudo junto
-db_completa = rbind(db_consumo, db_consumidores)
+#tudo junto ---------------------------------------------------------------
+db_completa = full_join(db_consumo, db_consumidores)
 
 # export ------------------------------------------------------------------
 saveRDS(db_consumidores, "data/consumidores_energia.rds")
@@ -206,14 +123,15 @@ temp_param_table <- tibble(
 
 temp_param_table$label <- temp_param_table$var
 temp_param_table$label[1] <- "Ano"
-temp_param_table$label[2] <- "Valor da variável"
+temp_param_table$label[2] <- "Consumo de energia (MWh)"
 temp_param_table$label[3] <- "Categoria"
+temp_param_table$label[4] <- "Média de consumidores"
 
-temp_param_table$x <- c(TRUE, FALSE, FALSE)
-temp_param_table$y <- c(FALSE, TRUE, FALSE)
-temp_param_table$color <- c(FALSE, FALSE, TRUE)
-temp_param_table$size <- c(FALSE, FALSE, TRUE)
-temp_param_table$slider <- c(FALSE, FALSE, FALSE)
+temp_param_table$x <- c(TRUE, FALSE, FALSE, FALSE)
+temp_param_table$y <- c(FALSE, TRUE, FALSE, TRUE)
+temp_param_table$color <- c(FALSE, FALSE, TRUE, FALSE)
+temp_param_table$size <- c(FALSE, FALSE, TRUE, FALSE)
+temp_param_table$slider <- c(FALSE, FALSE, FALSE, FALSE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/consumo_e_consumidores_energia_dic.csv", fileEncoding = "UTF-8")
