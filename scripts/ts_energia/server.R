@@ -11,7 +11,7 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
   server <- function(input, output, session) {
-    
+
     # Carrega dados
     df <- readRDS(files$db_file)
     df$geometry <- NULL
@@ -121,7 +121,7 @@ get_server <- function(files, param) {
           
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y), ]
+          y_col <- param$table[which(param$table$var == input$y_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
           color_col <- param$table[which(param$table$var == param$color_def), ]
 
@@ -139,7 +139,8 @@ get_server <- function(files, param) {
           df_p$text <- df_p$group
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
+          #Nesse caso temos colunas com NA de proposito
+         # df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {

@@ -52,15 +52,6 @@ get_ui <- function(files, param) {
           width = "100%"
         ),
 
-        # Seleciona filtro
-        selectizeInput(
-          "filter1",
-          "Subdivisão geográfica",
-          choices = NULL,
-          multiple = TRUE,
-          options = list(maxItems = 20),
-          width = "100%"
-        ),
         
         # espaço vazio
         div(class = "fakecheckbox", ),

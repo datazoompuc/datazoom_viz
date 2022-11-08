@@ -95,7 +95,7 @@ db_consumidores <- bind_rows(list(db_consumidores_total, db_consumidores_residen
 db_completa = full_join(db_consumo, db_consumidores)
 
 # export ------------------------------------------------------------------
-saveRDS(db_consumidores, "data/consumidores_energia.rds")
+saveRDS(db_completa, "data/consumo_e_consumidores_energia.rds")
 
 
 # dictionary --------------------------------------------------------------
@@ -105,7 +105,7 @@ columns_db_completa <- colnames(db_completa)
 
 # generate dictionary
 temp_param_table <- tibble(
-  var = columns_db_consumidores,
+  var = columns_db_completa,
   x = TRUE,
   y = TRUE,
   color = FALSE,
