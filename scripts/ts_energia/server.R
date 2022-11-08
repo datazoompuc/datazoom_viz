@@ -120,10 +120,13 @@ get_server <- function(files, param) {
           }
           
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y_def), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
+          x_col <- df %>%
+            select(Ano)
+          y_col <- df %>%
+            select(valor, media)
+        #id_col <-
+          color_col <- df %>%
+            select(tipo)
 
           # Filtra dataframe com grupos selecionados
           df_filtered <- df %>%
