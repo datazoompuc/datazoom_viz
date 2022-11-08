@@ -17,8 +17,8 @@ get_server <- function(files, param) {
     df$geometry <- NULL
     
     # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
+    #param$filter_choices <- sort(unique(df$group))
+    #param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
@@ -124,7 +124,6 @@ get_server <- function(files, param) {
             select(Ano)
           y_col <- df %>%
             select(valor, media)
-        #id_col <-
           color_col <- df %>%
             select(tipo)
 
@@ -133,13 +132,13 @@ get_server <- function(files, param) {
             filter(tipo == input$y)
 
           df_p <- data.frame(
-            df_filtered[x_col$var],
+            df_filtered[x_col],
             df_filtered[y_col$var],
-            df_filtered[color_col$var]
+            df_filtered[color_col]
           )
           colnames(df_p) <- c("x", "y", "color")
-          df_p$group <- df_filtered$group
-          df_p$text <- df_p$group
+         # df_p$group <- df_filtered$group
+        #  df_p$text <- df_p$group
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
           #Nesse caso temos colunas com NA de proposito
@@ -154,7 +153,7 @@ get_server <- function(files, param) {
           # Alternativa de medida para y
           if (input$y_option & is.numeric(df_p$y)) {
             df_p <- df_p %>%
-              group_by(df_p$group) %>%
+             # group_by(df_p$group) %>%
               mutate(
                 aux1 = first(y),
                 y_option = (y / aux1) * 100
@@ -184,7 +183,7 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
             x = ~x,
             y = ~y,
-            color = ~group,
+            color = ~tipo,
             type = "scatter",
             mode = "lines",
             text = ~tooltip,
