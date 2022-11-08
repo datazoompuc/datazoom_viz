@@ -13,8 +13,8 @@ get_server <- function(files, param) {
   server <- function(input, output, session) {
 
     # Carrega dados
-    df <- readRDS(files$db_file)
-    df$geometry <- NULL
+    df <- readRDS(files$db_file) %>%
+      mutate(valor = as.numeric(valor))
     
     # Cria opções para seleção de grupos
     #param$filter_choices <- sort(unique(df$group))
@@ -120,29 +120,30 @@ get_server <- function(files, param) {
           }
           
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- df %>%
-            select(Ano)
-          y_col <- df %>%
-            select(valor, media)
-          color_col <- df %>%
-            select(tipo)
-
+          x_col <- param$table[which(param$table$var == param$x_def), ]
+          y_col <- param$table[which(param$table$var == input$y), ]
+          color_col <- param$table[which(param$table$var == param$color_def), ]
+          
           # Filtra dataframe com grupos selecionados
-          df_filtered <- df %>%
-            filter(tipo == input$y)
-
+          if (input$y == "valor") {
+            df_filtered <- df %>%
+              filter(stringr::str_detect(tipo, "CONSUMO"))
+          } else {
+            df_filtered <- df %>%
+              filter(stringr::str_detect(tipo, "CONSUMIDORES"))
+          }
+          
           df_p <- data.frame(
-            df_filtered[x_col],
+            df_filtered[x_col$var],
             df_filtered[y_col$var],
-            df_filtered[color_col]
+            df_filtered[color_col$var]
           )
           colnames(df_p) <- c("x", "y", "color")
          # df_p$group <- df_filtered$group
         #  df_p$text <- df_p$group
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-          #Nesse caso temos colunas com NA de proposito
-         # df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
+          df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
@@ -153,7 +154,8 @@ get_server <- function(files, param) {
           # Alternativa de medida para y
           if (input$y_option & is.numeric(df_p$y)) {
             df_p <- df_p %>%
-             # group_by(df_p$group) %>%
+              group_by(color) %>%
+              arrange(x) %>%
               mutate(
                 aux1 = first(y),
                 y_option = (y / aux1) * 100
@@ -183,7 +185,7 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
             x = ~x,
             y = ~y,
-            color = ~tipo,
+            color = ~color,
             type = "scatter",
             mode = "lines",
             text = ~tooltip,
