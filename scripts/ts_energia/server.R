@@ -125,13 +125,11 @@ get_server <- function(files, param) {
           color_col <- param$table[which(param$table$var == param$color_def), ]
           
           # Filtra dataframe com grupos selecionados
-          if (input$y == "valor") {
-            df_filtered <- df %>%
-              filter(stringr::str_detect(tipo, "CONSUMO"))
-          } else {
-            df_filtered <- df %>%
-              filter(stringr::str_detect(tipo, "CONSUMIDORES"))
-          }
+          
+          df_filtered <- df %>%
+            select(Ano, tipo, input$y) %>%
+            drop_na(input$y)
+          
           
           df_p <- data.frame(
             df_filtered[x_col$var],
@@ -139,8 +137,6 @@ get_server <- function(files, param) {
             df_filtered[color_col$var]
           )
           colnames(df_p) <- c("x", "y", "color")
-         # df_p$group <- df_filtered$group
-        #  df_p$text <- df_p$group
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]

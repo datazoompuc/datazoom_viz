@@ -12,8 +12,8 @@ files$param_script <- "scripts/ts_energia/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
-files$param_file <- "data/consumo_e_consumidores_energia_dic.csv"
-files$db_file <- "data/consumo_e_consumidores_energia.rds"
+files$param_file <- "data/energia_sistemas_isolados_dic.csv"
+files$db_file <- "data/energia_sistemas_isolados.rds"
 
 # Carrega scripts
 source(files$param_script)
