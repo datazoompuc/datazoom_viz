@@ -4,5 +4,3 @@
 "3","n_bovino_por_area_pastagem",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Rebanho por área de pasto","n_bovino_por_area_pastagem","IBGE - PPM e MAPBIOMAS","Rebano bovino por área (ha) de pastagem","Produção Econômica","Pecuária"
 "4","nm_municip",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"Nome do município","nm_municip","Fonte de dados","","Categoria principal","Subcategoria"
 "5","uf",TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,"Estado","uf","Fonte de dados","","Categoria principal","Subcategoria"
-"6","regiao",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Região","regiao","Fonte de dados","","Categoria principal","Subcategoria"
-"7","legal_amazon",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Amazônia Legal","legal_amazon","Fonte de dados","","Categoria principal","Subcategoria"

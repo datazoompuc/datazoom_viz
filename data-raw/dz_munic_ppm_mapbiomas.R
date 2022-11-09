@@ -26,7 +26,7 @@ ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
 #MAPBIONMAS - COBERTURA
 ###################
 
-data_frame_mapbiomas <-datazoom.amazonia::load_mapbiomas(dataset = "mapbiomas_cover",
+data_frame_mapbiomas <- datazoom.amazonia::load_mapbiomas(dataset = "mapbiomas_cover",
                                                          cover_level = "4",
                                                          geo_level = "municipality", 
                                                          raw_data = FALSE)
@@ -35,7 +35,7 @@ data_frame_mapbiomas <-datazoom.amazonia::load_mapbiomas(dataset = "mapbiomas_co
 # edit data to merge
 ###########################
 
-class(data_frame_mapbiomas$territory_id ) <- 'numeric'
+class(data_frame_mapbiomas$municipality_code) <- 'numeric'
 class(data_frame_mapbiomas$year) <- 'numeric'
 
 class(ppm_livestock$geo_id) <- 'numeric'
@@ -46,7 +46,7 @@ class(ppm_livestock$ano) <- 'numeric'
 ###########################
 dz_munic_ppm_mapbiomas <- data_frame_mapbiomas %>%
   full_join(ppm_livestock, 
-            by = c('territory_id' = 'geo_id', 'year' = 'ano')
+            by = c('municipality_code' = 'geo_id', 'year' = 'ano')
             ) 
 
 
@@ -58,17 +58,17 @@ dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
 # colnames(dz_munic_ppm_mapbiomas)
 
 dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>% 
-  select(territory_id, municipality, state, year, n_bovino_por_area_pastagem) %>%
-  arrange(territory_id, year) %>%
-  relocate(territory_id, year)
+  select(municipality_code, municipality, state, year, n_bovino_por_area_pastagem) %>%
+  arrange(municipality_code, year) %>%
+  relocate(municipality_code, year)
 
 # edit dataset
-dz_munic_ppm_mapbiomas$cod_ibge <- dz_munic_ppm_mapbiomas$territory_id
+dz_munic_ppm_mapbiomas$cod_ibge <- dz_munic_ppm_mapbiomas$municipality_code
 dz_munic_ppm_mapbiomas$nm_municip <- dz_munic_ppm_mapbiomas$municipality
 dz_munic_ppm_mapbiomas$ano <- dz_munic_ppm_mapbiomas$year
 dz_munic_ppm_mapbiomas$uf <- dz_munic_ppm_mapbiomas$state
 dz_munic_ppm_mapbiomas$municipality <- NULL
-dz_munic_ppm_mapbiomas$territory_id <- NULL
+dz_munic_ppm_mapbiomas$municipality_code <- NULL
 dz_munic_ppm_mapbiomas$year <- NULL
 dz_munic_ppm_mapbiomas$state <- NULL
 
@@ -108,21 +108,41 @@ dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
 
 # adding regions
 dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
-  mutate(regiao= case_when(uf == 'AC' | uf == 'AM' | uf == 'AP' | uf == 'PA' | uf == 'RO' | uf == 'RR' | uf == 'TO' ~ "Norte",
-                           uf == 'AL' | uf == 'BA' | uf == 'CE' | uf == 'MA' | uf == 'PI' | uf == 'PB' | uf == 'RN' | uf == 'SE' ~ "Nordeste",
-                           uf == 'MS' | uf == 'MT' | uf == 'GO' | uf == 'DF' ~ "Centro-Oeste",
-                           uf == 'ES' | uf == 'MG' | uf == 'RJ' | uf == 'SP' ~ "Sudeste",
-                           uf == 'PR' | uf == 'RS' | uf == 'SC' ~ "Sul"))
+  mutate(regiao= case_when(uf %in% c('AC','AM','AP','PA','RO','RR','TO') ~ "Norte",
+                           uf %in% c('AL','BA','CE','MA','PI','PB','PE','RN','SE') ~ "Nordeste",
+                           uf %in% c('MS','MT','GO','DF') ~ "Centro-Oeste",
+                           uf %in% c('ES','MG','RJ','SP') ~ "Sudeste",
+                           uf %in% c('PR','RS','SC') ~ "Sul"))
 
 # adding legal_amazon dummy
-legal_amazon <- read_excel("data/lista_de_municipios_Amazonia_Legal_2021.xlsx")
-legal_amazon <- legal_amazon$CD_MUN
+legal_amazon <- datazoom.amazonia::municipalities
+legal_amazon <- legal_amazon%>%
+  filter(legal_amazon == 1)
+legal_amazon <- legal_amazon$code_muni
 
 dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
   mutate(legal_amazon= case_when(cod_ibge %in% legal_amazon ~ TRUE,
                                  TRUE ~ FALSE))
+
+# add legal amazon and regions as options in UF
+regioes <- dz_munic_ppm_mapbiomas %>% 
+  select(-uf) %>% 
+  pivot_longer(regiao, values_to = "uf", names_to = NULL) %>%
+  select(-legal_amazon)
+
+amz_legal <- dz_munic_ppm_mapbiomas %>% 
+  select(-uf) %>% 
+  pivot_longer(legal_amazon, values_to = "uf", names_to = NULL) %>% 
+  mutate(uf = ifelse(uf, "Amazônia Legal", "Fora da Amazônia Legal")) %>%
+  select(-regiao)
+
+df <- dz_munic_ppm_mapbiomas %>% 
+  select(-regiao, -legal_amazon) %>% 
+  rbind(regioes) %>% 
+  rbind(amz_legal)
+
 # save data
-readr::write_rds(dz_munic_ppm_mapbiomas,
+readr::write_rds(df,
         file = "./data/dz_munic_ppm_mapbiomas.rds"
 )
 
@@ -157,8 +177,6 @@ temp_param_table <- tibble(
 temp_param_table$label[temp_param_table$var == "cod_ibge"] <- "C\u00f3digo do município"
 temp_param_table$label[temp_param_table$var == "nm_municip"] <- "Nome do município"
 temp_param_table$label[temp_param_table$var == "uf"] <- "Estado"
-temp_param_table$label[temp_param_table$var == "regiao"] <- "Região"
-temp_param_table$label[temp_param_table$var == "legal_amazon"] <- "Amazônia Legal"
 temp_param_table$label[temp_param_table$var == "ano"] <- "Ano"
 temp_param_table$label[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Rebanho por área de pasto"
 
@@ -166,8 +184,6 @@ temp_param_table$label[temp_param_table$var == "n_bovino_por_area_pastagem"] <- 
 temp_param_table$unidade[temp_param_table$var == "cod_ibge"] <- ""
 temp_param_table$unidade[temp_param_table$var == "nm_municip"] <- ""
 temp_param_table$unidade[temp_param_table$var == "uf"] <- ""
-temp_param_table$unidade[temp_param_table$var == "regiao"] <- ""
-temp_param_table$unidade[temp_param_table$var == "legal_amazon"] <- ""
 temp_param_table$unidade[temp_param_table$var == "ano"] <- "Ano"
 temp_param_table$unidade[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Rebano bovino por área (ha) de pastagem"
 
