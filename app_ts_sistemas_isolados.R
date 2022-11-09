@@ -1,14 +1,14 @@
 # Carrega bibliotecas
 library(shiny)
-library(ggplot2)
+library(tidyverse)
 library(plotly)
 library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_energia/ui.R"
-files$server_script <- "scripts/ts_energia/server.R"
-files$param_script <- "scripts/ts_energia/db_params.R"
+files$ui_script <- "scripts/ts_sistemas_isolados/ui.R"
+files$server_script <- "scripts/ts_sistemas_isolados/server.R"
+files$param_script <- "scripts/ts_sistemas_isolados/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 

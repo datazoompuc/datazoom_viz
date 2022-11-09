@@ -125,7 +125,6 @@ get_server <- function(files, param) {
           color_col <- param$table[which(param$table$var == param$color_def), ]
           
           # Filtra dataframe com grupos selecionados
-          
           df_filtered <- df %>%
             select(Ano, tipo, input$y) %>%
             drop_na(input$y)

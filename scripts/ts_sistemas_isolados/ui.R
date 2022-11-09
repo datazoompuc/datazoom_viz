@@ -60,7 +60,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_ts_dz_munic/', '_blank')")
+                              onclick = "window.open('https://datazoom.shinyapps.io/app_ts_sistemas_isolados/', '_blank')")
         ),
       ),
       column(9,
