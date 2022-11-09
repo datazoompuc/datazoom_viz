@@ -118,7 +118,7 @@ get_server <- function(files, param) {
             fig <- plotly_empty()
             stop()
           }
-          
+
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def), ]
           y_col <- param$table[which(param$table$var == input$y), ]

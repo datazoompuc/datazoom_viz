@@ -103,7 +103,7 @@ db_orcamento_cde = read_csv(file = ".\\data-raw\\bases viz energia CPI\\sistemas
   select(c("Ano", "Valor")) %>%
   rename("orcamento" = "Valor") %>%
   filter(Ano != 2022) %>%
-  mutate(tipo = "ORCAMENTO CCC")
+  mutate(tipo = "ORÇAMENTO CCC")
 
 #tudo junto ---------------------------------------------------------------
 db_completa = full_join(db_consumo, db_consumidores)
