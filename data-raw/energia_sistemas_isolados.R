@@ -141,7 +141,7 @@ temp_param_table$label[1] <- "Ano"
 temp_param_table$label[2] <- "Consumo de energia (MWh)"
 temp_param_table$label[3] <- "Categoria"
 temp_param_table$label[4] <- "Média de consumidores"
-temp_param_table$label[5] <- "Orçamento CDE (R$)"
+temp_param_table$label[5] <- "Orçamento CCC (R$)"
 
 temp_param_table$x <- c(TRUE, FALSE, FALSE, FALSE, FALSE)
 temp_param_table$y <- c(FALSE, TRUE, FALSE, TRUE, TRUE)
