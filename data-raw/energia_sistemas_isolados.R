@@ -103,7 +103,8 @@ db_orcamento_cde = read_csv(file = ".\\data-raw\\bases viz energia CPI\\sistemas
   select(c("Ano", "Valor")) %>%
   rename("orcamento" = "Valor") %>%
   filter(Ano != 2022) %>%
-  mutate(tipo = "ORÇAMENTO CCC")
+  mutate(orcamento = orcamento / 1e9,
+         tipo = "DESPESAS ESTIMADAS CCC")
 
 #tudo junto ---------------------------------------------------------------
 db_completa = full_join(db_consumo, db_consumidores)
@@ -138,10 +139,18 @@ temp_param_table <- tibble(
 
 temp_param_table$label <- temp_param_table$var
 temp_param_table$label[1] <- "Ano"
-temp_param_table$label[2] <- "Consumo de energia (MWh)"
+temp_param_table$label[2] <- "Consumo de Energia"
 temp_param_table$label[3] <- "Categoria"
-temp_param_table$label[4] <- "Média de consumidores"
-temp_param_table$label[5] <- "Orçamento CCC (R$)"
+temp_param_table$label[4] <- "Média de Consumidores"
+temp_param_table$label[5] <- "Despesas Estimadas da Conta CCC"
+
+temp_param_table$var_group[5] <- "Energia - ANEEL"
+
+temp_param_table$unidade[2] <- "MWh"
+temp_param_table$unidade[4] <- "Consumidores"
+temp_param_table$unidade[5] <- "Bilhões de R$"
+
+
 
 temp_param_table$x <- c(TRUE, FALSE, FALSE, FALSE, FALSE)
 temp_param_table$y <- c(FALSE, TRUE, FALSE, TRUE, TRUE)
