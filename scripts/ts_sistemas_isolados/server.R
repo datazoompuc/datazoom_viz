@@ -93,13 +93,11 @@ get_server <- function(files, param) {
     })
     output$plot_subtitle <- renderText({
       
-      
-      
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <- " "
+        text <- ifelse(input$y_option, "Proporcional ao ano inicial", " ")
       }
 
       text
@@ -133,9 +131,10 @@ get_server <- function(files, param) {
           df_p <- data.frame(
             df_filtered[x_col$var],
             df_filtered[y_col$var],
+            df_filtered[color_col$var],
             df_filtered[color_col$var]
           )
-          colnames(df_p) <- c("x", "y", "color")
+          colnames(df_p) <- c("x", "y", "color", "text")
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
@@ -170,7 +169,8 @@ get_server <- function(files, param) {
             y_col$label, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>"
+                                      big.mark = "."), "<br>",
+            "Unidade de medida: <b>", y_col$unidade, "</b>"
           )
 
           # Define paleta de cores
@@ -182,7 +182,7 @@ get_server <- function(files, param) {
             y = ~y,
             color = ~color,
             type = "scatter",
-            mode = "lines",
+            mode = "lines+markers",
             text = ~tooltip,
             hoverinfo = "text"
           )
