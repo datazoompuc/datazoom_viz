@@ -31,7 +31,7 @@ param$text_def <- "" # variável padrão de texto
 param$id_def <- "" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Dados dos Sistemas Isolados de energia"
+param$plot_desc <- "Dados dos Sistemas Isolados de Energia"
 
 
 # Outros parâmetros e configurações
