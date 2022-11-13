@@ -19,9 +19,10 @@ library(lubridate)
 ############
 
 load_producao = readxl::read_excel(".\\bases\\Cap 8 - (Dados Estaduais).xls", sheet = "8.1 part 3", skip = 2)
+#atencao ao nome das colunas de load_producao
 
 producao = load_producao %>%
-  select(-c("State\n")) %>%
+  select(-c("State\n")) %>% #tira o nome dos estados em ingles
   rename("estado" = "Estado\n", 
          "total" = "Geração total\nTotal Generation", 
          "hidro" = "Hidro\nHydro",
@@ -38,4 +39,19 @@ producao = load_producao %>%
          "combustivel" = "Óleo combustível\nFuel Oil",
          "diesel" = "Óleo diesel\nDiesel Oil",
          "outras fontes nao renovaveis" = "Out. Fontes não renováveis\nOther Non-Renewable Sources") %>%
-  filter(estado == c("Acre","Alagoas","Amapá","Amazonas","Bahia","Ceará","Distrito Federal","Espírito Santo","Distrito Federal","Goiás","Maranhão","Mato Grosso","Mato G. do Sul","Minas Gerais","Pará","Paraíba","Paraná","Pernambuco","Piauí","Rio de Janeiro", "Rio G. do Norte", "Rio G. do Sul", "Rondônia", "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins"))
+  drop_na(total) %>% #tira cabecalhos das tabelas empilhadas
+  filter(eolica != "Eólica \nWind") %>% #tira header das tabelas empilhadas
+  filter(str_detect(estado, '[:lower:]')) %>% #tira dados a nivel de pais e de macroregiao
+  mutate(ano = rep(2021:2011, times = 1, each = 27)) %>% #insere a informacao de ano
+  mutate(amz_legal = case_when(estado == "Amapá" ~1,
+                               estado == "Acre"~1,
+                               estado == "Amazonas" ~1,
+                               estado == "Mato Grosso" ~1,
+                               estado == "Tocantins" ~1,
+                               estado == "Maranhão" ~1,
+                               estado == "Rondônia" ~1,
+                               estado == "Roraima" ~1,
+                               estado == "Pará" ~1,
+                              TRUE ~ 0)) %>%
+  rename("amz legal" = "amz_legal") %>%
+  mutate(tipo = "producao")
