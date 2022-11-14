@@ -134,7 +134,8 @@ get_server <- function(files, param) {
          filter(!is.na(value)) %>%
          mutate(unidade = case_when(str_detect(name, "Consumo") ~ "Milhões de MWh",
                                     str_detect(name, "Despesas") ~ "Bilhões de R$",
-                                    str_detect(name, "Consumidores") ~ "Milhões de Consumidores"))
+                                    str_detect(name, "Consumidores") ~ "Milhões de Consumidores",
+                                    str_detect(name, "Participação") ~ "% do Orçamento da Conta de Desenvolvimento Energético"))
           
        # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
