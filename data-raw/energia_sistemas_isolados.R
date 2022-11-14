@@ -6,6 +6,7 @@
 library(readr)
 library(tidyverse)
 library(readxl)
+library(deflateBR)
 ############
 
 #######################
@@ -33,7 +34,8 @@ limpa_consumo <- function(sheet_name) {
     mutate(Ano = 2021:2004) %>%  mutate(Ano = as.numeric(Ano)) %>%
     select(Ano, Total) %>%
     mutate(tipo = paste0("CONSUMO ", sheet_name)) %>% # adiciona coluna para tipo de consumo
-    rename("valor" = "Total")
+    rename("valor" = "Total") %>%
+    mutate(valor = as.numeric(valor) / 1e6)
   
   return(clean_df)
   
@@ -75,7 +77,7 @@ limpa_consumidores <- function(sheet_name) {
     select(Ano, Quantidade) %>% #tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
     mutate(Ano = as.numeric(Ano), Quantidade = as.numeric(Quantidade)) %>%
     group_by(Ano) %>%
-    dplyr::summarise(media = mean(Quantidade)) %>%
+    dplyr::summarise(valor = mean(Quantidade) / 1e6) %>%
     mutate(tipo = sheet_name) # adiciona coluna para tipo de consumidor
   
   return(clean_df)
@@ -101,14 +103,31 @@ db_consumidores <- bind_rows(list(db_consumidores_total, db_consumidores_residen
 
 db_orcamento_cde = read_csv(file = ".\\data-raw\\bases viz energia CPI\\sistemas_isolados_despesas_estimadas_no_orcamento_da_cde.csv", skip = 0) %>%
   select(c("Ano", "Valor")) %>%
-  rename("orcamento" = "Valor") %>%
+  rename("valor" = "Valor") %>%
   filter(Ano != 2022) %>%
-  mutate(orcamento = orcamento / 1e9,
-         tipo = "DESPESAS ESTIMADAS CCC")
+  mutate(valor = valor / 1e9,
+         tipo = "DESPESAS ESTIMADAS CCC (Nominal)",
+         nominal_dates = as.Date(paste0(Ano, "-01-01")),
+         `DESPESAS ESTIMADAS CCC (Real, R$ 2021)` = ipca(valor, nominal_dates, "01/2021")) %>%
+  select(Ano, `DESPESAS ESTIMADAS CCC (Nominal)` = valor, 
+         `DESPESAS ESTIMADAS CCC (Real, R$ 2021)`)
 
 #tudo junto ---------------------------------------------------------------
 db_completa = full_join(db_consumo, db_consumidores)
-db_sistemas_isolados = full_join(db_completa, db_orcamento_cde)
+db_sistemas_isolados_p = full_join(db_completa, db_orcamento_cde)
+
+
+# pivot table -----------------------------------------------------------------------
+db_sistemas_isolados <- db_sistemas_isolados_p %>%
+  pivot_wider(names_from = tipo, values_from = valor)
+
+colnames(db_sistemas_isolados) <- str_to_title(colnames(db_sistemas_isolados))
+
+db_sistemas_isolados <- db_sistemas_isolados %>%
+  rename(`Despesas Estimadas CCC (Nominal)` = `Despesas Estimadas Ccc (Nominal)`,
+         `Despesas Estimadas CCC (Real, R$ 2021)` = `Despesas Estimadas Ccc (Real, R$ 2021)`
+         )
+
 
 # export ------------------------------------------------------------------
 saveRDS(db_sistemas_isolados, "data/energia_sistemas_isolados.rds")
@@ -130,7 +149,7 @@ temp_param_table <- tibble(
   geometry = FALSE,
   label = columns_db_sistemas_isolados,
   desc = columns_db_sistemas_isolados,
-  var_group = "Energia - EPE", #ATENCAO coluna 5 tem fonte ANEEL
+  var_group = "Energia - EPE", #ATENCAO colunas de despesas tem fonte ANEEL
   tipo = 1,
   unidade = "",
   categoria= "Economia", 
@@ -138,25 +157,19 @@ temp_param_table <- tibble(
 )
 
 temp_param_table$label <- temp_param_table$var
-temp_param_table$label[1] <- "Ano"
-temp_param_table$label[2] <- "Consumo de Energia"
-temp_param_table$label[3] <- "Categoria"
-temp_param_table$label[4] <- "Média de Consumidores"
-temp_param_table$label[5] <- "Despesas Estimadas da Conta CCC"
 
-temp_param_table$var_group[5] <- "Energia - ANEEL"
+temp_param_table$var_group[1:2] <- "Orçamento CCC - ANEEL"
+temp_param_table$var_group[4:8] <- "Consumo de Eletricidade - EPE"
+temp_param_table$var_group[9:10] <- "Média de Consumidores - EPE"
 
-temp_param_table$unidade[2] <- "MWh"
-temp_param_table$unidade[4] <- "Consumidores"
-temp_param_table$unidade[5] <- "Bilhões de R$"
+temp_param_table$unidade[1:2] <- "Bilhões de R$"
+temp_param_table$unidade[4:8] <- "Milhões de MWh"
+temp_param_table$unidade[9:10] <- "Milhões de Consumidores"
 
 
+temp_param_table$x <- c(TRUE, rep(FALSE, 9))
+temp_param_table$y <- c(FALSE, rep(TRUE, 9))
 
-temp_param_table$x <- c(TRUE, FALSE, FALSE, FALSE, FALSE)
-temp_param_table$y <- c(FALSE, TRUE, FALSE, TRUE, TRUE)
-temp_param_table$color <- c(FALSE, FALSE, TRUE, FALSE, FALSE)
-temp_param_table$size <- c(FALSE, FALSE, TRUE, FALSE, FALSE)
-temp_param_table$slider <- c(FALSE, FALSE, FALSE, FALSE, FALSE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_sistemas_isolados_dic.csv", fileEncoding = "UTF-8")
