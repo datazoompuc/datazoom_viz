@@ -117,7 +117,130 @@ consumidores_proprio = limpa_workbook("Tabela 3.51", "consumidores proprio")
 consumidores_classe = rbind(consumidores_residencial, consumidores_industrial, consumidores_comercial, consumidores_rural, consumidores_pod_pub, consumidores_iluminacao_pub, consumidores_serv_pub, consumidores_proprio) %>%
   pivot_wider(names_from = tipo, values_from = valor)
 
+#tudo junto ---------------------------------------------------------------
 db_bind1 = left_join(producao,consumo_cativo_livre)
 db_bind2 = left_join(db_bind1,consumo_classe)
 db_bind3 = left_join(db_bind2,consumidores_cativos_livres)
 db_bind4 = left_join(db_bind3,consumidores_classe)
+
+# export ------------------------------------------------------------------
+saveRDS(db_bind4, "data/energia_amz_exporta.rds")
+
+# dictionary --------------------------------------------------------------
+
+# extract variables from data
+columns_db_amz_exporta <- colnames(db_bind4)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns_db_amz_exporta,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  geometry = FALSE,
+  label = columns_db_amz_exporta,
+  desc = columns_db_amz_exporta,
+  var_group = "Energia - EPE",
+  tipo = 1,
+  unidade = "",
+  categoria= "Economia", 
+  subcategoria = "Energia"
+)
+
+
+#o que e cada var
+temp_param_table$label <- temp_param_table$var
+temp_param_table$label[1] <- "UF"
+temp_param_table$label[2] <- "Total de energia produzida"
+temp_param_table$label[3] <- "Energia produzida por hidro"
+temp_param_table$label[4] <- "Energia produzida por eólica"
+temp_param_table$label[5] <- "Energia produzida por solar"
+temp_param_table$label[6] <- "Energia produzida por nuclear"
+temp_param_table$label[7] <- "Energia produzida por termo"
+temp_param_table$label[8] <- "Energia produzida por cana"
+temp_param_table$label[9] <- "Energia produzida por lenha"
+temp_param_table$label[10] <- "Energia produzida por lixívia"
+temp_param_table$label[11] <- "Energia produzida por outras fontes renováveis"
+temp_param_table$label[12] <- "Energia produzida por carvão vapor"
+temp_param_table$label[13] <- "Energia produzida por gás natural"
+temp_param_table$label[14] <- "Energia produzida por gás de coqueira"
+temp_param_table$label[15] <- "Energia produzida por combustível"
+temp_param_table$label[16] <- "Energia produzida por diesel"
+temp_param_table$label[17] <- "Energia produzida outras fontes não renováveis"
+temp_param_table$label[18] <- "Ano"
+temp_param_table$label[19] <- "Amazônia Legal"
+temp_param_table$label[20] <- "Consumo cativo"
+temp_param_table$label[21] <- "Consumo livre"
+temp_param_table$label[22] <- "Consumo residencial"
+temp_param_table$label[23] <- "Consumo industrial"
+temp_param_table$label[24] <- "Consumo comercial"
+temp_param_table$label[25] <- "Consumo rural"
+temp_param_table$label[26] <- "Consumo do poder público"
+temp_param_table$label[27] <- "Consumo de iluminação pública"
+temp_param_table$label[28] <- "Consumo do serviço público"
+temp_param_table$label[29] <- "Consumo próprio"
+temp_param_table$label[30] <- "Consumidores cativos"
+temp_param_table$label[31] <- "Consumidores livres"
+temp_param_table$label[32] <- "Consumidores residenciais"
+temp_param_table$label[33] <- "Consumidores industriais"
+temp_param_table$label[34] <- "Consumidores comerciais"
+temp_param_table$label[35] <- "Consumidores rurais"
+temp_param_table$label[36] <- "Consumidores do poder público"
+temp_param_table$label[37] <- "Consumidores de iluminação pública"
+temp_param_table$label[38] <- "Consumidores do serviço público"
+temp_param_table$label[39] <- "Consumidores próprios"
+
+
+#unidades de cada var
+temp_param_table$unidade[1] <- ""
+temp_param_table$unidade[2] <- ""
+temp_param_table$unidade[3] <- ""
+temp_param_table$unidade[4] <- ""
+temp_param_table$unidade[5] <- ""
+temp_param_table$unidade[6] <- ""
+temp_param_table$unidade[7] <- ""
+temp_param_table$unidade[8] <- ""
+temp_param_table$unidade[9] <- ""
+temp_param_table$unidade[10] <- ""
+temp_param_table$unidade[11] <- ""
+temp_param_table$unidade[12] <- ""
+temp_param_table$unidade[13] <- ""
+temp_param_table$unidade[14] <- ""
+temp_param_table$unidade[15] <- ""
+temp_param_table$unidade[16] <- ""
+temp_param_table$unidade[17] <- ""
+temp_param_table$unidade[18] <- ""
+temp_param_table$unidade[19] <- ""
+temp_param_table$unidade[20] <- "GWh"
+temp_param_table$unidade[21] <- "GWh"
+temp_param_table$unidade[22] <- "GWh"
+temp_param_table$unidade[23] <- "GWh"
+temp_param_table$unidade[24] <- "GWh"
+temp_param_table$unidade[25] <- "GWh"
+temp_param_table$unidade[26] <- "GWh"
+temp_param_table$unidade[27] <- "GWh"
+temp_param_table$unidade[28] <- "GWh"
+temp_param_table$unidade[29] <- "GWh"
+temp_param_table$unidade[30] <- "Consumidores"
+temp_param_table$unidade[31] <- "Consumidores"
+temp_param_table$unidade[32] <- "Consumidores"
+temp_param_table$unidade[33] <- "Consumidores"
+temp_param_table$unidade[34] <- "Consumidores"
+temp_param_table$unidade[35] <- "Consumidores"
+temp_param_table$unidade[36] <- "Consumidores"
+temp_param_table$unidade[37] <- "Consumidores"
+temp_param_table$unidade[38] <- "Consumidores"
+temp_param_table$unidade[39] <- "Consumidores"
+
+
+#o que cada var pode assumir
+temp_param_table$x <- c(rep(FALSE, times = 17), TRUE, rep(FALSE, times = 21))
+temp_param_table$y <- c(FALSE, rep(TRUE, times = 16), rep(FALSE, times = 2), rep(TRUE, times = 20))
+temp_param_table$color <- c(TRUE, rep(FALSE, times = 17), TRUE, rep(FALSE, times = 20))
+temp_param_table$size <- c(FALSE, rep(TRUE, times = 16), rep(FALSE, times = 2), rep(TRUE, times = 20)) #mesma coisa que y
+temp_param_table$slider <- c(rep(FALSE, times = 17), TRUE, rep(FALSE, times = 21))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/energia_amz_exporta_dic.csv", fileEncoding = "UTF-8")
