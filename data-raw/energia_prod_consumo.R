@@ -54,8 +54,10 @@ producao = load_producao %>%
                                uf == "Roraima" ~1,
                                uf == "Pará" ~1,
                               TRUE ~ 0)) %>%
-  rename("amz legal" = "amz_legal")
-
+  rename("amz legal" = "amz_legal") %>%
+  mutate(uf = replace(uf, uf == "Mato G. do Sul", "Mato Grosso do Sul")) %>%
+  mutate(uf = replace(uf, uf == "Rio G. do Sul", "Rio Grande do Sul")) %>%
+  mutate(uf = replace(uf, uf == "Rio G. do Norte", "Rio Grande do Norte")) 
 
 limpa_workbook = function(sheet_number, tipo_dado) {
 
