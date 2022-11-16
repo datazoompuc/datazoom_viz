@@ -57,7 +57,7 @@ producao = load_producao %>%
   rename("amz legal" = "amz_legal")
 
 
-limpa_cativo_livre = function(sheet_number, tipo_dado) {
+limpa_workbook = function(sheet_number, tipo_dado) {
 
 load_cativo_livre = read_excel(".\\bases\\Energia Elétrica 2022 - Workbook.xlsx", sheet = sheet_number, skip = 8)
 
@@ -78,22 +78,44 @@ parc = load_cativo_livre %>%
                                uf == "Roraima" ~1,
                                uf == "Pará" ~1,
                                TRUE ~ 0)) %>%
-  rename("amz legal" = "amz_legal")
+  rename("amz legal" = "amz_legal") %>%
 
 return(parc)
 }
 
-consumo_cativo = limpa_cativo_livre("Tabela 3.13", "consumo cativo")
-consumo_livre = limpa_cativo_livre("Tabela 3.14", "consumo livre")
+consumo_cativo = limpa_workbook("Tabela 3.13", "consumo cativo")
+consumo_livre = limpa_workbook("Tabela 3.14", "consumo livre")
 consumo_cativo_livre = rbind(consumo_cativo,consumo_livre) %>%
   pivot_wider(names_from = tipo, values_from = valor) 
 
-consumidores_cativos = limpa_cativo_livre("Tabela 3.42", "consumidores cativos")
-consumidores_livres = limpa_cativo_livre("Tabela 3.43", "consumidores livres")
+consumidores_cativos = limpa_workbook("Tabela 3.42", "consumidores cativos")
+consumidores_livres = limpa_workbook("Tabela 3.43", "consumidores livres")
 consumidores_cativos_livres = rbind(consumidores_cativos,consumidores_livres) %>%
   pivot_wider(names_from = tipo, values_from = valor) 
 
+consumo_residencial = limpa_workbook("Tabela 3.15", "consumo residencial")
+consumo_industrial = limpa_workbook("Tabela 3.16", "consumo industrial")
+consumo_comercial = limpa_workbook("Tabela 3.17", "consumo comercial")
+consumo_rural = limpa_workbook("Tabela 3.18", "consumo rural")
+consumo_pod_pub  = limpa_workbook("Tabela 3.19", "consumo poder publico")
+consumo_iluminacao_pub = limpa_workbook("Tabela 3.20", "consumo iluminacao publica")
+consumo_serv_pub  = limpa_workbook("Tabela 3.21", "consumo servico publico")
+consumo_proprio = limpa_workbook("Tabela 3.22", "consumo proprio")
+consumo_classe = rbind(consumo_residencial, consumo_industrial, consumo_comercial, consumo_rural, consumo_pod_pub, consumo_iluminacao_pub, consumo_serv_pub, consumo_proprio) %>%
+  pivot_wider(names_from = tipo, values_from = valor)
 
+consumidores_residencial = limpa_workbook("Tabela 3.44", "consumidores residencial")
+consumidores_industrial = limpa_workbook("Tabela 3.45", "consumidores industrial")
+consumidores_comercial = limpa_workbook("Tabela 3.46", "consumidores comercial")
+consumidores_rural = limpa_workbook("Tabela 3.47", "consumidores rural")
+consumidores_pod_pub  = limpa_workbook("Tabela 3.48", "consumidores poder publico")
+consumidores_iluminacao_pub = limpa_workbook("Tabela 3.49", "consumidores iluminacao publica")
+consumidores_serv_pub  = limpa_workbook("Tabela 3.50", "consumidores servico publico")
+consumidores_proprio = limpa_workbook("Tabela 3.51", "consumidores proprio")
+consumidores_classe = rbind(consumidores_residencial, consumidores_industrial, consumidores_comercial, consumidores_rural, consumidores_pod_pub, consumidores_iluminacao_pub, consumidores_serv_pub, consumidores_proprio) %>%
+  pivot_wider(names_from = tipo, values_from = valor)
 
 db_bind1 = left_join(producao,consumo_cativo_livre)
-db_bind2 = left_join(db_bind1,consumidores_cativos_livres)
+db_bind2 = left_join(db_bind1,consumo_classe)
+db_bind3 = left_join(db_bind2,consumidores_cativos_livres)
+db_bind4 = left_join(db_bind3,consumidores_classe)
