@@ -143,9 +143,9 @@ get_server <- function(files, param) {
             df_filtered["value"],
             df_filtered["name"],
             df_filtered["name"],
-            df_filtered["unidade"]
+          #  df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "color", "text", "unidade")
+          colnames(df_p) <- c("x", "y", "color", "text")
           
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
