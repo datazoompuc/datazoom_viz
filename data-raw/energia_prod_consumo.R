@@ -125,19 +125,31 @@ db_bind4 = left_join(db_bind3,consumidores_classe) %>%
   rename("amz_legal" = "amz legal") %>%
   mutate(across(!uf & !amz_legal, as.numeric))
 
-amz_legal = db_bind4 %>%
-  group_by(`amz_legal`) %>%
-  summarise(across(!uf & !`amz_legal` & !ano, .funs = ~colSums())) %>%
-  mutate(uf = case_when("amz_legal" == TRUE ~"amz legal",
-         TRUE ~"fora amz legal"))
+amz_legal_df = db_bind4 %>%
+  filter(amz_legal == 1) %>%
+  group_by(ano) %>%
+  summarise(across(!uf, ~sum(.x, na.rm = TRUE))) %>%
+  mutate(uf = case_when(amz_legal == TRUE ~"amz legal",
+                        TRUE ~ "fora amz legal"))
+
+fora_amz_legal_df = db_bind4 %>%
+  filter(amz_legal == 0) %>%
+  group_by(ano) %>%
+  summarise(across(!uf, ~sum(.x, na.rm = TRUE))) %>%
+  mutate(uf = case_when(amz_legal == TRUE ~"amz legal",
+                        TRUE ~ "fora amz legal"))
+
+df_final <- rbind(db_bind4, amz_legal_df) %>%
+  rbind(fora_amz_legal_df)
+
 
 # export ------------------------------------------------------------------
-saveRDS(db_bind4, "data/energia_amz_exporta.rds")
+saveRDS(df_final, "data/energia_amz_exporta.rds")
 
 # dictionary --------------------------------------------------------------
 
 # extract variables from data
-columns_db_amz_exporta <- colnames(db_bind4)
+columns_db_amz_exporta <- colnames(df_final)
 
 # generate dictionary
 temp_param_table <- tibble(
