@@ -121,7 +121,15 @@ consumidores_classe = rbind(consumidores_residencial, consumidores_industrial, c
 db_bind1 = left_join(producao,consumo_cativo_livre)
 db_bind2 = left_join(db_bind1,consumo_classe)
 db_bind3 = left_join(db_bind2,consumidores_cativos_livres)
-db_bind4 = left_join(db_bind3,consumidores_classe)
+db_bind4 = left_join(db_bind3,consumidores_classe) %>%
+  rename("amz_legal" = "amz legal") %>%
+  mutate(across(!uf & !amz_legal, as.numeric))
+
+amz_legal = db_bind4 %>%
+  group_by(`amz_legal`) %>%
+  summarise(across(!uf & !`amz_legal` & !ano, .funs = ~colSums())) %>%
+  mutate(uf = case_when("amz_legal" == TRUE ~"amz legal",
+         TRUE ~"fora amz legal"))
 
 # export ------------------------------------------------------------------
 saveRDS(db_bind4, "data/energia_amz_exporta.rds")
