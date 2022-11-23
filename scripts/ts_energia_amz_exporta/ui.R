@@ -32,7 +32,7 @@ get_ui <- function(files, param) {
                  inputId = "y",
                  label = "eixo vertical (y)",
                  choices = param$y_choices,
-                 selected = c("Total energia produzida", "Consumo cativo"), 
+                 selected = c("total", "consumo cativo"), 
                  multiple = TRUE,
                  width = "100%"
                )

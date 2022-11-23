@@ -13,7 +13,8 @@ get_server <- function(files, param) {
   server <- function(input, output, session) {
     
     # Carrega dados
-    df <- readRDS(files$db_file) 
+    df <- readRDS(files$db_file) %>%
+      mutate(total = as.numeric(total))
     
     # Cria opções para seleção de grupos
     #param$filter_choices <- sort(unique(df$group))
@@ -24,7 +25,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
                         "y",
                         choices = param$y_choices,
-                        selected = c("Total energia produzida", "Consumo cativo") 
+                        selected = c("total", "consumo cativo") 
       )
     }
     
@@ -123,7 +124,7 @@ get_server <- function(files, param) {
             fig <- plotly_empty()
             stop()
           }
-          
+         
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def), ]
           y_col <- param$table %>% filter(var %in% input$y)
@@ -142,7 +143,7 @@ get_server <- function(files, param) {
             df_filtered[x_col$var],
             df_filtered["value"],
             df_filtered["name"],
-            df_filtered["name"],
+            df_filtered["name"]
           #  df_filtered["unidade"]
           )
           colnames(df_p) <- c("x", "y", "color", "text")

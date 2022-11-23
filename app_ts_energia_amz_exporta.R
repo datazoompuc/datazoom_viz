@@ -36,9 +36,6 @@ param$plot_desc <- "Dados de produção, consumo e consumidores de energia"
 
 # Outros parâmetros e configurações
 param$y_choices$`Fonte de dados` <- NULL
-param$y_choices$IMAZON <- NULL
-param$y_choices$`IBGE - Censo 2000` <- NULL
-param$y_choices$`IBGE - Censo 2010` <- NULL
 param$y_choices[[1]] <- NULL
 
 
