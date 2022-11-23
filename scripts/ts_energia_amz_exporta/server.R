@@ -130,7 +130,7 @@ get_server <- function(files, param) {
           y_col <- param$table %>% filter(var %in% input$y)
           
           df_filtered <- df %>%
-            select("ano", "uf", "amz legal", input$y) %>%
+            select("ano", "uf", input$y) %>%
             pivot_longer(cols = input$y) %>%
             filter(!is.na(value)) # %>%
           #  mutate(unidade = case_when(str_detect(name, "Consumo") ~ "Milhões de MWh",
@@ -142,11 +142,13 @@ get_server <- function(files, param) {
           df_p <- data.frame(
             df_filtered[x_col$var],
             df_filtered["value"],
+            df_filtered["uf"],
             df_filtered["name"],
             df_filtered["name"]
           #  df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "color", "text")
+          colnames(df_p) <- c("x", "y", "group", "color", "text")
+          df_p$text <- df_p$group
           
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
@@ -189,7 +191,7 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
                            x = ~x,
                            y = ~y,
-                           color = ~color,
+                           color = ~group,
                            type = "scatter",
                            mode = "lines+markers",
                            text = ~tooltip,

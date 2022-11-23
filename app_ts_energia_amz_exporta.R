@@ -25,7 +25,7 @@ source(files$server_script)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "ano" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
-param$color_def <- "amz legal" # variável padrão de cor
+param$color_def <- "" # variável padrão de cor
 param$slider_def <- "" # variável padrão do slider
 param$text_def <- "" # variável padrão de texto
 param$id_def <- "" # variável padrão de id
