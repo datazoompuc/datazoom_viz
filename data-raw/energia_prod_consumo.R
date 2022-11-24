@@ -8,7 +8,7 @@
 #https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20-%20(Dados%20Estaduais).xls
 
 #consumo de energia
-#https://www.epe.gov.br/pt/publicacoes-dados-abertos/publicacoes/anuario-estatistico-de-energia-eletrica
+#https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-160/topico-168/Anu%C3%A1rio%20Estat%C3%ADstico%20de%20Energia%20El%C3%A9trica%202022%20-%20Workbook.xlsx
 
 ############
 #libraries
@@ -129,15 +129,13 @@ amz_legal_df = db_bind4 %>%
   filter(amz_legal == 1) %>%
   group_by(ano) %>%
   summarise(across(!uf, ~sum(.x, na.rm = TRUE))) %>%
-  mutate(uf = case_when(amz_legal == TRUE ~"amz legal",
-                        TRUE ~ "fora amz legal"))
+  mutate("uf" = "Amazônia Legal")
 
 fora_amz_legal_df = db_bind4 %>%
   filter(amz_legal == 0) %>%
   group_by(ano) %>%
   summarise(across(!uf, ~sum(.x, na.rm = TRUE))) %>%
-  mutate(uf = case_when(amz_legal == TRUE ~"amz legal",
-                        TRUE ~ "fora amz legal"))
+  mutate("uf" = "Fora da Amazônia Legal")
 
 df_final <- rbind(db_bind4, amz_legal_df) %>%
   rbind(fora_amz_legal_df)

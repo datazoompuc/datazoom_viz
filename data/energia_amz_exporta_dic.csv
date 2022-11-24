@@ -17,7 +17,7 @@
 "16","diesel",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Energia produzida por diesel","diesel","Energia - EPE",1,"","Economia","Energia"
 "17","outras fontes nao renovaveis",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Energia produzida outras fontes não renováveis","outras fontes nao renovaveis","Energia - EPE",1,"","Economia","Energia"
 "18","ano",TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,"Ano","ano","Energia - EPE",1,"","Economia","Energia"
-"19","amz legal",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Amazônia Legal","amz legal","Energia - EPE",1,"","Economia","Energia"
+"19","amz_legal",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Amazônia Legal","amz_legal","Energia - EPE",1,"","Economia","Energia"
 "20","consumo cativo",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Consumo cativo","consumo cativo","Energia - EPE",1,"GWh","Economia","Energia"
 "21","consumo livre",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Consumo livre","consumo livre","Energia - EPE",1,"GWh","Economia","Energia"
 "22","consumo residencial",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Consumo residencial","consumo residencial","Energia - EPE",1,"GWh","Economia","Energia"
