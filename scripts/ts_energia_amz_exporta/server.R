@@ -172,19 +172,19 @@ get_server <- function(files, param) {
             filter(!is.na(value))
           
           df_filtered <- df_filtered[which(df_filtered$uf %in% input$filter1), ]
+          df_filtered <- df_filtered %>%
+            mutate(group = paste(uf, name, sep = " - "))
           
           # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
             df_filtered[x_col$var],
             df_filtered["value"],
-            df_filtered["uf"],
-            df_filtered["name"],
-            df_filtered["name"],
-            df_filtered["name"]
+            df_filtered["group"],
+            df_filtered["group"],
+            df_filtered["group"]
           #  df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "group", "group", "color", "text")
-          df_p$text <- df_p$group
+          colnames(df_p) <- c("x", "y", "group", "color", "text")
           
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
