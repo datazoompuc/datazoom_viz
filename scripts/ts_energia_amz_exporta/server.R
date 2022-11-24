@@ -27,7 +27,14 @@ get_server <- function(files, param) {
                         choices = param$y_choices,
                         selected = c("total", "consumo cativo") 
       )
+      
+      updateSelectInput(session,
+                        "filter1",
+                        choices = param$filter_choices,
+                        selected = c("Amazônia Legal", "Fora da Amazônia Legal") # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+      )
     }
+    
     
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
@@ -43,11 +50,24 @@ get_server <- function(files, param) {
         )
       }
       
+      for (i in input$filter1) {
+        q_string <- paste0(
+          q_string,
+          "&", "filter=", i
+        )
+      }
+      
       updateQueryString(q_string, mode = "replace")
     }
     
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
+      # Preenche filtro vazio
+      updateSelectInput(session,
+                        "filter1",
+                        choices = param$filter_choices,
+                        selected = NULL
+      )
       
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
@@ -73,6 +93,15 @@ get_server <- function(files, param) {
         )
       }
       
+      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+      if (!is.null(query[["filter"]])) {
+        updateSelectInput(session,
+                          "filter1",
+                          choices = param$filter_choices,
+                          selected = selected
+        )
+      }
+      
       # Se query está vazia, preenche aleatório
       if (is.null(query[["y"]])) {
         random_inputs() # preenche inputs se estiverem vazios
@@ -84,17 +113,19 @@ get_server <- function(files, param) {
       
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y)) {
+      if ((is.null(input$y)) | (is.null(input$filter1))) {
         text <- " "
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table %>%
           filter(var %in% input$y)
-        
+        filt <- paste(sapply(input$filter1, paste, collapse = ", "), 
+                      collapse = ", ")
         text <- paste0("", paste(y_col$label, collapse = ", "))
         if (input$y_option) {
           text <- paste0("", y_col$label, "*")
         }
+        text <- paste0(text, filt)
       }
       
       text
@@ -102,7 +133,7 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
       
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y)) {
+      if ((is.null(input$y)) | (is.null(input$filter1))) {
         text <- " "
       } else {
         text <- ifelse(input$y_option, "Proporcional ao ano inicial", " ")
@@ -116,7 +147,8 @@ get_server <- function(files, param) {
       
       update_my_queryString() # atualiza url com parametros dos inputs
       
-      fig <- plotly_empty() # inicia figura com gráfico em branco
+      fig <- plotly_empty() 
+      # inicia figura com gráfico em branco
       tryCatch(
         {
           # Se algum campo estiver vazio retorna gráfico vazio
@@ -124,19 +156,22 @@ get_server <- function(files, param) {
             fig <- plotly_empty()
             stop()
           }
-         
+          
+          if (is.null(input$filter1) || length(input$filter1) < 1) {
+            fig <- plotly_empty()
+            stop()
+          }
+          
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def), ]
           y_col <- param$table %>% filter(var %in% input$y)
-          
+         
           df_filtered <- df %>%
             select("ano", "uf", input$y) %>%
             pivot_longer(cols = input$y) %>%
-            filter(!is.na(value)) # %>%
-          #  mutate(unidade = case_when(str_detect(name, "Consumo") ~ "Milhões de MWh",
-          #                             str_detect(name, "Despesas") ~ "Bilhões de R$",
-          #                             str_detect(name, "Consumidores") ~ "Milhões de Consumidores",
-          #                             str_detect(name, "Participação") ~ "% do Orçamento da Conta de Desenvolvimento Energético"))
+            filter(!is.na(value))
+          
+          df_filtered <- df_filtered[which(df_filtered$uf %in% input$filter1), ]
           
           # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
@@ -144,10 +179,11 @@ get_server <- function(files, param) {
             df_filtered["value"],
             df_filtered["uf"],
             df_filtered["name"],
+            df_filtered["name"],
             df_filtered["name"]
           #  df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "group", "color", "text")
+          colnames(df_p) <- c("x", "y", "group", "group", "color", "text")
           df_p$text <- df_p$group
           
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco

@@ -27,10 +27,20 @@ get_ui <- function(files, param) {
              p(class = "vars", "VARI\u00C1VEIS:"),
              div(
                class = "var_selec_group",
+               
+               # Seleciona filtro
+               selectizeInput(
+                 "filter1",
+                 "Subdivisão geográfica",
+                 selected = c("Amazônia Legal", "Fora da Amazônia Legal"), 
+                 choices = NULL,
+                 multiple = TRUE,
+                 width = "100%"),
+               
                # Seleciona variável do eixo y
                selectInput(
                  inputId = "y",
-                 label = "eixo vertical (y)",
+                 label = "Eixo vertical (y)",
                  choices = param$y_choices,
                  selected = c("total", "consumo cativo"), 
                  multiple = TRUE,
