@@ -3,6 +3,7 @@ library(shiny)
 library(tidyverse)
 library(plotly)
 library(htmlwidgets)
+library(owdbr)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -35,6 +36,8 @@ param$plot_desc <- "Dados de produção, consumo e consumidores de energia"
 
 
 # Outros parâmetros e configurações
+param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal"),
+                             "UF" = owdbr::uflist()$UF)
 param$y_choices$`Fonte de dados` <- NULL
 param$y_choices[[1]] <- NULL
 

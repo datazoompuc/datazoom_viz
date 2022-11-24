@@ -125,7 +125,7 @@ get_server <- function(files, param) {
         if (input$y_option) {
           text <- paste0("", y_col$label, "*")
         }
-        text <- paste0(text, filt)
+        text <- paste0(text, " ", filt)
       }
       
       text

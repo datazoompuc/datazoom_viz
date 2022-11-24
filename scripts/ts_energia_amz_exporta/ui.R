@@ -33,7 +33,7 @@ get_ui <- function(files, param) {
                  "filter1",
                  "Subdivisão geográfica",
                  selected = c("Amazônia Legal", "Fora da Amazônia Legal"), 
-                 choices = NULL,
+                 choices = param$filter_choices,
                  multiple = TRUE,
                  width = "100%"),
                
