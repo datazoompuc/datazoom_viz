@@ -24,7 +24,7 @@ load_producao = readxl::read_excel(".\\bases\\Cap 8 - (Dados Estaduais).xls", sh
 producao = load_producao %>%
   select(-c("State\n")) %>% #tira o nome dos estados em ingles
   rename("uf" = "Estado\n", 
-         "total" = "Geração total\nTotal Generation", 
+         "total produzido" = "Geração total\nTotal Generation", 
          "hidro" = "Hidro\nHydro",
          "eolica" = "Eólica \nWind",
          "solar" = "Solar \nSolar",
@@ -40,7 +40,7 @@ producao = load_producao %>%
          "combustivel" = "Óleo combustível\nFuel Oil",
          "diesel" = "Óleo diesel\nDiesel Oil",
          "outras fontes nao renovaveis" = "Out. Fontes não renováveis\nOther Non-Renewable Sources") %>%
-  drop_na(total) %>% #tira cabecalhos das tabelas empilhadas
+  drop_na(`total produzido`) %>% #tira cabecalhos das tabelas empilhadas
   filter(eolica != "Eólica \nWind") %>% #tira header das tabelas empilhadas
   filter(str_detect(uf, '[:lower:]')) %>% #tira dados a nivel de pais e de macroregiao
   mutate(ano = rep(2021:2011, times = 1, each = 27)) %>% #insere a informacao de ano
@@ -140,6 +140,7 @@ fora_amz_legal_df = db_bind4 %>%
 df_final <- rbind(db_bind4, amz_legal_df) %>%
   rbind(fora_amz_legal_df)
 
+df_final[, 20:29][df_final[, 20:29] == 0] <- NA
 
 # export ------------------------------------------------------------------
 saveRDS(df_final, "data/energia_amz_exporta.rds")
