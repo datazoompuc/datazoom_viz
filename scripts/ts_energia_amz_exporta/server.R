@@ -31,7 +31,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
                         "filter1",
                         choices = param$filter_choices,
-                        selected = c("Amazônia Legal", "Fora da Amazônia Legal") # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+                        selected = c("Amazônia Legal", "Fora da Amazônia Legal")
       )
     }
     
@@ -122,10 +122,8 @@ get_server <- function(files, param) {
         filt <- paste(sapply(input$filter1, paste, collapse = ", "), 
                       collapse = ", ")
         text <- paste0("", paste(y_col$label, collapse = ", "))
-        if (input$y_option) {
-          text <- paste0("", y_col$label, "*")
-        }
-        text <- paste0(text, " ", filt)
+
+        text <- paste0(text, ": ", filt)
       }
       
       text
@@ -181,10 +179,11 @@ get_server <- function(files, param) {
             df_filtered["value"],
             df_filtered["group"],
             df_filtered["group"],
-            df_filtered["group"]
+            df_filtered["name"],
+            df_filtered["uf"]
           #  df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "group", "color", "text")
+          colnames(df_p) <- c("x", "y", "group", "color", "text", "uf")
           
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
@@ -211,9 +210,9 @@ get_server <- function(files, param) {
           
           # Monta html do tooltip
           df_p$tooltip <- paste0(
-            "<b>", df_p$text, "</b><br>",
+            "<b>", df_p$uf, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", format(df_p$y, scientific = FALSE,
+            df_p$text, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
