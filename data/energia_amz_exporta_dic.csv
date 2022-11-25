@@ -1,6 +1,6 @@
 "","var","x","y","color","size","slider","geometry","label","desc","var_group","tipo","unidade","categoria","subcategoria"
 "1","uf",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"UF","uf","Energia - EPE",1,"","Economia","Energia"
-"2","total",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Total de energia produzida","total","Energia - EPE",1,"","Economia","Energia"
+"2","total produzido",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Total de energia produzida","total produzido","Energia - EPE",1,"","Economia","Energia"
 "3","hidro",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Energia produzida por hidro","hidro","Energia - EPE",1,"","Economia","Energia"
 "4","eolica",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Energia produzida por eólica","eolica","Energia - EPE",1,"","Economia","Energia"
 "5","solar",FALSE,TRUE,FALSE,TRUE,FALSE,FALSE,"Energia produzida por solar","solar","Energia - EPE",1,"","Economia","Energia"
