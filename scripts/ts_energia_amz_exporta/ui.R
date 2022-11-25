@@ -42,7 +42,7 @@ get_ui <- function(files, param) {
                  inputId = "y",
                  label = "Eixo vertical (y)",
                  choices = param$y_choices,
-                 selected = c("total", "consumo cativo"), 
+                 selected = c("total produzido", "consumo cativo", "consumo livre"), 
                  multiple = TRUE,
                  width = "100%"
                )

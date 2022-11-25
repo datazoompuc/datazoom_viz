@@ -14,7 +14,7 @@ get_server <- function(files, param) {
     
     # Carrega dados
     df <- readRDS(files$db_file) %>%
-      mutate(total = as.numeric(total))
+      mutate(`total produzido`= as.numeric(`total produzido`))
     
     # Cria opções para seleção de grupos
     #param$filter_choices <- sort(unique(df$group))
@@ -25,7 +25,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
                         "y",
                         choices = param$y_choices,
-                        selected = c("total", "consumo cativo") 
+                        selected = c("total produzido", "consumo cativo", "consumo livre") 
       )
       
       updateSelectInput(session,
