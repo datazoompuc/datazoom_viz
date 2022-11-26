@@ -140,7 +140,40 @@ fora_amz_legal_df = db_bind4 %>%
 df_final <- rbind(db_bind4, amz_legal_df) %>%
   rbind(fora_amz_legal_df)
 
-df_final[, 20:29][df_final[, 20:29] == 0] <- NA
+#atribui NA aos dados de consumo e consumidores em 2011
+#esses dados nao estao disponiveis na fonte
+df_final[, 20:39][df_final[, 20:39] == 0] <- NA
+
+#modifica `uf` para evitar problemas com acentos e dar match no UI 
+df_final = df_final %>%
+  mutate(uf = case_when(uf == "Amapá" ~ "AP",
+                   uf == "Acre"~ "AC",
+                   uf == "Amazonas" ~ "AM",
+                   uf == "Mato Grosso" ~ "MT",
+                   uf == "Tocantins" ~ "TO",
+                   uf == "Maranhão" ~ "MA",
+                   uf == "Rondônia" ~ "RO",
+                   uf == "Roraima" ~ "RR",
+                   uf == "Pará" ~ "PA",
+                   uf == "Alagoas" ~ "AL",
+                   uf == "Bahia" ~ "BA",
+                   uf == "Ceará" ~ "CE",
+                   uf == "Distrito Federal" ~ "DF",
+                   uf == "Espírito Santo" ~ "ES",
+                   uf == "Goiás" ~ "GO",
+                   uf == "Mato Grosso do Sul" ~ "MS",
+                   uf == "Minas Gerais" ~ "MG",
+                   uf == "Paraíba" ~ "PB",
+                   uf == "Paraná" ~ "PR",
+                   uf == "Pernambuco" ~ "Piauí",
+                   uf == "Rio de Janeiro" ~"RJ",
+                   uf == "Rio Grande do Sul" ~"RS",
+                   uf == "Santa Catarina" ~ "SC",
+                   uf == "São Paulo" ~ "SP",
+                   uf == "Sergipe" ~ "SE",
+                   uf == "Piauí" ~ "PI",
+                   uf == "Rio Grande do Norte" ~ "RN",
+                   TRUE ~ as.character(uf)))
 
 # export ------------------------------------------------------------------
 saveRDS(df_final, "data/energia_amz_exporta.rds")
