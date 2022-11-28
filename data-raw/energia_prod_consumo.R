@@ -18,7 +18,7 @@ library(readxl)
 library(lubridate)
 ############
 
-load_producao = readxl::read_excel(".\\bases\\Cap 8 - (Dados Estaduais).xls", sheet = "8.1 part 3", skip = 2)
+load_producao = readxl::read_excel(".\\data-raw\\bases\\Cap 8 - (Dados Estaduais).xls", sheet = "8.1 part 3", skip = 2)
 #atencao ao nome das colunas de load_producao
 
 producao = load_producao %>%
@@ -61,7 +61,7 @@ producao = load_producao %>%
 
 limpa_workbook = function(sheet_number, tipo_dado) {
 
-load_cativo_livre = read_excel(".\\bases\\Energia Elétrica 2022 - Workbook.xlsx", sheet = sheet_number, skip = 8)
+load_cativo_livre = read_excel(".\\data-raw\\bases\\Energia Elétrica 2022 - Workbook.xlsx", sheet = sheet_number, skip = 8)
 
 parc = load_cativo_livre %>%
   select(-c(12,13,14)) %>%
@@ -165,7 +165,7 @@ df_final = df_final %>%
                    uf == "Minas Gerais" ~ "MG",
                    uf == "Paraíba" ~ "PB",
                    uf == "Paraná" ~ "PR",
-                   uf == "Pernambuco" ~ "Piauí",
+                   uf == "Pernambuco" ~ "PE",
                    uf == "Rio de Janeiro" ~"RJ",
                    uf == "Rio Grande do Sul" ~"RS",
                    uf == "Santa Catarina" ~ "SC",
