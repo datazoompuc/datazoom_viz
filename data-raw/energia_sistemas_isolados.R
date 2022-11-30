@@ -81,9 +81,6 @@ limpa_consumidores <- function(sheet_name) {
   
   return(clean_df)
   
-  
-  return(clean_df)
-  
 }
 
 # roda funcao -----------------------------------------------------------------------
