@@ -73,12 +73,14 @@ limpa_consumidores <- function(sheet_name) {
     filter(Sistema == "Sistemas Isolados") %>%
     slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
     mutate(Ano = 2021:2004)  %>%
-    pivot_longer(cols = c(2:13), names_to = "Mes", values_to = "Quantidade") %>%
-    select(Ano, Quantidade) %>% #tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
-    mutate(Ano = as.numeric(Ano), Quantidade = as.numeric(Quantidade)) %>%
-    group_by(Ano) %>%
-    dplyr::summarise(valor = mean(Quantidade) / 1e6) %>%
+    pivot_longer(cols = c(2:13), names_to = "Mes", values_to = "valor") %>%
+    filter(Mes == 12) %>%
+    select(Ano, valor) %>% #tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
+    mutate(Ano = as.numeric(Ano), valor = as.numeric(valor), valor = valor / 1e6) %>%
     mutate(tipo = sheet_name) # adiciona coluna para tipo de consumidor
+  
+  return(clean_df)
+  
   
   return(clean_df)
   
