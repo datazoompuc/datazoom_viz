@@ -144,6 +144,7 @@ db_sistemas_isolados <- db_sistemas_isolados %>%
 db_sistemas_isolados <- db_sistemas_isolados %>%
   filter(Ano >= 2013)
 
+
 # export ------------------------------------------------------------------
 saveRDS(db_sistemas_isolados, "data/energia_sistemas_isolados.rds")
 
