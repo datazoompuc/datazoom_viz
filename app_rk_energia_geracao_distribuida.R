@@ -27,13 +27,13 @@ param$x_def <- "potencia_outorgada_k_w" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "ano"
 param$color_def <- "estado" # variável padrão de cor
-param$text_def <- "municipio" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
-param$group <- "municipio" # variável de agrupamento
-param$id_def <- "municipio" # variável padrão de id
+param$text_def <- "estado" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
+param$group <- "estado" # variável de agrupamento
+param$id_def <- "estado" # variável padrão de id
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Municípios com maior capacidade instalada de energia na Amazônia Legal"
+param$plot_desc <- "Estados com maior capacidade instalada de energia na Amazônia Legal"
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL

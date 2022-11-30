@@ -24,7 +24,7 @@ get_server <- function(files, param) {
       if (input$combustivel != "Todos") df <- df %>% filter(combustivel_final == input$combustivel)
       
       w <- df %>%
-        group_by(ano, municipio, estado) %>%
+        group_by(ano, estado) %>%
         summarise(potencia_outorgada_k_w = sum(potencia_outorgada_k_w))
       
       return(w)
@@ -225,7 +225,7 @@ get_server <- function(files, param) {
           }
 
           # Deixa somente grupos que tem rank <n em algum momento
-          top_n <- 10
+          top_n <- 5
           top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
           df_p <- df_p %>% filter(group %in% top_groups)
           
