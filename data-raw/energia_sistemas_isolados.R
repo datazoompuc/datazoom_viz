@@ -140,6 +140,10 @@ db_sistemas_isolados <- db_sistemas_isolados %>%
          `Participação da CCC no Orçamento Total da CDE` = Participacao)
 
 
+# remove years before 2013 ----------------------------------------------------------
+db_sistemas_isolados <- db_sistemas_isolados %>%
+  filter(Ano >= 2013)
+
 # export ------------------------------------------------------------------
 saveRDS(db_sistemas_isolados, "data/energia_sistemas_isolados.rds")
 

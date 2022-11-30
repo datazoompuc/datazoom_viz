@@ -145,7 +145,7 @@ get_server <- function(files, param) {
             df_filtered["name"],
             df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "color", "text", "unidade")
+          colnames(df_p) <- c("x", "y", "group", "text", "unidade")
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
@@ -170,6 +170,13 @@ get_server <- function(files, param) {
             df_p$color <- " "
           }
 
+          # Adicionar coluna de color
+          df_p <- df_p %>%
+            mutate(color = case_when(str_detect(group, "Consumo") ~ "Consumo",
+                                     str_detect(group, "Despesas") ~ "Despesas",
+                                     str_detect(group, "Consumidores") ~ "Consumidores",
+                                     str_detect(group, "Participação") ~ "Despesas"))
+          
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
@@ -185,7 +192,9 @@ get_server <- function(files, param) {
           pallete <- pallete_discrete
 
           # Monta gráfico
-          fig_p <- plot_ly(df_p,
+          fig_p <- df_p %>%
+            group_by(group) %>%
+            plot_ly(
             x = ~x,
             y = ~y,
             color = ~color,
