@@ -201,7 +201,8 @@ get_server <- function(files, param) {
             type = "scatter",
             mode = "lines+markers",
             text = ~tooltip,
-            hoverinfo = "text"
+            hoverinfo = "text",
+            symbol = ~group
           )
 
           # Layout eixos
