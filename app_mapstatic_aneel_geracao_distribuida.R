@@ -32,7 +32,7 @@ param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Dados compilados do Instituto do Homem e do Meio Ambiente da Amaz\u00f4nia (Imazon)"
+param$plot_desc <- "Dados compilados da Ag\u00eancia Nacional de Energia El\u00e9trica (ANEEL)"
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
