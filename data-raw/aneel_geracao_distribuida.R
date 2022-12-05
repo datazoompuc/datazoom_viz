@@ -17,12 +17,14 @@ library(scales) # to use label_percent()
 library(rmapshaper)
 
 # load data -------------------------------------------------------------------------
-db_geracao_distribuida <- read_csv2(file = "C:/Users/DELL/Desktop/empreendimento-geracao-distribuida.csv") %>%
+# Original raw data can be downloaded at:
+# Also can be downloaded at Data Zoom drive:
+db_geracao_distribuida <- read_csv2(file = "C:/Users/f.cavalcanti/Desktop/empreendimento-geracao-distribuida.csv") %>%
   janitor::clean_names()
 
 db_geracao_distribuida$cod_ibge <- db_geracao_distribuida$cod_municipio_ibge
 
-hhh <- pivot_wider(
+db_geracao_distribuida_collapsed <- pivot_wider(
   db_geracao_distribuida,
   id_cols = c(cod_ibge, sig_uf),
   id_expand = FALSE,
@@ -33,21 +35,6 @@ hhh <- pivot_wider(
   values_from = c(mda_potencia_instalada_kw, qtd_uc_recebe_credito),
   values_fn = sum
 )
-
-?pivot_wider
-
-# colnames(db_geracao_distribuida)
-db_geracao_distribuida <- db_geracao_distribuida %>%
-  group_by(cod_municipio_ibge, 
-           sig_uf, 
-           dsc_classe_consumo, 
-           sig_modalidade_empreendimento, 
-           sig_tipo_geracao, 
-           dsc_fonte_geracao) %>%
-  summarise(
-    mda_potencia_instalada_kw = sum(mda_potencia_instalada_kw),
-    qtd_uc_recebe_credito = sum(qtd_uc_recebe_credito)
-  )
 
 ###################
 # TERRABRASILIS
@@ -65,7 +52,7 @@ shapefile <- st_read("data/shapefiles/municipalities_legal_amazon.shp")
 ######################################################
 # merge data with amazon municipalities shapefile
 ######################################################
-temporary_data <- sp::merge(shapefile, hhh, by.x = "cod_ibge", by.y = "cod_ibge")
+temporary_data <- sp::merge(shapefile, db_geracao_distribuida_collapsed, by.x = "cod_ibge", by.y = "cod_ibge")
 
 # drop municipalities with empty geometry
 temporary_data <- temporary_data[!st_is_empty(temporary_data), , drop = FALSE]
