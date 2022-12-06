@@ -118,15 +118,26 @@ db_orcamento_cde_particip <- read_csv(file = "data-raw/bases viz energia CPI/sis
          participacao = str_replace_all(participacao, "[,]", "."),
          participacao = as.numeric(participacao))
   
+db_orcamento_total = read_csv(file = "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orçamento_da_CDE.csv") %>%
+  select("Ano", "Valor") %>%
+  rename("valor" = "Valor") %>%
+  filter(Ano != 2022) %>%
+  mutate(valor = valor/1e9) %>%
+  group_by(Ano) %>%
+  summarise("DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)" = sum(`valor`)) %>%
+  mutate(nominal_dates = as.Date(paste0(Ano, "-01-01")),
+         `DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Real, R$ 2021)` = ipca(`DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)`, nominal_dates, "01/2021")) %>%
+  select(Ano, `DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)`, 
+         `DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Real, R$ 2021)`)
   
 #tudo junto ---------------------------------------------------------------
 db_completa = full_join(db_consumo, db_consumidores)
 db_sistemas_isolados_p1 = full_join(db_completa, db_orcamento_cde)
 db_sistemas_isolados_p2 = full_join(db_sistemas_isolados_p1, db_orcamento_cde_particip)
-
+db_sistemas_isolados_p3 = full_join(db_sistemas_isolados_p2, db_orcamento_total)
 
 # pivot table -----------------------------------------------------------------------
-db_sistemas_isolados <- db_sistemas_isolados_p2 %>%
+db_sistemas_isolados <- db_sistemas_isolados_p3 %>%
   pivot_wider(names_from = tipo, values_from = valor)
 
 colnames(db_sistemas_isolados) <- str_to_title(colnames(db_sistemas_isolados))
@@ -134,8 +145,10 @@ colnames(db_sistemas_isolados) <- str_to_title(colnames(db_sistemas_isolados))
 db_sistemas_isolados <- db_sistemas_isolados %>%
   rename(`Despesas Estimadas CCC (Nominal)` = `Despesas Estimadas Ccc (Nominal)`,
          `Despesas Estimadas CCC (Real, R$ 2021)` = `Despesas Estimadas Ccc (Real, R$ 2021)`,
-         `Participação da CCC no Orçamento Total da CDE` = Participacao)
-
+         `Participação da CCC no Orçamento Total da CDE` = Participacao,
+         `Despesas Estimadas no Orçamento da CDE (Nominal)` = `Despesas Estimadas No Orçamento Da Cde (Nominal)`,
+         `Despesas Estimadas no Orçamento da CDE (Real, R$ 2021)` = `Despesas Estimadas No Orçamento Da Cde (Real, R$ 2021)`)
+        
 
 # remove years before 2013 ----------------------------------------------------------
 db_sistemas_isolados <- db_sistemas_isolados %>%
@@ -171,18 +184,19 @@ temp_param_table <- tibble(
 
 temp_param_table$label <- temp_param_table$var
 
-temp_param_table$var_group[2:4] <- "Orçamento CCC - ANEEL"
-temp_param_table$var_group[5:9] <- "Consumo de Eletricidade - EPE"
-temp_param_table$var_group[10:11] <- "Média de Consumidores - EPE"
+temp_param_table$var_group[2:6] <- "Orçamento CCC - ANEEL"
+temp_param_table$var_group[7:11] <- "Consumo de Eletricidade - EPE"
+temp_param_table$var_group[12:13] <- "Média de Consumidores - EPE"
 
 temp_param_table$unidade[2:3] <- "Bilhões de R$"
 temp_param_table$unidade[4] <- "% do Orçamento da Conta de Desenvolvimento Energético"
-temp_param_table$unidade[5:9] <- "Milhões de MWh"
-temp_param_table$unidade[10:11] <- "Milhões de Consumidores"
+temp_param_table$unidade[5:6] <- "Bilhões de R$"
+temp_param_table$unidade[7:11] <- "Milhões de MWh"
+temp_param_table$unidade[12:13] <- "Milhões de Consumidores"
 
 
-temp_param_table$x <- c(TRUE, rep(FALSE, 10))
-temp_param_table$y <- c(FALSE, rep(TRUE, 10))
+temp_param_table$x <- c(TRUE, rep(FALSE, 12))
+temp_param_table$y <- c(FALSE, rep(TRUE, 12))
 
 
 # save csv in utf-8 encoding
