@@ -181,7 +181,6 @@ get_server <- function(files, param) {
             df_filtered["group"],
             df_filtered["name"],
             df_filtered["uf"]
-          #  df_filtered["unidade"]
           )
           colnames(df_p) <- c("x", "y", "group", "color", "text", "uf")
           
@@ -216,7 +215,7 @@ get_server <- function(files, param) {
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            "Unidade de medida: <b>", df_p$unidade, "</b>"
+            "Unidade de medida: <b>", y_col$unidade, "</b>"
           )
           
           # Define paleta de cores
