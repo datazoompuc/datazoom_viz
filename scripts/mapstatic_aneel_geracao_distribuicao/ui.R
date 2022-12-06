@@ -47,13 +47,24 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
+         # espaço vazio
+        div(class = "fakecheckbox", ),
+
+        # Seleciona filtro de municípios
+        selectInput(
+          "filter_sig_modalidade_empreendimento",
+          "Modalidade de empreendimento",
+          choices = NULL,
+          selected = "M",
+          width = "100%"
+        ),
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_mapstatic_ips_2021/', '_blank')")
+                              onclick = "window.open('https://datazoom.shinyapps.io/app_mapstatic_aneel_distribuicao/', '_blank')")
         ),
       ),
       column(9,

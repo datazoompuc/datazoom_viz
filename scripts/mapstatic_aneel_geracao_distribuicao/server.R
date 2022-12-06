@@ -13,8 +13,32 @@ get_server <- function(files, param) {
   df <- readRDS(files$db_file)
 
   server <- function(input, output, session) {
+
+    # filtra dados de composicao demografica
+    df_reactived <- reactive({
+      
+      w <- df %>%
+        filter(sig_modalidade_empreendimento == input$filter_sig_modalidade_empreendimento)
+      
+      return(w)
+    })
+
+    # Cria opções para seleção de grupos
+    param$filter_choices <- sort(unique(df$sig_modalidade_empreendimento))
+    #param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
+    
+    param$filter_sig_modalidade_empreendimento_choices <- sort(unique(df$sig_modalidade_empreendimento))
+
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
+      
+      selected_sig_modalidade_empreendimento <- sample(param$filter_sig_modalidade_empreendimento_choices, 1)
+      updateSelectInput(session,
+                        "filter_sig_modalidade_empreendimento",
+                        choices = param$filter_sig_modalidade_empreendimento_choices,
+                        selected = selected_sig_modalidade_empreendimento
+      )
+
       selected <- sample(sample(param$x_choices, 1)[[1]], 1)
       updateSelectInput(session,
         "x",
@@ -26,7 +50,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "x=", input$x
+        "?", "x=", input$x,
+        "&", "filter_sig_modalidade_empreendimento=", input$filter_sig_modalidade_empreendimento
       )
 
       updateQueryString(q_string, mode = "replace")
@@ -34,6 +59,14 @@ get_server <- function(files, param) {
 
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
+
+      # Preenche filtro vazio
+      updateSelectInput(session,
+        "filter_sig_modalidade_empreendimento",
+        choices = param$filter_sig_modalidade_empreendimento_choices,
+        selected = NULL
+      )
+
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
@@ -46,13 +79,20 @@ get_server <- function(files, param) {
         )
       }
 
-      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+      if (!is.null(query[["filter_sig_modalidade_empreendimento"]])) {
+        updateSelectInput(session, "filter_sig_modalidade_empreendimento",
+          choices = param$filter_sig_modalidade_empreendimento_choices,
+          selected = query[["filter_sig_modalidade_empreendimento"]]
+        )
+      }
+
+      selected <- unlist(query[names(query) == "filter_sig_modalidade_empreendimento"], use.names = FALSE)
     
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
       # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter"]]) && is.null(query[["x"]])) {
+      if (is.null(query[["filter_sig_modalidade_empreendimento"]]) && is.null(query[["x"]])) {
         random_inputs() # preenche inputs se estiverem vazios
       }
     }
@@ -78,7 +118,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Vari\u00e1vel selecionada: ", x_col$label)
+        text <- paste0("Vari\u00e1vel selecionada por modalidade ", input$filter_sig_modalidade_empreendimento, " : ", x_col$label)
       }
 
       text
@@ -106,20 +146,30 @@ get_server <- function(files, param) {
       tryCatch(
         {
           
+          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
+          x_col <- param$table[which(param$table$var == param$x_def), ]
+          y_col <- param$table[which(param$table$var == input$y), ]
+          id_col <- param$table[which(param$table$var == param$id_def), ]
+          color_col <- param$table[which(param$table$var == param$color_def), ]
+
+          # Filtra dataframe com grupos selecionados
+          df_filtered <- df_reactived()[which(df_reactived()$sig_modalidade_empreendimento %in% input$filter_sig_modalidade_empreendimento), ]
+
           # Monta mapa
 
           # Monta html do tooltip
           x_col <- param$table[which(param$table$var == input$x), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
-            "Nome do munic\u00edpio: ", "<b>", df$nm_municip, "</b><br>",
-            "Estado: ", "<b>", df$uf, "</b><br>",
-            x_col$label, ": ", "<b>", df[[input$x]], "</b><br>",
+            "Nome do munic\u00edpio: ", "<b>", df_filtered$nm_municip, "</b><br>",
+            "Estado: ", "<b>", df_filtered$uf, "</b><br>",
+            "Modalidade de empreendimento: ", "<b>", input$filter_sig_modalidade_empreendimento, "</b><br>",
+            x_col$label, ": ", "<b>", df_filtered[[input$x]], "</b><br>",
             "Unidade de medida: ", "<b>", x_col$unidade, "</b><br>"
           ) %>%
             lapply(htmltools::HTML)
 
-          fig_p <- df %>%
+          fig_p <- df_filtered %>%
             st_transform(crs = "+init=epsg:4326") %>%
             leaflet() %>%
             addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
@@ -129,7 +179,7 @@ get_server <- function(files, param) {
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = 0.7,
-              fillColor = ~ pal(df[[input$x]]),
+              fillColor = ~ pal(df_filtered[[input$x]]),
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -140,7 +190,7 @@ get_server <- function(files, param) {
             ) %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df[[input$x]],
+              values = ~ df_filtered[[input$x]],
               title = title_legend,
               opacity = 0.7
             )

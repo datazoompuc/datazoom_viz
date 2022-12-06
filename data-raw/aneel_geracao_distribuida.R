@@ -38,11 +38,9 @@ class(db_geracao_distribuida$qtd_uc_recebe_credito) <- "numeric"
 # convert long data to wide data
 db_geracao_distribuida_collapsed <- pivot_wider(
   db_geracao_distribuida,
-  id_cols = c(cod_ibge, sig_uf),
+  id_cols = c(cod_ibge, sig_uf, sig_tipo_geracao, sig_modalidade_empreendimento),
   id_expand = FALSE,
   names_from = c(dsc_classe_consumo, 
-                 sig_modalidade_empreendimento, 
-                 sig_tipo_geracao, 
                  dsc_fonte_geracao),
   values_from = c(mda_potencia_instalada_kw, qtd_uc_recebe_credito),
   values_fn = sum
@@ -309,7 +307,7 @@ temp_param_table$label[temp_param_table$var  == "qtd_uc_recebe_credito_Rural_P_U
 
 # Unidade de medida
 temp_param_table$unidade[str_detect(temp_param_table$var, regex("mda_potencia_instalada_kw", ignore_case = TRUE))] <- "KiloWatz"
-temp_param_table$unidade[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "Número inteiro"
+temp_param_table$unidade[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "Somatório de unidades consumidoras"
 
 temp_param_table$unidade[temp_param_table$var == "mda_potencia_instalada_kw"] <- "KiloWatz"
 
