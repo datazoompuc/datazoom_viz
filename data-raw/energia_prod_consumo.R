@@ -175,17 +175,36 @@ df_final = df_final %>%
                    uf == "Rio Grande do Norte" ~ "RN",
                    TRUE ~ as.character(uf)))
 
-df_prop = df_final %>%
-  group_by(ano) %>%
-  mutate(across(!c(uf), ~(.x/(2*sum(.x)))), .groups = "ano")
+faz_proporcao = function(a) {
+  parc = df_final %>%
+    filter(ano == a) %>%
+    mutate(across(!c(uf,ano, amz_legal), ~(.x/(0.5*sum(.x)))))
+  
+  return(parc)
+}
+
+parc2011 = faz_proporcao(2011)
+parc2012 = faz_proporcao(2012)
+parc2013 = faz_proporcao(2013)
+parc2014 = faz_proporcao(2014)
+parc2015 = faz_proporcao(2015)
+parc2016 = faz_proporcao(2016)
+parc2017 = faz_proporcao(2017)
+parc2018 = faz_proporcao(2018)
+parc2019 = faz_proporcao(2019)
+parc2020 = faz_proporcao(2020)
+parc2021 = faz_proporcao(2021)
+
+df_final2 = rbind(parc2011,parc2012,parc2013, parc2014,parc2015,parc2016,parc2017,parc2018,parc2019,parc2020,parc2021) %>%
+  mutate(across(!c(uf,ano, amz_legal), ~.x*100))
 
 # export ------------------------------------------------------------------
-saveRDS(df_final, "data/energia_amz_exporta.rds")
+saveRDS(df_final2, "data/energia_amz_exporta.rds")
 
 # dictionary --------------------------------------------------------------
 
 # extract variables from data
-columns_db_amz_exporta <- colnames(df_final)
+columns_db_amz_exporta <- colnames(df_final2)
 
 # generate dictionary
 temp_param_table <- tibble(
@@ -250,8 +269,8 @@ temp_param_table$label[39] <- "Consumidores próprios"
 
 
 #unidades de cada var
-temp_param_table$unidade[2:29] <- "GWh"
-temp_param_table$unidade[30:39] <- "Consumidores"
+temp_param_table$unidade[2:29] <- "% do total de GWh do Brasil"
+temp_param_table$unidade[30:39] <- "% do total de consumidores do Brasil"
 
 #o que cada var pode assumir
 temp_param_table$x <- c(rep(FALSE, times = 17), TRUE, rep(FALSE, times = 21))
