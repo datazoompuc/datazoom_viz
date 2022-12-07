@@ -178,11 +178,11 @@ get_server <- function(files, param) {
             df_filtered[x_col$var],
             df_filtered["value"],
             df_filtered["group"],
-            df_filtered["group"],
+            df_filtered["uf"],
             df_filtered["name"],
             df_filtered["uf"]
           )
-          colnames(df_p) <- c("x", "y", "group", "color", "text", "uf")
+          colnames(df_p) <- c("x", "y", "group", "color", "text")
           
           unidade_df <- y_col %>%
             select(text = var, unidade)
@@ -211,10 +211,10 @@ get_server <- function(files, param) {
           if (all(is.na(df_p$color))) {
             df_p$color <- " "
           }
-          
+       
           # Monta html do tooltip
           df_p$tooltip <- paste0(
-            "<b>", df_p$uf, "</b><br>",
+            "<b>", df_p$color, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
             df_p$text, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
@@ -230,11 +230,12 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
                            x = ~x,
                            y = ~y,
-                           color = ~group,
+                           color = ~color,
                            type = "scatter",
                            mode = "lines+markers",
                            text = ~tooltip,
-                           hoverinfo = "text"
+                           hoverinfo = "text",
+                           symbol = ~text
           )
           
           # Layout eixos
