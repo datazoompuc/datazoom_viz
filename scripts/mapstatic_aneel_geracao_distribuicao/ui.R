@@ -50,7 +50,7 @@ get_ui <- function(files, param) {
          # espaço vazio
         div(class = "fakecheckbox", ),
 
-        # Seleciona filtro de municípios
+        # Seleciona filtro de modalidade empreendimento
         selectInput(
           "filter_sig_modalidade_empreendimento",
           "Modalidade de empreendimento",
@@ -58,6 +58,17 @@ get_ui <- function(files, param) {
           selected = "M",
           width = "100%"
         ),
+         # espaço vazio
+        div(class = "fakecheckbox", ),
+
+        # Seleciona filtro de tipo geracao
+        selectInput(
+          "filter_sig_tipo_geracao",
+          "Fonte de geração",
+          choices = NULL,
+          selected = "UFV",
+          width = "100%"
+        ),        
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(

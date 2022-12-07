@@ -18,26 +18,32 @@ get_server <- function(files, param) {
     df_reactived <- reactive({
       
       w <- df %>%
-        filter(sig_modalidade_empreendimento == input$filter_sig_modalidade_empreendimento)
+        filter(sig_modalidade_empreendimento == input$filter_sig_modalidade_empreendimento & sig_tipo_geracao == input$filter_sig_tipo_geracao)
       
       return(w)
     })
 
     # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$sig_modalidade_empreendimento))
-    #param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-    
     param$filter_sig_modalidade_empreendimento_choices <- sort(unique(df$sig_modalidade_empreendimento))
+    param$filter_sig_tipo_geracao_choices <- sort(unique(df$sig_tipo_geracao))
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       
       selected_sig_modalidade_empreendimento <- sample(param$filter_sig_modalidade_empreendimento_choices, 1)
+      selected_sig_tipo_geracao <- sample(param$filter_sig_tipo_geracao_choices, 1)
+      
       updateSelectInput(session,
                         "filter_sig_modalidade_empreendimento",
                         choices = param$filter_sig_modalidade_empreendimento_choices,
                         selected = selected_sig_modalidade_empreendimento
       )
+
+      updateSelectInput(session,
+                        "filter_sig_tipo_geracao",
+                        choices = param$filter_sig_tipo_geracao_choices,
+                        selected = selected_sig_tipo_geracao
+      )      
 
       selected <- sample(sample(param$x_choices, 1)[[1]], 1)
       updateSelectInput(session,
@@ -51,7 +57,8 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?", "x=", input$x,
-        "&", "filter_sig_modalidade_empreendimento=", input$filter_sig_modalidade_empreendimento
+        "&", "filter_sig_modalidade_empreendimento=", input$filter_sig_modalidade_empreendimento,
+        "&", "filter_sig_tipo_geracao=", input$filter_sig_tipo_geracao
       )
 
       updateQueryString(q_string, mode = "replace")
@@ -64,6 +71,12 @@ get_server <- function(files, param) {
       updateSelectInput(session,
         "filter_sig_modalidade_empreendimento",
         choices = param$filter_sig_modalidade_empreendimento_choices,
+        selected = NULL
+      )
+
+      updateSelectInput(session,
+        "filter_sig_tipo_geracao",
+        choices = param$filter_sig_tipo_geracao_choices,
         selected = NULL
       )
 
@@ -85,6 +98,13 @@ get_server <- function(files, param) {
           selected = query[["filter_sig_modalidade_empreendimento"]]
         )
       }
+
+      if (!is.null(query[["filter_sig_tipo_geracao"]])) {
+        updateSelectInput(session, "filter_sig_tipo_geracao",
+          choices = param$filter_sig_tipo_geracao_choices,
+          selected = query[["filter_sig_tipo_geracao"]]
+        )
+      }      
 
       selected <- unlist(query[names(query) == "filter_sig_modalidade_empreendimento"], use.names = FALSE)
     
@@ -164,6 +184,7 @@ get_server <- function(files, param) {
             "Nome do munic\u00edpio: ", "<b>", df_filtered$nm_municip, "</b><br>",
             "Estado: ", "<b>", df_filtered$uf, "</b><br>",
             "Modalidade de empreendimento: ", "<b>", input$filter_sig_modalidade_empreendimento, "</b><br>",
+            "Fonte de geração: ", "<b>", input$filter_sig_tipo_geracao, "</b><br>",
             x_col$label, ": ", "<b>", df_filtered[[input$x]], "</b><br>",
             "Unidade de medida: ", "<b>", x_col$unidade, "</b><br>"
           ) %>%
