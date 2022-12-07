@@ -18,20 +18,20 @@ get_server <- function(files, param) {
     df_reactived <- reactive({
       
       w <- df %>%
-        filter(sig_modalidade_empreendimento == input$filter_sig_modalidade_empreendimento & sig_tipo_geracao == input$filter_sig_tipo_geracao)
+        filter(sig_modalidade_empreendimento == input$filter_sig_modalidade_empreendimento & dsc_fonte_geracao == input$filter_dsc_fonte_geracao)
       
       return(w)
     })
 
     # Cria opções para seleção de grupos
     param$filter_sig_modalidade_empreendimento_choices <- sort(unique(df$sig_modalidade_empreendimento))
-    param$filter_sig_tipo_geracao_choices <- sort(unique(df$sig_tipo_geracao))
+    param$filter_dsc_fonte_geracao_choices <- sort(unique(df$dsc_fonte_geracao))
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       
       selected_sig_modalidade_empreendimento <- sample(param$filter_sig_modalidade_empreendimento_choices, 1)
-      selected_sig_tipo_geracao <- sample(param$filter_sig_tipo_geracao_choices, 1)
+      selected_dsc_fonte_geracao <- sample(param$filter_dsc_fonte_geracao_choices, 1)
       
       updateSelectInput(session,
                         "filter_sig_modalidade_empreendimento",
@@ -40,9 +40,9 @@ get_server <- function(files, param) {
       )
 
       updateSelectInput(session,
-                        "filter_sig_tipo_geracao",
-                        choices = param$filter_sig_tipo_geracao_choices,
-                        selected = selected_sig_tipo_geracao
+                        "filter_dsc_fonte_geracao",
+                        choices = param$filter_dsc_fonte_geracao_choices,
+                        selected = selected_dsc_fonte_geracao
       )      
 
       selected <- sample(sample(param$x_choices, 1)[[1]], 1)
@@ -58,7 +58,7 @@ get_server <- function(files, param) {
       q_string <- paste0(
         "?", "x=", input$x,
         "&", "filter_sig_modalidade_empreendimento=", input$filter_sig_modalidade_empreendimento,
-        "&", "filter_sig_tipo_geracao=", input$filter_sig_tipo_geracao
+        "&", "filter_dsc_fonte_geracao=", input$filter_dsc_fonte_geracao
       )
 
       updateQueryString(q_string, mode = "replace")
@@ -75,8 +75,8 @@ get_server <- function(files, param) {
       )
 
       updateSelectInput(session,
-        "filter_sig_tipo_geracao",
-        choices = param$filter_sig_tipo_geracao_choices,
+        "filter_dsc_fonte_geracao",
+        choices = param$filter_dsc_fonte_geracao_choices,
         selected = NULL
       )
 
@@ -99,10 +99,10 @@ get_server <- function(files, param) {
         )
       }
 
-      if (!is.null(query[["filter_sig_tipo_geracao"]])) {
-        updateSelectInput(session, "filter_sig_tipo_geracao",
-          choices = param$filter_sig_tipo_geracao_choices,
-          selected = query[["filter_sig_tipo_geracao"]]
+      if (!is.null(query[["filter_dsc_fonte_geracao"]])) {
+        updateSelectInput(session, "filter_dsc_fonte_geracao",
+          choices = param$filter_dsc_fonte_geracao_choices,
+          selected = query[["filter_dsc_fonte_geracao"]]
         )
       }      
 
@@ -138,7 +138,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Vari\u00e1vel selecionada por modalidade ", input$filter_sig_modalidade_empreendimento, " : ", x_col$label)
+        text <- paste0("Vari\u00e1vel selecionada : ", x_col$label)
       }
 
       text
@@ -184,7 +184,7 @@ get_server <- function(files, param) {
             "Nome do munic\u00edpio: ", "<b>", df_filtered$nm_municip, "</b><br>",
             "Estado: ", "<b>", df_filtered$uf, "</b><br>",
             "Modalidade de empreendimento: ", "<b>", input$filter_sig_modalidade_empreendimento, "</b><br>",
-            "Fonte de geração: ", "<b>", input$filter_sig_tipo_geracao, "</b><br>",
+            "Fonte de gera\u00e7\u00e3o: ", "<b>", input$filter_dsc_fonte_geracao, "</b><br>",
             x_col$label, ": ", "<b>", df_filtered[[input$x]], "</b><br>",
             "Unidade de medida: ", "<b>", x_col$unidade, "</b><br>"
           ) %>%

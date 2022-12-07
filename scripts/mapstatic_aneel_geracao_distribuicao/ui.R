@@ -35,7 +35,7 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS::"),
+        p(class = "vars", "VARI\u00C1VEIS:"),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
@@ -49,22 +49,20 @@ get_ui <- function(files, param) {
         ),
          # espaço vazio
         div(class = "fakecheckbox", ),
+        p(class = "vars", "FILTROS:"),        
 
         # Seleciona filtro de modalidade empreendimento
         selectInput(
           "filter_sig_modalidade_empreendimento",
           "Modalidade de empreendimento",
           choices = NULL,
-          selected = "M",
+          selected = "Radia\u00e7\u00e3o solar",
           width = "100%"
         ),
-         # espaço vazio
-        div(class = "fakecheckbox", ),
-
         # Seleciona filtro de tipo geracao
         selectInput(
-          "filter_sig_tipo_geracao",
-          "Fonte de geração",
+          "filter_dsc_fonte_geracao",
+          "Fonte de gera\u00e7\u00e3o",
           choices = NULL,
           selected = "UFV",
           width = "100%"
