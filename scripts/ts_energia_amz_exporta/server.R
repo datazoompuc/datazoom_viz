@@ -184,6 +184,11 @@ get_server <- function(files, param) {
           )
           colnames(df_p) <- c("x", "y", "group", "color", "text", "uf")
           
+          unidade_df <- y_col %>%
+            select(text = var, unidade)
+          
+          df_p <- left_join(df_p, unidade_df)
+          
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
@@ -215,7 +220,7 @@ get_server <- function(files, param) {
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            "Unidade de medida: <b>", y_col$unidade, "</b>"
+            "Unidade de medida: <b>", df_p$unidade, "</b>"
           )
           
           # Define paleta de cores
