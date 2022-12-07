@@ -175,11 +175,9 @@ df_final = df_final %>%
                    uf == "Rio Grande do Norte" ~ "RN",
                    TRUE ~ as.character(uf)))
 
-df_total = df_final %>%
-  filter(uf == "Amazônia Legal" | uf == "Fora da Amazônia Legal") %>%
+df_prop = df_final %>%
   group_by(ano) %>%
-  summarise(across(!uf, ~sum(.x, na.rm = TRUE))) %>%
-  mutate("uf" = "Total")
+  mutate(across(!c(uf), ~(.x/(2*sum(.x)))), .groups = "ano")
 
 # export ------------------------------------------------------------------
 saveRDS(df_final, "data/energia_amz_exporta.rds")
