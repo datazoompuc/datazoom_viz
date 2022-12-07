@@ -4,7 +4,8 @@
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Incluí script CSS
-    tags$style(type = "text/css", 
+    tags$style(
+      type = "text/css",
       # remove o ultimo ano no slider (2018 e 2019 estavam um em cima do outro)
       # remove tracos intermediarios do slider
       # move botao de play para a esquerda e para baixo
@@ -14,24 +15,24 @@ get_ui <- function(files, param) {
       .irs-grid-pol.small {display: none;}
       .slider-animate-container {width: 5%; margin-top: 1px;}
       .slider-animate-button {font-size: 20px;}
-    "),
+    "
+    ),
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
       column(3, # dimensão da coluna do bootstrap
         class = "menucol",
-        
+
         # muda cor do background
-        tags$style('.menucol {
+        tags$style(".menucol {
                              background-color: #50A486;
-              }',),
-        
-        # muda cor do botao 
-        tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+              }", ),
+
+        # muda cor do botao
+        tags$style(".btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
                           background-color: #48968B !important;
                           border-color: #48968B !important;
-              }',),
-        
+              }", ),
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
@@ -47,9 +48,9 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
-         # espaço vazio
+        # espaço vazio
         div(class = "fakecheckbox", ),
-        p(class = "vars", "FILTROS:"),        
+        p(class = "vars", "FILTROS:"),
 
         # Seleciona filtro de modalidade empreendimento
         selectInput(
@@ -66,14 +67,16 @@ get_ui <- function(files, param) {
           choices = NULL,
           selected = "UFV",
           width = "100%"
-        ),        
+        ),
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
-                              class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_mapstatic_aneel_distribuicao/', '_blank')")
+          shiny::actionButton(
+            inputId = "ab1", label = "Fullscreen",
+            icon = icon("expand"),
+            class = "btn-primary",
+            onclick = "window.open('https://datazoom.shinyapps.io/app_mapstatic_aneel_distribuicao/', '_blank')"
+          )
         ),
       ),
       column(9,

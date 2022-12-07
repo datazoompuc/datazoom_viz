@@ -2,7 +2,7 @@
 
 # Paleta de cores
 pallete_discrete <- c("#757575", "#60458c", "#c368b1", "#000098", "#261c4e", "#99b0c8", "#4fdf94", "#00596d", "#007e47", "#c3ff83", "#ffcf48", "#fcff84")
-pallete_continuous <- c("#fde725","#dce319", "#b8de29", "#95d840", "#73d055", "#55c667", "#3cbb75", "#29af7f", "#20a387", "#1f968b", "#238a8d", "#287d8e", "#33638d", "#39568c", "#404788", "#453781", "#481567", "#440154") # Viridis inverse
+pallete_continuous <- c("#fde725", "#dce319", "#b8de29", "#95d840", "#73d055", "#55c667", "#3cbb75", "#29af7f", "#20a387", "#1f968b", "#238a8d", "#287d8e", "#33638d", "#39568c", "#404788", "#453781", "#481567", "#440154") # Viridis inverse
 
 # Fontes
 
@@ -16,10 +16,9 @@ get_server <- function(files, param) {
 
     # filtra dados de composicao demografica
     df_reactived <- reactive({
-      
       w <- df %>%
         filter(sig_modalidade_empreendimento == input$filter_sig_modalidade_empreendimento & dsc_fonte_geracao == input$filter_dsc_fonte_geracao)
-      
+
       return(w)
     })
 
@@ -29,21 +28,20 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      
       selected_sig_modalidade_empreendimento <- sample(param$filter_sig_modalidade_empreendimento_choices, 1)
       selected_dsc_fonte_geracao <- sample(param$filter_dsc_fonte_geracao_choices, 1)
-      
+
       updateSelectInput(session,
-                        "filter_sig_modalidade_empreendimento",
-                        choices = param$filter_sig_modalidade_empreendimento_choices,
-                        selected = selected_sig_modalidade_empreendimento
+        "filter_sig_modalidade_empreendimento",
+        choices = param$filter_sig_modalidade_empreendimento_choices,
+        selected = selected_sig_modalidade_empreendimento
       )
 
       updateSelectInput(session,
-                        "filter_dsc_fonte_geracao",
-                        choices = param$filter_dsc_fonte_geracao_choices,
-                        selected = selected_dsc_fonte_geracao
-      )      
+        "filter_dsc_fonte_geracao",
+        choices = param$filter_dsc_fonte_geracao_choices,
+        selected = selected_dsc_fonte_geracao
+      )
 
       selected <- sample(sample(param$x_choices, 1)[[1]], 1)
       updateSelectInput(session,
@@ -104,10 +102,10 @@ get_server <- function(files, param) {
           choices = param$filter_dsc_fonte_geracao_choices,
           selected = query[["filter_dsc_fonte_geracao"]]
         )
-      }      
+      }
 
       selected <- unlist(query[names(query) == "filter_sig_modalidade_empreendimento"], use.names = FALSE)
-    
+
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
@@ -165,7 +163,7 @@ get_server <- function(files, param) {
 
       tryCatch(
         {
-          
+
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def), ]
           y_col <- param$table[which(param$table$var == input$y), ]
