@@ -16,6 +16,7 @@ library(readr)
 library(tidyverse)
 library(readxl)
 library(lubridate)
+library(stringi)
 ############
 
 load_producao = readxl::read_excel(".\\data-raw\\bases\\Cap 8 - (Dados Estaduais).xls", sheet = "8.1 part 3", skip = 2)
@@ -194,6 +195,7 @@ saveRDS(df_final, "data/energia_amz_exporta.rds")
 # dictionary --------------------------------------------------------------
 
 # extract variables from data
+df_final <- readRDS("./data/energia_amz_exporta.rds")
 columns_db_amz_exporta <- colnames(df_final)
 
 # generate dictionary
@@ -266,6 +268,11 @@ temp_param_table$y <- c(FALSE, rep(TRUE, times = 36), FALSE)
 temp_param_table$color <- c(rep(FALSE, times = 37), TRUE)
 temp_param_table$size <- c(rep(FALSE, times = 38))
 temp_param_table$slider <- c(TRUE, rep(FALSE, times = 37))
+
+# Seleciona groupos de variaveis nas opções do UI
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumo", ignore_case = TRUE))] <- "ENERGIA - EPE - CONSUMO:"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumidores", ignore_case = TRUE))] <- "ENERGIA - EPE - CONSUMIDORES:"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("energia produzida", ignore_case = TRUE))] <- "ENERGIA - EPE - ENERGIA PRODUZIDA:"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_amz_exporta_dic.csv", fileEncoding = "UTF-8")
