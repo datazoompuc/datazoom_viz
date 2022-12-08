@@ -179,8 +179,7 @@ get_server <- function(files, param) {
             df_filtered["value"],
             df_filtered["group"],
             df_filtered["uf"],
-            df_filtered["name"],
-            df_filtered["uf"]
+            df_filtered["name"]
           )
           colnames(df_p) <- c("x", "y", "group", "color", "text")
           
