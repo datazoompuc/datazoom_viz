@@ -16,6 +16,7 @@ library(readr)
 library(tidyverse)
 library(readxl)
 library(lubridate)
+library(stringi)
 ############
 
 load_producao = readxl::read_excel(".\\data-raw\\bases\\Cap 8 - (Dados Estaduais).xls", sheet = "8.1 part 3", skip = 2)
@@ -57,7 +58,8 @@ producao = load_producao %>%
   rename("amz legal" = "amz_legal") %>%
   mutate(uf = replace(uf, uf == "Mato G. do Sul", "Mato Grosso do Sul")) %>%
   mutate(uf = replace(uf, uf == "Rio G. do Sul", "Rio Grande do Sul")) %>%
-  mutate(uf = replace(uf, uf == "Rio G. do Norte", "Rio Grande do Norte")) 
+  mutate(uf = replace(uf, uf == "Rio G. do Norte", "Rio Grande do Norte"))  %>%
+  mutate(across(!uf, ~as.numeric(.x)))
 
 limpa_workbook = function(sheet_number, tipo_dado) {
 
@@ -80,8 +82,8 @@ parc = load_cativo_livre %>%
                                uf == "Roraima" ~1,
                                uf == "Pará" ~1,
                                TRUE ~ 0)) %>%
-  rename("amz legal" = "amz_legal") %>%
-
+  rename("amz legal" = "amz_legal")
+ 
 return(parc)
 }
 
@@ -124,25 +126,36 @@ db_bind3 = left_join(db_bind2,consumidores_cativos_livres)
 db_bind4 = left_join(db_bind3,consumidores_classe) %>%
   rename("amz_legal" = "amz legal") %>%
   mutate(across(!uf & !amz_legal, as.numeric))
+  
+  
+db_bind5 <- db_bind4 %>%  
+  group_by(ano) %>%
+  mutate(across(!uf & !amz_legal, ~(.x / sum(.x, na.rm = TRUE)) * 100)) %>%
+  ungroup()
 
 amz_legal_df = db_bind4 %>%
   filter(amz_legal == 1) %>%
   group_by(ano) %>%
-  summarise(across(!uf, ~sum(.x, na.rm = TRUE))) %>%
+  summarise(across(!uf & !amz_legal, ~sum(.x, na.rm = TRUE))) %>%
   mutate("uf" = "Amazônia Legal")
 
 fora_amz_legal_df = db_bind4 %>%
   filter(amz_legal == 0) %>%
   group_by(ano) %>%
-  summarise(across(!uf, ~sum(.x, na.rm = TRUE))) %>%
+  summarise(across(!uf & !amz_legal, ~sum(.x, na.rm = TRUE))) %>%
   mutate("uf" = "Fora da Amazônia Legal")
 
-df_final <- rbind(db_bind4, amz_legal_df) %>%
-  rbind(fora_amz_legal_df)
+df_final <- rbind(amz_legal_df, fora_amz_legal_df) %>%
+  group_by(ano) %>%
+  mutate(across(!uf, ~(.x / sum(.x, na.rm = TRUE)) * 100)) %>%
+  ungroup() %>%
+  rbind(db_bind5 %>% select(-amz_legal)) %>%
+  mutate(across(!uf, ~ifelse(.x < 0, 0, .x)))
 
 #atribui NA aos dados de consumo e consumidores em 2011
 #esses dados nao estao disponiveis na fonte
-df_final[, 20:39][df_final[, 20:39] == 0] <- NA
+df_final <- df_final %>% 
+  mutate_all(function(x) ifelse(is.nan(x), NA, x))
 
 #modifica `uf` para evitar problemas com acentos e dar match no UI 
 df_final = df_final %>%
@@ -175,36 +188,15 @@ df_final = df_final %>%
                    uf == "Rio Grande do Norte" ~ "RN",
                    TRUE ~ as.character(uf)))
 
-faz_proporcao = function(a) {
-  parc = df_final %>%
-    filter(ano == a) %>%
-    mutate(across(!c(uf,ano, amz_legal), ~(.x/(0.5*sum(.x)))))
-  
-  return(parc)
-}
-
-parc2011 = faz_proporcao(2011)
-parc2012 = faz_proporcao(2012)
-parc2013 = faz_proporcao(2013)
-parc2014 = faz_proporcao(2014)
-parc2015 = faz_proporcao(2015)
-parc2016 = faz_proporcao(2016)
-parc2017 = faz_proporcao(2017)
-parc2018 = faz_proporcao(2018)
-parc2019 = faz_proporcao(2019)
-parc2020 = faz_proporcao(2020)
-parc2021 = faz_proporcao(2021)
-
-df_final2 = rbind(parc2011,parc2012,parc2013, parc2014,parc2015,parc2016,parc2017,parc2018,parc2019,parc2020,parc2021) %>%
-  mutate(across(!c(uf,ano, amz_legal), ~.x*100))
 
 # export ------------------------------------------------------------------
-saveRDS(df_final2, "data/energia_amz_exporta.rds")
+saveRDS(df_final, "data/energia_amz_exporta.rds")
 
 # dictionary --------------------------------------------------------------
 
 # extract variables from data
-columns_db_amz_exporta <- colnames(df_final2)
+df_final <- readRDS("./data/energia_amz_exporta.rds")
+columns_db_amz_exporta <- colnames(df_final)
 
 # generate dictionary
 temp_param_table <- tibble(
@@ -227,7 +219,7 @@ temp_param_table <- tibble(
 
 #o que e cada var
 temp_param_table$label <- temp_param_table$var
-temp_param_table$label[1] <- "UF"
+temp_param_table$label[1] <- "Ano"
 temp_param_table$label[2] <- "Total de energia produzida"
 temp_param_table$label[3] <- "Energia produzida por hidro"
 temp_param_table$label[4] <- "Energia produzida por eólica"
@@ -244,40 +236,43 @@ temp_param_table$label[14] <- "Energia produzida por gás de coqueira"
 temp_param_table$label[15] <- "Energia produzida por combustível"
 temp_param_table$label[16] <- "Energia produzida por diesel"
 temp_param_table$label[17] <- "Energia produzida outras fontes não renováveis"
-temp_param_table$label[18] <- "Ano"
-temp_param_table$label[19] <- "Amazônia Legal"
-temp_param_table$label[20] <- "Consumo cativo"
-temp_param_table$label[21] <- "Consumo livre"
-temp_param_table$label[22] <- "Consumo residencial"
-temp_param_table$label[23] <- "Consumo industrial"
-temp_param_table$label[24] <- "Consumo comercial"
-temp_param_table$label[25] <- "Consumo rural"
-temp_param_table$label[26] <- "Consumo do poder público"
-temp_param_table$label[27] <- "Consumo de iluminação pública"
-temp_param_table$label[28] <- "Consumo do serviço público"
-temp_param_table$label[29] <- "Consumo próprio"
-temp_param_table$label[30] <- "Consumidores cativos"
-temp_param_table$label[31] <- "Consumidores livres"
-temp_param_table$label[32] <- "Consumidores residenciais"
-temp_param_table$label[33] <- "Consumidores industriais"
-temp_param_table$label[34] <- "Consumidores comerciais"
-temp_param_table$label[35] <- "Consumidores rurais"
-temp_param_table$label[36] <- "Consumidores do poder público"
-temp_param_table$label[37] <- "Consumidores de iluminação pública"
-temp_param_table$label[38] <- "Consumidores do serviço público"
-temp_param_table$label[39] <- "Consumidores próprios"
-
+temp_param_table$label[18] <- "Consumo cativo"
+temp_param_table$label[19] <- "Consumo livre"
+temp_param_table$label[20] <- "Consumo residencial"
+temp_param_table$label[21] <- "Consumo industrial"
+temp_param_table$label[22] <- "Consumo comercial"
+temp_param_table$label[23] <- "Consumo rural"
+temp_param_table$label[24] <- "Consumo do poder público"
+temp_param_table$label[25] <- "Consumo de iluminação pública"
+temp_param_table$label[26] <- "Consumo do serviço público"
+temp_param_table$label[27] <- "Consumo próprio"
+temp_param_table$label[28] <- "Consumidores cativos"
+temp_param_table$label[29] <- "Consumidores livres"
+temp_param_table$label[30] <- "Consumidores residenciais"
+temp_param_table$label[31] <- "Consumidores industriais"
+temp_param_table$label[32] <- "Consumidores comerciais"
+temp_param_table$label[33] <- "Consumidores rurais"
+temp_param_table$label[34] <- "Consumidores do poder público"
+temp_param_table$label[35] <- "Consumidores de iluminação pública"
+temp_param_table$label[36] <- "Consumidores do serviço público"
+temp_param_table$label[37] <- "Consumidores próprios"
+temp_param_table$label[38] <- "UF"
 
 #unidades de cada var
-temp_param_table$unidade[2:29] <- "% do total de GWh do Brasil"
-temp_param_table$unidade[30:39] <- "% do total de consumidores do Brasil"
+temp_param_table$unidade[2:28] <- "% do total (Brasil)"
+temp_param_table$unidade[29:38] <- "% do total (Brasil)"
 
 #o que cada var pode assumir
-temp_param_table$x <- c(rep(FALSE, times = 17), TRUE, rep(FALSE, times = 21))
-temp_param_table$y <- c(FALSE, rep(TRUE, times = 16), rep(FALSE, times = 2), rep(TRUE, times = 20))
-temp_param_table$color <- c(TRUE, rep(FALSE, times = 17), TRUE, rep(FALSE, times = 20))
-temp_param_table$size <- c(FALSE, rep(TRUE, times = 16), rep(FALSE, times = 2), rep(TRUE, times = 20)) #mesma coisa que y
-temp_param_table$slider <- c(rep(FALSE, times = 17), TRUE, rep(FALSE, times = 21))
+temp_param_table$x <- c(TRUE, rep(FALSE, times = 37))
+temp_param_table$y <- c(FALSE, rep(TRUE, times = 36), FALSE)
+temp_param_table$color <- c(rep(FALSE, times = 37), TRUE)
+temp_param_table$size <- c(rep(FALSE, times = 38))
+temp_param_table$slider <- c(TRUE, rep(FALSE, times = 37))
+
+# Seleciona groupos de variaveis nas opções do UI
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumo", ignore_case = TRUE))] <- "ENERGIA - EPE - CONSUMO:"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumidores", ignore_case = TRUE))] <- "ENERGIA - EPE - CONSUMIDORES:"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("energia produzida", ignore_case = TRUE))] <- "ENERGIA - EPE - ENERGIA PRODUZIDA:"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_amz_exporta_dic.csv", fileEncoding = "UTF-8")
