@@ -259,8 +259,8 @@ temp_param_table$label[37] <- "Consumidores próprios"
 temp_param_table$label[38] <- "UF"
 
 #unidades de cada var
-temp_param_table$unidade[2:28] <- "% do total (Brasil)"
-temp_param_table$unidade[29:38] <- "% do total (Brasil)"
+temp_param_table$unidade[2:28] <- "% do total do Brasil"
+temp_param_table$unidade[29:38] <- "% do total do Brasil"
 
 #o que cada var pode assumir
 temp_param_table$x <- c(TRUE, rep(FALSE, times = 37))
@@ -270,9 +270,9 @@ temp_param_table$size <- c(rep(FALSE, times = 38))
 temp_param_table$slider <- c(TRUE, rep(FALSE, times = 37))
 
 # Seleciona groupos de variaveis nas opções do UI
-temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumo", ignore_case = TRUE))] <- "ENERGIA - EPE - CONSUMO:"
-temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumidores", ignore_case = TRUE))] <- "ENERGIA - EPE - CONSUMIDORES:"
-temp_param_table$var_group[str_detect(temp_param_table$label, regex("energia produzida", ignore_case = TRUE))] <- "ENERGIA - EPE - ENERGIA PRODUZIDA:"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumo", ignore_case = TRUE))] <- "CONSUMO DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumidores", ignore_case = TRUE))] <- "CONSUMIDORES DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("energia produzida", ignore_case = TRUE))] <- "ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_amz_exporta_dic.csv", fileEncoding = "UTF-8")
