@@ -156,7 +156,7 @@ get_server <- function(files, param) {
           # Alternativa de medida para y
           if (input$y_option & is.numeric(df_p$y)) {
             df_p <- df_p %>%
-              group_by(color) %>%
+              group_by(group) %>%
               arrange(x) %>%
               mutate(
                 aux1 = first(y),
