@@ -57,7 +57,7 @@ get_ui <- function(files, param) {
           "filter_sig_modalidade_empreendimento",
           "Modalidade de empreendimento",
           choices = NULL,
-          selected = "Radia\u00e7\u00e3o solar",
+          selected = param$filter_sig_modalidade_empreendimento_def,
           width = "100%"
         ),
         # Seleciona filtro de tipo geracao
@@ -65,8 +65,29 @@ get_ui <- function(files, param) {
           "filter_dsc_fonte_geracao",
           "Fonte de gera\u00e7\u00e3o",
           choices = NULL,
-          selected = "UFV",
+          selected = param$filter_dsc_fonte_geracao_def,
           width = "100%"
+        ),
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        div(
+          class = "var_selec_group",
+          # Seleciona variável do eixo de data
+          sliderInput(
+            inputId = "filter_ano",
+            label = "Ano referente",
+            min = param$year_inicio,
+            max = param$year_final,
+            value = param$year_final,
+            step = 1,
+            width = "100%",
+            animate = animationOptions(
+              interval = 3000,
+              playButton = "\u25B6",
+              pauseButton = "\u23F8"
+            ),
+            sep = ""
+          )
         ),
         # espaço vazio
         div(class = "fakecheckbox", ),
