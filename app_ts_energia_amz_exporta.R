@@ -31,8 +31,8 @@ param$slider_def <- "" # variável padrão do slider
 param$text_def <- "" # variável padrão de texto
 param$id_def <- "" # variável padrão de id
 
-param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Dados de produção, consumo e consumidores de energia"
+param$plot_name <- "Data Zoom Amaz\u00f4nia"
+param$plot_desc <- "Dados de Energia do EPE sobre propor\u00e7\u00e3o de produ\u00e7\u00e3o, consumo e consumidores de energia"
 
 
 # Outros parâmetros e configurações
