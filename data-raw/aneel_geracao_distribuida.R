@@ -27,7 +27,14 @@ db_geracao_distribuida <- data.table::fread(
   janitor::clean_names()
 
 db_geracao_distribuida$cod_ibge <- db_geracao_distribuida$cod_municipio_ibge
+db_geracao_distribuida$code_muni <- db_geracao_distribuida$cod_municipio_ibge
 
+# keep with only amazon cities
+amz_cities <- datazoom.amazonia::municipalities
+db_geracao_distribuida <- left_join(db_geracao_distribuida, amz_cities, by = c("code_muni"))
+
+#db_geracao_distribuida <- db_geracao_distribuida %>%
+#  filter(legal_amazon ==1)
 
 # replace character "," to "."
 db_geracao_distribuida$mda_potencia_instalada_kw <- gsub(",", ".", db_geracao_distribuida$mda_potencia_instalada_kw)
@@ -45,88 +52,100 @@ db_geracao_distribuida <- db_geracao_distribuida %>%
 class(db_geracao_distribuida$ano_cadastral) <- "numeric"
 
 # convert long data to wide data
-db_geracao_distribuida_collapsed <- pivot_wider(
-  db_geracao_distribuida,
-  id_cols = c(cod_ibge, sig_uf, dsc_fonte_geracao, sig_modalidade_empreendimento, ano_cadastral),
-  id_expand = FALSE,
+
+## ## ## ## ## ## ## ## ## ## ## ## 
+## Por: AMZ vs. Fora AMZ
+## ## ## ## ## ## ## ## ## ## ## ## 
+
+colnames(db_geracao_distribuida)
+
+db_geracao_distribuida_amazon <- db_geracao_distribuida %>%
+  mutate(id = case_when(legal_amazon ==1 ~ "Amazônia Legal",
+                        legal_amazon !=1 ~ "Fora da Amazônia Legal"
+  ) 
+  )
+
+db_geracao_distribuida_amazon$id[is.na(db_geracao_distribuida_amazon$id)] <- "Fora da Amazônia Legal"
+
+db_geracao_distribuida_amazon <- pivot_wider(
+  db_geracao_distribuida_amazon,
+  id_cols = c(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte, ano_cadastral),
+  id_expand = TRUE,
   names_from = c(dsc_classe_consumo),
   values_from = c(mda_potencia_instalada_kw, qtd_uc_recebe_credito),
   values_fn = sum
-)
-
-remove(db_geracao_distribuida)
-
-# clean names
-db_geracao_distribuida_collapsed <- db_geracao_distribuida_collapsed %>% janitor::clean_names()
-
-# sort data
-db_geracao_distribuida_collapsed <- db_geracao_distribuida_collapsed %>%
-  arrange(cod_ibge, dsc_fonte_geracao, sig_modalidade_empreendimento, ano_cadastral)
-
-###################
-# TERRABRASILIS
-###################
-# read shapefile
-shapefile <- st_read("data/shapefiles/municipalities_legal_amazon.shp")
-
-# data too heavy (over 100mb)
-# solution: simplify geometry
-# shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
-
-# plot(shapefile)
-# shapefile$cod_ibge
-
-######################################################
-# merge data with amazon municipalities shapefile
-######################################################
-temporary_data <- sp::merge(shapefile, db_geracao_distribuida_collapsed, by.x = "cod_ibge", by.y = "cod_ibge")
-
-# drop municipalities with empty geometry
-temporary_data <- temporary_data[!st_is_empty(temporary_data), , drop = FALSE]
-
-# save simplified sf for faster maps
-cols <- colnames(temporary_data)
-temporary_data <- rmapshaper::ms_simplify(temporary_data,
-  keep_shapes = TRUE,
-  keep = 0.01
-)
-
-colnames(temporary_data) <- cols
-
-# sort data
-temporary_data <- temporary_data %>%
-  arrange(cod_ibge, sig_uf, dsc_fonte_geracao, sig_modalidade_empreendimento, ano_cadastral)
-
-# merge with a balanced panel - extract info
-years_to_expand <- temporary_data$ano_cadastral %>%
-  unique() %>%
-  sort()
-mun_to_expand <- temporary_data$cod_ibge %>%
-  unique() %>%
-  sort()
-fonte_to_expand <- temporary_data$dsc_fonte_geracao %>%
-  unique() %>%
-  sort()
-mod_to_expand <- temporary_data$sig_modalidade_empreendimento %>%
-  unique() %>%
-  sort()
-
-# merge with a balanced panel - expand by info
-balanced_panel <- expand.grid(mun_to_expand, fonte_to_expand, mod_to_expand, years_to_expand)
-colnames(balanced_panel) <- c("cod_ibge", "dsc_fonte_geracao", "sig_modalidade_empreendimento", "ano_cadastral")
-balanced_panel <- balanced_panel %>% arrange(cod_ibge, dsc_fonte_geracao, sig_modalidade_empreendimento, ano_cadastral)
-
-# merge with a balanced panel - left join
-balanced_panel_merged <- left_join(balanced_panel, temporary_data, by = c("cod_ibge", "dsc_fonte_geracao", "sig_modalidade_empreendimento", "ano_cadastral"))
-colnames(balanced_panel_merged)
-remove(balanced_panel, db_geracao_distribuida_collapsed)
+)  %>% janitor::clean_names()
 
 # convert NA to zero
-balanced_panel_merged[is.na(balanced_panel_merged)] <- 0
+colnames(db_geracao_distribuida_amazon)
+db_geracao_distribuida_amazon[is.na(db_geracao_distribuida_amazon)] <- 0
+
+## ## ## ## ## ## ## ## ## ## ## ## 
+## Por estados
+## ## ## ## ## ## ## ## ## ## ## ## 
+colnames(db_geracao_distribuida)
+db_geracao_distribuida$code_state %>% unique() %>% sort()
+
+db_geracao_distribuida_uf <- db_geracao_distribuida %>%
+  mutate(id = case_when(code_state ==11 ~ "R. Norte: RO",
+                        code_state ==12 ~ "R. Norte: AC",
+                        code_state ==13 ~ "R. Norte: AM",
+                        code_state ==14 ~ "R. Norte: RR",
+                        code_state ==15 ~ "R. Norte: PA",
+                        code_state ==16 ~ "R. Norte: AP",
+                        code_state ==17 ~ "R. Norte: TO",
+                        code_state ==21 ~ "R. Nordeste: MA",
+                        code_state ==22 ~ "R. Nordeste: MA",
+                        code_state ==23 ~ "R. Nordeste: CE",
+                        code_state ==24 ~ "R. Nordeste: RN",
+                        code_state ==25 ~ "R. Nordeste: PB",
+                        code_state ==26 ~ "R. Nordeste: PE",
+                        code_state ==27 ~ "R. Nordeste: AL",
+                        code_state ==28 ~ "R. Nordeste: SE",
+                        code_state ==29 ~ "R. Nordeste: BA",
+                        code_state ==31 ~ "R. Sudeste: MG",
+                        code_state ==32 ~ "R. Sudeste: ES",
+                        code_state ==33 ~ "R. Sudeste: RJ",
+                        code_state ==35 ~ "R. Sudeste: SP",
+                        code_state ==41 ~ "R. Sul: PR",
+                        code_state ==42 ~ "R. Sul: SC",
+                        code_state ==43 ~ "R. Sul: RS",
+                        code_state ==50 ~ "R. Centro-Oeste: MS",
+                        code_state ==51 ~ "R. Centro-Oeste: MT",
+                        code_state ==52 ~ "R. Centro-Oeste: GO",
+                        code_state ==53 ~ "R. Centro-Oeste: DF"
+                        )
+         )
+
+db_geracao_distribuida_uf$id[is.na(db_geracao_distribuida_uf$id)] <- ""
+
+db_geracao_distribuida_uf <- pivot_wider(
+  db_geracao_distribuida_uf,
+  id_cols = c(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte, ano_cadastral),
+  id_expand = TRUE,
+  names_from = c(dsc_classe_consumo),
+  values_from = c(mda_potencia_instalada_kw, qtd_uc_recebe_credito),
+  values_fn = sum
+) %>% janitor::clean_names()
+
+# convert NA to zero
+colnames(db_geracao_distribuida_uf)
+db_geracao_distribuida_uf[is.na(db_geracao_distribuida_uf)] <- 0
+
+# Append datasets into one
+append_data <- rbind(db_geracao_distribuida_amazon, db_geracao_distribuida_uf)
+
+# clean names
+append_data <- append_data %>% janitor::clean_names()
+
+# sort data
+append_data <- append_data %>%
+  arrange(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte, ano_cadastral)
 
 # variables of interest have to represent the cumulative sum over time
-balanced_panel_merged <- balanced_panel_merged %>%
-  group_by(cod_ibge, dsc_fonte_geracao, sig_modalidade_empreendimento) %>%
+append_data <- append_data %>%
+  arrange(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte, ano_cadastral) %>%
+  group_by(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte) %>%
   dplyr::mutate(
     mda_potencia_instalada_kw_comercial = cumsum(mda_potencia_instalada_kw_comercial),
     mda_potencia_instalada_kw_residencial = cumsum(mda_potencia_instalada_kw_residencial),
@@ -142,16 +161,38 @@ balanced_panel_merged <- balanced_panel_merged %>%
     qtd_uc_recebe_credito_poder_publico = cumsum(qtd_uc_recebe_credito_poder_publico),
     qtd_uc_recebe_credito_servico_publico = cumsum(qtd_uc_recebe_credito_servico_publico),
     qtd_uc_recebe_credito_iluminacao_publica = cumsum(qtd_uc_recebe_credito_iluminacao_publica)
-  )
+  ) 
+
+# filter years above 2013
+append_data$ano_cadastral %>% unique
+#append_data <- append_data %>%
+#  filter(ano_cadastral>=2013)
+#append_data$ano_cadastral %>% unique  
+  
+# sort data
+append_data <- append_data %>%
+  arrange(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte, ano_cadastral)
 
 # relabel variables
-balanced_panel_merged$sig_modalidade_empreendimento[balanced_panel_merged$sig_modalidade_empreendimento == "P"] <- "Microgeração"
-balanced_panel_merged$sig_modalidade_empreendimento[balanced_panel_merged$sig_modalidade_empreendimento == "R"] <- "Autoconsumo "
-balanced_panel_merged$sig_modalidade_empreendimento[balanced_panel_merged$sig_modalidade_empreendimento == "C"] <- "Compartilhada"
-balanced_panel_merged$sig_modalidade_empreendimento[balanced_panel_merged$sig_modalidade_empreendimento == "M"] <- "Múltiplas"
+append_data$sig_modalidade_empreendimento %>% unique() %>% sort()
+append_data$dsc_fonte_geracao %>% unique() %>% sort()
+append_data$dsc_porte %>% unique() %>% sort()
+
+append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "P"] <- "Microgera\u00e7\u00e3o ou Minigera\u00e7\u00e3o distribuída"
+append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "R"] <- "Autoconsumo remoto"
+append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "C"] <- "Geração compartilhada"
+append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "M"] <- "Múltiplas unidades consumidoras"
+append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == ""] <- "Indefinido"
+
+append_data$dsc_porte[append_data$dsc_porte == "Microgeracao"] <- "Microgera\u00e7\u00e3o"
+append_data$dsc_porte[append_data$dsc_porte == "Minigeracao"] <- "Minigera\u00e7\u00e3o"
+append_data$dsc_porte[append_data$dsc_porte == ""] <- "Outro"
+
+# generate variables
+append_data$group <- append_data$id
 
 # save at rds format
-saveRDS(balanced_panel_merged,
+saveRDS(append_data,
   file = "./data/aneel_geracao_distribuida.rds"
 )
 
@@ -198,7 +239,7 @@ temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_industrial
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_rural"] <- "Qtd. de  Unidades - Rural"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_poder_publico"] <- "Qtd. de  Unidades - Poder Público"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_servico_publico"] <- "Qtd. de  Unidades - Serviço Público"
-temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica pública"] <- "Qtd. de  Unidades - Iluminação pública"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica_publica"] <- "Qtd. de  Unidades - Iluminação pública"
 temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Ano"
 
 
@@ -210,17 +251,15 @@ temp_param_table$unidade[str_detect(temp_param_table$var, regex("qtd_uc_recebe_c
 temp_param_table$var_group[str_detect(temp_param_table$var, regex("mda_potencia_instalada_kw", ignore_case = TRUE))] <- "POTÊNCIA INSTALADA:"
 temp_param_table$var_group[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "QUANTIDADE DE UNIDADES CONSUMIDORAS:"
 
-# block variables in graphs y-axis
-
 # allow variables in graphs x-axis
-temp_param_table$x[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- TRUE
-temp_param_table$x[str_detect(temp_param_table$var, regex("mda_potencia_instalada", ignore_case = TRUE))] <- TRUE
+temp_param_table$x[temp_param_table$var == "ano_cadastral"] <- TRUE
+
+# allow variables in graphs y-axis
+temp_param_table$y[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- TRUE
+temp_param_table$y[str_detect(temp_param_table$var, regex("mda_potencia_instalada", ignore_case = TRUE))] <- TRUE
 
 # allow variables in graphs slider
 temp_param_table$slider[temp_param_table$var == "ano_cadastral"] <- TRUE
-
-# allow variables geometry in maps
-temp_param_table$geometry[temp_param_table$var == "geometry"] <- TRUE
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table,
