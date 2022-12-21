@@ -25,7 +25,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
                         "y",
                         choices = param$y_choices,
-                        selected = c("total produzido", "consumo cativo", "consumo livre") 
+                        selected = c("total produzido", "consumo total") 
       )
       
       updateSelectInput(session,

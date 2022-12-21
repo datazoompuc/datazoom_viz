@@ -37,3 +37,5 @@
 "36","consumidores servico publico",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Consumidores do serviço público","consumidores servico publico","CONSUMIDORES DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "37","consumidores proprio",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Consumidores próprios","consumidores proprio","CONSUMIDORES DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "38","uf",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"UF","uf","Energia - EPE",1,"% do total do Brasil","Economia","Energia"
+"39","consumo total",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Consumo total","consumo total","CONSUMO DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
+"40","consumidores",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Total de consumidores","consumidores","CONSUMIDORES DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"

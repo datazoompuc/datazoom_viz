@@ -131,7 +131,10 @@ db_bind4 = left_join(db_bind3,consumidores_classe) %>%
 db_bind5 <- db_bind4 %>%  
   group_by(ano) %>%
   mutate(across(!uf & !amz_legal, ~(.x / sum(.x, na.rm = TRUE)) * 100)) %>%
-  ungroup()
+  ungroup() %>%
+  rowwise() %>% 
+  mutate(`consumo total` = sum(c_across(`consumo cativo`:`consumo proprio`)),
+         `consumidores` = sum(c_across(`consumidores cativos`:`consumidores proprio`)))
 
 amz_legal_df = db_bind4 %>%
   filter(amz_legal == 1) %>%
@@ -146,6 +149,9 @@ fora_amz_legal_df = db_bind4 %>%
   mutate("uf" = "Fora da Amazônia Legal")
 
 df_final <- rbind(amz_legal_df, fora_amz_legal_df) %>%
+  rowwise() %>% 
+  mutate(`consumo total` = sum(c_across(`consumo cativo`:`consumo proprio`)),
+         `consumidores` = sum(c_across(`consumidores cativos`:`consumidores proprio`))) %>%
   group_by(ano) %>%
   mutate(across(!uf, ~(.x / sum(.x, na.rm = TRUE)) * 100)) %>%
   ungroup() %>%
@@ -257,17 +263,18 @@ temp_param_table$label[35] <- "Consumidores de iluminação pública"
 temp_param_table$label[36] <- "Consumidores do serviço público"
 temp_param_table$label[37] <- "Consumidores próprios"
 temp_param_table$label[38] <- "UF"
+temp_param_table$label[39] <- "Consumo total"
+temp_param_table$label[40] <- "Total de consumidores"
 
 #unidades de cada var
-temp_param_table$unidade[2:28] <- "% do total do Brasil"
-temp_param_table$unidade[29:38] <- "% do total do Brasil"
+temp_param_table$unidade[2:40] <- "% do total do Brasil"
 
 #o que cada var pode assumir
-temp_param_table$x <- c(TRUE, rep(FALSE, times = 37))
-temp_param_table$y <- c(FALSE, rep(TRUE, times = 36), FALSE)
-temp_param_table$color <- c(rep(FALSE, times = 37), TRUE)
-temp_param_table$size <- c(rep(FALSE, times = 38))
-temp_param_table$slider <- c(TRUE, rep(FALSE, times = 37))
+temp_param_table$x <- c(TRUE, rep(FALSE, times = 39))
+temp_param_table$y <- c(FALSE, rep(TRUE, times = 36), FALSE, TRUE, TRUE)
+temp_param_table$color <- c(rep(FALSE, times = 37), TRUE, FALSE, FALSE)
+temp_param_table$size <- c(rep(FALSE, times = 40))
+temp_param_table$slider <- c(TRUE, rep(FALSE, times = 39))
 
 # Seleciona groupos de variaveis nas opções do UI
 temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumo", ignore_case = TRUE))] <- "CONSUMO DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL"
