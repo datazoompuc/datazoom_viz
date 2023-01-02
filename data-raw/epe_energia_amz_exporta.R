@@ -163,6 +163,11 @@ df_final <- rbind(amz_legal_df, fora_amz_legal_df) %>%
 df_final <- df_final %>% 
   mutate_all(function(x) ifelse(is.nan(x), NA, x))
 
+# filter years above 2012
+df_final$ano %>% unique
+df_final <- df_final %>%
+  filter(ano>=2012)
+
 #modifica `uf` para evitar problemas com acentos e dar match no UI 
 df_final = df_final %>%
   mutate(uf = case_when(uf == "Amapá" ~ "AP",
