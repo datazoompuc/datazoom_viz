@@ -154,13 +154,27 @@ append_data <- append_data %>%
     mda_potencia_instalada_kw_poder_publico = cumsum(mda_potencia_instalada_kw_poder_publico),
     mda_potencia_instalada_kw_servico_publico = cumsum(mda_potencia_instalada_kw_servico_publico),
     mda_potencia_instalada_kw_iluminacao_publica = cumsum(mda_potencia_instalada_kw_iluminacao_publica),
+    mda_potencia_instalada_kw_total = mda_potencia_instalada_kw_comercial +
+      mda_potencia_instalada_kw_residencial + 
+      mda_potencia_instalada_kw_industrial + 
+      mda_potencia_instalada_kw_rural + 
+      mda_potencia_instalada_kw_poder_publico + 
+      mda_potencia_instalada_kw_servico_publico + 
+      mda_potencia_instalada_kw_iluminacao_publica,
     qtd_uc_recebe_credito_comercial = cumsum(qtd_uc_recebe_credito_comercial),
     qtd_uc_recebe_credito_residencial = cumsum(qtd_uc_recebe_credito_residencial),
     qtd_uc_recebe_credito_industrial = cumsum(qtd_uc_recebe_credito_industrial),
     qtd_uc_recebe_credito_rural = cumsum(qtd_uc_recebe_credito_rural),
     qtd_uc_recebe_credito_poder_publico = cumsum(qtd_uc_recebe_credito_poder_publico),
     qtd_uc_recebe_credito_servico_publico = cumsum(qtd_uc_recebe_credito_servico_publico),
-    qtd_uc_recebe_credito_iluminacao_publica = cumsum(qtd_uc_recebe_credito_iluminacao_publica)
+    qtd_uc_recebe_credito_iluminacao_publica = cumsum(qtd_uc_recebe_credito_iluminacao_publica),
+    qtd_uc_recebe_credito_total = qtd_uc_recebe_credito_comercial +
+      qtd_uc_recebe_credito_residencial + 
+      qtd_uc_recebe_credito_industrial + 
+      qtd_uc_recebe_credito_rural + 
+      qtd_uc_recebe_credito_poder_publico + 
+      qtd_uc_recebe_credito_servico_publico + 
+      qtd_uc_recebe_credito_iluminacao_publica
   ) 
 
 # filter years above 2013
@@ -233,13 +247,15 @@ temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_rural"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_poder_publico"] <- "Potência Instalada - Poder Público"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_servico_publico"] <- "Potência Instalada - Serviço Público"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_iluminacao_publica"] <- "Potência Instalada - Iluminação pública"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_total"] <- "Total de Potência Instalada"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_comercial"] <- "Qtd. de  Unidades - Comercial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_residencial"] <- "Qtd. de  Unidades - Residencial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_industrial"] <- "Qtd. de  Unidades - Industrial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_rural"] <- "Qtd. de  Unidades - Rural"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_poder_publico"] <- "Qtd. de  Unidades - Poder Público"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_servico_publico"] <- "Qtd. de  Unidades - Serviço Público"
-temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica_publica"] <- "Qtd. de  Unidades - Iluminação pública"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica"] <- "Qtd. de  Unidades - Iluminação pública"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_total"] <- "Total de Qtd. de  Unidades"
 temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Ano"
 
 
