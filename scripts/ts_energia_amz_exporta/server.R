@@ -229,7 +229,7 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
                            x = ~x,
                            y = ~y,
-                           color = ~color,
+                           color = ~group,
                            type = "scatter",
                            mode = "lines+markers",
                            text = ~tooltip,
