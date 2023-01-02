@@ -32,7 +32,8 @@ get_ui <- function(files, param) {
             inputId = "y",
             label = "eixo vertical (y)",
             choices = param$y_choices,
-            selected = param$y_def,
+            selected = c("Consumo Total", "Despesas Estimadas CCC (Nominal)"),
+            multiple = TRUE,
             width = "100%"
           )
         ),

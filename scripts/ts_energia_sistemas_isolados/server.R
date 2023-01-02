@@ -13,8 +13,7 @@ get_server <- function(files, param) {
   server <- function(input, output, session) {
 
     # Carrega dados
-    df <- readRDS(files$db_file) %>%
-      mutate(valor = as.numeric(valor))
+    df <- readRDS(files$db_file) 
     
     # Cria opções para seleção de grupos
     #param$filter_choices <- sort(unique(df$group))
@@ -22,21 +21,26 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
       updateSelectInput(session,
         "y",
         choices = param$y_choices,
-        selected = selected
+        selected = c("Consumo Total", "Despesas Estimadas CCC (Nominal)")
       )
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "y=", input$y,
-        "&", "ylog=", input$ylog,
+        "?", "ylog=", input$ylog,
         "&", "y_option=", input$y_option
       )
+      
+      for (i in input$y) {
+        q_string <- paste0(
+          q_string,
+          "&", "y=", i
+        )
+      }
 
       updateQueryString(q_string, mode = "replace")
     }
@@ -47,10 +51,12 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
+      selected <- unlist(query[names(query) == "y"], use.names = FALSE)
       if (!is.null(query[["y"]])) {
-        updateSelectInput(session, "y",
-          choices = param$y_choices,
-          selected = query[["y"]]
+        updateSelectInput(session,
+                          "y",
+                          choices = param$y_choices,
+                          selected = selected
         )
       }
 
@@ -67,7 +73,7 @@ get_server <- function(files, param) {
       }
 
       # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter"]]) && is.null(query[["y"]])) {
+      if (is.null(query[["y"]])) {
         random_inputs() # preenche inputs se estiverem vazios
       }
     }
@@ -77,13 +83,14 @@ get_server <- function(files, param) {
       
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
+      if (is.null(input$y)) {
         text <- " "
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
+        y_col <- param$table %>%
+          filter(var %in% input$y)
 
-        text <- paste0("", y_col$label)
+        text <- paste0("", paste(y_col$label, collapse = ", "))
         if (input$y_option) {
           text <- paste0("", y_col$label, "*")
         }
@@ -94,7 +101,7 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
       
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
+      if (is.null(input$y)) {
         text <- " "
       } else {
         text <- ifelse(input$y_option, "Proporcional ao ano inicial", " ")
@@ -112,32 +119,33 @@ get_server <- function(files, param) {
       tryCatch(
         {
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$y) || input$y == "") {
+          if (is.null(input$y)) {
             fig <- plotly_empty()
             stop()
           }
-
+          
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
+          y_col <- param$table %>% filter(var %in% input$y)
+       
+       df_filtered <- df %>%
+         select("Ano", input$y) %>%
+         pivot_longer(cols = input$y) %>%
+         filter(!is.na(value)) %>%
+         mutate(unidade = case_when(str_detect(name, "Consumo") ~ "Milhões de MWh",
+                                    str_detect(name, "Despesas") ~ "Bilhões de R$",
+                                    str_detect(name, "Consumidores") ~ "Milhões de Consumidores",
+                                    str_detect(name, "Participação") ~ "% do Orçamento da Conta de Desenvolvimento Energético"))
           
-          # Filtra dataframe com grupos selecionados
-          df_filtered <- df %>%
-            select(Ano, tipo, input$y) %>%
-            drop_na(input$y)
-          
-          
+       # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
             df_filtered[x_col$var],
-            df_filtered[y_col$var],
-            df_filtered[color_col$var],
-            df_filtered[color_col$var]
+            df_filtered["value"],
+            df_filtered["name"],
+            df_filtered["name"],
+            df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "color", "text")
-
-          # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
+          colnames(df_p) <- c("x", "y", "group", "text", "unidade")
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
@@ -148,7 +156,7 @@ get_server <- function(files, param) {
           # Alternativa de medida para y
           if (input$y_option & is.numeric(df_p$y)) {
             df_p <- df_p %>%
-              group_by(color) %>%
+              group_by(group) %>%
               arrange(x) %>%
               mutate(
                 aux1 = first(y),
@@ -162,29 +170,39 @@ get_server <- function(files, param) {
             df_p$color <- " "
           }
 
+          # Adicionar coluna de color
+          df_p <- df_p %>%
+            mutate(color = case_when(str_detect(group, "Consumo") ~ "Consumo",
+                                     str_detect(group, "Despesas") ~ "Despesas",
+                                     str_detect(group, "Consumidores") ~ "Consumidores",
+                                     str_detect(group, "Participação") ~ "Despesas"))
+          
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", format(df_p$y, scientific = FALSE,
+            df_p$text, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            "Unidade de medida: <b>", y_col$unidade, "</b>"
+            "Unidade de medida: <b>", df_p$unidade, "</b>"
           )
 
           # Define paleta de cores
           pallete <- pallete_discrete
 
           # Monta gráfico
-          fig_p <- plot_ly(df_p,
+          fig_p <- df_p %>%
+            group_by(group) %>%
+            plot_ly(
             x = ~x,
             y = ~y,
             color = ~color,
             type = "scatter",
             mode = "lines+markers",
             text = ~tooltip,
-            hoverinfo = "text"
+            hoverinfo = "text",
+            symbol = ~group
           )
 
           # Layout eixos
