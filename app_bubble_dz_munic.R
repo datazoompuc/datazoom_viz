@@ -35,6 +35,20 @@ param$id_def <- "cod_ibge" # variável padrão de id
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Compila\u00e7\u00e3o de dados ao n\u00edvel municipal"
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_x_name <- "eixo horizontal (x)"
+param$label_y_name <- "eixo vertical (y)"
+param$label_color_name <- "Cor do marcador:"
+param$label_size_name <- "Tamanho do marcador:"
+
+param$link <- "https://datazoom.shinyapps.io/app_bubble_dz_munic/"
+
+### Parametros especificos no server
+param$sep <- "por"                    # separador no titulo
+param$subtitle_init <- "considerando" # primeira palavra do subtitulo
+param$subtitle_sep <- "e"             # separador no subtitulo
+
 # Outros parâmetros e configurações
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
