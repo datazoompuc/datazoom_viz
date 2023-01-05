@@ -33,7 +33,21 @@ param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Compila\u00e7\u00e3o de dados ao n\u00edvel municipal"
+param$plot_desc <- "Compilation of data at the municipality-level"
+
+### Parametros especificos no UI
+param$label_var_name <- "VARIABLES:"
+param$label_x_name <- "horizontal axis (x)"
+param$label_y_name <- "vertical axis (y)"
+param$label_color_name <- "Marker color:"
+param$label_size_name <- "Marker size:"
+
+param$link <- "https://datazoom.shinyapps.io/app_bubble_dz_munic_en/"
+
+### Parametros especificos no server
+param$sep <- "by"                    # separador no titulo 
+param$subtitle_init <- "considering" # primeira palavra do subtitulo 
+param$subtitle_sep <- "and"          # separador no subtitulo
 
 # Outros parâmetros e configurações
 
