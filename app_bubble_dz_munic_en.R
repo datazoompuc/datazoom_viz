@@ -41,6 +41,7 @@ param$label_x_name <- "horizontal axis (x)"
 param$label_y_name <- "vertical axis (y)"
 param$label_color_name <- "Marker color:"
 param$label_size_name <- "Marker size:"
+param$label_scale_name <- "log scale"
 
 param$link <- "https://datazoom.shinyapps.io/app_bubble_dz_munic_en/"
 

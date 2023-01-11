@@ -41,6 +41,7 @@ param$label_x_name <- "eixo horizontal (x)"
 param$label_y_name <- "eixo vertical (y)"
 param$label_color_name <- "Cor do marcador:"
 param$label_size_name <- "Tamanho do marcador:"
+param$label_scale_name <- "escala log"
 
 param$link <- "https://datazoom.shinyapps.io/app_bubble_dz_munic/"
 
