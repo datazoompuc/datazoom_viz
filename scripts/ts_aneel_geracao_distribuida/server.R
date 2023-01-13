@@ -180,8 +180,8 @@ get_server <- function(files, param) {
         text <- " "
       } else {
 
-        text <- paste0("por recorte regional e filtrado por ", input$filter_sig_modalidade_empreendimento,
-          ", ", input$filter_dsc_fonte_geracao, " e ", 
+        text <- paste0(param$subtitle_init, input$filter_sig_modalidade_empreendimento,
+          ", ", input$filter_dsc_fonte_geracao, " ", param$subtitle_sep, " ", 
           input$filter_dsc_porte)
       }
 
