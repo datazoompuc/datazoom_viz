@@ -35,12 +35,12 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos total da Amaz\u00f4nia Legal"
 
 
-param$label_var_name <- "Variables"
+param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Value (only option)"
 param$label_scale_name <- "log scale"
 param$label_axis_name <- "proportional to starting year (*)"
 param$label_mun_filter <- "Countries"
-param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_pais/"
+param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_pais_en/"
 param$currency <- "Per R$"
 
 # Outros parâmetros e configurações
