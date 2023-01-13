@@ -32,14 +32,14 @@ param$group <- "group" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos por  pa\u00eds de destino"
+param$plot_desc <- "External trade in the Amazon (COMEX): Product export value per destination country"
 
-param$label_var_name <- "Variables"
+param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Country"
 param$label_scale_name <- "log scale"
 param$label_axis_name <- "proportional to starting year (*)"
 param$label_mun_filter <- "Export Categories (SEC agreggation)"
-param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_munic_sec/"
+param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_sec_pais_en/"
 param$currency <- "Per R$"
 
 # Outros parâmetros e configurações
