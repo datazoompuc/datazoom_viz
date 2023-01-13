@@ -69,7 +69,7 @@
 "68","tilapia_producao_da_aquicultura",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Produção da Aquicultura Tilapia","tilapia_producao_da_aquicultura","IBGE - PPM - Aquicultura","Unidade de medida","Produção","Criação animal"
 "69","tilapia_valor_da_producao",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Valor da produção Tilapia","tilapia_valor_da_producao","IBGE - PPM - Aquicultura","Unidade de medida","Produção","Criação animal"
 "70","total_valor_da_producao",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Produção da Aquicultura Total","total_valor_da_producao","IBGE - PPM - Aquicultura","Unidade de medida","Produção","Criação animal"
-"71","traira_e_trairao_producao_da_aquicultura",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Valor da produção Total","traira_e_trairao_producao_da_aquicultura","IBGE - PPM - Aquicultura","Unidade de medida","Produção","Criação animal"
+"71","traira_e_trairao_producao_da_aquicultura",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Valor da produção Traira e trairao","traira_e_trairao_producao_da_aquicultura","IBGE - PPM - Aquicultura","Unidade de medida","Produção","Criação animal"
 "72","traira_e_trairao_valor_da_producao",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Produção da Aquicultura Traira e trairao","traira_e_trairao_valor_da_producao","IBGE - PPM - Aquicultura","Unidade de medida","Produção","Criação animal"
 "73","truta_producao_da_aquicultura",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Produção da Aquicultura Truta","truta_producao_da_aquicultura","IBGE - PPM - Aquicultura","Unidade de medida","Produção","Criação animal"
 "74","truta_valor_da_producao",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Valor da produção Truta","truta_valor_da_producao","IBGE - PPM - Aquicultura","Unidade de medida","Produção","Criação animal"
