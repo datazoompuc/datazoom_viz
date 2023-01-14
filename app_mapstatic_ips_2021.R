@@ -37,6 +37,15 @@ param$plot_desc <- "Dados compilados do Instituto do Homem e do Meio Ambiente da
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
 
+#parâmetros específicos no UI
+param$label_title<-"Mapa dos munic\u00edpios da Amaz\u00f4nia Legal"
+param$label_selected_variable<-"Vari\u00e1vel selecionada:"
+param$label_var_name<- "VARI\u00C1VEIS::"
+param$label_x_name<- "Seleciona vari\u00e1vel"
+param$label_munic_name<- "Nome do munic\u00edpio: "
+param$label_state<- "Estado: "
+param$label_measurement_unit<- "Unidade de Medida: "
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)

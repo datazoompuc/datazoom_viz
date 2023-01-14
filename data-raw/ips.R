@@ -627,7 +627,7 @@ temp_param_table$var_group[temp_param_table$var == "direitos_individuais"] <- "C
 temp_param_table$var_group[temp_param_table$var == "liberdade_individual_e_de_escolha"] <- "Components: Oportunities"
 temp_param_table$var_group[temp_param_table$var == "inclusao_social"] <- "Components: Oportunities"
 temp_param_table$var_group[temp_param_table$var == "acesso_a_educacao_superior"] <- "Components: Oportunities"
-temp_param_table$var_group[temp_param_table$var == "mortalidade_infantil_ate_5_anos_2019_obitos_1_000_nasc_vivos"] <- ""
+temp_param_table$var_group[temp_param_table$var == "mortalidade_infantil_ate_5_anos_2019_obitos_1_000_nasc_vivos"] <- "Indicators: Nutrition and Basic Medical Care"
 temp_param_table$var_group[temp_param_table$var == "mortalidade_materna_2019_obitos_maternos_100_000_nascidos_vivos"] <- "Indicators: Nutrition and Basic Medical Care"
 temp_param_table$var_group[temp_param_table$var == "mortalidade_por_doencas_infecciosas_2019_obitos_100_000_habitantes"] <- "Indicators: Nutrition and Basic Medical Care"
 temp_param_table$var_group[temp_param_table$var == "mortalidade_por_desnutricao_2019_obitos_100_000_habitantes"] <- "Indicators: Nutrition and Basic Medical Care"
