@@ -51,6 +51,13 @@ temp_param_table <- temp_param_table %>%
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/saude_mortalidade_dic.csv", fileEncoding = "UTF-8")
 
+temp_param_table <- temp_param_table %>%
+    filter(var %in% columns) %>%
+    mutate(unidade = case_when(
+        stringr::str_detect(var, "t_") ~ "Mortality per 100,000 habitantes",
+        stringr::str_detect(var, "n_") ~ "Hospital beds per 100,000 habitantes",
+        TRUE ~ unidade
+    ))
 #renaming the variables to english 
 temp_param_table$label[temp_param_table$var == "cod_ibge"] <- "Municipality code"
 temp_param_table$label[temp_param_table$var == "ano"] <- "Year"

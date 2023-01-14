@@ -37,6 +37,15 @@ param$plot_desc <- "Sa\u00fade na Amaz\u00f4nia: Mortalidade ao n\u00edvel munic
 param$year_inicio <- 2006
 param$year_final <- 2019
 
+#parâmetros específicos no UI
+param$label_var_name<- "VARI\u00C1VEIS:"
+param$label_x_name<- "Seleciona variável (x)"
+param$label_year<- "Ano referente"
+param$label_title<- "Mapa dos munic\u00edpios da Amaz\u00f4nia Legal"
+param$label_selected_variable<- "Vari\u00e1vel selecionada:"
+param$label_munic_name<- "Nome do município <b>"
+param$label_state_name<- "Estado: <b>"
+param$label_measurement_unit<- "Unidade de medida: <b>"
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
 
