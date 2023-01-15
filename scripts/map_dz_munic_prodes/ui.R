@@ -35,13 +35,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS::"),
+        p(class = "vars", param$label_var_name),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = "Seleciona variável (x)",
+            label = param$label_x_name,
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
@@ -53,7 +53,7 @@ get_ui <- function(files, param) {
           class = "var_selec_group",
           # Seleciona variável do eixo de data
           sliderInput(inputId = "filter1",
-                      label = "Ano referente",
+                      label = param$ref_year,
                       min = param$year_inicio,
                       max = param$year_final,
                       value = 2000,

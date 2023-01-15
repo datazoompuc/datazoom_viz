@@ -38,6 +38,16 @@ param$app <- "INPE - PRODES"
 param$year_inicio <- 2000
 param$year_final <- 2019
 
+#parâmetros específicos no Server
+param$label_title<- "Mapa dos municípios da Amazônia Legal"
+param$label_munic<- "Nome do Município <b>"
+param$label_state<- "Estado: <b>"
+param$label_measurement_unit<- "Unidade de medida: <b>"
+
+#parametros especificos no UI
+param$label_var_name<-  "VARI\u00C1VEIS:"
+param$label_x_name<- "Seleciona variável (x)"
+param$ref_year<- "Ano Referente"
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]
 
