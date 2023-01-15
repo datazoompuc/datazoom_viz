@@ -24,13 +24,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$label_var_name),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo y
           selectInput(
             inputId = "y",
-            label = "Munic\u00edpios da Amaz\u00f4nia",
+            label = param$label_y_name,
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -40,14 +40,14 @@ get_ui <- function(files, param) {
         # Seleciona eixo log
         checkboxInput(
           inputId = "ylog",
-          "escala log",
+          param$label_scale_name,
           value = FALSE,
           width = "100%"
         ),
         # Seleciona eixo
         checkboxInput(
           inputId = "y_option",
-          "proporcional ao ano inicial (*)",
+          param$label_axis_name,
           value = FALSE,
           width = "100%"
         ),
@@ -55,7 +55,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          "Categorias da exporta\u00e7\u00e3o (agrega\u00e7\u00e3o do SH2)",
+          param$label_mun_filter,
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
@@ -69,7 +69,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_ts_comex_exp_munic_sh2/', '_blank')")
+                              onclick = paste0("window.open(",param$link,", '_blank')"))
         ),
       ),
       column(9,

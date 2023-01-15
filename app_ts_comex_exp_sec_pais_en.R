@@ -35,7 +35,7 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "External trade in the Amazon (COMEX): Products export value per destination country"
 
 param$label_var_name <- "VARIABLES:"
-param$label_y_name <- "Country"
+param$label_y_name <- "Destination country"
 param$label_scale_name <- "log scale"
 param$label_axis_name <- "proportional to starting year (*)"
 param$label_mun_filter <- "Export Categories (SEC agreggation)"

@@ -36,7 +36,7 @@ param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da ex
 
 
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "País"
+param$label_y_name <- "País de destino"
 param$label_scale_name <- "escala log"
 param$label_axis_name <- "proporcional ao ano inicial (*)"
 param$label_mun_filter <- "Categorias de exportação (agregação da SEC)"

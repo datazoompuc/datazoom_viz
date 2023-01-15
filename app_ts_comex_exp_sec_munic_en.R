@@ -38,7 +38,7 @@ param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Export Category (SEC agreggation)"
 param$label_scale_name <- "log scale"
 param$label_axis_name <- "proportional to starting year (*)"
-param$label_mun_filter <- "Municipalities"
+param$label_mun_filter <- "Amazon Municipalities"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_sec_munic_en/"
 param$currency <- "Per R$"
 
