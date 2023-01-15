@@ -423,12 +423,28 @@ temp_param_table$label[2] <- "Municipio"
 temp_param_table$label[3] <- "Valor relativo do principal produto exportado"
 temp_param_table$label[4] <- "Principal produto exportado"
 temp_param_table$label[6] <- "Produtos Compat\u00edveis com a Floresta"
-temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
-temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE)
-temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE)
-temp_param_table$size <- c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
-temp_param_table$slider <- c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$x <- c(rep(TRUE, 12))
+temp_param_table$y <- c(rep(TRUE, 12))
+temp_param_table$color <- c(rep(TRUE, 12))
+temp_param_table$size <- c(rep(TRUE, 12))
+temp_param_table$slider <- c(rep(TRUE, 12))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_sel_dic.csv", fileEncoding = "UTF-8")
+
+
+# relabel in english ----------------------------------------------------------------
+temp_param_table$label[1] <- "Year"
+temp_param_table$label[2] <- "Municipality"
+temp_param_table$label[3] <- "Main exported product relative value"
+temp_param_table$label[4] <- "Main exported product"
+temp_param_table$label[6] <- "Forest Compatible Products"
+
+temp_param_table$unidade <- "% of world exports"
+temp_param_table$categoria <- "Economy"
+temp_param_table$subcategoria <- "Foreign Trade"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_sel_dic_en.csv", fileEncoding = "UTF-8")
+
 
