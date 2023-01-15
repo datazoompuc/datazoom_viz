@@ -41,7 +41,7 @@ get_ui <- function(files, param) {
                # Seleciona variável do eixo x
                selectInput(
                  inputId = "x",
-                 label = "Tipos de Produto:",
+                 label = param$varxlabel,
                  choices = param$x_choices,
                  selected = param$x_def,
                  width = "100%"
@@ -53,7 +53,7 @@ get_ui <- function(files, param) {
                class = "var_selec_group",
                # Seleciona variável do eixo de data
                sliderInput(inputId = "filter1",
-                           label = "Ano referente",
+                           label = param$vardatelabel,
                            min = param$year_inicio,
                            max = param$year_final,
                            value = 2000,
@@ -70,7 +70,7 @@ get_ui <- function(files, param) {
                shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                                    icon = icon("expand"), 
                                    class = "btn-primary",
-                                   onclick = "window.open('https://datazoom.shinyapps.io/app_map_comex_exp_sh4_sel/', '_blank')")
+                                   onclick = paste0("window.open('", param$link, "', '_blank')"))
              ),
       ),
       column(9,
