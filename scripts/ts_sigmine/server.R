@@ -1,4 +1,4 @@
-# -------------------------------- Define lÃ³gica do server --------------------------------
+# -------------------------------- Define lógica do server --------------------------------
 
 # Paleta de cores
 pallete_discrete <- c("#fcff84","#ffcf48" ,"#c3ff83","#007e47","#00596d","#4fdf94","#99b0c8","#261c4e","#000098","#c368b1","#60458c","#757575")
@@ -8,23 +8,23 @@ pallete_continuous <- c("#440154","#481567" ,"#453781","#404788","#39568c","#336
 f1 <- list(family = "Roboto", size = 14, color = "rgb(0, 0, 0)")
 f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
-# FuncÃ£o para retornar objeto server
+# Funcão para retornar objeto server
 get_server <- function(files, param) {
   server <- function(input, output, session) {
     
     # Carrega dados
     df <- readRDS(files$db_file)
 
-    # Cria opÃ§Ãµes para seleÃ§Ã£o de grupos
+    # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
     
-    # FuncÃ£o para preencher inputs com coluna/variÃ¡vel aleatÃ³ria
+    # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function( ) {
       updateSelectInput(session, 
                         "filter1", 
                         choices = param$filter_choices, 
-                        selected = sample(param$filter_choices,2) #2 significa o numero de parametros aleatÃ³rios que sÃ£o escolhidos na geraÃ§Ã£o do grÃ¡fico
+                        selected = sample(param$filter_choices,2) #2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
       
       selected <- sample(sample(param$y_choices,1)[[1]],1)
@@ -35,7 +35,7 @@ get_server <- function(files, param) {
       )
     }
     
-    # FunÃ§Ã£o para atualizar url do app com parÃ¢metros dos inputs
+    # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
         "?","y=",input$y,
@@ -54,7 +54,7 @@ get_server <- function(files, param) {
       updateQueryString(q_string, mode = "replace")
     }
     
-    # FunÃ§Ã£o para atualizar inputs a partir da URL
+    # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       # Preenche filtro vazio
       updateSelectInput(session, 
@@ -91,21 +91,21 @@ get_server <- function(files, param) {
         )
       }
       
-      # Se query estÃ¡ vazia, preenche aleatÃ³rio
+      # Se query está vazia, preenche aleatório
       if (is.null(query[['filter']]) && is.null(query[['y']]) ) {
         random_inputs() #preenche inputs se estiverem vazios
       }
       
     }
     
-    # Output titulo do grÃ¡fico
+    # Output titulo do gráfico
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if(is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        # Monta titulo a partir de variÃ¡veis selecionadas nos inputs
+        # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
         
         text <-  paste0("", y_col$label)
@@ -121,27 +121,27 @@ get_server <- function(files, param) {
       if(is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <-  paste0("por subdivisão territorial")
+        text <-  paste0("por subdivis�o territorial")
       }
       
       text
     })
     
-    # Output grÃ¡fico
+    # Output gráfico
     output$plot <- renderPlotly({
       update_my_queryString()  #atualiza url com parametros dos inputs
       
-      fig <- plotly_empty() #inicia figura com grÃ¡fico em branco
+      fig <- plotly_empty() #inicia figura com gráfico em branco
       tryCatch({
-        # Se algum campo estiver vazio retorna grÃ¡fico vazio
+        # Se algum campo estiver vazio retorna gráfico vazio
         if(is.null(input$y) || input$y == "" || 
            is.null(input$filter1) || length(input$filter1) < 1) {
           fig <- plotly_empty()
           stop()
         }
         
-        #Cria dataframe do grÃ¡fico a partir do arquivo de parÃ¢metros e dos select inputs
-        # Cria dataframe do grÃ¡fico
+        #Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
+        # Cria dataframe do gráfico
         x_col <- param$table[which(param$table$var == param$x_def),]
         y_col <- param$table[which(param$table$var == input$y),]
         id_col <- param$table[which(param$table$var == param$id_def), ]
@@ -158,10 +158,10 @@ get_server <- function(files, param) {
         df_p$group <- df_filtered$group
         df_p$text <- df_p$group
         
-        # Filtra colunas onde x,y e size sÃ£o NA (nÃ£o serÃ£o exibidas no grÃ¡fico de qualquer forma)
+        # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
         df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
         
-        # Se dataset estiver vazio, nÃ£o monta o grÃ¡fico, retorna em branco
+        # Se dataset estiver vazio, não monta o gráfico, retorna em branco
         if (nrow(df_p) < 1) {
           fig <- plotly_empty()
           stop()
@@ -191,7 +191,7 @@ get_server <- function(files, param) {
         # Define paleta de cores
         pallete <- pallete_discrete
         
-        # Monta grÃ¡fico
+        # Monta gráfico
         fig_p <- plot_ly(df_p, 
                          x = ~x,
                          y = ~y,
@@ -246,7 +246,7 @@ get_server <- function(files, param) {
             hoverlabel = tooltip
           )
         
-        #  Configura botÃµes do plotly
+        #  Configura botões do plotly
         fig_p <- fig_p %>%
           config(
             #toImageButtonOptions = list(format = "svg"),
@@ -259,7 +259,7 @@ get_server <- function(files, param) {
             )
           )
         
-        fig <- fig_p # retorna a figura do grÃ¡fico
+        fig <- fig_p # retorna a figura do gráfico
       },
       error = function(cond) {
         # se encontrar erro retorna fig em branco
