@@ -32,7 +32,7 @@ param$group <- "group" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "External trade in the Amazon (COMEX): Product export value per destination country"
+param$plot_desc <- "External trade in the Amazon (COMEX): Products export value per destination country"
 
 param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Country"

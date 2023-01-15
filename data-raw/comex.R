@@ -743,3 +743,81 @@ temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_tot_pais_en_dic.csv", fileEncoding = "UTF-8")
+
+
+
+
+### exportação municipal da amazônia por tipo sec inglês
+datafinal <- readRDS(file = "data/comex_exp_munic_sec.rds")
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "R$",
+    categoria= "Economia", 
+    subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Sec production"
+temp_param_table$label[1] <- "Year"
+temp_param_table$desc[2] <- "Sec production"
+temp_param_table$desc[1] <- "Year"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_munic_sec_en_dic.csv", fileEncoding = "UTF-8")
+
+
+
+
+### exportação municipal da amazônia por tipo sec inglês
+datafinal <- readRDS(file = "data/comex_exp_sec_munic.rds")
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "R$",
+    categoria= "Economia", 
+    subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Municipality"
+temp_param_table$label[1] <- "Year"
+temp_param_table$desc[2] <- "Municipality"
+temp_param_table$desc[1] <- "Year"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 96))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 96))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_sec_munic_en_dic.csv", fileEncoding = "UTF-8")
