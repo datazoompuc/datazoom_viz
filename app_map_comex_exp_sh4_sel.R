@@ -40,6 +40,19 @@ param$vardatelabel <- "Ano referente"
 param$link <- "https://datazoom.shinyapps.io/app_map_comex_exp_sh4_sel/"
 
 # Parâmetros específicos do server
+param$titulo1 <- "Mapa dos municípios da Amazônia Legal"
+param$titulo2 <- "Nenhuma variável selecionada"
+param$titulo3 <- "Principal produto exportado: "
+
+param$tooltip1 <- "Nome do município: <b>"
+param$tooltip2 <- "Estado: <b>"
+param$tooltip3 <- "Principal Produto: <b>"
+param$tooltip4 <- "Categoria do Principal Produto: <b>"
+param$tooltip5 <- "Valor: "
+param$tooltip6 <- "Unidade de medida: <b>"
+param$tooltip7 <- "% das exportações do produto vindas da Amazônia no ano"
+
+param$legend <- "Categoria do Principal Produto"
 
 # Outros parâmetros e configurações
 param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos")
