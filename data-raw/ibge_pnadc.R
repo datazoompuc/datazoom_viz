@@ -855,7 +855,7 @@ temp_param_table$label[8] <- "Employed persons in the private sector"
 temp_param_table$label[9] <- "Mean monthly income"
 temp_param_table$label[10] <- "Mean monthly income in the formal sector"
 temp_param_table$label[11] <- "Mean monthly income in the informal sector"
-temp_param_table$label[12] <- "Wages"
+temp_param_table$label[12] <- " Total wage"
 temp_param_table$label[13] <- "State"
 
 
