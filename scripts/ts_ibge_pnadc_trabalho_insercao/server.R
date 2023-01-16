@@ -140,7 +140,7 @@ get_server <- function(files, param) {
         text <- "Variável no eixo Y não selecionada"
       } else {
 
-        text <- paste0("por recorte regional e ", input$filter_composicao_demografica)
+        text <- paste0(param$subtitle_init, " ", input$filter_composicao_demografica)
       }
 
       text
