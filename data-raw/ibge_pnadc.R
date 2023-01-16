@@ -826,7 +826,7 @@ write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic.csv", fileEncodin
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
+user_folder_path <- "C:\\Users\\Acer\\Documents\\GitHub\\" # set actual user data path
 github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
 
 # call raw data
@@ -920,3 +920,49 @@ temp_param_table$y[13] <- FALSE # Estado
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
+
+#############################
+# Build Dictionary in English
+############################
+
+# extract variables from data
+columns <- colnames(temp)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = TRUE,
+    label = columns,
+    desc = columns,
+    var_group = "PNADC IBGE",
+    tipo = 1,
+    categoria = "Economia",
+    subcategoria = "Trabalho"
+)
+
+# label variables
+temp_param_table$label[1] <- "Occupation"
+temp_param_table$label[2] <-  "Quarter-year"
+temp_param_table$label[3] <- "Ocupação"
+temp_param_table$label[4] <- "Employed persons"
+temp_param_table$label[5] <- "Employed persons in the formal sector"
+temp_param_table$label[6] <- "Employed persons in the informal sector"
+temp_param_table$label[7] <- "Employed persons in the public sector"
+temp_param_table$label[8] <- "Employed persons in the private sector"
+temp_param_table$label[9] <- "Mean monthly income"
+temp_param_table$label[10] <- "Mean monthly income in the formal sector"
+temp_param_table$label[11] <- "Mean monthly income in the informal sector"
+temp_param_table$label[12] <- "Total wage"
+temp_param_table$label[13] <- "State"
+
+# block variables in graphs y-axis
+temp_param_table$y[1] <- FALSE # Ocupação
+temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[3] <- FALSE # Ocupação
+temp_param_table$y[13] <- FALSE # Estado
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_cod_dic_en.csv", fileEncoding = "UTF-8")
+
