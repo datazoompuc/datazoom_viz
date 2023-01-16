@@ -31,6 +31,17 @@ param$group <- "id" # variável de agrupamento
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Mercado de Trabalho"
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "Eixo vertical (y)"
+param$label_geo_name <-  "Selecione recorte regional"
+param$label_comp_name <-  "Selecione grupos"
+param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_trabalho/"
+
+### Parametros especificos no server
+param$subtitle_init <- "por recorte regional e " # expressão subtitulo
+
+
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
 param$y_choices[[1]] <- NULL
