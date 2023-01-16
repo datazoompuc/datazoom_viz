@@ -41,7 +41,7 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_trabalho_insercao
 
 ### Parametros especificos no server
 param$subtitle_init <- "by region and " # expressão subtitulo
-
+param$tooltip  <- "Group:" # expressão html
 
 
 # Outros parâmetros e configurações

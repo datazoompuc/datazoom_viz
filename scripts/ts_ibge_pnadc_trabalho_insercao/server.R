@@ -199,7 +199,7 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", paste0(year(df_p$x), '-', 'T', quarter(df_p$x)),"<br>",
-            "Grupo: ", paste0(input$filter_composicao_demografica),"<br>",
+            param$tooltip , paste0(input$filter_composicao_demografica),"<br>",
             y_col$label, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
