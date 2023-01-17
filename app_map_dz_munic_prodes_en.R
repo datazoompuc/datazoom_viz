@@ -48,7 +48,7 @@ param$label_var_name<- "VARIABLE: "
 param$label_x_name<- "Variable selecion (x)"
 param$ref_year<- "Reference year"
 param$variavel_none<- paste0("No variable selected")
-
+param$link<-"window.open('https://datazoom.shinyapps.io/app_map_dz_munic_prodes_en/"
 
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]
