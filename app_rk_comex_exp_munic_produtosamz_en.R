@@ -1,13 +1,12 @@
-# Cache
-cache_folder <- "./cache/app_rk_comex_exp_munic_produtosamz/"
-shinyOptions(cache = cachem::cache_disk(cache_folder))
-
 # Carrega bibliotecas
 library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
 
+# Cache
+cache_folder <- "./cache/app_rk_comex_exp_munic_produtosamz/"
+shinyOptions(cache = cachem::cache_disk(cache_folder))
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/rk_comex_exp_munic_produtosamz/ui.R"
@@ -34,7 +33,7 @@ param$id_def <- "group" # variável padrão de id
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "municípios que mais exportam produtos da Amazônia Legal"
+param$plot_desc <- "The municipalities who are the biggest product exporters of the Legal Amazon"
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
