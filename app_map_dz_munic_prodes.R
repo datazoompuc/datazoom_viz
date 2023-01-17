@@ -43,6 +43,7 @@ param$label_title<- "Mapa dos municípios da Amazônia Legal"
 param$label_munic<- "Nome do Município <b>"
 param$label_state<- "Estado: <b>"
 param$label_measurement_unit<- "Unidade de medida: <b>"
+param$variavel_none<- paste0("Nenhuma variável selecionada")
 
 #parametros especificos no UI
 param$label_var_name<-  "VARI\u00C1VEIS:"

@@ -47,6 +47,8 @@ param$label_measurement_unit<- "Measurement Unit: <b>"
 param$label_var_name<- "VARIABLES"
 param$label_x_name<- "Variable selecion (x)"
 param$ref_year<- "Reference year"
+param$variavel_none<- paste0("No variable selected")
+
 
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]

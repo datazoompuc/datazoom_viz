@@ -92,7 +92,7 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x) || input$x == "") {
-        text <- "No variable selected"
+        text <- param$variavel_none
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
