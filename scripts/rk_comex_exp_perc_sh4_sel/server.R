@@ -75,10 +75,10 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$filter) || input$filter == "") {
-        text <- "Vari\u00e1vel n\u00e3o selecionada"
+        text <- param$server1
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        text <- "Ranking da Propor\u00e7\u00e3o das Exporta\u00e7\u00f5es Mundiais Vindas da Amaz\u00f4nia"
+        text <- param$server2
       }
 
       text
@@ -91,7 +91,7 @@ get_server <- function(files, param) {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        text <- paste0("Amaz\u00f4nia Legal")
+        text <- paste0(param$server3)
       }
 
       text
@@ -179,7 +179,7 @@ get_server <- function(files, param) {
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
             y_col$label, ": ", df_p$y, "<br>",
-            "Unidade de medida: <b>", x_col$unidade, "</b>"
+            param$server4, x_col$unidade, "</b>"
           )
 
           # Define paleta de cores
@@ -254,7 +254,7 @@ get_server <- function(files, param) {
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
             # Edita slider
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = "Ano: ", font = f1))
+            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = param$server5, font = f1))
 
             # Botões da animação
             #  edita botão padrão (editar move ele para o updatemenus)
