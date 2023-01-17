@@ -34,7 +34,7 @@ param$group <- "group" # variável de agrupamento
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "External Trade in Amazon (COMEX): Products export value per municipality"
 
-param$label_var_name <- "VARIABLES::"
+param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Amazon Municipality"
 param$label_scale_name <- "log scale"
 param$label_axis_name <- "proportional to starting year (*)"
