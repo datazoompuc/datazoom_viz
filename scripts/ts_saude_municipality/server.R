@@ -146,7 +146,7 @@ get_server <- function(files, param) {
       if (is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <- paste0("por Municipio")
+        text <- paste0(param$title_init)
       }
 
       text
