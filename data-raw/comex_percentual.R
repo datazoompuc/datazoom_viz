@@ -76,7 +76,7 @@ data= data%>%
 
 saveRDS(data, "data/comex_exp_perc_sh4_sel.rds")
 
-
+# dictionary --------------------------------------------------------------
 ### exportação total da amazônia por tipo sh4
 datafinal <- readRDS(file = "data/comex_exp_perc_sh4_sel.rds")
 
@@ -137,3 +137,21 @@ temp_param_table$slider[temp_param_table$var == "floresta"] <- FALSE
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic.csv", fileEncoding = "UTF-8")
+
+# relabel in english ----------------------------------------------------------------
+temp_param_table$unidade <- "% of world exports"
+temp_param_table$categoria <- "Economy"
+temp_param_table$subcategoria <- "Foreign trade"
+
+temp_param_table$label[temp_param_table$var == "group"] <- "Product (SH4)"
+temp_param_table$label[temp_param_table$var == "time"] <- "Year"
+temp_param_table$label[temp_param_table$var == "value"] <- "Value"
+temp_param_table$label[temp_param_table$var == "floresta"] <- "Forest"
+
+temp_param_table$desc[temp_param_table$var == "group"] <- "Product (SH4)"
+temp_param_table$desc[temp_param_table$var == "time"] <- "Year"
+temp_param_table$desc[temp_param_table$var == "value"] <- "Value"
+temp_param_table$desc[temp_param_table$var == "floresta"] <- "Forest Compatible Products"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic_en.csv", fileEncoding = "UTF-8")

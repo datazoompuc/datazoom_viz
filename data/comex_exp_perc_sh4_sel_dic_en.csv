@@ -1,0 +1,5 @@
+"","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
+"1","time",FALSE,FALSE,FALSE,FALSE,FALSE,"Year","Year","Comex",1,"% of world exports","Economy","Foreign trade"
+"2","group",FALSE,FALSE,TRUE,FALSE,FALSE,"Product (SH4)","Product (SH4)","Comex",1,"% of world exports","Economy","Foreign trade"
+"3","value",TRUE,TRUE,FALSE,TRUE,TRUE,"Value","Value","Comex",1,"% of world exports","Economy","Foreign trade"
+"4","floresta",FALSE,FALSE,FALSE,FALSE,FALSE,"Forest","Forest Compatible Products","Comex",1,"% of world exports","Economy","Foreign trade"
