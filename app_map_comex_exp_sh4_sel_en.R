@@ -35,6 +35,7 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Foreign trade in the Amazon: Value of the product's export"
 
 # Parâmetros específicos do UI
+param$topo <- "Variables:"
 param$varxlabel <- "Product type"
 param$vardatelabel <- "Reference year"
 param$link <- "https://datazoom.shinyapps.io/app_map_comex_exp_sh4_sel_en/"

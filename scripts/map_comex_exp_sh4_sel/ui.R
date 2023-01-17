@@ -35,7 +35,7 @@ get_ui <- function(files, param) {
              h2(class = "plot_name", param$plot_name),
              p(class = "plot_desc", param$plot_desc),
              hr(),
-             p(class = "vars", "VARI\u00C1VEIS::"),
+             p(class = "vars", param$topo),
              div(
                class = "var_selec_group",
                # Seleciona variável do eixo x
