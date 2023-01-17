@@ -9,8 +9,8 @@ library(htmlwidgets)
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/map_dz_munic_prodes/ui.R"
-files$server_script <- "scripts/map/server.R"
-files$param_script <- "scripts/map/db_params.R"
+files$server_script <- "scripts/map_dz_munic_prodes/server.R"
+files$param_script <- "scripts/map_dz_munic_prodes/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/dz_munic_dic_en.csv"
 files$db_file <- "data/dz_munic_simplified.rds"
@@ -44,7 +44,7 @@ param$label_munic<- "Municipalitie's name: <b>"
 param$label_state<- "State: <b>"
 param$label_measurement_unit<- "Measurement Unit: <b>"
 #parametros especificos no UI
-param$label_var_name<- "VARIABLES"
+param$label_var_name<- "VARIABLE: "
 param$label_x_name<- "Variable selecion (x)"
 param$ref_year<- "Reference year"
 param$variavel_none<- paste0("No variable selected")
