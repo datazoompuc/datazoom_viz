@@ -36,7 +36,7 @@ param$plot_desc <- "Data compiled at the municipality level"
 param$app <- "INPE - PRODES"
 
 param$year_inicio <- 2000
-param$year_final <- 2019
+param$year_final <- 2021
 
 #parâmetros específicos no Server
 param$label_title<- "Legal Amazon Municipalities Map"
@@ -46,7 +46,7 @@ param$label_measurement_unit<- "Measurement Unit: <b>"
 #parametros especificos no UI
 param$label_var_name<- "VARIABLES"
 param$label_x_name<- "Variable selecion (x)"
-param$ref_year<- "Referencing year"
+param$ref_year<- "Reference year"
 
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]

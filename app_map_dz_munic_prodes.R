@@ -36,7 +36,7 @@ param$plot_desc <- "Compilação de dados ao nível municipal (PRODES)"
 param$app <- "INPE - PRODES"
 
 param$year_inicio <- 2000
-param$year_final <- 2019
+param$year_final <- 2021
 
 #parâmetros específicos no Server
 param$label_title<- "Mapa dos municípios da Amazônia Legal"
