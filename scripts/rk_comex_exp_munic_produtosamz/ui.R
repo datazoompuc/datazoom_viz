@@ -24,13 +24,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$label_variable),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = "Ranking - eixo horizontal (x):",
+            label = param$label_x_choice_rk,
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
@@ -41,7 +41,7 @@ get_ui <- function(files, param) {
           # Seleciona variável de cor
           selectInput(
             inputId = "color",
-            label = "Cor das barras:",
+            label = param$color_bar,
             choices = param$color_choices,
             selected = param$color_def,
             width = "100%"
