@@ -45,6 +45,7 @@ param$label_x_name<- "Seleciona vari\u00e1vel"
 param$label_munic_name<- "Nome do munic\u00edpio: "
 param$label_state<- "Estado: "
 param$label_measurement_unit<- "Unidade de Medida: "
+param$link<-"https://datazoom.shinyapps.io/app_mapstatic_ips_2021/"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
