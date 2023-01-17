@@ -40,7 +40,7 @@ param$year_final <- 2019
 #parâmetros específicos no UI
 param$label_var_name<- "VARIABLES"
 param$label_x_name<- "variable selection (x)"
-param$label_year<- "Referring year"
+param$label_year<- "Reference year"
 param$label_title<- "Legal Amazon Municipalities Map"
 param$label_selected_variable<- "Selected Variable:"
 param$label_munic_name<- "Municipalitie's name: <b>"
