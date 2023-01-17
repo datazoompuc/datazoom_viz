@@ -39,7 +39,7 @@ param$label_y_name <- "Município da Amazônia"
 param$label_scale_name <- "escala log"
 param$label_axis_name <- "proporcional ao ano inicial (*)"
 param$label_mun_filter <- "Categorias de exportação (agregação da SEC)"
-param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_sec_pais/"
+param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_munic_sec/"
 param$currency <- "Por R$"
 
 # Outros parâmetros e configurações
