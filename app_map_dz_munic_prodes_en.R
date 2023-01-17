@@ -32,7 +32,7 @@ param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Data compiled at the municipality level"
+param$plot_desc <- "Data compiled at the municipality level (PRODES)"
 param$app <- "INPE - PRODES"
 
 param$year_inicio <- 2000
