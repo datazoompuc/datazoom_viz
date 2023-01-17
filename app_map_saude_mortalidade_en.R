@@ -46,6 +46,7 @@ param$label_selected_variable<- "Selected Variable:"
 param$label_munic_name<- "Municipalitie's name: <b>"
 param$label_state_name<- "State's name: <b>"
 param$label_measurement_unit<- "Measurement unit: <b>"
+param$link<- "https://datazoom.shinyapps.io/app_map_saude_mortalidade_en/"
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
 

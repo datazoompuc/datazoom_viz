@@ -70,7 +70,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_map_saude_mortalidade/', '_blank')")
+                              onclick = paste0("window.open('", param$link, "', '_blank')"))
         ),
       ),
       column(9,
