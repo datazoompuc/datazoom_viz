@@ -42,6 +42,17 @@ param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e
                               param$x_choices$Comex$`Cacau inteiro ou partido, em bruto ou torrado`,
                               param$x_choices$Comex$`Madeira em bruto, mesmo descascada, desalburnada ou esquadriada`
                               )
+#Mudanças específicas no server
+
+param$label_no_variable<- paste0("Variável não selecionada")
+param$ranking_intro<- "Ranking de"
+param$label_amazon<- paste0("Amazônia Legal")
+
+#Mudanças específicas no UI
+
+param$label_variable<- "VARI\u00C1VEIS:"
+param$label_x_choice_rk<- "Ranking - eixo horizontal (x):"
+param$color_bar<- "Cor das barras:"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
