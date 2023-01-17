@@ -46,7 +46,7 @@ param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e
 #Mudanças específicas no server
 
 param$label_no_variable<- "No variable selected"
-param$ranking_intro<- "Ranking of"
+param$ranking_intro<- "Ranking of "
 param$label_amazon<- "Legal Amazon"
 
 #Mudanças específicas no UI
