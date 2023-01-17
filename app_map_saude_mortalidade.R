@@ -35,7 +35,7 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Sa\u00fade na Amaz\u00f4nia: Mortalidade ao n\u00edvel municipal"
 
 param$year_inicio <- 2006
-param$year_final <- 2019
+param$year_final <- 2020
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARI\u00C1VEIS:"

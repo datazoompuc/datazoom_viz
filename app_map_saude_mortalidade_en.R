@@ -35,12 +35,12 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Health conditions at Amazon: Mortality at the municipal level"
 
 param$year_inicio <- 2006
-param$year_final <- 2019
+param$year_final <- 2020
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARIABLES"
 param$label_x_name<- "variable selection (x)"
-param$label_year<- "Referring year"
+param$label_year<- "Reference year"
 param$label_title<- "Legal Amazon Municipalities Map"
 param$label_selected_variable<- "Selected Variable:"
 param$label_munic_name<- "Municipalitie's name: <b>"
