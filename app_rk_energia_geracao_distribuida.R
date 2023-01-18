@@ -35,6 +35,16 @@ param$id_def <- "estado" # variável padrão de id
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Estados com maior capacidade instalada de energia na Amazônia Legal"
 
+# Parâmetros específicos do UI
+param$ui1 <- "VARI\u00C1VEIS:"
+param$ui2 <- "Fonte:"
+param$ui3 <- "Origem:"
+param$ui4 <- "Tipo:"
+param$ui5 <- "Combustível final:"
+param$ui6 <- "https://datazoom.shinyapps.io/app_rk_energia_geracao_distribuida/"
+
+# Parâmetros específicos do server
+
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
 

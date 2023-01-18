@@ -24,34 +24,34 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$ui1),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "fonte",
-            label = "Fonte:",
+            label = param$ui2,
             choices = c("Todos", param$x_choices),
             selected = "Todos",
             width = "100%"
           ),
           selectInput(
             inputId = "origem",
-            label = "Origem:",
+            label = param$ui3,
             choices = c("Todos", param$x_choices),
             selected = "Todos",
             width = "100%"
           ),
           selectInput(
             inputId = "tipo",
-            label = "Tipo:",
+            label = param$ui4,
             choices = c("Todos", param$x_choices),
             selected = "Todos",
             width = "100%"
           ),
           selectInput(
             inputId = "combustivel",
-            label = "Combustível final:",
+            label = param$ui5,
             choices = c("Todos", param$x_choices),
             selected = "Todos",
             width = "100%"
@@ -64,7 +64,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_rk_energia_geracao_distribuida/', '_blank')")
+                              onclick = paste0("window.open('", param$ui6, "', '_blank')"))
         ),
       ),
       column(9,
