@@ -720,7 +720,7 @@ write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_insercao_dic.csv"
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
+user_folder_path <- "C:\\Users\\Acer\\Documents\\GitHub\\" # set actual user data path
 github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
 
 # call raw data
@@ -748,6 +748,7 @@ temp <- rbind(base1, base2, base3, base4, base5, base6, base7, base8, base9)
 
 # remove rows with missing data
 temp <- na.omit(temp)
+
 temp <- temp %>%
   filter(titulo != "")
 
@@ -817,6 +818,58 @@ temp_param_table$y[13] <- FALSE # Estado
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
+
+#############################
+# Build Dictionary in English
+############################
+
+# extract variables from data
+columns <- colnames(temp)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = TRUE,
+    size = TRUE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "IBGE - PNAD Contínua",
+    tipo = 1,
+    categoria = "Economia",
+    subcategoria = "Mercado de trabalho"
+)
+
+# relabel in english
+
+temp_param_table$label[1] <- "Economic Activity"
+temp_param_table$label[2] <- "Quarter-year"
+temp_param_table$label[3] <- "Economic Activity"
+temp_param_table$label[4] <- "Employed persons"
+temp_param_table$label[5] <- "Employed persons in the formal sector"
+temp_param_table$label[6] <- "Employed persons in the informal sector"
+temp_param_table$label[7] <- "Employed persons in the public sector"
+temp_param_table$label[8] <- "Employed persons in the private sector"
+temp_param_table$label[9] <- "Mean monthly income"
+temp_param_table$label[10] <- "Mean monthly income in the formal sector"
+temp_param_table$label[11] <- "Mean monthly income in the informal sector"
+temp_param_table$label[12] <- " Total wage"
+temp_param_table$label[13] <- "State"
+
+
+
+# block variables in graphs y-axis
+temp_param_table$y[1] <- FALSE # Recorte regional
+temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[3] <- FALSE # "Atividade econômica"
+temp_param_table$y[13] <- FALSE # Estado
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic_en.csv", fileEncoding = "UTF-8")
+
+
 
 #################################################
 ## Ocupações na Amazônia Legal
