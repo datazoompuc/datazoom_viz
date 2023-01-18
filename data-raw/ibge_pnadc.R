@@ -20,7 +20,7 @@ library(zoo)
 #################################################
 
 # set path to raw data
-user_folder_path <- "D:/Dropbox/" # set actual user data path
+user_folder_path <- "C:\\Users\\Acer\\Documents\\GitHub\\" # set actual user data path
 github_folder_path <- "Amazonia_Mercado_Trabalho/build/output/" # set github structure path
 
 # call raw data
@@ -347,6 +347,49 @@ temp_param_table$y[temp_param_table$var == "group"] <- FALSE
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
 
+##############################
+# Build Dictionary in English
+#############################
+
+# call data
+temp <- readRDS("./data/ibge_pnadc_trabalho.rds")
+
+# extract variables from data
+columns <- colnames(temp)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = TRUE,
+    label = columns,
+    desc = columns,
+    var_group = "IBGE - PNAD Contínua",
+    categoria = "Economia",
+    subcategoria = "Mercado de Trabalho"
+)
+
+# label variables
+temp_param_table$label[temp_param_table$var == "id"] <- "Region"
+temp_param_table$label[temp_param_table$var == "time"] <- "Quarter-year"
+temp_param_table$label[temp_param_table$var == "group"] <- "Region"
+temp_param_table$label[temp_param_table$var == "composicao_demografica"] <- "Demographic composition"
+temp_param_table$label[temp_param_table$var == "taxa_de_desemprego"] <- "Unemployment rate (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_ocupacao"] <- "Employment rate (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_participacao"] <- " Labor participation rate (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_informalidade"] <- "Informality rate (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_desalento"] <- "Rate of discouragement (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_nemnem"] <- "Neither-Nor rate (%)"
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "id"] <- FALSE
+temp_param_table$y[temp_param_table$var == "composicao_demografica"] <- FALSE
+temp_param_table$y[temp_param_table$var == "time"] <- FALSE
+temp_param_table$y[temp_param_table$var == "group"] <- FALSE
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
 
 #################################################
 ## Inserção no Mercado de Trabalho na Amazônia Legal
