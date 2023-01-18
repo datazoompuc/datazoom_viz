@@ -129,19 +129,19 @@ get_server <- function(files, param) {
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$tipo) || is.null(input$origem) || 
           is.null(input$fonte) || is.null(input$combustivel)) {
-        text <- "Variável não selecionada"
+        text <- param$server1
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == param$x_def), ]
 
-        text <- paste0("Ranking de ", x_col$label)
+        text <- paste0(param$server2, x_col$label)
       }
 
       text
     })
     output$plot_subtitle <- renderText({
-      text <- paste0("Fonte: ", input$fonte, ", Origem: ", input$origem,
-                     ", Tipo: ", input$tipo, ", Combustível Final: ", input$combustivel)
+      text <- paste0(param$server3, input$fonte, param$server4, input$origem,
+                     param$server5, input$tipo, param$server6, input$combustivel)
 
       text
     })

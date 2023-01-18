@@ -44,6 +44,12 @@ param$ui5 <- "Combustível final:"
 param$ui6 <- "https://datazoom.shinyapps.io/app_rk_energia_geracao_distribuida/"
 
 # Parâmetros específicos do server
+param$server1 <- "Variável não selecionada"
+param$server2 <- "Ranking de "
+param$server3 <- "Fonte: "
+param$server4 <- ", Origem: "
+param$server5 <- ", Tipo: "
+param$server6 <- ", Combustível Final: "
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
