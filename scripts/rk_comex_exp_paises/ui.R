@@ -30,7 +30,7 @@ get_ui <- function(files, param) {
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = "Ranking - eixo horizontal (x):",
+            label = param$ui2,
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
@@ -41,7 +41,7 @@ get_ui <- function(files, param) {
           # Seleciona variável de cor
           selectInput(
             inputId = "color",
-            label = "Cor das barras:",
+            label = param$ui3,
             choices = param$color_choices,
             selected = param$color_def,
             width = "100%"
@@ -53,7 +53,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_rk_comex_exp_paises/', '_blank')")
+                              paste0("window.open('", param$ui4, "', '_blank')"))
         ),
       ),
       column(9,
