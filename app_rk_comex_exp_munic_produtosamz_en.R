@@ -37,9 +37,9 @@ param$plot_desc <- "The municipalities who are the biggest product exporters of 
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
-param$x_choices$Comex <- list(param$x_choices$Comex$`Coconuts, Brazil nuts and cashew nuts, fresh or dried, whether or not shelled or peeled`, 
-                              param$x_choices$Comex$`Cocoa beans, whole or broken, raw or roasted`,
-                              param$x_choices$Comex$`Rough Wood, whether or not stripped of bark or sapwood, or roughly squared`
+param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados`, 
+                              param$x_choices$Comex$`Cacau inteiro ou partido, em bruto ou torrado`,
+                              param$x_choices$Comex$`Madeira em bruto, mesmo descascada, desalburnada ou esquadriada`
 )
 
 #Mudanças específicas no server

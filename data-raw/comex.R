@@ -377,10 +377,7 @@ temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 1103))
 temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 1103))
 temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 1103))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 1103))
-#renaming the 3 variables that appear at the options of the app rk_comex_exp_munic_produtosamz_en
-temp_param_table$label[temp_param_table$var=="Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados"]<- "Coconuts, Brazil nuts and cashew nuts, fresh or dried, whether or not shelled or peeled"
-temp_param_table$label[temp_param_table$var== "Cacau inteiro ou partido, em bruto ou torrado"]<-"Cocoa beans, whole or broken, raw or roasted"
-temp_param_table$label[temp_param_table$var== "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada"]<- "Rough Wood, whether or not stripped of bark or sapwood, or roughly squared"
+
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_sh4_munic_dic_en.csv", fileEncoding = "UTF-8")
 
