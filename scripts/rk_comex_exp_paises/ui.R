@@ -24,7 +24,7 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$ui1),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
@@ -53,7 +53,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              paste0("window.open('", param$ui4, "', '_blank')"))
+                              onclick = paste0("window.open('", param$ui4, "', '_blank')"))
         ),
       ),
       column(9,
