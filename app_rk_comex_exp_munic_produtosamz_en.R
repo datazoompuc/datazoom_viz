@@ -53,6 +53,7 @@ param$label_amazon<- "Legal Amazon"
 param$label_variable<- "VARIABLES"
 param$label_x_choice_rk<- "Ranking - horizontal axis (x):"
 param$color_bar<- "Bar Colors :"
+param$link<-"https://datazoom.shinyapps.io/app_rk_comex_exp_munic_produtosamz_en/"
 
 
 #Mudanças específicas no UI

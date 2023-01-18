@@ -53,7 +53,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_rk_comex_exp_munic_produtosamz/', '_blank')")
+                              onclick = paste0("window.open('", param$link, "', '_blank')"))
         ),
       ),
       column(9,
