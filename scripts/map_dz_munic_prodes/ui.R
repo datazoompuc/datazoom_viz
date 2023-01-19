@@ -70,7 +70,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = paste0("window.open('",param$link,"', '_blank')")
+                              onclick = paste0("window.open('",param$link,"', '_blank')"))
         ),
       ),
       column(9,
