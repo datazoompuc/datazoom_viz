@@ -34,6 +34,17 @@ param$id_def <- "group" # variável padrão de id
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Campeões do desmatamento"
 
+#Mudanças específicas do server
+param$label_novariable<- "Variável não selecionada"
+param$rk_of<- "Ranking de "
+param$label_legal_amazon<- "Amazônia Legal"
+
+#Mudanças específicas do UI
+param$label_variable<- "VARI\u00C1VEIS: "
+param$rk_x_choice<- "Ranking - eixo horizontal (x):"
+param$link<-"https://datazoom.shinyapps.io/app_rkstatic_dz_munic/"
+param$label_geog_subdiv<- "Subdivisão geográfica"
+param$time_interval<- "Intervalo de tempo: "
 
 # Outros parâmetros e configurações
 param$x_choices$`Fonte de dados` <- NULL
