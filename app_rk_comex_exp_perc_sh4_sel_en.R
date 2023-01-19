@@ -32,8 +32,8 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Foreign trade (COMEX) in the Amazon compared to international commerce (BACI): Proportion of products' export values"
 
 # Outros parâmetros e configurações
-param$filter_choices <- c("Produtos Compat\u00edveis com a Floresta", "Todos os Produtos")
-param$filter_def <- c("Produtos Compat\u00edveis com a Floresta")
+param$filter_choices <- c("Products Compatible with the Forest", "All products")
+param$filter_def <- c("Products Compatible with the Forest")
 
 # Parâmetros específicos do UI
 param$ui1 <- "VARIABLES:"

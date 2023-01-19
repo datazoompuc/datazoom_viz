@@ -24,7 +24,7 @@ get_server <- function(files, param) {
     df_reactived <- reactive({
     
       # filtrar para produtos da floresta
-      if(input$filter == "Produtos Compat\u00edveis com a Floresta") {
+      if(input$filter == param$filter_def) {
         w <- df %>% filter(floresta)
       } else {
         w <- df
