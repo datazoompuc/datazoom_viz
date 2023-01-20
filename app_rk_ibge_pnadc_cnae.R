@@ -32,6 +32,15 @@ param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando 
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
 
+# Parâmetros específicos do UI
+param$vars <- "VARI\u00C1VEIS:"
+param$xaxis <- "Ranking - eixo horizontal (x):"
+param$cor <- "Cor das barras:"
+param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cnae/"
+
+# Parâmetros específicos do server
+
+
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Atividades Econômicas"
