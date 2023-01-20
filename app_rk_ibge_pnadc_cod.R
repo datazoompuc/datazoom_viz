@@ -39,7 +39,9 @@ param$cor <- "Cor das barras:"
 param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cod/"
 
 # Parâmetros específicos do server
-
+param$novar <- "Variável não selecionada"
+param$title <- "Ranking de "
+param$AL <- "Amazônia Legal"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
