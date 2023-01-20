@@ -108,9 +108,9 @@ get_server <- function(files, param) {
         # Monta título a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
         
-        text <-  paste0("Evolu\u00e7\u00e3o trimestral de ", y_col$label)
+        text <-  paste0(param$title_init, " ", y_col$label)
         if(input$y_option)  {
-          text <-  paste0("Evolu\u00e7\u00e3o trimestral de ", y_col$label, "*")
+          text <-  paste0(param$title_init, " ", y_col$label, "*")
         }
       }
       
@@ -121,7 +121,7 @@ get_server <- function(files, param) {
       if(is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <-  paste0("por atividade econ\u00f4mica")
+        text <-  paste0(param$subtitle_init)
       }
       
       text
