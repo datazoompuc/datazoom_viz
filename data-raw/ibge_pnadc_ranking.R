@@ -283,3 +283,6 @@ temp_param_table$label[temp_param_table$var == "n_ocu_cod_formal"] <- "Number of
 temp_param_table$label[temp_param_table$var == "n_ocu_cod_informal"] <- "Number of workers employed in the informal sector"
 temp_param_table$label[temp_param_table$var == "n_ocu_cod_publico"] <- "Number of workers employed in the public sector"
 temp_param_table$label[temp_param_table$var == "n_ocu_cod_privado"] <- "Number of workers employed in the private sector"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cod_dic_en.csv", fileEncoding = "UTF-8")
