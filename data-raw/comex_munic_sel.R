@@ -423,15 +423,14 @@ temp_param_table$label[2] <- "Municipio"
 temp_param_table$label[3] <- "Valor relativo do principal produto exportado"
 temp_param_table$label[4] <- "Principal produto exportado"
 temp_param_table$label[6] <- "Produtos Compat\u00edveis com a Floresta"
-temp_param_table$x <- c(rep(TRUE, 12))
-temp_param_table$y <- c(rep(TRUE, 12))
-temp_param_table$color <- c(rep(TRUE, 12))
-temp_param_table$size <- c(rep(TRUE, 12))
-temp_param_table$slider <- c(rep(TRUE, 12))
+temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE)
+temp_param_table$size <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE)
+temp_param_table$slider <- c(TRUE, rep(FALSE, 11))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_sel_dic.csv", fileEncoding = "UTF-8")
-
 
 # relabel in english ----------------------------------------------------------------
 temp_param_table$label[1] <- "Year"
