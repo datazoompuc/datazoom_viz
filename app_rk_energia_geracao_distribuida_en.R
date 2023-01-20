@@ -13,8 +13,8 @@ files$param_script <- "scripts/rk_comex_exp_paises/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
-files$param_file <- "data/aneel_siga_geracao_distribuida_dic_en.csv"
-files$db_file <- "data/aneel_siga_geracao_distribuida.rds"
+files$param_file <- "data/aneel_geracao_distribuida_dic_en.csv"
+files$db_file <- "data/aneel_geracao_distribuida.rds"
 
 # Carrega scripts
 source(files$param_script)
