@@ -66,7 +66,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Mapa dos munic\u00edpios da Amaz\u00f4nia Legal")
+        text <- param$label_title
       }
 
       text
@@ -78,7 +78,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("Vari\u00e1vel selecionada: ", x_col$label)
+        text <- paste0(param$label_selected_variable, x_col$label)
       }
 
       text
@@ -112,10 +112,10 @@ get_server <- function(files, param) {
           x_col <- param$table[which(param$table$var == input$x), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
-            "Nome do munic\u00edpio: ", "<b>", df$nm_municip, "</b><br>",
-            "Estado: ", "<b>", df$uf, "</b><br>",
+            param$label_munic_name, "<b>", df$nm_municip, "</b><br>",
+            param$label_state, "<b>", df$uf, "</b><br>",
             x_col$label, ": ", "<b>", df[[input$x]], "</b><br>",
-            "Unidade de medida: ", "<b>", x_col$unidade, "</b><br>"
+            param$label_measurement_unit, "<b>", x_col$unidade, "</b><br>"
           ) %>%
             lapply(htmltools::HTML)
 

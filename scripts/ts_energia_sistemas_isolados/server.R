@@ -128,20 +128,44 @@ get_server <- function(files, param) {
           x_col <- param$table[which(param$table$var == param$x_def), ]
           y_col <- param$table %>% filter(var %in% input$y)
        
-       df_filtered <- df %>%
-         select("Ano", input$y) %>%
-         pivot_longer(cols = input$y) %>%
-         filter(!is.na(value)) %>%
-         mutate(unidade = case_when(str_detect(name, "Consumo") ~ "Milhões de MWh",
-                                    str_detect(name, "Despesas") ~ "Bilhões de R$",
-                                    str_detect(name, "Consumidores") ~ "Milhões de Consumidores",
-                                    str_detect(name, "Participação") ~ "% do Orçamento da Conta de Desenvolvimento Energético"))
-          
+           df_filtered <- df %>%
+             select("Ano", input$y) %>%
+             pivot_longer(cols = input$y) %>%
+             filter(!is.na(value)) %>%
+             mutate(unidade = case_when(str_detect(name, "Consumo") ~ "Milhões de MWh",
+                                        str_detect(name, "Despesas") ~ "Bilhões de R$",
+                                        str_detect(name, "Consumidores") ~ "Milhões de Consumidores",
+                                        str_detect(name, "Participação") ~ "% do Orçamento da Conta de Desenvolvimento Energético"),
+                    group = name)
+              
+           if (param$translate_names) {
+               df_filtered <- df_filtered %>%
+                   mutate(unidade = case_when(str_detect(name, "Consumo") ~ "MWh Millions",
+                                              str_detect(name, "Despesas") ~ "R$ Billions",
+                                              str_detect(name, "Consumidores") ~ "Millions of Consumers",
+                                              str_detect(name, "Participação") ~ "% of the Energy Development Account Budget"))
+               
+               df_filtered$name[df_filtered$name == "Ano"] <- "Year"
+               df_filtered$name[df_filtered$name == "Despesas Estimadas CCC (Nominal)"] <- "Estimated Expenses CCC (Nominal)"
+               df_filtered$name[df_filtered$name == "Despesas Estimadas CCC (Real, R$ 2021)"] <- "Estimated Expenses CCC (Real, R$ 2021)"
+               df_filtered$name[df_filtered$name == "Participação da CCC no Orçamento Total da CDE"] <- "CCC Participation in the Total Energy Development Account Budget"
+               df_filtered$name[df_filtered$name == "Despesas Estimadas no Orçamento da CDE (Nominal)"] <- "Estimated Expenses in the Energy Development Account Budget (Nominal)"
+               df_filtered$name[df_filtered$name == "Despesas Estimadas no Orçamento da CDE (Real, R$ 2021)"] <- "Estimated Expenses in the Energy Development Account Budget (Real, R$ 2021)"
+               df_filtered$name[df_filtered$name == "Consumo Total"] <- "Total Consumption"
+               df_filtered$name[df_filtered$name == "Consumo Residencial"] <- "Residential Consumption"
+               df_filtered$name[df_filtered$name == "Consumo Industrial"] <- "Industrial Consumption"
+               df_filtered$name[df_filtered$name == "Consumo Comercial"] <- "Comercial Consumption"
+               df_filtered$name[df_filtered$name == "Consumo Outros"] <- "Other Consumption"
+               df_filtered$name[df_filtered$name == "Consumidores Totais"] <- "Total Consumers"
+               df_filtered$name[df_filtered$name == "Consumidores Residenciais"] <- "Residential Consumers"
+               
+           }
+           
        # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
             df_filtered[x_col$var],
             df_filtered["value"],
-            df_filtered["name"],
+            df_filtered["group"],
             df_filtered["name"],
             df_filtered["unidade"]
           )
@@ -175,7 +199,17 @@ get_server <- function(files, param) {
             mutate(color = case_when(str_detect(group, "Consumo") ~ "Consumo",
                                      str_detect(group, "Despesas") ~ "Despesas",
                                      str_detect(group, "Consumidores") ~ "Consumidores",
-                                     str_detect(group, "Participação") ~ "Despesas"))
+                                     str_detect(group, "Participação") ~ "Despesas"),
+                   group = text)
+          
+          if (param$translate_names) {
+              
+              df_p <- df_p %>%
+                  mutate(color = case_when(color == "Consumo" ~ "Consumption",
+                                           color == "Despesas" ~ "Expenses",
+                                           color == "Consumidores" ~ "Consumers",
+                                           color == "Participação" ~ "Expenses"))
+          }
           
           # Monta html do tooltip
           df_p$tooltip <- paste0(
@@ -185,7 +219,7 @@ get_server <- function(files, param) {
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            "Unidade de medida: <b>", df_p$unidade, "</b>"
+            param$label_unit_name, ": <b>", df_p$unidade, "</b>"
           )
 
           # Define paleta de cores
