@@ -11,7 +11,7 @@ library(htmlwidgets)
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/rk_ibge_pnadc_cnae/ui.R"
-files$server_script <- "scripts/rk/server.R"
+files$server_script <- "scripts/rk_ibge_pnadc_cnae/server.R"
 files$param_script <- "scripts/rk/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/ibge_pnadc_ranking_cnae_dic.csv"
@@ -39,7 +39,9 @@ param$cor <- "Cor das barras:"
 param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cnae/"
 
 # Parâmetros específicos do server
-
+param$novar <- "Variável não selecionada"
+param$title <- "Ranking de "
+param$AL <- "Amazônia Legal"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
