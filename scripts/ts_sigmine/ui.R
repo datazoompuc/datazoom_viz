@@ -3,7 +3,7 @@
 # FuncÃ£o para retornar objeto server
 get_ui <- function(files, param) {
   div( # div geral
-    includeCSS(files$CSS_script), # IncluÃ script CSS
+    includeCSS(files$CSS_script), # Inclu? script CSS
     class = "container-fluid h-100 d-flex flex-column apppanel",
     
     fluidRow( class = "mainrow h-100",
@@ -12,13 +12,13 @@ get_ui <- function(files, param) {
                      h2(class="plot_name", param$plot_name),
                      p(class="plot_desc", param$plot_desc),
                      hr(),
-                     p(class="vars", "VARI\u00C1VEIS:"),
+                     p(class="vars", param$label_var_name),
                      
                      div(class="var_selec_group",
                          # Seleciona variÃ¡vel do eixo y
                          selectInput(
                            inputId = "y",
-                           label = "eixo vertical (y)",
+                           label = param$label_y_name,
                            choices = param$y_choices,
                            selected = param$y_def,
                            width = "100%"
@@ -28,14 +28,14 @@ get_ui <- function(files, param) {
                      # Seleciona eixo log
                      checkboxInput(
                        inputId = "ylog",
-                       "escala log",
+                       param$label_scale_name,
                        value = FALSE,
                        width = "100%"
                      ),
                     # Seleciona eixo 
                       checkboxInput(
                       inputId = "y_option",
-                      "proporcinal ao ano inicial (*)",
+                      param$label_axis_name,
                       value = FALSE,
                       width = "100%"
                       ),
@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
                      # Seleciona filtro de municipios
                      selectizeInput(
                        'filter1', 
-                       'Subdivisão geográfica', 
+                       param$label_mun_filter, 
                        choices = NULL,
                        multiple = TRUE, 
                        options = list(maxItems = 20),
