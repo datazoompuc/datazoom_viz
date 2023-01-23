@@ -43,7 +43,7 @@ param$label_geo_name <- "Subdivisão geográfica"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_munic/"
 
 ### Parametros especificos no server
-param$stitle_init <- "por Territorio" # expressão titulo
+param$subtitle_init <- "por Território" # expressão titulo
 
 
 # Outros parâmetros e configurações
