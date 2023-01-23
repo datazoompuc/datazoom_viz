@@ -43,7 +43,7 @@ param$label_geo_name <- "State"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_est_en/"
 
 ### Parametros especificos no server
-param$subtitle_init <- "per hectare" # expressão titulo
+param$subtitle_init <- "per hectare " # expressão titulo
 
 
 # Outros parâmetros e configurações
