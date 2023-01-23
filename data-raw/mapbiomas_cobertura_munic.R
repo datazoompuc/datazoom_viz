@@ -8,7 +8,7 @@ library(tibble)
 library(zoo)
 library(readxl)
 
-dat <- load_mapbiomas_covering(space_aggregation = "municipality")
+dat <- load_mapbiomas(dataset= "mapbiomas_cover", geo_level   = "municipality")
 
 saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
 
@@ -60,6 +60,7 @@ data3$state <- NULL
 
 colnames(data3) <- c("group", "area", "time", "municipality")
 data3 <- aggregate(area ~ time + group + municipality, data3, sum)
+class(data1$municipality)
 
 
 
@@ -105,19 +106,19 @@ labl <- substr(labl, 6, 100)
 sublabl <- labl[23:27]
 sublabl <- substr(sublabl, 5, 100)
 labl[23:27] <- sublabl
-translated_labl <- c("Mosaico de Cultivos", "Soja", "Pastagem", "Infraestrutura Urbana", "Formação de Floresta",
-                     "Pradaria", "Rios, Lagos ou Oceanos", "Não Observado", "Formação de Savana",
-                     "Outras áreas não vegetadas", "Plantação de Floresta", "Mineiração", "Cana-de-açúcar",
-                     "Mangue", "Salar", "Praia e Dunas", "Pântano", "Cultivos perenes",
-                     "Mosaico de Agricultura e Pastagem", "Cultivos temporários", "Agricultura",
-                     "Floresta Natural", "Floresta", "Formação Natural sem ser Floresta",
-                     "Fazenda", "Área não Vegetada", "Água", "Formação Antrópica", "Formação Natural",
-                     "Não Identificado")
+translated_labl <- c("Mosaico de Cultivos", "Soja", "Pastagem", "Infraestrutura Urbana", "Forma??o de Floresta",
+                     "Pradaria", "Rios, Lagos ou Oceanos", "N?o Observado", "Forma??o de Savana",
+                     "Outras ?reas n?o vegetadas", "Planta??o de Floresta", "Mineira??o", "Cana-de-a??car",
+                     "Mangue", "Salar", "Praia e Dunas", "P?ntano", "Cultivos perenes",
+                     "Mosaico de Agricultura e Pastagem", "Cultivos tempor?rios", "Agricultura",
+                     "Floresta Natural", "Floresta", "Forma??o Natural sem ser Floresta",
+                     "Fazenda", "?rea n?o Vegetada", "?gua", "Forma??o Antr?pica", "Forma??o Natural",
+                     "N?o Identificado")
 colnames(datafinal) <- c("time", "group", translated_labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
 
-
+datafinal <- readRDS("~/GitHub/datazoom_viz/data/mapbiomas_cobertura_munic.rds")
 
 #####################
 # Build Dictionary 
@@ -144,9 +145,9 @@ temp_param_table <- tibble(
 )
 
 temp_param_table$label[1] <- "Ano"
-temp_param_table$label[2] <- "Município"
+temp_param_table$label[2] <- "Munic?pio"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[2] <- "Munic?pio"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 30))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 30))
 temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 30))
@@ -155,3 +156,42 @@ temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 30))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_dic.csv", fileEncoding = "UTF-8")
+
+
+##############################
+# Build Dictionary in English
+##############################
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Mapbiomas",
+    tipo = 1,
+    unidade = "m^2",
+    categoria= "Meio ambiente", 
+    subcategoria = "Uso da terra"
+)
+
+temp_param_table$label[1] <- "Year"
+temp_param_table$label[2] <- "Municipality"
+temp_param_table$desc[1] <- "Year"
+temp_param_table$desc[2] <- "Municipality"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 30))
+temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 30))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 30))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_dic_en.csv", fileEncoding = "UTF-8")
+
