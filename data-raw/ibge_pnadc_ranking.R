@@ -139,7 +139,7 @@ temp_param_table$categoria <- "Economy"
 temp_param_table$subcategoria <- "Labor market"
 
 temp_param_table$label[temp_param_table$var == "group"] <- "Economic activity"
-temp_param_table$label[temp_param_table$var == "time"] <- "Trimester-Year"
+temp_param_table$label[temp_param_table$var == "time"] <- "Quarter-year"
 temp_param_table$label[temp_param_table$var == "n_ocu_cnae"] <- "Number of employed workers"
 temp_param_table$label[temp_param_table$var == "n_ocu_cnae_formal"] <- "Number of workers employed in the formal sector"
 temp_param_table$label[temp_param_table$var == "n_ocu_cnae_informal"] <- "Number of workers employed in the informal sector"
