@@ -12,7 +12,7 @@
 "11","outras fontes renovaveis",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por outras fontes renováveis","outras fontes renovaveis","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "12","carvao vapor",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por carvão vapor","carvao vapor","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "13","gas natural",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por gás natural","gas natural","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
-"14","gas de coqueira",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por gás de coqueira","gas de coqueira","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
+"14","gas de coqueira",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por gás de coqueria","gas de coqueira","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "15","combustivel",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por combustível","combustivel","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "16","diesel",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por diesel","diesel","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "17","outras fontes nao renovaveis",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida outras fontes não renováveis","outras fontes nao renovaveis","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"

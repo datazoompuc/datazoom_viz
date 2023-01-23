@@ -844,4 +844,3 @@ temp_param_table$label[temp_param_table$var == "quant_v40124"] <- "Quantity - So
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_dic_en.csv", fileEncoding = "UTF-8")
-

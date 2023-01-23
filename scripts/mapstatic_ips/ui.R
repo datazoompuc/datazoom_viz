@@ -35,13 +35,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS::"),
+        p(class = "vars", param$label_var_name),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = "Seleciona vari\u00e1vel",
+            label = param$label_x_name,
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
@@ -53,7 +53,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_mapstatic_ips_2021/', '_blank')")
+                              onclick =paste0( "window.open('",param$link,"', '_blank')"))
         ),
       ),
       column(9,

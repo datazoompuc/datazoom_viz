@@ -33,6 +33,17 @@ param$id_def <- "" # variável padrão de id
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Dados dos Sistemas Isolados de Energia"
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_scale_name <- "escala log"
+param$label_prop_name <- "proporcional ao ano inicial (*)"
+
+param$link <- "https://datazoom.shinyapps.io/app_ts_sistemas_isolados/"
+
+### Parametros especificos no server
+param$label_unit_name <- "Unidade de medida"
+param$translate_names <- FALSE
 
 # Outros parâmetros e configurações
 param$y_choices$`Fonte de dados` <- NULL

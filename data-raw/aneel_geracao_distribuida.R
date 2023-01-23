@@ -260,7 +260,7 @@ temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Ano"
 
 
 # Unidade de medida
-temp_param_table$unidade[str_detect(temp_param_table$var, regex("mda_potencia_instalada_kw", ignore_case = TRUE))] <- "KiloWatz"
+temp_param_table$unidade[str_detect(temp_param_table$var, regex("mda_potencia_instalada_kw", ignore_case = TRUE))] <- "kilowatt"
 temp_param_table$unidade[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "Somatório de unidades consumidoras"
 
 # var_group variables
@@ -281,4 +281,36 @@ temp_param_table$slider[temp_param_table$var == "ano_cadastral"] <- TRUE
 write.csv(temp_param_table,
   file = "data/aneel_geracao_distribuida_dic.csv",
   fileEncoding = "UTF-8"
+)
+
+
+# translate to english --------------------------------------------------------------
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_comercial"] <- "Installed Capacity - Comercial"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_residencial"] <- "Installed Capacity - Residential"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_industrial"] <- "Installed Capacity - Industrial"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_rural"] <- "Installed Capacity - Rural"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_poder_publico"] <- "Installed Capacity - Public Authority"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_servico_publico"] <- "Installed Capacity - Public Service"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_iluminacao_publica"] <- "Installed Capacity - Public Lighting"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_total"] <- "Total Installed Capacity"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_comercial"] <- "Number of Units - Comercial"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_residencial"] <- "Number of Units - Residential"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_industrial"] <- "Number of Units - Industrial"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_rural"] <- "Number of Units - Rural"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_poder_publico"] <- "Number of Units - Public Authority"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_servico_publico"] <- "Number of Units - Public Service"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica"] <- "Number of Units - Public Lighting"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_total"] <- "Total Number of Units"
+temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Year"
+
+
+# Unidade de medida
+temp_param_table$unidade[str_detect(temp_param_table$var, regex("mda_potencia_instalada_kw", ignore_case = TRUE))] <- "kilowatt"
+temp_param_table$unidade[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "Sum of consumer units"
+
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table,
+          file = "data/aneel_geracao_distribuida_dic_en.csv",
+          fileEncoding = "UTF-8"
 )
