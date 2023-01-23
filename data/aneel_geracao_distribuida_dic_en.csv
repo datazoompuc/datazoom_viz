@@ -1,4 +1,4 @@
-"","var","x","y","color","size","slider","geometry","label","desc","var_group","tipo","unidade","categoria","subcategoria",
+"","var","x","y","color","size","slider","geometry","label","desc","var_group","tipo","unidade","categoria","subcategoria"
 "1","id",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"id","id","Energia - ANEEL",1,"","Economia","Energia"
 "2","dsc_fonte_geracao",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"dsc_fonte_geracao","dsc_fonte_geracao","Energia - ANEEL",1,"","Economia","Energia"
 "3","sig_modalidade_empreendimento",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"sig_modalidade_empreendimento","sig_modalidade_empreendimento","Energia - ANEEL",1,"","Economia","Energia"
