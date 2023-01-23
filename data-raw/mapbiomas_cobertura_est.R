@@ -100,23 +100,23 @@ labl <- substr(labl, 6, 100)
 sublabl <- labl[22:26]
 sublabl <- substr(sublabl, 5, 100)
 labl[22:26] <- sublabl
-translated_labl <- c("Pastagem", "Formação de Floresta", "Pradaria", "Não Observado",
-                     "Outras áreas não vegetadas", "Infraestrutura Urbana", "Rios, Lagos ou Oceanos",
-                     "Mosaico de Cultivos", "Soja", "Plantação de Floresta", "Mangue", "Mineiração",
-                     "Cana-de-açúcar", "Formação de Savana", "Salar", "Praia e Dunas",
-                     "Mosaico de Agricultura e Pastagem", "Pântano", "Cultivos temporários",
-                     "Agricultura", "Floresta Natural", "Floresta", "Formação Natural sem ser Floresta",
-                     "Fazenda", "Área não Vegetada", "Água", "Formação Antrópica", "Formação Natural",
-                     "Não Identificado")
+translated_labl <- c("Pastagem", "Forma??o de Floresta", "Pradaria", "N?o Observado",
+                     "Outras ?reas n?o vegetadas", "Infraestrutura Urbana", "Rios, Lagos ou Oceanos",
+                     "Mosaico de Cultivos", "Soja", "Planta??o de Floresta", "Mangue", "Mineira??o",
+                     "Cana-de-a??car", "Forma??o de Savana", "Salar", "Praia e Dunas",
+                     "Mosaico de Agricultura e Pastagem", "P?ntano", "Cultivos tempor?rios",
+                     "Agricultura", "Floresta Natural", "Floresta", "Forma??o Natural sem ser Floresta",
+                     "Fazenda", "?rea n?o Vegetada", "?gua", "Forma??o Antr?pica", "Forma??o Natural",
+                     "N?o Identificado")
 colnames(datafinal) <- c("group", "time", translated_labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
 
+datafinal <- readRDS("~/GitHub/datazoom_viz/data/mapbiomas_cobertura_est.rds")
 
-
-#####################
-# Build Dictionary 
-#####################
+##############################
+# Build Dictionary in English
+#############################
 
 # extract variables from data
 columns <- colnames(datafinal)
@@ -150,3 +150,38 @@ temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 29))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/mapbiomas_cobertura_est_dic.csv", fileEncoding = "UTF-8")
+
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Mapbiomas",
+    tipo = 1,
+    unidade = "m^2",
+    categoria= "Meio ambiente", 
+    subcategoria = "Uso da terra"
+)
+
+temp_param_table$label[1] <- "State"
+temp_param_table$label[2] <- "Year"
+temp_param_table$desc[1] <- "State"
+temp_param_table$desc[2] <- "Year"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 29))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 29))
+temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 30))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 29))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 29))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/mapbiomas_cobertura_est_dic_en.csv", fileEncoding = "UTF-8")
+
