@@ -112,7 +112,7 @@ colnames(datafinal) <- c("group", "time", translated_labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
 
-datafinal <- readRDS("~/GitHub/datazoom_viz/data/mapbiomas_cobertura_est.rds")
+datafinal <- readRDS("data/mapbiomas_cobertura_est.rds")
 
 ##############################
 # Build Dictionary in English
