@@ -38,7 +38,7 @@ db_geracao_distribuida <- left_join(db_geracao_distribuida, amz_cities, by = c("
 
 # replace character "," to "."
 db_geracao_distribuida$mda_potencia_instalada_kw <- gsub(",", ".", db_geracao_distribuida$mda_potencia_instalada_kw)
-db_geracao_distribuida$qtd_uc_recebe_credito <- gsub(",", ".", db_geracao_distribuida$mda_potencia_instalada_kw)
+db_geracao_distribuida$qtd_uc_recebe_credito <- gsub(",", ".", db_geracao_distribuida$qtd_uc_recebe_credito)
 
 # ensure variables are numeric
 class(db_geracao_distribuida$mda_potencia_instalada_kw) <- "numeric"
