@@ -35,6 +35,8 @@ param$ui3 <- "Cor das barras:"
 param$link <- 'https://datazoom.shinyapps.io/app_rk_comex_exp_perc_sh4_sel/'
 
 # Parâmetros específicos do server
+param$server1 <- "Ranking de "
+param$server2 <- "Amazônia Legal"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"

@@ -80,7 +80,7 @@ get_server <- function(files, param) {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
 
-        text <- paste0("Ranking de ", x_col$label)
+        text <- paste0(param$server1, x_col$label)
       }
 
       text
@@ -94,7 +94,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         color_col <- param$table[which(param$table$var == input$color), ]
-        text <- paste0("Amazônia Legal")
+        text <- paste0(param$server2)
       }
 
       text
