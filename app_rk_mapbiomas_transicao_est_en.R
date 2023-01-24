@@ -41,7 +41,7 @@ param$server2 <- "Legal Amazon"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Transition/change of cover and soil use"
+param$plot_desc <- "Transition/change of soil cover and use"
 
 # Outros parâmetros e configurações
 
