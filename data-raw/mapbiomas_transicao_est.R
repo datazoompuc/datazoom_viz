@@ -120,6 +120,10 @@ temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 232))
 temp_param_table$size <- c(rep(TRUE, 1), rep(FALSE, 232))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 231))
 
+# remove multiple white spaces
+temp_param_table$var <- stringr::str_squish(temp_param_table$var)
+
+
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/mapbiomas_transicao_est_dic.csv", fileEncoding = "UTF-8")
 
@@ -156,13 +160,16 @@ temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 232))
 temp_param_table$size <- c(rep(TRUE, 1), rep(FALSE, 232))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 231))
 
+# remove multiple white spaces
+temp_param_table$var <- stringr::str_squish(temp_param_table$var)
+
 temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Cana-de-açúcar"] <- "Sugar Cane to Sugar Cane"
-temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para  Formação de Floresta"] <- "Sugar Cane to Forest Formation"
-temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para  Formação de Savana"] <- "Sugar Cane to Savanna Formation"
+temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Formação de Floresta"] <- "Sugar Cane to Forest Formation"
+temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Formação de Savana"] <- "Sugar Cane to Savanna Formation"
 temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Infraestrutura Urbana"] <- "Sugar Cane to Urban Infrastructure"
 temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Mineiração"] <- "Sugar Cane to Mining"
 temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Mosaico de Cultivos"] <- "Sugar Cane to Mosaic of Crops"
-temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para  Pastagem"] <- "Sugar Cane to Pasture"
+temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Pastagem"] <- "Sugar Cane to Pasture"
 temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Plantação de Floresta"] <- "Sugar Cane to Forest Plantation"
 temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Pradaria"] <- "Sugar Cane to Grassland"
 temp_param_table$label[temp_param_table$var=="Cana-de-açúcar para Rios, Lagos ou Oceanos"] <- "Sugar Cane to River, Lake and Ocean"
@@ -173,7 +180,7 @@ temp_param_table$label[temp_param_table$var=="Formação de Floresta para Cana-d
 temp_param_table$label[temp_param_table$var=="Formação de Floresta para Formação de Savana"] <- "Forest Formation to Savanna Formation"
 temp_param_table$label[temp_param_table$var=="Formação de Floresta para Infraestrutura Urbana"] <- "Forest Formation to Urban Infrastructure"
 temp_param_table$label[temp_param_table$var=="Formação de Floresta para Mangue"] <- "Forest Formation to Magrove"
-temp_param_table$label[temp_param_table$var=="Formação de Floresta para Mineiração"] <- "Forest Formation to  Mining"
+temp_param_table$label[temp_param_table$var=="Formação de Floresta para Mineiração"] <- "Forest Formation to Mining"
 temp_param_table$label[temp_param_table$var=="Formação de Floresta para Mosaico de Cultivos "] <- "Forest Formation to Mosaic of Crops"
 temp_param_table$label[temp_param_table$var=="Formação de Floresta para Não Observado"] <- "Forest Formation to Non Observed"
 temp_param_table$label[temp_param_table$var=="Formação de Floresta para Outras áreas não vegetadas"] <- "Forest Formation to Other Non Vegetated Areas"
