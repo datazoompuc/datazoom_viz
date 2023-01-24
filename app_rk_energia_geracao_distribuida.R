@@ -9,7 +9,7 @@ library(htmlwidgets)
 files <- list()
 files$ui_script <- "scripts/rk_energia_geracao_distribuida/ui.R"
 files$server_script <- "scripts/rk_energia_geracao_distribuida/server.R"
-files$param_script <- "scripts/rk_comex_exp_paises/db_params.R"
+files$param_script <- "scripts/rk_energia_geracao_distribuida/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
