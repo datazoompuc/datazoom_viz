@@ -1,3 +1,9 @@
+# Carrega bibliotecas
+library(shiny)
+library(ggplot2)
+library(plotly)
+library(htmlwidgets)
+
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/ts_mapbiomas_transicao/ui.R"
