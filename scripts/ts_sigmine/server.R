@@ -121,7 +121,7 @@ get_server <- function(files, param) {
       if(is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <-  paste0("por subdivisão territorial")
+        text <-  paste0(param$geo_level)
       }
       
       text
