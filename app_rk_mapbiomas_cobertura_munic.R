@@ -6,9 +6,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk/ui.R"
-files$server_script <- "scripts/rk/server.R"
-files$param_script <- "scripts/rk/db_params.R"
+files$ui_script <- "scripts/rk_mapbiomas_cobertura_munic/ui.R"
+files$server_script <- "scripts/rk_mapbiomas_cobertura_munic/server.R"
+files$param_script <- "scripts/rk_mapbiomas_cobertura_munic/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/mapbiomas_cobertura_munic_dic.csv"
 files$db_file <- "data/mapbiomas_cobertura_munic.rds"
@@ -32,7 +32,7 @@ param$id_def <- "group" # variável padrão de id
 param$ui1 <- "VARI\u00C1VEIS:"
 param$ui2 <- "Ranking - eixo horizontal (x):"
 param$ui3 <- "Cor das barras:"
-param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura_est/'
+param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura_munic_en/'
 
 # Parâmetros específicos do server
 param$server0 <- "Variável não selecionada"
