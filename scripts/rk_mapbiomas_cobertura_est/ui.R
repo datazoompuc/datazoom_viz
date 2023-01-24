@@ -41,7 +41,7 @@ get_ui <- function(files, param) {
           # Seleciona variável de cor
           selectInput(
             inputId = "color",
-            label = "Cor das barras:",
+            label = param$ui3,
             choices = param$color_choices,
             selected = param$color_def,
             width = "100%"
