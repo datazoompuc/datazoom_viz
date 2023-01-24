@@ -1,6 +1,6 @@
 "","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
 "1","time",FALSE,FALSE,FALSE,FALSE,FALSE,"Ano","Ano","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
-"2","group",FALSE,FALSE,TRUE,TRUE,FALSE,"Munic?pio","Munic?pio","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"2","group",FALSE,FALSE,TRUE,TRUE,FALSE,"Município","Município","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "3","Mosaico de Cultivos",TRUE,TRUE,FALSE,FALSE,TRUE,"Mosaico de Cultivos","Mosaico de Cultivos","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "4","Soja",TRUE,TRUE,FALSE,FALSE,TRUE,"Soja","Soja","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "5","Pastagem",TRUE,TRUE,FALSE,FALSE,TRUE,"Pastagem","Pastagem","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
