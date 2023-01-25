@@ -227,6 +227,7 @@ saveRDS(temp,
 #####################
 
 # extract variables from data
+temp <- readRDS(file = "data/ibge_pnadc_ranking_cod.rds")
 columns <- colnames(temp)
 
 # generate dictionary
@@ -269,3 +270,19 @@ temp_param_table$color[temp_param_table$var == "group"] <- TRUE # Atividade econ
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cod_dic.csv", fileEncoding = "UTF-8")
+
+# relabel in english ----------------------------
+temp_param_table$var_group <- "IBGE - Continuous PNAD"
+temp_param_table$categoria <- "Economy"
+temp_param_table$subcategoria <- "Labor market"
+
+temp_param_table$label[temp_param_table$var == "group"] <- "Occupation type"
+temp_param_table$label[temp_param_table$var == "time"] <- "Quarter-year"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod"] <- "Number of employed workers"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod_formal"] <- "Number of workers employed in the formal sector"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod_informal"] <- "Number of workers employed in the informal sector"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod_publico"] <- "Number of workers employed in the public sector"
+temp_param_table$label[temp_param_table$var == "n_ocu_cod_privado"] <- "Number of workers employed in the private sector"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cod_dic_en.csv", fileEncoding = "UTF-8")
