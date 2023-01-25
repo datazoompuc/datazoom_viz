@@ -42,10 +42,10 @@ get_ui <- function(files, param) {
           sliderInput("slider",
             label = param$time_interval,
             min = as.Date("2000-01-01", "%Y-%m-%d"),
-            max = as.Date("2019-01-01", "%Y-%m-%d"),
+            max = as.Date("2021-01-01", "%Y-%m-%d"),
             value = c(
               as.Date("2000-01-01", "%Y-%m-%d"),
-              as.Date("2019-01-01", "%Y-%m-%d")
+              as.Date("2021-01-01", "%Y-%m-%d")
             ),
             timeFormat = "%Y"
           ),
