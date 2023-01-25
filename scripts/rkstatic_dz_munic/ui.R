@@ -24,13 +24,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$label_variable),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = "Ranking - eixo horizontal (x):",
+            label = param$rk_x_choice,
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
@@ -40,12 +40,12 @@ get_ui <- function(files, param) {
           class = "var_selec_group",
           # Seleciona variável do eixo x
           sliderInput("slider",
-            label = "Intervalo de tempo:",
+            label = param$time_interval,
             min = as.Date("2000-01-01", "%Y-%m-%d"),
-            max = as.Date("2019-01-01", "%Y-%m-%d"),
+            max = as.Date("2021-01-01", "%Y-%m-%d"),
             value = c(
               as.Date("2000-01-01", "%Y-%m-%d"),
-              as.Date("2019-01-01", "%Y-%m-%d")
+              as.Date("2021-01-01", "%Y-%m-%d")
             ),
             timeFormat = "%Y"
           ),
@@ -53,7 +53,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro
         selectInput(
           "filter1",
-          "Subdivisão geográfica",
+          param$label_geog_subdiv,
           choices = NULL,
           multiple = TRUE,
           width = "100%"
@@ -64,7 +64,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_rkstatic_dz_munic/', '_blank')")
+                              onclick = paste0("window.open('", param$link,"', '_blank')"))
         ),
       ),
       column(9,
