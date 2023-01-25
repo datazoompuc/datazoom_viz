@@ -313,7 +313,6 @@ temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_dic.csv", fileEncoding = "UTF-8")
 
 
-
 ### exportação municipal da amazônia por tipo sh4
 datafinal <- readRDS(file = "data/comex_exp_sh4_munic.rds")
 
@@ -683,8 +682,8 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    categoria= "Economy", 
+    subcategoria = "Trade"
 )
 
 temp_param_table$label[2] <- "Sh2 production"
@@ -722,8 +721,8 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    categoria= "Economy", 
+    subcategoria = "Trade"
 )
 
 temp_param_table$label[2] <- "Municipality"
@@ -761,8 +760,8 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    categoria= "Economy", 
+    subcategoria = "Trade"
 )
 
 temp_param_table$label[2] <- "Sec production"
@@ -800,8 +799,8 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    categoria= "Economy", 
+    subcategoria = "Trade"
 )
 
 temp_param_table$label[2] <- "Municipality"
@@ -839,8 +838,8 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    categoria= "Economy", 
+    subcategoria = "Trade"
 )
 
 temp_param_table$label[2] <- "Region"
@@ -883,8 +882,8 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    categoria= "Economy", 
+    subcategoria = "Trade"
 )
 
 temp_param_table$label[2] <- "Country"
@@ -923,8 +922,8 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    categoria= "Economy", 
+    subcategoria = "Trade"
 )
 
 temp_param_table$label[2] <- "Year"
@@ -962,8 +961,8 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    categoria= "Economy", 
+    subcategoria = "Trade"
 )
 
 temp_param_table$label[2] <- "Country"
