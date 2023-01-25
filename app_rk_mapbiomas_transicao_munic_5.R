@@ -32,7 +32,7 @@ param$id_def <- "group" # variável padrão de id
 param$ui1 <- "VARI\u00C1VEIS:"
 param$ui2 <- "Ranking - eixo horizontal (x):"
 param$ui3 <- "Cor das barras:"
-param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura_munic_percentual/'
+param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_munic_5/'
 
 # Parâmetros específicos do server
 param$server0 <- "Variável não selecionada"
