@@ -122,7 +122,8 @@ seeg_state_energy_dic= tibble::tibble(
   subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
 )
 #saving f
-write.csv(metadata_seeg_state_energy, file = "./data/seeg_state_energy_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_state_energy, file = "./data/seeg_state_energy_dic.csv", fileEncoding = "UTF-8")
+
 
 #seeg_land
 seeg_state_land= readRDS('data/seeg_state_land.rds')
@@ -165,3 +166,34 @@ seeg_state_residuals_dic= tibble::tibble(
 )
 #saving f
 write.csv(metadata_seeg_state_residuals, file = "./data/seeg_state_residuals_dic.csv", fileEncoding = "UTF-8")
+
+
+
+###############################################
+### Creating metadatabase in english -> SEEG
+###############################################
+
+
+#seeg_energy
+seeg_state_energy <- readRDS("~/GitHub/datazoom_viz/data/seeg_state_energy.rds")
+energy_var= colnames(seeg_state_energy)
+
+seeg_state_energy_dic= tibble::tibble(
+    var = energy_var ,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = c('Research Year', 'Geographic Identifier', 'Economic Sector',
+              'Emission Type',  'Emissions Generation Process', 'Economic Activity',
+              'Source of Emissions', 'Emitters', 'Bunker Emission/Removal', 'Emitted Gas',
+              'Product', 'Value'),
+    source = "SEEG - Observatório do Clima",
+    tipo = 1,
+    unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas'),
+    categoria= c("Unidade de Tempo","Localizaçao", rep('Meio Ambiente', 10)), 
+    subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
+)
+#saving f
+write.csv(seeg_state_energy, file = "./data/seeg_state_energy_dic_en.csv", fileEncoding = "UTF-8")
