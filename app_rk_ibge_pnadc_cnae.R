@@ -12,7 +12,7 @@ library(htmlwidgets)
 files <- list()
 files$ui_script <- "scripts/rk_ibge_pnadc_cnae/ui.R"
 files$server_script <- "scripts/rk_ibge_pnadc_cnae/server.R"
-files$param_script <- "scripts/rk/db_params.R"
+files$param_script <- "scripts/rk_ibge_pnadc_cnae/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/ibge_pnadc_ranking_cnae_dic.csv"
 files$db_file <- "data/ibge_pnadc_ranking_cnae.rds"

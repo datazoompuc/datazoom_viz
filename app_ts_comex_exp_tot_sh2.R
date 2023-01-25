@@ -32,9 +32,17 @@ param$group <- "group" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos total da Amaz\u00f4nia Legal"
+param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos total da Amaz\u00f4nia Legal por tipo de produto"
 
 # Outros parâmetros e configurações
+
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "Valor (única opção)"
+param$label_scale_name <- "escala log"
+param$label_axis_name <- "proporcional ao ano inicial (*)"
+param$label_mun_filter <- "Categorias de exportação (agregação da SH2)"
+param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_sh2/"
+param$currency <- "Por R$"
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
