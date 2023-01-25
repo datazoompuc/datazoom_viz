@@ -1,5 +1,5 @@
 # Cache
-cache_folder <- "./cache/app_rk_ibge_pnadc_cod/"
+cache_folder <- "./cache/app_rk_ibge_pnadc_cod_en/"
 shinyOptions(cache = cachem::cache_disk(cache_folder))
 
 # Carrega bibliotecas
