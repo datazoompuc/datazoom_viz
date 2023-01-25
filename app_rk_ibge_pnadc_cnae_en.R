@@ -1,5 +1,5 @@
 # Cache
-cache_folder <- "./cache/app_rk_ibge_pnadc_cnae/"
+cache_folder <- "./cache/app_rk_ibge_pnadc_cnae_en/"
 shinyOptions(cache = cachem::cache_disk(cache_folder))
 
 # Carrega bibliotecas
@@ -48,7 +48,7 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Economic Activities"
 
 # Outros parâmetros e configurações
-param$x_choices$`IBGE - PNAD Contínua`$`Atividade econômica` <- NULL
+param$x_choices$`IBGE - Continuous PNAD`$`Economic activity` <- NULL
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
