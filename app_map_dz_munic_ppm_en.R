@@ -9,8 +9,8 @@ library(htmlwidgets)
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/map_dz_munic_ppm/ui.R"
-files$server_script <- "scripts/map/server.R"
-files$param_script <- "scripts/map/db_params.R"
+files$server_script <- "scripts/map_dz_munic_ppm/server.R"
+files$param_script <- "scripts/map_dz_munic_ppm/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/dz_munic_dic.csv"
 files$db_file <- "data/dz_munic_simplified.rds"
@@ -32,7 +32,7 @@ param$text_def <- "nm_municip" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Compilação de dados ao nível municipal (PPM)"
+param$plot_desc <- "Data compiled at the municipal level (PPM)"
 param$app <- "IBGE - PPM"
 
 param$year_inicio <- 2000
