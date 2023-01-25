@@ -168,3 +168,33 @@ seeg_state_residuals_dic= tibble::tibble(
 )
 #saving f
 write.csv(seeg_state_residuals_dic, file = "./data/seeg_state_residuals_dic.csv", fileEncoding = "UTF-8")
+
+#########
+### Creating metadatabase in english -> SEEG
+#########
+
+
+#seeg_farming
+seeg_state_farming= readRDS('data/seeg_state_farming.rds')
+farming_var= colnames(seeg_state_farming)
+
+seeg_state_farming_dic= tibble::tibble(
+    var = farming_var,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = c('Research Year', 'Geographic Identifier', 'Economic Sector',
+            'Emissions Generation Process','Source of Emissions','Emitters', 'Emitted Gas',
+            'Economic Activity' ,'Product', 'Value','Direct/Indirect Emitters','Emission Type', 'Bunker Emission/Removal'
+              ),
+    source = "SEEG - Observatório do Clima",
+    tipo = 1,
+    unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas',NA,NA,NA),
+    categoria= c("Unidade de Tempo","Localizaçao", rep('Meio Ambiente', 11)), 
+    subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 11))
+)
+
+#saving f
+write.csv(seeg_state_farming_dic, file = "./data/seeg_state_farming_dic_en.csv", fileEncoding = "UTF-8")
