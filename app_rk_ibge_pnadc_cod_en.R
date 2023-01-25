@@ -48,7 +48,7 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Occupation type"
 
 # Outros parâmetros e configurações
-param$x_choices$`IBGE - PNAD Contínua`$`Tipo de ocupação` <- NULL
+param$x_choices$`IBGE - Continuous PNAD`$`Occupation type` <- NULL
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
