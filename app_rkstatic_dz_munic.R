@@ -47,21 +47,9 @@ param$label_geog_subdiv<- "Subdivisão geográfica"
 param$time_interval<- "Intervalo de tempo: "
 
 # Outros parâmetros e configurações
-param$x_choices$`Fonte de dados` <- NULL
-param$x_choices$IMAZON <- NULL
-param$x_choices$`IBGE - Censo 2000` <- NULL
-param$x_choices$`IBGE - Censo 2010` <- NULL
-param$x_choices[[1]] <- NULL
-param$x_choices$`IBGE - CEMPRE` <- NULL
-param$x_choices$`INPE - PRODES`$`Proporção de desmatamento na área do município` <- NULL
-param$x_choices$`INPE - PRODES`$`Proporção de floresta na área do município` <- NULL
-param$x_choices$`INPE - PRODES`$`Proporção de não-floresta na área do município` <- NULL
-param$x_choices$`INPE - PRODES`$`Proporção de hidrografia na área do município` <- NULL
-param$x_choices$`INPE - PRODES`$`Área total desmatada` <- NULL
-param$x_choices$`INPE - PRODES`$`Área total de floresta` <- NULL
-param$x_choices$`INPE - PRODES`$`Área total de não-floresta` <- NULL
-param$x_choices$`INPE - PRODES`$`Área total de hidrografia` <- NULL
-param$x_choices$`IBGE - PPM` <- NULL
+param$x_choices <- list("INPE - PRODES" = list("Área total de incremento de desmatamento" = "incremento",
+                                               "Proporção de incremento de desmatamento na área do município" = "prop_incremento"))
+
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
