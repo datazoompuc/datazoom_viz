@@ -33,6 +33,22 @@ param$id_def <- "group" # variável padrão de id
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Emissões de Gases Estufa na Agropecuária ao nível estadual"
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_log_name <- "escala log"
+param$label_prop_name <-  "proporcional ao ano inicial (*)"
+param$label_geo_name <- "Subdivisão geográfica"
+param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_farming/"
+
+### Parametros especificos no server
+param$subtitle_init <- "por Estado" # expressão subtitulo
+param$title_init <- "Emissões Totais advindas de "
+param$tooltip_a <- "Emissões"
+param$tooltip_b <-  "Unidade de medida: <b>"
+param$tooltip_c <- "Toneladas"
+
+
 
 # Outros parâmetros e configurações
 
