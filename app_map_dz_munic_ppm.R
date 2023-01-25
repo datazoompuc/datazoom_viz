@@ -38,6 +38,18 @@ param$app <- "IBGE - PPM"
 param$year_inicio <- 2000
 param$year_final <- 2019
 
+#Mudanças específicas no UI
+param$variables_caps<- "VARI\u001VEIS::"
+param$choice_variable<- "Seleciona variável (x)"
+param$reference_year<- "Ano Referente"
+param$link<-"https://datazoom.shinyapps.io/app_map_dz_munic_ppm/"
+#Mudanças específicas no server
+param$label_title<- paste0("Mapa dos municípios da Amazônia Legal")
+param$no_variable<- "Nenhuma variável selecionada"
+param$variable_selected<- "Variável selecionada: "
+param$munic<- "Nome do município: <b>"
+param$state<- "Estado: <b>"
+param$measurement_unit<- "Unidade de medida: <b>"
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]
 
