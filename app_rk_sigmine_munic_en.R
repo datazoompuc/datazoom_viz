@@ -10,7 +10,7 @@ files$ui_script <- "scripts/rk_sigmine_munic/ui.R"
 files$server_script <- "scripts/rk_sigmine_munic/server.R"
 files$param_script <- "scripts/rk_sigmine_munic/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/sigmine_munic_dic_en.csv"
+files$param_file <- "data/sigmine_munic_en_dic.csv"
 files$db_file <- "data/sigmine_munic.rds"
 
 # Carrega scripts
@@ -30,8 +30,9 @@ param$id_def <- "group" # variável padrão de id
 
 
 # Parâmetros específicos do UI
-param$ui1 <- "VARIABES:"
-param$ui2 <- "Bar colors:"
+param$ui1 <- "VARIABLES:"
+param$ui2 <- "Ranking - horizontal axis (x):"
+param$ui3 <- "Bar colors:"
 param$link <- 'https://datazoom.shinyapps.io/app_rk_sigmine_munic_en/'
 
 # Parâmetros específicos do server
