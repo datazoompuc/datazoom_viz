@@ -223,4 +223,4 @@ seeg_state_energy_dic= tibble::tibble(
     subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
 )
 #saving f
-write.csv(seeg_state_energy, file = "./data/seeg_state_energy_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(seeg_state_energy_dic, file = "./data/seeg_state_energy_dic_en.csv", fileEncoding = "UTF-8")
