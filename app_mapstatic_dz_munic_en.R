@@ -42,7 +42,7 @@ param$x_choices$`IBGE - CEMPRE` <- NULL
 param$x_choices$`IBGE - PPM` <- NULL
 param$x_choices$`IBGE - PAM` <- NULL
 
-param$label_var_name <- "VARIABLES"
+param$label_var_name <- "VARIABLES:"
 param$label_x_name <- "Select variable (x)"
 param$link <- "https://datazoom.shinyapps.io/app_mapstatic_dz_munic_en/"
 param$title <- "Amazônia Legal municipality map"
