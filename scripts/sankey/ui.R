@@ -26,13 +26,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", param$label_var_name),
+        p(class = "vars", "VARI\u00C1VEIS:"),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = param$label_x_name,
+            label = "Ano:",
             choices = param$year_inicio:param$year_final,
             selected = param$year_final,
             width = "100%"
@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
           # Seleciona variável de cor
           selectInput(
             inputId = "y",
-            label = param$label_colour_name,
+            label = "Categorias da exportação (agregação da SEC):",
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -55,7 +55,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = paste0("window.open('",param$link,"', '_blank')"))
+                              onclick = "window.open('https://datazoom.shinyapps.io/app_sankey_comex_exp_pais_sec/', '_blank')")
         ),
       ),
       column(9,
