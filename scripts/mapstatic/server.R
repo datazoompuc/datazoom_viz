@@ -67,7 +67,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("",param$title,"")
+        text <- paste0("Mapa dos municípios da Amazônia Legal")
       }
 
       text
@@ -75,11 +75,11 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x) || input$x == "") {
-        text <- param$empty
+        text <- "Nenhuma variável selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0("",param$selected_variable,"", x_col$label)
+        text <- paste0("Variável selecionada: ", x_col$label)
       }
 
       text
@@ -113,10 +113,10 @@ get_server <- function(files, param) {
           x_col <- param$table[which(param$table$var == input$x), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
-            "",param$label_1,"", df$nm_municip, "<br>",
-            "",param$label_2,"", df$estado, "<br>",
+            "Nome do município: ", df$nm_municip, "<br>",
+            "Estado: ", df$estado, "<br>",
             x_col$label, ": ", df[[input$x]], "<br>",
-            "",param$label_3,"", x_col$unidade
+            "Unidade de medida: ", x_col$unidade
           ) %>%
             lapply(htmltools::HTML)
 

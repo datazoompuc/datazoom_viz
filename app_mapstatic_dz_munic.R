@@ -42,16 +42,6 @@ param$x_choices$`IBGE - CEMPRE` <- NULL
 param$x_choices$`IBGE - PPM` <- NULL
 param$x_choices$`IBGE - PAM` <- NULL
 
-param$label_var_name <- "VARIÁVEIS:"
-param$label_x_name <- "Seleciona variável (x)"
-param$link <- "https://datazoom.shinyapps.io/app_mapstatic_dz_munic/"
-param$title <- "Mapa dos municípios da Amazônia Legal"
-param$empty <- "Nenhuma variável selecionada"
-param$selected_variable <- "Variável selecionada: "
-param$label_1 <- "Nome do município: "
-param$label_2 <- "Estado: "
-param$label_3 <- "Unidade de medida: "   
-
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
