@@ -842,5 +842,27 @@ temp_param_table$label[temp_param_table$var == "quant_v40122"] <- "Quantity - Co
 temp_param_table$label[temp_param_table$var == "area_plantada_dest_colheita_v40124"] <- "Area Planted or Destined for Harvesting - Soy"
 temp_param_table$label[temp_param_table$var == "quant_v40124"] <- "Quantity - Soy"
 
+temp_param_table$unidade[1] <- "Measurement unit"
+temp_param_table$unidade[2] <- "Measurement unit"
+temp_param_table$unidade[3] <- "Measurement unit"
+temp_param_table$unidade[4] <- "Year"
+temp_param_table$unidade[5] <- "People"
+temp_param_table$unidade[6] <- "People"
+temp_param_table$unidade[7] <- "R$ in 2000"
+temp_param_table$unidade[8] <- "R$ in 2010"
+temp_param_table$unidade[9] <- "R$ in 2000"
+temp_param_table$unidade[10] <- "R$ in 2010"
+temp_param_table$unidade[21] <- "People"
+temp_param_table$unidade[24] <- "Establishments"
+temp_param_table$unidade[25] <- "People"
+temp_param_table$unidade[26] <- "People"
+temp_param_table$unidade[28] <- "Index from 0 to 100"
+temp_param_table$unidade[29] <- "Index from 0 to 100"
+temp_param_table$unidade[35] <- "Heads"
+temp_param_table$unidade[36] <- "Heads"
+temp_param_table$unidade[37] <- "Heads"
+
+
+
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_dic_en.csv", fileEncoding = "UTF-8")
