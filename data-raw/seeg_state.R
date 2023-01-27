@@ -3,8 +3,10 @@
 ##########
 ## Agregation level - STATE
 
-#seeg_farming
+# load packages ---------------------------------------------------------------------
+library(datazoom.amazonia)
 
+#seeg_farming
 seeg_state_farming= load_seeg(dataset = 'seeg_farming', geo_level = 'state', raw_data = FALSE, language = 'pt')
 seeg_state_farming= seeg_state_farming%>%
   dplyr::rename(time= .data$Ano, group= .data$estado)
@@ -79,7 +81,7 @@ seeg_state_farming_dic= tibble::tibble(
 )
 
 #saving f
-write.csv(metadata_seeg_state_farming, file = "./data/seeg_state_farming_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_state_farming_dic, file = "./data/seeg_state_farming_dic.csv", fileEncoding = "UTF-8")
 
 
 #seeg_industry
@@ -101,10 +103,10 @@ seeg_state_industry_dic= tibble::tibble(
   subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 9))
 )
 #saving F
-write.csv(metadata_seeg_state_industry, file = "./data/seeg_state_industry_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_state_industry_dic, file = "./data/seeg_state_industry_dic.csv", fileEncoding = "UTF-8")
 
 #seeg_energy
-seeg_state_energy_og= readRDS('data/seeg_state_energy.rds')
+seeg_state_energy= readRDS('data/seeg_state_energy.rds')
 energy_var= colnames(seeg_state_energy)
 
 seeg_state_energy_dic= tibble::tibble(
@@ -122,7 +124,7 @@ seeg_state_energy_dic= tibble::tibble(
   subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
 )
 #saving f
-write.csv(seeg_state_energy, file = "./data/seeg_state_energy_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_state_energy_dic, file = "./data/seeg_state_energy_dic.csv", fileEncoding = "UTF-8")
 
 
 #seeg_land
@@ -144,7 +146,7 @@ seeg_state_land_dic= tibble::tibble(
   subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
 )
 #saving f
-write.csv(metadata_seeg_state_land, file = "./data/seeg_state_land_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_state_land_dic, file = "./data/seeg_state_land_dic.csv", fileEncoding = "UTF-8")
 
 #seeg_residuals
 seeg_state_residuals= readRDS('data/seeg_state_residuals.rds')
@@ -165,7 +167,7 @@ seeg_state_residuals_dic= tibble::tibble(
   subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 10))
 )
 #saving f
-write.csv(metadata_seeg_state_residuals, file = "./data/seeg_state_residuals_dic.csv", fileEncoding = "UTF-8")
+write.csv(seeg_state_residuals_dic, file = "./data/seeg_state_residuals_dic.csv", fileEncoding = "UTF-8")
 
 
 
