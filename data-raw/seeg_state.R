@@ -201,7 +201,7 @@ write.csv(seeg_state_farming_dic, file = "./data/seeg_state_farming_dic_en.csv",
 
 
 #seeg_energy
-seeg_state_energy <- readRDS("~/GitHub/datazoom_viz/data/seeg_state_energy.rds")
+seeg_state_energy <- readRDS("data/seeg_state_energy.rds")
 energy_var= colnames(seeg_state_energy)
 
 seeg_state_energy_dic= tibble::tibble(
