@@ -8,12 +8,14 @@ library(tibble)
 library(zoo)
 library(readxl)
 
-dat <- load_mapbiomas_covering(space_aggregation = "state")
+dat<- datazoom.amazonia::load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE, geo_level = "state", language = "eng", cover_level = 4)
+#dat <- load_mapbiomas_covering(space_aggregation = "state")
 colnames(dat)[colnames(dat) == "Leval_zero"] <- "level_0"
 
 saveRDS(dat, file = "data/mapbiomas_cobertura_est_raw.rds")
 
 # Data for level_4
+dat <- readRDS("./data/mapbiomas_cobertura_est_raw.rds")
 data1 <- dat
 data1$level_0 <- NULL
 data1$level_1 <- NULL
@@ -100,14 +102,14 @@ labl <- substr(labl, 6, 100)
 sublabl <- labl[22:26]
 sublabl <- substr(sublabl, 5, 100)
 labl[22:26] <- sublabl
-translated_labl <- c("Pastagem", "Forma??o de Floresta", "Pradaria", "N?o Observado",
-                     "Outras ?reas n?o vegetadas", "Infraestrutura Urbana", "Rios, Lagos ou Oceanos",
-                     "Mosaico de Cultivos", "Soja", "Planta??o de Floresta", "Mangue", "Mineira??o",
-                     "Cana-de-a??car", "Forma??o de Savana", "Salar", "Praia e Dunas",
-                     "Mosaico de Agricultura e Pastagem", "P?ntano", "Cultivos tempor?rios",
-                     "Agricultura", "Floresta Natural", "Floresta", "Forma??o Natural sem ser Floresta",
-                     "Fazenda", "?rea n?o Vegetada", "?gua", "Forma??o Antr?pica", "Forma??o Natural",
-                     "N?o Identificado")
+translated_labl <- c("Pastagem", "Forma\u00e7\u00e3o de Floresta", "Pradaria", "N\u00e3o Observado",
+                     "Outras \u00c1reas n\u00e3o Vegetadas", "Infraestrutura Urbana", "Rios, Lagos ou Oceanos",
+                     "Mosaico de Cultivos", "Soja", "Planta\u00e7\u00e3o de Floresta", "Mangue", "Mineira\u00e7\u00e3o",
+                     "Cana-de-a\u00e7\u00facar", "Forma\u00e7\u00e3o de Savana", "Salar", "Praia e Dunas",
+                     "Mosaico de Agricultura e Pastagem", "P\u00e2ntano", "Cultivos tempor\u00e1rios",
+                     "Agricultura", "Floresta Natural", "Floresta", "Forma\u00e7\u00e3o Natural sem ser Floresta",
+                     "Fazenda", "\u00c1rea n\u00e3o Vegetada", "\u00c1gua", "Forma\u00e7\u00e3o Antrópica", "Forma\u00e7\u00e3o Natural",
+                     "N\u00e3o Identificado")
 colnames(datafinal) <- c("group", "time", translated_labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
