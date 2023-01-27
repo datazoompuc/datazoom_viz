@@ -15,7 +15,6 @@ colnames(dat)[colnames(dat) == "Leval_zero"] <- "level_0"
 saveRDS(dat, file = "data/mapbiomas_cobertura_est_raw.rds")
 
 # Data for level_4
-dat <- readRDS("./data/mapbiomas_cobertura_est_raw.rds")
 data1 <- dat
 data1$level_0 <- NULL
 data1$level_1 <- NULL

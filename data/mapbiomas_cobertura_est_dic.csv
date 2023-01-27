@@ -5,7 +5,7 @@
 "4","Formação de Floresta",TRUE,TRUE,FALSE,TRUE,TRUE,"Formação de Floresta","Formação de Floresta","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "5","Pradaria",TRUE,TRUE,FALSE,TRUE,TRUE,"Pradaria","Pradaria","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "6","Não Observado",TRUE,TRUE,FALSE,TRUE,TRUE,"Não Observado","Não Observado","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
-"7","Outras áreas não vegetadas",TRUE,TRUE,FALSE,TRUE,TRUE,"Outras áreas não vegetadas","Outras áreas não vegetadas","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"7","Outras Áreas não Vegetadas",TRUE,TRUE,FALSE,TRUE,TRUE,"Outras Áreas não Vegetadas","Outras Áreas não Vegetadas","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "8","Infraestrutura Urbana",TRUE,TRUE,FALSE,TRUE,TRUE,"Infraestrutura Urbana","Infraestrutura Urbana","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "9","Rios, Lagos ou Oceanos",TRUE,TRUE,FALSE,TRUE,TRUE,"Rios, Lagos ou Oceanos","Rios, Lagos ou Oceanos","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "10","Mosaico de Cultivos",TRUE,TRUE,FALSE,TRUE,TRUE,"Mosaico de Cultivos","Mosaico de Cultivos","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
