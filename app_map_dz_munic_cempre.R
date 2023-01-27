@@ -9,8 +9,8 @@ library(htmlwidgets)
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/map_dz_munic_cempre/ui.R"
-files$server_script <- "scripts/map/server.R"
-files$param_script <- "scripts/map/db_params.R"
+files$server_script <- "scripts/map_dz_munic_cempre/server.R"
+files$param_script <- "scripts/map_dz_munic_cempre/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/dz_munic_dic.csv"
 files$db_file <- "data/dz_munic_simplified.rds"
@@ -40,6 +40,18 @@ param$year_final <- 2019
 
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]
+
+
+param$label_var_name <- "VARIÁVEIS:"
+param$label_x_name <- "Seleciona variável (x)"
+param$label_data_axis_name <- "Ano referente"
+param$link <- "https://datazoom.shinyapps.io/app_map_dz_munic_cempre/"
+param$title <- "Mapa dos municípios da Amazônia Legal"
+param$empty <- "Nenhuma variável selecionada"
+param$selected_variable <- "Variável selecionada: "
+param$label_1 <- "Nome do município: "
+param$label_2 <- "Estado: "
+param$label_3 <- "Unidade de medida: "  
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
