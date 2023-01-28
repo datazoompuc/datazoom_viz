@@ -36,6 +36,15 @@ param$plot_desc <- "Diferença entre várias amaz\u00f4nias em indicadores mais 
 
 # Outros parâmetros e configurações
 
+#mudanças específicas no UI
+param$variable_caps<- "VARI\u00C1VEIS:"
+param$y_variable<- "Eixo vertical (y)"
+#mudanças específicas no server
+param$selected_variable<- "Vari\u00e1vel selecionada: "
+param$label_datasource<- "Fonte de dados: "
+param$y_empty<-"Vari\u00e1vel Y vazia"
+param$measurement_unit<- "Unidade de medida: "
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
