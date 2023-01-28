@@ -143,7 +143,7 @@ get_server <- function(files, param) {
             "<b>",df_p$text,"</b><br>",
             x_col$label, ":  <b>", df_p$x, "</b><br>",
             y_col$label, ":  <b>", format(df_p$y, scientific = FALSE, digits = 2, decimal.mark = ",", big.mark = "."),  "</b><br>",
-            "Unidade de medida: <b>", y_col$unidade, "</b></b>"
+            param$measurement_unit, y_col$unidade, "</b></b>"
           )
 
           # Define paleta de cores

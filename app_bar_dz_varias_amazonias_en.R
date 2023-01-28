@@ -13,7 +13,7 @@ files$param_script <- "scripts/bar/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
-files$param_file <- "data/dz_varias_amazonias_cross_section_dic.csv"
+files$param_file <- "data/dz_varias_amazonias_cross_section_dic_en.csv"
 files$db_file <- "data/dz_varias_amazonias_cross_section.rds"
 
 # Carrega scripts
@@ -33,6 +33,15 @@ param$group <- "front_2020_label" # variável de agrupamento
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Diference between multiple Amazons in more recent indicators"
+
+#mudanças específicas no UI
+param$variable_caps<- "VARIABLES:"
+param$y_variable<- "vertical axis (y)"
+#mudanças específicas no server
+param$selected_variable<- "Selected variable: "
+param$label_datasource<- "Data source: "
+param$y_empty<-"Y variable empty"
+param$measurement_unit<- "Measurement Unit: "
 
 
 # Outros parâmetros e configurações
