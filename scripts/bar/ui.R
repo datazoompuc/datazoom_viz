@@ -12,13 +12,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$variable_caps),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo y
           selectInput(
             inputId = "y",
-            label = "eixo vertical (y)",
+            label = param$y_variable,
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
