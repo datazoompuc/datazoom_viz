@@ -24,13 +24,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00c1VEIS:"),
+        p(class = "vars", param$variable),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = "eixo horizontal (x)",
+            label = param$label_x,
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
@@ -48,7 +48,7 @@ get_ui <- function(files, param) {
           # Seleciona variável do eixo y
           selectInput(
             inputId = "y",
-            label = "eixo vertical (y)",
+            label = param$label_y,
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -57,7 +57,7 @@ get_ui <- function(files, param) {
         # Seleciona eixo log
         checkboxInput(
           inputId = "ylog",
-          "escala log",
+          param$log_scale,
           value = FALSE,
           width = "100%"
         ),
@@ -66,7 +66,7 @@ get_ui <- function(files, param) {
           # Seleciona variável de cor
           selectInput(
             inputId = "color",
-            label = "Cor do marcador:",
+            label = param$color_label,
             choices = param$color_choices,
             selected = param$color_def,
             width = "100%"
@@ -79,7 +79,7 @@ get_ui <- function(files, param) {
           # Seleciona variável de tamanho
           selectInput(
             inputId = "size",
-            label = "Tamanho do marcador:",
+            label = param$marker_size,
             choices = param$size_choices,
             selected = param$size_def,
             width = "100%"
