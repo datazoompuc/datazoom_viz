@@ -5,7 +5,7 @@ library(plotly)
 library(htmlwidgets)
 
 # Cache
-cache_folder <- "./cache/app_rk_comex_exp_munic_produtosamz/"
+cache_folder <- "./cache/app_rk_comex_exp_munic_produtosamz_en/"
 shinyOptions(cache = cachem::cache_disk(cache_folder))
 # Define nome de arquivos a serem carregados
 files <- list()
