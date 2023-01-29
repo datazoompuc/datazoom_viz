@@ -250,7 +250,7 @@ get_server <- function(files, param) {
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
             # Edita slider
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = param$label_year), font = f1))
+            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = param$label_year), font = f1)
 
             # Botões da animação
             #  edita botão padrão (editar move ele para o updatemenus)
