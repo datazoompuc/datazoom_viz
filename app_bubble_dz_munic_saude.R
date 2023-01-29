@@ -38,6 +38,20 @@ param$plot_desc <- "Compila\u00e7\u00e3o de dados ao n\u00edvel municipal"
 
 # Outros parâmetros e configurações
 
+#Mudanças específicas no UI
+param$link <- "https://datazoom.shinyapps.io/app_bubble_dz_munic_saude/"
+param$variable<-"VARI\u00c1VEIS:"
+param$label_x<- "eixo horizontal (x)"
+param$label_y<- "eixo vertical (y)"
+param$log_scale<-"escala log"
+param$color_label<- "Cor do marcador:"
+param$marker_size<- "Tamanho do marcador"
+
+#Mudanças específicas no server
+param$label_by<- " por "
+param$label_considering<- "considerando"
+param$label_year<- "Ano: "
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
