@@ -12,7 +12,7 @@ files$ui_script <- "scripts/map_dz_state/ui.R"
 files$server_script <- "scripts/map_dz_state/server.R"
 files$param_script <- "scripts/map_dz_state/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/dz_state_dic.csv"
+files$param_file <- "data/dz_state_dic_en.csv"
 files$db_file <- "data/dz_state_simplified.rds"
 
 # Carrega scripts
