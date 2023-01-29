@@ -42,6 +42,17 @@ param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora d
 param$year_inicio <- 1985
 param$year_final <- 2019
 
+#mudanças específicas no server
+param$legal_amazon_in<- "Amazônia Legal"
+param$legal_amazon_out<- "Fora da Amazônia Legal"
+param$bovino<-"Bovino/Hectares de Área de Pastagem: "
+param$munic_dist<- "Distribuição dos Municípios"
+param$hover<-"Número de Municípios: %{y}<br>Log(Número de Bovino/Hectares de Área de Pastagem + 1): %{x}"
+param$hover_2<-"Número de Municípios: %{y}<br>Número de Bovino/Hectares de Área de Pastagem: %{x}"
+param$log_bovino<- "Log(Número de Bovino/Hectares de Área de Pastagem + 1)"
+param$bovino_area_2<- "Bovinos/Hectares de Área de Pastagem"
+param$munic_num<- "Número de Municípios"
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
