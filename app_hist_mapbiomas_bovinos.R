@@ -52,6 +52,11 @@ param$hover_2<-"Número de Municípios: %{y}<br>Número de Bovino/Hectares de Á
 param$log_bovino<- "Log(Número de Bovino/Hectares de Área de Pastagem + 1)"
 param$bovino_area_2<- "Bovinos/Hectares de Área de Pastagem"
 param$munic_num<- "Número de Municípios"
+#mudanças específicas no UI
+param$variable<- "VARI\u00C1VEIS:"
+param$logx<-"escala log(x+1)"
+param$ref_year<-"Ano referente"
+param$link<-"https://datazoom.shinyapps.io/app_hist_mapbiomas_bovinos/"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
