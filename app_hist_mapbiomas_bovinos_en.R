@@ -57,6 +57,7 @@ param$variable<- "VARIABLES:"
 param$logx<-"log scale (x+1)"
 param$ref_year<-"Referecing year"
 param$link<-"https://datazoom.shinyapps.io/app_hist_mapbiomas_bovinos_en/"
+param$subdiv_geog<- "Geographical Subdivisions"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

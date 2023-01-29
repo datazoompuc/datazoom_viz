@@ -41,7 +41,7 @@ get_ui <- function(files, param) {
           # Seleciona filtro
           selectizeInput(
             "filter1",
-            "Subdivisão geográfica",
+            param$subdiv_geog,
             choices = NULL,
             multiple = TRUE,
             width = "100%")
