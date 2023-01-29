@@ -371,6 +371,7 @@ temp_param_table$label[temp_param_table$var== "truta_valor_da_producao"] <- "Val
 temp_param_table$label[temp_param_table$var== "tucunare_producao_da_aquicultura"] <- "Aquaculture Production - Tucunare"
 temp_param_table$label[temp_param_table$var== "tucunare_valor_da_producao"] <- "Value - Tucunare"
 
+temp_param_table$unidade <- "Measurement unit"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_state_dic_en.csv", fileEncoding = "UTF-8")
