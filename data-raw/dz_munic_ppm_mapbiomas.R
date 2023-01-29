@@ -219,3 +219,77 @@ temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_ppm_mapbiomas_dic.csv", fileEncoding = "UTF-8")
+
+#####################
+# Build Dictionary in English
+#####################
+
+# call data
+dz_munic_ppm_mapbiomas <- readRDS("./data/dz_munic_ppm_mapbiomas.rds")
+
+# extract variables from data
+columns <- colnames(dz_munic_ppm_mapbiomas)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    geometry = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Fonte de dados",
+    unidade = "Unidade de medida",
+    categoria = "Categoria principal",
+    subcategoria = "Subcategoria"
+)
+
+# label variables
+temp_param_table$label[temp_param_table$var == "cod_ibge"] <- "Municipality Code"
+temp_param_table$label[temp_param_table$var == "nm_municip"] <- "Municipality name"
+temp_param_table$label[temp_param_table$var == "uf"] <- "State"
+temp_param_table$label[temp_param_table$var == "ano"] <- "Year"
+temp_param_table$label[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Herd by pasture area"
+
+# unidade variables
+temp_param_table$unidade[temp_param_table$var == "cod_ibge"] <- ""
+temp_param_table$unidade[temp_param_table$var == "nm_municip"] <- ""
+temp_param_table$unidade[temp_param_table$var == "uf"] <- ""
+temp_param_table$unidade[temp_param_table$var == "ano"] <- "Ano"
+temp_param_table$unidade[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Herd by pasture area (in hectares)"
+
+# var_group variables
+temp_param_table$var_group[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "IBGE - PPM e MAPBIOMAS"
+
+# label data category
+temp_param_table$categoria[temp_param_table$var == "ano"] <- "Time unit"
+temp_param_table$categoria[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Economic Output"
+
+# subcategoria variables
+temp_param_table$subcategoria[temp_param_table$var == "ano"] <- "Year"
+temp_param_table$subcategoria[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Livestock"
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "cod_ibge"] <- FALSE
+temp_param_table$y[temp_param_table$var == "nm_municip"] <- FALSE
+temp_param_table$y[temp_param_table$var == "uf"] <- TRUE
+temp_param_table$y[temp_param_table$var == "ano"] <- TRUE
+temp_param_table$y[temp_param_table$var == "n_bovino_por_area_pastagem"] <- TRUE
+
+# block variables in graphs x-axis
+temp_param_table$x[temp_param_table$var == "cod_ibge"] <- FALSE
+temp_param_table$x[temp_param_table$var == "nm_municip"] <- FALSE
+temp_param_table$x[temp_param_table$var == "uf"] <- TRUE
+temp_param_table$x[temp_param_table$var == "ano"] <- TRUE
+temp_param_table$x[temp_param_table$var == "n_bovino_por_area_pastagem"] <- TRUE
+
+# allow variables in graphs size, color, and slider-axis
+temp_param_table$size[temp_param_table$var == "uf"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "uf"] <- TRUE #
+temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/dz_munic_ppm_mapbiomas_dic_en.csv", fileEncoding = "UTF-8")

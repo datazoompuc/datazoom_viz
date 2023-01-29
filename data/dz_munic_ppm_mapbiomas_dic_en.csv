@@ -1,0 +1,6 @@
+"","var","x","y","color","size","slider","geometry","label","desc","var_group","unidade","categoria","subcategoria"
+"1","cod_ibge",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"Municipality Code","cod_ibge","Fonte de dados","","Categoria principal","Subcategoria"
+"2","ano",TRUE,TRUE,FALSE,FALSE,TRUE,FALSE,"Year","ano","Fonte de dados","Ano","Time unit","Year"
+"3","n_bovino_por_area_pastagem",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Herd by pasture area","n_bovino_por_area_pastagem","IBGE - PPM e MAPBIOMAS","Herd by pasture area (in hectares)","Economic Output","Livestock"
+"4","nm_municip",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"Municipality name","nm_municip","Fonte de dados","","Categoria principal","Subcategoria"
+"5","uf",TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,"State","uf","Fonte de dados","","Categoria principal","Subcategoria"
