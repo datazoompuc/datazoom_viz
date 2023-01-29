@@ -45,6 +45,18 @@ param$x_choices$Geral <- NULL
 param$year_inicio <- 2000
 param$year_final <- 2019
 
+#Mudanças específicas no server
+param$title<-"Mapa dos estados da Amazônia Legal"
+param$no_selec_var<-"Nenhuma variável selecionada"
+param$selec_var<-"Variável selecionada: "
+param$stat<- "Estado: "
+param$measurement_unit<-"Unidade de medida: "
+
+#Mudanças específicas no UI
+param$variable<- "VARI\u00C1VEIS::"
+param$variable_x<- "Seleciona variável (x)"
+param$year_ref<- "Ano referente"
+param$link<-'https://datazoom.shinyapps.io/app_map_dz_state/'
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
