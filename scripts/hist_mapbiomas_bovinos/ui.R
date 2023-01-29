@@ -35,7 +35,7 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$variable),
         div(
           class = "var_selec_group",
           # Seleciona filtro
@@ -50,7 +50,7 @@ get_ui <- function(files, param) {
         # Seleciona eixo log
         checkboxInput(
           inputId = "ylog",
-          "escala log(x+1)",
+          param$logx,
           value = TRUE,
           width = "100%"
         ),
@@ -59,7 +59,7 @@ get_ui <- function(files, param) {
           class = "var_selec_group",
           # Seleciona variável do eixo de data
           sliderInput(inputId = "filter_ano",
-                      label = "Ano referente",
+                      label = param$ref_year,
                       min = param$year_inicio,
                       max = param$year_final,
                       value = param$year_final,
@@ -75,7 +75,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_hist_mapbiomas_bovinos/', '_blank')")
+                              onclick = paste0("window.open('", param$link, "', '_blank')"))
         ),
       ),
       column(9,
