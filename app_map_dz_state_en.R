@@ -32,7 +32,7 @@ param$text_def <- "estado" # variável padrão de texto
 param$id_def <- "group" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Compilação de dados ao nível estadual"
+param$plot_desc <- "Data compiled at the state level"
 
 # Outros parâmetros e configurações
 param$x_choices$`Fonte de dados` <- NULL
