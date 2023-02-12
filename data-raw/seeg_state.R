@@ -21,6 +21,7 @@ seeg_state_industry= load_seeg(dataset = "seeg_industry", geo_level = 'state', r
 seeg_state_industry= seeg_state_industry%>%
   dplyr::rename(time= .data$Ano, group= .data$estado)
 
+
 ##saving
 saveRDS(seeg_state_industry,
         'data/seeg_state_industry.rds'
@@ -224,9 +225,18 @@ seeg_state_energy_dic= tibble::tibble(
 #saving f
 write.csv(seeg_state_energy_dic, file = "./data/seeg_state_energy_dic_en.csv", fileEncoding = "UTF-8")
 
+library(tidyverse)
 
 #seeg_industry
 seeg_state_industry= readRDS('data/seeg_state_industry.rds')
+
+
+##saving in english
+seeg_state_industry$setor <- "Industrial Process"
+saveRDS(seeg_state_industry,
+        'data/seeg_state_industry_en.rds'
+)
+
 industry_var= colnames(seeg_state_industry)
 
 seeg_state_industry_dic= tibble::tibble(

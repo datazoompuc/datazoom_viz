@@ -13,7 +13,8 @@ files$param_script <- "scripts/ts_seeg_state_industry/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 
 files$param_file <- "data/seeg_state_industry_dic_en.csv"
-files$db_file <- "data/seeg_state_industry.rds"
+files$db_file <- "data/seeg_state_industry_en.rds"
+
 
 # Carrega scripts
 source(files$param_script)
@@ -47,7 +48,6 @@ param$title_init <- "Total emissions from "
 param$tooltip_a <- "Emissions"
 param$tooltip_b <-  "Unit of measurement: <b>"
 param$tooltip_c <- "Tons"
-
 
 
 # Outros parâmetros e configurações
