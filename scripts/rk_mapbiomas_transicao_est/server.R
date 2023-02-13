@@ -183,7 +183,7 @@ get_server <- function(files, param) {
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
             y_col$label, ": ", df_p$y, "<br>",
-            "Unidade de medida: ", x_col$unidade,"<br>",
+            param$measurement_unit, x_col$unidade,"<br>",
             color_col$label, ": ", df_p$color
           )
 

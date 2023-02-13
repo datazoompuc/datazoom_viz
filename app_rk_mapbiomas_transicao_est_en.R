@@ -38,6 +38,7 @@ param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_est_en/'
 param$server0 <- "No variable selected"
 param$server1 <- "Ranking of "
 param$server2 <- "Legal Amazon"
+param$measurement_unit <- "Measurement unit: "
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
