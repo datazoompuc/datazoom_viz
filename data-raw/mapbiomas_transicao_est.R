@@ -156,6 +156,30 @@ temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 232))
 temp_param_table$size <- c(rep(TRUE, 1), rep(FALSE, 232))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 231))
 
+
+temp_param_table$label <- str_replace_all(temp_param_table$label, c(  "para" = "to",
+                                            "N\\?o Observado" = "Non Observed",
+                                            "Forma\\?\\?o de Floresta" = "Forest Formation",
+                                            "Pradaria" = "Grassland",
+                                            "Pastagem" = "Pasture",
+                                            "Infraestrutura Urbana" = "Urban Infrastructure",
+                                            "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
+                                            "Outras \\?reas n\\?o vegetadas" = "Other Non Vegetated Area",
+                                            "Mangue" = "Magrove",
+                                            "Planta\\?\\?o de Floresta" = "Forest Plantation",
+                                            "Mineira\\?\\?o" = "Mining",
+                                            "Mosaico de Cultivos" = "Mosaic of Crops",
+                                            "Soja" = "Soy Beans",
+                                            "Cana-de-a\\?\\?car" = "Sugar Cane",
+                                            "Forma\\?\\?o de Savana" = "Savanna Formation",
+                                            "Praia e Dunas" = "Beach and Dune",
+                                            "Salar" = "Salt flat",
+                                            "P\\?ntano" = "Wetland",
+                                            "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
+                                            "Mosaico de Agricultura e Pasture" = "Mosaic of Agriculture and Pasture"))
+
+
+
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/mapbiomas_transicao_est_dic_en.csv", fileEncoding = "UTF-8")
 
