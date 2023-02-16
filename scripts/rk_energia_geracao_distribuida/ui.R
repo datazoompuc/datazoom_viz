@@ -31,29 +31,29 @@ get_ui <- function(files, param) {
           selectInput(
             inputId = "fonte",
             label = param$ui2,
-            choices = c("Todos", param$x_choices),
-            selected = "Todos",
+            choices = c(param$server7, param$x_choices),
+            selected = param$server7,
             width = "100%"
           ),
           selectInput(
             inputId = "origem",
             label = param$ui3,
-            choices = c("Todos", param$x_choices),
-            selected = "Todos",
+            choices = c(param$server7, param$x_choices),
+            selected = param$server7,
             width = "100%"
           ),
           selectInput(
             inputId = "tipo",
             label = param$ui4,
-            choices = c("Todos", param$x_choices),
-            selected = "Todos",
+            choices = c(param$server7, param$x_choices),
+            selected = param$server7,
             width = "100%"
           ),
           selectInput(
             inputId = "combustivel",
             label = param$ui5,
-            choices = c("Todos", param$x_choices),
-            selected = "Todos",
+            choices = c(param$server7, param$x_choices),
+            selected = param$server7,
             width = "100%"
           )
         ),

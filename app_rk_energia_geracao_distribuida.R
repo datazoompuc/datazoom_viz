@@ -21,9 +21,9 @@ source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
-# Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
+# Parâmetros da visualização (define as variáveis/colunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "potencia_outorgada_k_w" # variável padrão do eixo x
+param$x_def <- "potencia_outorgada_kw" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "ano"
 param$color_def <- "estado" # variável padrão de cor
@@ -44,12 +44,14 @@ param$ui5 <- "Combustível final:"
 param$ui6 <- "https://datazoom.shinyapps.io/app_rk_energia_geracao_distribuida/"
 
 # Parâmetros específicos do server
+param$lang <- FALSE
 param$server1 <- "Variável não selecionada"
 param$server2 <- "Ranking de "
 param$server3 <- "Fonte: "
 param$server4 <- ", Origem: "
 param$server5 <- ", Tipo: "
 param$server6 <- ", Combustível Final: "
+param$server7 <- "Todos"
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
