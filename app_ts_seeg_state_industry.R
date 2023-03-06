@@ -45,7 +45,7 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_industry/"
 param$subtitle_init <- "por Estado" # expressão subtitulo
 param$title_init <- "Emissões Totais advindas de "
 param$tooltip_a <- "Emissões"
-param$tooltip_b <-  "Unidade de medida: <b>"
+param$tooltip_b <-  "Unidade de medida:"
 param$tooltip_c <- "Toneladas"
 
 # Outros parâmetros e configurações

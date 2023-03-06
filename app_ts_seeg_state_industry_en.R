@@ -1,5 +1,6 @@
 # Carrega bibliotecas
 library(shiny)
+library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
@@ -13,7 +14,7 @@ files$param_script <- "scripts/ts_seeg_state_industry/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 
 files$param_file <- "data/seeg_state_industry_dic_en.csv"
-files$db_file <- "data/seeg_state_industry_en.rds"
+files$db_file <- "data/seeg_state_industry.rds"
 
 
 # Carrega scripts
@@ -38,15 +39,16 @@ param$plot_desc <- "Greenhouse Gas Emissions in Industry at State Level"
 param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "vertical axis (y)"
 param$label_log_name <- "log scale"
-param$label_prop_name <-  "proportional to the initial year (*)"
+param$label_prop_name <- "proportional to the initial year (*)"
 param$label_geo_name <- "State"
 param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_industry_en/"
 
 ### Parametros especificos no server
+param$lang <- TRUE
 param$subtitle_init <- "by State" # expressão subtitulo
 param$title_init <- "Total emissions from "
 param$tooltip_a <- "Emissions"
-param$tooltip_b <-  "Unit of measurement: <b>"
+param$tooltip_b <- "Unit of measurement:"
 param$tooltip_c <- "Tons"
 
 

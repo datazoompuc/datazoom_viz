@@ -14,8 +14,16 @@ get_server <- function(files, param) {
 
     # Carrega dados
     df <- readRDS(files$db_file) %>% 
-      filter(!is.na(group))
-    
+      filter(!is.na(group)) 
+
+# Traduz dados para inglês
+  if(param$lang){
+
+     df$setor <- df$setor %>%
+          str_replace_all(c("Processos industriais" = "Industrial process"))
+
+  }
+
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -207,7 +215,7 @@ get_server <- function(files, param) {
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            param$tooltip_b, param$tooltip_c, "</b>"
+            param$tooltip_b,  "<b>", param$tooltip_c, "</b>"
           )
 
           # Define paleta de cores
