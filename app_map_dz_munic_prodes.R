@@ -9,8 +9,8 @@ library(htmlwidgets)
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/map_dz_munic_prodes/ui.R"
-files$server_script <- "scripts/map/server.R"
-files$param_script <- "scripts/map/db_params.R"
+files$server_script <- "scripts/map_dz_munic_prodes/server.R"
+files$param_script <- "scripts/map_dz_munic_prodes/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/dz_munic_dic.csv"
 files$db_file <- "data/dz_munic_simplified.rds"
@@ -36,7 +36,20 @@ param$plot_desc <- "Compilação de dados ao nível municipal (PRODES)"
 param$app <- "INPE - PRODES"
 
 param$year_inicio <- 2000
-param$year_final <- 2019
+param$year_final <- 2021
+
+#parâmetros específicos no Server
+param$label_title<- "Mapa dos municípios da Amazônia Legal"
+param$label_munic<- "Nome do Município <b>"
+param$label_state<- "Estado: <b>"
+param$label_measurement_unit<- "Unidade de medida: <b>"
+param$variavel_none<- paste0("Nenhuma variável selecionada")
+
+#parametros especificos no UI
+param$label_var_name<-  "VARI\u00C1VEIS:"
+param$label_x_name<- "Seleciona variável (x)"
+param$ref_year<- "Ano Referente"
+param$link<-"window.open('https://datazoom.shinyapps.io/app_map_dz_munic_prodes/"
 
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]

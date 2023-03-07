@@ -285,7 +285,7 @@ write.csv(temp_param_table,
 )
 
 # translate to english --------------------------------------------------------------
-temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_comercial"] <- "Installed Capacity - Comercial"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_comercial"] <- "Installed Capacity - Commercial"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_residencial"] <- "Installed Capacity - Residential"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_industrial"] <- "Installed Capacity - Industrial"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_rural"] <- "Installed Capacity - Rural"
@@ -293,7 +293,7 @@ temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_poder_
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_servico_publico"] <- "Installed Capacity - Public Service"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_iluminacao_publica"] <- "Installed Capacity - Public Lighting"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_total"] <- "Total Installed Capacity"
-temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_comercial"] <- "Number of Units - Comercial"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_comercial"] <- "Number of Units - Commercial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_residencial"] <- "Number of Units - Residential"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_industrial"] <- "Number of Units - Industrial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_rural"] <- "Number of Units - Rural"

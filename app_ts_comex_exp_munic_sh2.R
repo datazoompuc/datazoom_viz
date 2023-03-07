@@ -36,6 +36,13 @@ param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da ex
 
 # Outros parâmetros e configurações
 
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "Município da Amazônia"
+param$label_scale_name <- "escala log"
+param$label_axis_name <- "proporcional ao ano inicial (*)"
+param$label_mun_filter <- "Categorias de exportação (agregação do SH2)"
+param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_munic_sh2/"
+param$currency <- "Por R$"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
