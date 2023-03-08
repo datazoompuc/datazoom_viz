@@ -86,6 +86,7 @@ get_server <- function(files, param) {
     
     df_reactived <- reactive({
         
+      df <- df %>% filter(ano != as.numeric(str_extract(Sys.Date(), "^.{4}")))
       if (input$tipo != param$server7) df <- df %>% filter(tipo == input$tipo)
       if (input$fonte != param$server7) df <- df %>% filter(fonte == input$fonte)
       if (input$origem != param$server7) df <- df %>% filter(origem == input$origem)
