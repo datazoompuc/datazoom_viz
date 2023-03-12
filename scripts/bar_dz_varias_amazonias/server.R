@@ -121,6 +121,21 @@ get_server <- function(files, param) {
           colnames(df_p) <- c("y_variable", "x_variable")
           
 
+          if(param$lang){
+              df_p <- df_p %>%
+                  mutate(x_variable = case_when(x_variable == "Municípios desmatados" ~ "Deforested municipalities",
+                                                x_variable == "Municípios florestais" ~ "Forest municipalities",
+                                                x_variable == "Municípios não florestais" ~ "Non-forest municipalities",
+                                                x_variable == "Municípios sob pressão de desmatamento" ~ "Municipalities under pressure of deforestation"))
+              
+              df <- df %>%
+                  mutate(front_2020_label = case_when(front_2020_label == "Municípios desmatados" ~ "Deforested municipalities",
+                                                      front_2020_label == "Municípios florestais" ~ "Forest municipalities",
+                                                      front_2020_label == "Municípios não florestais" ~ "Non-forest municipalities",
+                                                      front_2020_label == "Municípios sob pressão de desmatamento" ~ "Municipalities under pressure of deforestation"))
+              
+          }
+          
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$y_variable)), ]
 
@@ -141,9 +156,9 @@ get_server <- function(files, param) {
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>",df_p$text,"</b><br>",
-            x_col$label, ":  <b>", df_p$x, "</b><br>",
+            x_col$label, ":  <b>", df_p$x_variable, "</b><br>",
             y_col$label, ":  <b>", format(df_p$y, scientific = FALSE, digits = 2, decimal.mark = ",", big.mark = "."),  "</b><br>",
-            param$measurement_unit, y_col$unidade, "</b></b>"
+            param$measurement_unit,"<b>", y_col$unidade,"</b>", "</b></b>"
           )
 
           # Define paleta de cores
