@@ -7,9 +7,9 @@ library(lubridate)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/bar/ui.R"
-files$server_script <- "scripts/bar/server.R"
-files$param_script <- "scripts/bar/db_params.R"
+files$ui_script <- "scripts/bar_dz_varias_amazonias/ui.R"
+files$server_script <- "scripts/bar_dz_varias_amazonias/server.R"
+files$param_script <- "scripts/bar_dz_varias_amazonias/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
@@ -44,6 +44,8 @@ param$selected_variable<- "Vari\u00e1vel selecionada: "
 param$label_datasource<- "Fonte de dados: "
 param$y_empty<-"Vari\u00e1vel Y vazia"
 param$measurement_unit<- "Unidade de medida: "
+param$lang<- FALSE
+param$empty_x <- "Eixo X vazio" 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

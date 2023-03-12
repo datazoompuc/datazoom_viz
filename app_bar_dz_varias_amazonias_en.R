@@ -7,9 +7,9 @@ library(lubridate)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/bar/ui.R"
-files$server_script <- "scripts/bar/server.R"
-files$param_script <- "scripts/bar/db_params.R"
+files$ui_script <- "scripts/bar_dz_varias_amazonias/ui.R"
+files$server_script <- "scripts/bar_dz_varias_amazonias/server.R"
+files$param_script <- "scripts/bar_dz_varias_amazonias/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
@@ -37,11 +37,15 @@ param$plot_desc <- "Diference between multiple Amazons in more recent indicators
 #mudanças específicas no UI
 param$variable_caps<- "VARIABLES:"
 param$y_variable<- "vertical axis (y)"
+
+
 #mudanças específicas no server
 param$selected_variable<- "Selected variable: "
 param$label_datasource<- "Data source: "
 param$y_empty<-"Y variable empty"
 param$measurement_unit<- "Measurement Unit: "
+param$lang<- TRUE
+param$empty_x <- "Empty X-axis"
 
 
 # Outros parâmetros e configurações
