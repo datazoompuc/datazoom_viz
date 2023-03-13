@@ -155,7 +155,7 @@ get_server <- function(files, param) {
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
-            "<b>",df_p$text,"</b><br>",
+            "<b>",y_col$label,"</b><br><br>",
             x_col$label, ":  <b>", df_p$x_variable, "</b><br>",
             y_col$label, ":  <b>", format(df_p$y, scientific = FALSE, digits = 2, decimal.mark = ",", big.mark = "."),  "</b><br>",
             param$measurement_unit,"<b>", y_col$unidade,"</b>", "</b></b>"
@@ -182,6 +182,8 @@ get_server <- function(files, param) {
             colors = pallete,
             text = ~tooltip,
             hoverlabel = "text",
+            hoverinfo = "text",
+            textposition = "none",
             marker = list(
               opacity = 0.5,
               line = list(width = 1, color = "white")
