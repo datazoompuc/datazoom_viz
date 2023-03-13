@@ -194,7 +194,7 @@ get_server <- function(files, param) {
           x_axis_layout <- list(
             title = x_col$label,
             titlefont = f1,
-            tickfont = f2,
+            showticklabels = FALSE,
             automargin = FALSE,
             autorange = TRUE,
             showgrid = FALSE,
