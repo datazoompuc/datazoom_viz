@@ -1,6 +1,6 @@
-############################################################
-#### Generate rds data in the folder ./data/ 
-############################################################
+#################################################
+#### Generate rds data in the folder ./data/ ####
+#################################################
 
 library(datazoom.amazonia)
 library(tidyverse)
@@ -10,8 +10,8 @@ library(readxl)
 
 dat <- load_mapbiomas(dataset = "mapbiomas_transition", geo_level = "state")
 
-saveRDS(dat, file = "data/mapbiomas_transicao_est_raw.rds")
-dat <- readRDS("data/mapbiomas_transicao_est_raw.rds")
+#saveRDS(dat, file = "data/mapbiomas_transicao_est_raw.rds")
+#dat <- readRDS("data/mapbiomas_transicao_est_raw.rds")
 
 
 # Data for level_4
@@ -27,8 +27,16 @@ data1$from_level_0 <- NULL
 data1$from_level_1 <- NULL
 data1$from_level_2 <- NULL
 data1$from_level_3 <- NULL
+data1$to_color <- NULL
+data1$class_id_from <- NULL
+data1$from_color <- NULL
+data1$from_class <- NULL
+data1$to_class <- NULL
 
-# Translation
+###############
+# Translation #
+###############
+
 ########################################## from_level_4 ##########################################
 data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "Não Observado"
 data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "Formação de Floresta"
@@ -94,28 +102,32 @@ data1$to_level_4[data1$to_level_4 == "Other Non Forest Natural Formation"] <- "O
 
 
 data1$group <- paste(data1$from_level_4, " para ",data1$to_level_4)
+
 data1 <- select(data1, c("year", "state", "value", "group")) %>%
     group_by(year, state, group) %>%
     summarise(value = sum(value))
 
 
-datafinal <- pivot_wider(data2,id_cols = c("year", "state"), names_from = group, values_from = value)%>% 
+datafinal <- pivot_wider(data1,id_cols = c("year", "state"), names_from = group, values_from = value)%>% 
     mutate_all(~replace_na(., 0))  %>%
     relocate(.before = c("year", "state"))
 
 datafinal[,3:ncol(datafinal)] <- round(datafinal[,3:ncol(datafinal)], digits = 2)
 
-#labl <- colnames(datafinal)
-#labl <- labl[-c(1,2)]
-#labl <- substr(labl, 6, 100)
+datafinal <- datafinal %>%
+    mutate(ano_inicial = str_split(year, "_")[[1]][1],
+           ano_final = str_split(year, "_")[[1]][2]) %>%
+    relocate(ano_final, ano_inicial) %>%
+    filter(as.numeric(ano_final) - as.numeric(ano_inicial) == 5) %>%
+    select(-c("ano_final", "ano_inicial"))
 
-#saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
+saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
 
-#datafinal <- readRDS("data/mapbiomas_transicao_est.rds")
+datafinal <- readRDS("data/mapbiomas_transicao_est.rds")
 
-#####################
-# Build Dictionary 
-#####################
+####################
+# Build Dictionary #
+####################
 
 # extract variables from data
 columns <- colnames(datafinal)
@@ -157,9 +169,9 @@ temp_param_table$label <- stringr::str_squish(temp_param_table$label)
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/mapbiomas_transicao_est_dic.csv", fileEncoding = "UTF-8")
 
-#############################
-# Build Dictionary in English
-#############################
+###############################
+# Build Dictionary in English #
+###############################
 
 # extract variables from data
 columns <- colnames(datafinal)
