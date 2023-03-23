@@ -8,7 +8,7 @@ library(tibble)
 library(zoo)
 library(readxl)
 
-dat <- load_mapbiomas_transition(space_aggregation = "municipality", transition_interval = 5)
+dat <- load_mapbiomas(dataset = "mapbiomas_transition", geo_level = "municipality")
 
 saveRDS(dat, file = "data/mapbiomas_transicao_munic_raw.rds")
 dat <- readRDS(file = "data/mapbiomas_transicao_munic_raw.rds")
@@ -45,51 +45,68 @@ data1$from_level_1 <- NULL
 data1$from_level_2 <- NULL
 data1$from_level_3 <- NULL
 
-# Translation
-data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "Não Observado"
-data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "Formação de Floresta"
+########################################## from_level_4 ##########################################
+data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "NÃ£o Observado"
+data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "FormaÃ§Ã£o de Floresta"
 data1$from_level_4[data1$from_level_4 == "Grassland"] <- "Pradaria"
 data1$from_level_4[data1$from_level_4 == "Pasture"] <- "Pastagem"
 data1$from_level_4[data1$from_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
 data1$from_level_4[data1$from_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
-data1$from_level_4[data1$from_level_4 == "Other Non Vegetated Area"] <- "Outras áreas não vegetadas"
+data1$from_level_4[data1$from_level_4 == "Other Non Vegetated Area"] <- "Outras Ã¡reas nÃ£o vegetadas"
 data1$from_level_4[data1$from_level_4 == "Magrove"] <- "Mangue"
-data1$from_level_4[data1$from_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
-data1$from_level_4[data1$from_level_4 == "Mining"] <- "Mineiração"
+data1$from_level_4[data1$from_level_4 == "Forest Plantation"] <- "PlantaÃ§Ã£o de Floresta"
+data1$from_level_4[data1$from_level_4 == "Mining"] <- "MineiraÃ§Ã£o"
 data1$from_level_4[data1$from_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
 data1$from_level_4[data1$from_level_4 == "Soy Beans"] <- "Soja"
-data1$from_level_4[data1$from_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
-data1$from_level_4[data1$from_level_4 == "Savanna Formation"] <- "Formação de Savana"
+data1$from_level_4[data1$from_level_4 == "Sugar Cane"] <- "Cana-de-aÃ§Ãºcar"
+data1$from_level_4[data1$from_level_4 == "Savanna Formation"] <- "FormaÃ§Ã£o de Savana"
 data1$from_level_4[data1$from_level_4 == "Beach and Dune"] <- "Praia e Dunas"
 data1$from_level_4[data1$from_level_4 == "Salt flat"] <- "Salar"
-data1$from_level_4[data1$from_level_4 == "Wetland"] <- "Pântano"
+data1$from_level_4[data1$from_level_4 == "Wetland"] <- "PÃ¢ntano"
 data1$from_level_4[data1$from_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
-data1$from_level_4[data1$from_level_4 == "Perennial Crops"] <- "Cultivos temporários"
-data1$from_level_4[data1$from_level_4 == "Rocky outcrop"] <- "Afloramento rochoso"
 data1$from_level_4[data1$from_level_4 == "Aquaculture"] <- "Aquacultura"
-data1$from_level_4[data1$from_level_4 == "Other Non Forest Natural Formation"] <- "Outras Formações Naturais não Florestais"
-data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "Não Observado"
-data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "Formação de Floresta"
+data1$from_level_4[data1$from_level_4 == "Salar"] <- "Salar"
+data1$from_level_4[data1$from_level_4 == "Other Perennial Crops"] <- "Outros Cultivos Perenes"
+data1$from_level_4[data1$from_level_4 == "Wooded Restinga"] <- "Restinga Arborizada"
+data1$from_level_4[data1$from_level_4 == "Restinga Herbacea/Arbustiva"] <- "Restinga HerbÃ¡cea/Arbustiva"
+data1$from_level_4[data1$from_level_4 == "Rocky outcrop"] <- "Afloramento Rochoso"
+data1$from_level_4[data1$from_level_4 == "Coffe"] <- "CafÃ©"
+data1$from_level_4[data1$from_level_4 == "Cotton"] <- "AlgodÃ£o"
+data1$from_level_4[data1$from_level_4 == "Other Temporary Crops"] <- "Outros Cultivos TemporÃ¡rios"
+data1$from_level_4[data1$from_level_4 == "Citrus"] <- "Cultivos CÃ­tricos"
+data1$from_level_4[data1$from_level_4 == "Rice"] <- "Arroz"
+data1$from_level_4[data1$from_level_4 == "Other Non Forest Natural Formation"] <- "Outras FormaÃ§Ãµes NÃ£o Florestais Naturais"
+########################################## to_level_4 ##########################################
+data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "NÃ£o Observado"
+data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "FormaÃ§Ã£o de Floresta"
 data1$to_level_4[data1$to_level_4 == "Grassland"] <- "Pradaria"
 data1$to_level_4[data1$to_level_4 == "Pasture"] <- "Pastagem"
 data1$to_level_4[data1$to_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
 data1$to_level_4[data1$to_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
-data1$to_level_4[data1$to_level_4 == "Other Non Vegetated Area"] <- "Outras áreas não vegetadas"
+data1$to_level_4[data1$to_level_4 == "Other Non Vegetated Area"] <- "Outras Ã¡reas nÃ£o vegetadas"
 data1$to_level_4[data1$to_level_4 == "Magrove"] <- "Mangue"
-data1$to_level_4[data1$to_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
-data1$to_level_4[data1$to_level_4 == "Mining"] <- "Mineiração"
+data1$to_level_4[data1$to_level_4 == "Forest Plantation"] <- "PlantaÃ§Ã£o de Floresta"
+data1$to_level_4[data1$to_level_4 == "Mining"] <- "MineiraÃ§Ã£o"
 data1$to_level_4[data1$to_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
 data1$to_level_4[data1$to_level_4 == "Soy Beans"] <- "Soja"
-data1$to_level_4[data1$to_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
-data1$to_level_4[data1$to_level_4 == "Savanna Formation"] <- "Formação de Savana"
+data1$to_level_4[data1$to_level_4 == "Sugar Cane"] <- "Cana-de-aÃ§Ãºcar"
+data1$to_level_4[data1$to_level_4 == "Savanna Formation"] <- "FormaÃ§Ã£o de Savana"
 data1$to_level_4[data1$to_level_4 == "Beach and Dune"] <- "Praia e Dunas"
 data1$to_level_4[data1$to_level_4 == "Salt flat"] <- "Salar"
-data1$to_level_4[data1$to_level_4 == "Wetland"] <- "Pântano"
+data1$to_level_4[data1$to_level_4 == "Wetland"] <- "PÃ¢ntano"
 data1$to_level_4[data1$to_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
-data1$to_level_4[data1$to_level_4 == "Perennial Crops"] <- "Cultivos temporários"
-data1$to_level_4[data1$to_level_4 == "Rocky outcrop"] <- "Afloramento rochoso"
 data1$to_level_4[data1$to_level_4 == "Aquaculture"] <- "Aquacultura"
-data1$to_level_4[data1$to_level_4 == "Other Non Forest Natural Formation"] <- "Outras Formações Naturais não Florestais"
+data1$to_level_4[data1$to_level_4 == "Salar"] <- "Salar"
+data1$to_level_4[data1$to_level_4 == "Other Perennial Crops"] <- "Outros Cultivos Perenes"
+data1$to_level_4[data1$to_level_4 == "Wooded Restinga"] <- "Restinga Arborizada"
+data1$to_level_4[data1$to_level_4 == "Restinga Herbacea/Arbustiva"] <- "Restinga HerbÃ¡cea/Arbustiva"
+data1$to_level_4[data1$to_level_4 == "Rocky outcrop"] <- "Afloramento Rochoso"
+data1$to_level_4[data1$to_level_4 == "Coffe"] <- "CafÃ©"
+data1$to_level_4[data1$to_level_4 == "Cotton"] <- "AlgodÃ£o"
+data1$to_level_4[data1$to_level_4 == "Other Temporary Crops"] <- "Outros Cultivos TemporÃ¡rios"
+data1$to_level_4[data1$to_level_4 == "Citrus"] <- "Cultivos CÃ­tricos"
+data1$to_level_4[data1$to_level_4 == "Rice"] <- "Arroz"
+data1$to_level_4[data1$to_level_4 == "Other Non Forest Natural Formation"] <- "Outras FormaÃ§Ãµes NÃ£o Florestais Naturais"
 
 
 data1$group <- paste(data1$from_level_4, " para ",data1$to_level_4)
@@ -152,9 +169,9 @@ temp_param_table <- tibble(
   subcategoria = "Uso da terra"
 )
 
-temp_param_table$label[1] <- "Município"
+temp_param_table$label[1] <- "MunicÃ­pio"
 temp_param_table$label[2] <- "Intervalo"
-temp_param_table$desc[1] <- "Município"
+temp_param_table$desc[1] <- "MunicÃ­pio"
 temp_param_table$desc[2] <- "Intervalo"
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 460))
 temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 460))
