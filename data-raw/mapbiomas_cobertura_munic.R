@@ -2,15 +2,20 @@
 #### Generate rds data in the folder ./data/ 
 ############################################################
 
+#devtools::install_github("https://github.com/datazoompuc/datazoom.amazonia")
+
+
+# packages --------------------------------------------------------------------------
 library(datazoom.amazonia)
 library(tidyverse)
 library(tibble)
 library(zoo)
 library(readxl)
 
-devtools::install_github("https://github.com/datazoompuc/datazoom.amazonia/tree/update_mapbiomas")
 
-dat <- load_mapbiomas(dataset= "mapbiomas_cover", geo_level   = "municipality", cover_level = "none")
+# load data[ ------------------------------------------------------------------------
+dat <- load_mapbiomas(dataset = "mapbiomas_cover", geo_level = "municipality", 
+                      cover_level = "none")
 
 saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
 
@@ -147,7 +152,9 @@ data <- rbind(data1, data2, data3, data4, data5)
 # num de linhas= anos*agregação, ou seja, moda a area de cada agregação para cada ano
 # acho que os warnings ocorrem pq deve aparecer a mesma agregação em mais de uma dataX
 
-datafinal <- reshape(data, idvar = c("aggregation", "time"), timevar = "group", direction = "wide")
+datafinal <- pivot_wider(unique(data), names_from = aggregation, values_from = area,
+                         values_fill = 0)
+
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
