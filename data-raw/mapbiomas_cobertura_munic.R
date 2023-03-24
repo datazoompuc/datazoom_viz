@@ -155,6 +155,19 @@ data <- rbind(data1, data2, data3, data4, data5)
 datafinal <- pivot_wider(unique(data), names_from = aggregation, values_from = area,
                          values_fill = 0)
 
+#questão: esse df tem mt mais municipio. provavelmente pois nao filtra para os da amazonia legal
+#solucao: pehgar o df antigo e fazer um inner join por group
+
+datafinal_antigo <- datafinal_antigo %>%
+select(group)
+
+datafinal <- datafinal %>%
+    inner_join(datafinal_antigo)
+
+# deletar coluna Citrus pois é tudo 0
+datafinal$Citrus <- NULL
+
+
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
@@ -162,16 +175,49 @@ sublabl <- labl[23:27]
 sublabl <- substr(sublabl, 5, 100)
 labl[23:27] <- sublabl
 
-#a ordem está certa mesmo?
-translated_labl <- c("Mosaico de Cultivos", "Soja", "Pastagem", "Infraestrutura Urbana", "Formação de Floresta",
-                     "Pradaria", "Rios, Lagos ou Oceanos", "Não Observado", "Formação de Savana",
-                     "Outras áreas não vegetadas", "Plantação de Floresta", "Mineiração", "Cana-de-açúcar",
-                     "Mangue", "Salar", "Praia e Dunas", "Pântano", "Cultivos perenes",
-                     "Mosaico de Agricultura e Pastagem", "Cultivos temporários", "Agricultura",
-                     "Floresta Natural", "Floresta", "Formação Natural sem ser Floresta",
-                     "Fazenda", "Área não Vegetada", "Água", "Formação Antrópica", "Formação Natural",
-                     "Não Identificado")
-colnames(datafinal) <- c("time", "group", translated_labl)
+
+
+#para evitar que a ordem esteja descasada, renomeei as colunas uma por uma:
+
+datafinal <- datafinal %>%
+    select( time, group,                         
+ "Aquicultura"= "Aquaculture"  ,         
+ "Praia e Dunas"="Beach and Dune" ,                  
+   "Café"  = "Coffe"    ,                      
+   " Plantação de Floresta" = "Forest Plantation"     ,            
+  "Pradaria" = "Grassland"  ,                     
+ "Mineiração"= "Mining" ,
+ "Cana-de-açúcar" = "Sugar Cane" ,
+"Mangue"= "Magrove"  ,
+  "Salar" = "Salt flat",                        
+   "Mosaico de Agricultura e Pastagens"="Mosaic of Agriculture and Pasture",
+  "Não observado"="Non Observed" ,                    
+  "Outras formações naturais não florestais"= "Other Non Forest Natural Formation",
+ "Outras áreas não vegetadas"= "Other Non Vegetated Area" ,        
+  "Outras Culturas Perenes" =  "Other Perennial Crops" ,           
+ "Outras Culturas Temporárias"=  "Other Temporary Crops"  ,           
+ "Arroz" =  "Rice"    ,                     
+ "Rios, Lagos ou Oceanos" =  "River, Lake and Ocean"  ,           
+"Afloramento rochoso" =  "Rocky outcrop"  ,                   
+  "Formação de Savana" =  "Savanna Formation"    ,           
+  "Soja" =  "Soy Beans",
+ "Pastagem" =  "Pasture" , 
+"Infraestrutura Urbana" =  "Urban Infrastructure",
+"Formação de Floresta"=  "Forest Formation" ,                     
+"Pântano"=  "Wetland" ,                          
+  "Restinga Arborizada"=  "Wooded Restinga" ,                 
+  "Culturas Perenes"=  "Perennial Crops",                 
+  "Culturas Temporárias" =  "Temporary Crops" ,                
+ "Agricultura" =  "Agriculture"  ,                    
+  "Floresta" =  "1. Forest"   ,                     
+ "Formação Natural Não Florestal" =  "2. Non Forest Natural Formation"   ,
+ "Fazenda" =  "3. Farming" ,                       
+  "Áreas não vegetadas" =  "4. Non Vegetated Area" ,           
+  "Água" = "5. Water"   ,                  
+  "Antrópico" = "Anthropic"     ,                   
+"Natural"=  "Natural"       ,                    
+  "Não aplicado"=  "Not applied" )                     
+
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
 
@@ -209,11 +255,11 @@ temp_param_table$label[1] <- "Ano"
 temp_param_table$label[2] <- "Município"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$desc[2] <- "Município"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 30))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 30))
-temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 30))
-temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 30))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 37))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 37))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 37))
+temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 37))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 37))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_dic.csv", fileEncoding = "UTF-8")
