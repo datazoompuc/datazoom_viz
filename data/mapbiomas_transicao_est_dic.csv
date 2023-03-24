@@ -1,6 +1,6 @@
 "","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","year",TRUE,FALSE,TRUE,TRUE,FALSE,"Ano","Ano","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
-"2","state",TRUE,FALSE,FALSE,FALSE,FALSE,"Estado","state","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"1","time",TRUE,FALSE,TRUE,TRUE,FALSE,"Intervalo de tempo","Intervalo de tempo","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"2","group",TRUE,FALSE,TRUE,FALSE,FALSE,"Estado","group","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "3","Formação de Floresta  para  Formação de Floresta",TRUE,TRUE,FALSE,FALSE,TRUE,"Formação de Floresta para Formação de Floresta","Formação de Floresta  para  Formação de Floresta","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "4","Formação de Floresta  para  Formação de Savana",TRUE,TRUE,FALSE,FALSE,TRUE,"Formação de Floresta para Formação de Savana","Formação de Floresta  para  Formação de Savana","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "5","Formação de Floresta  para  Infraestrutura Urbana",TRUE,TRUE,FALSE,FALSE,TRUE,"Formação de Floresta para Infraestrutura Urbana","Formação de Floresta  para  Infraestrutura Urbana","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
