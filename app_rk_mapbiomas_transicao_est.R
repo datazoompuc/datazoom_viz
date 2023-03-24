@@ -6,9 +6,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk/ui.R"
-files$server_script <- "scripts/rk/server.R"
-files$param_script <- "scripts/rk/db_params.R"
+files$ui_script <- "scripts/rk_mapbiomas_transition_est/ui.R"
+files$server_script <- "scripts/rk_mapbiomas_transition_est/server.R"
+files$param_script <- "scripts/rk_mapbiomas_transition_est/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/mapbiomas_transicao_est_dic.csv"
 files$db_file <- "data/mapbiomas_transicao_est.rds"
