@@ -10,8 +10,8 @@ library(readxl)
 
 dat <- load_mapbiomas(dataset = "mapbiomas_transition", geo_level = "state")
 
-#saveRDS(dat, file = "data/mapbiomas_transicao_est_raw.rds")
-#dat <- readRDS("data/mapbiomas_transicao_est_raw.rds")
+saveRDS(dat, file = "data/mapbiomas_transicao_est_raw.rds")
+dat <- readRDS("data/mapbiomas_transicao_est_raw.rds")
 
 
 # Data for level_4
@@ -119,7 +119,8 @@ datafinal <- datafinal %>%
            ano_final = str_split(year, "_")[[1]][2]) %>%
     relocate(ano_final, ano_inicial) %>%
     filter(as.numeric(ano_final) - as.numeric(ano_inicial) == 5) %>%
-    select(-c("ano_final", "ano_inicial"))
+    select(-c("ano_final", "ano_inicial")) %>%
+    rename(time = year, group = state)
 
 saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
 
@@ -151,14 +152,14 @@ temp_param_table <- tibble(
 
 temp_param_table$label[temp_param_table$var == "year"] <- "Ano"
 temp_param_table$label[temp_param_table$var == "time"]  <- "Intervalo de tempo"
-temp_param_table$label[temp_param_table$var == "state"]  <- "Estado"
+temp_param_table$label[temp_param_table$var == "group"]  <- "Estado"
 
 temp_param_table$desc[temp_param_table$var == "year"]  <- "Ano"
 temp_param_table$desc[temp_param_table$var == "time"]  <- "Intervalo de tempo"
-temp_param_table$label[temp_param_table$var == "state"]  <- "Estado"
+temp_param_table$label[temp_param_table$var == "group"]  <- "Estado"
 
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, (ncol(datafinal) - 2)))
-temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, (ncol(datafinal) - 1)))
+temp_param_table$color <- c(rep(TRUE, 2), rep(FALSE, (ncol(datafinal) - 2)))
 temp_param_table$size <- c(rep(TRUE, 1), rep(FALSE, (ncol(datafinal) - 1)))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, (ncol(datafinal) - 2)))
 
@@ -196,11 +197,11 @@ temp_param_table <- tibble(
 
 temp_param_table$label[temp_param_table$var == "year"] <- "Year"
 temp_param_table$label[temp_param_table$var == "time"]  <- "Time Span"
-temp_param_table$label[temp_param_table$var == "state"]  <- "State"
+temp_param_table$label[temp_param_table$var == "group"]  <- "State"
 
 temp_param_table$desc[temp_param_table$var == "year"]  <- "Year"
 temp_param_table$desc[temp_param_table$var == "time"]  <- "Time Span"
-temp_param_table$label[temp_param_table$var == "state"]  <- "State"
+temp_param_table$label[temp_param_table$var == "group"]  <- "State"
 
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, (ncol(datafinal) - 2)))
 temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, (ncol(datafinal) - 1)))
@@ -244,4 +245,3 @@ temp_param_table$label <- temp_param_table$label %>% str_replace_all(c(" para " 
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/mapbiomas_transicao_est_dic_en.csv", fileEncoding = "UTF-8")
-
