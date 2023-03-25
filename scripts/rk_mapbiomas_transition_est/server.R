@@ -183,7 +183,8 @@ get_server <- function(files, param) {
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
             y_col$label, ": ", df_p$y, "<br>",
-            color_col$label, ": ", df_p$color
+            color_col$label, ": ", df_p$color, "<br>",
+            param$measur_unit1, ": ", param$measur_unit2
           )
 
           # Define paleta de cores

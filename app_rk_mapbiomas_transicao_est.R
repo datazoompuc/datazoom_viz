@@ -27,6 +27,9 @@ param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
+param$measur_unit1 <- "Unidade de Medida" # Texto "Unidade de Medida" para tooltip
+param$measur_unit2 <- "m<sup>2" # a unidade de medida
+
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
