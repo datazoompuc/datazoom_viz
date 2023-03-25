@@ -44,7 +44,8 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_munic/"
 
 ### Parametros especificos no server
 param$subtitle_init <- "por Território" # expressão titulo
-
+param$measur_unit1 <- "Unidade de Medida" # Texto "Unidade de Medida" para tooltip
+param$measur_unit2 <- "m<sup>2</sup>" # a unidade de medida
 
 # Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL
