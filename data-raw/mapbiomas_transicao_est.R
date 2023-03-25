@@ -101,26 +101,24 @@ data1$to_level_4[data1$to_level_4 == "Rice"] <- "Arroz"
 data1$to_level_4[data1$to_level_4 == "Other Non Forest Natural Formation"] <- "Outras Forma\u00e7\u00f5es N\u00e3o Florestais Naturais"
 
 
-data1$group <- paste(data1$from_level_4, " para ",data1$to_level_4)
-
-data1 <- select(data1, c("year", "state", "value", "group")) %>%
-    group_by(year, state, group) %>%
-    summarise(value = sum(value))
-
-
-datafinal <- pivot_wider(data1,id_cols = c("year", "state"), names_from = group, values_from = value)%>% 
+datafinal <- data1 %>% 
     mutate_all(~replace_na(., 0))  %>%
     relocate(.before = c("year", "state"))
 
-datafinal[,3:ncol(datafinal)] <- round(datafinal[,3:ncol(datafinal)], digits = 2)
+datafinal[,"value"] <- round(datafinal[,"value"], digits = 2)
 
+#filtrando para apenas intervalos de 5 anos
 datafinal <- datafinal %>%
-    mutate(ano_inicial = str_split(year, "_")[[1]][1],
-           ano_final = str_split(year, "_")[[1]][2]) %>%
-    relocate(ano_final, ano_inicial) %>%
-    filter(as.numeric(ano_final) - as.numeric(ano_inicial) == 5) %>%
-    select(-c("ano_final", "ano_inicial")) %>%
-    rename(time = year, group = state)
+    mutate(ano_inicial = str_split_i(year, "_",i = 1), #create inicial year variable
+           ano_final = str_split_i(year, "_", i = 2)) %>% #create final year variable
+    relocate(ano_final, ano_inicial) %>% # reorganize columns order
+    filter(as.numeric(ano_final) - as.numeric(ano_inicial) == 5) %>% #filtering for 5 year span
+    select(-c("ano_final", "ano_inicial")) %>% #removing created columns
+    rename(time = year, group = state, from = from_level_4, to = to_level_4) #renaming columns
+
+#replace "_" for "-" in the database
+datafinal$time <- datafinal$time %>%
+    str_replace(pattern = "_", replacement = " - ")
 
 saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
 
@@ -145,7 +143,7 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Mapbiomas",
   tipo = 1,
-  unidade = "m^2",
+  unidade = "m<sup>2",
   categoria= "Meio ambiente", 
   subcategoria = "Uso da terra"
 )
@@ -153,15 +151,19 @@ temp_param_table <- tibble(
 temp_param_table$label[temp_param_table$var == "year"] <- "Ano"
 temp_param_table$label[temp_param_table$var == "time"]  <- "Intervalo de tempo"
 temp_param_table$label[temp_param_table$var == "group"]  <- "Estado"
+temp_param_table$label[temp_param_table$var == "to"]  <- "Transição de"
+temp_param_table$label[temp_param_table$var == "from"]  <- "Transição para"
 
 temp_param_table$desc[temp_param_table$var == "year"]  <- "Ano"
 temp_param_table$desc[temp_param_table$var == "time"]  <- "Intervalo de tempo"
-temp_param_table$label[temp_param_table$var == "group"]  <- "Estado"
+temp_param_table$desc[temp_param_table$var == "group"]  <- "Estado"
+temp_param_table$desc[temp_param_table$var == "to"]  <- "Transição de"
+temp_param_table$desc[temp_param_table$var == "from"]  <- "Transição para"
 
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, (ncol(datafinal) - 2)))
-temp_param_table$color <- c(rep(TRUE, 2), rep(FALSE, (ncol(datafinal) - 2)))
+temp_param_table$y <- c(rep(FALSE, 5), rep(TRUE, 1))
+temp_param_table$color <- c(rep(FALSE, 1),c(rep(TRUE, 1), rep(FALSE, 4)))
 temp_param_table$size <- c(rep(TRUE, 1), rep(FALSE, (ncol(datafinal) - 1)))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, (ncol(datafinal) - 2)))
+temp_param_table$slider <- c(rep(TRUE, 1), rep(FALSE, (ncol(datafinal) - 1)))
 
 # remove multiple white spaces
 temp_param_table$label <- stringr::str_squish(temp_param_table$label)
@@ -198,15 +200,19 @@ temp_param_table <- tibble(
 temp_param_table$label[temp_param_table$var == "year"] <- "Year"
 temp_param_table$label[temp_param_table$var == "time"]  <- "Time Span"
 temp_param_table$label[temp_param_table$var == "group"]  <- "State"
+temp_param_table$label[temp_param_table$var == "to"]  <- "Transition from"
+temp_param_table$label[temp_param_table$var == "from"]  <- "Transition to"
 
 temp_param_table$desc[temp_param_table$var == "year"]  <- "Year"
 temp_param_table$desc[temp_param_table$var == "time"]  <- "Time Span"
-temp_param_table$label[temp_param_table$var == "group"]  <- "State"
+temp_param_table$desc[temp_param_table$var == "group"]  <- "State"
+temp_param_table$desc[temp_param_table$var == "to"]  <- "Transition from"
+temp_param_table$desc[temp_param_table$var == "from"]  <- "Transition to"
 
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, (ncol(datafinal) - 2)))
-temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, (ncol(datafinal) - 1)))
+temp_param_table$y <- c(rep(FALSE, 5), rep(TRUE, 1))
+temp_param_table$color <- c(rep(FALSE, 1),c(rep(TRUE, 1), rep(FALSE, 4)))
 temp_param_table$size <- c(rep(TRUE, 1), rep(FALSE, (ncol(datafinal) - 1)))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, (ncol(datafinal) - 2)))
+temp_param_table$slider <- c(rep(TRUE, 1), rep(FALSE, (ncol(datafinal) - 1)))
 
 # remove multiple white spaces
 temp_param_table$label <- stringr::str_squish(temp_param_table$label)

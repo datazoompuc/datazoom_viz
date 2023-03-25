@@ -29,8 +29,8 @@ get_ui <- function(files, param) {
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
-            inputId = "x",
-            label = "Ranking - eixo horizontal (x):",
+            inputId = "x_from",
+            label = param$ui_label_1,
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
@@ -40,10 +40,10 @@ get_ui <- function(files, param) {
           class = "var_selec_group",
           # Seleciona variável de cor
           selectInput(
-            inputId = "color",
-            label = "Cor das barras:",
-            choices = param$color_choices,
-            selected = param$color_def,
+            inputId = "x_to",
+            label = param$ui_label_2,
+            choices = param$x_choices,
+            selected = param$x_def,
             width = "100%"
           )
         ),

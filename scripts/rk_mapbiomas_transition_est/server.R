@@ -73,14 +73,13 @@ get_server <- function(files, param) {
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "" ||
-        is.null(input$color) || input$color == "") {
+      if (is.null(input$x_from) || input$x_from == "" ||
+        is.null(input$x_to) || input$x_from == "") {
         text <- "Variável não selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
 
-        text <- paste0("Ranking de ", x_col$label)
+        text <- paste0("Ranking de ", input$x_from, " para ", input$x_to)
       }
 
       text
@@ -94,7 +93,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         color_col <- param$table[which(param$table$var == input$color), ]
-        text <- paste0("Amazônia Legal")
+        text <- paste0(param$subtitle)
       }
 
       text
@@ -112,24 +111,26 @@ get_server <- function(files, param) {
         {
 
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$x) || input$x == "" ||
-            is.null(input$color) || input$color == "") {
+          if (is.null(input$x_to) || input$x_to == "" ||
+            is.null(input$x_from) || input$x_from == "") {
             fig <- plotly_empty()
             stop()
           }
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == input$x), ]
+          x_col <- param$table[which(param$table$var == "value")]
           color_col <- param$table[which(param$table$var == input$color), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
           text_col <- param$table[which(param$table$var == param$text_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
-
           # Cria coluna vazia para o ranking
           y_col <- list()
           y_col$var <- "rank"
           y_col$label <- "Ranking"
 
+          df <- df %>%
+              filter(from == input$x_from, to == input$x_to)
+          
           df_p <- data.frame(
             df[x_col$var],
             NA,
