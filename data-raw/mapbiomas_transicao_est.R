@@ -38,67 +38,67 @@ data1$to_class <- NULL
 ###############
 
 ########################################## from_level_4 ##########################################
-data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "Não Observado"
-data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "Formação de Floresta"
+data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "N\u00e3o Observado"
+data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "Forma\u00e7\u00e3o de Floresta"
 data1$from_level_4[data1$from_level_4 == "Grassland"] <- "Pradaria"
 data1$from_level_4[data1$from_level_4 == "Pasture"] <- "Pastagem"
 data1$from_level_4[data1$from_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
 data1$from_level_4[data1$from_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
-data1$from_level_4[data1$from_level_4 == "Other Non Vegetated Area"] <- "Outras áreas não vegetadas"
+data1$from_level_4[data1$from_level_4 == "Other Non Vegetated Area"] <- "Outras \u00e1reas n\u00e3o vegetadas"
 data1$from_level_4[data1$from_level_4 == "Magrove"] <- "Mangue"
-data1$from_level_4[data1$from_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
-data1$from_level_4[data1$from_level_4 == "Mining"] <- "Mineiração"
+data1$from_level_4[data1$from_level_4 == "Forest Plantation"] <- "Planta\u00e7\u00e3o de Floresta"
+data1$from_level_4[data1$from_level_4 == "Mining"] <- "Mineira\u00e7\u00e3o"
 data1$from_level_4[data1$from_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
 data1$from_level_4[data1$from_level_4 == "Soy Beans"] <- "Soja"
-data1$from_level_4[data1$from_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
-data1$from_level_4[data1$from_level_4 == "Savanna Formation"] <- "Formação de Savana"
+data1$from_level_4[data1$from_level_4 == "Sugar Cane"] <- "Cana-de-a\u00e7\u00facar"
+data1$from_level_4[data1$from_level_4 == "Savanna Formation"] <- "Forma\u00e7\u00e3o de Savana"
 data1$from_level_4[data1$from_level_4 == "Beach and Dune"] <- "Praia e Dunas"
 data1$from_level_4[data1$from_level_4 == "Salt flat"] <- "Salar"
-data1$from_level_4[data1$from_level_4 == "Wetland"] <- "Pântano"
+data1$from_level_4[data1$from_level_4 == "Wetland"] <- "P\u00e2ntano"
 data1$from_level_4[data1$from_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
 data1$from_level_4[data1$from_level_4 == "Aquaculture"] <- "Aquacultura"
 data1$from_level_4[data1$from_level_4 == "Salar"] <- "Salar"
 data1$from_level_4[data1$from_level_4 == "Other Perennial Crops"] <- "Outros Cultivos Perenes"
 data1$from_level_4[data1$from_level_4 == "Wooded Restinga"] <- "Restinga Arborizada"
-data1$from_level_4[data1$from_level_4 == "Restinga Herbacea/Arbustiva"] <- "Restinga Herbácea/Arbustiva"
+data1$from_level_4[data1$from_level_4 == "Restinga Herbacea/Arbustiva"] <- "Restinga Herb\u00e1cea/Arbustiva"
 data1$from_level_4[data1$from_level_4 == "Rocky outcrop"] <- "Afloramento Rochoso"
-data1$from_level_4[data1$from_level_4 == "Coffe"] <- "Café"
-data1$from_level_4[data1$from_level_4 == "Cotton"] <- "Algodão"
-data1$from_level_4[data1$from_level_4 == "Other Temporary Crops"] <- "Outros Cultivos Temporários"
-data1$from_level_4[data1$from_level_4 == "Citrus"] <- "Cultivos Cítricos"
+data1$from_level_4[data1$from_level_4 == "Coffe"] <- "Caf\u00e9"
+data1$from_level_4[data1$from_level_4 == "Cotton"] <- "Algod\u00e3o"
+data1$from_level_4[data1$from_level_4 == "Other Temporary Crops"] <- "Outros Cultivos Tempor\u00e1rios"
+data1$from_level_4[data1$from_level_4 == "Citrus"] <- "Cultivos C\u00edtricos"
 data1$from_level_4[data1$from_level_4 == "Rice"] <- "Arroz"
-data1$from_level_4[data1$from_level_4 == "Other Non Forest Natural Formation"] <- "Outras Formações Não Florestais Naturais"
+data1$from_level_4[data1$from_level_4 == "Other Non Forest Natural Formation"] <- "Outras Forma\u00e7\u00f5es N\u00e3o Florestais Naturais"
 ########################################## to_level_4 ##########################################
-data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "Não Observado"
-data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "Formação de Floresta"
+data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "N\u00e3o Observado"
+data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "Forma\u00e7\u00e3o de Floresta"
 data1$to_level_4[data1$to_level_4 == "Grassland"] <- "Pradaria"
 data1$to_level_4[data1$to_level_4 == "Pasture"] <- "Pastagem"
 data1$to_level_4[data1$to_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
 data1$to_level_4[data1$to_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
-data1$to_level_4[data1$to_level_4 == "Other Non Vegetated Area"] <- "Outras áreas não vegetadas"
+data1$to_level_4[data1$to_level_4 == "Other Non Vegetated Area"] <- "Outras \u00e1reas n\u00e3o vegetadas"
 data1$to_level_4[data1$to_level_4 == "Magrove"] <- "Mangue"
-data1$to_level_4[data1$to_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
-data1$to_level_4[data1$to_level_4 == "Mining"] <- "Mineiração"
+data1$to_level_4[data1$to_level_4 == "Forest Plantation"] <- "Planta\u00e7\u00e3o de Floresta"
+data1$to_level_4[data1$to_level_4 == "Mining"] <- "Mineira\u00e7\u00e3o"
 data1$to_level_4[data1$to_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
 data1$to_level_4[data1$to_level_4 == "Soy Beans"] <- "Soja"
-data1$to_level_4[data1$to_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
-data1$to_level_4[data1$to_level_4 == "Savanna Formation"] <- "Formação de Savana"
+data1$to_level_4[data1$to_level_4 == "Sugar Cane"] <- "Cana-de-a\u00e7\u00facar"
+data1$to_level_4[data1$to_level_4 == "Savanna Formation"] <- "Forma\u00e7\u00e3o de Savana"
 data1$to_level_4[data1$to_level_4 == "Beach and Dune"] <- "Praia e Dunas"
 data1$to_level_4[data1$to_level_4 == "Salt flat"] <- "Salar"
-data1$to_level_4[data1$to_level_4 == "Wetland"] <- "Pântano"
+data1$to_level_4[data1$to_level_4 == "Wetland"] <- "P\u00e2ntano"
 data1$to_level_4[data1$to_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
 data1$to_level_4[data1$to_level_4 == "Aquaculture"] <- "Aquacultura"
 data1$to_level_4[data1$to_level_4 == "Salar"] <- "Salar"
 data1$to_level_4[data1$to_level_4 == "Other Perennial Crops"] <- "Outros Cultivos Perenes"
 data1$to_level_4[data1$to_level_4 == "Wooded Restinga"] <- "Restinga Arborizada"
-data1$to_level_4[data1$to_level_4 == "Restinga Herbacea/Arbustiva"] <- "Restinga Herbácea/Arbustiva"
+data1$to_level_4[data1$to_level_4 == "Restinga Herbacea/Arbustiva"] <- "Restinga Herb\u00e1cea/Arbustiva"
 data1$to_level_4[data1$to_level_4 == "Rocky outcrop"] <- "Afloramento Rochoso"
-data1$to_level_4[data1$to_level_4 == "Coffe"] <- "Café"
-data1$to_level_4[data1$to_level_4 == "Cotton"] <- "Algodão"
-data1$to_level_4[data1$to_level_4 == "Other Temporary Crops"] <- "Outros Cultivos Temporários"
-data1$to_level_4[data1$to_level_4 == "Citrus"] <- "Cultivos Cítricos"
+data1$to_level_4[data1$to_level_4 == "Coffe"] <- "Caf\u00e9"
+data1$to_level_4[data1$to_level_4 == "Cotton"] <- "Algod\u00e3o"
+data1$to_level_4[data1$to_level_4 == "Other Temporary Crops"] <- "Outros Cultivos Tempor\u00e1rios"
+data1$to_level_4[data1$to_level_4 == "Citrus"] <- "Cultivos C\u00edtricos"
 data1$to_level_4[data1$to_level_4 == "Rice"] <- "Arroz"
-data1$to_level_4[data1$to_level_4 == "Other Non Forest Natural Formation"] <- "Outras Formações Não Florestais Naturais"
+data1$to_level_4[data1$to_level_4 == "Other Non Forest Natural Formation"] <- "Outras Forma\u00e7\u00f5es N\u00e3o Florestais Naturais"
 
 
 data1$group <- paste(data1$from_level_4, " para ",data1$to_level_4)
@@ -217,29 +217,29 @@ temp_param_table$label <- temp_param_table$label %>% str_replace_all(c(" para " 
                                                                     "Outros Cultivos Perenes" = "Other Perennial Crops",
                                                                     "Outros Cultivos Perenes" = "Othere Perennial Crops",
                                                                     "Restinga Arborizada" = "Wooded Restinga",
-                                                                    "Outras áreas não vegetadas" = "Other Non Vegetated Area",
-                                                                    "Restinga Herbácea/Arbustiva" = "Restinga Herbacea/Arbustiva",
+                                                                    "Outras \u00e1reas n\u00e3o vegetadas" = "Other Non Vegetated Area",
+                                                                    "Restinga Herb\u00e1cea/Arbustiva" = "Restinga Herbacea/Arbustiva",
                                                                     "Afloramento Rochoso" = "Rocky Outcrop",
-                                                                    "Outros Cultivos Temporários" = "Other Temporary Crops",
-                                                                    "Outras Formações Não Florestais Naturais" = "Other Non Forest Natural Formation",
+                                                                    "Outros Cultivos Tempor\u00e1rios" = "Other Temporary Crops",
+                                                                    "Outras Forma\u00e7\u00f5es N\u00e3o Florestais Naturais" = "Other Non Forest Natural Formation",
                                                                     "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
-                                                                    "Outros Cultivos Temporários" = "Othere Temporary Crops",
-                                                                    "Plantação de Floresta" = "Forest Plantation",
-                                                                    "Não Observado" = "Non Observed",
-                                                                    "Formação de Floresta" = "Forest Formation",
-                                                                    "Formação de Savana" = "Savanna Formation",
-                                                                    "Pântano" = "Wetland",
+                                                                    "Outros Cultivos Tempor\u00e1rios" = "Othere Temporary Crops",
+                                                                    "Planta\u00e7\u00e3o de Floresta" = "Forest Plantation",
+                                                                    "N\u00e3o Observado" = "Non Observed",
+                                                                    "Forma\u00e7\u00e3o de Floresta" = "Forest Formation",
+                                                                    "Forma\u00e7\u00e3o de Savana" = "Savanna Formation",
+                                                                    "P\u00e2ntano" = "Wetland",
                                                                     "Pradaria" = "Grassland",
                                                                     "Infraestrutura Urbana" = "Urban Infrastructure",
                                                                     "Soja" = "Soy Beans",
                                                                     "Mangue" = "Magrove",
-                                                                    "Mineiração" = "Mining",
+                                                                    "Mineira\u00e7\u00e3o" = "Mining",
                                                                     "Praia e Dunas" = "Beaches and Dunes",
-                                                                    "Café" = "Coffee",
-                                                                    "Cultivos Cítricos" = "Citrus",
+                                                                    "Caf\u00e9" = "Coffee",
+                                                                    "Cultivos C\u00edtricos" = "Citrus",
                                                                     "Arroz" = "Rice",
-                                                                    "Algodão" = "Cotton",
-                                                                    "Cana-de-açúcar" = "Sugar Cane",
+                                                                    "Algod\u00e3o" = "Cotton",
+                                                                    "Cana-de-a\u00e7\u00facar" = "Sugar Cane",
                                                                     "Pastagem" = "Pasture"))
 
 
