@@ -92,9 +92,10 @@ get_server <- function(files, param) {
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x_from) || input$x_from == "" ||
         is.null(input$x_to) || input$x_to == "") {
-        text <- "Variável não selecionada"
+          
         text <- param$no_variable
-      } else if (nrow(df) == 0) {
+      
+        } else if (nrow(df) == 0) {
         
           text <- param$no_observation
           
@@ -143,7 +144,7 @@ get_server <- function(files, param) {
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def)]
-          color_col <- param$table[which(param$table$var == input$color), ]
+          color_col <- param$table[which(param$table$var == param$color_def), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
           text_col <- param$table[which(param$table$var == param$text_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
@@ -154,13 +155,13 @@ get_server <- function(files, param) {
           y_col$label <- "Ranking"
           
           df_p <- data.frame(
-            df_reactived()[x_col$var],
+           df_reactived()[x_col$var],
             NA,
-            df_reactived()[color_col$var],
-            df_reactived()[slider_col$var],
-            df_reactived()["group"],
-            df_reactived()["group"],
-            df_reactived()[id_col$var]
+           df_reactived()[color_col$var],
+           df_reactived()[slider_col$var],
+           df_reactived()["group"],
+           df_reactived()["group"],
+           df_reactived()[id_col$var]
           )
 
           colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
@@ -173,9 +174,6 @@ get_server <- function(files, param) {
             fig <- plotly_empty()
             stop()
           }
-
-          # Filtra sem grupo
-          df_p <- df_p[which(df_p$group != " - "), ]
 
           # Ordena base por variável de ranking e preenche y
           df_p <- df_p %>%

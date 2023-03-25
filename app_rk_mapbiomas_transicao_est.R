@@ -29,13 +29,13 @@ param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
 param$measur_unit1 <- "Unidade de Medida" # Texto "Unidade de Medida" para tooltip
 param$measur_unit2 <- "m<sup>2" # a unidade de medida
-param$ui_label_1 <- "Transição de"
-param$ui_label_2 <- "Transição para"
+param$ui_label_1 <- "Transição de" # opção de transicao de
+param$ui_label_2 <- "para" # opção de transicao para
 param$to <- " para " # parametro que define conectivo das variaveis do eixo x
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Transição (mudança) de cobertura e uso do solo"
+param$plot_desc <- "Transição (mudança) de cobertura e uso do solo. Fonte: MapBiomas"
 param$subtitle <- "Contém dados agregados de municípios da Amazônia Legal"
 param$no_variables <- "Variável não selecionada" # titulo do grafico caso nenhuma observacao seja selecionada
 param$no_observations <- "Não há observações" # titulo do grafico caso nao haja observacoes na base
