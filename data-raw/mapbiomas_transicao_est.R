@@ -143,7 +143,7 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Mapbiomas",
   tipo = 1,
-  unidade = "m<sup>2",
+  unidade = "m<sup>2</sup>",
   categoria= "Meio ambiente", 
   subcategoria = "Uso da terra"
 )
