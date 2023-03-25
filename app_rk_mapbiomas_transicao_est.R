@@ -20,7 +20,7 @@ source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "" # variável padrão do eixo x
+param$x_def <- "value" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
@@ -31,12 +31,14 @@ param$measur_unit1 <- "Unidade de Medida" # Texto "Unidade de Medida" para toolt
 param$measur_unit2 <- "m<sup>2" # a unidade de medida
 param$ui_label_1 <- "Transição de"
 param$ui_label_2 <- "Transição para"
-
+param$to <- " para " # parametro que define conectivo das variaveis do eixo x
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Transição (mudança) de cobertura e uso do solo"
 param$subtitle <- "Contém dados agregados de municípios da Amazônia Legal"
+param$no_variables <- "Variável não selecionada" # titulo do grafico caso nenhuma observacao seja selecionada
+param$no_observations <- "Não há observações" # titulo do grafico caso nao haja observacoes na base
 
 # Outros parâmetros e configurações
 

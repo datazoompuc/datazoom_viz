@@ -16,24 +16,41 @@ get_server <- function(files, param) {
   
   server <- function(input, output, session) {
       
-      # Cria opções para seleção de grupos
-      param$filter_choices <- sort(unique(df$group))
-      param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
+      
+      df_reactived <- reactive({
+          
+          if (input$x_from != "") df <- df %>% filter(from == input$x_from)
+          if (input$x_to != "") df <- df %>% filter(to == input$x_to)
+          
+          return(df)
+      })
+      
+      # Cria opções para seleção das variaveis de transição
+      param$x_from_choices <- sort(unique(df$from))
+      param$x_to_choices <- sort(unique(df$to))
+      
+      # Adicionar opcoes no ui
+      updateSelectInput(session, "x_from",
+                        choices = param$x_from_choices)
+      
+      updateSelectInput(session, "x_to",
+                        choices = param$x_to_choices)
+     
       
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       # se input está vazio preenche com valor aleatório da lista de colunas
-      if (input$x == "") {
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = sample(param$x_cols$var, 1)
+      if (input$x_from == "") {
+        updateSelectInput(session, "x_from",
+          choices = param$x_from,
+          selected = sample(param$x_from_choices, 1)
         )
       }
 
-      if (input$color == "") {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = sample(param$color_cols$var, 1)
+      if (input$x_to == "") {
+        updateSelectInput(session, "x_to",
+          choices = param$x_to_choices,
+          selected = sample(param$x_to$var, 1)
         )
       }
     }
@@ -41,8 +58,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "x=", input$x,
-        "&", "color=", input$color
+        "?", "x_from=", input$x_from,
+        "&", "x_to=", input$x_to
       )
       updateQueryString(q_string, mode = "replace")
     }
@@ -52,18 +69,18 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
-      if (!is.null(query[["x"]])) {
+      if (!is.null(query[["x_from"]])) {
         # se tem x na url atribui valor ao selecinput x
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = query[["x"]]
+        updateSelectInput(session, "x_from",
+          choices = param$x_from_choices,
+          selected = query[["x_from"]]
         )
       }
 
-      if (!is.null(query[["color"]])) {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = query[["color"]]
+      if (!is.null(query[["x_to"]])) {
+        updateSelectInput(session, "x_to",
+          choices = param$x_to_choices,
+          selected = query[["x_to"]]
         )
       }
     }
@@ -74,12 +91,18 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x_from) || input$x_from == "" ||
-        is.null(input$x_to) || input$x_from == "") {
+        is.null(input$x_to) || input$x_to == "") {
         text <- "Variável não selecionada"
+        text <- param$no_variable
+      } else if (nrow(df) == 0) {
+        
+          text <- param$no_observation
+          
       } else {
-        # Monta título a partir de variáveis selecionadas nos inputs
-
+          
+          # Monta título a partir de variáveis selecionadas nos inputs
         text <- paste0("Ranking de ", input$x_from, " para ", input$x_to)
+        
       }
 
       text
@@ -88,11 +111,12 @@ get_server <- function(files, param) {
       text <- " "
 
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$color) || input$color == "") {
+      if (is.null(input$x_from) || input$x_from == "" ||
+          is.null(input$x_to) || input$x_to == "" ||
+          nrow(df) == 0) {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        color_col <- param$table[which(param$table$var == input$color), ]
         text <- paste0(param$subtitle)
       }
 
@@ -118,27 +142,25 @@ get_server <- function(files, param) {
           }
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == "value")]
+          x_col <- param$table[which(param$table$var == param$x_def)]
           color_col <- param$table[which(param$table$var == input$color), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
           text_col <- param$table[which(param$table$var == param$text_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
+          
           # Cria coluna vazia para o ranking
           y_col <- list()
           y_col$var <- "rank"
           y_col$label <- "Ranking"
-
-          df <- df %>%
-              filter(from == input$x_from, to == input$x_to)
           
           df_p <- data.frame(
-            df[x_col$var],
+            df_reactived()[x_col$var],
             NA,
-            df[color_col$var],
-            df[slider_col$var],
-            df["group"],
-            df["group"],
-            df[id_col$var]
+            df_reactived()[color_col$var],
+            df_reactived()[slider_col$var],
+            df_reactived()["group"],
+            df_reactived()["group"],
+            df_reactived()[id_col$var]
           )
 
           colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
@@ -179,7 +201,7 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            x_col$label, ": ", format(df_p$x, scientific = FALSE,
+            input$x_from, param$to, input$x_to,  ": ", format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",

@@ -31,8 +31,8 @@ get_ui <- function(files, param) {
           selectInput(
             inputId = "x_from",
             label = param$ui_label_1,
-            choices = param$x_choices,
-            selected = param$x_def,
+            choices = param$x_from_choices,
+            selected = "",
             width = "100%"
           )
         ),
@@ -42,8 +42,8 @@ get_ui <- function(files, param) {
           selectInput(
             inputId = "x_to",
             label = param$ui_label_2,
-            choices = param$x_choices,
-            selected = param$x_def,
+            choices = param$x_to_choices,
+            selected = "",
             width = "100%"
           )
         ),
