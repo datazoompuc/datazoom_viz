@@ -188,6 +188,17 @@ datafinal <- datafinal %>%
 "Natural"=  "Natural"  )                     
 
 datafinal[is.na(datafinal)] <- 0
+
+#filtrar pra municipios da amazonia legal
+municipios_amazonia<- datazoom.amazonia::municipalities
+municipios_amazonia <- municipios_amazonia%>%
+    filter(legal_amazon == 1)%>%
+    select(municipality_code=code_muni)
+
+datafinal <- datafinal%>%
+    inner_join(municipios_amazonia)
+    
+
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
 
 datafinal <- readRDS("data/mapbiomas_cobertura_munic.rds")
