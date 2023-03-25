@@ -17,6 +17,8 @@ library(readxl)
 dat <- load_mapbiomas(dataset = "mapbiomas_cover", geo_level = "municipality", 
                       cover_level = "none")
 
+
+#salva
 saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
 
 
@@ -28,20 +30,16 @@ data1$level_1 <- NULL
 data1$level_2 <- NULL
 data1$level_3 <- NULL
 data1$color <- NULL
-data1$feature_id <- NULL
-data1$index <- NULL
 data1$class_id <- NULL
-data1$municipality_code <- NULL
 data1$group <- paste(data1$municipality, " - ",data1$state)
 data1$municipality <- NULL
 data1$state <- NULL
 
-colnames(data1) <- c("time", "aggregation", "area","group")
+colnames(data1) <- c("time", "municipality_code", "aggregation", "area","group")
 
 #tentando resolver problema do aggregate
 data1$area <- as.numeric(data1$area)
-
-data1 <- aggregate(area ~ time + group + aggregation, data1, sum)
+data1 <- aggregate(area ~ time + municipality_code+ group + aggregation, data1, sum)
 
 
 # Data for level_3
@@ -51,22 +49,17 @@ data2$level_0 <- NULL
 data2$level_1 <- NULL
 data2$level_2 <- NULL
 data2$level_4 <- NULL
-
 data2$color <- NULL
-data2$feature_id <- NULL
-data2$index <- NULL
 data2$class_id <- NULL
-data2$municipality_code <- NULL
 data2$group <- paste(data2$municipality, " - ",data2$state)
 data2$municipality <- NULL
 data2$state <- NULL
 
-colnames(data2) <- c("time", "aggregation", "area","group")
+colnames(data2) <- c("time","municipality_code", "aggregation", "area","group")
 
 #tentando resolver problema do aggregate
 data2$area <- as.numeric(data2$area)
-
-data2 <- aggregate(area ~ time + group + aggregation, data2, sum)
+data2 <- aggregate(area ~ time +  municipality_code+ group + aggregation, data2, sum)
 
 # Data for level_2
 data3 <- dat
@@ -75,22 +68,18 @@ data3$level_0 <- NULL
 data3$level_1 <- NULL
 data3$level_3 <- NULL
 data3$level_4 <- NULL
-
 data3$color <- NULL
-data3$feature_id <- NULL
-data3$index <- NULL
 data3$class_id <- NULL
-data3$municipality_code <- NULL
 data3$group <- paste(data3$municipality, " - ",data3$state)
 data3$municipality <- NULL
 data3$state <- NULL
 
-colnames(data3) <- c("time", "aggregation", "area","group")
+colnames(data3) <- c("time","municipality_code", "aggregation", "area","group")
 
 #tentando resolver problema do aggregate
 data3$area <- as.numeric(data3$area)
 
-data3 <- aggregate(area ~ time + group + aggregation, data3, sum)
+data3 <- aggregate(area ~ time +  municipality_code + group + aggregation, data3, sum)
 
 
 # Data for level_1
@@ -100,22 +89,18 @@ data4$level_0 <- NULL
 data4$level_2 <- NULL
 data4$level_3 <- NULL
 data4$level_4 <- NULL
-
 data4$color <- NULL
-data4$feature_id <- NULL
-data4$index <- NULL
 data4$class_id <- NULL
-data4$municipality_code <- NULL
 data4$group <- paste(data4$municipality, " - ",data4$state)
 data4$municipality <- NULL
 data4$state <- NULL
 
-colnames(data4) <- c("time", "aggregation", "area","group")
+colnames(data4) <- c("time","municipality_code", "aggregation", "area","group")
 
 #tentando resolver problema do aggregate
 data4$area <- as.numeric(data4$area)
 
-data4 <- aggregate(area ~ time + group + aggregation, data4, sum)
+data4 <- aggregate(area ~ time +  municipality_code + group + aggregation, data4, sum)
 
 
 
@@ -126,28 +111,22 @@ data5$level_1 <- NULL
 data5$level_2 <- NULL
 data5$level_3 <- NULL
 data5$level_4 <- NULL
-
 data5$color <- NULL
-data5$feature_id <- NULL
-data5$index <- NULL
 data5$class_id <- NULL
-data5$municipality_code <- NULL
 data5$group <- paste(data5$municipality, " - ",data5$state)
 data5$municipality <- NULL
 data5$state <- NULL
 
-colnames(data5) <- c("time", "aggregation", "area","group")
+colnames(data5) <- c("time", "municipality_code","aggregation", "area","group")
 
 #tentando resolver problema do aggregate
 data5$area <- as.numeric(data5$area)
 
-data5 <- aggregate(area ~ time + group + aggregation, data5, sum)
+data5 <- aggregate(area ~ time  +  municipality_code+ group + aggregation, data5, sum)
 
 
 data <- rbind(data1, data2, data3, data4, data5)
 
-#problema parou aqui
-#sinto que muita coisa foi deletada aqui
 #num de colunas = quantidade de municipio
 # num de linhas= anos*agregação, ou seja, moda a area de cada agregação para cada ano
 # acho que os warnings ocorrem pq deve aparecer a mesma agregação em mais de uma dataX
@@ -155,21 +134,9 @@ data <- rbind(data1, data2, data3, data4, data5)
 datafinal <- pivot_wider(unique(data), names_from = aggregation, values_from = area,
                          values_fill = 0)
 
-#questão: esse df tem mt mais municipio. provavelmente pois nao filtra para os da amazonia legal
-#solucao: pehgar o df antigo e fazer um inner join por group
-
-datafinal_antigo <- datafinal_antigo %>%
-select(group)
-
-datafinal <- datafinal %>%
-    inner_join(datafinal_antigo)
-
-# deletar coluna Citrus pois é tudo 0
-datafinal$Citrus <- NULL
-
 
 labl <- colnames(datafinal)
-labl <- labl[-c(1,2)]
+labl <- labl[-c(1,2,3)]
 labl <- substr(labl, 6, 100)
 sublabl <- labl[23:27]
 sublabl <- substr(sublabl, 5, 100)
@@ -178,19 +145,22 @@ labl[23:27] <- sublabl
 
 
 #para evitar que a ordem esteja descasada, renomeei as colunas uma por uma:
-
+# removi a categoria "Nao aplicado" pois os resultados eram análogos ao "Não observado"
 datafinal <- datafinal %>%
-    select( time, group,                         
+    select( time, municipality_code, group,                         
  "Aquicultura"= "Aquaculture"  ,         
- "Praia e Dunas"="Beach and Dune" ,                  
-   "Café"  = "Coffe"    ,                      
+ "Praia e Dunas"="Beach and Dune" ,  
+ "Cítricos" = "Citrus",
+   "Café"  = "Coffe"    ,
+ "Algodão" = "Cotton",
+ "Formação de Floresta" = "Forest Formation",
    " Plantação de Floresta" = "Forest Plantation"     ,            
   "Pradaria" = "Grassland"  ,                     
  "Mineiração"= "Mining" ,
+ "Mosaico de Uso da Terra"="Land Use Mosaic",
  "Cana-de-açúcar" = "Sugar Cane" ,
 "Mangue"= "Magrove"  ,
   "Salar" = "Salt flat",                        
-   "Mosaico de Agricultura e Pastagens"="Mosaic of Agriculture and Pasture",
   "Não observado"="Non Observed" ,                    
   "Outras formações naturais não florestais"= "Other Non Forest Natural Formation",
  "Outras áreas não vegetadas"= "Other Non Vegetated Area" ,        
@@ -215,8 +185,7 @@ datafinal <- datafinal %>%
   "Áreas não vegetadas" =  "4. Non Vegetated Area" ,           
   "Água" = "5. Water"   ,                  
   "Antrópico" = "Anthropic"     ,                   
-"Natural"=  "Natural"       ,                    
-  "Não aplicado"=  "Not applied" )                     
+"Natural"=  "Natural"  )                     
 
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
@@ -250,6 +219,11 @@ temp_param_table <- tibble(
 # tentando resolver a questão de terem várias linhas NA 
 temp_param_table <-temp_param_table %>%
      drop_na()
+
+# remover o codigo do municipio, pois nao será utilizado aqui
+temp_param_table <- temp_param_table %>%
+    filter(var != "municipality_code")
+
 
 temp_param_table$label[1] <- "Ano"
 temp_param_table$label[2] <- "Município"
