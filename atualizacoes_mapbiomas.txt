@@ -53,7 +53,7 @@ Error: std::bad_alloc
 MAPBIOMAS_TRANSICAO_MUNIC_5
 	
 	Usado por:
-	->app_rk_mapbiomas_transicao_munic_5.R
+	-> app_rk_mapbiomas_transicao_munic_5.R
 
 	Em conjunto com:
 	-> NA
@@ -76,3 +76,7 @@ Dados só vão até 2019-2020
 
 	Em conjunto com:
 	-> NA
+	
+	
+	
+Baixar ppm_livestock para 2021 (se tiver) e tentar rodar a data-raw das bases que rodam mesmo que sem o ano atualizado.
