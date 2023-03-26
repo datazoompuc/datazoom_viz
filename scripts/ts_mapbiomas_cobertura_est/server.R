@@ -16,7 +16,7 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file)
 
     # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
+    param$filter_choices <- sort(unique(df$state)) #nao tem nada chamamado de group
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
     
     # Funcão para preencher inputs com coluna/variável aleatória
@@ -142,13 +142,13 @@ get_server <- function(files, param) {
         
         #Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
         # Cria dataframe do gráfico
-        x_col <- param$table[which(param$table$var == param$x_def),]
+        x_col <- param$table[which(param$table$var == param$x_def),] #achei estranho aqui
         y_col <- param$table[which(param$table$var == input$y),]
         id_col <- param$table[which(param$table$var == param$id_def), ]
         color_col <- param$table[which(param$table$var == param$color_def), ]
         
         # Filtra dataframe com grupos selecionados
-        df_filtered <- df[which(df$group %in% input$filter1),]
+        df_filtered <- df[which(df$state %in% input$filter1),]
         
         df_p <- data.frame(df_filtered[x_col$var],
                            df_filtered[y_col$var],
