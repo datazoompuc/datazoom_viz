@@ -8,115 +8,217 @@ library(tibble)
 library(zoo)
 library(readxl)
 
-dat <- load_mapbiomas_covering(space_aggregation = "state")
-colnames(dat)[colnames(dat) == "Leval_zero"] <- "level_0"
+# load data ------------------------------------------------------------------------
+# carrega por municipio, pois filtraremos os municipios que participam da amazonia legal
+# antes de agregar por UF
+
+dat <- load_mapbiomas(dataset = "mapbiomas_cover", geo_level = "municipality", 
+                      cover_level = "none")
+
+
 
 saveRDS(dat, file = "data/mapbiomas_cobertura_est_raw.rds")
 
 # Data for level_4
 data1 <- dat
+data1$territory_id <- NULL
 data1$level_0 <- NULL
 data1$level_1 <- NULL
 data1$level_2 <- NULL
 data1$level_3 <- NULL
+data1$color <- NULL
+data1$class_id <- NULL
+data1$municipality <- NULL
 
-data1$group <- data1$level_4
-data1$biome <- NULL
-data1$level_4 <- NULL
+# filtra os municipios que participam da Amazonia Legal
 
-colnames(data1) <- c("state", "area", "time", "group")
+municipios_amazonia<- datazoom.amazonia::municipalities
+municipios_amazonia <- municipios_amazonia%>%
+    filter(legal_amazon == 1)%>%
+    select(municipality_code=code_muni)
 
+data1 <- data1%>%
+    inner_join(municipios_amazonia)
+
+data1$municipality_code <- NULL
+
+#agrega por UF
+colnames(data1) <- c("time","state", "group","area" )
+data1 <- aggregate(area ~ time + state + group, data1, sum)
 
 
 # Data for level_3
 data2 <- dat
+data2$territory_id <- NULL
 data2$level_0 <- NULL
 data2$level_1 <- NULL
 data2$level_2 <- NULL
 data2$level_4 <- NULL
+data2$color <- NULL
+data2$class_id <- NULL
+data2$municipality <- NULL
 
-data2$group <- data2$level_3
-data2$biome <- NULL
-data2$level_3 <- NULL
+# filtra os municipios que participam da Amazonia Legal
 
-colnames(data2) <- c("state", "area", "time", "group")
+municipios_amazonia<- datazoom.amazonia::municipalities
+municipios_amazonia <- municipios_amazonia%>%
+    filter(legal_amazon == 1)%>%
+    select(municipality_code=code_muni)
+
+data2 <- data2%>%
+    inner_join(municipios_amazonia)
+
+data2$municipality_code <- NULL
+
+#agrega por UF
+colnames(data2) <- c("time","state", "group","area" )
 data2 <- aggregate(area ~ time + state + group, data2, sum)
-
 
 
 # Data for level_2
 data3 <- dat
+data3$territory_id <- NULL
 data3$level_0 <- NULL
 data3$level_1 <- NULL
 data3$level_3 <- NULL
 data3$level_4 <- NULL
+data3$color <- NULL
+data3$class_id <- NULL
+data3$municipality <- NULL
 
-data3$group <- data3$level_2
-data3$biome <- NULL
-data3$level_2 <- NULL
+# filtra os municipios que participam da Amazonia Legal
 
-colnames(data3) <- c("state", "area", "time", "group")
+municipios_amazonia<- datazoom.amazonia::municipalities
+municipios_amazonia <- municipios_amazonia%>%
+    filter(legal_amazon == 1)%>%
+    select(municipality_code=code_muni)
+
+data3 <- data3%>%
+    inner_join(municipios_amazonia)
+
+data3$municipality_code <- NULL
+
+#agrega por UF
+colnames(data3) <- c("time","state", "group","area" )
 data3 <- aggregate(area ~ time + state + group, data3, sum)
 
 
 
 # Data for level_1
 data4 <- dat
+data4$territory_id <- NULL
 data4$level_0 <- NULL
 data4$level_2 <- NULL
 data4$level_3 <- NULL
 data4$level_4 <- NULL
+data4$color <- NULL
+data4$class_id <- NULL
+data4$municipality <- NULL
 
-data4$group <- data4$level_1
-data4$biome <- NULL
-data4$level_1 <- NULL
+# filtra os municipios que participam da Amazonia Legal
 
-colnames(data4) <- c("state", "area", "time", "group")
+municipios_amazonia<- datazoom.amazonia::municipalities
+municipios_amazonia <- municipios_amazonia%>%
+    filter(legal_amazon == 1)%>%
+    select(municipality_code=code_muni)
+
+data4 <- data4%>%
+    inner_join(municipios_amazonia)
+
+data4$municipality_code <- NULL
+
+#agrega por UF
+colnames(data4) <- c("time","state", "group","area" )
 data4 <- aggregate(area ~ time + state + group, data4, sum)
 
 
 
 # Data for level_0
 data5 <- dat
+data5$territory_id <- NULL
 data5$level_1 <- NULL
 data5$level_2 <- NULL
 data5$level_3 <- NULL
 data5$level_4 <- NULL
+data5$color <- NULL
+data5$class_id <- NULL
+data5$municipality <- NULL
 
-data5$group <- data5$level_0
-data5$biome <- NULL
-data5$level_0 <- NULL
+# filtra os municipios que participam da Amazonia Legal
 
-colnames(data5) <- c("state", "area", "time", "group")
+municipios_amazonia<- datazoom.amazonia::municipalities
+municipios_amazonia <- municipios_amazonia%>%
+    filter(legal_amazon == 1)%>%
+    select(municipality_code=code_muni)
+
+data5 <- data5%>%
+    inner_join(municipios_amazonia)
+
+data5$municipality_code <- NULL
+
+#agrega por UF
+colnames(data5) <- c("time","state", "group","area" )
 data5 <- aggregate(area ~ time + state + group, data5, sum)
 
 
-
+# juntando as bases e criando o df final
 data <- rbind(data1, data2, data3, data4, data5)
-datafinal <- reshape(data, idvar = c("state", "time"), timevar = "group", direction = "wide")
+
+datafinal <- pivot_wider(unique(data), names_from = group, values_from = area,
+                         values_fill = 0)
+
+
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
 labl <- substr(labl, 6, 100)
 sublabl <- labl[22:26]
 sublabl <- substr(sublabl, 5, 100)
-labl[22:26] <- sublabl
-translated_labl <- c("Pastagem", "Formação de Floresta", "Pradaria", "Não Observado",
-                     "Outras áreas não vegetadas", "Infraestrutura Urbana", "Rios, Lagos ou Oceanos",
-                     "Mosaico de Cultivos", "Soja", "Plantação de Floresta", "Mangue", "Mineiração",
-                     "Cana-de-açúcar", "Formação de Savana", "Salar", "Praia e Dunas",
-                     "Mosaico de Agricultura e Pastagem", "Pântano", "Cultivos temporários",
-                     "Agricultura", "Floresta Natural", "Floresta", "Formação Natural sem ser Floresta",
-                     "Fazenda", "Área não Vegetada", "Água", "Formação Antrópica", "Formação Natural",
-                     "Não Identificado")
-colnames(datafinal) <- c("group", "time", translated_labl)
+#para evitar que a ordem esteja descasada, renomeei as colunas uma por uma:
+# removi a categoria "Nao aplicado" pois os resultados eram análogos ao "Não observado"
+datafinal <- datafinal %>%
+    select( time, state,                         
+            "Praia e Dunas"="Beach and Dune" ,  
+            "Algodão" = "Cotton",
+            "Formação de Floresta" = "Forest Formation",
+            " Plantação de Floresta" = "Forest Plantation"     ,            
+            "Pradaria" = "Grassland"  ,                     
+            "Mineiração"= "Mining" ,
+            "Mosaico de Uso da Terra"="Land Use Mosaic",
+            "Cana-de-açúcar" = "Sugar Cane" ,
+            "Mangue"= "Magrove"  ,
+            "Salar" = "Salt flat",                        
+            "Não observado"="Non Observed" ,                    
+            "Outras áreas não vegetadas"= "Other Non Vegetated Area" ,        
+            "Outras Culturas Perenes" =  "Other Perennial Crops" ,           
+            "Outras Culturas Temporárias"=  "Other Temporary Crops"  ,           
+            "Arroz" =  "Rice"    ,                     
+            "Rios, Lagos ou Oceanos" =  "River, Lake and Ocean"  ,           
+            "Afloramento rochoso" =  "Rocky outcrop"  ,                   
+            "Formação de Savana" =  "Savanna Formation"    ,           
+            "Soja" =  "Soy Beans",
+            "Pastagem" =  "Pasture" , 
+            "Infraestrutura Urbana" =  "Urban Infrastructure",
+            "Formação de Floresta"=  "Forest Formation" ,                     
+            "Pântano"=  "Wetland" ,                          
+            "Culturas Perenes"=  "Perennial Crops",                 
+            "Culturas Temporárias" =  "Temporary Crops" ,                
+            "Agricultura" =  "Agriculture"  ,                    
+            "Floresta" =  "1. Forest"   ,                     
+            "Formação Natural Não Florestal" =  "2. Non Forest Natural Formation"   ,
+            "Fazenda" =  "3. Farming" ,                       
+            "Áreas não vegetadas" =  "4. Non Vegetated Area" ,           
+            "Água" = "5. Water"   ,                  
+            "Antrópico" = "Anthropic"     ,                   
+            "Natural"=  "Natural"  )                 
+
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
 
 datafinal <- readRDS("data/mapbiomas_cobertura_est.rds")
 
-##############################
-# Build Dictionary in English
-#############################
+####################
+# Build Dictionary 
+#####################
 
 # extract variables from data
 columns <- colnames(datafinal)
@@ -138,19 +240,23 @@ temp_param_table <- tibble(
   subcategoria = "Uso da terra"
 )
 
-temp_param_table$label[1] <- "UF"
-temp_param_table$label[2] <- "Ano"
-temp_param_table$desc[1] <- "UF"
-temp_param_table$desc[2] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 29))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 29))
-temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 30))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 29))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 29))
+temp_param_table$label[2] <- "UF"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "UF"
+temp_param_table$desc[1] <- "Ano"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 32))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 32))
+temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 33))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 32))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 32))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/mapbiomas_cobertura_est_dic.csv", fileEncoding = "UTF-8")
 
+
+##############################
+# Build Dictionary in English
+#############################
 
 # extract variables from data
 columns <- colnames(datafinal)
