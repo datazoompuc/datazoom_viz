@@ -38,8 +38,6 @@ param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura_munic/'
 param$server0 <- "Variável não selecionada"
 param$server1 <- "Ranking de "
 param$server2 <- "Amazônia Legal"
-param$measur_unit1 <- "Unidade de Medida" # Texto "Unidade de Medida" para tooltip
-param$measur_unit2 <- "m<sup>2</sup>" # a unidade de medida
 
 
 # Descrição da visualização no eixo de opções
