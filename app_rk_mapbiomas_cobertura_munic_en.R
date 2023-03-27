@@ -41,7 +41,7 @@ param$server2 <- "Legal Amazon"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Annual Mapping of Land Use and Cover in Brazil"
+param$plot_desc <- "Annual Mapping of Land Use and Cover in Brazil (Data Source: MAPBIOMAS)"
 
 # Outros parâmetros e configurações
 
