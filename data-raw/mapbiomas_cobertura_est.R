@@ -207,9 +207,9 @@ datafinal <- datafinal %>%
             "Formação Natural Não Florestal" =  "2. Non Forest Natural Formation"   ,
             "Fazenda" =  "3. Farming" ,                       
             "Áreas não vegetadas" =  "4. Non Vegetated Area" ,           
-            "Água" = "5. Water"   ,                  
-            "Antrópico" = "Anthropic"     ,                   
-            "Natural"=  "Natural"  )                 
+            "Água" = "5. Water" ,                 
+            "Antrópico" = "Anthropic" ,                  
+            "Natural"=  "Natural"   )               
 
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
@@ -282,40 +282,50 @@ temp_param_table$label[1] <- "State"
 temp_param_table$label[2] <- "Year"
 temp_param_table$desc[1] <- "State"
 temp_param_table$desc[2] <- "Year"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 29))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 29))
-temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 30))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 29))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 29))
-temp_param_table$label[temp_param_table$var=="Mosaico de Cultivos"] <- "Mosaic of Crops"
-temp_param_table$label[temp_param_table$var=="Soja"] <- "Soy Beans"
-temp_param_table$label[temp_param_table$var=="Pastagem"] <- "Pasture"
-temp_param_table$label[temp_param_table$var=="Infraestrutura Urbana"] <- "Urban Infrastructure"
-temp_param_table$label[temp_param_table$var=="Formação de Floresta"] <- "Forest Formation"
-temp_param_table$label[temp_param_table$var=="Pradaria"] <- "Grassland"
-temp_param_table$label[temp_param_table$var=="Rios, Lagos ou Oceanos"] <- "River, Lake and Ocean"
-temp_param_table$label[temp_param_table$var=="Não Observado"] <- "Non Observed"
-temp_param_table$label[temp_param_table$var=="Formação de Savana"] <- "Savanna Formation"
-temp_param_table$label[temp_param_table$var=="Outras áreas não vegetadas"] <- "Other Non Vegetated Area"
-temp_param_table$label[temp_param_table$var=="Plantação de Floresta"] <- "Forest Plantation"
-temp_param_table$label[temp_param_table$var=="Mineiração"] <- "Mining"
-temp_param_table$label[temp_param_table$var=="Cana-de-açúcar"] <- "Sugar Cane"
-temp_param_table$label[temp_param_table$var=="Mangue"] <- "Magrove"
-temp_param_table$label[temp_param_table$var=="Salar"] <- "Salt flat"
-temp_param_table$label[temp_param_table$var=="Praia e Dunas"] <- "Beach and Dune"
-temp_param_table$label[temp_param_table$var=="Pântano"] <- "Wetland"
-temp_param_table$label[temp_param_table$var=="Mosaico de Agricultura e Pastagem"] <-"Mosaic of Agriculture and Pasture"
-temp_param_table$label[temp_param_table$var=="Cultivos temporários"] <- "Temporary Crops"
-temp_param_table$label[temp_param_table$var=="Agricultura"] <- " Agriculture"
-temp_param_table$label[temp_param_table$var=="Floresta Natural"] <- "Natural Forest"
-temp_param_table$label[temp_param_table$var=="Floresta"] <- "Forest"
-temp_param_table$label[temp_param_table$var=="Formação Natural sem ser Floresta"] <- "Natural Formation without being Forest"
-temp_param_table$label[temp_param_table$var=="Fazenda"] <- "Farm"
-temp_param_table$label[temp_param_table$var=="Área não Vegetada"] <- "Non Vegetated Area"
-temp_param_table$label[temp_param_table$var=="Água"] <- "Water"
-temp_param_table$label[temp_param_table$var=="Formação Antrópica"] <- "Anthropic Formation"
-temp_param_table$label[temp_param_table$var=="Formação Natural"] <- "Natural Formation"
-temp_param_table$label[temp_param_table$var=="Não Identificado"] <- "Not identified"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 32))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 32))
+temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 33))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 32))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 32))
+
+
+temp_param_table$label[temp_param_table$var==	"Praia e Dunas"]="Beach and Dune"
+temp_param_table$label[temp_param_table$var==	            "Algodão"]= "Cotton"
+ temp_param_table$label[temp_param_table$var==	            "Formação de Floresta"]= "Forest Formation"
+temp_param_table$label[temp_param_table$var==	            " Plantação de Floresta"]= "Forest Plantation"               
+temp_param_table$label[temp_param_table$var==	            "Pradaria"]= "Grassland"                    
+temp_param_table$label[temp_param_table$var==	            "Mineiração"]= "Mining" 
+temp_param_table$label[temp_param_table$var==	            "Mosaico de Uso da Terra"]="Land Use Mosaic"
+temp_param_table$label[temp_param_table$var==	            "Cana-de-açúcar"]= "Sugar Cane" 
+temp_param_table$label[temp_param_table$var==	            "Mangue"]= "Magrove"  
+temp_param_table$label[temp_param_table$var==	            "Salar"]= "Salt flat"                       
+temp_param_table$label[temp_param_table$var==	            "Não observado"]="Non Observed"                  
+temp_param_table$label[temp_param_table$var==	            "Outras áreas não vegetadas"]= "Other Non Vegetated Area"      
+temp_param_table$label[temp_param_table$var==	            "Outras Culturas Perenes"]=  "Other Perennial Crops"         
+temp_param_table$label[temp_param_table$var==	            "Outras Culturas Temporárias"]=  "Other Temporary Crops"          
+temp_param_table$label[temp_param_table$var==	            "Arroz"]=  "Rice"                      
+temp_param_table$label[temp_param_table$var==	            "Rios, Lagos ou Oceanos"]=  "River, Lake and Ocean"          
+temp_param_table$label[temp_param_table$var==	            "Afloramento rochoso"]=  "Rocky outcrop"                  
+temp_param_table$label[temp_param_table$var==	            "Formação de Savana"]=  "Savanna Formation"            
+ temp_param_table$label[temp_param_table$var==	            "Soja"]=  "Soy Beans"
+temp_param_table$label[temp_param_table$var==	            "Pastagem"]=  "Pasture"  
+temp_param_table$label[temp_param_table$var==	            "Infraestrutura Urbana"]=  "Urban Infrastructure"
+temp_param_table$label[temp_param_table$var==	            "Formação de Floresta"]=  "Forest Formation"                   
+temp_param_table$label[temp_param_table$var==	            "Pântano"]=  "Wetland"                        
+temp_param_table$label[temp_param_table$var==	            "Culturas Perenes"]=  "Perennial Crops"                 
+temp_param_table$label[temp_param_table$var==	            "Culturas Temporárias"]=  "Temporary Crops"              
+temp_param_table$label[temp_param_table$var==	            "Agricultura"]=  "Agriculture"                   
+temp_param_table$label[temp_param_table$var==	            "Floresta"]=  " Forest"                     
+temp_param_table$label[temp_param_table$var==	            "Formação Natural Não Florestal"]=  " Non Forest Natural Formation"  
+temp_param_table$label[temp_param_table$var==	            "Fazenda"]=  " Farming"                     
+temp_param_table$label[temp_param_table$var==	            "Áreas não vegetadas"]=  " Non Vegetated Area"         
+temp_param_table$label[temp_param_table$var==	            "Água"]= " Water"                  
+temp_param_table$label[temp_param_table$var==	            "Antrópico"]= "Anthropic"                     
+temp_param_table$label[temp_param_table$var==	            "Natural"]=  "Natural" 
+                               
+
+                       
+                       
 
 View(temp_param_table)
 
