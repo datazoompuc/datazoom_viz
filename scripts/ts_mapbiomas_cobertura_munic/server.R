@@ -182,8 +182,11 @@ get_server <- function(files, param) {
         df_p$tooltip <- paste0(
           "<b>",df_p$text,"</b><br>",
           x_col$label,": ",df_p$x,"<br>",
-          y_col$label,": ",df_p$y,"<br>",
-          param$measur_unit1, ": ", param$measur_unit2
+          y_col$label,": ",format(df_p$y, scientific = FALSE,
+                                  digits = 2,
+                                  decimal.mark = ",", 
+                                  big.mark = "."), " ", "m<sup>2</sup>", "<br>"
+          
         )
         
         # Define paleta de cores
