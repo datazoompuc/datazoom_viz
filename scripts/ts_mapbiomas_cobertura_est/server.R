@@ -152,8 +152,8 @@ get_server <- function(files, param) {
                            df_filtered[color_col$var]
         )
         colnames(df_p) <- c("x", "y", "color")
-        df_p$state <- df_filtered$state
-        df_p$text <- df_p$state
+        df_p$group <- df_filtered$group
+        df_p$text <- df_p$group
         
         # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
         df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
@@ -167,7 +167,7 @@ get_server <- function(files, param) {
         # Alternativa de medida para y
         if (input$y_option & is.numeric(df_p$y)) {
           df_p <- df_p %>%
-            group_by(df_p$state) %>%
+            group_by(df_p$group) %>%
             mutate(aux1 = first(y),
                    y_option = (y/aux1)*100)
           df_p$y <- df_p$y_option
@@ -182,7 +182,10 @@ get_server <- function(files, param) {
         df_p$tooltip <- paste0(
           "<b>",df_p$text,"</b><br>",
           x_col$label,": ",df_p$x,"<br>",
-          y_col$label,": ",df_p$y,"<br>"
+          y_col$label,": ",format(df_p$y, scientific = FALSE,
+                                  digits = 2,
+                                  decimal.mark = ",", 
+                                  big.mark = "."), " ", "m<sup>2</sup>"
         )
         
         # Define paleta de cores
@@ -192,10 +195,12 @@ get_server <- function(files, param) {
         fig_p <- plot_ly(df_p, 
                          x = ~x,
                          y = ~y,
-                         color = ~state,
+                         color = ~group,
                          type = "scatter", 
                          mode = "lines",
-                         text = ~tooltip
+                         text = ~tooltip,
+                         textposition= "none"
+                         
         )
         
         # Layout eixos
