@@ -22,7 +22,8 @@ get_server <- function(files, param) {
           if (input$x_from != "") df <- df %>% filter(from == input$x_from)
           if (input$x_to != "") df <- df %>% filter(to == input$x_to)
           
-          return(df)
+          w <- df
+          return(w)
       })
       
       # Cria opções para seleção das variaveis de transição
@@ -143,7 +144,7 @@ get_server <- function(files, param) {
           }
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def)]
+          x_col <- param$table[which(param$table$var == param$x_def), ]
           color_col <- param$table[which(param$table$var == param$color_def), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
           text_col <- param$table[which(param$table$var == param$text_def), ]
@@ -159,8 +160,8 @@ get_server <- function(files, param) {
             NA,
            df_reactived()[color_col$var],
            df_reactived()[slider_col$var],
-           df_reactived()["group"],
-           df_reactived()["group"],
+           df_reactived()[text_col$var],
+           df_reactived()[color_col$var],
            df_reactived()[id_col$var]
           )
 
