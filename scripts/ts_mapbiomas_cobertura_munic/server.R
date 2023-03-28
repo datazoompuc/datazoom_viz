@@ -11,7 +11,7 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
   server <- function(input, output, session) {
-    
+      
     # Carrega dados
     df <- readRDS(files$db_file)
 
@@ -39,7 +39,7 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?","y=",input$y,
-        "&","ylog=",input$ylog,
+        
         "&","y_option=",input$y_option
       )
       
@@ -72,10 +72,7 @@ get_server <- function(files, param) {
                           selected = query[['y']])
       } 
       
-      if (!is.null(query[['ylog']])) {
-        updateCheckboxInput(session, "ylog",
-                            value = (query[['ylog']] == "TRUE"))
-      }
+      
 
       if (!is.null(query[['y_option']])) {
         updateCheckboxInput(session, "y_option",
@@ -222,10 +219,6 @@ get_server <- function(files, param) {
           zeroline = FALSE
         )
         
-        if (input$ylog & is.numeric(df_p$y)) {
-          y_axis_layout$type <- "log"
-        }
-
         if (input$y_option) {
           y_axis_layout$title <- paste0(y_col$label, "*")
         }
