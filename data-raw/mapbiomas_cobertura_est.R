@@ -212,9 +212,13 @@ datafinal <- datafinal %>%
             "Natural"=  "Natural"   )               
 
 datafinal[is.na(datafinal)] <- 0
+
 saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
 
 datafinal <- readRDS("data/mapbiomas_cobertura_est.rds")
+
+datafinal <-datafinal %>%
+    select(group = state, everything())
 
 ####################
 # Build Dictionary 
@@ -240,10 +244,10 @@ temp_param_table <- tibble(
   subcategoria = "Uso da terra"
 )
 
-temp_param_table$label[2] <- "UF"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "UF"
-temp_param_table$desc[1] <- "Ano"
+temp_param_table$label[1] <- "UF"
+temp_param_table$label[2] <- "Ano"
+temp_param_table$desc[1] <- "UF"
+temp_param_table$desc[2] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 32))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 32))
 temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 33))
