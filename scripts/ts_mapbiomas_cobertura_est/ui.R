@@ -37,13 +37,7 @@ get_ui <- function(files, param) {
                          )
                      ),
                      
-                     # Seleciona eixo log
-                     checkboxInput(
-                       inputId = "ylog",
-                       param$label_log_name,
-                       value = FALSE,
-                       width = "100%"
-                     ),
+                     
                     # Seleciona eixo 
                       checkboxInput(
                       inputId = "y_option",
