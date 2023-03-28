@@ -167,6 +167,9 @@ data <- rbind(data1, data2, data3, data4, data5)
 datafinal <- pivot_wider(unique(data), names_from = group, values_from = area,
                          values_fill = 0)
 
+#desfaz as atribuições que eu havia feito acima e coloca na ordem correta
+datafinal <-datafinal %>%
+    select(group = state, everything())
 
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2)]
@@ -176,7 +179,7 @@ sublabl <- substr(sublabl, 5, 100)
 #para evitar que a ordem esteja descasada, renomeei as colunas uma por uma:
 # removi a categoria "Nao aplicado" pois os resultados eram análogos ao "Não observado"
 datafinal <- datafinal %>%
-    select( time, state,                         
+    select(  group,  time,                       
             "Praia e Dunas"="Beach and Dune" ,  
             "Algodão" = "Cotton",
             "Formação de Floresta" = "Forest Formation",
@@ -213,12 +216,13 @@ datafinal <- datafinal %>%
 
 datafinal[is.na(datafinal)] <- 0
 
+
+
 saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
 
 datafinal <- readRDS("data/mapbiomas_cobertura_est.rds")
 
-datafinal <-datafinal %>%
-    select(group = state, everything())
+
 
 ####################
 # Build Dictionary 

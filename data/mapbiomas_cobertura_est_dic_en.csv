@@ -1,6 +1,6 @@
 "","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","time",FALSE,FALSE,TRUE,FALSE,FALSE,"State","State","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
-"2","state",FALSE,FALSE,FALSE,FALSE,FALSE,"Year","Year","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"1","group",FALSE,FALSE,TRUE,FALSE,FALSE,"State","State","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
+"2","time",FALSE,FALSE,FALSE,FALSE,FALSE,"Year","Year","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "3","Praia e Dunas",TRUE,TRUE,FALSE,TRUE,TRUE,"Beach and Dune","Praia e Dunas","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "4","Algodão",TRUE,TRUE,FALSE,TRUE,TRUE,"Cotton","Algodão","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
 "5","Formação de Floresta",TRUE,TRUE,FALSE,TRUE,TRUE,"Forest Formation","Formação de Floresta","Mapbiomas",1,"m^2","Meio ambiente","Uso da terra"
