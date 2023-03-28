@@ -10,13 +10,14 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
+   
   server <- function(input, output, session) {
-    
+      
     # Carrega dados
     df <- readRDS(files$db_file)
 
     # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$state)) #nao tem nada chamamado de group
+    param$filter_choices <- sort(unique(df$group)) #nao tem nada chamamado de group
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
     
     # Funcão para preencher inputs com coluna/variável aleatória
@@ -39,7 +40,7 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?","y=",input$y,
-        "&","ylog=",input$ylog,
+
         "&","y_option=",input$y_option
       )
       
@@ -72,10 +73,6 @@ get_server <- function(files, param) {
                           selected = query[['y']])
       } 
       
-      if (!is.null(query[['ylog']])) {
-        updateCheckboxInput(session, "ylog",
-                            value = (query[['ylog']] == "TRUE"))
-      }
 
       if (!is.null(query[['y_option']])) {
         updateCheckboxInput(session, "y_option",
@@ -148,15 +145,15 @@ get_server <- function(files, param) {
         color_col <- param$table[which(param$table$var == param$color_def), ]
         
         # Filtra dataframe com grupos selecionados
-        df_filtered <- df[which(df$state %in% input$filter1),]
+        df_filtered <- df[which(df$group %in% input$filter1),]
         
         df_p <- data.frame(df_filtered[x_col$var],
                            df_filtered[y_col$var],
                            df_filtered[color_col$var]
         )
         colnames(df_p) <- c("x", "y", "color")
-        df_p$group <- df_filtered$group
-        df_p$text <- df_p$group
+        df_p$state <- df_filtered$state
+        df_p$text <- df_p$state
         
         # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
         df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
@@ -170,7 +167,7 @@ get_server <- function(files, param) {
         # Alternativa de medida para y
         if (input$y_option & is.numeric(df_p$y)) {
           df_p <- df_p %>%
-            group_by(df_p$group) %>%
+            group_by(df_p$state) %>%
             mutate(aux1 = first(y),
                    y_option = (y/aux1)*100)
           df_p$y <- df_p$y_option
@@ -195,7 +192,7 @@ get_server <- function(files, param) {
         fig_p <- plot_ly(df_p, 
                          x = ~x,
                          y = ~y,
-                         color = ~group,
+                         color = ~state,
                          type = "scatter", 
                          mode = "lines",
                          text = ~tooltip
@@ -221,9 +218,7 @@ get_server <- function(files, param) {
           zeroline = FALSE
         )
         
-        if (input$ylog & is.numeric(df_p$y)) {
-          y_axis_layout$type <- "log"
-        }
+        
 
         if (input$y_option) {
           y_axis_layout$title <- paste0(y_col$label, "*")
