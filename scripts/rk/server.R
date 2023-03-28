@@ -177,13 +177,12 @@ get_server <- function(files, param) {
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
-            "(", df_p$slider, ")", "<br><br>",
+            "(", df_p$slider, ")", "<br>",
             x_col$label, ": ", format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            color_col$label, ": ", df_p$color
+                                      big.mark = "."), " ", "m<sup>2</sup>", "<br>"
+           
           )
 
           # Define paleta de cores
