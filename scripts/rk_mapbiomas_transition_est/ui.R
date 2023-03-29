@@ -32,7 +32,7 @@ get_ui <- function(files, param) {
             inputId = "x_from",
             label = param$ui_label_1,
             choices = param$x_from_choices,
-            selected = "",
+            selected = param$x_from_choices[1],
             width = "100%"
           )
         ),
@@ -43,7 +43,7 @@ get_ui <- function(files, param) {
             inputId = "x_to",
             label = param$ui_label_2,
             choices = param$x_to_choices,
-            selected = "",
+            selected = param$x_to_choices[1],
             width = "100%"
           )
         ),

@@ -135,14 +135,9 @@ get_server <- function(files, param) {
 
       tryCatch(
         {
-
+            
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$x_to) || input$x_to == "" ||
-            is.null(input$x_from) || input$x_from == "") {
-            fig <- plotly_empty()
-            stop()
-          }
-
+          
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def), ]
           color_col <- param$table[which(param$table$var == param$color_def), ]
