@@ -10,7 +10,7 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
-  
+    
   # Carrega dados
   df <- readRDS(files$db_file)
   
@@ -21,9 +21,8 @@ get_server <- function(files, param) {
           
           if (input$x_from != "") df <- df %>% filter(from == input$x_from)
           if (input$x_to != "") df <- df %>% filter(to == input$x_to)
-          
-          w <- df
-          return(w)
+    
+          return(df)
       })
       
       # Cria opções para seleção das variaveis de transição
@@ -43,7 +42,7 @@ get_server <- function(files, param) {
       # se input está vazio preenche com valor aleatório da lista de colunas
       if (input$x_from == "") {
         updateSelectInput(session, "x_from",
-          choices = param$x_from,
+          choices = param$x_from_choices,
           selected = sample(param$x_from_choices, 1)
         )
       }
@@ -51,7 +50,7 @@ get_server <- function(files, param) {
       if (input$x_to == "") {
         updateSelectInput(session, "x_to",
           choices = param$x_to_choices,
-          selected = sample(param$x_to$var, 1)
+          selected = sample(param$x_to_choices, 1)
         )
       }
     }
@@ -137,7 +136,7 @@ get_server <- function(files, param) {
         {
             
           # Se algum campo estiver vazio retorna gráfico vazio
-          
+            
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == param$x_def), ]
           color_col <- param$table[which(param$table$var == param$color_def), ]
@@ -191,18 +190,21 @@ get_server <- function(files, param) {
           top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
           df_p <- df_p %>% filter(group %in% top_groups)
 
+          # Define os parametros do tooltip como sendo os inputs
+          param$label_x_from <- paste(input$x_from)
+          param$label_x_to <- paste(input$x_to)
+          
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            input$x_from, param$to, input$x_to,  ": ", format(df_p$x, scientific = FALSE,
+            param$label_x_from, param$to, param$label_x_to, "<br>",
+            param$measur_unit1, ": ", format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            color_col$label, ": ", df_p$color, "<br>",
-            param$measur_unit1, ": ", param$measur_unit2
-          )
+                                      big.mark = "."),param$measur_unit2 ,"<br>",
+            y_col$label, ": ", df_p$y, "<br>"
+            )
 
           # Define paleta de cores
           pallete <- pallete_continuous
@@ -412,7 +414,7 @@ get_server <- function(files, param) {
       )
       fig
     }) %>%
-      bindCache(input$x, input$color)
+      bindCache(input$x_from, input$x_to)
 
     # Observa eventos
     observe({
