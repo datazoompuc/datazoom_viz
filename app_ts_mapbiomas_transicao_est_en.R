@@ -33,6 +33,7 @@ param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$x_from_def <- "Aquaculture"
 param$x_to_def <- "Aquaculture"
+param$measur_unit2 <- "m<sup>2</sup>" 
 
 param$label_x_from_name <- "Transition from"
 param$label_x_to_name <- "to"

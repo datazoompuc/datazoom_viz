@@ -33,6 +33,7 @@ param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$x_from_def <- "Afloramento Rochoso"
 param$x_to_def <- "Afloramento Rochoso"
+param$measur_unit <- "m<sup>2</sup>" 
 
 param$label_x_from_name <- "Transição de"
 param$label_x_to_name <- "para"
@@ -40,7 +41,7 @@ param$to <- "para" # preposição que liga variavel de origem para final da tran
 param$no_observation_title <- "Sem observações"
 param$no_observation_subtitle <- "não possui observações para o(s) estado(s) selecionado(s)"
 
-param$plot_name <- "Data Zoom Amazonia"
+param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Transição (mudança) de cobertura e uso do solo. Fonte: MapBiomas"
 param$lang <- FALSE
 

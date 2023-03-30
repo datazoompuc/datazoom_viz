@@ -291,7 +291,7 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", df_p$y, "<br>"
+            y_col$label, ": ", df_p$y, param$measur_unit2 <- "m<sup>2</sup>"  ,"<br>"
           )
 
           # Define paleta de cores
@@ -304,7 +304,8 @@ get_server <- function(files, param) {
             color = ~group,
             type = "scatter",
             mode = "lines",
-            text = ~tooltip
+            text = ~tooltip,
+            hoverinfo = "text"
           )
 
           # Layout eixos
