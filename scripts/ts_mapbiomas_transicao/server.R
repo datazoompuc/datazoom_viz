@@ -11,42 +11,51 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
   server <- function(input, output, session) {
-
+      
     # Carrega dados
     df <- readRDS(files$db_file)
 
     # Cria opções para seleção de grupos
+    param$x_from_choices <- sort(unique(df$from))
+    param$x_to_choices <- sort(unique(df$to))
+    
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
+        
       updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        "x_from",
+        choices = param$x_from_choices,
+        selected = sample(param$x_from_choices, 1) 
       )
 
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
       updateSelectInput(session,
-        "y",
-        choices = param$y_choices,
-        selected = selected
+        "x_to",
+        choices = param$x_to_choices,
+        selected = sample(param$x_to_choices, 1)
+      )
+      
+      updateSelectInput(session,
+                          inputId = "filter1",
+                          choices = param$filter_choices,
+                          selected = sample(param$filter_choices, 2)
       )
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "y=", input$y,
-        "&", "ylog=", input$ylog,
+        "?", "x_from=", input$x_from,
+        "&", "x_to=", input$x_to,
         "&", "y_option=", input$y_option
       )
 
       for (i in input$filter1) {
         q_string <- paste0(
           q_string,
-          "&", "filter=", i
+          "&", "filter1=", i
         )
       }
 
@@ -66,16 +75,17 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
-      if (!is.null(query[["y"]])) {
-        updateSelectInput(session, "y",
-          choices = param$y_choices,
-          selected = query[["y"]]
+      if (!is.null(query[["x_from"]])) {
+        updateSelectInput(session, "x_from",
+                          choices = param$x_from_choices,
+                          selected = query[["x_from"]]
         )
       }
 
-      if (!is.null(query[["ylog"]])) {
-        updateCheckboxInput(session, "ylog",
-          value = (query[["ylog"]] == "TRUE")
+      if (!is.null(query[["x_to"]])) {
+        updateSelectInput(session, "x_to",
+                            choices = param$x_to_choices,
+                            selected = query[["x_to"]]
         )
       }
 
@@ -85,8 +95,8 @@ get_server <- function(files, param) {
         )
       }
 
-      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-      if (!is.null(query[["filter"]])) {
+      selected <- unlist(query[names(query) == "filter1"], use.names = FALSE)
+      if (!is.null(query[["filter1"]])) {
         updateSelectInput(session,
           "filter1",
           choices = param$filter_choices,
@@ -95,7 +105,7 @@ get_server <- function(files, param) {
       }
 
       # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter"]]) && is.null(query[["y"]])) {
+      if (is.null(query[["filter1"]]) || is.null(query[["x_from"]]) || is.null(query[["x_to"]])) {
         random_inputs() # preenche inputs se estiverem vazios
       }
     }
@@ -104,23 +114,20 @@ get_server <- function(files, param) {
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
+      if (is.null(input$x_from) || input$x_from == "") {
         text <- " "
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0("", y_col$label)
-        if (input$y_option) {
-          text <- paste0("", y_col$label, "*")
-        }
+        text <- paste0(input$x_from, param$to, input$x_to)
+    
       }
 
       text
     })
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
+      if (is.null(input$x_from) || input$x_from == "") {
         text <- " "
       } else {
         text <- paste0(param$subtitle_init)
@@ -136,23 +143,19 @@ get_server <- function(files, param) {
       fig <- plotly_empty() # inicia figura com gráfico em branco
       tryCatch(
         {
-          # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$y) || input$y == "" ||
-            is.null(input$filter1) || length(input$filter1) < 1) {
-            fig <- plotly_empty()
-            stop()
-          }
-
+          
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           # Cria dataframe do gráfico
           x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y), ]
+          y_col <- param$table[which(param$table$var == param$y_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
           color_col <- param$table[which(param$table$var == param$color_def), ]
 
           # Filtra dataframe com grupos selecionados
           df_filtered <- df[which(df$group %in% input$filter1), ]
-
+          df_filtered <- df_filtered[which(df$to == input$x_to), ]
+          df_filtered <- df_filtered[which(df$from == input$x_from), ]
+         
           df_p <- data.frame(
             df_filtered[x_col$var],
             df_filtered[y_col$var],
@@ -226,10 +229,6 @@ get_server <- function(files, param) {
             showgrid = FALSE,
             zeroline = FALSE
           )
-
-          if (input$ylog & is.numeric(df_p$y)) {
-            y_axis_layout$type <- "log"
-          }
 
           if (input$y_option) {
             y_axis_layout$title <- paste0(y_col$label, "*")

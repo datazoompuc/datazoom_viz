@@ -24,15 +24,22 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "time" # variável padrão do eixo x
-param$y_def <- "area" # variável padrão do eixo y
+param$y_def <- "value" # variável padrão do eixo y
 param$slider_def <- "time"
+param$id_def <- "group"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
+param$x_from_def <- "Afloramento Rochoso"
+param$x_to_def <- "Afloramento Rochoso"
 
+
+param$label_x_from_name <- "Transição de"
+param$label_x_to_name <- "para"
+param$to <- " para " # preposição que liga variavel de origem para final da transição
 
 param$plot_name <- "Data Zoom Amazonia"
-param$plot_desc <- "Transição/mudança de cobertura e uso do solo"
+param$plot_desc <- "Transição (mudança) de cobertura e uso do solo. Fonte: MapBiomas"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
