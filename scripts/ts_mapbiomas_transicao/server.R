@@ -105,7 +105,7 @@ get_server <- function(files, param) {
       }
 
       # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter1"]]) || is.null(query[["x_from"]]) || is.null(query[["x_to"]])) {
+      if (is.null(query[["filter1"]]) && is.null(query[["x_from"]]) && is.null(query[["x_to"]])) {
         random_inputs() # preenche inputs se estiverem vazios
       }
     }
@@ -144,6 +144,7 @@ get_server <- function(files, param) {
       tryCatch(
         {
           
+
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           # Cria dataframe do gráfico
           x_col <- param$table[which(param$table$var == param$x_def), ]
