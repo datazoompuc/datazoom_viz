@@ -15,13 +15,75 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
 
+    if(param$lang) {
+        
+        df$from <- df$from %>%
+            str_replace_all( c("Não Observado" = "Non Observed",
+                               "Formação de Savana" = "Savanna Formation",
+                               "Pradaria" = "Grassland",
+                               "Infraestrutura Urbana" = "Urban Infrastructure",
+                               "Soja" = "Soy Beans",
+                               "Mangue" = "Magrove",
+                               "Outras Formações Não Florestais Naturais" = "Other Non Forest Natural Formation",
+                               "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
+                               "Outras áreas não vegetadas" = "Other Non Vegetated Area",
+                               "Salar" = "Salt flat",
+                               "Restinga Arborizada" = "Wooded Restinga",
+                               "Mineiração" = "Mining",
+                               "Café" = "Coffe",
+                               "Algodão" = "Cotton",
+                               "Formação de Floresta" = "Forest Formation",
+                               "Pântano" = "Wetland",
+                               "Pastagem" = "Pasture",
+                               "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
+                               "Outros Cultivos Temporários" = "Other Temporary Crops",
+                               "Plantação de Floresta" = "Forest Plantation",
+                               "Cana-de-açúcar" = "Sugar Cane",
+                               "Praia e Dunas" = "Beach and Dune",
+                               "Aquacultura" = "Aquaculture",
+                               "Outros Cultivos Perenes" = "Other Perennial Crops",
+                               "Restinga Herbácea/Arbustiva" = "Restinga Herbacea/Arbustiva",
+                               "Afloramento Rochoso" = "Rocky outcrop",
+                               "Cultivos Cítricos" = "Citrus",
+                               "Arroz" = "Rice"))
+        df$to <- df$to %>%
+            str_replace_all( c("Não Observado" = "Non Observed",
+                               "Formação de Savana" = "Savanna Formation",
+                               "Pradaria" = "Grassland",
+                               "Infraestrutura Urbana" = "Urban Infrastructure",
+                               "Soja" = "Soy Beans",
+                               "Mangue" = "Magrove",
+                               "Outras Formações Não Florestais Naturais" = "Other Non Forest Natural Formation",
+                               "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
+                               "Outras áreas não vegetadas" = "Other Non Vegetated Area",
+                               "Salar" = "Salt flat",
+                               "Restinga Arborizada" = "Wooded Restinga",
+                               "Mineiração" = "Mining",
+                               "Café" = "Coffe",
+                               "Algodão" = "Cotton",
+                               "Formação de Floresta" = "Forest Formation",
+                               "Pântano" = "Wetland",
+                               "Pastagem" = "Pasture",
+                               "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
+                               "Outros Cultivos Temporários" = "Other Temporary Crops",
+                               "Plantação de Floresta" = "Forest Plantation",
+                               "Cana-de-açúcar" = "Sugar Cane",
+                               "Praia e Dunas" = "Beach and Dune",
+                               "Aquacultura" = "Aquaculture",
+                               "Outros Cultivos Perenes" = "Other Perennial Crops",
+                               "Restinga Herbácea/Arbustiva" = "Restinga Herbacea/Arbustiva",
+                               "Afloramento Rochoso" = "Rocky outcrop",
+                               "Cultivos Cítricos" = "Citrus",
+                               "Arroz" = "Rice"))
+        
+    }
+    
     # Cria opções para seleção de grupos
     param$x_from_choices <- sort(unique(df$from))
     param$x_to_choices <- sort(unique(df$to))
     
     param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-
+    
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
         
@@ -103,7 +165,7 @@ get_server <- function(files, param) {
           selected = selected
         )
       }
-
+      
       # Se query está vazia, preenche aleatório
       if (is.null(query[["filter1"]]) && is.null(query[["x_from"]]) && is.null(query[["x_to"]])) {
         random_inputs() # preenche inputs se estiverem vazios
@@ -111,30 +173,7 @@ get_server <- function(files, param) {
     }
 
     # Output titulo do gráfico
-    output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x_from) || input$x_from == "") {
-        text <- " "
-      } else {
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-
-        text <- paste0(input$x_from, param$to, input$x_to)
     
-      }
-
-      text
-    })
-    output$plot_subtitle <- renderText({
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x_from) || input$x_from == "") {
-        text <- " "
-      } else {
-        text <- paste0(param$subtitle_init)
-      }
-
-      text
-    })
 
     # Output gráfico
     output$plot <- renderPlotly({
@@ -144,18 +183,19 @@ get_server <- function(files, param) {
       tryCatch(
         {
           
-
+            
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           # Cria dataframe do gráfico
           x_col <- param$table[which(param$table$var == param$x_def), ]
           y_col <- param$table[which(param$table$var == param$y_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
           color_col <- param$table[which(param$table$var == param$color_def), ]
-
+          y_col$label <- param$label_y_name
           # Filtra dataframe com grupos selecionados
-          df_filtered <- df[which(df$group %in% input$filter1), ]
-          df_filtered <- df_filtered[which(df$to == input$x_to), ]
-          df_filtered <- df_filtered[which(df$from == input$x_from), ]
+          df_filtered <- df %>% 
+                            filter(group %in% input$filter1) %>%
+                            filter(to == input$x_to) %>%
+                            filter(from == input$x_from)
          
           df_p <- data.frame(
             df_filtered[x_col$var],
@@ -172,7 +212,63 @@ get_server <- function(files, param) {
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
+            
+            #Título para quando não há observações
+            output$plot_title <- renderText({
+                text <- 
+                # Se algum campo estiver vazio retorna texto vazio
+                if (is.null(input$x_from) || input$x_from == "") {
+                    text <- " "
+                } else {
+                    # Monta titulo a partir do parâmetro pré-definido
+                    
+                    text <- paste(param$no_observation_title)
+                    
+                }
+                
+                text
+            })
+            #Subtítulo para quando não há observações
+            output$plot_subtitle <- renderText({
+                
+                #Monta subtítulo a partir de variáveis selecionadas e parâmetro pré-definido
+                text <- paste(input$x_from, param$to, input$x_to, param$no_observation_subtitle, sep = " ")
+                
+                text
+                
+            })
+            
             stop()
+          } else {
+              
+              #Título para quando há observações
+              output$plot_title <- renderText({
+                  text <- " "
+                  # Se algum campo estiver vazio retorna texto vazio
+                  if (is.null(input$x_from) || input$x_from == "") {
+                      text <- " "
+                  } else {
+                      # Monta titulo a partir de variáveis selecionadas nos inputs
+                      
+                      text <- paste(input$x_from, param$to, input$x_to, sep = " ")
+                      
+                  }
+                  
+                  text
+              })
+              
+              #Subtítulo para quando há observações
+              output$plot_subtitle <- renderText({
+                  # Se algum campo estiver vazio retorna texto vazio
+                  if (is.null(input$x_from) || input$x_from == "") {
+                      text <- " "
+                  } else {
+                      text <- paste(param$subtitle_init)
+                  }
+                  
+                  text
+              })
+              
           }
 
           # Alternativa de medida para y

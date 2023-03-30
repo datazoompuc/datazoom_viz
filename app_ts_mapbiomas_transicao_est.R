@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(stringr)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -33,17 +34,19 @@ param$group <- "group" # variável de agrupamento
 param$x_from_def <- "Afloramento Rochoso"
 param$x_to_def <- "Afloramento Rochoso"
 
-
 param$label_x_from_name <- "Transição de"
 param$label_x_to_name <- "para"
-param$to <- " para " # preposição que liga variavel de origem para final da transição
+param$to <- "para" # preposição que liga variavel de origem para final da transição
+param$no_observation_title <- "Sem observações"
+param$no_observation_subtitle <- "não possui observações para o(s) estado(s) selecionado(s)"
 
 param$plot_name <- "Data Zoom Amazonia"
 param$plot_desc <- "Transição (mudança) de cobertura e uso do solo. Fonte: MapBiomas"
+param$lang <- FALSE
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "eixo vertical (y)"
+param$label_y_name <- "Área"
 param$label_log_name <- "escala log"
 param$label_prop_name <-  "proporcional ao ano inicial (*)"
 param$label_geo_name <- "Subdivisão geográfica"
