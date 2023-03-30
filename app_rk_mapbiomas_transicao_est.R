@@ -28,7 +28,7 @@ param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando 
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
 param$measur_unit1 <- "Área" # Texto "Unidade de Medida" para tooltip
-param$measur_unit2 <- "m<sup>2</sup>" # a unidade de medida
+param$measur_unit2 <- " (ha)" # a unidade de medida
 param$ui_label_1 <- "Transição de" # opção de transicao de
 param$ui_label_2 <- "para" # opção de transicao para
 param$to <- " para " # parametro que define conectivo das variaveis do eixo x
