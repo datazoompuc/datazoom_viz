@@ -181,7 +181,7 @@ get_server <- function(files, param) {
             x_col$label, ": ", format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), " ", "m<sup>2</sup>", "<br>"
+                                      big.mark = "."), " ", "(ha)", "<br>"
            
           )
 

@@ -185,7 +185,7 @@ get_server <- function(files, param) {
           y_col$label,": ",format(df_p$y, scientific = FALSE,
                                   digits = 2,
                                   decimal.mark = ",", 
-                                  big.mark = "."), " ", "m<sup>2</sup>", "<br>"
+                                  big.mark = "."), " ", "(ha)", "<br>"
           
         )
         
@@ -199,7 +199,8 @@ get_server <- function(files, param) {
                          color = ~group,
                          type = "scatter", 
                          mode = "lines",
-                         text = ~tooltip
+                         text = ~tooltip,
+                         hoverinfo = "text"
         )
         
         # Layout eixos
