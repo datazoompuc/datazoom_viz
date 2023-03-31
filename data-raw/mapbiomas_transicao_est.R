@@ -10,6 +10,10 @@ library(readxl)
 
 dat <- load_mapbiomas(dataset = "mapbiomas_transition", geo_level = "state")
 
+dat <- dat %>% 
+    filter(state %in% c("Rondonia", "Acre", "Amazonas", "Roraima", "Para", "Amapa", "Tocantins", "Maranhao", "Mato Grosso"))
+
+
 saveRDS(dat, file = "data/mapbiomas_transicao_est_raw.rds")
 dat <- readRDS("data/mapbiomas_transicao_est_raw.rds")
 
@@ -119,6 +123,7 @@ datafinal <- datafinal %>%
 #replace "_" for "-" in the database
 datafinal$time <- datafinal$time %>%
     str_replace(pattern = "_", replacement = " - ")
+
 
 saveRDS(datafinal, "data/mapbiomas_transicao_est.rds")
 
