@@ -208,7 +208,7 @@ get_server <- function(files, param) {
           title = x_col$label,
           titlefont = f1,
           tickfont = f2,
-          automargin = FALSE,
+          automargin = TRUE,
           autorange = TRUE,
           showgrid = FALSE,
           zeroline = FALSE
