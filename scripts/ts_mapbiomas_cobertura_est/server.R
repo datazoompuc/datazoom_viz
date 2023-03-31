@@ -187,7 +187,7 @@ get_server <- function(files, param) {
           y_col$label,": ",format(df_p$y, scientific = FALSE,
                                   digits = 2,
                                   decimal.mark = ",", 
-                                  big.mark = "."), " ", "m<sup>2</sup>"
+                                  big.mark = "."), " ", "(ha)"
         )
         
         # Define paleta de cores
@@ -205,7 +205,8 @@ get_server <- function(files, param) {
                          type = "scatter", 
                          mode = "lines",
                          text = ~tooltip,
-                         textposition= "none"
+                         textposition= "none",
+                         hoverinfo = "text"
                          
         )
         
