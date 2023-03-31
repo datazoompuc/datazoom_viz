@@ -148,6 +148,7 @@ get_server <- function(files, param) {
           y_col <- list()
           y_col$var <- "rank"
           y_col$label <- "Ranking"
+          x_col$label <- param$x_label
           
           df_p <- data.frame(
            df_reactived()[x_col$var],

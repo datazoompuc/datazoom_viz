@@ -32,6 +32,7 @@ param$measur_unit2 <- " (ha)" # a unidade de medida
 param$ui_label_1 <- "Transição de" # opção de transicao de
 param$ui_label_2 <- "para" # opção de transicao para
 param$to <- " para " # parametro que define conectivo das variaveis do eixo x
+param$x_label <- "Área"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
