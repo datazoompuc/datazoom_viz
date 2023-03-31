@@ -291,7 +291,7 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", df_p$y, param$measur_unit2 <- "m<sup>2</sup>"  ,"<br>"
+            y_col$label, ": ", round(df_p$y, 2), param$measur_unit2,"<br>"
           )
 
           # Define paleta de cores

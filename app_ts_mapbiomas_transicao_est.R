@@ -33,7 +33,7 @@ param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$x_from_def <- "Afloramento Rochoso"
 param$x_to_def <- "Afloramento Rochoso"
-param$measur_unit <- " (ha)" 
+param$measur_unit2 <- " (ha)" 
 
 param$label_x_from_name <- "Transição de"
 param$label_x_to_name <- "para"
