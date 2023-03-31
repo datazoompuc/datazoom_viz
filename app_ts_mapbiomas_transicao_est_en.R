@@ -49,7 +49,7 @@ param$lang <- TRUE
 param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Area"
 param$label_log_name <- "log scale"
-param$label_prop_name <-  "proportional to the initial year (*)"
+param$label_prop_name <-  "proportional to the initial time span (*)"
 param$label_geo_name <- "State"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_transicao_est_en/"
 

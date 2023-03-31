@@ -49,7 +49,7 @@ param$lang <- FALSE
 param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "Área"
 param$label_log_name <- "escala log"
-param$label_prop_name <-  "proporcional ao ano inicial (*)"
+param$label_prop_name <-  "proporcional ao intervalo de tempo inicial (*)"
 param$label_geo_name <- "Subdivisão geográfica"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_transicao_est/"
 
