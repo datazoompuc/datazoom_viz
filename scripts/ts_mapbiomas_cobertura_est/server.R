@@ -150,7 +150,9 @@ get_server <- function(files, param) {
         df_p <- data.frame(df_filtered[x_col$var],
                            df_filtered[y_col$var],
                            df_filtered[color_col$var]
-        )
+        ) 
+        
+        
         colnames(df_p) <- c("x", "y", "color")
         df_p$group <- df_filtered$group
         df_p$text <- df_p$group
@@ -190,6 +192,10 @@ get_server <- function(files, param) {
         
         # Define paleta de cores
         pallete <- pallete_discrete
+       
+        
+        df_p <- df_p %>%
+            arrange(group,x)
         
         # Monta gráfico
         fig_p <- plot_ly(df_p, 
