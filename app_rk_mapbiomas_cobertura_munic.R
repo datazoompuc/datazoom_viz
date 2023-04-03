@@ -39,9 +39,10 @@ param$server0 <- "Variável não selecionada"
 param$server1 <- "Ranking de "
 param$server2 <- "Amazônia Legal"
 
+
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil"
+param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil (Fonte: MAPBIOMAS)"
 
 # Outros parâmetros e configurações
 

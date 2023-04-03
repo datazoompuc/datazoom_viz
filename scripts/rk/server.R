@@ -75,12 +75,12 @@ get_server <- function(files, param) {
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x) || input$x == "" ||
         is.null(input$color) || input$color == "") {
-        text <- "Variável não selecionada"
+        text <- param$server0
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
 
-        text <- paste0("Ranking de ", x_col$label)
+        text <- paste0(param$server1 , x_col$label)
       }
 
       text
@@ -94,7 +94,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         color_col <- param$table[which(param$table$var == input$color), ]
-        text <- paste0("Amazônia Legal")
+        text <- paste0(param$server2 )
       }
 
       text
@@ -177,13 +177,12 @@ get_server <- function(files, param) {
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
-            "(", df_p$slider, ")", "<br><br>",
+            "(", df_p$slider, ")", "<br>",
             x_col$label, ": ", format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            color_col$label, ": ", df_p$color
+                                      big.mark = "."), " ", "(ha)", "<br>"
+           
           )
 
           # Define paleta de cores

@@ -32,7 +32,7 @@ param$group <- "group" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil"
+param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil - Fonte: MAPBIOMAS"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
@@ -44,7 +44,6 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_munic/"
 
 ### Parametros especificos no server
 param$subtitle_init <- "por Território" # expressão titulo
-
 
 # Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL

@@ -32,7 +32,7 @@ param$group <- "group" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Annual Mapping of Land Use and Coverage in Brazil"
+param$plot_desc <- "Annual Mapping of Land Use and Coverage in Brazil (Data Source: MAPBIOMAS)"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"
