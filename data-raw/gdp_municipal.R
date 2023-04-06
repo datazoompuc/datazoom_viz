@@ -6,13 +6,11 @@ library(tidyverse)
 library(datazoom.amazonia)
 
 gdp <- load_pibmunic(raw_data = F, 
-                     time_period = 2000:2021, 
+                     time_period = 2002:2020, 
                      language = "pt",
-                     geo_level = "municipality"
-                     )
+                     geo_level = "municipality")
 
 
 #saving 
 saveRDS(prodes,
-        file = "./data/gdp.rds"
-)
+        file = "./data/gdp.rds")
