@@ -6,7 +6,7 @@
 #livestock_inventory
 
 ##state
-ppm_state_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'state', 1974:2019, language = "pt")
+ppm_state_livestock_inventory= load_ppm(dataset = 'ppm_livestock_inventory', raw_data = FALSE, 'state', 1974:2021, language = "pt")
 ##making data usable for datazoom viz
 ppm_state_livestock_inventory= dplyr::rename(ppm_state_livestock_inventory, time=.data$ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
@@ -246,7 +246,7 @@ metadata_ppm_livestock_inventory= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep('Cabecas',10)),
-  categoria= c("Localizaçao","Unidade de Tempo",rep("Pecuaria",10)), 
+  categoria= c("Localiza?ao","Unidade de Tempo",rep("Pecuaria",10)), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Especies - Criacao",10))
 ) 
 #saving f
@@ -278,7 +278,7 @@ metadata_ppm_animal_origin_production= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, '1K BRL', '1K Liters', '1K BRL', 'Kg', '1K BRL', 'Kg', '1K BRL', '1K Dozens', '1K BRL', '1K Dozens', '1K BRL', 'Kg', '1K BRL'),
-  categoria= c("Localizaçao","Unidade de Tempo",rep("Pecuaria",13)), 
+  categoria= c("Localiza?ao","Unidade de Tempo",rep("Pecuaria",13)), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',rep("Produtos Pecuarios",13))
 )
 #saving f
@@ -301,7 +301,7 @@ metadata_ppm_sheep_farming= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, 'Cabecas'),
-  categoria= c("Localizaçao","Unidade de Tempo","Pecuaria"), 
+  categoria= c("Localiza?ao","Unidade de Tempo","Pecuaria"), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 #saving f
@@ -325,7 +325,7 @@ metadata_ppm_cow_farming= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, 'Cabecas'),
-  categoria= c("Localizaçao","Unidade de Tempo","Pecuaria"), 
+  categoria= c("Localiza?ao","Unidade de Tempo","Pecuaria"), 
   subcategoria = c('Identificador Geografico','Ano da Pesquisa',"Atividade Pecuaria")
 ) 
 
@@ -366,7 +366,7 @@ metadata_ppm_aquaculture= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = unidade_aqua,
-  categoria= c("Localizaçao","Unidade de Tempo" ,rep("Pecuaria",48)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" ,rep("Pecuaria",48)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa" ,rep("Especies - Aquicultura",48))
 )
 #saving f
