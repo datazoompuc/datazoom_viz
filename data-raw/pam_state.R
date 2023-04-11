@@ -9,53 +9,58 @@ library(tidyverse)
 library(datazoom.amazonia)
 
 ##state
-pam_state_all_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
+pam_state_all_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, geo_level = 'state', time_period = 1974:2020, language = "pt")
 #making data usable for datazoom viz f
+    #remove labels from all variables
+pam_state_all_crops <- remove_labels(pam_state_all_crops)
+    #replace na values with 0
 pam_state_all_crops[is.na(pam_state_all_crops)] = 0
-pam_state_all_crops= dplyr::rename(pam_state_all_crops, time=.data$ano)%>%
-  dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
-                                         .data$geo_id == '27' ~ 'AL',
-                                         .data$geo_id == '16' ~ 'AP',
-                                         .data$geo_id == '13' ~ 'AM',
-                                         .data$geo_id == '29' ~ 'BA',
-                                         .data$geo_id == '23' ~ 'CE',
-                                         .data$geo_id == '53' ~ 'DF',
-                                         .data$geo_id == '32' ~ 'ES',
-                                         .data$geo_id == '52' ~ 'GO',
-                                         .data$geo_id == '21' ~ 'MA',
-                                         .data$geo_id == '51' ~ 'MT',
-                                         .data$geo_id == '50' ~ 'MS',
-                                         .data$geo_id == '31' ~ 'MG',
-                                         .data$geo_id == '15' ~ 'PA',
-                                         .data$geo_id == '25' ~ 'PB',
-                                         .data$geo_id == '41' ~ 'PR',
-                                         .data$geo_id == '26' ~ 'PE',
-                                         .data$geo_id == '22' ~ 'PI',
-                                         .data$geo_id == '24' ~ 'RN',
-                                         .data$geo_id == '43' ~ 'RS',
-                                         .data$geo_id == '33' ~ 'RJ',
-                                         .data$geo_id == '11' ~ 'RO',
-                                         .data$geo_id == '14' ~ 'RR',
-                                         .data$geo_id == '42' ~ 'SC',
-                                         .data$geo_id == '35' ~ 'SP',
-                                         .data$geo_id == '28' ~ 'SE',
-                                         .data$geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
+pam_state_all_crops= dplyr::rename(pam_state_all_crops, time=ano)%>%
+  dplyr::mutate(group = dplyr::case_when(geo_id == '12' ~ 'AC',
+                                         geo_id == '27' ~ 'AL',
+                                         geo_id == '16' ~ 'AP',
+                                         geo_id == '13' ~ 'AM',
+                                         geo_id == '29' ~ 'BA',
+                                         geo_id == '23' ~ 'CE',
+                                         geo_id == '53' ~ 'DF',
+                                         geo_id == '32' ~ 'ES',
+                                         geo_id == '52' ~ 'GO',
+                                         geo_id == '21' ~ 'MA',
+                                         geo_id == '51' ~ 'MT',
+                                         geo_id == '50' ~ 'MS',
+                                         geo_id == '31' ~ 'MG',
+                                         geo_id == '15' ~ 'PA',
+                                         geo_id == '25' ~ 'PB',
+                                         geo_id == '41' ~ 'PR',
+                                         geo_id == '26' ~ 'PE',
+                                         geo_id == '22' ~ 'PI',
+                                         geo_id == '24' ~ 'RN',
+                                         geo_id == '43' ~ 'RS',
+                                         geo_id == '33' ~ 'RJ',
+                                         geo_id == '11' ~ 'RO',
+                                         geo_id == '14' ~ 'RR',
+                                         geo_id == '42' ~ 'SC',
+                                         geo_id == '35' ~ 'SP',
+                                         geo_id == '28' ~ 'SE',
+                                         geo_id == '17' ~ 'TO'), .keep="unused", .before= time)
 
 ##saving f
 saveRDS(pam_state_all_crops,
         file = "./data/pam_state_all_crops.rds"
 )
 
+pam_state_all_crops<- readRDS("C:/Users/victorhugo/Desktop/pam_state_all_crops.rds")
+
 #permanent_crops
 
 ##state
-pam_state_permanent_crops= load_pam(dataset = 'pam_permanent_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
+pam_state_permanent_crops= load_pam(dataset = 'permanent_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
 #making data usable for datazoom viz
 pam_state_permanent_crops = lapply(pam_state_permanent_crops, as.numeric)
 pam_state_permanent_crops <- as.data.frame(pam_state_permanent_crops)
 pam_state_permanent_crops[is.na(pam_state_permanent_crops)] <- 0
 pam_state_permanent_crops=pam_state_permanent_crops%>%
-  dplyr::rename(time=.data$ano)%>%
+  dplyr::rename(time=ano)%>%
   dplyr::mutate(group = dplyr::case_when(.data$geo_id == '12' ~ 'AC',
                                          .data$geo_id == '27' ~ 'AL',
                                          .data$geo_id == '16' ~ 'AP',
@@ -91,7 +96,7 @@ saveRDS(pam_state_permanent_crops,
 #temporary_crops
 
 ##state
-pam_state_temporary_crops= load_pam(dataset = 'pam_temporary_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
+pam_state_temporary_crops= load_pam(dataset = 'temporary_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
 ##making data usable for datazoom viz
 pam_state_temporary_crops = lapply(pam_state_temporary_crops, as.numeric)
 pam_state_temporary_crops <- as.data.frame(pam_state_temporary_crops)
@@ -135,10 +140,10 @@ saveRDS(pam_state_temporary_crops,
 #pam_xx (xx= corn, potato, peanut, beans)
 
 ##state
-pam_state_corn= load_pam(dataset = 'pam_corn', raw_data = FALSE, 'state', 2003:2019, language = "pt")
-pam_state_potato= load_pam(dataset = 'pam_potato', raw_data = FALSE, 'state', 2003:2019, language = "pt")
-pam_state_peanut= load_pam(dataset = 'pam_peanut', raw_data = FALSE, 'state', 2003:2019, language = "pt")
-pam_state_beans= load_pam(dataset = 'pam_beans', raw_data = FALSE, 'state', 2003:2019, language = "pt")
+pam_state_corn= load_pam(dataset = 'corn', raw_data = FALSE, 'state', 2003:2019, language = "pt")
+pam_state_potato= load_pam(dataset = 'potato', raw_data = FALSE, 'state', 2003:2019, language = "pt")
+pam_state_peanut= load_pam(dataset = 'peanut', raw_data = FALSE, 'state', 2003:2019, language = "pt")
+pam_state_beans= load_pam(dataset = 'beans', raw_data = FALSE, 'state', 2003:2019, language = "pt")
 ##making data usable for datazoom viz
 pam_state_corn = lapply(pam_state_corn, as.numeric)
 pam_state_corn <- as.data.frame(pam_state_corn)
@@ -295,7 +300,7 @@ saveRDS(pam_state_beans,
 pam_state_all_crops= readRDS('data/pam_state_all_crops.rds')
 
 
-dic_pam_all_crops= load_dictionary(dataset= 'pam_all_crops')%>%
+dic_pam_all_crops= load_dictionary(dataset= 'all_crops')%>%
   arrange(var_code)
 met_all_crops= NULL
 met_all_crops=
@@ -339,7 +344,7 @@ write.csv(metadata_pam_all_crops, file = "./data/pam_state_all_crops_dic.csv", f
 #pam_permanent_crops
 pam_state_permanent_crops= readRDS('data/pam_state_permanent_crops.rds')
 
-dic_pam_permanent_crops= load_dictionary(dataset= 'pam_permanent_crops')%>%
+dic_pam_permanent_crops= load_dictionary(dataset= 'permanent_crops')%>%
   dplyr::arrange(var_code)  
 
 met_permanent_crops= NULL
@@ -382,7 +387,7 @@ write.csv(metadata_pam_permanent_crops, file = "./data/pam_state_permanent_crops
 pam_state_temporary_crops= readRDS('data/pam_state_temporary_crops.rds')
 
 
-dic_pam_temporary_crops= load_dictionary(dataset= 'pam_temporary_crops')%>%
+dic_pam_temporary_crops= load_dictionary(dataset= 'temporary_crops')%>%
   dplyr::arrange(var_code)
 met_temporary_crops= NULL
 met_temporary_crops= c(met_temporary_crops, rep(dic_pam_temporary_crops$var_pt[1],3)) 
@@ -422,7 +427,7 @@ write.csv(metadata_pam_temporary_crops, file = "./data/pam_state_temporary_crops
 
 #pam_beans
 pam_state_beans= readRDS('data/pam_state_beans.rds')
-dic_pam_beans= load_dictionary(dataset= 'pam_beans')
+dic_pam_beans= load_dictionary(dataset= 'beans')
 
 vec= rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio '),4)
 vec= c('','',vec)
@@ -451,7 +456,7 @@ write.csv(metadata_pam_beans, file = "./data/pam_state_beans_dic.csv", fileEncod
 
 #pam_corn
 pam_state_corn= readRDS('data/pam_state_corn.rds')
-dic_pam_corn= load_dictionary(dataset= 'pam_corn')
+dic_pam_corn= load_dictionary(dataset= 'corn')
 
 
 vec2= rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio '),3)
@@ -480,7 +485,7 @@ write.csv(metadata_pam_corn, file = "./data/pam_state_corn_dic.csv", fileEncodin
 
 #pam_potato
 pam_state_potato= readRDS('data/pam_state_potato.rds')
-dic_pam_potato= load_dictionary(dataset= 'pam_potato')
+dic_pam_potato= load_dictionary(dataset= 'potato')
 
 
 vec= rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio '),4)
@@ -509,7 +514,7 @@ write.csv(metadata_pam_potato, file = "./data/pam_state_potato_dic.csv", fileEnc
 
 #pam_peanut
 pam_state_peanut= readRDS('data/pam_state_peanut.rds')
-dic_pam_peanut= load_dictionary(dataset= 'pam_peanut')
+dic_pam_peanut= load_dictionary(dataset= 'peanut')
 
 
 vec2= rep(c('Area Colhida ', 'Area Plantada ', 'Quantidade ', 'Rendimento Medio '),3)
