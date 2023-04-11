@@ -5,6 +5,9 @@
 
 #all_crops
 
+library(tidyverse)
+library(datazoom.amazonia)
+
 ##state
 pam_state_all_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'state', 1974:2019, language = "pt")
 #making data usable for datazoom viz f
@@ -325,7 +328,7 @@ metadata_pam_all_crops= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, c('Hectares', 'Hectares', '1K BRL'), rep(c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares','1K BRL'),66), rep(c('Hectares','Tons','Kg/Hectares','1K BRL'),4), c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares','1K BRL')),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",354)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",354)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",354))
 )
 
@@ -438,7 +441,7 @@ metadata_pam_beans= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),4)),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",16)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",16)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
 )
 
@@ -468,7 +471,7 @@ metadata_pam_corn= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),3)),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",12)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",12)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
 )
 #saving 
@@ -497,7 +500,7 @@ metadata_pam_potato= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),4)),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",16)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",16)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
 )
 #saving 
@@ -526,7 +529,7 @@ metadata_pam_peanut= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),3)),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",12)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",12)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
 )
 #saving 
