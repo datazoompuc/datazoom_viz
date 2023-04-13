@@ -3,10 +3,15 @@
 ##########
 ## Agregation level - MUNICIPALITY
 
+devtools::install_github("datazoompuc/datazoom.amazonia")
+library(tidyverse)
+library(datazoom.amazonia)
+library(labelled)
+
 #all_crops
 
 ##municipality (ainda nao salvo)
-pam_municipality_all_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, 'municipality', 1974:2020, language = "pt")
+pam_municipality_all_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, 'municipality', 1974:2021, language = "pt")
 #making data usable for datazoom viz f
 
 ##saving 
