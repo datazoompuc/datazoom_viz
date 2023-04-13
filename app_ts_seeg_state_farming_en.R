@@ -39,7 +39,7 @@ param$label_y_name <- "vertical axis (y)"
 param$label_log_name <- "log scale"
 param$label_prop_name <-  "proportional to the initial year (*)"
 param$label_geo_name <- "State"
-param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_energy_en/"
+param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_farming_en/"
 
 ### Parametros especificos no server
 param$subtitle_init <- "by State" # expressão subtitulo
