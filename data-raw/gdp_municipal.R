@@ -11,6 +11,7 @@ gdp <- load_pibmunic(raw_data = F,
                      geo_level = "municipality")
 
 
+
 #saving 
-saveRDS(prodes,
+saveRDS(gdp,
         file = "./data/gdp.rds")
