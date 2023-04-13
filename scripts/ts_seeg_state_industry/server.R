@@ -113,7 +113,7 @@ get_server <- function(files, param) {
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         
-        text <- paste0("Emissões Totais advindas de ", input$y)
+        text <- paste0(param$title_init, input$y)
         if (input$y_option) {
           text <- paste0(text, "*")
         }
@@ -129,7 +129,7 @@ get_server <- function(files, param) {
       if (is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <- paste0("por Estado")
+        text <- paste0(param$subtitle_init)
       }
 
       text
@@ -203,7 +203,7 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            "Emissões", ": ", format(df_p$y, scientific = FALSE,
+            param$tooltip_a, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."),  " ", "(t)"
@@ -234,7 +234,7 @@ get_server <- function(files, param) {
             zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = "Emissões",
+            title = param$plot_y,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,

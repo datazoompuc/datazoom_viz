@@ -223,3 +223,28 @@ seeg_state_energy_dic= tibble::tibble(
 )
 #saving f
 write.csv(seeg_state_energy_dic, file = "./data/seeg_state_energy_dic_en.csv", fileEncoding = "UTF-8")
+
+
+#seeg_industry
+seeg_state_industry= readRDS('data/seeg_state_industry.rds')
+industry_var= colnames(seeg_state_industry)
+
+seeg_state_industry_dic= tibble::tibble(
+    var = industry_var ,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = c('Year', 'Geographic Identifier', 'Economic Sector',
+              'Emissions Generation Process','Production Generating Emissions',
+              'Emitters', 'Gas', 'Economic Activity', 'Product', 'Value',
+              ' Bunker Emission'),
+    source = "SEEG - Observatório do Clima",
+    tipo = 1,
+    unidade = c(NA,NA,NA,NA,NA,NA,NA,NA,NA,'Toneladas',NA),
+    categoria= c("Unidade de Tempo","Localizaçao", rep('Meio Ambiente', 9)), 
+    subcategoria = c('Ano da Pesquisa', 'Identificador Geografico', rep('Emissão de Gases de Efeito Estufa', 9))
+)
+#saving F
+write.csv(seeg_state_industry_dic, file = "./data/seeg_state_industry_dic_en.csv", fileEncoding = "UTF-8")
