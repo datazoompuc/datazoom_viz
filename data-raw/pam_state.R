@@ -4,9 +4,10 @@
 ## Agregation level - STATE
 
 #all_crops
-
+devtools::install_github("datazoompuc/datazoom.amazonia")
 library(tidyverse)
 library(datazoom.amazonia)
+library(labelled)
 
 ##state
 pam_state_all_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, geo_level = 'state', time_period = 1974:2021, language = "pt")
