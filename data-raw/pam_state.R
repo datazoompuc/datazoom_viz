@@ -50,7 +50,7 @@ saveRDS(pam_state_all_crops,
         file = "./data/pam_state_all_crops.rds"
 )
 
-pam_state_all_crops<- readRDS("C:/Users/victorhugo/Desktop/pam_state_all_crops.rds")
+pam_state_all_crops<- readRDS("./data/pam_state_all_crops.rds")
 
 #permanent_crops
 
