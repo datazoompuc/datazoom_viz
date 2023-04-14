@@ -4,12 +4,13 @@
 ## Agregation level - STATE
 
 #all_crops
-
+devtools::install_github("datazoompuc/datazoom.amazonia")
 library(tidyverse)
 library(datazoom.amazonia)
+library(labelled)
 
 ##state
-pam_state_all_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, geo_level = 'state', time_period = 1974:2020, language = "pt")
+pam_state_all_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, geo_level = 'state', time_period = 1974:2021, language = "pt")
 #making data usable for datazoom viz f
     #remove labels from all variables
 pam_state_all_crops <- remove_labels(pam_state_all_crops)
@@ -49,7 +50,7 @@ saveRDS(pam_state_all_crops,
         file = "./data/pam_state_all_crops.rds"
 )
 
-pam_state_all_crops<- readRDS("C:/Users/victorhugo/Desktop/pam_state_all_crops.rds")
+pam_state_all_crops<- readRDS("./data/pam_state_all_crops.rds")
 
 #permanent_crops
 
