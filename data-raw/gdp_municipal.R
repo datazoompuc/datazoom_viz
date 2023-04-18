@@ -2,6 +2,7 @@
 #### Generate rds data in the folder ./data/ 
 ############################################################
 
+devtools::install_github("datazoompuc/datazoom.amazonia")
 library(tidyverse)
 library(datazoom.amazonia)
 
