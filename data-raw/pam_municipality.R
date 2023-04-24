@@ -3,14 +3,21 @@
 ##########
 ## Agregation level - MUNICIPALITY
 
-devtools::install_github("datazoompuc/datazoom.amazonia")
-library(tidyverse)
-library(datazoom.amazonia)
-library(labelled)
-
 #all_crops
 
 ##municipality (ainda nao salvo)
+
+
+update_pam <- function(geo_level,dataset){
+    pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds"))
+    year_max <- max(pam_old$ano)
+    pam_update<- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max, language = "pt")
+    pam_new <- bind_rows(pam_update, pam_old)
+    return(pam_new)
+}
+
+update_pam(geo_level = "municipality", dataset = "all_crops")%>%
+saveRDS(file = "./data/pam_municipality_all_crops.rds")
 
 pam_municipality_all_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, 'municipality', 1974:2021, language = "pt")
 
