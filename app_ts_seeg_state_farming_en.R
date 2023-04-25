@@ -32,6 +32,7 @@ param$id_def <- "group" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Greenhouse Gas Emissions in Farming  at State Level"
+param$plot_y <- "Emissions"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"

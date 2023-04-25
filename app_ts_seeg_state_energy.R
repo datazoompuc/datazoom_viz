@@ -32,6 +32,7 @@ param$id_def <- "group" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Emissões de Gases Estufa no Setor de Energia ao nível estadual"
+param$plot_y <- "Emissões"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"

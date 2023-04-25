@@ -235,7 +235,7 @@ get_server <- function(files, param) {
             zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = "Emissões",
+            title = param$plot_y ,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
