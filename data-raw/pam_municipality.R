@@ -3,15 +3,23 @@
 ##########
 ## Agregation level - MUNICIPALITY
 
+#libraries
+
+library(tidyverse)
+library(datazoom.amazonia)
+library(labelled)
+
+
 #all_crops
 
 ##municipality (ainda nao salvo)
 
 
 update_pam <- function(geo_level,dataset){
-    pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds"))
+    pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds")) %>%
+        remove_labels()
     year_max <- max(pam_old$ano)
-    pam_update<- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max, language = "pt")
+    pam_update <- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max, language = "pt")
     pam_new <- bind_rows(pam_update, pam_old)
     return(pam_new)
 }
