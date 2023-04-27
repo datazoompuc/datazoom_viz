@@ -33,6 +33,9 @@ update_pam <- function(geo_level,dataset){
     pam_new <- bind_rows(pam_update, pam_old) %>% 
     #select the variables that already were there
         select(contains(old_variables))
+    #make number variables numerical
+    pam_new$ano <- pam_new$ano %>% as.numeric()
+    pam_new$geo_id <- pam_new$geo_id %>% as.numeric()
     
     return(pam_new)
 }
@@ -43,6 +46,8 @@ update_pam(geo_level = "municipality", dataset = "all_crops") %>%
 saveRDS(file = "./data/pam_municipality_all_crops.rds")
 
 #permanent_crops
+
+
 
 update_pam(geo_level = "municipality", dataset = "permanent_crops") %>%
 saveRDS(file = "./data/pam_municipality_permanent_crops.rds")
