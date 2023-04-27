@@ -3,84 +3,68 @@
 ##########
 ## Agregation level - MUNICIPALITY
 
-#libraries
+#install newer version of datazoom.amazonia
+devtools::install_github("datazoompuc/datazoom.amazonia")
 
+#libraries
 library(tidyverse)
 library(datazoom.amazonia)
 library(labelled)
 
-
-#all_crops
-
-##municipality (ainda nao salvo)
-
-
+##pam_update function
 update_pam <- function(geo_level,dataset){
+    
+    #load the old pam dataset
     pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds")) %>%
-        remove_labels()
-    year_max <- max(pam_old$ano)
-    pam_update <- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max, language = "pt")
-    pam_new <- bind_rows(pam_update, pam_old)
+        labelled::remove_labels()
+    
+    #get the names of the variables from the old dataset
+    old_variables <- colnames(pam_old)
+    
+    #get the bigger year from the old dataset as a number
+    year_max <- max(pam_old$ano) %>% 
+        as.numeric()
+    
+    #download the next year of pam (notice the 'year_max + 1' in the time period argument)
+    pam_update <- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max + 1, language = "pt") %>%
+        labelled::remove_labels()
+    
+    #bind rows of new and old pam
+    pam_new <- bind_rows(pam_update, pam_old) %>% 
+    #select the variables that already were there
+        select(contains(old_variables))
+    
     return(pam_new)
 }
 
-update_pam(geo_level = "municipality", dataset = "all_crops")%>%
+#all_crops
+
+update_pam(geo_level = "municipality", dataset = "all_crops") %>%
 saveRDS(file = "./data/pam_municipality_all_crops.rds")
-
-pam_municipality_all_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, 'municipality', 1974:2021, language = "pt")
-
-#making data usable for datazoom viz f
-
-##saving 
-saveRDS(pam_municipality_all_crops,
-        file = "./data/pam_municipality_all_crops.rds"
-)
 
 #permanent_crops
 
-##municipality (ainda nao salvo)
-pam_municipality_permanent_crops= load_pam(dataset = 'all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
-#making data usable for datazoom viz
-##saving 
-saveRDS(pam_municipality_permanent_crops,
-        file = "./data/pam_municipality_permanent_crops.rds"
-)
+update_pam(geo_level = "municipality", dataset = "permanent_crops") %>%
+saveRDS(file = "./data/pam_municipality_permanent_crops.rds")
 
 #temporary_crops
 
-##municipality (ainda nao salvo)
-pam_municipality_temporary_crops= load_pam(dataset = 'temporary_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
-##making data usable for datazoom viz
-##saving f
-saveRDS(pam_municipality_temporary_crops,
-        file = "./data/pam_municipality_temporary_crops.rds"
-)
+update_pam(geo_level = "municipality", dataset = "temporary_crops") %>%
+saveRDS(file = "./data/pam_municipality_temporary_crops.rds")
 
-#pam_xx (xx= corn, potato, peanut, beans)
+#corn, potato, peanut and bean crops
 
-##municipality (ainda nao salvo)
-pam_municipality_corn= load_pam(dataset = 'corn', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
-pam_municipality_potato= load_pam(dataset = 'potato', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
-pam_municipality_peanut= load_pam(dataset = 'peanut', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
-pam_municipality_beans= load_pam(dataset = 'beans', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+update_pam(geo_level = "municipality", dataset = "corn") %>%
+    saveRDS(file = "./data/pam_municipality_corn.rds")
 
-##making data usable for datazoom viz
-
-##saving 
-saveRDS(pam_municipality_corn,
-        file = "./data/pam_municipality_corn.rds"
-)
-saveRDS(pam_municipality_potato,
-        file = "./data/pam_municipality_potato.rds"
-)
-saveRDS(pam_municipality_peanut,
-        file = "./data/pam_municipality_peanut.rds"
-)
-saveRDS(pam_municipality_beans,
-        file = "./data/pam_municipality_beans.rds"
-)
-
-
+update_pam(geo_level = "municipality", dataset = "potato") %>%
+    saveRDS(file = "./data/pam_municipality_potato.rds")
+    
+update_pam(geo_level = "municipality", dataset = "peanut") %>%
+    saveRDS(file = "./data/pam_municipality_peanut.rds")
+    
+update_pam(geo_level = "municipality", dataset = "beans") %>%
+    saveRDS(file = "./data/pam_municipality_beans.rds")
 
 #########
 ### Creating metadatabase -> IBGE - PAM
