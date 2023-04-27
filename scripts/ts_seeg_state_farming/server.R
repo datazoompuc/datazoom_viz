@@ -16,6 +16,41 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file) %>% 
       filter(emissores != "Lavouras Cultivadas sob Sistema Convencional") %>% 
       filter(emissores != "Lavouras Cultivadas sob Sistema Plantio Direto")
+
+    if(param$lang){
+        df <- df %>%
+            mutate(emissores = case_when(
+                    emissores == "Arroz" ~ "Rice",
+                emissores == "Asinino" ~ "Donkey",
+                emissores == "Bubalino" ~ "Water Buffalo",
+                emissores == "Caprino" ~ "Goat",
+                emissores == "Equino" ~ "Horse",
+                emissores == "Gado de Corte" ~ "Beef Cattle",
+                emissores == "Gado de Leite" ~ "Dairy Cattle",
+                emissores == "Muar" ~ "Mule",
+                emissores == "Ovino" ~ "Sheep",
+                emissores == "Suinos" ~ "Pigs",
+                emissores == "Aves" ~ "Poultry",
+                emissores == "Algodao" ~ "Cotton",
+                emissores == "Cana-de-acucar" ~ "Sugarcane",
+                emissores == "Torta de Filtro" ~ "Filter Cake",
+                emissores == "Vinhaca" ~ "Vinasse",
+                emissores == "Fertilizantes Sinteticos" ~ "Synthetic Fertilizers",
+                emissores == "Solos" ~ "Soils",
+                emissores == "Aplicacao de Ureia" ~ "Urea Application",
+                emissores == "Uso de Calcario" ~ "Limestone Use",
+                emissores == "Feijao" ~ "Beans",
+                emissores == "Mandioca" ~ "Cassava",
+                emissores == "Milho" ~ "Corn",
+                emissores == "Outras culturas" ~ "Other Crops",
+                emissores == "Pastagem" ~ "Pasture",
+                emissores == "Soja" ~ "Soybean",
+                emissores == "Trigo" ~ "Wheat",
+                emissores == "Pastagem Degradada" ~ "Degraded Pasture",
+                emissores == "Pastagem Bem Manejada" ~ "Well-managed Pasture",
+                emissores == "Florestas Plantadas" ~ "Planted Forests",
+                emissores == "Sistemas Integrados Lavoura-Pecuaria-Floresta" ~ "Integrated Crop-Livestock-Forest Systems",))
+    }
     
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
@@ -172,6 +207,7 @@ get_server <- function(files, param) {
             df_filtered["group"]
           )
           colnames(df_p) <- c("x", "y", "color")
+          
           df_p$group <- df_filtered$group
           df_p$text <- df_p$group
 
