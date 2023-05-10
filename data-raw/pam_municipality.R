@@ -45,26 +45,26 @@ update_pam <- function(geo_level,dataset){
 #########################################################
 
 ##this file exists
-#pam_municipality_all_crops = load_pam(dataset = 'all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+#pam_municipality_all_crops = load_pam(dataset = 'all_crops', raw_data = FALSE, geo_level = 'municipality', 1974:2019, language = "pt")
 #saveRDS(pam_municipality_all_crops, file = "./data/pam_municipality_all_crops.rds")
 
-pam_municipality_permanent_crops = load_pam(dataset = 'permanent_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+pam_municipality_permanent_crops = load_pam(dataset = 'permanent_crops', raw_data = FALSE, geo_level = 'municipality', 1974:2019, language = "pt")
 saveRDS(pam_municipality_permanent_crops, file = "./data/pam_municipality_permanent_crops.rds")
 
-pam_municipality_temporary_crops = load_pam(dataset = 'temporary_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+pam_municipality_temporary_crops = load_pam(dataset = 'temporary_crops', raw_data = FALSE, geo_level = 'municipality', 1974:2019, language = "pt")
 saveRDS(pam_municipality_temporary_crops, file = "./data/pam_municipality_temporary_crops.rds")
 
-pam_municipality_corn = load_pam(dataset = 'corn', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+pam_municipality_corn = load_pam(dataset = 'corn', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
 saveRDS(pam_municipality_corn, file = "./data/pam_municipality_corn.rds")
 
-pam_municipality_potato = load_pam(dataset = 'potato', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+pam_municipality_potato = load_pam(dataset = 'potato', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
 saveRDS(pam_municipality_potato, file = "./data/pam_municipality_potato.rds")
 
-pam_municipality_peanut= load_pam(dataset = 'peanut', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+pam_municipality_peanut= load_pam(dataset = 'peanut', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
 saveRDS(pam_municipality_peanut, file = "./data/pam_municipality_peanut.rds" )
 
 ##this file exists
-#pam_municipality_beans = load_pam(dataset = 'beans', raw_data = FALSE, 'municipality', 2003:2021, language = "pt")
+#pam_municipality_beans = load_pam(dataset = 'beans', raw_data = FALSE, geo_level = 'municipality', 2003:2021, language = "pt")
 #saveRDS(pam_municipality_beans, file = "./data/pam_municipality_beans.rds")
 
 ################################################
