@@ -48,6 +48,7 @@ param$title_init <- "Emissões Totais advindas de "
 param$tooltip_a <- "Emissões"
 param$tooltip_b <-  "Unidade de medida: <b>"
 param$tooltip_c <- "Toneladas"
+param$lang = FALSE
 
 # Outros parâmetros e configurações
 

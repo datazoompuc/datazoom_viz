@@ -48,6 +48,7 @@ param$title_init <- "Total emissions from "
 param$tooltip_a <- "Emissions"
 param$tooltip_b <-  "Unit of measurement: <b>"
 param$tooltip_c <- "Tons"
+param$lang = TRUE
 
 # Outros parâmetros e configurações
 

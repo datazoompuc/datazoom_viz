@@ -15,7 +15,19 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file) %>% 
       filter(processos_geradores_emissoes != "Nao Identificado") %>% 
-      filter(processos_geradores_emissoes != "Producao de Combustiveis")
+      filter(processos_geradores_emissoes != "Producao de Combustiveis")%>%
+        filter(!is.na(processos_geradores_emissoes))
+    
+        if(param$lang){
+            df <- df %>%
+                mutate(processos_geradores_emissoes = case_when(
+                    processos_geradores_emissoes == "Agropecuario" ~ "Farming",
+                    processos_geradores_emissoes == "Comercial"  ~ "Commercial",
+                    processos_geradores_emissoes == "Industrial" ~ "Industrial",
+                    processos_geradores_emissoes ==  "Geracao de Eletricidade (Servico Publico)" ~ "Electricity Generation (Public Service)",
+                    processos_geradores_emissoes == "Transportes" ~ "Transports",
+                    processos_geradores_emissoes == "Publico" ~ "Public"))
+        }
     
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
