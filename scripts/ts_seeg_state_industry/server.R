@@ -16,6 +16,12 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file) %>% 
       filter(!is.na(group))
     
+    if(param$lang){
+        df <- df %>%
+            mutate(setor = case_when(
+                setor == "Processos Industriais" ~ "Industrial Process"))
+    }
+    
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]

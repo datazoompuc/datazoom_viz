@@ -30,9 +30,11 @@ param$slider_def <- "time" # variável padrão do slider
 param$text_def <- "group" # variável padrão de texto
 param$id_def <- "group" # variável padrão de id
 
+### Parametros especificos no server
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Emissões de Gases Estufa na Indústria ao nível estadual"
 param$plot_y <- "Emissões"
+param$lang <- FALSE
 
 # Outros parâmetros e configurações
 

@@ -46,6 +46,7 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_industry_en/"
 param$subtitle_init <- "by State" # expressão subtitulo
 param$title_init <- "Total emissions from "
 param$tooltip_a <- "Emissions"
+param$lang = TRUE
 
 
 
