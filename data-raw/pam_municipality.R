@@ -44,24 +44,67 @@ update_pam <- function(geo_level,dataset){
 # first-time downloads (for files that don't exist yet) #
 #########################################################
 
+########### All Crops
+
 ##this file exists
 #pam_municipality_all_crops = load_pam(dataset = 'all_crops', raw_data = FALSE, geo_level = 'municipality', 1974:2019, language = "pt")
 #saveRDS(pam_municipality_all_crops, file = "./data/pam_municipality_all_crops.rds")
 
-pam_municipality_permanent_crops = load_pam(dataset = 'permanent_crops', raw_data = FALSE, geo_level = 'municipality', 1974:2019, language = "pt")
-saveRDS(pam_municipality_permanent_crops, file = "./data/pam_municipality_permanent_crops.rds")
+########### Permanent Crops
 
-pam_municipality_temporary_crops = load_pam(dataset = 'temporary_crops', raw_data = FALSE, geo_level = 'municipality', 1974:2019, language = "pt")
-saveRDS(pam_municipality_temporary_crops, file = "./data/pam_municipality_temporary_crops.rds")
+#loop that saves each year as an archive
+for(year_i in 1974:2019){
+pam_municipality_permanent_crops = load_pam(dataset = 'permanent_crops', raw_data = FALSE, geo_level = 'municipality', time_period = year_i, language = "pt")
+saveRDS(pam_municipality_permanent_crops, file = paste0("./data/pam_municipality_permanent_crops", year_i, ".rds"))
+}
+
+#loop that binds everything
+year_vector_bind <- 1974:2019
+pam_municipality_permanent_crops <- data.frame()
+
+for(year_i in year_vector_bind){
+    pam_df <- readRDS(file = paste0("./data/pam_municipality_permanent_crops", year_i, ".rds"))
+    pam_municipality_permanent_crops <- bind_rows(pam_municipality_permanent_crops, pam_df)
+}
+
+########### Temporary Crops
+
+#loop that saves each year as an archive
+year_vector_save <- 1974:2019
+
+for(year_i in year_vector_save){
+pam_municipality_temporary_crops = load_pam(dataset = 'temporary_crops', raw_data = FALSE, geo_level = 'municipality', time_period = year_i, language = "pt")
+saveRDS(pam_municipality_temporary_crops, file = paste0("./data/pam_municipality_temporary_crops", year_i, ".rds"))
+}
+
+#loop that binds everything
+year_vector_bind <- 1974:2019
+pam_municipality_temporary_crops <- data.frame()
+
+for(year_i in year_vector_bind){
+    pam_df <- readRDS(file = paste0("./data/pam_municipality_temporary_crops", year_i, ".rds"))
+    pam_municipality_temporary_crops <- bind_rows(pam_municipality_temporary_crops, pam_df)
+}
+
+#saves the final data.frame
+saveRDS(pam_municipality_temporary_crops, file = paste0("./data/pam_municipality_temporary_crops.rds"))
+
+########### Corn
 
 pam_municipality_corn = load_pam(dataset = 'corn', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
 saveRDS(pam_municipality_corn, file = "./data/pam_municipality_corn.rds")
 
+########### Potato
+
 pam_municipality_potato = load_pam(dataset = 'potato', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
 saveRDS(pam_municipality_potato, file = "./data/pam_municipality_potato.rds")
 
+########### Peanut
+
 pam_municipality_peanut= load_pam(dataset = 'peanut', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
 saveRDS(pam_municipality_peanut, file = "./data/pam_municipality_peanut.rds" )
+
+########### Beans
 
 ##this file exists
 #pam_municipality_beans = load_pam(dataset = 'beans', raw_data = FALSE, geo_level = 'municipality', 2003:2021, language = "pt")
