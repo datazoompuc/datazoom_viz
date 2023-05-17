@@ -63,9 +63,14 @@ year_vector_bind <- 1974:2019
 pam_municipality_permanent_crops <- data.frame()
 
 for(year_i in year_vector_bind){
-    pam_df <- readRDS(file = paste0("./data/pam_municipality_permanent_crops", year_i, ".rds"))
+    pam_df <- readRDS(file = paste0("./data/pam_municipality_permanent_crops", year_i, ".rds")) %>%
+        labelled::remove_labels()
     pam_municipality_permanent_crops <- bind_rows(pam_municipality_permanent_crops, pam_df)
 }
+
+
+#saves the final data.frame
+saveRDS(pam_municipality_permanent_crops, file = paste0("./data/pam_municipality_permanent_crops.rds"))
 
 ########### Temporary Crops
 
@@ -82,7 +87,7 @@ year_vector_bind <- 1974:2019
 pam_municipality_temporary_crops <- data.frame()
 
 for(year_i in year_vector_bind){
-    pam_df <- readRDS(file = paste0("./data/pam_municipality_temporary_crops", year_i, ".rds"))
+    pam_df <- readRDS(file = paste0("./data/pam_municipality_temporary_crops_", year_i, ".rds"))
     pam_municipality_temporary_crops <- bind_rows(pam_municipality_temporary_crops, pam_df)
 }
 
