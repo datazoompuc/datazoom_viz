@@ -12,7 +12,99 @@ library(datazoom.amazonia)
 library(labelled)
 
 ##update_pam function
-update_pam <- function(geo_level,dataset){
+
+update_download_pam <- function(geo_level, dataset, time_period = NULL){
+    
+    #define empty vectors
+    year_vector <-C()
+    not_year_vector <- c()
+    
+    #makes a loop to check it there is yearly files for the dataset and municipality
+    #(if this part of the code doesn't make sense, keep reading and come back here later)
+    for(i in time_period){
+        
+        if(!file.exists("./data/pam_", geo_level, "_",dataset,year_i,".rds")){
+            year_vector <- c(year_vector, year_i)
+        
+        } else {
+            
+            #saves all the years that are already downloaded
+            year_exists_vector <- c(year_exists_vector, year_i)
+        
+            }
+    }
+    
+    #check for existing files (the whole file with all the years, not yearly files)
+    if(
+        file.exists(
+            paste0("./data/pam_", geo_level, "_", dataset, ".rds")
+            )
+        ){
+        
+        #reads existing file
+        pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds")) %>%
+            labelled::remove_labels() #remove variable labels (for binding)
+        
+        #get the names of the variables from the old dataset (we want the year variable)
+        old_variables <- colnames(pam_old)
+        
+        #get the bigger year from the old dataset as a number
+        year_max <- max(pam_old$ano) %>% 
+            as.numeric()
+        
+        #download the next year of pam (notice the 'year_max + 1' in the time period argument)
+        pam_update <- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max + 1, language = "pt") %>%
+            labelled::remove_labels() #remove variable labels (for binding)
+        
+        #bind rows of new and old pam
+        pam_new <- bind_rows(pam_update, pam_old) %>% 
+            #select the variables that already were there
+            select(contains(old_variables))
+        
+        #change numerical variables to class numeric
+        pam_new$ano <- pam_new$ano %>% as.numeric()
+        pam_new$geo_id <- pam_new$geo_id %>% as.numeric()
+        
+    } else
+        { #if the file doesnt exist, proceed here
+    
+        #create a loop that saves each year as a file
+        for(year_i in year_vector){
+            
+            #download one year of the pam dataset and geolevel required
+            pam_yearly = load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_i, language = "pt")
+            
+            #save the file for that year
+            saveRDS(pam_yearly, pam_municipality_permanent_crops, file = paste0("./data/pam_", geo_level,"_", dataset, year_i, ".rds"))
+            
+        }
+        
+        #loop that binds everything
+        year_vector_total <- c(year_exists_vector, year_vector)
+        
+        #define an empty data.frame
+        pam_new <- data.frame()
+        
+        #bind yearly files to create new big file with all the years
+        for(year_j in year_vector_total){
+            pam_df <- readRDS(file = paste0("./data/pam_", geo_level,"_", dataset, year_j, ".rds")) %>%
+                labelled::remove_labels()
+            pam_new <- bind_rows(pam_new, pam_df)
+        }
+        
+        #saves the final data.frame as a file
+        saveRDS(pam_new, file = paste0("./data/pam_", geo_level,"_", dataset,".rds"))
+        
+        #remove all yearly files
+        for(year_k in year_vector_total){
+            file.remove("./data/pam_", geo_level,"_", dataset, year_k, ".rds")
+        }
+    }
+    
+}
+
+
+update_pam <- function(geo_level, dataset, time_period = NULL){
     
     #load the old pam dataset
     pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds")) %>%
@@ -54,8 +146,10 @@ update_pam <- function(geo_level,dataset){
 
 #loop that saves each year as an archive
 for(year_i in 1974:2019){
+    
 pam_municipality_permanent_crops = load_pam(dataset = 'permanent_crops', raw_data = FALSE, geo_level = 'municipality', time_period = year_i, language = "pt")
 saveRDS(pam_municipality_permanent_crops, file = paste0("./data/pam_municipality_permanent_crops", year_i, ".rds"))
+
 }
 
 #loop that binds everything
@@ -74,14 +168,14 @@ saveRDS(pam_municipality_permanent_crops, file = paste0("./data/pam_municipality
 
 ########### Temporary Crops
 
-#loop that saves each year as an archive
+#loop that saves each year as an archive'
 year_vector_save <- 1974:2019
 
 for(year_i in year_vector_save){
 pam_municipality_temporary_crops = load_pam(dataset = 'temporary_crops', raw_data = FALSE, geo_level = 'municipality', time_period = year_i, language = "pt")
 saveRDS(pam_municipality_temporary_crops, file = paste0("./data/pam_municipality_temporary_crops", year_i, ".rds"))
 }
-
+''
 #loop that binds everything
 year_vector_bind <- 1974:2019
 pam_municipality_temporary_crops <- data.frame()
