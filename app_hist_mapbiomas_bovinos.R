@@ -40,7 +40,16 @@ param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora d
                              "Estados" = owdbr::uflist()$UF)
 
 param$year_inicio <- 1985
-param$year_final <- 2019
+param$year_final <- 2021
+
+#Parametros UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "vertical axis (y)"
+param$label_log_name <- "escala log(x+1)"
+param$label_prop_name <-  "proportional to the initial year (*)"
+param$label_geo_name <- "Subdivisão geográfica"
+param$label_ref_name  <- "Ano referente"
+param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_energy_en/"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

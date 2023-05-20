@@ -35,13 +35,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$label_var_name ),
         div(
           class = "var_selec_group",
           # Seleciona filtro
           selectizeInput(
             "filter1",
-            "Subdivisão geográfica",
+            param$label_geo_name,
             choices = NULL,
             multiple = TRUE,
             width = "100%")
@@ -50,7 +50,7 @@ get_ui <- function(files, param) {
         # Seleciona eixo log
         checkboxInput(
           inputId = "ylog",
-          "escala log(x+1)",
+          param$label_log_name ,
           value = TRUE,
           width = "100%"
         ),
@@ -59,7 +59,7 @@ get_ui <- function(files, param) {
           class = "var_selec_group",
           # Seleciona variável do eixo de data
           sliderInput(inputId = "filter_ano",
-                      label = "Ano referente",
+                      label = param$label_ref_name ,
                       min = param$year_inicio,
                       max = param$year_final,
                       value = param$year_final,
