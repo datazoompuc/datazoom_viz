@@ -141,6 +141,14 @@ df <- dz_munic_ppm_mapbiomas %>%
   rbind(regioes) %>% 
   rbind(amz_legal)
 
+# filtra os anos que serao utilizados na visualização
+df <- df %>%
+    filter(ano >= 1985)  
+
+# filtra as colunas utilizadas na visualização
+df <- df %>%
+    select(cod_ibge, ano, n_bovino_por_area_pastagem, nm_municip, uf)
+
 # save data
 readr::write_rds(df,
         file = "./data/dz_munic_ppm_mapbiomas.rds"
