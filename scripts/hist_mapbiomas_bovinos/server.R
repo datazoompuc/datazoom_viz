@@ -22,7 +22,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
         "filter1",
         choices = param$filter_choices,
-        selected = c("Amazônia Legal", "Fora da Amazônia Legal") # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        selected = c(param$legal_amazon_in, param$legal_amazon_out) # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
     }
 
@@ -89,10 +89,10 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$filter1)) {
-        text <- "Bovino/Hectares de Área de Pastagem: "
+        text <- param$bovino
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
-        text <- "Bovino/Hectares de Área de Pastagem: "
+        text <- param$bovino
         filt <- paste(sapply(input$filter1, paste, collapse = ", "), 
                       collapse = ", ")
         text <- paste0(text, filt)
@@ -108,7 +108,7 @@ get_server <- function(files, param) {
       if (is.null(input$filter1)) {
         text <- " "
       } else {
-        text <- paste0("Distribuição dos Municípios")
+        text <- paste0(param$munic_dist)
       }
 
       text
@@ -181,7 +181,7 @@ get_server <- function(files, param) {
                              #  line = list(width = 1, color = 'white')
                              # ),
                              hoverinfo = "text",
-                             hovertemplate = "Número de Municípios: %{y}<br>Log(Número de Bovino/Hectares de Área de Pastagem + 1): %{x}"
+                             hovertemplate = param$hover
             )
           } else {
             fig_p <- plot_ly(df_p,
@@ -197,8 +197,7 @@ get_server <- function(files, param) {
                              #  line = list(width = 1, color = 'white')
                              # ),
                              hoverinfo = "text",
-                             hovertemplate = "Número de Municípios: %{y}<br>Número de Bovino/Hectares de Área de Pastagem: %{x}"
-            )
+                             hovertemplate = param$hover_2 )
           }
           
 
@@ -267,8 +266,8 @@ get_server <- function(files, param) {
           # Layout eixos
           x_axis_layout <- list(
             title = ifelse(input$ylog, 
-                           "Log(Número de Bovino/Hectares de Área de Pastagem + 1)", 
-                           "Bovinos/Hectares de Área de Pastagem"),
+                           param$log_bovino, 
+                           param$bovino_area_2),
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
@@ -277,7 +276,7 @@ get_server <- function(files, param) {
             zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = "Número de Municípios",
+            title = param$munic_num,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
