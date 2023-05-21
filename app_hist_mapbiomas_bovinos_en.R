@@ -35,7 +35,7 @@ param$plot_desc <- "Distribution of Municipalities according to Cattle per Hecta
 
 
 # Outros parâmetros e configurações
-param$filter_choices <- list("Legal Amazon" = list("Legal Amazon", "Outside Legal Amazon"),
+param$filter_choices <- list("Legal Amazon" = list("Legal Amazon", "Outside of the Legal Amazon"),
                              "Regions" = list("Centro-Oeste (Midwest)", "Nordeste (Northeast)", 
                                               "Norte (North)", "Sudeste (Southeast)", "Sul (South)"),
                              "States" = owdbr::uflist()$UF)
@@ -51,7 +51,7 @@ param$munic_dist<- "Distribution of Municipalities"
 param$hover<-"Number of Municipalities: %{y}<br>Log(Number of Cattle/Hectares of Pasture Area + 1): %{x}"
 param$hover_2<-"Number of Municipalities: %{y}<br>Number of Cattle/Hectares of Pasture Area: %{x}"
 param$log_bovino<- "Log(Number of Cattle/Hectares of Pasture Area + 1)"
-param$bovino_area_2<- "Bovinos/Hectares de Área de Pastagem"
+param$bovino_area_2<- " Cattle/Hectares of Pasture Area"
 param$munic_num<- "Number of Municipalities"
 
 #mudanças específicas no UI
