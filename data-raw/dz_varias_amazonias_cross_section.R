@@ -211,41 +211,41 @@ temp_param_table <- tibble(
 
 # label variables
 
-temp_param_table$label[temp_param_table$var == "front_2020"] <- "Categoria numérica de munic\u00edpio"
-temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Categoria de munic\u00edpio"
+temp_param_table$label[temp_param_table$var == "front_2020"] <- "Categoria numérica de município"
+temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Categoria de município"
 
 temp_param_table$label[temp_param_table$var == "ips_amazonia_2021"] <- "Indice de Progresso Social 2021"
 temp_param_table$label[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "Qualidade da educação IDEB 2019"
 
-temp_param_table$label[temp_param_table$var == "desmatado"] <- "\u00c1rea total desmatada"
-temp_param_table$label[temp_param_table$var == "floresta"] <- "\u00c1rea total florestal"
-temp_param_table$label[temp_param_table$var == "prop_desmatado"] <- "Proporção média de desmatamento pela \u00c1rea"
-temp_param_table$label[temp_param_table$var == "prop_floresta"] <- "Proporção média de floresta pela \u00c1rea"
+temp_param_table$label[temp_param_table$var == "desmatado"] <- "Área total desmatada"
+temp_param_table$label[temp_param_table$var == "floresta"] <- "Área total florestal"
+temp_param_table$label[temp_param_table$var == "prop_desmatado"] <- "Proporção média de desmatamento pela área"
+temp_param_table$label[temp_param_table$var == "prop_floresta"] <- "Proporção média de floresta pela área"
 
 temp_param_table$label[temp_param_table$var == "quant_v40124"] <- "Quantidade de soja"
 temp_param_table$label[temp_param_table$var == "num_v2670"] <- "Quantidade de rebanho bovino"
 
-temp_param_table$label[temp_param_table$var == "pib_percapita_preco_corrente"] <- "PIB percapita de 2019"
-temp_param_table$label[temp_param_table$var == "populacao"] <- "Popula\u00e7\u00e3o m\u00e9dia municipal em 2019"
+temp_param_table$label[temp_param_table$var == "pib_percapita_preco_corrente"] <- "PIB per capita de 2019"
+temp_param_table$label[temp_param_table$var == "populacao"] <- "População média municipal em 2019"
 temp_param_table$label[temp_param_table$var == "population_density"] <- "Densidade populacional em 2019"
 
 # unidade de medida das variaveis
 
-temp_param_table$unidade[temp_param_table$var == "ips_amazonia_2021"] <- "\u00cdndice de 0 a 100"
+temp_param_table$unidade[temp_param_table$var == "ips_amazonia_2021"] <- "Índice de 0 a 100"
 temp_param_table$unidade[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "Nota IDEB (0-10)"
 
-temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km2 em 2021"
-temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km2 em 2021"
+temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km²  em 2021"
+temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km² em 2021"
 
 temp_param_table$unidade[temp_param_table$var == "prop_desmatado"] <- "Percentual em 2021"
 temp_param_table$unidade[temp_param_table$var == "prop_floresta"] <- "Percentual em 2021"
 
-temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- "Gr\u00e3os em 2019"
+temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- "Grãos em 2019"
 temp_param_table$unidade[temp_param_table$var == "num_v2670"] <- "Cabeça de animais em 2019"
 
 temp_param_table$unidade[temp_param_table$var == "pib_percapita_preco_corrente"] <- "R$ em 2019"
 temp_param_table$unidade[temp_param_table$var == "populacao"] <- "Pessoas"
-temp_param_table$unidade[temp_param_table$var == "population_density"] <- "Pessoas por km2"
+temp_param_table$unidade[temp_param_table$var == "population_density"] <- "Pessoas por km²"
 
 # var_group variables
 

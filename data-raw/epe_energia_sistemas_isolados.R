@@ -185,12 +185,12 @@ temp_param_table <- tibble(
 
 temp_param_table$label <- temp_param_table$var
 
-temp_param_table$var_group[2:6] <- "Orçamento CCC - ANEEL"
+temp_param_table$var_group[2:6] <- "Orçamento CDE (Conta de Desenvolvimento Energético) - ANEEL"
 temp_param_table$var_group[7:11] <- "Consumo de Eletricidade - EPE"
 temp_param_table$var_group[12:13] <- "Média de Consumidores - EPE"
 
 temp_param_table$unidade[2:3] <- "Bilhões de R$"
-temp_param_table$unidade[4] <- "% do Orçamento da Conta de Desenvolvimento Energético"
+temp_param_table$unidade[4] <- "% do Orçamento da CDE"
 temp_param_table$unidade[5:6] <- "Bilhões de R$"
 temp_param_table$unidade[7:11] <- "Milhões de MWh"
 temp_param_table$unidade[12:13] <- "Milhões de Consumidores"
@@ -219,7 +219,7 @@ temp_param_table$label[temp_param_table$var == "Consumo Outros"] <- "Other Consu
 temp_param_table$label[temp_param_table$var == "Consumidores Totais"] <- "Total Consumers"
 temp_param_table$label[temp_param_table$var == "Consumidores Residenciais"] <- "Residential Consumers"
 
-temp_param_table$var_group[2:6] <- "CCC Budget - ANEEL"
+temp_param_table$var_group[2:6] <- "CDE Budget - ANEEL"
 temp_param_table$var_group[7:11] <- "Eletricity Consumption - EPE"
 temp_param_table$var_group[12:13] <- "Average of Consumers - EPE"
 
