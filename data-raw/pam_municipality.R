@@ -25,7 +25,7 @@ update_download_pam <- function(geo_level, dataset, time_period){
     for(i in time_period){
         
         #saves all the year that are not downloaded
-        if(!file.exists("./data/pam_", geo_level, "_", dataset, year_i, ".rds")[1]){
+        if((!file.exists("./data/pam_", geo_level, "_", dataset, year_i, ".rds"))[1]){
             year_vector <- c(year_vector, year_i)
         
         } else {
