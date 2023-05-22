@@ -76,7 +76,7 @@ update_download_pam <- function(geo_level, dataset, time_period){
             pam_yearly = load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_i, language = "pt")
             
             #save the file for that year
-            saveRDS(pam_yearly, pam_municipality_permanent_crops, file = paste0("./data/pam_", geo_level,"_", dataset, year_i, ".rds"))
+            saveRDS(pam_yearly, file = paste0("./data/pam_", geo_level,"_", dataset, year_i, ".rds"))
             
         }
         
@@ -107,7 +107,7 @@ update_download_pam <- function(geo_level, dataset, time_period){
             file.remove("./data/pam_", geo_level,"_", dataset, year_k, ".rds")
         }
     }
-    
+    return(pam_new)
 }
 
 
