@@ -36,6 +36,14 @@ param$plot_desc <- "Emissões de Gases Estufa na Indústria ao nível estadual"
 param$plot_y <- "Emissões"
 param$lang <- FALSE
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo y (y)"
+param$label_log_name <- "escala log"
+param$label_prop_name <-  "proporcional ao ano inicial (*)"
+param$label_geo_name <- "Estado"
+param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_industry/"
+
 # Outros parâmetros e configurações
 
 
