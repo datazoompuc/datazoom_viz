@@ -13,7 +13,8 @@ files$param_script <- "scripts/hist_mapbiomas_bovinos/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 
 files$param_file <- "data/dz_munic_ppm_mapbiomas_dic_en.csv"
-files$db_file <- "data/dz_munic_ppm_mapbiomas.rds"
+
+files$db_file <- "data/dz_munic_ppm_mapbiomas_en.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -36,14 +37,15 @@ param$plot_desc <- "Distribution of Municipalities according to Cattle per Hecta
 
 # Outros parâmetros e configurações
 param$filter_choices <- list("Legal Amazon" = list("Legal Amazon", "Outside of the Legal Amazon"),
-                             "Regions" = list("Centro-Oeste (Midwest)", "Nordeste (Northeast)", 
-                                              "Norte (North)", "Sudeste (Southeast)", "Sul (South)"),
+                             "Regions" = list("Midwest", "Northeast", "North", "Southeast", "South"),
                              "States" = owdbr::uflist()$UF)
+
 
 param$year_inicio <- 1985
 param$year_final <- 2021
 
 #mudanças específicas no server
+
 param$legal_amazon_in<- "Legal Amazon"
 param$legal_amazon_out<- "Outside of the Legal Amazon"
 param$bovino<-"Cattle/Hectares of Pasture Area: "

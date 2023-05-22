@@ -302,3 +302,29 @@ temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_ppm_mapbiomas_dic_en.csv", fileEncoding = "UTF-8")
+
+
+######################
+#
+# Build rds in english
+#
+######################
+
+
+dz_munic_ppm_mapbiomas <- readRDS("~/GitHub/datazoom_viz/data/dz_munic_ppm_mapbiomas.rds")
+
+
+    dz_munic_ppm_mapbiomas_en <- dz_munic_ppm_mapbiomas %>%
+        mutate(uf = case_when(
+            uf == "Norte" ~ "North",
+            uf ==  "Nordeste"  ~ "Northeast",
+            uf == "Sudeste"  ~ "Southeast",
+            uf == "Sul" ~ "South",
+            uf == "Centro-Oeste"  ~ "Midwest",
+            uf == "Amazônia Legal"  ~ "Legal Amazon",
+            uf == "Fora da Amazônia Legal" ~ "Outside of the Legal Amazon"))
+
+    # save data
+    readr::write_rds(dz_munic_ppm_mapbiomas_en,
+                     file = "./data/dz_munic_ppm_mapbiomas_en.rds"
+    )
