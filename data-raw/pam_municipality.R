@@ -232,22 +232,22 @@ pam_municipality_permanent_crops <- saveRDS(file = "./data/pam_municipality_perm
 
 #temporary_crops
 
-update_download_pam(geo_level = "municipality", dataset = "temporary_crops", time_period = 1974:2019) 
-pam_municipality_temporary_crops <- saveRDS(file = "./data/pam_municipality_temporary_crops.rds")
+pam_municipality_temporary_crops <- update_download_pam(geo_level = "municipality", dataset = "temporary_crops", time_period = 1974:2019) 
+pam_municipality_temporary_crops <- readRDS(file = "./data/pam_municipality_temporary_crops.rds")
 
 #corn, potato, peanut and bean crops
 
 update_download_pam(geo_level = "municipality", dataset = "corn", time_period = 2003:2021) 
-pam_municipality_corn <- saveRDS(file = "./data/pam_municipality_corn.rds")
+pam_municipality_corn <- readRDS(file = "./data/pam_municipality_corn.rds")
 
 update_download_pam(geo_level = "municipality", dataset = "potato", time_period = 2003:2021) 
-pam_municipality_potato <- saveRDS(file = "./data/pam_municipality_potato.rds")
+pam_municipality_potato <- readRDS(file = "./data/pam_municipality_potato.rds")
     
 pam_municipality_peanut <- update_download_pam(geo_level = "municipality", dataset = "peanut", time_period = 2003:2021) 
 saveRDS(pam_municipality_peanut, file = "./data/pam_municipality_peanut.rds")
     
 update_download_pam(geo_level = "municipality", dataset = "beans", time_period = 2003:2021)
-pam_municipality_beans <- saveRDS(file = "./data/pam_municipality_beans.rds")
+pam_municipality_beans <- readRDS(file = "./data/pam_municipality_beans.rds")
 
 #########
 ### Creating metadatabase -> IBGE - PAM
