@@ -36,10 +36,10 @@ param$plot_desc <- "Compilação de dados ao nível municipal (PPM)"
 param$app <- "IBGE - PPM"
 
 param$year_inicio <- 2000
-param$year_final <- 2019
+param$year_final <- 2021
 
 #Mudanças específicas no UI
-param$variables_caps<- "VARI\u001VEIS::"
+param$variables_caps<- "VARIÁVEIS::"
 param$choice_variable<- "Seleciona variável (x)"
 param$reference_year<- "Ano Referente"
 param$link<-"https://datazoom.shinyapps.io/app_map_dz_munic_ppm/"

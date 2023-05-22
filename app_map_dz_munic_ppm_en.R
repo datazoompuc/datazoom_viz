@@ -36,7 +36,7 @@ param$plot_desc <- "Data compiled at the municipality level (PPM)"
 param$app <- "IBGE - PPM"
 
 param$year_inicio <- 2000
-param$year_final <- 2019
+param$year_final <- 2021
 
 #Mudanças específicas no UI
 param$variables_caps<- "VARIABLES"
