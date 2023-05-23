@@ -32,6 +32,7 @@ param$id_def <- "group" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Emissões de Gases Estufa na Agropecuária ao nível estadual"
+param$plot_y <- "Emissões"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
@@ -47,7 +48,7 @@ param$title_init <- "Emissões Totais advindas de "
 param$tooltip_a <- "Emissões"
 param$tooltip_b <-  "Unidade de medida: <b>"
 param$tooltip_c <- "Toneladas"
-
+param$lang = FALSE
 
 
 # Outros parâmetros e configurações

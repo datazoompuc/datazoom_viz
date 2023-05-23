@@ -40,20 +40,16 @@ ppm_municipality_livestock_inventory4= load_ppm(dataset = 'ppm_livestock_invento
 ppm_municipality_livestock_inventory5= load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
-                                                2011:2019, 
+                                                2011:2021, 
                                                 language = "pt")
 
-ppm_municipality_livestock_inventory6= load_ppm(dataset = 'ppm_livestock_inventory', 
-                                                raw_data = FALSE, 
-                                                'municipality', 
-                                                2020, 
-                                                language = "pt")
+
 ##append datasets
 
 xxx <- bind_rows(ppm_municipality_livestock_inventory1, 
                  ppm_municipality_livestock_inventory2, 
                  ppm_municipality_livestock_inventory3, 
-                 ppm_municipality_livestock_inventory4, 
+                 ppm_municipality_livestock_inventory4
 )
 
 # something went wrong with bind_rows with ppm_municipality_livestock_inventory5
@@ -71,6 +67,12 @@ ppm_municipality_livestock_inventory[is.na(ppm_municipality_livestock_inventory)
 # convert back list to dataframe
 ppm_municipality_livestock_inventory <- as.data.frame(do.call(cbind,ppm_municipality_livestock_inventory))
 
+municipios = datazoom.amazonia::municipalities_biomes
+municipios%>%
+    dplyr::select('municipality_mapbiomas', 'code_muni')
+ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
+ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , time=.data$ano, group=.data$geo_id)
+
 
 ##saving f
 saveRDS(ppm_municipality_livestock_inventory,
@@ -80,16 +82,18 @@ saveRDS(ppm_municipality_livestock_inventory,
 #sheep_farming 
 
 ##municipality 
-ppm_municipality_sheep_farming= load_ppm(dataset = 'ppm_sheep_farming', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+ppm_municipality_sheep_farming= load_ppm(dataset = 'ppm_sheep_farming', raw_data = FALSE, 'municipality', 1974:2021, language = "pt")
 
 ##making data usable for datazoom viz
 ppm_municipality_sheep_farming = lapply(ppm_municipality_sheep_farming, as.numeric)
 ppm_municipality_sheep_farming <- as.data.frame(ppm_municipality_sheep_farming)
 ppm_municipality_sheep_farming[is.na(ppm_municipality_sheep_farming)] <- 0
 
-munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
-ppm_municipality_sheep_farming$geo_id= plyr::mapvalues(ppm_municipality_sheep_farming$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
+
+municipios = datazoom.amazonia::municipalities_biomes
+municipios%>%
+  dplyr::select('municipality_mapbiomas', 'code_muni')
+ppm_municipality_sheep_farming$geo_id= plyr::mapvalues(ppm_municipality_sheep_farming$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
 ppm_municipality_sheep_farming= dplyr::rename(ppm_municipality_sheep_farming , time=.data$ano, group=.data$geo_id)
 
 ##saving f
@@ -100,16 +104,17 @@ saveRDS(ppm_municipality_sheep_farming,
 #animal_origin_production 
 
 ##municipality (ainda nao salvo)
-ppm_municipality_animal_origin_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+ppm_municipality_animal_origin_production= load_ppm(dataset = 'ppm_animal_origin_production', raw_data = FALSE, 'municipality', 1974:2021, language = "pt")
 
 ##making data usable for datazoom viz
 ppm_municipality_animal_origin_production = lapply(ppm_municipality_animal_origin_production, as.numeric)
 ppm_municipality_animal_origin_production <- as.data.frame(ppm_municipality_animal_origin_production)
 ppm_municipality_animal_origin_production[is.na(ppm_municipality_animal_origin_production)] <- 0
 
-munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
-ppm_municipality_animal_origin_production$geo_id= plyr::mapvalues(ppm_municipality_animal_origin_production$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
+municipios = datazoom.amazonia::municipalities_biomes
+municipios%>%
+    dplyr::select('municipality_mapbiomas', 'code_muni')
+ppm_municipality_animal_origin_production$geo_id= plyr::mapvalues(ppm_municipality_animal_origin_production$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
 ppm_municipality_animal_origin_production= dplyr::rename(ppm_municipality_animal_origin_production , time=.data$ano, group=.data$geo_id)
 
 ##saving f
@@ -120,15 +125,16 @@ saveRDS(ppm_municipality_animal_origin_production,
 #ppm_cow_farming 
 
 ##municipality (ainda nao salvo)
-ppm_municipality_cow_farming= load_ppm(dataset = 'ppm_cow_farming', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
+ppm_municipality_cow_farming= load_ppm(dataset = 'ppm_cow_farming', raw_data = FALSE, 'municipality', 1974:2021, language = "pt")
 ##making data usable for datazoom viz
 ppm_municipality_cow_farming = lapply(ppm_municipality_cow_farming, as.numeric)
 ppm_municipality_cow_farming <- as.data.frame(ppm_municipality_cow_farming)
 ppm_municipality_cow_farming[is.na(ppm_municipality_cow_farming)] <- 0
 
-munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
-ppm_municipality_cow_farming$geo_id= plyr::mapvalues(ppm_municipality_cow_farming$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
+municipios = datazoom.amazonia::municipalities_biomes
+municipios%>%
+    dplyr::select('municipality_mapbiomas', 'code_muni')
+ppm_municipality_cow_farming$geo_id= plyr::mapvalues(ppm_municipality_cow_farming$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
 ppm_municipality_cow_farming= dplyr::rename(ppm_municipality_cow_farming , time=.data$ano, group=.data$geo_id)
 
 ##saving f
@@ -139,7 +145,7 @@ saveRDS(ppm_municipality_cow_farming,
 #ppm_aquaculture
 
 ##municipality (ainda nao salvo)
-ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'municipality', 2013:2019, language = "pt")
+ppm_municipality_aquaculture= load_ppm(dataset = 'ppm_aquaculture', raw_data = FALSE, 'municipality', 2013:2021, language = "pt")
 ##making data usable for datazoom viz
 label_aqua= Hmisc::label(ppm_municipality_aquaculture) # for generating metadata
 
@@ -147,9 +153,10 @@ ppm_municipality_aquaculture = lapply(ppm_municipality_aquaculture, as.numeric)
 ppm_municipality_aquaculture <- as.data.frame(ppm_municipality_aquaculture)
 ppm_municipality_aquaculture[is.na(ppm_municipality_aquaculture)] <- 0
 
-munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
-ppm_municipality_aquaculture$geo_id= plyr::mapvalues(ppm_municipality_aquaculture$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
+municipios = datazoom.amazonia::municipalities_biomes
+municipios%>%
+    dplyr::select('municipality_mapbiomas', 'code_muni')
+ppm_municipality_aquaculture$geo_id= plyr::mapvalues(ppm_municipality_aquaculture$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
 ppm_municipality_aquaculture= dplyr::rename(ppm_municipality_aquaculture , time=.data$ano, group=.data$geo_id)
 
 ##saving f

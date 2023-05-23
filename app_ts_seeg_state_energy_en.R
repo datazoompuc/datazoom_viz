@@ -32,6 +32,7 @@ param$id_def <- "group" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Greenhouse Gas Emissions in the Energy Sector at State Level"
+param$plot_y <- "Emissions"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"
@@ -47,6 +48,7 @@ param$title_init <- "Total emissions from "
 param$tooltip_a <- "Emissions"
 param$tooltip_b <-  "Unit of measurement: <b>"
 param$tooltip_c <- "Tons"
+param$lang = TRUE
 
 # Outros parâmetros e configurações
 

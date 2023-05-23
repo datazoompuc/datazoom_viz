@@ -53,6 +53,7 @@ get_ui <- function(files, param) {
           class = "var_selec_group",
           # Seleciona variável do eixo de data
           sliderInput(inputId = "filter1",
+                      
                       label = param$reference_year,
                       min = param$year_inicio,
                       max = param$year_final,
@@ -64,6 +65,7 @@ get_ui <- function(files, param) {
                                                  pauseButton = "\u23F8"),
                       sep = "")
         ),
+        
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
