@@ -299,8 +299,9 @@ ppm_livestock= ppm_livestock%>%
 # 
 # saveRDS(pam_municipality_all_crops_2000_19, "data/pam_municipality_all_crops_2000_19.rds")
 
-pam_municipality_all_crops_2000_19= readRDS('data/pam_municipality_all_crops_2000_19.rds')
-pam_municipality_all_crops_2000_19[is.na(pam_municipality_all_crops_2000_19)] <- 0  
+pam_municipality_all_crops= readRDS('data/pam_municipality_all_crops.rds') %>%
+    filter(ano >= 2000)
+pam_municipality_all_crops[is.na(pam_municipality_all_crops)] <- 0  
 
 ###########################
 # edit data to merge
@@ -324,7 +325,7 @@ class(gdp$ano) <-  'numeric'
 #class(degrad$ano) <-  'numeric'
 #class(income$ano) <-  'numeric'
 class(ips$cod_municipio) <-  'character'
-class(pam_municipality_all_crops_2000_19$ano) <- 'numeric'
+class(pam_municipality_all_crops$ano) <- 'numeric'
 
 ###########################
 # merge all data
@@ -335,7 +336,7 @@ dz_munic <- income %>%
   full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
   full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
   full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
-  full_join(pam_municipality_all_crops_2000_19, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
+  full_join(pam_municipality_all_crops, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
   arrange(cod_ibge, ano) %>%
   relocate(cod_ibge, ano)
 
