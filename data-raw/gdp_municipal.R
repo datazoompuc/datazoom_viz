@@ -38,6 +38,7 @@ population <- load_population(raw_data = F,
 
 if("populacao_residente_v93" %in% colnames(population)){
     if("populacao_residente_estimada_v9324" %in% colnames(population)){
+        
         #If there are both "populacao_residente_v93" and "populacao_residente_estimada_v9324"
         #Combine them into "pop"
     population <- population %>% 
@@ -47,12 +48,14 @@ if("populacao_residente_v93" %in% colnames(population)){
             select(-c("populacao_residente_v93","populacao_residente_estimada_v9324"))
     
     } else {
+        
         #If there is no "populacao_residente_estimada_v9324", there must be only "populacao_residente_v93"
         #Therefore, proceed to rename it to "pop"
         population <- population %>% 
             rename(pop = populacao_residente_v93)
     }
 } else {
+    
     #If there is no "populacao_residente_v93", there must be only "populacao_residente_estimada_v9324"
     #Therefore, proceed to rename it to "pop"
     population <- population %>% 
@@ -78,15 +81,18 @@ gdp$cod_ibge <- gdp$cod_ibge %>% as.character()
 gdp$ano <- gdp$ano %>% as.integer()
 gdp$gdp <- gdp$gdp %>% as.numeric()
 
+#Merging population and municipality datasets
 population_final <- inner_join(population, municipality, by = "cod_ibge") %>%
     mutate(Municipality = paste0(municipality_mapbiomas, " - ", abbrev_state)) %>%
     select(pop, cod_ibge, ano, Municipality)
 
+#Merging previously merged dataset and gdp dataset
 gdp_final <- population_final %>%
     inner_join(gdp, by = c("cod_ibge", "ano")) %>%
     mutate(gd_ppc = gdp*1000/pop) %>%
     relocate(cod_ibge,Municipality, ano, pop)
 
+#Binding rows of new and old final dataset
 gdp_final <- gdp_final %>% 
     bind_rows(gdp_antigo)
 
