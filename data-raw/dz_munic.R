@@ -133,7 +133,6 @@ prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 gdp <- readRDS(file = "data/gdp.rds")
 gdp <- gdp %>%
   janitor::clean_names()
-gdp$ano <- gdp$year
 class(gdp$ano) <- "numeric"
 class(gdp$cod_ibge) <- "character"
 # Replace NA with previous and next rows mean
