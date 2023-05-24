@@ -222,36 +222,6 @@ ips <- ips %>%
 # IBGE - CEMPRE
 ###################
 cempre_municipality <- readRDS(file = "data/cempre_municipality_dza.rds")
-cempre_municipality <- cempre_municipality %>%
-  janitor::clean_names()
-
-# Reshaping data.frame from long  to wide format
-cempre_municipality <- cempre_municipality %>%
-  tidyr::pivot_wider(
-    id_cols = c(municipio_codigo, ano),
-    names_from = variavel_codigo,
-    names_prefix = "cempre",
-    values_from = valor
-  )
-
-cempre_municipality$cod_ibge <- cempre_municipality$municipio_codigo
-cempre_municipality$cempre_n_empresas_organizacoes <- cempre_municipality$cempre2585
-cempre_municipality$cempre_n_ocupados <- cempre_municipality$cempre707
-cempre_municipality$cempre_n_ocupados_assalariados <- cempre_municipality$cempre708
-cempre_municipality$cempre_salarios_remuneracoes <- cempre_municipality$cempre662
-
-# Identify and remove duplicate data
-cempre_municipality <- cempre_municipality %>%
-  distinct(cod_ibge, ano, .keep_all = TRUE) %>%
-  select(
-    cod_ibge,
-    ano,
-    cempre_n_empresas_organizacoes,
-    cempre_n_ocupados,
-    cempre_n_ocupados_assalariados,
-    cempre_salarios_remuneracoes
-  ) %>%
-  arrange(cod_ibge, ano)
 
 ###################
 # SEEG
