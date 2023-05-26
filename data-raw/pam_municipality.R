@@ -41,6 +41,9 @@ update_download_pam <- function(geo_level, dataset, time_period){
         pam_update <- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max + 1, language = "pt") %>%
             labelled::remove_labels() #remove variable labels (for binding)
         
+        #makes all variables class numeric
+        pam_update <- pam_update %>% mutate_all(~as.numeric(.))
+        
         #bind rows of new and old pam
         pam_new <- bind_rows(pam_update, pam_old) %>% 
             #select the variables that already were there
