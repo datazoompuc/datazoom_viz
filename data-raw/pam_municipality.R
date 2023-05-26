@@ -102,8 +102,14 @@ update_download_pam <- function(geo_level, dataset, time_period){
             pam_df <- readRDS(file = paste0("./data/pam_", geo_level,"_", dataset, year_j, ".rds")) %>%  
                 remove_labels()
             
+            #makes all variables class numeric
+            pam_df <- pam_df %>% mutate_all(~as.numeric(.))
+            
             #bind the rows of this file with previously binded years
             pam_new <- bind_rows(pam_new, pam_df)
+            
+            #makes all variables class numeric
+            pam_new <- pam_new %>% mutate_all(~as.numeric(.))
             
             #saves the final data.frame as a .rds file
             saveRDS(pam_new, file = paste0("./data/pam_", geo_level,"_", dataset,".rds"))
