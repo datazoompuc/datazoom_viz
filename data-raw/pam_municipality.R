@@ -104,7 +104,11 @@ update_download_pam <- function(geo_level, dataset, time_period){
             
             #remove all yearly files
             for(year_k in year_vector_total){
-                file.remove("./data/pam_", geo_level,"_", dataset, year_k, ".rds")
+                #Define file path
+                file <- paste0("./data/pam_", geo_level,"_", dataset, year_k, ".rds")
+                
+                #Remove file
+                file.remove(file)
         }
         }
     }
