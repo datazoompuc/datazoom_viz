@@ -11,7 +11,9 @@ library(tidyverse)
 library(datazoom.amazonia)
 library(labelled)
 
-##update_pam function
+##########################################
+##   update-and-download-pam function   ##
+##########################################
 
 update_download_pam <- function(geo_level, dataset, time_period){
     
@@ -127,144 +129,30 @@ update_download_pam <- function(geo_level, dataset, time_period){
     return(pam_new)
 }
 
+##########################
+##   use pam function   ##
+##########################
 
-update_pam <- function(geo_level, dataset, time_period = NULL){
-    
-    #load the old pam dataset
-    pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds")) %>%
-        labelled::remove_labels()
-    
-    #get the names of the variables from the old dataset
-    old_variables <- colnames(pam_old)
-    
-    #get the bigger year from the old dataset as a number
-    year_max <- max(pam_old$ano) %>% 
-        as.numeric()
-    
-    #download the next year of pam (notice the 'year_max + 1' in the time period argument)
-    pam_update <- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max + 1, language = "pt") %>%
-        labelled::remove_labels()
-    
-    #bind rows of new and old pam
-    pam_new <- bind_rows(pam_update, pam_old) %>% 
-    #select the variables that already were there
-        select(contains(old_variables))
-    #make number variables numerical
-    pam_new$ano <- pam_new$ano %>% as.numeric()
-    pam_new$geo_id <- pam_new$geo_id %>% as.numeric()
-    
-    return(pam_new)
-}
+#dataset all_crops
+update_download_pam(dataset = "all_crops", geo_level = "municipality", time_period = 1974:2021)
 
-#########################################################
-# first-time downloads (for files that don't exist yet) #
-#########################################################
+#dataset permanent_crops
+update_download_pam(dataset = "permanent_crops", geo_level = "municipality", time_period = 1974:2021)
 
-########### All Crops
+#dataset temporary_crops
+update_download_pam(dataset = "temporary_crops", geo_level = "municipality", time_period = 1974:2021)
 
-##this file exists
-#pam_municipality_all_crops = load_pam(dataset = 'all_crops', raw_data = FALSE, geo_level = 'municipality', 1974:2019, language = "pt")
-#saveRDS(pam_municipality_all_crops, file = "./data/pam_municipality_all_crops.rds")
+#dataset corn
+update_download_pam(dataset = "corn", geo_level = "municipality", time_period = 1974:2021)
 
-########### Permanent Crops
+#dataset potato
+update_download_pam(dataset = "potato", geo_level = "municipality", time_period = 1974:2021)
 
-#loop that saves each year as an archive
-for(year_i in 1974:2019){
-    
-pam_municipality_permanent_crops = load_pam(dataset = 'permanent_crops', raw_data = FALSE, geo_level = 'municipality', time_period = year_i, language = "pt")
-saveRDS(pam_municipality_permanent_crops, file = paste0("./data/pam_municipality_permanent_crops", year_i, ".rds"))
+#dataset peanut
+update_download_pam(dataset = "peanut", geo_level = "municipality", time_period = 1974:2021)
 
-}
-
-#loop that binds everything
-year_vector_bind <- 1974:2019
-pam_municipality_permanent_crops <- data.frame()
-
-for(year_i in year_vector_bind){
-    pam_df <- readRDS(file = paste0("./data/pam_municipality_permanent_crops", year_i, ".rds")) %>%
-        labelled::remove_labels()
-    pam_municipality_permanent_crops <- bind_rows(pam_municipality_permanent_crops, pam_df)
-}
-
-
-#saves the final data.frame
-saveRDS(pam_municipality_permanent_crops, file = paste0("./data/pam_municipality_permanent_crops.rds"))
-
-########### Temporary Crops
-
-#loop that saves each year as an archive'
-year_vector_save <- 1974:2019
-
-for(year_i in year_vector_save){
-pam_municipality_temporary_crops = load_pam(dataset = 'temporary_crops', raw_data = FALSE, geo_level = 'municipality', time_period = year_i, language = "pt")
-saveRDS(pam_municipality_temporary_crops, file = paste0("./data/pam_municipality_temporary_crops", year_i, ".rds"))
-}
-''
-#loop that binds everything
-year_vector_bind <- 1974:2019
-pam_municipality_temporary_crops <- data.frame()
-
-for(year_i in year_vector_bind){
-    pam_df <- readRDS(file = paste0("./data/pam_municipality_temporary_crops_", year_i, ".rds"))
-    pam_municipality_temporary_crops <- bind_rows(pam_municipality_temporary_crops, pam_df)
-}
-
-#saves the final data.frame
-saveRDS(pam_municipality_temporary_crops, file = paste0("./data/pam_municipality_temporary_crops.rds"))
-
-########### Corn
-
-pam_municipality_corn = load_pam(dataset = 'corn', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
-saveRDS(pam_municipality_corn, file = "./data/pam_municipality_corn.rds")
-
-########### Potato
-
-pam_municipality_potato = load_pam(dataset = 'potato', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
-saveRDS(pam_municipality_potato, file = "./data/pam_municipality_potato.rds")
-
-########### Peanut
-
-pam_municipality_peanut= load_pam(dataset = 'peanut', raw_data = FALSE, geo_level = 'municipality', 2003:2019, language = "pt")
-saveRDS(pam_municipality_peanut, file = "./data/pam_municipality_peanut.rds" )
-
-########### Beans
-
-##this file exists
-#pam_municipality_beans = load_pam(dataset = 'beans', raw_data = FALSE, geo_level = 'municipality', 2003:2021, language = "pt")
-#saveRDS(pam_municipality_beans, file = "./data/pam_municipality_beans.rds")
-
-##############
-# update pam #
-##############
-
-#all_crops
-
-update_download_pam(geo_level = "municipality", dataset = "all_crops", time_period = 1974:2019)
-pam_municipality_all_crops <- readRDS(file = "./data/pam_municipality_all_crops.rds")
-
-#permanent_crops
-
-update_download_pam(geo_level = "municipality", dataset = "permanent_crops", time_period = 1974:2019) 
-pam_municipality_permanent_crops <- saveRDS(file = "./data/pam_municipality_permanent_crops.rds")
-
-#temporary_crops
-
-pam_municipality_temporary_crops <- update_download_pam(geo_level = "municipality", dataset = "temporary_crops", time_period = 1974:2019) 
-pam_municipality_temporary_crops <- readRDS(file = "./data/pam_municipality_temporary_crops.rds")
-
-#corn, potato, peanut and bean crops
-
-update_download_pam(geo_level = "municipality", dataset = "corn", time_period = 2003:2021) 
-pam_municipality_corn <- readRDS(file = "./data/pam_municipality_corn.rds")
-
-update_download_pam(geo_level = "municipality", dataset = "potato", time_period = 2003:2021) 
-pam_municipality_potato <- readRDS(file = "./data/pam_municipality_potato.rds")
-    
-pam_municipality_peanut <- update_download_pam(geo_level = "municipality", dataset = "peanut", time_period = 2003:2021) 
-saveRDS(pam_municipality_peanut, file = "./data/pam_municipality_peanut.rds")
-    
-update_download_pam(geo_level = "municipality", dataset = "beans", time_period = 2003:2021)
-pam_municipality_beans <- readRDS(file = "./data/pam_municipality_beans.rds")
+#dataset beans
+update_download_pam(dataset = "beans", geo_level = "municipality", time_period = 1974:2021)
 
 #########
 ### Creating metadatabase -> IBGE - PAM
