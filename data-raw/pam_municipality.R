@@ -30,6 +30,9 @@ update_download_pam <- function(geo_level, dataset, time_period){
         pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds")) %>%
             labelled::remove_labels() #remove variable labels (for binding)
         
+        #makes all variables class numeric
+        pam_old <- pam_old %>% mutate_all(~as.numeric(.))
+        
         #get the names of the variables from the old dataset (we want the year variable)
         old_variables <- colnames(pam_old)
         
