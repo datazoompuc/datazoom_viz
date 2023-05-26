@@ -93,7 +93,8 @@ update_download_pam <- function(geo_level, dataset, time_period){
         for(year_j in year_vector_total){
             
             #read an yearly file
-            pam_df <- readRDS(file = paste0("./data/pam_", geo_level,"_", dataset, year_j, ".rds"))
+            pam_df <- readRDS(file = paste0("./data/pam_", geo_level,"_", dataset, year_j, ".rds")) %>%  
+                remove_labels()
             
             #bind the rows of this file with previously binded years
             pam_new <- bind_rows(pam_new, pam_df)
