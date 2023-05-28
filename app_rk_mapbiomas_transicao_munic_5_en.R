@@ -10,7 +10,7 @@ files$ui_script <- "scripts/rk_mapbiomas_transicao_munic_5/ui.R"
 files$server_script <- "scripts/rk_mapbiomas_transicao_munic_5/server.R"
 files$param_script <- "scripts/rk_mapbiomas_transicao_munic_5/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/mapbiomas_transicao_munic_dic.csv"
+files$param_file <- "data/mapbiomas_transicao_munic_dic_en.csv"
 files$db_file <- "data/mapbiomas_transicao_munic_5.rds"
 
 # Carrega scripts
