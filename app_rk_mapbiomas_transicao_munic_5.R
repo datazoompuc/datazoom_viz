@@ -38,6 +38,7 @@ param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_munic_5/
 param$server0 <- "Variável não selecionada"
 param$server1 <- "Ranking de "
 param$server2 <- "Amazônia Legal"
+param$lang <- FALSE
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"

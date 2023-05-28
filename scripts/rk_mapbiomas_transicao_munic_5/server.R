@@ -14,6 +14,23 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file)
   
+  if(param$lang){
+      df <- df %>%
+          mutate(time = case_when(
+              time == "Entre  1985  e  1990" ~ "Between 1985 and 1990",
+              time == "Entre  1990  e  1995"  ~ "Between 1990 and 1995",
+              time == "Entre  1995  e  2000" ~ "Between 1995 and 2000",
+              time ==  "Entre  2000  e  2005" ~ "Between 2000 and 2005",
+              time == "Entre  2005  e  2010" ~ "Between 2005 and 2010",
+              time ==  "Entre  2010  e  2015" ~ "Between 2010 and 2015"))
+  }
+
+  
+  
+  
+    
+  
+  
   server <- function(input, output, session) {
     
     # Cria opções para seleção de grupos
