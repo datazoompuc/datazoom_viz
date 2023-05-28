@@ -35,7 +35,7 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Compilação de dados ao nível municipal (CEMPRE)"
 param$app <- "IBGE - CEMPRE"
 
-param$year_inicio <- 2002
+param$year_inicio <- 2006
 param$year_final <- 2019
 
 # Outros parâmetros e configurações
