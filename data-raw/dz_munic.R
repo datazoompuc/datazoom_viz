@@ -842,6 +842,7 @@ temp_param_table$label[temp_param_table$var == "quant_v40122"] <- "Quantity - Co
 temp_param_table$label[temp_param_table$var == "area_plantada_dest_colheita_v40124"] <- "Area Planted or Destined for Harvesting - Soy"
 temp_param_table$label[temp_param_table$var == "quant_v40124"] <- "Quantity - Soy"
 
+
 temp_param_table$unidade[1] <- "Measurement unit"
 temp_param_table$unidade[2] <- "Measurement unit"
 temp_param_table$unidade[3] <- "Measurement unit"
@@ -861,6 +862,212 @@ temp_param_table$unidade[29] <- "Index from 0 to 100"
 temp_param_table$unidade[35] <- "Heads"
 temp_param_table$unidade[36] <- "Heads"
 temp_param_table$unidade[37] <- "Heads"
+temp_param_table$unidade[3] <- "Measurement unit"
+
+# var_group variables
+temp_param_table$var_group[temp_param_table$var == "ano"] <- ""
+temp_param_table$var_group[temp_param_table$var == "employed_census2000"] <- "IBGE - Censo 2000"
+temp_param_table$var_group[temp_param_table$var == "employed_census2010"] <- "IBGE - Censo 2010"
+temp_param_table$var_group[temp_param_table$var == "mean_income_census2000"] <- "IBGE - Censo 2000"
+temp_param_table$var_group[temp_param_table$var == "mean_income_census2010"] <- "IBGE - Censo 2010"
+temp_param_table$var_group[temp_param_table$var == "median_income_census2000"] <- "IBGE - Censo 2000"
+temp_param_table$var_group[temp_param_table$var == "median_income_census2010"] <- "IBGE - Censo 2010"
+temp_param_table$var_group[temp_param_table$var == "desmatado"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "incremento"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "floresta"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "nao_floresta"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "hidrografia"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_desmatado"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_incremento"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_floresta"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_nao_floresta"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_hidrografia"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "pop"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "gdp"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "gd_ppc"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "gdp_deflacionado"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "gd_ppc_deflacionado"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "IBGE - CEMPRE"
+temp_param_table$var_group[temp_param_table$var == "cempre_n_ocupados"] <- "IBGE - CEMPRE"
+temp_param_table$var_group[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "IBGE - CEMPRE"
+temp_param_table$var_group[temp_param_table$var == "cempre_salarios_remuneracoes"] <- "IBGE - CEMPRE"
+temp_param_table$var_group[temp_param_table$var == "ips2018"] <- "IMAZON"
+temp_param_table$var_group[temp_param_table$var == "ips2014"] <- "IMAZON"
+temp_param_table$var_group[temp_param_table$var == "num_v2670"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v2672"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v2675"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v2677"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v2680"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v2681"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v32793"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v32794"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v32795"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "num_v32796"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "geometry"] <- "Terrabrasilis"
+temp_param_table$var_group[temp_param_table$var == "estado"] <- "Geral"
+temp_param_table$var_group[temp_param_table$var == "group"] <- ""
+
+# label data category
+temp_param_table$categoria[temp_param_table$var == "ano"] <- "Unidade de tempo"
+temp_param_table$categoria[temp_param_table$var == "employed_census2000"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "employed_census2010"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "mean_income_census2000"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "mean_income_census2010"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "median_income_census2000"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "median_income_census2010"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "desmatado"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "incremento"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "floresta"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "nao_floresta"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "hidrografia"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "prop_desmatado"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "prop_incremento"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "prop_floresta"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "prop_nao_floresta"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "prop_hidrografia"] <- "Meio ambiente"
+temp_param_table$categoria[temp_param_table$var == "pop"] <- "Demografia"
+temp_param_table$categoria[temp_param_table$var == "gdp"] <- "Economia"
+temp_param_table$categoria[temp_param_table$var == "gd_ppc"] <- "Economia"
+temp_param_table$categoria[temp_param_table$var == "gdp_deflacionado"] <- "Economia"
+temp_param_table$categoria[temp_param_table$var == "gd_ppc_deflacionado"] <- "Economia"
+temp_param_table$categoria[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "cempre_n_ocupados"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "cempre_salarios_remuneracoes"] <- "Mercado de trabalho"
+temp_param_table$categoria[temp_param_table$var == "ips2018"] <- "Social"
+temp_param_table$categoria[temp_param_table$var == "ips2014"] <- "Social"
+temp_param_table$categoria[temp_param_table$var == "num_v2670"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v2672"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v2675"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v2677"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v2680"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v2681"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v32793"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v32794"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v32795"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "num_v32796"] <- "Produção Econômica"
+temp_param_table$categoria[temp_param_table$var == "geometry"] <- ""
+temp_param_table$categoria[temp_param_table$var == "estado"] <- ""
+temp_param_table$categoria[temp_param_table$var == "group"] <- ""
+
+# subcategoria variables
+temp_param_table$subcategoria[temp_param_table$var == "ano"] <- "Ano"
+temp_param_table$subcategoria[temp_param_table$var == "employed_census2000"] <- "Emprego"
+temp_param_table$subcategoria[temp_param_table$var == "employed_census2010"] <- "Emprego"
+temp_param_table$subcategoria[temp_param_table$var == "mean_income_census2000"] <- "Rendimento"
+temp_param_table$subcategoria[temp_param_table$var == "mean_income_census2010"] <- "Rendimento"
+temp_param_table$subcategoria[temp_param_table$var == "median_income_census2000"] <- "Rendimento"
+temp_param_table$subcategoria[temp_param_table$var == "median_income_census2010"] <- "Rendimento"
+temp_param_table$subcategoria[temp_param_table$var == "desmatado"] <- "Desmatamento"
+temp_param_table$subcategoria[temp_param_table$var == "incremento"] <- "Desmatamento"
+temp_param_table$subcategoria[temp_param_table$var == "floresta"] <- "Floresta"
+temp_param_table$subcategoria[temp_param_table$var == "nao_floresta"] <- "Geografia"
+temp_param_table$subcategoria[temp_param_table$var == "hidrografia"] <- "Geografia"
+temp_param_table$subcategoria[temp_param_table$var == "prop_desmatado"] <- "Desmatamento"
+temp_param_table$subcategoria[temp_param_table$var == "prop_incremento"] <- "Desmatamento"
+temp_param_table$subcategoria[temp_param_table$var == "prop_floresta"] <- "Floresta"
+temp_param_table$subcategoria[temp_param_table$var == "prop_nao_floresta"] <- "Geografia"
+temp_param_table$subcategoria[temp_param_table$var == "prop_hidrografia"] <- "Geografia"
+temp_param_table$subcategoria[temp_param_table$var == "pop"] <- "População"
+temp_param_table$subcategoria[temp_param_table$var == "gdp"] <- "Desenvolvimento"
+temp_param_table$subcategoria[temp_param_table$var == "gd_ppc"] <- "Desenvolvimento"
+temp_param_table$subcategoria[temp_param_table$var == "gdp_deflacionado"] <- "Desenvolvimento"
+temp_param_table$subcategoria[temp_param_table$var == "gd_ppc_deflacionado"] <- "Desenvolvimento"
+temp_param_table$subcategoria[temp_param_table$var == "cempre_n_empresas_organizacoes"] <- "Empresa"
+temp_param_table$subcategoria[temp_param_table$var == "cempre_n_ocupados"] <- "Trabalho"
+temp_param_table$subcategoria[temp_param_table$var == "cempre_n_ocupados_assalariados"] <- "Trabalho"
+temp_param_table$subcategoria[temp_param_table$var == "cempre_salarios_remuneracoes"] <- "Rendimento"
+temp_param_table$subcategoria[temp_param_table$var == "ips2018"] <- "Desenvolvimento"
+temp_param_table$subcategoria[temp_param_table$var == "ips2014"] <- "Desenvolvimento"
+temp_param_table$subcategoria[temp_param_table$var == "num_v2670"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v2672"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v2675"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v2677"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v2680"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v2681"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v32793"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v32794"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v32795"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "num_v32796"] <- "Pecuária"
+temp_param_table$subcategoria[temp_param_table$var == "geometry"] <- ""
+temp_param_table$subcategoria[temp_param_table$var == "estado"] <- ""
+temp_param_table$subcategoria[temp_param_table$var == "group"] <- ""
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "cod_ibge"] <- FALSE # "Código do município"
+temp_param_table$y[temp_param_table$var == "nm_municip"] <- FALSE # "nm_municip"
+temp_param_table$y[temp_param_table$var == "uf"] <- FALSE # "uf_x"
+temp_param_table$y[temp_param_table$var == "ano"] <- FALSE # "ano"
+temp_param_table$y[temp_param_table$var == "geometry"] <- FALSE # "geometry"
+temp_param_table$y[temp_param_table$var == "group"] <- FALSE # "estado"
+temp_param_table$y[temp_param_table$var == "estado"] <- FALSE # "estado"
+temp_param_table$y[temp_param_table$var == "group"] <- FALSE 
+
+# block variables in graphs x-axis
+temp_param_table$x[temp_param_table$var == "cod_ibge"] <- FALSE # "Código do município"
+temp_param_table$x[temp_param_table$var == "nm_municip"] <- FALSE # "nm_municip"
+temp_param_table$x[temp_param_table$var == "uf"] <- FALSE # "uf_x"
+temp_param_table$x[temp_param_table$var == "ano"] <- FALSE # "ano"
+temp_param_table$x[temp_param_table$var == "geometry"] <- FALSE # "geometry"
+temp_param_table$x[temp_param_table$var == "estado"] <- FALSE # "estado"
+temp_param_table$x[temp_param_table$var == "group"] <- FALSE 
+
+#filtering the ppm obs, because there is already a .csv dictionary for ppm livestock inventory
+temp_param_table= temp_param_table%>%
+    dplyr::filter(!startsWith(.data$var, 'num'))
+#adding ppm dictionary
+metappm= read.csv(file = 'data/ppm_municipality_livestock_inventory_dic.csv')
+metappm <- metappm%>%
+    dplyr::mutate(geometry = FALSE, desc= var)%>%
+    dplyr::rename(var_group = source)%>%
+    dplyr::select(-X, - tipo)%>%
+    dplyr::filter(endsWith(.data$var, 'v2670')|endsWith(.data$var, 'v32794')|endsWith(.data$var, 'v32796'))
+metappm$var_group= 'IBGE - PPM'
+
+temp_param_table= dplyr::bind_rows(temp_param_table, metappm)
+
+# allow variables in graphs size, color, and slider-axis
+temp_param_table$size[temp_param_table$var == "employed_census2000"] <- TRUE #
+temp_param_table$size[temp_param_table$var == "employed_census2010"] <- TRUE #
+temp_param_table$size[temp_param_table$var == "mean_income_census2000"] <- TRUE #
+temp_param_table$size[temp_param_table$var == "mean_income_census2010"] <- TRUE #
+temp_param_table$size[temp_param_table$var == "median_income_census2000"] <- TRUE #
+temp_param_table$size[temp_param_table$var == "median_income_census2010"] <- TRUE #
+temp_param_table$size[temp_param_table$var == "ips2014"] <- TRUE #
+temp_param_table$size[temp_param_table$var == "ips2018"] <- TRUE #
+temp_param_table$size[temp_param_table$var == "pop"] <- TRUE #
+
+temp_param_table$color[temp_param_table$var == "employed_census2000"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "employed_census2010"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "mean_income_census2000"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "mean_income_census2010"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "median_income_census2000"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "median_income_census2010"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "ips2014"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "ips2018"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "pop"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "estado"] <- TRUE #
+
+temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
+
+
+#filtering the pam obs, because there is already a .csv dictionary for ppm livestock inventory
+temp_param_table= temp_param_table%>%
+    dplyr::filter(!startsWith(.data$var, 'quant'))%>%
+    dplyr::filter(!startsWith(.data$var, 'area_plantada_dest_colheita'))
+
+
+#adding pam dictionary
+metapam= read.csv(file = 'data/pam_state_all_crops_dic.csv')
+metapam <- metapam%>%
+    dplyr::mutate(geometry = FALSE, desc= var)%>%
+    dplyr::rename(var_group = source)%>%
+    dplyr::select(-X, - tipo)%>%
+    dplyr::filter(endsWith(.data$var, 'v40124')|endsWith(.data$var, 'v40102')|endsWith(.data$var, 'v40122')|endsWith(.data$var, 'v40119'))%>%
+    dplyr::filter(startsWith(.data$var, 'quant')|startsWith(.data$var, 'area_plantada_dest_colheita'))
+metapam$var_group= 'IBGE - PAM'
+
+temp_param_table= dplyr::bind_rows(temp_param_table, metapam)
 
 
 
