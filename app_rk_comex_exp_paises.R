@@ -42,6 +42,7 @@ param$ui4 <- "https://datazoom.shinyapps.io/app_rk_comex_exp_paises/"
 param$server1 <- "Variável não selecionada"
 param$server2 <- "Ranking de "
 param$server3 <- "Amazônia Legal"
+param$lang <- FALSE
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
