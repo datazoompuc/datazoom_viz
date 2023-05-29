@@ -829,10 +829,10 @@ temp_param_table$label[temp_param_table$var == "num_v2675"] <- "Buffalo herds"
 temp_param_table$label[temp_param_table$var == "num_v2677"] <- "Sheep herds"
 temp_param_table$label[temp_param_table$var == "num_v2680"] <- "Quail herds"
 temp_param_table$label[temp_param_table$var == "num_v2681"] <- "Goat herds"
-temp_param_table$label[temp_param_table$var == "num_v32793"] <- "Chicken herds - Galinhas"
+temp_param_table$label[temp_param_table$var == "num_v32793"] <- "Gallinaceous - Chicken"
 temp_param_table$label[temp_param_table$var == "num_v32794"] <- "Swine herds - Total"
 temp_param_table$label[temp_param_table$var == "num_v32795"] <- "Swine herds - Matrizes de Suinos"
-temp_param_table$label[temp_param_table$var == "num_v32796"] <- "Chicken herds - Total"
+temp_param_table$label[temp_param_table$var == "num_v32796"] <- "Gallinaceous - Total"
 temp_param_table$label[temp_param_table$var == "area_plantada_dest_colheita_v40102"] <- "Area Planted or Destined for Harvesting - Rice"
 temp_param_table$label[temp_param_table$var == "quant_v40102"] <- "Quantity - Rice"
 temp_param_table$label[temp_param_table$var == "area_plantada_dest_colheita_v40119"] <- "Area Planted or Destined for Harvesting - Manioc"
@@ -842,7 +842,7 @@ temp_param_table$label[temp_param_table$var == "quant_v40122"] <- "Quantity - Co
 temp_param_table$label[temp_param_table$var == "area_plantada_dest_colheita_v40124"] <- "Area Planted or Destined for Harvesting - Soy"
 temp_param_table$label[temp_param_table$var == "quant_v40124"] <- "Quantity - Soy"
 
-
+# relabel in english ----------------------------------------------------------------
 temp_param_table$unidade[temp_param_table$var == "ano"] <- "Year"
 temp_param_table$unidade[temp_param_table$var == "employed_census2000"] <- "People"
 temp_param_table$unidade[temp_param_table$var == "employed_census2010"] <- "People"
