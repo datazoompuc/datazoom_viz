@@ -659,9 +659,44 @@ temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_tot_pais_dic.csv", fileEncoding = "UTF-8")
 
+### exportação por pais da amazônia total inglês
+datafinal <- readRDS(file = "data/comex_exp_tot_pais.rds")
 
+# extract variables from data
+columns <- colnames(datafinal)
 
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "R$",
+    categoria= "Economy", 
+    subcategoria = "Trade"
+)
 
+temp_param_table$label[2] <- "Country"
+temp_param_table$label[1] <- "Year"
+temp_param_table$desc[2] <- "Country"
+temp_param_table$desc[1] <- "Year"
+temp_param_table$label[3] <- "Value"
+temp_param_table$desc[3] <- "Value"
+
+temp_param_table$x <- c(rep(FALSE, 2), TRUE)
+temp_param_table$y <- c(rep(FALSE, 2), TRUE)
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), FALSE)
+temp_param_table$size <- c(rep(FALSE, 2), TRUE)
+temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_tot_pais_dic_en.csv", fileEncoding = "UTF-8")
 
 ### exportação municipal da amazônia por tipo sh2 inglês
 datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
