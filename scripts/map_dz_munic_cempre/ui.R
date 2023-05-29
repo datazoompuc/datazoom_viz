@@ -56,7 +56,7 @@ get_ui <- function(files, param) {
                       label = param$label_data_axis_name,
                       min = param$year_inicio,
                       max = param$year_final,
-                      value = 2000,
+                      value = param$year_final,
                       step = 1,
                       width = "100%",
                       animate = animationOptions(interval = 3000,
