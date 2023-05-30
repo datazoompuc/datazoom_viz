@@ -10,13 +10,15 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
-  
+
   # Carrega dados
   df <- readRDS(files$db_file) %>% 
-    right_join(tidyr::expand(., time, group)) %>%  # add all combinations of time and group
-    mutate(value = ifelse(is.na(value), 0, value))
+      right_join(tidyr::expand(., time, group)) %>%  # add all combinations of time and group
+      mutate(value = ifelse(is.na(value), 0, value))
     
-  if(param$lang == TRUE){
+  #######
+  #Translating country names
+   if(param$lang){
       
       df <- df %>% 
           mutate(group = case_when(group == 
@@ -47,10 +49,10 @@ get_server <- function(files, param) {
                                        "Benin" ~ "Benin", group ==
                                        "Bermudas" ~ "Bermuda", group ==
                                        "Bolívia" ~ "Bolivia", group ==
-                                       "Bonaires, Saint Eustatius e Saba" ~ "Bonaire, group == Sint Eustatius and Saba", group ==
+                                       "Bonaires, Saint Eustatius e Saba" ~ "Bonaire, Saint Eustatius and Saba", group ==
                                        "Bósnia-Herzegovina" ~ "Bosnia and Herzegovina", group ==
                                        "Botsuana" ~ "Botswana", group ==
-                                       "Bouvet, group == Ilha" ~ "Bouvet Island", group ==
+                                       "Bouvet, Ilha" ~ "Bouvet Island", group ==
                                        "Brasil" ~ "Brazil", group ==
                                        "Brunei" ~ "Brunei", group ==
                                        "Bulgária" ~ "Bulgaria", group ==
@@ -262,8 +264,8 @@ get_server <- function(files, param) {
       
   }
   
-  server <- function(input, session) {
-      browser()
+  server <- function(input, output, session) {
+
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -431,6 +433,7 @@ get_server <- function(files, param) {
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
             y_col$label, ": ", df_p$y, "<br>",
+            param$unit_text, ": ", param$unit, "<br>",
             color_col$label, ": ", df_p$color
           )
 
