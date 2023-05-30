@@ -625,11 +625,11 @@ get_server <- function(files, param) {
           x_col <- param$table[which(param$table$var == "produto_principal"), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
-              param$tooltip1, df_reactived()$nm_municip, "</b> <br>",
-              param$tooltip2, df_reactived()$uf, "</b> <br>",
-              param$tooltip3, df_reactived()[["produto_principal"]], "</b> <br>",
-              param$tooltip4, df_reactived()[["nome_sh2"]], "</b> <br>",
-              param$tooltip5, format(df_reactived()$maximo_produto, scientific = FALSE,
+              param$tooltip1, " <b>", df_reactived()$nm_municip, "</b> <br>",
+              param$tooltip2, " <b>", df_reactived()$uf, "</b> <br>",
+              param$tooltip3, " <b>", df_reactived()[["produto_principal"]], "</b> <br>",
+              param$tooltip4, " <b>", df_reactived()[["nome_sh2"]], "</b> <br>",
+              param$tooltip5, " <b>", format(df_reactived()$maximo_produto, scientific = FALSE,
                                   digits = 2,
                                   decimal.mark = ",", 
                                   big.mark = "."), "<br>",
