@@ -31,6 +31,8 @@ param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
+param$unit <- "R$"
+param$unit_text <- "Measurement Unit"
 
 # Parâmetros específicos do UI
 param$ui1 <- "VARIABLES:"
