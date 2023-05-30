@@ -45,7 +45,7 @@ param$x_choices$`IBGE - PAM` <- NULL
 param$label_var_name <- "VARIABLES:"
 param$label_x_name <- "Select variable (x)"
 param$link <- "https://datazoom.shinyapps.io/app_mapstatic_dz_munic_en/"
-param$title <- "Amazônia Legal municipality map"
+param$title <- "Legal Amazon municipality map"
 param$empty <- "No variable was selected"
 param$selected_variable <- "Selected variable: "
 param$label_1 <- "Municipality name: "
