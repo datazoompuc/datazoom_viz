@@ -30,6 +30,8 @@ param$size_def <- "" # variável padrão de tamanho
 param$slider_def <- "time" # variável padrão do slider
 param$text_def <- "group" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
+param$lang <- TRUE
+param$forest <- "Forest Compatible Products"
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Foreign trade in the Amazon: Value of the product's export"
@@ -60,6 +62,10 @@ param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos")
 param$year_inicio <- 1997
 param$year_final <- 2021
 
+if(param$lang){
+    param$x_choices[param$x_choices == "Produtos Compativeis com a Floresta"] <- "Forest Compatible Products"
+    param$x_choices[param$x_choices == "Todos os Produtos"] <- "All Products"
+}
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
