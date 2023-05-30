@@ -1,5 +1,5 @@
 # Cache
-cache_folder <- "./cache/app_rk_comex_exp_paises/"
+cache_folder <- "./cache/app_rk_comex_exp_paises_en/"
 shinyOptions(cache = cachem::cache_disk(cache_folder))
 
 # Carrega bibliotecas
