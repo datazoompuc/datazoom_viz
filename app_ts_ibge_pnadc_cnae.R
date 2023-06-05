@@ -31,6 +31,19 @@ param$group <- "group" # variável de agrupamento
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Dados compilados sobre atividades econ\u00f4micas gerados a partir da PNAD Cont\u00ednua Trimestral - IBGE"
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_scale_name <- "escala log"
+param$label_prop_name <- "proporcional ao trimestre inicial (*)"
+param$label_eco_name <- "Estado - Atividades econômicas"
+param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cnae/"
+
+### Parametros especificos no server
+param$title_init <- "Evolução trimestral de"  # expressão titulo
+param$subtitle_init <- "por atividade econômica" # expressão subtitulo
+
+
 # Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL
 

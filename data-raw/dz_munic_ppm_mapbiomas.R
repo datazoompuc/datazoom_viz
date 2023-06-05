@@ -1,0 +1,330 @@
+############################################################
+#### Generate rds data in the folder ./data/
+############################################################
+
+#### Packages
+library(tidyverse)
+library(readxl)
+library(tibble)
+library(zoo)
+library(sf)
+library(sp)
+library(scales) # to use label_percent()
+library(datazoom.amazonia)
+
+####################
+# 1) Call and clean data
+###################
+
+###################
+#PPM - IBGE
+###################
+
+ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
+
+###################
+#MAPBIONMAS - COBERTURA
+###################
+
+data_frame_mapbiomas <- datazoom.amazonia::load_mapbiomas(dataset = "mapbiomas_cover",
+                                                         cover_level = "4",
+                                                         geo_level = "municipality", 
+                                                         raw_data = FALSE)
+
+###########################
+# edit data to merge
+###########################
+
+class(data_frame_mapbiomas$municipality_code) <- 'numeric'
+class(data_frame_mapbiomas$year) <- 'numeric'
+
+class(ppm_livestock$geo_id) <- 'numeric'
+class(ppm_livestock$ano) <- 'numeric'
+
+###########################
+# merge all data
+###########################
+dz_munic_ppm_mapbiomas <- data_frame_mapbiomas %>%
+  full_join(ppm_livestock, 
+            by = c('municipality_code' = 'geo_id', 'year' = 'ano')
+            ) 
+
+
+# generate varialbe - número de cabeças por hectare de pastagem por município
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
+  mutate(n_bovino_por_area_pastagem = num_v2670/pasture) 
+  
+
+# colnames(dz_munic_ppm_mapbiomas)
+
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>% 
+  select(municipality_code, municipality, state, year, n_bovino_por_area_pastagem) %>%
+  arrange(municipality_code, year) %>%
+  relocate(municipality_code, year)
+
+# edit dataset
+dz_munic_ppm_mapbiomas$cod_ibge <- dz_munic_ppm_mapbiomas$municipality_code
+dz_munic_ppm_mapbiomas$nm_municip <- dz_munic_ppm_mapbiomas$municipality
+dz_munic_ppm_mapbiomas$ano <- dz_munic_ppm_mapbiomas$year
+dz_munic_ppm_mapbiomas$uf <- dz_munic_ppm_mapbiomas$state
+dz_munic_ppm_mapbiomas$municipality <- NULL
+dz_munic_ppm_mapbiomas$municipality_code <- NULL
+dz_munic_ppm_mapbiomas$year <- NULL
+dz_munic_ppm_mapbiomas$state <- NULL
+
+# edit final data
+class(dz_munic_ppm_mapbiomas)
+colnames(dz_munic_ppm_mapbiomas)
+class(dz_munic_ppm_mapbiomas$cod_ibge)
+dz_munic_ppm_mapbiomas$cod_ibge <- as.factor(dz_munic_ppm_mapbiomas$cod_ibge)
+dz_munic_ppm_mapbiomas$uf <- as.factor(dz_munic_ppm_mapbiomas$uf)
+
+# clean column names
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
+  janitor::clean_names()
+
+# convert time data to date
+#dz_munic_ppm_mapbiomas$ano <- as.Date(as.yearqtr(dz_munic_ppm_mapbiomas$ano), format = "%Y")
+
+# unique rows
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>% 
+  group_by(cod_ibge, ano)
+
+# arrange data by municipality and year
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
+  arrange(cod_ibge, ano) %>%
+  relocate(cod_ibge, ano)
+
+# Identify and remove duplicate data
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>% 
+  distinct(cod_ibge, ano, .keep_all = TRUE)
+
+# limiting decimal places)
+# for the variables with proportions, limiting to 4 decimal places
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas %>%
+  mutate(across(c(
+    .data$n_bovino_por_area_pastagem
+  ), ~ round(., digits = 2)))
+
+# adding regions
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
+  mutate(regiao= case_when(uf %in% c('AC','AM','AP','PA','RO','RR','TO') ~ "Norte",
+                           uf %in% c('AL','BA','CE','MA','PI','PB','PE','RN','SE') ~ "Nordeste",
+                           uf %in% c('MS','MT','GO','DF') ~ "Centro-Oeste",
+                           uf %in% c('ES','MG','RJ','SP') ~ "Sudeste",
+                           uf %in% c('PR','RS','SC') ~ "Sul"))
+
+# adding legal_amazon dummy
+legal_amazon <- datazoom.amazonia::municipalities
+legal_amazon <- legal_amazon%>%
+  filter(legal_amazon == 1)
+legal_amazon <- legal_amazon$code_muni
+
+dz_munic_ppm_mapbiomas <- dz_munic_ppm_mapbiomas%>%
+  mutate(legal_amazon= case_when(cod_ibge %in% legal_amazon ~ TRUE,
+                                 TRUE ~ FALSE))
+
+# add legal amazon and regions as options in UF
+regioes <- dz_munic_ppm_mapbiomas %>% 
+  select(-uf) %>% 
+  pivot_longer(regiao, values_to = "uf", names_to = NULL) %>%
+  select(-legal_amazon)
+
+amz_legal <- dz_munic_ppm_mapbiomas %>% 
+  select(-uf) %>% 
+  pivot_longer(legal_amazon, values_to = "uf", names_to = NULL) %>% 
+  mutate(uf = ifelse(uf, "Amazônia Legal", "Fora da Amazônia Legal")) %>%
+  select(-regiao)
+
+df <- dz_munic_ppm_mapbiomas %>% 
+  select(-regiao, -legal_amazon) %>% 
+  rbind(regioes) %>% 
+  rbind(amz_legal)
+
+# filtra os anos que serao utilizados na visualização
+df <- df %>%
+    filter(ano >= 1985)  
+
+# filtra as colunas utilizadas na visualização
+df <- df %>%
+    select(cod_ibge, ano, n_bovino_por_area_pastagem, nm_municip, uf)
+
+# save data
+readr::write_rds(df,
+        file = "./data/dz_munic_ppm_mapbiomas.rds"
+)
+
+#####################
+# Build Dictionary
+#####################
+
+# call data
+dz_munic_ppm_mapbiomas <- readRDS("./data/dz_munic_ppm_mapbiomas.rds")
+
+# extract variables from data
+columns <- colnames(dz_munic_ppm_mapbiomas)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  geometry = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Fonte de dados",
+  unidade = "Unidade de medida",
+  categoria = "Categoria principal",
+  subcategoria = "Subcategoria"
+)
+
+# label variables
+temp_param_table$label[temp_param_table$var == "cod_ibge"] <- "C\u00f3digo do município"
+temp_param_table$label[temp_param_table$var == "nm_municip"] <- "Nome do município"
+temp_param_table$label[temp_param_table$var == "uf"] <- "Estado"
+temp_param_table$label[temp_param_table$var == "ano"] <- "Ano"
+temp_param_table$label[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Rebanho por área de pasto"
+
+# unidade variables
+temp_param_table$unidade[temp_param_table$var == "cod_ibge"] <- ""
+temp_param_table$unidade[temp_param_table$var == "nm_municip"] <- ""
+temp_param_table$unidade[temp_param_table$var == "uf"] <- ""
+temp_param_table$unidade[temp_param_table$var == "ano"] <- "Ano"
+temp_param_table$unidade[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Rebano bovino por área (ha) de pastagem"
+
+# var_group variables
+temp_param_table$var_group[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "IBGE - PPM e MAPBIOMAS"
+
+# label data category
+temp_param_table$categoria[temp_param_table$var == "ano"] <- "Unidade de tempo"
+temp_param_table$categoria[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Produção Econômica"
+
+# subcategoria variables
+temp_param_table$subcategoria[temp_param_table$var == "ano"] <- "Ano"
+temp_param_table$subcategoria[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Pecuária"
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "cod_ibge"] <- FALSE
+temp_param_table$y[temp_param_table$var == "nm_municip"] <- FALSE
+temp_param_table$y[temp_param_table$var == "uf"] <- TRUE
+temp_param_table$y[temp_param_table$var == "ano"] <- TRUE
+temp_param_table$y[temp_param_table$var == "n_bovino_por_area_pastagem"] <- TRUE
+
+# block variables in graphs x-axis
+temp_param_table$x[temp_param_table$var == "cod_ibge"] <- FALSE
+temp_param_table$x[temp_param_table$var == "nm_municip"] <- FALSE
+temp_param_table$x[temp_param_table$var == "uf"] <- TRUE
+temp_param_table$x[temp_param_table$var == "ano"] <- TRUE
+temp_param_table$x[temp_param_table$var == "n_bovino_por_area_pastagem"] <- TRUE
+
+# allow variables in graphs size, color, and slider-axis
+temp_param_table$size[temp_param_table$var == "uf"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "uf"] <- TRUE #
+temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/dz_munic_ppm_mapbiomas_dic.csv", fileEncoding = "UTF-8")
+
+
+#############################
+# Build Dictionary in English
+#############################
+
+# call data
+dz_munic_ppm_mapbiomas <- readRDS("./data/dz_munic_ppm_mapbiomas.rds")
+
+# extract variables from data
+columns <- colnames(dz_munic_ppm_mapbiomas)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    geometry = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Fonte de dados",
+    unidade = "Unidade de medida",
+    categoria = "Categoria principal",
+    subcategoria = "Subcategoria"
+)
+
+# label variables
+temp_param_table$label[temp_param_table$var == "cod_ibge"] <- "Municipality Code"
+temp_param_table$label[temp_param_table$var == "nm_municip"] <- "Municipality"
+temp_param_table$label[temp_param_table$var == "uf"] <- "State"
+temp_param_table$label[temp_param_table$var == "ano"] <- "Year"
+temp_param_table$label[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Cattle herd by pasture area"
+
+# unidade variables
+temp_param_table$unidade[temp_param_table$var == "cod_ibge"] <- ""
+temp_param_table$unidade[temp_param_table$var == "nm_municip"] <- ""
+temp_param_table$unidade[temp_param_table$var == "uf"] <- ""
+temp_param_table$unidade[temp_param_table$var == "ano"] <- "Year"
+temp_param_table$unidade[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Cattle herd per area (ha) of pasture"
+
+# var_group variables
+temp_param_table$var_group[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "IBGE - PPM and MAPBIOMAS"
+
+# label data category
+temp_param_table$categoria[temp_param_table$var == "ano"] <- "Unit of time"
+temp_param_table$categoria[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Economic Production"
+
+# subcategoria variables
+temp_param_table$subcategoria[temp_param_table$var == "ano"] <- "Year"
+temp_param_table$subcategoria[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Livestock"
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "cod_ibge"] <- FALSE
+temp_param_table$y[temp_param_table$var == "nm_municip"] <- FALSE
+temp_param_table$y[temp_param_table$var == "uf"] <- TRUE
+temp_param_table$y[temp_param_table$var == "ano"] <- TRUE
+temp_param_table$y[temp_param_table$var == "n_bovino_por_area_pastagem"] <- TRUE
+
+# block variables in graphs x-axis
+temp_param_table$x[temp_param_table$var == "cod_ibge"] <- FALSE
+temp_param_table$x[temp_param_table$var == "nm_municip"] <- FALSE
+temp_param_table$x[temp_param_table$var == "uf"] <- TRUE
+temp_param_table$x[temp_param_table$var == "ano"] <- TRUE
+temp_param_table$x[temp_param_table$var == "n_bovino_por_area_pastagem"] <- TRUE
+
+# allow variables in graphs size, color, and slider-axis
+temp_param_table$size[temp_param_table$var == "uf"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "uf"] <- TRUE #
+temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/dz_munic_ppm_mapbiomas_dic_en.csv", fileEncoding = "UTF-8")
+
+
+######################
+#
+# Build rds in english
+#
+######################
+
+
+dz_munic_ppm_mapbiomas <- readRDS("~/GitHub/datazoom_viz/data/dz_munic_ppm_mapbiomas.rds")
+
+
+    dz_munic_ppm_mapbiomas_en <- dz_munic_ppm_mapbiomas %>%
+        mutate(uf = case_when(
+            uf == "Norte" ~ "North",
+            uf ==  "Nordeste"  ~ "Northeast",
+            uf == "Sudeste"  ~ "Southeast",
+            uf == "Sul" ~ "South",
+            uf == "Centro-Oeste"  ~ "Midwest",
+            uf == "Amazônia Legal"  ~ "Legal Amazon",
+            uf == "Fora da Amazônia Legal" ~ "Outside of the Legal Amazon"))
+
+    # save data
+    readr::write_rds(dz_munic_ppm_mapbiomas_en,
+                     file = "./data/dz_munic_ppm_mapbiomas_en.rds"
+    )

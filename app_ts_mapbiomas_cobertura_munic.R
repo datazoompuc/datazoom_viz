@@ -6,9 +6,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_mapbiomas_cobertura/ui.R"
-files$server_script <- "scripts/ts_mapbiomas_cobertura/server.R"
-files$param_script <- "scripts/ts_mapbiomas_cobertura/db_params.R"
+files$ui_script <- "scripts/ts_mapbiomas_cobertura_munic/ui.R"
+files$server_script <- "scripts/ts_mapbiomas_cobertura_munic/server.R"
+files$param_script <- "scripts/ts_mapbiomas_cobertura_munic/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
@@ -32,9 +32,21 @@ param$group <- "group" # variável de agrupamento
 
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil"
+param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil - Fonte: MAPBIOMAS"
+
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_log_name <- "escala log"
+param$label_prop_name <-  "proporcional ao ano inicial (*)"
+param$label_geo_name <- "Subdivisão geográfica"
+param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_munic/"
+
+### Parametros especificos no server
+param$subtitle_init <- "por Território" # expressão titulo
 
 # Outros parâmetros e configurações
+param$y_choices[[1]] <- NULL
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

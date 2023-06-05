@@ -9,16 +9,28 @@ get_ui <- function(files, param) {
       class = "mainrow h-100",
       column(3, # dimensão da coluna do bootstrap
         class = "menucol",
+        
+        # muda cor do background
+        tags$style('.menucol {
+                        background-color: #3E688B;
+              }',),
+        
+        # muda cor do botao 
+        tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+                        background-color: #3E5688 !important;
+                        border-color: #3E5688 !important;
+              }',),
+        
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$u1),
         div(
           class = "var_selec_group",
           # Seleciona variável de cor
           selectInput(
             inputId = "filter",
-            label = "Tipos de Produto:",
+            label = param$ui2,
             choices = param$filter_choices,
             selected = param$filter_def,
             width = "100%"
@@ -26,6 +38,12 @@ get_ui <- function(files, param) {
         ),
         # espaço vazio
         div(class = "fakecheckbox", ),
+        div(
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
+                              icon = icon("expand"), 
+                              class = "btn-primary",
+                              onclick = paste0("window.open('", param$ui3, "', '_blank')"))
+        ),
       ),
       column(9,
         class = "plotcol h-100",

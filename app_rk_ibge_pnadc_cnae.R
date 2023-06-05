@@ -10,9 +10,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk/ui.R"
-files$server_script <- "scripts/rk/server.R"
-files$param_script <- "scripts/rk/db_params.R"
+files$ui_script <- "scripts/rk_ibge_pnadc_cnae/ui.R"
+files$server_script <- "scripts/rk_ibge_pnadc_cnae/server.R"
+files$param_script <- "scripts/rk_ibge_pnadc_cnae/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/ibge_pnadc_ranking_cnae_dic.csv"
 files$db_file <- "data/ibge_pnadc_ranking_cnae.rds"
@@ -31,6 +31,17 @@ param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
+
+# Parâmetros específicos do UI
+param$vars <- "VARI\u00C1VEIS:"
+param$xaxis <- "Ranking - eixo horizontal (x):"
+param$cor <- "Cor das barras:"
+param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cnae/"
+
+# Parâmetros específicos do server
+param$novar <- "Variável não selecionada"
+param$title <- "Ranking de "
+param$AL <- "Amazônia Legal"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"

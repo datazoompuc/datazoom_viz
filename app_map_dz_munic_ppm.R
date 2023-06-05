@@ -8,9 +8,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/map/ui.R"
-files$server_script <- "scripts/map/server.R"
-files$param_script <- "scripts/map/db_params.R"
+files$ui_script <- "scripts/map_dz_munic_ppm/ui.R"
+files$server_script <- "scripts/map_dz_munic_ppm/server.R"
+files$param_script <- "scripts/map_dz_munic_ppm/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/dz_munic_dic.csv"
 files$db_file <- "data/dz_munic_simplified.rds"
@@ -36,8 +36,20 @@ param$plot_desc <- "Compilação de dados ao nível municipal (PPM)"
 param$app <- "IBGE - PPM"
 
 param$year_inicio <- 2000
-param$year_final <- 2019
+param$year_final <- 2021
 
+#Mudanças específicas no UI
+param$variables_caps<- "VARIÁVEIS::"
+param$choice_variable<- "Seleciona variável (x)"
+param$reference_year<- "Ano Referente"
+param$link<-"https://datazoom.shinyapps.io/app_map_dz_munic_ppm/"
+#Mudanças específicas no server
+param$label_title<- paste0("Mapa dos municípios da Amazônia Legal")
+param$no_variable<- "Nenhuma variável selecionada"
+param$variable_selected<- "Variável selecionada: "
+param$munic<- "Nome do município: <b>"
+param$state<- "Estado: <b>"
+param$measurement_unit<- "Unidade de medida: <b>"
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]
 

@@ -1,0 +1,340 @@
+#######################
+##Amazônia exporta energia
+#######################
+
+#fonte: Empresa de Pesquisa Energética
+
+#producao de energia
+#https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20-%20(Dados%20Estaduais).xls
+
+#consumo de energia
+#https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-160/topico-168/Anu%C3%A1rio%20Estat%C3%ADstico%20de%20Energia%20El%C3%A9trica%202022%20-%20Workbook.xlsx
+
+############
+#libraries
+library(readr)
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(stringi)
+############
+
+load_producao = readxl::read_excel(".\\data-raw\\bases\\Cap 8 - (Dados Estaduais).xls", sheet = "8.1 part 3", skip = 2)
+#atencao ao nome das colunas de load_producao
+
+producao = load_producao %>%
+  select(-c("State\n")) %>% #tira o nome dos estados em ingles
+  rename("uf" = "Estado\n", 
+         "total produzido" = "Geração total\nTotal Generation", 
+         "hidro" = "Hidro\nHydro",
+         "eolica" = "Eólica \nWind",
+         "solar" = "Solar \nSolar",
+         "nuclear" = "Nuclear \nNuclear",
+         "termo" = "Termo\nThermal",
+         "cana" = "Bagaço de cana    \nSugar Cane Bagasse",
+         "lenha" = "Lenha\nFirewood",
+         "lixivia" = "Lixívia\nBlack Liquor",
+         "outras fontes renovaveis" = "Out. Fontes renováveis\nOther Renewable Sources",
+         "carvao vapor" = "Carvão vapor\nSteam Coal",
+         "gas de coqueira" = "Gás de coqueria\nCoke Oven Gas",
+         "gas natural" = "Gás natural\nNatural Gas", 
+         "combustivel" = "Óleo combustível\nFuel Oil",
+         "diesel" = "Óleo diesel\nDiesel Oil",
+         "outras fontes nao renovaveis" = "Out. Fontes não renováveis\nOther Non-Renewable Sources") %>%
+  drop_na(`total produzido`) %>% #tira cabecalhos das tabelas empilhadas
+  filter(eolica != "Eólica \nWind") %>% #tira header das tabelas empilhadas
+  filter(str_detect(uf, '[:lower:]')) %>% #tira dados a nivel de pais e de macroregiao
+  mutate(ano = rep(2021:2011, times = 1, each = 27)) %>% #insere a informacao de ano
+  mutate(amz_legal = case_when(uf == "Amapá" ~1,
+                               uf == "Acre"~1,
+                               uf == "Amazonas" ~1,
+                               uf == "Mato Grosso" ~1,
+                               uf == "Tocantins" ~1,
+                               uf == "Maranhão" ~1,
+                               uf == "Rondônia" ~1,
+                               uf == "Roraima" ~1,
+                               uf == "Pará" ~1,
+                              TRUE ~ 0)) %>%
+  rename("amz legal" = "amz_legal") %>%
+  mutate(uf = replace(uf, uf == "Mato G. do Sul", "Mato Grosso do Sul")) %>%
+  mutate(uf = replace(uf, uf == "Rio G. do Sul", "Rio Grande do Sul")) %>%
+  mutate(uf = replace(uf, uf == "Rio G. do Norte", "Rio Grande do Norte"))  %>%
+  mutate(across(!uf, ~as.numeric(.x)))
+
+limpa_workbook = function(sheet_number, tipo_dado) {
+
+load_cativo_livre = read_excel(".\\data-raw\\bases\\Energia Elétrica 2022 - Workbook.xlsx", sheet = sheet_number, skip = 8)
+
+parc = load_cativo_livre %>%
+  select(-c(12,13,14)) %>%
+  rename("uf" = 1) %>%
+  filter(uf == "Acre"|uf =="Amazonas"|uf == "Amapá"|uf == "Alagoas"|uf == "Bahia"|uf == "Ceará"|uf == "Distrito Federal"|uf == "Espírito Santo"|uf == "Goiás"|uf == "Maranhão"|uf == "Mato Grosso"| uf == "Mato Grosso do Sul"|uf == "Minas Gerais"|uf == "Paraná"|uf == "Piauí"| uf == "Paraíba"| uf == "Pará"| uf =="Pernambuco"| uf == "Rio de Janeiro"|uf == "Rio Grande do Norte"| uf == "Rio Grande do Sul"| uf == "Roraima"| uf == "Rondônia"|uf == "Santa Catarina"| uf == "São Paulo"| uf == "Sergipe"| uf == "Tocantins") %>%
+  pivot_longer(cols = 2:11, names_to = "ano", values_to = "valor") %>%
+  mutate(tipo = tipo_dado) %>%
+  mutate(ano = as.integer(ano)) %>%
+  mutate(amz_legal = case_when(uf == "Amapá" ~1,
+                               uf == "Acre"~1,
+                               uf == "Amazonas" ~1,
+                               uf == "Mato Grosso" ~1,
+                               uf == "Tocantins" ~1,
+                               uf == "Maranhão" ~1,
+                               uf == "Rondônia" ~1,
+                               uf == "Roraima" ~1,
+                               uf == "Pará" ~1,
+                               TRUE ~ 0)) %>%
+  rename("amz legal" = "amz_legal")
+ 
+return(parc)
+}
+
+consumo_cativo = limpa_workbook("Tabela 3.13", "consumo cativo")
+consumo_livre = limpa_workbook("Tabela 3.14", "consumo livre")
+consumo_cativo_livre = rbind(consumo_cativo,consumo_livre) %>%
+  pivot_wider(names_from = tipo, values_from = valor) 
+
+consumidores_cativos = limpa_workbook("Tabela 3.42", "consumidores cativos")
+consumidores_livres = limpa_workbook("Tabela 3.43", "consumidores livres")
+consumidores_cativos_livres = rbind(consumidores_cativos,consumidores_livres) %>%
+  pivot_wider(names_from = tipo, values_from = valor) 
+
+consumo_residencial = limpa_workbook("Tabela 3.15", "consumo residencial")
+consumo_industrial = limpa_workbook("Tabela 3.16", "consumo industrial")
+consumo_comercial = limpa_workbook("Tabela 3.17", "consumo comercial")
+consumo_rural = limpa_workbook("Tabela 3.18", "consumo rural")
+consumo_pod_pub  = limpa_workbook("Tabela 3.19", "consumo poder publico")
+consumo_iluminacao_pub = limpa_workbook("Tabela 3.20", "consumo iluminacao publica")
+consumo_serv_pub  = limpa_workbook("Tabela 3.21", "consumo servico publico")
+consumo_proprio = limpa_workbook("Tabela 3.22", "consumo proprio")
+consumo_classe = rbind(consumo_residencial, consumo_industrial, consumo_comercial, consumo_rural, consumo_pod_pub, consumo_iluminacao_pub, consumo_serv_pub, consumo_proprio) %>%
+  pivot_wider(names_from = tipo, values_from = valor)
+
+consumidores_residencial = limpa_workbook("Tabela 3.44", "consumidores residencial")
+consumidores_industrial = limpa_workbook("Tabela 3.45", "consumidores industrial")
+consumidores_comercial = limpa_workbook("Tabela 3.46", "consumidores comercial")
+consumidores_rural = limpa_workbook("Tabela 3.47", "consumidores rural")
+consumidores_pod_pub  = limpa_workbook("Tabela 3.48", "consumidores poder publico")
+consumidores_iluminacao_pub = limpa_workbook("Tabela 3.49", "consumidores iluminacao publica")
+consumidores_serv_pub  = limpa_workbook("Tabela 3.50", "consumidores servico publico")
+consumidores_proprio = limpa_workbook("Tabela 3.51", "consumidores proprio")
+consumidores_classe = rbind(consumidores_residencial, consumidores_industrial, consumidores_comercial, consumidores_rural, consumidores_pod_pub, consumidores_iluminacao_pub, consumidores_serv_pub, consumidores_proprio) %>%
+  pivot_wider(names_from = tipo, values_from = valor)
+
+#tudo junto ---------------------------------------------------------------
+db_bind1 = left_join(producao,consumo_cativo_livre)
+db_bind2 = left_join(db_bind1,consumo_classe)
+db_bind3 = left_join(db_bind2,consumidores_cativos_livres)
+db_bind4 = left_join(db_bind3,consumidores_classe) %>%
+  rename("amz_legal" = "amz legal") %>%
+  mutate(across(!uf & !amz_legal, as.numeric))
+  
+  
+db_bind5 <- db_bind4 %>%  
+  group_by(ano) %>%
+  mutate(across(!uf & !amz_legal, ~(.x / sum(.x, na.rm = TRUE)) * 100)) %>%
+  ungroup() %>%
+  rowwise() %>% 
+  mutate(`consumo total` = sum(c_across(`consumo cativo`:`consumo proprio`)),
+         `consumidores` = sum(c_across(`consumidores cativos`:`consumidores proprio`)))
+
+amz_legal_df = db_bind4 %>%
+  filter(amz_legal == 1) %>%
+  group_by(ano) %>%
+  summarise(across(!uf & !amz_legal, ~sum(.x, na.rm = TRUE))) %>%
+  mutate("uf" = "Amazônia Legal")
+
+fora_amz_legal_df = db_bind4 %>%
+  filter(amz_legal == 0) %>%
+  group_by(ano) %>%
+  summarise(across(!uf & !amz_legal, ~sum(.x, na.rm = TRUE))) %>%
+  mutate("uf" = "Fora da Amazônia Legal")
+
+df_final <- rbind(amz_legal_df, fora_amz_legal_df) %>%
+  rowwise() %>% 
+  mutate(`consumo total` = sum(c_across(`consumo cativo`:`consumo proprio`)),
+         `consumidores` = sum(c_across(`consumidores cativos`:`consumidores proprio`))) %>%
+  group_by(ano) %>%
+  mutate(across(!uf, ~(.x / sum(.x, na.rm = TRUE)) * 100)) %>%
+  ungroup() %>%
+  rbind(db_bind5 %>% select(-amz_legal)) %>%
+  mutate(across(!uf, ~ifelse(.x < 0, 0, .x)))
+
+#atribui NA aos dados de consumo e consumidores em 2011
+#esses dados nao estao disponiveis na fonte
+df_final <- df_final %>% 
+  mutate_all(function(x) ifelse(is.nan(x), NA, x))
+
+# filter years above 2012
+df_final$ano %>% unique
+df_final <- df_final %>%
+  filter(ano>=2012)
+
+#modifica `uf` para evitar problemas com acentos e dar match no UI 
+df_final = df_final %>%
+  mutate(uf = case_when(uf == "Amapá" ~ "AP",
+                   uf == "Acre"~ "AC",
+                   uf == "Amazonas" ~ "AM",
+                   uf == "Mato Grosso" ~ "MT",
+                   uf == "Tocantins" ~ "TO",
+                   uf == "Maranhão" ~ "MA",
+                   uf == "Rondônia" ~ "RO",
+                   uf == "Roraima" ~ "RR",
+                   uf == "Pará" ~ "PA",
+                   uf == "Alagoas" ~ "AL",
+                   uf == "Bahia" ~ "BA",
+                   uf == "Ceará" ~ "CE",
+                   uf == "Distrito Federal" ~ "DF",
+                   uf == "Espírito Santo" ~ "ES",
+                   uf == "Goiás" ~ "GO",
+                   uf == "Mato Grosso do Sul" ~ "MS",
+                   uf == "Minas Gerais" ~ "MG",
+                   uf == "Paraíba" ~ "PB",
+                   uf == "Paraná" ~ "PR",
+                   uf == "Pernambuco" ~ "PE",
+                   uf == "Rio de Janeiro" ~"RJ",
+                   uf == "Rio Grande do Sul" ~"RS",
+                   uf == "Santa Catarina" ~ "SC",
+                   uf == "São Paulo" ~ "SP",
+                   uf == "Sergipe" ~ "SE",
+                   uf == "Piauí" ~ "PI",
+                   uf == "Rio Grande do Norte" ~ "RN",
+                   TRUE ~ as.character(uf)))
+
+
+# export ------------------------------------------------------------------
+saveRDS(df_final, "data/energia_amz_exporta.rds")
+
+# dictionary --------------------------------------------------------------
+
+# extract variables from data
+df_final <- readRDS("./data/energia_amz_exporta.rds")
+columns_db_amz_exporta <- colnames(df_final)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns_db_amz_exporta,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  geometry = FALSE,
+  label = columns_db_amz_exporta,
+  desc = columns_db_amz_exporta,
+  var_group = "Energia - EPE",
+  tipo = 1,
+  unidade = "",
+  categoria= "Economia", 
+  subcategoria = "Energia"
+)
+
+
+#o que e cada var
+temp_param_table$label <- temp_param_table$var
+temp_param_table$label[1] <- "Ano"
+temp_param_table$label[2] <- "Total de energia produzida"
+temp_param_table$label[3] <- "Energia produzida por hidro"
+temp_param_table$label[4] <- "Energia produzida por eólica"
+temp_param_table$label[5] <- "Energia produzida por solar"
+temp_param_table$label[6] <- "Energia produzida por nuclear"
+temp_param_table$label[7] <- "Energia produzida por termo"
+temp_param_table$label[8] <- "Energia produzida por cana"
+temp_param_table$label[9] <- "Energia produzida por lenha"
+temp_param_table$label[10] <- "Energia produzida por lixívia"
+temp_param_table$label[11] <- "Energia produzida por outras fontes renováveis"
+temp_param_table$label[12] <- "Energia produzida por carvão vapor"
+temp_param_table$label[13] <- "Energia produzida por gás natural"
+temp_param_table$label[14] <- "Energia produzida por gás de coqueria"
+temp_param_table$label[15] <- "Energia produzida por combustível"
+temp_param_table$label[16] <- "Energia produzida por diesel"
+temp_param_table$label[17] <- "Energia produzida outras fontes não renováveis"
+temp_param_table$label[18] <- "Consumo cativo"
+temp_param_table$label[19] <- "Consumo livre"
+temp_param_table$label[20] <- "Consumo residencial"
+temp_param_table$label[21] <- "Consumo industrial"
+temp_param_table$label[22] <- "Consumo comercial"
+temp_param_table$label[23] <- "Consumo rural"
+temp_param_table$label[24] <- "Consumo do poder público"
+temp_param_table$label[25] <- "Consumo de iluminação pública"
+temp_param_table$label[26] <- "Consumo do serviço público"
+temp_param_table$label[27] <- "Consumo próprio"
+temp_param_table$label[28] <- "Consumidores cativos"
+temp_param_table$label[29] <- "Consumidores livres"
+temp_param_table$label[30] <- "Consumidores residenciais"
+temp_param_table$label[31] <- "Consumidores industriais"
+temp_param_table$label[32] <- "Consumidores comerciais"
+temp_param_table$label[33] <- "Consumidores rurais"
+temp_param_table$label[34] <- "Consumidores do poder público"
+temp_param_table$label[35] <- "Consumidores de iluminação pública"
+temp_param_table$label[36] <- "Consumidores do serviço público"
+temp_param_table$label[37] <- "Consumidores próprios"
+temp_param_table$label[38] <- "UF"
+temp_param_table$label[39] <- "Consumo total"
+temp_param_table$label[40] <- "Total de consumidores"
+
+#unidades de cada var
+temp_param_table$unidade[2:40] <- "% do total do Brasil"
+
+#o que cada var pode assumir
+temp_param_table$x <- c(TRUE, rep(FALSE, times = 39))
+temp_param_table$y <- c(FALSE, rep(TRUE, times = 36), FALSE, TRUE, TRUE)
+temp_param_table$color <- c(rep(FALSE, times = 37), TRUE, FALSE, FALSE)
+temp_param_table$size <- c(rep(FALSE, times = 40))
+temp_param_table$slider <- c(TRUE, rep(FALSE, times = 39))
+
+# Seleciona groupos de variaveis nas opções do UI
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumo", ignore_case = TRUE))] <- "CONSUMO DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumidores", ignore_case = TRUE))] <- "CONSUMIDORES DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("energia produzida", ignore_case = TRUE))] <- "ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/energia_amz_exporta_dic.csv", fileEncoding = "UTF-8")
+
+
+# translate to english --------------------------------------------------------------
+temp_param_table$label[1] <- "Year"
+temp_param_table$label[2] <- "Total energy produced"
+temp_param_table$label[3] <- "Energy produced by hydro"
+temp_param_table$label[4] <- "Energy produced by wind"
+temp_param_table$label[5] <- "Energy produced by solar"
+temp_param_table$label[6] <- "Energy produced by nuclear"
+temp_param_table$label[7] <- "Energy produced by thermo"
+temp_param_table$label[8] <- "Energy produced by sugar cane"
+temp_param_table$label[9] <- "Energy produced by wood"
+temp_param_table$label[10] <- "Energy produced by black liquor"
+temp_param_table$label[11] <- "Energy produced by other renewable sources"
+temp_param_table$label[12] <- "Energy produced by steam coal"
+temp_param_table$label[13] <- "Energy produced by natural gas"
+temp_param_table$label[14] <- "Energy produced by coke oven gas"
+temp_param_table$label[15] <- "Energy produced by fuel"
+temp_param_table$label[16] <- "Energy produced by diesel"
+temp_param_table$label[17] <- "Energy produced by other non-renewable sources"
+temp_param_table$label[18] <- "Captive consumption"
+temp_param_table$label[19] <- "Free consumption"
+temp_param_table$label[20] <- "Residential consumption"
+temp_param_table$label[21] <- "Industrial consumption"
+temp_param_table$label[22] <- "Comercial consumption"
+temp_param_table$label[23] <- "Rural consumption"
+temp_param_table$label[24] <- "Public authority consumption"
+temp_param_table$label[25] <- "Public lighting consumption"
+temp_param_table$label[26] <- "Public service consumption"
+temp_param_table$label[27] <- "Personal consumption"
+temp_param_table$label[28] <- "Captive consumers"
+temp_param_table$label[29] <- "Free consumers"
+temp_param_table$label[30] <- "Residential consumers"
+temp_param_table$label[31] <- "Industrial consumers"
+temp_param_table$label[32] <- "Comercial consumers"
+temp_param_table$label[33] <- "Rural consumers"
+temp_param_table$label[34] <- "Public authority consumers"
+temp_param_table$label[35] <- "Public lighting consumers"
+temp_param_table$label[36] <- "Public service consumers"
+temp_param_table$label[37] <- "Personal consumers"
+temp_param_table$label[38] <- "State"
+temp_param_table$label[39] <- "Total consumption"
+temp_param_table$label[40] <- "Total of consumers"
+
+#unidades de cada var
+temp_param_table$unidade[2:40] <- "% of Brazil's total"
+
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/energia_amz_exporta_dic_en.csv", fileEncoding = "UTF-8")

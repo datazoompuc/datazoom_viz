@@ -1,0 +1,228 @@
+# -------------------------------- Define lógica do server --------------------------------
+
+# Paleta de cores
+pallete_discrete <- c("#fcff84", "#ffcf48", "#c3ff83", "#007e47", "#00596d", "#4fdf94", "#99b0c8", "#261c4e", "#000098", "#c368b1", "#60458c", "#757575")
+pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "#33638d", "#287d8e", "#238a8d", "#1f968b", "#20a387", "#29af7f", "#3cbb75", "#55c667", "#73d055", "#95d840", "#b8de29", "#dce319", "#fde725") # Viridis
+
+# Fontes
+f1 <- list(family = "Roboto", size = 14, color = "rgb(0, 0, 0)")
+f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
+
+# Funcão para retornar objeto server
+get_server <- function(files, param) {
+  server <- function(input, output, session) {
+
+    # Carrega dados
+    df <- readRDS(files$db_file)
+
+    # Funcão para preencher inputs com coluna/variável aleatória
+    random_inputs <- function() {
+      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
+      updateSelectInput(session,
+        "y",
+        choices = param$y_choices,
+        selected = param$y_def
+      )
+    }
+
+    # Função para atualizar url do app com parâmetros dos inputs
+    update_my_queryString <- function() {
+      q_string <- paste0(
+        "?", "y=", input$y,
+        "&", "ano=", input$x
+      )
+
+      updateQueryString(q_string, mode = "replace")
+    }
+
+    # Função para atualizar inputs a partir da URL
+    update_my_inputs <- function() {
+      # Pega parametros da url e atribui aos selectinputs
+      query <- parseQueryString(session$clientData$url_search)
+
+      if (!is.null(query[["ano"]])) {
+        updateSelectInput(session, "x",
+          selected = query[["ano"]]
+        )
+      }
+      if (!is.null(query[["y"]])) {
+        updateSelectInput(session, "y",
+          choices = param$y_choices,
+          selected = query[["y"]]
+        )
+      }
+
+      # Se query está vazia, preenche aleatório
+      if (is.null(query[["y"]])) {
+        random_inputs() # preenche inputs se estiverem vazios
+      }
+    }
+
+    # Output titulo do gráfico
+    output$plot_title <- renderText({
+      text <- " "
+      # Se algum campo estiver vazio retorna texto vazio
+      if (is.null(input$y) || input$y == "") {
+        text <- " "
+      } else {
+        # Monta titulo a partir de variáveis selecionadas nos inputs
+        y_col <- param$table[which(param$table$var == input$y), ]
+
+        text <- paste0("", y_col$label)
+      }
+
+      text
+    })
+    output$plot_subtitle <- renderText({
+      # Se algum campo estiver vazio retorna texto vazio
+      if (is.null(input$y) || input$y == "") {
+        text <- " "
+      } else {
+        text <- paste0("")
+      }
+
+      text
+    })
+
+    # Output gráfico
+    output$plot <- renderPlotly({
+      update_my_queryString() # atualiza url com parametros dos inputs
+
+      fig <- plotly_empty() # inicia figura com gráfico em branco
+      tryCatch(
+        {
+          # Se algum campo estiver vazio retorna gráfico vazio
+          if (is.null(input$y) || input$y == "") {
+            fig <- plotly_empty()
+            stop()
+          }
+
+          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
+          y_col <- param$table[which(param$table$var == input$y), ]
+          color_col <- param$table[which(param$table$var == param$color_def), ]
+
+          # Filtra dataframe com ano selecionado
+          df_filtered <- df[which(df$time == input$x), ]
+
+          df_p <- data.frame(
+            df_filtered[y_col$var],
+            df_filtered[color_col$var]
+          )
+          colnames(df_p) <- c("y", "color")
+          df_p$group <- df_filtered$group
+          df_p$text <- df_p$group
+
+          # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
+          df_p <- df_p[which(!is.na(df_p$y)), ]
+
+          # Se dataset estiver vazio, não monta o gráfico, retorna em branco
+          if (nrow(df_p) < 1) {
+            fig <- plotly_empty()
+            stop()
+          }
+
+          # Se a coluna de cor for toda NA, preenche com strings em branco
+          if (all(is.na(df_p$color))) {
+            df_p$color <- " "
+          }
+
+          # Ordenar data.frame  
+          df_p <- df_p %>%
+            arrange(desc(y))
+          
+          # Define paleta de cores
+          pallete <- pallete_discrete
+
+          # Monta gráfico
+          fig_p <- plot_ly(df_p,
+            type = "sankey",
+            orientation = "h",
+            valueformat = ".2f",
+            valuesuffix = " milhões US$",
+            hoverlabel = list(namelength = -1),
+            
+            node = list(
+              label = c("Amazônia", df_p$group), # label de origem, label de destino
+              color = c(pallete[4], 
+                        rep(pallete[3], 5),
+                        rep(pallete[2], 5),
+                        rep(pallete[1], nrow(df_p) - 10)), # cores para cada node
+              hovertemplate = "<b> %{label} </b>",
+              pad = 15,
+              thickness = 10,
+              line = list(
+                color = "black",
+                width = 0.5
+              ),
+              x = c(-0.001, rep(NA, nrow(df_p))), # definir posicao do node "Amazonia"
+              y = c(0.5, rep(NA, nrow(df_p))) # definir posicao do node "Amazonia"
+            ),
+            
+            link = list(
+              source = rep(0, nrow(df_p)), # repetir mesma source para todos
+              target = 1:nrow(df_p), # definir todos os países destino como target
+              value = df_p$y / 1e6, # valor das exportações (milhões)
+              hoverinfo = "none"
+            )
+          )
+
+          # Layout eixos
+          y_axis_layout <- list(
+            title = y_col$label,
+            titlefont = f1,
+            tickfont = f2,
+            automargin = FALSE,
+            autorange = TRUE,
+            showgrid = FALSE,
+            zeroline = FALSE
+          )
+
+          # Layout hover/tooltip
+          tooltip <- list(
+            bordercolor = "rgba(255, 255, 255, 1)",
+            bgopacity = "0.5",
+            font = f1
+          )
+
+          # Aplica layout
+          fig_p <- fig_p %>%
+            layout(
+              font = f1,
+              yaxis = y_axis_layout,
+              showlegend = TRUE
+            )
+
+          #  Configura botões do plotly
+          fig_p <- fig_p %>%
+            config(
+              # toImageButtonOptions = list(format = "svg"),
+              displaylogo = FALSE,
+              modeBarButtonsToRemove = c(
+                "lasso2d",
+                "select2d",
+                "hoverCompareCartesian"
+              )
+            )
+
+          fig <- fig_p # retorna a figura do gráfico
+        },
+        error = function(cond) {
+          # se encontrar erro retorna fig em branco
+          print("plot error")
+          fig <- plotly_empty()
+        }
+      )
+      fig
+    })
+
+    # Observa eventos
+    observe({
+      # Pega parametros da url e atribui aos selectinputs
+      query <- parseQueryString(session$clientData$url_search)
+      update_my_inputs()
+    })
+  }
+
+  # Retorna objeto server
+  server
+}

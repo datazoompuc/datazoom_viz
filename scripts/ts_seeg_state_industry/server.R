@@ -16,6 +16,12 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file) %>% 
       filter(!is.na(group))
     
+    if(param$lang){
+        df <- df %>%
+            mutate(setor = case_when(
+                setor == "Processos Industriais" ~ "Industrial Process"))
+    }
+    
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -113,7 +119,7 @@ get_server <- function(files, param) {
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         
-        text <- paste0("Emissões Totais advindas de ", input$y)
+        text <- paste0(param$title_init, input$y)
         if (input$y_option) {
           text <- paste0(text, "*")
         }
@@ -129,7 +135,7 @@ get_server <- function(files, param) {
       if (is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <- paste0("por Estado")
+        text <- paste0(param$subtitle_init)
       }
 
       text
@@ -203,11 +209,10 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            "Emissões", ": ", format(df_p$y, scientific = FALSE,
+            param$tooltip_a, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            "Unidade de medida: <b>", "Toneladas", "</b>"
+                                      big.mark = "."),  " ", "(t)"
           )
 
           # Define paleta de cores
@@ -229,13 +234,13 @@ get_server <- function(files, param) {
             title = x_col$label,
             titlefont = f1,
             tickfont = f2,
-            automargin = FALSE,
+            automargin = TRUE,
             autorange = TRUE,
             showgrid = FALSE,
             zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = "Emissões",
+            title = param$plot_y,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,

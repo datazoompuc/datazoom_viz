@@ -6,9 +6,9 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_ibge_pnadc_trabalho/ui.R"
-files$server_script <- "scripts/ts_ibge_pnadc_trabalho/server.R"
-files$param_script <- "scripts/ts_ibge_pnadc_trabalho/db_params.R"
+files$ui_script <- "scripts/ts_ibge_pnadc_trabalho_insercao/ui.R"
+files$server_script <- "scripts/ts_ibge_pnadc_trabalho_insercao/server.R"
+files$param_script <- "scripts/ts_ibge_pnadc_trabalho_insercao/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/ibge_pnadc_trabalho_insercao_dic.csv"
 files$db_file <- "data/ibge_pnadc_trabalho_insercao.rds"
@@ -30,6 +30,20 @@ param$group <- "id" # variável de agrupamento
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Inserção dos Ocupados no Mercado de Trabalho"
+
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_geo_name <-  "Selecione recorte regional"
+param$label_comp_name <-  "Selecione grupos"
+
+param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_trabalho_insercao/"
+
+### Parametros especificos no server
+param$subtitle_init <- "por recorte regional e " # expressão subtitulo
+param$tooltip  <- "Grupo: " # expressão html
+
+
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
