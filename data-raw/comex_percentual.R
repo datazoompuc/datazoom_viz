@@ -64,7 +64,7 @@ data= data%>%
                         group == "Crustáceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crustáceos com casca, cozidos em água ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, pó e pellets de crustáceos, pr" ~ "Crustaceos vivos ou não, para alimento",
                         group == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Cocos e castanhas do Brasil e de caju",
                         group == "Frutas, não cozidas ou cozidas em água ou vapor, congeladas, mesmo adicionadas de açúcar ou de outros edulcorantes" ~ "Frutas cozidas ou não, misturadas ou não",
-                        group == "Pimenta (do gênero Piper); pimentos dos gêneros Capsicum ou Pimenta, secos ou triturados ou em pó" ~ "Pimentas secas ou trituradas",
+                        group == "Pimenta (do género Piper); pimentos dos géneros Capsicum ou Pimenta, secos ou triturados ou em pó" ~ "Pimentas secas ou trituradas",
                         group == "Outras sementes e frutos oleaginosos, mesmo triturados" ~ "Outras sementes e oleaginosos",
                         group == "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (bálsamos por exemplo), naturais" ~ "Gomas e resinas naturais",
                         group == "Óleo de palma e respectivas fracções, mesmo refinados, mas não quimicamente modificados" ~ "Óleo de palma não modificado",

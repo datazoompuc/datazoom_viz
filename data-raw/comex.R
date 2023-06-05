@@ -294,14 +294,15 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Produção sh4"
+temp_param_table$label[2] <- "Produ\u00e7\u00e3o sh4"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produção sh4"
+temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sh4"
+
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
@@ -332,14 +333,15 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Município"
+temp_param_table$label[2] <- "Munic\u00edpio"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[2] <- "Munic\u00edpio"
+
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 1103))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 1103))
@@ -370,14 +372,15 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Produção sh2"
+temp_param_table$label[2] <- "Produ\u00e7\u00e3o sh2"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produção sh2"
+temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sh2"
+
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
@@ -408,14 +411,15 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Município"
+temp_param_table$label[2] <- "Munic\u00edpio"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[2] <- "Munic\u00edpio"
+
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
@@ -425,6 +429,7 @@ temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_sh2_munic_dic.csv", fileEncoding = "UTF-8")
+
 
 
 
@@ -446,14 +451,15 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Produção sec"
+temp_param_table$label[2] <- "Produ\u00e7\u00e3o sec"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produção sec"
+temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sec"
+
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
@@ -484,14 +490,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Município"
+temp_param_table$label[2] <- "Munic\u00edpio"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[2] <- "Munic\u00edpio"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
@@ -523,15 +529,15 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "Região"
+temp_param_table$label[2] <- "Regi\u00e3o"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$label[3] <- "Valor"
-temp_param_table$desc[2] <- "Região"
+temp_param_table$desc[2] <- "Regi\u00e3o"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$desc[3] <- "Valor"
 temp_param_table$x <- c(FALSE, FALSE, TRUE)
@@ -563,14 +569,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "País"
+temp_param_table$label[2] <- "Pa\u00eds"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "País"
+temp_param_table$desc[2] <- "Pa\u00eds"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 221))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 221))
@@ -601,14 +607,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "País"
+temp_param_table$label[2] <- "Pa\u00eds"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "País"
+temp_param_table$desc[2] <- "Pa\u00eds"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 22))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 22))
@@ -639,14 +645,14 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "R$",
+  unidade = "US$",
   categoria= "Economia", 
-  subcategoria = "Comércio exterior"
+  subcategoria = "Com\u00e9rcio exterior"
 )
 
-temp_param_table$label[2] <- "País"
+temp_param_table$label[2] <- "Pa\u00eds"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "País"
+temp_param_table$desc[2] <- "Pa\u00eds"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$label[3] <- "Valor"
 temp_param_table$desc[3] <- "Valor"
