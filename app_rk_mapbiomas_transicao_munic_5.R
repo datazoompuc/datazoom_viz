@@ -41,6 +41,9 @@ param$subtitle <- "Contém dados de municípios da Amazônia Legal"
 param$no_variables <- "Variável não selecionada" # titulo do grafico caso nenhuma observacao seja selecionada
 param$no_observations <- "Não há observações" # titulo do grafico caso nao haja observacoes na base
 
+param$ui1 <- "VARI\u00C1VEIS:"
+param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_munic_5/'
+param$lang = FALSE
 # Outros parâmetros e configurações
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
