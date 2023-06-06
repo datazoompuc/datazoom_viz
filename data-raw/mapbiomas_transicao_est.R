@@ -29,41 +29,41 @@ data1$from_level_2 <- NULL
 data1$from_level_3 <- NULL
 
 # Translation
-data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "N?o Observado"
-data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "Forma??o de Floresta"
+data1$from_level_4[data1$from_level_4 == "Non Observed"] <- "Não Observado"
+data1$from_level_4[data1$from_level_4 == "Forest Formation"] <- "Formação de Floresta"
 data1$from_level_4[data1$from_level_4 == "Grassland"] <- "Pradaria"
 data1$from_level_4[data1$from_level_4 == "Pasture"] <- "Pastagem"
 data1$from_level_4[data1$from_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
 data1$from_level_4[data1$from_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
-data1$from_level_4[data1$from_level_4 == "Other Non Vegetated Area"] <- "Outras ?reas n?o vegetadas"
+data1$from_level_4[data1$from_level_4 == "Other Non Vegetated Area"] <- "Outras Áreas não vegetadas"
 data1$from_level_4[data1$from_level_4 == "Magrove"] <- "Mangue"
-data1$from_level_4[data1$from_level_4 == "Forest Plantation"] <- "Planta??o de Floresta"
-data1$from_level_4[data1$from_level_4 == "Mining"] <- "Mineira??o"
+data1$from_level_4[data1$from_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
+data1$from_level_4[data1$from_level_4 == "Mining"] <- "Mineiração"
 data1$from_level_4[data1$from_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
 data1$from_level_4[data1$from_level_4 == "Soy Beans"] <- "Soja"
-data1$from_level_4[data1$from_level_4 == "Sugar Cane"] <- "Cana-de-a??car"
-data1$from_level_4[data1$from_level_4 == "Savanna Formation"] <- "Forma??o de Savana"
+data1$from_level_4[data1$from_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
+data1$from_level_4[data1$from_level_4 == "Savanna Formation"] <- "Formação de Savana"
 data1$from_level_4[data1$from_level_4 == "Beach and Dune"] <- "Praia e Dunas"
 data1$from_level_4[data1$from_level_4 == "Salt flat"] <- "Salar"
-data1$from_level_4[data1$from_level_4 == "Wetland"] <- "P?ntano"
+data1$from_level_4[data1$from_level_4 == "Wetland"] <- "Pântano"
 data1$from_level_4[data1$from_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
-data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "N?o Observado"
-data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "Forma??o de Floresta"
+data1$to_level_4[data1$to_level_4 == "Non Observed"] <- "Não Observado"
+data1$to_level_4[data1$to_level_4 == "Forest Formation"] <- "Formação de Floresta"
 data1$to_level_4[data1$to_level_4 == "Grassland"] <- "Pradaria"
 data1$to_level_4[data1$to_level_4 == "Pasture"] <- "Pastagem"
 data1$to_level_4[data1$to_level_4 == "Urban Infrastructure"] <- "Infraestrutura Urbana"
 data1$to_level_4[data1$to_level_4 == "River, Lake and Ocean"] <- "Rios, Lagos ou Oceanos"
-data1$to_level_4[data1$to_level_4 == "Other Non Vegetated Area"] <- "Outras ?reas n?o vegetadas"
+data1$to_level_4[data1$to_level_4 == "Other Non Vegetated Area"] <- "Outras Áreas não vegetadas"
 data1$to_level_4[data1$to_level_4 == "Magrove"] <- "Mangue"
-data1$to_level_4[data1$to_level_4 == "Forest Plantation"] <- "Planta??o de Floresta"
-data1$to_level_4[data1$to_level_4 == "Mining"] <- "Mineira??o"
+data1$to_level_4[data1$to_level_4 == "Forest Plantation"] <- "Plantação de Floresta"
+data1$to_level_4[data1$to_level_4 == "Mining"] <- "Mineiração"
 data1$to_level_4[data1$to_level_4 == "Mosaic of Crops"] <- "Mosaico de Cultivos"
 data1$to_level_4[data1$to_level_4 == "Soy Beans"] <- "Soja"
-data1$to_level_4[data1$to_level_4 == "Sugar Cane"] <- "Cana-de-a??car"
-data1$to_level_4[data1$to_level_4 == "Savanna Formation"] <- "Forma??o de Savana"
+data1$to_level_4[data1$to_level_4 == "Sugar Cane"] <- "Cana-de-açúcar"
+data1$to_level_4[data1$to_level_4 == "Savanna Formation"] <- "Formação de Savana"
 data1$to_level_4[data1$to_level_4 == "Beach and Dune"] <- "Praia e Dunas"
 data1$to_level_4[data1$to_level_4 == "Salt flat"] <- "Salar"
-data1$to_level_4[data1$to_level_4 == "Wetland"] <- "P?ntano"
+data1$to_level_4[data1$to_level_4 == "Wetland"] <- "Pântano"
 data1$to_level_4[data1$to_level_4 == "Mosaic of Agriculture and Pasture"] <- "Mosaico de Agricultura e Pastagem"
 
 
@@ -158,23 +158,23 @@ temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 231))
 
 
 temp_param_table$label <- str_replace_all(temp_param_table$label, c(  "para" = "to",
-                                            "N\\?o Observado" = "Non Observed",
-                                            "Forma\\?\\?o de Floresta" = "Forest Formation",
+                                            "Não Observado" = "Non Observed",
+                                            "Formação de Floresta" = "Forest Formation",
                                             "Pradaria" = "Grassland",
                                             "Pastagem" = "Pasture",
                                             "Infraestrutura Urbana" = "Urban Infrastructure",
                                             "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
-                                            "Outras \\?reas n\\?o vegetadas" = "Other Non Vegetated Area",
+                                            "Outras Áreas não vegetadas" = "Other Non Vegetated Area",
                                             "Mangue" = "Magrove",
-                                            "Planta\\?\\?o de Floresta" = "Forest Plantation",
-                                            "Mineira\\?\\?o" = "Mining",
+                                            "Plantação de Floresta" = "Forest Plantation",
+                                            "Mineiração" = "Mining",
                                             "Mosaico de Cultivos" = "Mosaic of Crops",
                                             "Soja" = "Soy Beans",
-                                            "Cana-de-a\\?\\?car" = "Sugar Cane",
-                                            "Forma\\?\\?o de Savana" = "Savanna Formation",
+                                            "Cana-de-açúcar" = "Sugar Cane",
+                                            "Formação de Savana" = "Savanna Formation",
                                             "Praia e Dunas" = "Beach and Dune",
                                             "Salar" = "Salt flat",
-                                            "P\\?ntano" = "Wetland",
+                                            "Pântano" = "Wetland",
                                             "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
                                             "Mosaico de Agricultura e Pasture" = "Mosaic of Agriculture and Pasture"))
 
