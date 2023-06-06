@@ -24,30 +24,31 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars",  param$label_var_name),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo y
           selectInput(
-            inputId = "y",
-            label = "eixo vertical (y)",
-            choices = param$y_choices,
-            selected = param$y_def,
+            inputId = "x_from",
+            label = param$label_x_from_name,
+            choices = param$x_from_choices,
+            selected = param$x_from_def,
             width = "100%"
           )
         ),
 
         # Seleciona eixo log
-        checkboxInput(
-          inputId = "ylog",
-          "escala log",
-          value = FALSE,
+        selectInput(
+          inputId = "x_to",
+          label = param$label_x_to_name,
+          choices = param$x_to_choices,
+          selected = param$x_to_def,
           width = "100%"
         ),
         # Seleciona eixo
         checkboxInput(
           inputId = "y_option",
-          "proporcional ao ano inicial (*)",
+          param$label_prop_name,
           value = FALSE,
           width = "100%"
         ),
@@ -55,7 +56,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          "Subdivisão geográfica",
+          param$label_geo_name,
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
@@ -69,7 +70,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_ts_mapbiomas_transicao_est/', '_blank')")
+                              onclick = paste0("window.open('", param$link, "', '_blank')"))
         ),
       ),
       column(9,

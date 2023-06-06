@@ -24,13 +24,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$label_var_name),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo y
           selectInput(
             inputId = "y",
-            label = "eixo vertical (y)",
+            label = param$label_y_name,
             choices = param$y_choices,
             selected = c("Consumo Total", "Despesas Estimadas CCC (Nominal)"),
             multiple = TRUE,
@@ -41,14 +41,14 @@ get_ui <- function(files, param) {
         # Seleciona eixo log
         checkboxInput(
           inputId = "ylog",
-          "escala log",
+          param$label_scale_name,
           value = FALSE,
           width = "100%"
         ),
         # Seleciona eixo
         checkboxInput(
           inputId = "y_option",
-          "proporcional ao ano inicial (*)",
+          param$label_prop_name,
           value = FALSE,
           width = "100%"
         ),
@@ -61,7 +61,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_ts_sistemas_isolados/', '_blank')")
+                              onclick = paste0("window.open('", param$link, "', '_blank')"))
         ),
       ),
       column(9,

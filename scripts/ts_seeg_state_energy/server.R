@@ -15,7 +15,19 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file) %>% 
       filter(processos_geradores_emissoes != "Nao Identificado") %>% 
-      filter(processos_geradores_emissoes != "Producao de Combustiveis")
+      filter(processos_geradores_emissoes != "Producao de Combustiveis")%>%
+        filter(!is.na(processos_geradores_emissoes))
+    
+        if(param$lang){
+            df <- df %>%
+                mutate(processos_geradores_emissoes = case_when(
+                    processos_geradores_emissoes == "Agropecuario" ~ "Farming",
+                    processos_geradores_emissoes == "Comercial"  ~ "Commercial",
+                    processos_geradores_emissoes == "Industrial" ~ "Industrial",
+                    processos_geradores_emissoes ==  "Geracao de Eletricidade (Servico Publico)" ~ "Electricity Generation (Public Service)",
+                    processos_geradores_emissoes == "Transportes" ~ "Transports",
+                    processos_geradores_emissoes == "Publico" ~ "Public"))
+        }
     
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
@@ -114,7 +126,7 @@ get_server <- function(files, param) {
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         
-        text <- paste0("Emissões Totais advindas de ", input$y)
+        text <- paste0(param$title_init, input$y)
         if (input$y_option) {
           text <- paste0(text, "*")
         }
@@ -130,7 +142,7 @@ get_server <- function(files, param) {
       if (is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <- paste0("por Estado")
+        text <- paste0(param$subtitle_init)
       }
 
       text
@@ -204,11 +216,10 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            "Emissões", ": ", format(df_p$y, scientific = FALSE,
+            param$tooltip_a, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            "Unidade de medida: <b>", "Toneladas", "</b>"
+                                      big.mark = "."),  " ", "(t)"
           )
 
           # Define paleta de cores
@@ -230,13 +241,13 @@ get_server <- function(files, param) {
             title = x_col$label,
             titlefont = f1,
             tickfont = f2,
-            automargin = FALSE,
+            automargin = TRUE,
             autorange = TRUE,
             showgrid = FALSE,
             zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = "Emissões",
+            title = param$plot_y ,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,

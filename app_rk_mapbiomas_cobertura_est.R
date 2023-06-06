@@ -30,7 +30,7 @@ param$id_def <- "group" # variável padrão de id
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil"
+param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil (Fonte: MAPBIOMAS)"
 
 # Outros parâmetros e configurações
 

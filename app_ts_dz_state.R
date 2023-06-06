@@ -34,6 +34,18 @@ param$group <- "estado" # variável de agrupamento
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Produção Econômica por Estado"
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_scale_name <- "escala log"
+param$label_prop_name <- "proporcional ao ano inicial (*)"
+param$label_geo_name <- "Subdivisão geográfica"
+
+param$link <- "https://datazoom.shinyapps.io/app_ts_dz_state/"
+
+### Parametros especificos no server
+param$subtitle_init <- "por estado"
+
 # Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL
 

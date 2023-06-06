@@ -141,6 +141,14 @@ df <- dz_munic_ppm_mapbiomas %>%
   rbind(regioes) %>% 
   rbind(amz_legal)
 
+# filtra os anos que serao utilizados na visualização
+df <- df %>%
+    filter(ano >= 1985)  
+
+# filtra as colunas utilizadas na visualização
+df <- df %>%
+    select(cod_ibge, ano, n_bovino_por_area_pastagem, nm_municip, uf)
+
 # save data
 readr::write_rds(df,
         file = "./data/dz_munic_ppm_mapbiomas.rds"
@@ -219,3 +227,104 @@ temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_ppm_mapbiomas_dic.csv", fileEncoding = "UTF-8")
+
+
+#############################
+# Build Dictionary in English
+#############################
+
+# call data
+dz_munic_ppm_mapbiomas <- readRDS("./data/dz_munic_ppm_mapbiomas.rds")
+
+# extract variables from data
+columns <- colnames(dz_munic_ppm_mapbiomas)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    geometry = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Fonte de dados",
+    unidade = "Unidade de medida",
+    categoria = "Categoria principal",
+    subcategoria = "Subcategoria"
+)
+
+# label variables
+temp_param_table$label[temp_param_table$var == "cod_ibge"] <- "Municipality Code"
+temp_param_table$label[temp_param_table$var == "nm_municip"] <- "Municipality"
+temp_param_table$label[temp_param_table$var == "uf"] <- "State"
+temp_param_table$label[temp_param_table$var == "ano"] <- "Year"
+temp_param_table$label[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Cattle herd by pasture area"
+
+# unidade variables
+temp_param_table$unidade[temp_param_table$var == "cod_ibge"] <- ""
+temp_param_table$unidade[temp_param_table$var == "nm_municip"] <- ""
+temp_param_table$unidade[temp_param_table$var == "uf"] <- ""
+temp_param_table$unidade[temp_param_table$var == "ano"] <- "Year"
+temp_param_table$unidade[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Cattle herd per area (ha) of pasture"
+
+# var_group variables
+temp_param_table$var_group[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "IBGE - PPM and MAPBIOMAS"
+
+# label data category
+temp_param_table$categoria[temp_param_table$var == "ano"] <- "Unit of time"
+temp_param_table$categoria[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Economic Production"
+
+# subcategoria variables
+temp_param_table$subcategoria[temp_param_table$var == "ano"] <- "Year"
+temp_param_table$subcategoria[temp_param_table$var == "n_bovino_por_area_pastagem"] <- "Livestock"
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "cod_ibge"] <- FALSE
+temp_param_table$y[temp_param_table$var == "nm_municip"] <- FALSE
+temp_param_table$y[temp_param_table$var == "uf"] <- TRUE
+temp_param_table$y[temp_param_table$var == "ano"] <- TRUE
+temp_param_table$y[temp_param_table$var == "n_bovino_por_area_pastagem"] <- TRUE
+
+# block variables in graphs x-axis
+temp_param_table$x[temp_param_table$var == "cod_ibge"] <- FALSE
+temp_param_table$x[temp_param_table$var == "nm_municip"] <- FALSE
+temp_param_table$x[temp_param_table$var == "uf"] <- TRUE
+temp_param_table$x[temp_param_table$var == "ano"] <- TRUE
+temp_param_table$x[temp_param_table$var == "n_bovino_por_area_pastagem"] <- TRUE
+
+# allow variables in graphs size, color, and slider-axis
+temp_param_table$size[temp_param_table$var == "uf"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "uf"] <- TRUE #
+temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/dz_munic_ppm_mapbiomas_dic_en.csv", fileEncoding = "UTF-8")
+
+
+######################
+#
+# Build rds in english
+#
+######################
+
+
+dz_munic_ppm_mapbiomas <- readRDS("~/GitHub/datazoom_viz/data/dz_munic_ppm_mapbiomas.rds")
+
+
+    dz_munic_ppm_mapbiomas_en <- dz_munic_ppm_mapbiomas %>%
+        mutate(uf = case_when(
+            uf == "Norte" ~ "North",
+            uf ==  "Nordeste"  ~ "Northeast",
+            uf == "Sudeste"  ~ "Southeast",
+            uf == "Sul" ~ "South",
+            uf == "Centro-Oeste"  ~ "Midwest",
+            uf == "Amazônia Legal"  ~ "Legal Amazon",
+            uf == "Fora da Amazônia Legal" ~ "Outside of the Legal Amazon"))
+
+    # save data
+    readr::write_rds(dz_munic_ppm_mapbiomas_en,
+                     file = "./data/dz_munic_ppm_mapbiomas_en.rds"
+    )

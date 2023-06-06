@@ -34,6 +34,14 @@ param$group <- "group" #variável de agrupamento
 param$plot_name <- "Data Zoom Amazonia"
 param$plot_desc <- "Transição/mudança de cobertura e uso do solo"
 
+
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_scale_name <- "escala log"
+param$label_axis_name <- "proporcional ao ano inicial (*)"
+param$label_mun_filter <- "Subdivisão geográfica"
+param$geo_level <- "Por subdivisão geográfica"
+
 # Outros parâmetros e configurações
 
 

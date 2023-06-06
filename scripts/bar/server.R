@@ -71,7 +71,7 @@ get_server <- function(files, param) {
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
-        text <- paste0("Vari\u00e1vel selecionada: ", y_col$label)
+        text <- paste0(param$selected_variable, y_col$label)
       }
 
       text
@@ -85,7 +85,7 @@ get_server <- function(files, param) {
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
-        text <- paste0("Fonte de dados: ", y_col$source)
+        text <- paste0(param$label_datasource, y_col$source)
       }
 
       text
@@ -103,7 +103,7 @@ get_server <- function(files, param) {
           # Se algum campo estiver vazio retorna gráfico vazio
           if (is.null(input$y) || input$y == "") {
             fig <- plotly_empty()
-            print("Y variable empty")
+            print(param$y_empty)
             stop()
           }
 
@@ -127,14 +127,14 @@ get_server <- function(files, param) {
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
-            print("database empty")
+            print(param$empty_db)
             stop()
           }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
           if (all(is.na(df_p$x_variable))) {
             df_p$x_variable <- " "
-            print("x variable empty")
+            print(param$empty_x)
           }
 
 
@@ -143,7 +143,7 @@ get_server <- function(files, param) {
             "<b>",df_p$text,"</b><br>",
             x_col$label, ":  <b>", df_p$x, "</b><br>",
             y_col$label, ":  <b>", format(df_p$y, scientific = FALSE, digits = 2, decimal.mark = ",", big.mark = "."),  "</b><br>",
-            "Unidade de medida: <b>", y_col$unidade, "</b></b>"
+            param$measurement_unit, y_col$unidade, "</b></b>"
           )
 
           # Define paleta de cores

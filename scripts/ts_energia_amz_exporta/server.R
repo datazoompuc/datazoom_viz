@@ -169,6 +169,49 @@ get_server <- function(files, param) {
             pivot_longer(cols = input$y) %>%
             filter(!is.na(value))
           
+          if (param$translate_names) {
+              df_filtered <- df_filtered %>%
+                  mutate(name = case_when(name == "total produzido" ~ "Total energy produced",
+                                          name == "hidro" ~ "Energy produced by hydro",
+                                          name == "eolica" ~ "Energy produced by wind",
+                                          name == "solar" ~ "Energy produced by solar",
+                                          name == "nuclear" ~ "Energy produced by nuclear",
+                                          name == "termo" ~ "Energy produced by thermo",
+                                          name == "cana" ~ "Energy produced by sugar cane",
+                                          name == "lenha" ~ "Energy produced by wood",
+                                          name == "lixivia" ~ "Energy produced by black liquor",
+                                          name == "outras fontes renovaveis" ~ "Energy produced by other renewable sources",
+                                          name == "carvao vapor" ~ "Energy produced by steam coal",
+                                          name == "gas natural" ~ "Energy produced by natural gas",
+                                          name == "gas de coqueira" ~ "Energy produced by coke oven gas",
+                                          name == "combustivel" ~ "Energy produced by fuel",
+                                          name == "diesel" ~ "Energy produced by diesel",
+                                          name == "outras fontes nao renovaveis" ~ "Energy produced by other non-renewable sources",
+                                          name == "consumo cativo" ~ "Captive consumption",
+                                          name == "consumo livre" ~ "Free consumption",
+                                          name == "consumo residencial" ~ "Residential consumption",
+                                          name == "consumo industrial" ~ "Industrial consumption",
+                                          name == "consumo comercial" ~ "Comercial consumption",
+                                          name == "consumo rural" ~ "Rural consumption",
+                                          name == "consumo poder publico" ~ "Public authority consumption",
+                                          name == "consumo iluminacao publica" ~ "Public lighting consumption",
+                                          name == "consumo servico publica" ~ "Public service consumption",
+                                          name == "consumo proprio" ~ "Personal consumption",
+                                          name == "consumidores cativo" ~ "Captive consumers",
+                                          name == "consumidores livre" ~ "Free consumers",
+                                          name == "consumidores residencial" ~ "Residential consumers",
+                                          name == "consumidores industrial" ~ "Industrial consumers",
+                                          name == "consumidores comercial" ~ "Comercial consumers",
+                                          name == "consumidores rural" ~ "Rural consumers",
+                                          name == "consumidores poder publico" ~ "Public authority consumers",
+                                          name == "consumidores iluminacao publica" ~ "Public lighting consumers",
+                                          name == "consumidores servico publica" ~ "Public service consumers",
+                                          name == "consumidores proprio" ~ "Personal consumers",
+                                          name == "consumo total" ~ "Total consumption",
+                                          name == "consumidores" ~ "Total consumers",
+                                          ))
+          }
+          
           df_filtered <- df_filtered[which(df_filtered$uf %in% input$filter1), ]
           df_filtered <- df_filtered %>%
             mutate(group = paste(uf, name, sep = " - "))
@@ -229,12 +272,12 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
                            x = ~x,
                            y = ~y,
-                           color = ~group,
+                           color = ~color,
                            type = "scatter",
                            mode = "lines+markers",
                            text = ~tooltip,
                            hoverinfo = "text",
-                           symbol = ~text
+                           symbol = ~group
           )
           
           # Layout eixos

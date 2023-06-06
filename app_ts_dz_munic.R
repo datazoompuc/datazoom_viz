@@ -33,6 +33,18 @@ param$id_def <- "cod_ibge" # variável padrão de id
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Compilação de dados ao nível municipal"
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_scale_name <- "escala log"
+param$label_prop_name <- "proporcional ao ano inicial (*)"
+param$label_geo_name <- "Subdivisão geográfica"
+
+param$link <- "https://datazoom.shinyapps.io/app_ts_dz_munic/"
+
+### Parametros especificos no server
+param$subtitle_init <- "por município" # primeira palavra do subtitulo
+
 
 # Outros parâmetros e configurações
 param$y_choices$`Fonte de dados` <- NULL
