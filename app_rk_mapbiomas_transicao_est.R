@@ -43,6 +43,11 @@ param$no_observations <- "Não há observações" # titulo do grafico caso nao h
 
 # Outros parâmetros e configurações
 
+param$ui1 <- "VARI\u00C1VEIS:"
+param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_est/'
+param$lang = FALSE
+
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
