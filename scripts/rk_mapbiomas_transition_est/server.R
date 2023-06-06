@@ -97,10 +97,12 @@ get_server <- function(files, param) {
       
       # Adicionar opcoes no ui
       updateSelectInput(session, "x_from",
-                        choices = param$x_from_choices)
+                        choices = param$x_from_choices,
+                        selected = sample(param$x_from_choices, 1))
       
       updateSelectInput(session, "x_to",
-                        choices = param$x_to_choices)
+                        choices = param$x_to_choices,
+                        selected = sample(param$x_to_choices, 1))
      
       
     # Funcão para preencher inputs com coluna/variável aleatória
