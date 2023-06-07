@@ -49,7 +49,7 @@ param$year_final <- 2019
 param$title<-"Legal Amazon's States Map"
 param$no_selec_var<-"No variables selected"
 param$selec_var<-"Selected variable: "
-param$stat<- "State: "
+param$state<- "State: "
 param$measurement_unit<-"Measurement Unit: "
 
 #Mudanças específicas no UI
