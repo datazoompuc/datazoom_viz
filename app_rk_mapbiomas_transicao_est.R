@@ -46,6 +46,9 @@ param$no_observations <- "Não há observações" # titulo do grafico caso nao h
 param$ui1 <- "VARI\u00C1VEIS:"
 param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_est/'
 param$lang = FALSE
+param$server1 <- "Ranking de "
+param$server2 <- " para "
+param$measurement_unit <- "Unidade de medida: "
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

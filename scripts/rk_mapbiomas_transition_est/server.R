@@ -13,7 +13,8 @@ get_server <- function(files, param) {
     
   # Carrega dados
   df <- readRDS(files$db_file)
-  
+ 
+ 
    if(param$lang) {
   
        df$to <- df$to %>% str_replace_all(c(" para " = " to ",

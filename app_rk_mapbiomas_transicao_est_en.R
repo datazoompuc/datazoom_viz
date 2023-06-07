@@ -48,8 +48,7 @@ param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_est_en/'
 
 # Parametros server
 param$server1 <- "Ranking of "
-param$server2 <- "to"
-param$server2 <- "Legal Amazon"
+param$server2 <- " to "
 param$measurement_unit <- "Measurement unit: "
 param$lang = TRUE
 
