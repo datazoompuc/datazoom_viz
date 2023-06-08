@@ -47,7 +47,7 @@ param$ui1 <- "VARIABLES:"
 param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_est_en/'
 
 # Parametros server
-param$server1 <- "Ranking of "
+param$server1 <- "Ranking - Transition of "
 param$server2 <- " to "
 param$measurement_unit <- "Measurement unit: "
 param$lang = TRUE
