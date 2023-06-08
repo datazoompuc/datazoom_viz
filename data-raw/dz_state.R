@@ -3,6 +3,7 @@
 ############################################################
 
 #### Call library
+library(datazoom.amazonia)
 library(tidyverse)
 library(tibble)
 library(zoo)
@@ -150,8 +151,6 @@ aux= c(rep('Efetivo dos Rebanhos: ',11))
 label_livestock = paste0(aux, c(dic_ppm_livestock_inventory$var_pt[1:11]))
 # remove missing columns in dz_state
 label_livestock[! label_livestock %in% c("Efetivo dos Rebanhos: Suino - Matrizes de Suinos")]
-
-label_livestock <- subset(label_livestock, select = -c("Efetivo dos Rebanhos: Suino - Matrizes de Suinos") )
 
 #animal_origin_production
 dic_ppm_animal_origin_production= load_dictionary(dataset = 'ppm_animal_origin_production')%>%
