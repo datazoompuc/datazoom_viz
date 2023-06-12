@@ -29,19 +29,20 @@ get_ui <- function(files, param) {
           class = "var_selec_group",
           # Seleciona variável do eixo y
           selectInput(
-            inputId = "y",
-            label = param$label_y_name,
-            choices = param$y_choices,
-            selected = param$y_def,
+            inputId = "x_from",
+            label = param$label_x_from_name,
+            choices = param$x_from_choices,
+            selected = param$x_from_def,
             width = "100%"
           )
         ),
 
         # Seleciona eixo log
-        checkboxInput(
-          inputId = "ylog",
-          param$label_log_name,
-          value = FALSE,
+        selectInput(
+          inputId = "x_to",
+          label = param$label_x_to_name,
+          choices = param$x_to_choices,
+          selected = param$x_to_def,
           width = "100%"
         ),
         # Seleciona eixo

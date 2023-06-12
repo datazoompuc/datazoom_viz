@@ -33,18 +33,18 @@ shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
 income <- readRDS(file = "data/income.rds")
 income$Ano <- income$Year
 income <- income %>%
-  separate(Municipality, c("name_munic", "Estado"), " - ") %>%
-  janitor::clean_names() %>%
-  select(cod_ibge, name_munic, ano, employed, mean_income, median_income)
+    separate(Municipality, c("name_munic", "Estado"), " - ") %>%
+    janitor::clean_names() %>%
+    select(cod_ibge, name_munic, ano, employed, mean_income, median_income)
 class(income$ano) <- "numeric"
 # Reshaping data.frame from long  to wide format
 income <- income %>%
-  tidyr::pivot_wider(
-    id_cols = c(cod_ibge),
-    names_from = ano,
-    names_prefix = "census",
-    values_from = c(employed, mean_income, median_income)
-  )
+    tidyr::pivot_wider(
+        id_cols = c(cod_ibge),
+        names_from = ano,
+        names_prefix = "census",
+        values_from = c(employed, mean_income, median_income)
+    )
 # Identify and remove duplicate data
 income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
 
@@ -53,32 +53,32 @@ income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
 ###################
 prodes <- readRDS(file = "data/prodes.rds")
 prodes <- prodes %>%
-  janitor::clean_names()
+    janitor::clean_names()
 
 # generate variable by the share of municipality total area
 prodes <- prodes %>%
-  mutate(
-    prop_desmatado = desmatado / area_km2,
-    prop_incremento = incremento / area_km2,
-    prop_floresta = floresta / area_km2,
-    prop_nao_floresta = nao_floresta / area_km2,
-    prop_hidrografia = hidrografia / area_km2
-  ) %>%
-  select(
-    cod_munic_ibge,
-    ano,
-    desmatado,
-    incremento,
-    floresta,
-    nao_floresta,
-    hidrografia,
-    prop_desmatado,
-    prop_incremento,
-    prop_floresta,
-    prop_nao_floresta,
-    prop_hidrografia
-  ) %>%
-  arrange(cod_munic_ibge, ano)
+    mutate(
+        prop_desmatado = desmatado / area_km2,
+        prop_incremento = incremento / area_km2,
+        prop_floresta = floresta / area_km2,
+        prop_nao_floresta = nao_floresta / area_km2,
+        prop_hidrografia = hidrografia / area_km2
+    ) %>%
+    select(
+        cod_munic_ibge,
+        ano,
+        desmatado,
+        incremento,
+        floresta,
+        nao_floresta,
+        hidrografia,
+        prop_desmatado,
+        prop_incremento,
+        prop_floresta,
+        prop_nao_floresta,
+        prop_hidrografia
+    ) %>%
+    arrange(cod_munic_ibge, ano)
 
 # Identify and remove duplicate data
 prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
@@ -132,23 +132,24 @@ prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 
 gdp <- readRDS(file = "data/gdp.rds")
 gdp <- gdp %>%
+
   janitor::clean_names()
 class(gdp$ano) <- "numeric"
 class(gdp$cod_ibge) <- "character"
 # Replace NA with previous and next rows mean
 gdp <- gdp %>%
-  group_by(cod_ibge) %>%
-  arrange(cod_ibge, ano)
+    group_by(cod_ibge) %>%
+    arrange(cod_ibge, ano)
 gdp$pop <- zoo::na.approx(gdp$pop)
 gdp$gd_ppc <- zoo::na.approx(gdp$gd_ppc)
 # Identify and remove duplicate data
 gdp <- gdp %>%
-  distinct(cod_ibge, ano, .keep_all = TRUE) %>%
-  arrange(cod_ibge, ano)
+    distinct(cod_ibge, ano, .keep_all = TRUE) %>%
+    arrange(cod_ibge, ano)
 # select relevant variables
 gdp <- gdp %>%
-  select(cod_ibge, ano, pop, gdp, gd_ppc) %>%
-  arrange(cod_ibge, ano)
+    select(cod_ibge, ano, pop, gdp, gd_ppc) %>%
+    arrange(cod_ibge, ano)
 
 # deflacionar gdp (ano base 2021)
 gdp$gdp_deflacionado <- gdp$gdp
@@ -208,15 +209,15 @@ gdp$gdp_deflacionado[gdp$ano == 2021] <- gdp$gdp_deflacionado[gdp$ano == 2021] *
 ###################
 ips <- readRDS(file = "data/ips.rds")
 ips <- ips %>%
-  janitor::clean_names()
+    janitor::clean_names()
 # Reshaping data.frame from long  to wide format
 ips <- ips %>%
-  tidyr::pivot_wider(
-    id_cols = c(cod_municipio),
-    names_from = ano,
-    names_prefix = "ips",
-    values_from = ips
-  )
+    tidyr::pivot_wider(
+        id_cols = c(cod_municipio),
+        names_from = ano,
+        names_prefix = "ips",
+        values_from = ips
+    )
 
 ###################
 # IBGE - CEMPRE
@@ -236,12 +237,12 @@ cempre_municipality <- readRDS(file = "data/cempre_municipality_dza.rds")
 ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
 
 #munics <- readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls") %>%
- # dplyr::select("Código Município Completo", "Nome_Município")
+# dplyr::select("Código Município Completo", "Nome_Município")
 #ppm_livestock$group <- plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município, to = munics$`Código Município Completo`)
 
 ppm_livestock= ppm_livestock%>%
-  dplyr::filter(ano >= 2000)%>%
-  dplyr::select(geo_id, ano, num_v2670, num_v32794, num_v32796)
+    dplyr::filter(ano >= 2000)%>%
+    dplyr::select(geo_id, ano, num_v2670, num_v32794, num_v32796)
 
 ###################
 #PAM - IBGE
@@ -310,6 +311,7 @@ dz_munic <- income %>%
   arrange(cod_ibge, ano) %>%
   relocate(cod_ibge, ano)
 
+
 # colnames(dz_munic)
 #dz_munic$name_munic <- dz_munic$name_munic.x
 #dz_munic <- dz_munic %>% transform(estado = ifelse(!is.na(estado.x), estado.x, estado.y))
@@ -323,7 +325,7 @@ class(dz_munic$ano) <- "numeric"
 
 # clean column names
 dz_munic <- dz_munic %>%
-  janitor::clean_names()
+    janitor::clean_names()
 
 ######################################################
 # merge data with amazon municipalities shapefile
@@ -394,7 +396,7 @@ dz_munic <- dz_munic %>% group_by(cod_ibge, ano)
 
 # arrange data by municipality and year
 dz_munic <- dz_munic %>%
-  arrange(cod_ibge, ano)
+    arrange(cod_ibge, ano)
 
 # Identify and remove duplicate data
 # xxx <- dz_munic %>% distinct(cod_ibge, ano, .keep_all = TRUE)
@@ -404,16 +406,16 @@ dz_munic <- dz_munic[!st_is_empty(dz_munic), , drop = FALSE]
 
 # limiting decimal places
 dz_munic <- dz_munic %>%
-  mutate(across(where(is.numeric) & !c(
-    .data$prop_desmatado, .data$prop_floresta, .data$prop_incremento,
-    .data$prop_hidrografia, .data$prop_nao_floresta
-  ), ~ round(., digits = 1)))
+    mutate(across(where(is.numeric) & !c(
+        .data$prop_desmatado, .data$prop_floresta, .data$prop_incremento,
+        .data$prop_hidrografia, .data$prop_nao_floresta
+    ), ~ round(., digits = 1)))
 # for the variables with proportions, limiting to 4 decimal places
 dz_munic <- dz_munic %>%
-  mutate(across(c(
-    .data$prop_desmatado, .data$prop_floresta, .data$prop_incremento,
-    .data$prop_hidrografia, .data$prop_nao_floresta
-  ), ~ round(. * 100, digits = 1)))
+    mutate(across(c(
+        .data$prop_desmatado, .data$prop_floresta, .data$prop_incremento,
+        .data$prop_hidrografia, .data$prop_nao_floresta
+    ), ~ round(. * 100, digits = 1)))
 
 # convert time data to date
 # dz_munic$newdate <- as.Date(as.yearqtr(dz_munic$ano), format = "%Y")
@@ -423,7 +425,7 @@ dz_munic <- dz_munic %>%
 
 # save data
 saveRDS(dz_munic,
-  file = "./data/dz_munic.rds"
+        file = "./data/dz_munic.rds"
 )
 
 # save simplified sf for faster maps
@@ -431,7 +433,7 @@ dz_munic_simp <- rmapshaper::ms_simplify(dz_munic,
                                          keep_shapes = TRUE, 
                                          keep = 0.01)
 readr::write_rds(dz_munic_simp,
-        file = "./data/dz_munic_simplified.rds"
+                 file = "./data/dz_munic_simplified.rds"
 )
 
 #####################
@@ -446,19 +448,19 @@ columns <- colnames(dz_munic)
 
 # generate dictionary
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  geometry = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Fonte de dados",
-  unidade = "Unidade de medida",
-  categoria = "Categoria principal",
-  subcategoria = "Subcategoria"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    geometry = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Fonte de dados",
+    unidade = "Unidade de medida",
+    categoria = "Categoria principal",
+    subcategoria = "Subcategoria"
 )
 
 # label variables
@@ -699,14 +701,14 @@ temp_param_table$x[temp_param_table$var == "group"] <- FALSE
 
 #filtering the ppm obs, because there is already a .csv dictionary for ppm livestock inventory
 temp_param_table= temp_param_table%>%
-  dplyr::filter(!startsWith(.data$var, 'num'))
+    dplyr::filter(!startsWith(.data$var, 'num'))
 #adding ppm dictionary
 metappm= read.csv(file = 'data/ppm_municipality_livestock_inventory_dic.csv')
 metappm <- metappm%>%
-  dplyr::mutate(geometry = FALSE, desc= var)%>%
-  dplyr::rename(var_group = source)%>%
-  dplyr::select(-X, - tipo)%>%
-  dplyr::filter(endsWith(.data$var, 'v2670')|endsWith(.data$var, 'v32794')|endsWith(.data$var, 'v32796'))
+    dplyr::mutate(geometry = FALSE, desc= var)%>%
+    dplyr::rename(var_group = source)%>%
+    dplyr::select(-X, - tipo)%>%
+    dplyr::filter(endsWith(.data$var, 'v2670')|endsWith(.data$var, 'v32794')|endsWith(.data$var, 'v32796'))
 metappm$var_group= 'IBGE - PPM'
 
 temp_param_table= dplyr::bind_rows(temp_param_table, metappm)
@@ -738,18 +740,18 @@ temp_param_table$slider[temp_param_table$var == "ano"] <- TRUE # "ano"
 
 #filtering the pam obs, because there is already a .csv dictionary for ppm livestock inventory
 temp_param_table= temp_param_table%>%
-  dplyr::filter(!startsWith(.data$var, 'quant'))%>%
-  dplyr::filter(!startsWith(.data$var, 'area_plantada_dest_colheita'))
+    dplyr::filter(!startsWith(.data$var, 'quant'))%>%
+    dplyr::filter(!startsWith(.data$var, 'area_plantada_dest_colheita'))
 
 
 #adding pam dictionary
 metapam= read.csv(file = 'data/pam_state_all_crops_dic.csv')
 metapam <- metapam%>%
-  dplyr::mutate(geometry = FALSE, desc= var)%>%
-  dplyr::rename(var_group = source)%>%
-  dplyr::select(-X, - tipo)%>%
-  dplyr::filter(endsWith(.data$var, 'v40124')|endsWith(.data$var, 'v40102')|endsWith(.data$var, 'v40122')|endsWith(.data$var, 'v40119'))%>%
-  dplyr::filter(startsWith(.data$var, 'quant')|startsWith(.data$var, 'area_plantada_dest_colheita'))
+    dplyr::mutate(geometry = FALSE, desc= var)%>%
+    dplyr::rename(var_group = source)%>%
+    dplyr::select(-X, - tipo)%>%
+    dplyr::filter(endsWith(.data$var, 'v40124')|endsWith(.data$var, 'v40102')|endsWith(.data$var, 'v40122')|endsWith(.data$var, 'v40119'))%>%
+    dplyr::filter(startsWith(.data$var, 'quant')|startsWith(.data$var, 'area_plantada_dest_colheita'))
 metapam$var_group= 'IBGE - PAM'
 
 temp_param_table= dplyr::bind_rows(temp_param_table, metapam)
