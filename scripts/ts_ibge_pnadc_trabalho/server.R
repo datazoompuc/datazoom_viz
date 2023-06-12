@@ -30,7 +30,7 @@ get_server <- function(files, param) {
         composicao_demografica  == "Nível escolar mais de 15 anos de estudo" ~ "Education level higher than 15 years",
         composicao_demografica  == "Sexo feminino" ~ "Female",
         composicao_demografica  == "Sexo masculino" ~ "Male",
-        composicao_demografica  == "Todas as pessoas (PIA)" ~ "All (from 'PIA')"))
+        composicao_demografica  == "Todas as pessoas (PIA)" ~ "All (from Working-Age Population)"))
   }
   
   
