@@ -14,6 +14,26 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file)
   
+  if(param$lang){
+    df <- df %>%
+      mutate(composicao_demografica  = case_when(
+        composicao_demografica  == "Faixa étaria entre 18 e 24 anos" ~ "Age group between 18-24 years old",
+        composicao_demografica  == "Faixa étaria entre 25 e 29 anos"  ~ "Age group between 25-29 year old",
+        composicao_demografica  == "Faixa étaria entre 30 e 39 anos" ~ "Age group between 30-39 years old",
+        composicao_demografica  ==  "Faixa étaria entre 40 e 49 anos" ~ "Age group between 40-49 years old",
+        composicao_demografica  == "Faixa étaria entre 50 e 59 anos" ~ "Age group between 50-59 years old",
+        composicao_demografica  == "Faixa étaria maior que 60 anos" ~ "Age group older than 60 years old",
+        composicao_demografica  == "Nível escolar 0 anos de estudo (sem instrução)" ~ "Education level 0 years (uneducated)",
+        composicao_demografica  == "Nível escolar 1 a 7 anos de estudo" ~ "Education level from 1-7 years",
+        composicao_demografica  == "Nível escolar 8 a 11 anos de estudo" ~ "Education level from 8-11 years",
+        composicao_demografica  == "Nível escolar 9 a 14 anos de estudo" ~ "Education level from 9-14 years",
+        composicao_demografica  == "Nível escolar mais de 15 anos de estudo" ~ "Education level higher than 15 years",
+        composicao_demografica  == "Sexo feminino" ~ "Female",
+        composicao_demografica  == "Sexo masculino" ~ "Male",
+        composicao_demografica  == "Todas as pessoas (PIA)" ~ "All (from 'PIA')"))
+  }
+  
+  
   server <- function(input, output, session) {
     
     # filtra dados de composicao demografica
