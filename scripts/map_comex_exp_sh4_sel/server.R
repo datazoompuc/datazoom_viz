@@ -632,8 +632,8 @@ get_server <- function(files, param) {
               param$tooltip5, " <b>", format(df_reactived()$maximo_produto, scientific = FALSE,
                                   digits = 2,
                                   decimal.mark = ",", 
-                                  big.mark = "."), "<br>",
-              param$tooltip6, param$tooltip7, "</b>"
+                                  big.mark = "."), "<br>","</b>",
+              "<b>", param$tooltip6, param$tooltip7, "</b>"
           ) %>%
             lapply(htmltools::HTML)
 
