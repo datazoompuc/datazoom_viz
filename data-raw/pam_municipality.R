@@ -3,62 +3,156 @@
 ##########
 ## Agregation level - MUNICIPALITY
 
-#all_crops
+#install newer version of datazoom.amazonia
+devtools::install_github("datazoompuc/datazoom.amazonia")
 
-##municipality (ainda nao salvo)
-pam_municipality_all_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
-#making data usable for datazoom viz f
+#libraries
+library(tidyverse)
+library(datazoom.amazonia)
+library(labelled)
 
-##saving 
-saveRDS(pam_municipality_all_crops,
-        file = "./data/pam_municipality_all_crops.rds"
-)
+##########################################
+##   update-and-download-pam function   ##
+##########################################
 
-#permanent_crops
+update_download_pam <- function(geo_level, dataset, time_period){
+    
+    #define empty vectors
+    time_period <- time_period
+    year_vector <- c()
+    year_exists_vector <- c()
+        
+    #check for existing files (the whole file with all the years, not yearly files)
+    if(file.exists(
+            paste0("./data/pam_", geo_level, "_", dataset, ".rds")
+            )[1]
+        ){
+        
+        #reads existing file
+        pam_old <- readRDS(paste0("./data/pam_", geo_level, "_",dataset,".rds")) %>%
+            labelled::remove_labels() #remove variable labels (for binding)
+        
+        #makes all variables class numeric
+        pam_old <- pam_old %>% mutate_all(~as.numeric(.))
+        
+        #get the names of the variables from the old dataset (we want the year variable)
+        old_variables <- colnames(pam_old)
+        
+        #get the bigger year from the old dataset as a number
+        year_max <- max(pam_old$ano) %>% 
+            as.numeric()
+        
+        #download the next year of pam (notice the 'year_max + 1' in the time period argument)
+        pam_update <- load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_max + 1, language = "pt") %>%
+            labelled::remove_labels() #remove variable labels (for binding)
+        
+        #makes all variables class numeric
+        pam_update <- pam_update %>% mutate_all(~as.numeric(.))
+        
+        #bind rows of new and old pam
+        pam_new <- bind_rows(pam_update, pam_old) %>% 
+            #select the variables that already were there
+            select(contains(old_variables))
+        
+        #change numerical variables to class numeric
+        pam_new$ano <- pam_new$ano %>% as.numeric()
+        pam_new$geo_id <- pam_new$geo_id %>% as.numeric()
+        
+        saveRDS(pam_new, file = paste0("./data/pam_", geo_level,"_", dataset,".rds"))
+        
+    } else #if the file doesnt exist, proceed here
+        { 
+            #makes a loop to check it there is yearly files for the dataset and municipality
+            #(if this part of the code doesn't make sense, keep reading and come back here later)
+            for(year_h in time_period){
+                
+                #saves all the years that are not downloaded
+                if((!file.exists("./data/pam_", geo_level, "_", dataset, year_h, ".rds"))[1]){
+                    year_vector <- c(year_vector, year_h)
+                    
+                } else {
+                    
+                    #saves all the years that are already downloaded
+                    year_exists_vector <- c(year_exists_vector, year_h)
+                    
+                }
+            }
+            
+        #create a loop that saves each year as a file
+        for(year_i in year_vector){
+            
+            #download one year of the pam dataset and geolevel requested
+            pam_yearly = load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_i, language = "pt")
+            
+            #save the file for that year
+            saveRDS(pam_yearly, file = paste0("./data/pam_", geo_level,"_", dataset, year_i, ".rds"))
+            
+        }
+        
+        #vector with all download years 
+            #(year_exists_vector contains years download previously)
+            #(year_vector contains years download now)
+        year_vector_total <- c(year_exists_vector, year_vector)
+        
+        #define an empty data.frame
+        pam_new <- data.frame()
+        
+        #bind yearly files to create new big file with all the years
+        for(year_j in year_vector_total){
+            
+            #read an yearly file
+            pam_df <- readRDS(file = paste0("./data/pam_", geo_level,"_", dataset, year_j, ".rds")) %>%  
+                remove_labels()
+            
+            #makes all variables class numeric
+            pam_df <- pam_df %>% mutate_all(~as.numeric(.))
+            
+            #bind the rows of this file with previously binded years
+            pam_new <- bind_rows(pam_new, pam_df)
+            
+            #makes all variables class numeric
+            pam_new <- pam_new %>% mutate_all(~as.numeric(.))
+            
+            #saves the final data.frame as a .rds file
+            saveRDS(pam_new, file = paste0("./data/pam_", geo_level,"_", dataset,".rds"))
+            
+            #remove all yearly files
+            for(year_k in year_vector_total){
+                #Define file path
+                file <- paste0("./data/pam_", geo_level,"_", dataset, year_k, ".rds")
+                
+                #Remove file
+                file.remove(file)
+        }
+        }
+    }
+    return(pam_new)
+}
 
-##municipality (ainda nao salvo)
-pam_municipality_permanent_crops= load_pam(dataset = 'pam_all_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
-#making data usable for datazoom viz
-##saving 
-saveRDS(pam_municipality_permanent_crops,
-        file = "./data/pam_municipality_permanent_crops.rds"
-)
+##########################
+##   use pam function   ##
+##########################
 
-#temporary_crops
+#dataset all_crops
+update_download_pam(dataset = "all_crops", geo_level = "municipality", time_period = 1974:2021)
 
-##municipality (ainda nao salvo)
-pam_municipality_temporary_crops= load_pam(dataset = 'pam_temporary_crops', raw_data = FALSE, 'municipality', 1974:2019, language = "pt")
-##making data usable for datazoom viz
-##saving f
-saveRDS(pam_municipality_temporary_crops,
-        file = "./data/pam_municipality_temporary_crops.rds"
-)
+#dataset permanent_crops
+update_download_pam(dataset = "permanent_crops", geo_level = "municipality", time_period = 1974:2021)
 
-#pam_xx (xx= corn, potato, peanut, beans)
+#dataset temporary_crops
+update_download_pam(dataset = "temporary_crops", geo_level = "municipality", time_period = 1974:2021)
 
-##municipality (ainda nao salvo)
-pam_municipality_corn= load_pam(dataset = 'pam_corn', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
-pam_municipality_potato= load_pam(dataset = 'pam_potato', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
-pam_municipality_peanut= load_pam(dataset = 'pam_peanut', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
-pam_municipality_beans= load_pam(dataset = 'pam_beans', raw_data = FALSE, 'municipality', 2003:2019, language = "pt")
+#dataset corn
+update_download_pam(dataset = "corn", geo_level = "municipality", time_period = 1974:2021)
 
-##making data usable for datazoom viz
+#dataset potato
+update_download_pam(dataset = "potato", geo_level = "municipality", time_period = 1974:2021)
 
-##saving 
-saveRDS(pam_municipality_corn,
-        file = "./data/pam_municipality_corn.rds"
-)
-saveRDS(pam_municipality_potato,
-        file = "./data/pam_municipality_potato.rds"
-)
-saveRDS(pam_municipality_peanut,
-        file = "./data/pam_municipality_peanut.rds"
-)
-saveRDS(pam_municipality_beans,
-        file = "./data/pam_municipality_beans.rds"
-)
+#dataset peanut
+update_download_pam(dataset = "peanut", geo_level = "municipality", time_period = 1974:2021)
 
-
+#dataset beans
+update_download_pam(dataset = "beans", geo_level = "municipality", time_period = 1974:2021)
 
 #########
 ### Creating metadatabase -> IBGE - PAM
@@ -101,7 +195,7 @@ metadata_pam_all_crops= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, c('Hectares', 'Hectares', '1K BRL'), rep(c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares','1K BRL'),66), rep(c('Hectares','Tons','Kg/Hectares','1K BRL'),4), c('Hectares', 'Hectares', 'Tons', 'Kg/Hectares','1K BRL')),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",354)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",354)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",354))
 )
 
@@ -217,7 +311,7 @@ metadata_pam_beans= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),4)),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",16)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",16)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
 )
 
@@ -245,7 +339,7 @@ metadata_pam_corn= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),3)),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",12)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",12)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
 )
 #saving 
@@ -273,7 +367,7 @@ metadata_pam_potato= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),4)),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",16)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",16)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",16))
 )
 #saving 
@@ -301,7 +395,7 @@ metadata_pam_peanut= tibble::tibble(
   source = "IBGE",
   tipo = 1,
   unidade = c(NA, NA, rep(c("Hectares","Hectares","Tons","Kg/Hectares"),3)),
-  categoria= c("Localizaçao","Unidade de Tempo" , rep("Agricultura",12)), 
+  categoria= c("Localiza?ao","Unidade de Tempo" , rep("Agricultura",12)), 
   subcategoria = c("Identificador Geografico","Ano da Pesquisa",rep("Especies - Cultivo",12))
 )
 #saving 
