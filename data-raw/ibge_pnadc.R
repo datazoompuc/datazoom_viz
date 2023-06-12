@@ -15,43 +15,41 @@ library(zoo)
 #################################################
 ## Mercado de Trabalho na Amazônia Legal
 ## Ouput data from:
-## Dinamismo Economico na Amazonia
-## github: https://github.com/FranciscoCavalcanti/Amazonia_Mercado_Trabalho
+## github: https://github.com/datazoompuc/datazoom_labour_amazon
 #################################################
 
 # set path to raw data
-user_folder_path <- "D:/Dropbox/" # set actual user data path
-github_folder_path <- "Amazonia_Mercado_Trabalho/build/output/" # set github structure path
+github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # call raw data
-base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
+base1 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
 base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas (PIA)")
 
-base2 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
+base2 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
 base2 <- base2 %>% mutate(id = "Restante do Brasil", composicao_demografica = "Todas as pessoas (PIA)")
 
-base3 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_rondonia.dta"))
+base3 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_rondonia.dta"))
 base3 <- base3 %>% mutate(id = "Rondônia", composicao_demografica = "Todas as pessoas (PIA)")
 
-base4 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_acre.dta"))
+base4 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_acre.dta"))
 base4 <- base4 %>% mutate(id = "Acre", composicao_demografica = "Todas as pessoas (PIA)")
 
-base5 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonas.dta"))
+base5 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonas.dta"))
 base5 <- base5 %>% mutate(id = "Amazonas", composicao_demografica = "Todas as pessoas (PIA)")
 
-base6 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_roraima.dta"))
+base6 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_roraima.dta"))
 base6 <- base6 %>% mutate(id = "Roraima", composicao_demografica = "Todas as pessoas (PIA)")
 
-base7 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_para.dta"))
+base7 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_para.dta"))
 base7 <- base7 %>% mutate(id = "Pará", composicao_demografica = "Todas as pessoas (PIA)")
 
-base8 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amapa.dta"))
+base8 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amapa.dta"))
 base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pessoas (PIA)")
 
-base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_tocantins.dta"))
+base9 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_tocantins.dta"))
 base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas (PIA)")
 
-base10 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_matogrosso.dta"))
+base10 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_matogrosso.dta"))
 base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas (PIA)")
 
 # append all data
@@ -347,46 +345,88 @@ temp_param_table$y[temp_param_table$var == "group"] <- FALSE
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
 
+##############################
+# Build Dictionary in English
+#############################
+
+# call data
+temp <- readRDS("./data/ibge_pnadc_trabalho.rds")
+
+# extract variables from data
+columns <- colnames(temp)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = TRUE,
+    label = columns,
+    desc = columns,
+    var_group = "IBGE - PNAD Contínua",
+    categoria = "Economia",
+    subcategoria = "Mercado de Trabalho"
+)
+
+# label variables
+temp_param_table$label[temp_param_table$var == "id"] <- "Region"
+temp_param_table$label[temp_param_table$var == "time"] <- "Quarter-year"
+temp_param_table$label[temp_param_table$var == "group"] <- "Region"
+temp_param_table$label[temp_param_table$var == "composicao_demografica"] <- "Demographic composition"
+temp_param_table$label[temp_param_table$var == "taxa_de_desemprego"] <- "Unemployment rate (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_ocupacao"] <- "Employment rate (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_participacao"] <- " Labor participation rate (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_informalidade"] <- "Informality rate (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_desalento"] <- "Rate of discouragement (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_nemnem"] <- "Neither-Nor rate (%)"
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "id"] <- FALSE
+temp_param_table$y[temp_param_table$var == "composicao_demografica"] <- FALSE
+temp_param_table$y[temp_param_table$var == "time"] <- FALSE
+temp_param_table$y[temp_param_table$var == "group"] <- FALSE
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
 
 #################################################
 ## Inserção no Mercado de Trabalho na Amazônia Legal
 ## Input data from:
-## github: https://github.com/FranciscoCavalcanti/Amazonia_Mercado_Trabalho
+## github: https://github.com/datazoompuc/datazoom_labour_amazon
 #################################################
 
 # set path to raw data
-user_folder_path <- "D:/Dropbox/" # set actual user data path
-github_folder_path <- "Amazonia_Mercado_Trabalho/build/output/" # set github structure path
+github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # call raw data
-base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
+base1 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
 base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas (PIA)")
 
-base2 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
+base2 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
 base2 <- base2 %>% mutate(id = "Restante do Brasil", composicao_demografica = "Todas as pessoas (PIA)")
 
-base3 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_rondonia.dta"))
+base3 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_rondonia.dta"))
 base3 <- base3 %>% mutate(id = "Rondônia", composicao_demografica = "Todas as pessoas (PIA)")
 
-base4 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_acre.dta"))
+base4 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_acre.dta"))
 base4 <- base4 %>% mutate(id = "Acre", composicao_demografica = "Todas as pessoas (PIA)")
 
-base5 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amazonas.dta"))
+base5 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonas.dta"))
 base5 <- base5 %>% mutate(id = "Amazonas", composicao_demografica = "Todas as pessoas (PIA)")
 
-base6 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_roraima.dta"))
+base6 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_roraima.dta"))
 base6 <- base6 %>% mutate(id = "Roraima", composicao_demografica = "Todas as pessoas (PIA)")
 
-base7 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_para.dta"))
+base7 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_para.dta"))
 base7 <- base7 %>% mutate(id = "Pará", composicao_demografica = "Todas as pessoas (PIA)")
 
-base8 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_amapa.dta"))
+base8 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amapa.dta"))
 base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pessoas (PIA)")
 
-base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_tocantins.dta"))
+base9 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_tocantins.dta"))
 base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas (PIA)")
 
-base10 <- read_dta(paste0(user_folder_path, github_folder_path, "_estrutura_emprego_matogrosso.dta"))
+base10 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_matogrosso.dta"))
 base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas (PIA)")
 
 # append all data
@@ -712,35 +752,79 @@ temp_param_table$y[temp_param_table$var == "group"] <- FALSE
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_insercao_dic.csv", fileEncoding = "UTF-8")
 
+#############################
+# Build Dictionary in English
+#############################
+
+# call data
+temp <- readRDS("./data/ibge_pnadc_trabalho_insercao.rds")
+
+# extract variables from data
+columns <- colnames(temp)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = TRUE,
+    label = columns,
+    desc = columns,
+    var_group = "IBGE - PNAD Contínua",
+    categoria = "Economia",
+    subcategoria = "Inserção no Trabalho"
+)
+
+# relabel variables
+temp_param_table$label[temp_param_table$var == "id"] <- "Region"
+temp_param_table$label[temp_param_table$var == "time"] <- "Quarter-year"
+temp_param_table$label[temp_param_table$var == "group"] <- "Region"
+temp_param_table$label[temp_param_table$var == "composicao_demografica"] <- "Demographic composition"
+temp_param_table$label[temp_param_table$var == "prop_empregadoCC"] <- "Proportion of people with a formal contract in relation to employed persons (%)"
+temp_param_table$label[temp_param_table$var == "prop_empregadoSC"] <- "Proportion of people without a formal contract in relation to employed persons (%)"
+temp_param_table$label[temp_param_table$var == "prop_empregador"] <- "Proportion of employers in relation to the employed persons (%)"
+temp_param_table$label[temp_param_table$var == "prop_cpropriaC"] <- "Proportion of self-employed people who contribute in relation to employed persons (%)"
+temp_param_table$label[temp_param_table$var == "prop_cpropriaNc"] <- "Proportion of self-employed people who do not contribute in relation to employed persons (%)"
+temp_param_table$label[temp_param_table$var == "prop_militar"] <- "Proportion of civil servants and military in relation to employed persons (%)"
+temp_param_table$label[temp_param_table$var == "taxa_de_informalidade"] <- "Informality rate(%)"
+
+# block variables in graphs y-axis
+temp_param_table$y[temp_param_table$var == "id"] <- FALSE
+temp_param_table$y[temp_param_table$var == "composicao_demografica"] <- FALSE
+temp_param_table$y[temp_param_table$var == "time"] <- FALSE
+temp_param_table$y[temp_param_table$var == "group"] <- FALSE
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_insercao_dic_en.csv", fileEncoding = "UTF-8")
+
 #################################################
 ## Atividade Econômica na Amazônia Legal
 ## Ouput data from:
 ## Dinamismo Economico na Amazonia
-## github: https://github.com/FranciscoCavalcanti/Amazonia_Dinamismo_Economico
+## github: https://github.com/datazoompuc/datazoom_labour_amazon
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
-github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
+github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Economic_Dynamism/output/" # set github structure path
 
 # call raw data
-base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ac_numero_ocupados_por_atividade_2digitos.dta"))
+base1 <- read_dta(paste0(github_folder_path, "_amz_ac_numero_ocupados_por_atividade_2digitos.dta"))
 base1 <- base1 %>% mutate(UF = "AC")
-base2 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_am_numero_ocupados_por_atividade_2digitos.dta"))
+base2 <- read_dta(paste0(github_folder_path, "_amz_am_numero_ocupados_por_atividade_2digitos.dta"))
 base2 <- base2 %>% mutate(UF = "AM")
-base3 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ap_numero_ocupados_por_atividade_2digitos.dta"))
+base3 <- read_dta(paste0(github_folder_path, "_amz_ap_numero_ocupados_por_atividade_2digitos.dta"))
 base3 <- base3 %>% mutate(UF = "AP")
-base4 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ma_numero_ocupados_por_atividade_2digitos.dta"))
+base4 <- read_dta(paste0(github_folder_path, "_amz_ma_numero_ocupados_por_atividade_2digitos.dta"))
 base4 <- base4 %>% mutate(UF = "MA")
-base5 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_mt_numero_ocupados_por_atividade_2digitos.dta"))
+base5 <- read_dta(paste0(github_folder_path, "_amz_mt_numero_ocupados_por_atividade_2digitos.dta"))
 base5 <- base5 %>% mutate(UF = "MT")
-base6 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_pa_numero_ocupados_por_atividade_2digitos.dta"))
+base6 <- read_dta(paste0(github_folder_path, "_amz_pa_numero_ocupados_por_atividade_2digitos.dta"))
 base6 <- base6 %>% mutate(UF = "PA")
-base7 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ro_numero_ocupados_por_atividade_2digitos.dta"))
+base7 <- read_dta(paste0(github_folder_path, "_amz_ro_numero_ocupados_por_atividade_2digitos.dta"))
 base7 <- base7 %>% mutate(UF = "RO")
-base8 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_rr_numero_ocupados_por_atividade_2digitos.dta"))
+base8 <- read_dta(paste0(github_folder_path, "_amz_rr_numero_ocupados_por_atividade_2digitos.dta"))
 base8 <- base8 %>% mutate(UF = "RR")
-base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_to_numero_ocupados_por_atividade_2digitos.dta"))
+base9 <- read_dta(paste0(github_folder_path, "_amz_to_numero_ocupados_por_atividade_2digitos.dta"))
 base9 <- base9 %>% mutate(UF = "TO")
 
 # append all data
@@ -748,6 +832,7 @@ temp <- rbind(base1, base2, base3, base4, base5, base6, base7, base8, base9)
 
 # remove rows with missing data
 temp <- na.omit(temp)
+
 temp <- temp %>%
   filter(titulo != "")
 
@@ -818,35 +903,86 @@ temp_param_table$y[13] <- FALSE # Estado
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
 
+#############################
+# Build Dictionary in English
+############################
+
+# extract variables from data
+columns <- colnames(temp)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = TRUE,
+    size = TRUE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "IBGE - PNAD Contínua",
+    tipo = 1,
+    categoria = "Economia",
+    subcategoria = "Mercado de trabalho"
+)
+
+# relabel in english
+
+temp_param_table$label[1] <- "Economic Activity"
+temp_param_table$label[2] <- "Quarter-year"
+temp_param_table$label[3] <- "Economic Activity"
+temp_param_table$label[4] <- "Employed persons"
+temp_param_table$label[5] <- "Employed persons in the formal sector"
+temp_param_table$label[6] <- "Employed persons in the informal sector"
+temp_param_table$label[7] <- "Employed persons in the public sector"
+temp_param_table$label[8] <- "Employed persons in the private sector"
+temp_param_table$label[9] <- "Mean monthly income"
+temp_param_table$label[10] <- "Mean monthly income in the formal sector"
+temp_param_table$label[11] <- "Mean monthly income in the informal sector"
+temp_param_table$label[12] <- " Total wage"
+temp_param_table$label[13] <- "State"
+
+
+
+# block variables in graphs y-axis
+temp_param_table$y[1] <- FALSE # Recorte regional
+temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[3] <- FALSE # "Atividade econômica"
+temp_param_table$y[13] <- FALSE # Estado
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic_en.csv", fileEncoding = "UTF-8")
+
+
+
 #################################################
 ## Ocupações na Amazônia Legal
 ## Ouput data from:
 ## Dinamismo Economico na Amazonia
-## github: https://github.com/FranciscoCavalcanti/Amazonia_Dinamismo_Economico
+## github: https://github.com/datazoompuc/datazoom_labour_amazon
 #################################################
 
 # set path to raw data
-user_folder_path <- "C:/Users/DELL/Documents/GitHub/" # set actual user data path
-github_folder_path <- "Amazonia_Dinamismo_Economico/build/output/" # set github structure path
+github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Economic_Dynamism/output/" # set github structure path
 
 # call raw data
-base1 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ac_numero_ocupados_por_ocupacao_2digitos.dta"))
+base1 <- read_dta(paste0(github_folder_path, "_amz_ac_numero_ocupados_por_ocupacao_2digitos.dta"))
 base1 <- base1 %>% mutate(UF = "AC")
-base2 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_am_numero_ocupados_por_ocupacao_2digitos.dta"))
+base2 <- read_dta(paste0(github_folder_path, "_amz_am_numero_ocupados_por_ocupacao_2digitos.dta"))
 base2 <- base2 %>% mutate(UF = "AM")
-base3 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ap_numero_ocupados_por_ocupacao_2digitos.dta"))
+base3 <- read_dta(paste0(github_folder_path, "_amz_ap_numero_ocupados_por_ocupacao_2digitos.dta"))
 base3 <- base3 %>% mutate(UF = "AP")
-base4 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ma_numero_ocupados_por_ocupacao_2digitos.dta"))
+base4 <- read_dta(paste0(github_folder_path, "_amz_ma_numero_ocupados_por_ocupacao_2digitos.dta"))
 base4 <- base4 %>% mutate(UF = "MA")
-base5 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_mt_numero_ocupados_por_ocupacao_2digitos.dta"))
+base5 <- read_dta(paste0(github_folder_path, "_amz_mt_numero_ocupados_por_ocupacao_2digitos.dta"))
 base5 <- base5 %>% mutate(UF = "MT")
-base6 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_pa_numero_ocupados_por_ocupacao_2digitos.dta"))
+base6 <- read_dta(paste0(github_folder_path, "_amz_pa_numero_ocupados_por_ocupacao_2digitos.dta"))
 base6 <- base6 %>% mutate(UF = "PA")
-base7 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_ro_numero_ocupados_por_ocupacao_2digitos.dta"))
+base7 <- read_dta(paste0(github_folder_path, "_amz_ro_numero_ocupados_por_ocupacao_2digitos.dta"))
 base7 <- base7 %>% mutate(UF = "RO")
-base8 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_rr_numero_ocupados_por_ocupacao_2digitos.dta"))
+base8 <- read_dta(paste0(github_folder_path, "_amz_rr_numero_ocupados_por_ocupacao_2digitos.dta"))
 base8 <- base8 %>% mutate(UF = "RR")
-base9 <- read_dta(paste0(user_folder_path, github_folder_path, "_amz_to_numero_ocupados_por_ocupacao_2digitos.dta"))
+base9 <- read_dta(paste0(github_folder_path, "_amz_to_numero_ocupados_por_ocupacao_2digitos.dta"))
 base9 <- base9 %>% mutate(UF = "TO")
 
 # append all data
@@ -920,3 +1056,49 @@ temp_param_table$y[13] <- FALSE # Estado
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
+
+#############################
+# Build Dictionary in English
+############################
+
+# extract variables from data
+columns <- colnames(temp)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = TRUE,
+    label = columns,
+    desc = columns,
+    var_group = "PNADC IBGE",
+    tipo = 1,
+    categoria = "Economia",
+    subcategoria = "Trabalho"
+)
+
+# label variables
+temp_param_table$label[1] <- "Occupation"
+temp_param_table$label[2] <-  "Quarter-year"
+temp_param_table$label[3] <- "Ocupação"
+temp_param_table$label[4] <- "Employed persons"
+temp_param_table$label[5] <- "Employed persons in the formal sector"
+temp_param_table$label[6] <- "Employed persons in the informal sector"
+temp_param_table$label[7] <- "Employed persons in the public sector"
+temp_param_table$label[8] <- "Employed persons in the private sector"
+temp_param_table$label[9] <- "Mean monthly income"
+temp_param_table$label[10] <- "Mean monthly income in the formal sector"
+temp_param_table$label[11] <- "Mean monthly income in the informal sector"
+temp_param_table$label[12] <- "Total wage"
+temp_param_table$label[13] <- "State"
+
+# block variables in graphs y-axis
+temp_param_table$y[1] <- FALSE # Ocupação
+temp_param_table$y[2] <- FALSE # Ano-Trimestre
+temp_param_table$y[3] <- FALSE # Ocupação
+temp_param_table$y[13] <- FALSE # Estado
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/ibge_pnadc_cod_dic_en.csv", fileEncoding = "UTF-8")
+

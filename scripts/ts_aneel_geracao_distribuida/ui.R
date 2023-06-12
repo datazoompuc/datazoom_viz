@@ -29,7 +29,7 @@ get_ui <- function(files, param) {
           # Seleciona variável do eixo y
           selectInput(
             inputId = "y",
-            label = "Eixo vertical (y)",
+            label = param$label_y_name,
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -42,7 +42,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          "Selecione recorte regional",
+          param$label_region_name,
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
@@ -51,11 +51,11 @@ get_ui <- function(files, param) {
         
         # espaço vazio
         div(class = "fakecheckbox", ),
-          p(class = "vars", "FILTROS:"),      
+          p(class = "vars", param$label_var_name),      
         # Seleciona filtro de modalidade empreendimento
         selectInput(
           "filter_sig_modalidade_empreendimento",
-          "Modalidade de empreendimento",
+          param$label_type_name,
           choices = NULL,
           selected = param$filter_sig_modalidade_empreendimento_def,
           width = "100%"
@@ -63,7 +63,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de tipo geracao
         selectInput(
           "filter_dsc_fonte_geracao",
-          "Fonte de gera\u00e7\u00e3o",
+          param$label_source_name,
           choices = NULL,
           selected = param$filter_dsc_fonte_geracao_def,
           width = "100%"
@@ -71,7 +71,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de tipo porte
         selectInput(
           "filter_dsc_porte",
-          "Porte do Empreendimento",
+          param$label_size_name,
           choices = NULL,
           selected = param$filter_dsc_porte_def,
           width = "100%"
@@ -84,7 +84,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_ts_aneel_geracao_distribuida/', '_blank')")
+                              onclick = paste0("window.open('", param$link, "', '_blank')"))
         ),
       ),
       column(9,

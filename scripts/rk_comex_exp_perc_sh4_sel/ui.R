@@ -24,13 +24,13 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", "VARI\u00C1VEIS:"),
+        p(class = "vars", param$u1),
         div(
           class = "var_selec_group",
           # Seleciona variável de cor
           selectInput(
             inputId = "filter",
-            label = "Tipos de Produto:",
+            label = param$ui2,
             choices = param$filter_choices,
             selected = param$filter_def,
             width = "100%"
@@ -42,7 +42,7 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = "window.open('https://datazoom.shinyapps.io/app_rk_comex_exp_perc_sh4_sel/', '_blank')")
+                              onclick = paste0("window.open('", param$ui3, "', '_blank')"))
         ),
       ),
       column(9,

@@ -10,13 +10,14 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
+   
   server <- function(input, output, session) {
-    
+      
     # Carrega dados
     df <- readRDS(files$db_file)
 
     # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
+    param$filter_choices <- sort(unique(df$group)) #nao tem nada chamamado de group
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
     
     # Funcão para preencher inputs com coluna/variável aleatória
@@ -39,7 +40,7 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?","y=",input$y,
-        "&","ylog=",input$ylog,
+
         "&","y_option=",input$y_option
       )
       
@@ -72,10 +73,6 @@ get_server <- function(files, param) {
                           selected = query[['y']])
       } 
       
-      if (!is.null(query[['ylog']])) {
-        updateCheckboxInput(session, "ylog",
-                            value = (query[['ylog']] == "TRUE"))
-      }
 
       if (!is.null(query[['y_option']])) {
         updateCheckboxInput(session, "y_option",
@@ -121,7 +118,7 @@ get_server <- function(files, param) {
       if(is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <-  paste0("por hectare")
+        text <-  paste0(param$subtitle_init)
       }
       
       text
@@ -142,7 +139,7 @@ get_server <- function(files, param) {
         
         #Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
         # Cria dataframe do gráfico
-        x_col <- param$table[which(param$table$var == param$x_def),]
+        x_col <- param$table[which(param$table$var == param$x_def),] #achei estranho aqui
         y_col <- param$table[which(param$table$var == input$y),]
         id_col <- param$table[which(param$table$var == param$id_def), ]
         color_col <- param$table[which(param$table$var == param$color_def), ]
@@ -153,7 +150,9 @@ get_server <- function(files, param) {
         df_p <- data.frame(df_filtered[x_col$var],
                            df_filtered[y_col$var],
                            df_filtered[color_col$var]
-        )
+        ) 
+        
+        
         colnames(df_p) <- c("x", "y", "color")
         df_p$group <- df_filtered$group
         df_p$text <- df_p$group
@@ -185,11 +184,18 @@ get_server <- function(files, param) {
         df_p$tooltip <- paste0(
           "<b>",df_p$text,"</b><br>",
           x_col$label,": ",df_p$x,"<br>",
-          y_col$label,": ",df_p$y,"<br>"
+          y_col$label,": ",format(df_p$y, scientific = FALSE,
+                                  digits = 2,
+                                  decimal.mark = ",", 
+                                  big.mark = "."), " ", "(ha)"
         )
         
         # Define paleta de cores
         pallete <- pallete_discrete
+       
+        
+        df_p <- df_p %>%
+            arrange(group,x)
         
         # Monta gráfico
         fig_p <- plot_ly(df_p, 
@@ -198,7 +204,10 @@ get_server <- function(files, param) {
                          color = ~group,
                          type = "scatter", 
                          mode = "lines",
-                         text = ~tooltip
+                         text = ~tooltip,
+                         textposition= "none",
+                         hoverinfo = "text"
+                         
         )
         
         # Layout eixos
@@ -206,7 +215,7 @@ get_server <- function(files, param) {
           title = x_col$label,
           titlefont = f1,
           tickfont = f2,
-          automargin = FALSE,
+          automargin = TRUE,
           autorange = TRUE,
           showgrid = FALSE,
           zeroline = FALSE
@@ -221,9 +230,7 @@ get_server <- function(files, param) {
           zeroline = FALSE
         )
         
-        if (input$ylog & is.numeric(df_p$y)) {
-          y_axis_layout$type <- "log"
-        }
+        
 
         if (input$y_option) {
           y_axis_layout$title <- paste0(y_col$label, "*")

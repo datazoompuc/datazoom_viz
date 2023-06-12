@@ -412,22 +412,31 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Comex",
   tipo = 1,
-  unidade = "% das exporta\u00e7\u00f5es mundiais",
+  unidade = "-",
   categoria= "Economia", 
   subcategoria = "Com\u00e9rcio exterior"
 )
 
 temp_param_table$label <- temp_param_table$var
-temp_param_table$label[1] <- "Ano"
-temp_param_table$label[2] <- "Municipio"
-temp_param_table$label[3] <- "Valor relativo do principal produto exportado"
-temp_param_table$label[4] <- "Principal produto exportado"
-temp_param_table$label[6] <- "Produtos Compat\u00edveis com a Floresta"
-temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
-temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
-temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE)
-temp_param_table$size <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE)
-temp_param_table$slider <- c(TRUE, rep(FALSE, 11))
+
+temp_param_table$label[temp_param_table$var == 'cod_ibge'] <- "C\u00f3digo IBGE"
+temp_param_table$label[temp_param_table$var == 'time'] <- "Ano"
+temp_param_table$label[temp_param_table$var == 'uf'] <- "Estado"
+temp_param_table$label[temp_param_table$var == 'nm_municip'] <- "Munic\u00edpio"
+temp_param_table$label[temp_param_table$var == 'maximo_produto'] <- "Valor relativo do principal produto exportado"
+temp_param_table$label[temp_param_table$var == 'produto_principal'] <- "Principal produto exportado (sh2)"
+temp_param_table$label[temp_param_table$var == 'floresta'] <- "Produtos Compat\u00edveis com a Floresta"
+temp_param_table$label[temp_param_table$var == 'cod_sh4'] <- "C\u00f3digo no sistema unificado 4"
+temp_param_table$label[temp_param_table$var == 'cod_sh2'] <- "C\u00f3digo no sistema unificado 2"
+temp_param_table$label[temp_param_table$var == 'nome_sh2'] <- "Nome no sistema unificado 2"
+
+temp_param_table$unidade[temp_param_table$var == 'maximo_produto'] <- "% das exporta\u00e7\u00f5es mundiais"
+
+temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$size <- c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$slider <- c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_sel_dic.csv", fileEncoding = "UTF-8")

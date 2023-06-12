@@ -64,7 +64,7 @@ data= data%>%
                         group == "Crustáceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crustáceos com casca, cozidos em água ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, pó e pellets de crustáceos, pr" ~ "Crustaceos vivos ou não, para alimento",
                         group == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Cocos e castanhas do Brasil e de caju",
                         group == "Frutas, não cozidas ou cozidas em água ou vapor, congeladas, mesmo adicionadas de açúcar ou de outros edulcorantes" ~ "Frutas cozidas ou não, misturadas ou não",
-                        group == "Pimenta (do gênero Piper); pimentos dos gêneros Capsicum ou Pimenta, secos ou triturados ou em pó" ~ "Pimentas secas ou trituradas",
+                        group == "Pimenta (do género Piper); pimentos dos géneros Capsicum ou Pimenta, secos ou triturados ou em pó" ~ "Pimentas secas ou trituradas",
                         group == "Outras sementes e frutos oleaginosos, mesmo triturados" ~ "Outras sementes e oleaginosos",
                         group == "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (bálsamos por exemplo), naturais" ~ "Gomas e resinas naturais",
                         group == "Óleo de palma e respectivas fracções, mesmo refinados, mas não quimicamente modificados" ~ "Óleo de palma não modificado",
@@ -76,7 +76,7 @@ data= data%>%
 
 saveRDS(data, "data/comex_exp_perc_sh4_sel.rds")
 
-
+# dictionary --------------------------------------------------------------
 ### exportação total da amazônia por tipo sh4
 datafinal <- readRDS(file = "data/comex_exp_perc_sh4_sel.rds")
 
@@ -137,3 +137,21 @@ temp_param_table$slider[temp_param_table$var == "floresta"] <- FALSE
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic.csv", fileEncoding = "UTF-8")
+
+# relabel in english ----------------------------------------------------------------
+temp_param_table$unidade <- "% of world exports"
+temp_param_table$categoria <- "Economy"
+temp_param_table$subcategoria <- "Foreign trade"
+
+temp_param_table$label[temp_param_table$var == "group"] <- "Product (SH4)"
+temp_param_table$label[temp_param_table$var == "time"] <- "Year"
+temp_param_table$label[temp_param_table$var == "value"] <- "Value"
+temp_param_table$label[temp_param_table$var == "floresta"] <- "Forest"
+
+temp_param_table$desc[temp_param_table$var == "group"] <- "Product (SH4)"
+temp_param_table$desc[temp_param_table$var == "time"] <- "Year"
+temp_param_table$desc[temp_param_table$var == "value"] <- "Value"
+temp_param_table$desc[temp_param_table$var == "floresta"] <- "Forest Compatible Products"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic_en.csv", fileEncoding = "UTF-8")

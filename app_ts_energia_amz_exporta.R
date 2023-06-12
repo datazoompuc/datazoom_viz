@@ -34,6 +34,17 @@ param$id_def <- "" # variável padrão de id
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Dados de Energia do EPE sobre propor\u00e7\u00e3o de produ\u00e7\u00e3o, consumo e consumidores de energia"
 
+### Parametros especificos no UI
+param$label_var_name <- "VARIÁVEIS:"
+param$label_y_name <- "eixo vertical (y)"
+param$label_scale_name <- "escala log"
+param$label_prop_name <- "proporcional ao ano inicial (*)"
+param$label_geo_name <- "Subdivisão geográfica"
+
+param$link <- "https://datazoom.shinyapps.io/app_ts_energia_amz_exporta/"
+
+### Parametros especificos no server
+param$translate_names <- FALSE
 
 # Outros parâmetros e configurações
 param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal"),

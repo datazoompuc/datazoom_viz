@@ -160,6 +160,7 @@ saveRDS(db_sistemas_isolados, "data/energia_sistemas_isolados.rds")
 
 
 # dictionary --------------------------------------------------------------
+db_sistemas_isolados <- read_rds("data/energia_sistemas_isolados.rds")
 
 # extract variables from data
 columns_db_sistemas_isolados <- colnames(db_sistemas_isolados)
@@ -184,12 +185,12 @@ temp_param_table <- tibble(
 
 temp_param_table$label <- temp_param_table$var
 
-temp_param_table$var_group[2:6] <- "Orçamento CCC - ANEEL"
+temp_param_table$var_group[2:6] <- "Orçamento CDE (Conta de Desenvolvimento Energético) - ANEEL"
 temp_param_table$var_group[7:11] <- "Consumo de Eletricidade - EPE"
 temp_param_table$var_group[12:13] <- "Média de Consumidores - EPE"
 
 temp_param_table$unidade[2:3] <- "Bilhões de R$"
-temp_param_table$unidade[4] <- "% do Orçamento da Conta de Desenvolvimento Energético"
+temp_param_table$unidade[4] <- "% do Orçamento da CDE"
 temp_param_table$unidade[5:6] <- "Bilhões de R$"
 temp_param_table$unidade[7:11] <- "Milhões de MWh"
 temp_param_table$unidade[12:13] <- "Milhões de Consumidores"
@@ -201,3 +202,33 @@ temp_param_table$y <- c(FALSE, rep(TRUE, 12))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_sistemas_isolados_dic.csv", fileEncoding = "UTF-8")
+
+
+# translate to english --------------------------------------------------------------
+temp_param_table$label[temp_param_table$var == "Ano"] <- "Year"
+temp_param_table$label[temp_param_table$var == "Despesas Estimadas CCC (Nominal)"] <- "Estimated Expenses CCC (Nominal)"
+temp_param_table$label[temp_param_table$var == "Despesas Estimadas CCC (Real, R$ 2021)"] <- "Estimated Expenses CCC (Real, R$ 2021)"
+temp_param_table$label[temp_param_table$var == "Participação da CCC no Orçamento Total da CDE"] <- "CCC Participation in the Total Energy Development Account Budget"
+temp_param_table$label[temp_param_table$var == "Despesas Estimadas no Orçamento da CDE (Nominal)"] <- "Estimated Expenses in the Energy Development Account Budget (Nominal)"
+temp_param_table$label[temp_param_table$var == "Despesas Estimadas no Orçamento da CDE (Real, R$ 2021)"] <- "Estimated Expenses in the Energy Development Account Budget (Real, R$ 2021)"
+temp_param_table$label[temp_param_table$var == "Consumo Total"] <- "Total Consumption"
+temp_param_table$label[temp_param_table$var == "Consumo Residencial"] <- "Residential Consumption"
+temp_param_table$label[temp_param_table$var == "Consumo Industrial"] <- "Industrial Consumption"
+temp_param_table$label[temp_param_table$var == "Consumo Comercial"] <- "Comercial Consumption"
+temp_param_table$label[temp_param_table$var == "Consumo Outros"] <- "Other Consumption"
+temp_param_table$label[temp_param_table$var == "Consumidores Totais"] <- "Total Consumers"
+temp_param_table$label[temp_param_table$var == "Consumidores Residenciais"] <- "Residential Consumers"
+
+temp_param_table$var_group[2:6] <- "CDE Budget - ANEEL"
+temp_param_table$var_group[7:11] <- "Eletricity Consumption - EPE"
+temp_param_table$var_group[12:13] <- "Average of Consumers - EPE"
+
+temp_param_table$unidade[2:3] <- "R$ Billions"
+temp_param_table$unidade[4] <- "% of the Energy Development Account Budget"
+temp_param_table$unidade[5:6] <- "R$ Billions"
+temp_param_table$unidade[7:11] <- "MWh Millions"
+temp_param_table$unidade[12:13] <- "Millions of Consumers"
+
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/energia_sistemas_isolados_dic_en.csv", fileEncoding = "UTF-8")

@@ -211,41 +211,41 @@ temp_param_table <- tibble(
 
 # label variables
 
-temp_param_table$label[temp_param_table$var == "front_2020"] <- "Categoria numérica de munic\u00edpio"
-temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Categoria de munic\u00edpio"
+temp_param_table$label[temp_param_table$var == "front_2020"] <- "Categoria numérica de município"
+temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Categoria de município"
 
 temp_param_table$label[temp_param_table$var == "ips_amazonia_2021"] <- "Indice de Progresso Social 2021"
 temp_param_table$label[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "Qualidade da educação IDEB 2019"
 
-temp_param_table$label[temp_param_table$var == "desmatado"] <- "\u00c1rea total desmatada"
-temp_param_table$label[temp_param_table$var == "floresta"] <- "\u00c1rea total florestal"
-temp_param_table$label[temp_param_table$var == "prop_desmatado"] <- "Proporção média de desmatamento pela \u00c1rea"
-temp_param_table$label[temp_param_table$var == "prop_floresta"] <- "Proporção média de floresta pela \u00c1rea"
+temp_param_table$label[temp_param_table$var == "desmatado"] <- "Área total desmatada"
+temp_param_table$label[temp_param_table$var == "floresta"] <- "Área total florestal"
+temp_param_table$label[temp_param_table$var == "prop_desmatado"] <- "Proporção média de desmatamento pela área"
+temp_param_table$label[temp_param_table$var == "prop_floresta"] <- "Proporção média de floresta pela área"
 
 temp_param_table$label[temp_param_table$var == "quant_v40124"] <- "Quantidade de soja"
 temp_param_table$label[temp_param_table$var == "num_v2670"] <- "Quantidade de rebanho bovino"
 
-temp_param_table$label[temp_param_table$var == "pib_percapita_preco_corrente"] <- "PIB percapita de 2019"
-temp_param_table$label[temp_param_table$var == "populacao"] <- "Popula\u00e7\u00e3o m\u00e9dia municipal em 2019"
+temp_param_table$label[temp_param_table$var == "pib_percapita_preco_corrente"] <- "PIB per capita de 2019"
+temp_param_table$label[temp_param_table$var == "populacao"] <- "População média municipal em 2019"
 temp_param_table$label[temp_param_table$var == "population_density"] <- "Densidade populacional em 2019"
 
 # unidade de medida das variaveis
 
-temp_param_table$unidade[temp_param_table$var == "ips_amazonia_2021"] <- "\u00cdndice de 0 a 100"
+temp_param_table$unidade[temp_param_table$var == "ips_amazonia_2021"] <- "Índice de 0 a 100"
 temp_param_table$unidade[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "Nota IDEB (0-10)"
 
-temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km2 em 2021"
-temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km2 em 2021"
+temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km²  em 2021"
+temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km² em 2021"
 
 temp_param_table$unidade[temp_param_table$var == "prop_desmatado"] <- "Percentual em 2021"
 temp_param_table$unidade[temp_param_table$var == "prop_floresta"] <- "Percentual em 2021"
 
-temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- "Gr\u00e3os em 2019"
+temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- "Grãos em 2019"
 temp_param_table$unidade[temp_param_table$var == "num_v2670"] <- "Cabeça de animais em 2019"
 
 temp_param_table$unidade[temp_param_table$var == "pib_percapita_preco_corrente"] <- "R$ em 2019"
 temp_param_table$unidade[temp_param_table$var == "populacao"] <- "Pessoas"
-temp_param_table$unidade[temp_param_table$var == "population_density"] <- "Pessoas por km2"
+temp_param_table$unidade[temp_param_table$var == "population_density"] <- "Pessoas por km²"
 
 # var_group variables
 
@@ -332,3 +332,156 @@ temp_param_table$y[temp_param_table$var == "front_2020_label"] <- FALSE #
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_varias_amazonias_cross_section_dic.csv", fileEncoding = "UTF-8")
+
+##############################
+# Build Dictionary in English
+#############################
+
+# call data
+dz_varias_amazonias_cross_section <- readRDS("./data/dz_varias_amazonias_cross_section.rds")
+
+# extract variables from data
+columns <- colnames(dz_varias_amazonias_cross_section)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = FALSE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    geometry = FALSE,
+    label = columns,
+    desc = columns,
+    groups = columns,
+    var_group = "Fonte de dados",
+    source = "Fonte de dados",
+    unidade = "Unidade de medida",
+    categoria = "Categoria principal",
+    subcategoria = "Subcategoria"
+)
+
+# label variables
+
+temp_param_table$label[temp_param_table$var == "front_2020"] <- "Numeric Municipal Category"
+temp_param_table$label[temp_param_table$var == "front_2020_label"] <- "Municipal Category"
+
+temp_param_table$label[temp_param_table$var == "ips_amazonia_2021"] <- "Social Progress Index 2021"
+temp_param_table$label[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "Quality of education IDEB 2019"
+
+temp_param_table$label[temp_param_table$var == "desmatado"] <- "Total deforested area"
+temp_param_table$label[temp_param_table$var == "floresta"] <- "Total forest area"
+temp_param_table$label[temp_param_table$var == "prop_desmatado"] <- "Average proportion of deforestation by area"
+temp_param_table$label[temp_param_table$var == "prop_floresta"] <- "Average proportion of forest by area"
+
+temp_param_table$label[temp_param_table$var == "quant_v40124"] <- "Amount of soya"
+temp_param_table$label[temp_param_table$var == "num_v2670"] <- "Amount of cattle herd"
+
+temp_param_table$label[temp_param_table$var == "pib_percapita_preco_corrente"] <- "2019 PIB percapita"
+temp_param_table$label[temp_param_table$var == "populacao"] <- "Average municipal population in 2019"
+temp_param_table$label[temp_param_table$var == "population_density"] <- "Population density in 2019"
+
+# unidade de medida das variaveis
+
+temp_param_table$unidade[temp_param_table$var == "ips_amazonia_2021"] <- "Index from 0 to 100"
+temp_param_table$unidade[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "IDEB Grade (0-10)"
+
+temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km2 in 2021"
+temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km2 in 2021"
+
+temp_param_table$unidade[temp_param_table$var == "prop_desmatado"] <-"Percentage in 2021"
+temp_param_table$unidade[temp_param_table$var == "prop_floresta"] <- "Percentage in 2021"
+
+temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- "Gr\u00e3os in 2019"
+temp_param_table$unidade[temp_param_table$var == "num_v2670"] <- "Animal heads in 2019"
+
+temp_param_table$unidade[temp_param_table$var == "pib_percapita_preco_corrente"] <- "R$ in 2019"
+temp_param_table$unidade[temp_param_table$var == "populacao"] <- "Population"
+temp_param_table$unidade[temp_param_table$var == "population_density"] <- "People per km2"
+
+# var_group variables
+
+temp_param_table$var_group[temp_param_table$var == "front_2020"] <- "IMAZON"
+temp_param_table$var_group[temp_param_table$var == "front_2020_label"] <- "IMAZON"
+temp_param_table$var_group[temp_param_table$var == "ips_amazonia_2021"] <- "IMAZON"
+temp_param_table$var_group[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "IDEB"
+
+temp_param_table$var_group[temp_param_table$var == "desmatado"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "floresta"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_desmatado"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "prop_floresta"] <- "INPE - PRODES"
+temp_param_table$var_group[temp_param_table$var == "quant_v40124"] <- "IBGE - PAM"
+temp_param_table$var_group[temp_param_table$var == "num_v2670"] <- "IBGE - PPM"
+temp_param_table$var_group[temp_param_table$var == "pib_percapita_preco_corrente"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "populacao"] <- "IBGE"
+temp_param_table$var_group[temp_param_table$var == "population_density"] <- "IBGE"
+
+# label data source
+
+temp_param_table$source[temp_param_table$var == "front_2020"] <- "IMAZON"
+temp_param_table$source[temp_param_table$var == "front_2020_label"] <- "IMAZON"
+
+temp_param_table$source[temp_param_table$var == "ips_amazonia_2021"] <- "IMAZON"
+temp_param_table$source[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "IDEB"
+
+temp_param_table$source[temp_param_table$var == "desmatado"] <- "INPE - PRODES"
+temp_param_table$source[temp_param_table$var == "floresta"] <- "INPE - PRODES"
+temp_param_table$source[temp_param_table$var == "prop_desmatado"] <- "INPE - PRODES"
+temp_param_table$source[temp_param_table$var == "prop_floresta"] <- "INPE - PRODES"
+temp_param_table$source[temp_param_table$var == "quant_v40124"] <- "IBGE - PAM"
+temp_param_table$source[temp_param_table$var == "num_v2670"] <- "IBGE - PPM"
+temp_param_table$source[temp_param_table$var == "pib_percapita_preco_corrente"] <- "IBGE"
+temp_param_table$source[temp_param_table$var == "populacao"] <- "IBGE"
+temp_param_table$source[temp_param_table$var == "population_density"] <- "IBGE"
+
+# categoria variables
+
+temp_param_table$categoria[temp_param_table$var == "front_2020"] <- "Environment"
+temp_param_table$categoria[temp_param_table$var == "front_2020_label"] <- "Environment"
+temp_param_table$categoria[temp_param_table$var == "ips_amazonia_2021"] <- "Social"
+temp_param_table$categoria[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "Education"
+
+temp_param_table$categoria[temp_param_table$var == "desmatado"] <- "Environment"
+temp_param_table$categoria[temp_param_table$var == "floresta"] <- "Environment"
+temp_param_table$categoria[temp_param_table$var == "prop_desmatado"] <- "Environment"
+temp_param_table$categoria[temp_param_table$var == "prop_floresta"] <- "Environment"
+temp_param_table$categoria[temp_param_table$var == "quant_v40124"] <- "Agriculture"
+temp_param_table$categoria[temp_param_table$var == "num_v2670"] <- "Pecuária"
+temp_param_table$categoria[temp_param_table$var == "pib_percapita_preco_corrente"] <- "Economy"
+temp_param_table$categoria[temp_param_table$var == "populacao"] <- "Demographics"
+temp_param_table$categoria[temp_param_table$var == "population_density"] <- "Demographics"
+
+# subcategoria variables
+
+temp_param_table$subcategoria[temp_param_table$var == "front_2020"] <- "Environment"
+temp_param_table$subcategoria[temp_param_table$var == "front_2020_label"] <- "Environment"
+temp_param_table$subcategoria[temp_param_table$var == "ips_amazonia_2021"] <- "Social"
+temp_param_table$subcategoria[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "Education"
+temp_param_table$subcategoria[temp_param_table$var == "desmatado"] <- "Deforestation"
+temp_param_table$subcategoria[temp_param_table$var == "floresta"] <- "Forest"
+temp_param_table$subcategoria[temp_param_table$var == "prop_desmatado"] <- "Deforestation"
+temp_param_table$subcategoria[temp_param_table$var == "prop_floresta"] <- "Forest"
+temp_param_table$subcategoria[temp_param_table$var == "quant_v40124"] <- "Agriculture"
+temp_param_table$subcategoria[temp_param_table$var == "num_v2670"] <- "Livestock"
+temp_param_table$subcategoria[temp_param_table$var == "pib_percapita_preco_corrente"] <- "Economy"
+temp_param_table$subcategoria[temp_param_table$var == "populacao"] <- "Demographics"
+temp_param_table$subcategoria[temp_param_table$var == "population_density"] <- "Demographics"
+
+# allow variables in graphs size, color, and slider-axis
+
+temp_param_table$color[temp_param_table$var == "front_2020"] <- TRUE #
+temp_param_table$color[temp_param_table$var == "front_2020_label"] <- TRUE #
+
+# allow variables in graphs x-axis
+
+temp_param_table$x[temp_param_table$var == "front_2020"] <- TRUE
+temp_param_table$x[temp_param_table$var == "front_2020_label"] <- TRUE # 
+
+# disable variables in graphs y-axis
+
+temp_param_table$y[temp_param_table$var == "front_2020"] <- FALSE
+temp_param_table$y[temp_param_table$var == "front_2020_label"] <- FALSE # 
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "./data/dz_varias_amazonias_cross_section_dic_en.csv", fileEncoding = "UTF-8")

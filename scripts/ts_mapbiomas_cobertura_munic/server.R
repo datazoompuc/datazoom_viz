@@ -11,7 +11,7 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
   server <- function(input, output, session) {
-    
+      
     # Carrega dados
     df <- readRDS(files$db_file)
 
@@ -39,7 +39,7 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?","y=",input$y,
-        "&","ylog=",input$ylog,
+        
         "&","y_option=",input$y_option
       )
       
@@ -72,10 +72,7 @@ get_server <- function(files, param) {
                           selected = query[['y']])
       } 
       
-      if (!is.null(query[['ylog']])) {
-        updateCheckboxInput(session, "ylog",
-                            value = (query[['ylog']] == "TRUE"))
-      }
+      
 
       if (!is.null(query[['y_option']])) {
         updateCheckboxInput(session, "y_option",
@@ -121,7 +118,7 @@ get_server <- function(files, param) {
       if(is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        text <-  paste0("por Territorio")
+        text <-  paste0(param$subtitle_init)
       }
       
       text
@@ -185,7 +182,11 @@ get_server <- function(files, param) {
         df_p$tooltip <- paste0(
           "<b>",df_p$text,"</b><br>",
           x_col$label,": ",df_p$x,"<br>",
-          y_col$label,": ",df_p$y,"<br>"
+          y_col$label,": ",format(df_p$y, scientific = FALSE,
+                                  digits = 2,
+                                  decimal.mark = ",", 
+                                  big.mark = "."), " ", "(ha)", "<br>"
+          
         )
         
         # Define paleta de cores
@@ -198,7 +199,8 @@ get_server <- function(files, param) {
                          color = ~group,
                          type = "scatter", 
                          mode = "lines",
-                         text = ~tooltip
+                         text = ~tooltip,
+                         hoverinfo = "text"
         )
         
         # Layout eixos
@@ -206,7 +208,7 @@ get_server <- function(files, param) {
           title = x_col$label,
           titlefont = f1,
           tickfont = f2,
-          automargin = FALSE,
+          automargin = TRUE,
           autorange = TRUE,
           showgrid = FALSE,
           zeroline = FALSE
@@ -221,10 +223,6 @@ get_server <- function(files, param) {
           zeroline = FALSE
         )
         
-        if (input$ylog & is.numeric(df_p$y)) {
-          y_axis_layout$type <- "log"
-        }
-
         if (input$y_option) {
           y_axis_layout$title <- paste0(y_col$label, "*")
         }

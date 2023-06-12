@@ -243,7 +243,7 @@ temp_param_table$label[10] <- "Energia produzida por lixívia"
 temp_param_table$label[11] <- "Energia produzida por outras fontes renováveis"
 temp_param_table$label[12] <- "Energia produzida por carvão vapor"
 temp_param_table$label[13] <- "Energia produzida por gás natural"
-temp_param_table$label[14] <- "Energia produzida por gás de coqueira"
+temp_param_table$label[14] <- "Energia produzida por gás de coqueria"
 temp_param_table$label[15] <- "Energia produzida por combustível"
 temp_param_table$label[16] <- "Energia produzida por diesel"
 temp_param_table$label[17] <- "Energia produzida outras fontes não renováveis"
@@ -288,3 +288,53 @@ temp_param_table$var_group[str_detect(temp_param_table$label, regex("energia pro
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_amz_exporta_dic.csv", fileEncoding = "UTF-8")
+
+
+# translate to english --------------------------------------------------------------
+temp_param_table$label[1] <- "Year"
+temp_param_table$label[2] <- "Total energy produced"
+temp_param_table$label[3] <- "Energy produced by hydro"
+temp_param_table$label[4] <- "Energy produced by wind"
+temp_param_table$label[5] <- "Energy produced by solar"
+temp_param_table$label[6] <- "Energy produced by nuclear"
+temp_param_table$label[7] <- "Energy produced by thermo"
+temp_param_table$label[8] <- "Energy produced by sugar cane"
+temp_param_table$label[9] <- "Energy produced by wood"
+temp_param_table$label[10] <- "Energy produced by black liquor"
+temp_param_table$label[11] <- "Energy produced by other renewable sources"
+temp_param_table$label[12] <- "Energy produced by steam coal"
+temp_param_table$label[13] <- "Energy produced by natural gas"
+temp_param_table$label[14] <- "Energy produced by coke oven gas"
+temp_param_table$label[15] <- "Energy produced by fuel"
+temp_param_table$label[16] <- "Energy produced by diesel"
+temp_param_table$label[17] <- "Energy produced by other non-renewable sources"
+temp_param_table$label[18] <- "Captive consumption"
+temp_param_table$label[19] <- "Free consumption"
+temp_param_table$label[20] <- "Residential consumption"
+temp_param_table$label[21] <- "Industrial consumption"
+temp_param_table$label[22] <- "Comercial consumption"
+temp_param_table$label[23] <- "Rural consumption"
+temp_param_table$label[24] <- "Public authority consumption"
+temp_param_table$label[25] <- "Public lighting consumption"
+temp_param_table$label[26] <- "Public service consumption"
+temp_param_table$label[27] <- "Personal consumption"
+temp_param_table$label[28] <- "Captive consumers"
+temp_param_table$label[29] <- "Free consumers"
+temp_param_table$label[30] <- "Residential consumers"
+temp_param_table$label[31] <- "Industrial consumers"
+temp_param_table$label[32] <- "Comercial consumers"
+temp_param_table$label[33] <- "Rural consumers"
+temp_param_table$label[34] <- "Public authority consumers"
+temp_param_table$label[35] <- "Public lighting consumers"
+temp_param_table$label[36] <- "Public service consumers"
+temp_param_table$label[37] <- "Personal consumers"
+temp_param_table$label[38] <- "State"
+temp_param_table$label[39] <- "Total consumption"
+temp_param_table$label[40] <- "Total of consumers"
+
+#unidades de cada var
+temp_param_table$unidade[2:40] <- "% of Brazil's total"
+
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/energia_amz_exporta_dic_en.csv", fileEncoding = "UTF-8")

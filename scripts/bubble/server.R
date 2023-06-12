@@ -118,7 +118,7 @@ get_server <- function(files, param) {
         x_col <- param$table[which(param$table$var == input$x), ]
         y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0(x_col$label, " por ", y_col$label)
+        text <- paste0(x_col$label, " ", param$sep, " ", y_col$label)
       }
 
       text
@@ -135,7 +135,8 @@ get_server <- function(files, param) {
         color_col <- param$table[which(param$table$var == input$color), ]
         size_col <- param$table[which(param$table$var == input$size), ]
 
-        text <- paste0("considerando ", color_col$label, " e ", size_col$label)
+        text <- paste0(param$subtitle_init, " ", color_col$label, " ", param$subtitle_sep, 
+                       " ", size_col$label)
       }
 
       text

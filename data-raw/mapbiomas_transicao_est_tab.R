@@ -8,7 +8,7 @@ library(tibble)
 library(zoo)
 library(readxl)
 
-dat <- load_mapbiomas_transition(space_aggregation = "state", transition_interval = 5)
+dat <- load_mapbiomas(dataset = "mapbiomas_transition", geo_level = "state")
 
 saveRDS(dat, file = "data/mapbiomas_transicao_est_raw.rds")
 dat <- readRDS("data/mapbiomas_transicao_est_raw.rds")
