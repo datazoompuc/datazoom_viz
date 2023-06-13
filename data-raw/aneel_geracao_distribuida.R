@@ -38,7 +38,7 @@ db_geracao_distribuida <- left_join(db_geracao_distribuida, amz_cities, by = c("
 
 # replace character "," to "."
 db_geracao_distribuida$mda_potencia_instalada_kw <- gsub(",", ".", db_geracao_distribuida$mda_potencia_instalada_kw)
-db_geracao_distribuida$qtd_uc_recebe_credito <- gsub(",", ".", db_geracao_distribuida$mda_potencia_instalada_kw)
+db_geracao_distribuida$qtd_uc_recebe_credito <- gsub(",", ".", db_geracao_distribuida$qtd_uc_recebe_credito)
 
 # ensure variables are numeric
 class(db_geracao_distribuida$mda_potencia_instalada_kw) <- "numeric"
@@ -261,6 +261,7 @@ temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Ano"
 
 # Unidade de medida
 temp_param_table$unidade[str_detect(temp_param_table$var, regex("mda_potencia_instalada_kw", ignore_case = TRUE))] <- "kilowatt"
+
 temp_param_table$unidade[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "Somatório de unidades consumidoras"
 
 # var_group variables
@@ -282,7 +283,6 @@ write.csv(temp_param_table,
   file = "data/aneel_geracao_distribuida_dic.csv",
   fileEncoding = "UTF-8"
 )
-
 
 # translate to english --------------------------------------------------------------
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_comercial"] <- "Installed Capacity - Commercial"
@@ -309,8 +309,11 @@ temp_param_table$unidade[str_detect(temp_param_table$var, regex("mda_potencia_in
 temp_param_table$unidade[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "Sum of consumer units"
 
 
+
 # save csv in utf-8 encoding
 write.csv(temp_param_table,
           file = "data/aneel_geracao_distribuida_dic_en.csv",
           fileEncoding = "UTF-8"
+
 )
+

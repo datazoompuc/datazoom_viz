@@ -13,28 +13,97 @@ get_server <- function(files, param) {
   
   # Carrega dados
   df <- readRDS(files$db_file)
-    
+  
+  #Traduz dados para inglês
+  if(param$lang){
+      
+      df$fonte <- df$fonte %>%
+          str_replace_all(c("Termoelétrica" = "Thermal Power" , 
+                            "Eólica" = "Wind Power",
+                            "Solar" = "Solar Power",
+                            "Pequena Central Hidrelétrica" = "Small Hydroelectric Center",
+                            "Central Geradora Hidrelétrica" = "Hydroelectric Generating Center",
+                            "Usina Hidrelétrica" = "Hydroelectric Power Plant",
+                            "Energia Termonuclear" = "Thermonuclear Power"))
+      
+      df$origem <- df$origem %>%
+          str_replace_all(c("Fóssil" = "Fossil",
+                            "Biomassa" = "Biomass",
+                            "Eólica" = "Wind",
+                            "Hídrica" = "Hydric"))
+      
+      df$tipo <- df$tipo %>%
+          str_replace_all(c("Carvão Mineral" = "Mineral Coal",
+                            "Petróleo" = "Oil",
+                            "Radiação Solar" = "Solar Radiation",
+                            "Gás Natural" = "Natural Gas",
+                            "Floresta" = "Forest",
+                            "Cinética Do Vento" = "Wind Kinetics",
+                            "Potencial Hidráulico" = "Hydraulic Potential",
+                            "Agroindustriais" = "Agroindustrial",
+                            "Biocombustíveis Líquidos" = "Liquid Biofuels",
+                            "Resíduos Animais" = "Animal Residue",
+                            "Outros Fósseis" = "Other Fossil",
+                            "Resíduos Solidos Urbanos" = "Solid Urban Residue",
+                            "Urânio" = "Uranium"))
+      
+      df$combustivel_final <- df$combustivel_final %>%
+          str_replace_all(c("Carvão Mineral" = "Mineral Coal",
+                            "Óleo Diesel" = "Diesel",
+                            "Gás De Alto Forno - Biomassa" = "Blast Furnace Gas - Biomass",
+                            "Gás De Alto Forno - CM" = "Blast Furnace Gas",
+                            "Radiação Solar" = "Solar Radiation",
+                            "Óleo Combustivel" = "Fuel Oil",
+                            "Gás Natural" = "Natural Gas",
+                            "Cinética Do Vento" = "Wind Kinetics",
+                            "Licor Negro" = "Black Liquor",
+                            "Calor De Processo - GN" = "Process Heat - GN",
+                            "Lenha" = "Firewood",
+                            "Capim Elefante" = "Elephant Grass",
+                            "Carvão Vegetal" = "Charcoal",
+                            "Potencial Hidráulico" = "Hydraulic Potential",
+                            "Resíduos Florestais" = "Forest Residue",
+                            "Bagaço De Cana" = "Sugar Cane Bagasse",
+                            "Óleos Vegetais" = "Vegetable Oils",
+                            "Biogás Resíduo Animal" = "Biogas - Animal Residue",
+                            "Calor De Processo - OF" = "Process Heat - OF",
+                            "Casca De Arroz" = "Rice Husk",
+                            "Carvão - RU" = "Coal - RU",
+                            "Biogás - Agroindustriais" = "Biogas - Agroindustrial",
+                            "Urânio" = "Uranium",
+                            "Biogás - Resíduos Urbanos" = "Biogas - Urban Residue",
+                            "Resíduos Sólidos Urbanos" = "Solid Urban Residue",
+                            "Outros Energéticos de Petróleo" = "Other Oil Energetics",
+                            "Gás De Refinaria" = "Refinery Gas",
+                            "Calor De Processo - CM" = "Process Heat - CM",
+                            "Biogas - Floresta" = "Biogas - Forest",
+                            "Gás De Alto Forno - PE" = "Blast Funace Gas - PE", 
+                            "Etanol" = "Ethanol"
+          ))
+  }
+  
   server <- function(input, output, session) {
     
     df_reactived <- reactive({
-      
-      if (input$tipo != "Todos") df <- df %>% filter(tipo == input$tipo)
-      if (input$fonte != "Todos") df <- df %>% filter(fonte == input$fonte)
-      if (input$origem != "Todos") df <- df %>% filter(origem == input$origem)
-      if (input$combustivel != "Todos") df <- df %>% filter(combustivel_final == input$combustivel)
+        
+      df <- df %>% filter(ano != as.numeric(str_extract(Sys.Date(), "^.{4}")))
+      if (input$tipo != param$server7) df <- df %>% filter(tipo == input$tipo)
+      if (input$fonte != param$server7) df <- df %>% filter(fonte == input$fonte)
+      if (input$origem != param$server7) df <- df %>% filter(origem == input$origem)
+      if (input$combustivel != param$server7) df <- df %>% filter(combustivel_final == input$combustivel)
       
       w <- df %>%
         group_by(ano, estado) %>%
-        summarise(potencia_outorgada_k_w = sum(potencia_outorgada_k_w))
+        summarise(potencia_outorgada_kw = sum(potencia_outorgada_kw))
       
       return(w)
     })
     
     # Cria opções para seleção de grupos
-    param$fonte_choices <- c("Todos", sort(unique(df$fonte)))
-    param$origem_choices <- c("Todos", sort(unique(df$origem)))
-    param$tipo_choices <- c("Todos", sort(unique(df$tipo)))
-    param$combustivel_choices <- c("Todos", sort(unique(df$combustivel_final)))
+    param$fonte_choices <- c(param$server7, sort(unique(df$fonte)))
+    param$origem_choices <- c(param$server7, sort(unique(df$origem)))
+    param$tipo_choices <- c(param$server7, sort(unique(df$tipo)))
+    param$combustivel_choices <- c(param$server7, sort(unique(df$combustivel_final)))
     
     # Adicionar opcoes no ui
     updateSelectInput(session, "fonte",
@@ -129,19 +198,19 @@ get_server <- function(files, param) {
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$tipo) || is.null(input$origem) || 
           is.null(input$fonte) || is.null(input$combustivel)) {
-        text <- "Variável não selecionada"
+        text <- param$server1
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == param$x_def), ]
 
-        text <- paste0("Ranking de ", x_col$label)
+        text <- paste0(param$server2, x_col$label)
       }
 
       text
     })
     output$plot_subtitle <- renderText({
-      text <- paste0("Fonte: ", input$fonte, ", Origem: ", input$origem,
-                     ", Tipo: ", input$tipo, ", Combustível Final: ", input$combustivel)
+      text <- paste0(param$server3, input$fonte, param$server4, input$origem,
+                     param$server5, input$tipo, param$server6, input$combustivel)
 
       text
     })

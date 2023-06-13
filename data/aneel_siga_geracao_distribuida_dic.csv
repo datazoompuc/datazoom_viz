@@ -5,4 +5,4 @@
 "4","origem",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Origem","origem","Energia - ANEEL",1,"","Economia","Energia"
 "5","tipo",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Tipo","tipo","Energia - ANEEL",1,"","Economia","Energia"
 "6","combustivel_final",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Combustível Final","combustivel_final","Energia - ANEEL",1,"","Economia","Energia"
-"7","potencia_outorgada_k_w",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Potência Outorgada (kW)","potencia_outorgada_k_w","Energia - ANEEL",1,"kilowatt","Economia","Energia"
+"7","potencia_outorgada_kw",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Potência Outorgada (kW)","potencia_outorgada_kw","Energia - ANEEL",1,"kilowatt","Economia","Energia"
