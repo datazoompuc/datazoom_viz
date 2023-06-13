@@ -17,7 +17,7 @@ get_server <- function(files, param) {
  
    if(param$lang) {
   
-       df$to <- df$to %>% str_replace_all(c(" para " = " to ",
+       df$to <- df$to %>% stringr::str_replace_all(c(" para " = " to ",
                                                                             "Aquacultura" = "Aquaculture",
                                                                               "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
                                                                               "Outros Cultivos Perenes" = "Other Perennial Crops",
@@ -48,7 +48,7 @@ get_server <- function(files, param) {
                                                                               "Cana-de-a\u00e7\u00facar" = "Sugar Cane",
                                                                               "Pastagem" = "Pasture"))
        
-       df$from <- df$from %>% str_replace_all(c(" para " = " to ",
+       df$from <- df$from %>% stringr::str_replace_all(c(" para " = " to ",
                                             "Aquacultura" = "Aquaculture",
                                             "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
                                             "Outros Cultivos Perenes" = "Other Perennial Crops",

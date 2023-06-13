@@ -48,7 +48,6 @@ param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_transicao_munic_5_
 # Parametros server
 param$server1 <- "Ranking - Transition of "
 param$server2 <- " to "
-param$measurement_unit <- "Measurement unit: "
 param$lang = TRUE
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
