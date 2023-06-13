@@ -13,6 +13,73 @@ get_server <- function(files, param) {
     
   # Carrega dados
   df <- readRDS(files$db_file)
+ 
+ 
+   if(param$lang) {
+  
+       df$to <- df$to %>% stringr::str_replace_all(c(" para " = " to ",
+                                                                            "Aquacultura" = "Aquaculture",
+                                                                              "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
+                                                                              "Outros Cultivos Perenes" = "Other Perennial Crops",
+                                                                              "Outros Cultivos Perenes" = "Othere Perennial Crops",
+                                                                              "Restinga Arborizada" = "Wooded Restinga",
+                                                                              "Outras \u00e1reas n\u00e3o vegetadas" = "Other Non Vegetated Area",
+                                                                              "Restinga Herb\u00e1cea/Arbustiva" = "Restinga Herbacea/Arbustiva",
+                                                                              "Afloramento Rochoso" = "Rocky Outcrop",
+                                                                              "Outros Cultivos Tempor\u00e1rios" = "Other Temporary Crops",
+                                                                              "Outras Forma\u00e7\u00f5es N\u00e3o Florestais Naturais" = "Other Non Forest Natural Formation",
+                                                                              "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
+                                                                              "Outros Cultivos Tempor\u00e1rios" = "Othere Temporary Crops",
+                                                                              "Planta\u00e7\u00e3o de Floresta" = "Forest Plantation",
+                                                                              "N\u00e3o Observado" = "Non Observed",
+                                                                              "Forma\u00e7\u00e3o de Floresta" = "Forest Formation",
+                                                                              "Forma\u00e7\u00e3o de Savana" = "Savanna Formation",
+                                                                              "P\u00e2ntano" = "Wetland",
+                                                                              "Pradaria" = "Grassland",
+                                                                              "Infraestrutura Urbana" = "Urban Infrastructure",
+                                                                              "Soja" = "Soy Beans",
+                                                                              "Mangue" = "Magrove",
+                                                                              "Mineira\u00e7\u00e3o" = "Mining",
+                                                                              "Praia e Dunas" = "Beaches and Dunes",
+                                                                              "Caf\u00e9" = "Coffee",
+                                                                              "Cultivos C\u00edtricos" = "Citrus",
+                                                                              "Arroz" = "Rice",
+                                                                              "Algod\u00e3o" = "Cotton",
+                                                                              "Cana-de-a\u00e7\u00facar" = "Sugar Cane",
+                                                                              "Pastagem" = "Pasture"))
+       
+       df$from <- df$from %>% stringr::str_replace_all(c(" para " = " to ",
+                                            "Aquacultura" = "Aquaculture",
+                                            "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
+                                            "Outros Cultivos Perenes" = "Other Perennial Crops",
+                                            "Outros Cultivos Perenes" = "Othere Perennial Crops",
+                                            "Restinga Arborizada" = "Wooded Restinga",
+                                            "Outras \u00e1reas n\u00e3o vegetadas" = "Other Non Vegetated Area",
+                                            "Restinga Herb\u00e1cea/Arbustiva" = "Restinga Herbacea/Arbustiva",
+                                            "Afloramento Rochoso" = "Rocky Outcrop",
+                                            "Outros Cultivos Tempor\u00e1rios" = "Other Temporary Crops",
+                                            "Outras Forma\u00e7\u00f5es N\u00e3o Florestais Naturais" = "Other Non Forest Natural Formation",
+                                            "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
+                                            "Outros Cultivos Tempor\u00e1rios" = "Othere Temporary Crops",
+                                            "Planta\u00e7\u00e3o de Floresta" = "Forest Plantation",
+                                            "N\u00e3o Observado" = "Non Observed",
+                                            "Forma\u00e7\u00e3o de Floresta" = "Forest Formation",
+                                            "Forma\u00e7\u00e3o de Savana" = "Savanna Formation",
+                                            "P\u00e2ntano" = "Wetland",
+                                            "Pradaria" = "Grassland",
+                                            "Infraestrutura Urbana" = "Urban Infrastructure",
+                                            "Soja" = "Soy Beans",
+                                            "Mangue" = "Magrove",
+                                            "Mineira\u00e7\u00e3o" = "Mining",
+                                            "Praia e Dunas" = "Beaches and Dunes",
+                                            "Caf\u00e9" = "Coffee",
+                                            "Cultivos C\u00edtricos" = "Citrus",
+                                            "Arroz" = "Rice",
+                                            "Algod\u00e3o" = "Cotton",
+                                            "Cana-de-a\u00e7\u00facar" = "Sugar Cane",
+                                            "Pastagem" = "Pasture"))
+       
+   }
   
   server <- function(input, output, session) {
       
@@ -31,10 +98,12 @@ get_server <- function(files, param) {
       
       # Adicionar opcoes no ui
       updateSelectInput(session, "x_from",
-                        choices = param$x_from_choices)
+                        choices = param$x_from_choices,
+                        selected = sample(param$x_from_choices, 1))
       
       updateSelectInput(session, "x_to",
-                        choices = param$x_to_choices)
+                        choices = param$x_to_choices,
+                        selected = sample(param$x_to_choices, 1))
      
       
     # Funcão para preencher inputs com coluna/variável aleatória
@@ -102,7 +171,7 @@ get_server <- function(files, param) {
       } else {
           
           # Monta título a partir de variáveis selecionadas nos inputs
-        text <- paste0("Ranking de ", input$x_from, " para ", input$x_to)
+        text <- paste0(param$server1, input$x_from, param$server2, input$x_to)
         
       }
 
