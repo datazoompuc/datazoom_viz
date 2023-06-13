@@ -418,6 +418,7 @@ temp_param_table <- tibble(
 )
 
 temp_param_table$label <- temp_param_table$var
+
 temp_param_table$label[temp_param_table$var == 'cod_ibge'] <- "C\u00f3digo IBGE"
 temp_param_table$label[temp_param_table$var == 'time'] <- "Ano"
 temp_param_table$label[temp_param_table$var == 'uf'] <- "Estado"
@@ -439,4 +440,19 @@ temp_param_table$slider <- c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FAL
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_sel_dic.csv", fileEncoding = "UTF-8")
+
+# relabel in english ----------------------------------------------------------------
+temp_param_table$label[1] <- "Year"
+temp_param_table$label[2] <- "Municipality"
+temp_param_table$label[3] <- "Main exported product relative value"
+temp_param_table$label[4] <- "Main exported product"
+temp_param_table$label[6] <- "Forest Compatible Products"
+
+temp_param_table$unidade <- "% of world exports"
+temp_param_table$categoria <- "Economy"
+temp_param_table$subcategoria <- "Foreign Trade"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_sel_dic_en.csv", fileEncoding = "UTF-8")
+
 
