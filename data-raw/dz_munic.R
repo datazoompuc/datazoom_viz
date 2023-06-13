@@ -132,8 +132,8 @@ prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 
 gdp <- readRDS(file = "data/gdp.rds")
 gdp <- gdp %>%
+    
     janitor::clean_names()
-gdp$ano <- gdp$year
 class(gdp$ano) <- "numeric"
 class(gdp$cod_ibge) <- "character"
 # Replace NA with previous and next rows mean
@@ -223,36 +223,6 @@ ips <- ips %>%
 # IBGE - CEMPRE
 ###################
 cempre_municipality <- readRDS(file = "data/cempre_municipality_dza.rds")
-cempre_municipality <- cempre_municipality %>%
-    janitor::clean_names()
-
-# Reshaping data.frame from long  to wide format
-cempre_municipality <- cempre_municipality %>%
-    tidyr::pivot_wider(
-        id_cols = c(municipio_codigo, ano),
-        names_from = variavel_codigo,
-        names_prefix = "cempre",
-        values_from = valor
-    )
-
-cempre_municipality$cod_ibge <- cempre_municipality$municipio_codigo
-cempre_municipality$cempre_n_empresas_organizacoes <- cempre_municipality$cempre2585
-cempre_municipality$cempre_n_ocupados <- cempre_municipality$cempre707
-cempre_municipality$cempre_n_ocupados_assalariados <- cempre_municipality$cempre708
-cempre_municipality$cempre_salarios_remuneracoes <- cempre_municipality$cempre662
-
-# Identify and remove duplicate data
-cempre_municipality <- cempre_municipality %>%
-    distinct(cod_ibge, ano, .keep_all = TRUE) %>%
-    select(
-        cod_ibge,
-        ano,
-        cempre_n_empresas_organizacoes,
-        cempre_n_ocupados,
-        cempre_n_ocupados_assalariados,
-        cempre_salarios_remuneracoes
-    ) %>%
-    arrange(cod_ibge, ano)
 
 ###################
 # SEEG
@@ -300,8 +270,9 @@ ppm_livestock= ppm_livestock%>%
 # 
 # saveRDS(pam_municipality_all_crops_2000_19, "data/pam_municipality_all_crops_2000_19.rds")
 
-pam_municipality_all_crops_2000_19= readRDS('data/pam_municipality_all_crops_2000_19.rds')
-pam_municipality_all_crops_2000_19[is.na(pam_municipality_all_crops_2000_19)] <- 0  
+pam_municipality_all_crops= readRDS('data/pam_municipality_all_crops.rds') %>%
+    filter(ano >= 2000)
+pam_municipality_all_crops[is.na(pam_municipality_all_crops)] <- 0  
 
 ###########################
 # edit data to merge
@@ -325,7 +296,7 @@ class(gdp$ano) <-  'numeric'
 #class(degrad$ano) <-  'numeric'
 #class(income$ano) <-  'numeric'
 class(ips$cod_municipio) <-  'character'
-class(pam_municipality_all_crops_2000_19$ano) <- 'numeric'
+class(pam_municipality_all_crops$ano) <- 'numeric'
 
 ###########################
 # merge all data
@@ -336,9 +307,10 @@ dz_munic <- income %>%
     full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
     full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
     full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
-    full_join(pam_municipality_all_crops_2000_19, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
+    full_join(pam_municipality_all_crops, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
     arrange(cod_ibge, ano) %>%
     relocate(cod_ibge, ano)
+
 
 # colnames(dz_munic)
 #dz_munic$name_munic <- dz_munic$name_munic.x
@@ -888,3 +860,4 @@ temp_param_table$unidade[temp_param_table$var == "group"] <- ""
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_dic_en.csv", fileEncoding = "UTF-8")
+
