@@ -31,6 +31,20 @@ param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
+param$unit <- "R$" #Unidade de Medida
+param$unit_text <- "Unidade de Medida" #Texto para unidade de medida
+
+# Parâmetros específicos do UI
+param$ui1 <- "VARI\u00C1VEIS:"
+param$ui2 <- "Ranking - eixo horizontal (x):"
+param$ui3 <- "Cor das barras:"
+param$ui4 <- "https://datazoom.shinyapps.io/app_rk_comex_exp_paises/"
+
+# Parâmetros específicos do server
+param$server1 <- "Variável não selecionada"
+param$server2 <- "Ranking de "
+param$server3 <- "Amazônia Legal"
+param$lang <- FALSE
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
