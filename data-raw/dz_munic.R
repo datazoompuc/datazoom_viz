@@ -132,8 +132,8 @@ prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 
 gdp <- readRDS(file = "data/gdp.rds")
 gdp <- gdp %>%
-
-  janitor::clean_names()
+    
+    janitor::clean_names()
 class(gdp$ano) <- "numeric"
 class(gdp$cod_ibge) <- "character"
 # Replace NA with previous and next rows mean
@@ -302,14 +302,14 @@ class(pam_municipality_all_crops$ano) <- 'numeric'
 # merge all data
 ###########################
 dz_munic <- income %>%
-  full_join(prodes, by = c("cod_ibge" = "cod_munic_ibge")) %>%
-  full_join(gdp, by = c("cod_ibge", "ano")) %>%
-  full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
-  full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
-  full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
-  full_join(pam_municipality_all_crops, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
-  arrange(cod_ibge, ano) %>%
-  relocate(cod_ibge, ano)
+    full_join(prodes, by = c("cod_ibge" = "cod_munic_ibge")) %>%
+    full_join(gdp, by = c("cod_ibge", "ano")) %>%
+    full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
+    full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
+    full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
+    full_join(pam_municipality_all_crops, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
+    arrange(cod_ibge, ano) %>%
+    relocate(cod_ibge, ano)
 
 
 # colnames(dz_munic)
@@ -860,3 +860,4 @@ temp_param_table$unidade[temp_param_table$var == "group"] <- ""
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_dic_en.csv", fileEncoding = "UTF-8")
+
