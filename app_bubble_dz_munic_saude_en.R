@@ -9,7 +9,7 @@ library(lubridate)
 files <- list()
 files$ui_script <- "scripts/bubble_dz_munic_saude/ui.R"
 files$server_script <- "scripts/bubble_dz_munic_saude/server.R"
-files$param_script <- "scripts/bubble/db_params.R"
+files$param_script <- "scripts/bubble_dz_munic_saude/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
@@ -22,7 +22,6 @@ source(files$ui_script)
 source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
-
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "desmatado" # variável padrão do eixo x
 param$y_def <- "t_total" # variável padrão do eixo y
@@ -50,6 +49,7 @@ param$marker_size<- "Marker's size"
 #Mudanças específicas no server
 param$label_by<- " by "
 param$label_considering<- "considering"
+param$and <- "and"
 param$label_year<- "Year: "
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

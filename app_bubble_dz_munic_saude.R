@@ -50,6 +50,7 @@ param$marker_size<- "Tamanho do marcador"
 #Mudanças específicas no server
 param$label_by<- " por "
 param$label_considering<- "considerando"
+param$and <- "e"
 param$label_year<- "Ano: "
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
