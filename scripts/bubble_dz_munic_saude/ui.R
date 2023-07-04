@@ -39,7 +39,7 @@ get_ui <- function(files, param) {
         # Seleciona eixo log
         checkboxInput(
           inputId = "xlog",
-          "escala log",
+          param$log_scale,
           value = FALSE,
           width = "100%"
         ),
