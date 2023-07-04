@@ -16,6 +16,30 @@ get_server <- function(files, param) {
     select(time, group, starts_with("Cocos"), 
            starts_with("Madeira"), starts_with("Cacau")) %>% 
     right_join(tidyr::expand(., time, group))
+  
+  if(param$lang){
+      #translating the column names from the dataframe
+      df <- df %>%
+          rename("Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" = "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
+                 "Whole or broken cocoa, raw or roasted" = "Cacau inteiro ou partido, em bruto ou torrado",
+                 "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" = "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada")
+      
+      #translating the names from the param$table
+      param$table <- param$table %>% 
+          mutate(var = case_when(
+              var == "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ~ "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
+              var == "Whole or broken cocoa, raw or roasted" ~ "Cacau inteiro ou partido, em bruto ou torrado",
+              var == "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" ~ "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada",
+              TRUE ~ var
+              ),
+              label = case_when(
+                  label == "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ~ "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
+                  label == "Whole or broken cocoa, raw or roasted" ~ "Cacau inteiro ou partido, em bruto ou torrado",
+                  label == "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" ~ "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada",
+                  TRUE ~ label
+              )
+           )
+  }
    
   df[is.na(df)] <- 0
   
@@ -60,7 +84,7 @@ get_server <- function(files, param) {
       if (!is.null(query[["x"]])) {
         # se tem x na url atribui valor ao selecinput x
         updateSelectInput(session, "x",
-          choices = param$x_choices,
+          choices = param$x_choices$Comex,
           selected = query[["x"]]
         )
       }
