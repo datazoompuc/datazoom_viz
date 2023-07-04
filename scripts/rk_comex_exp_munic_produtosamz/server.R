@@ -27,15 +27,15 @@ get_server <- function(files, param) {
       #translating the names from the param$table
       param$table <- param$table %>% 
           mutate(var = case_when(
-              var == "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ~ "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
-              var == "Whole or broken cocoa, raw or roasted" ~ "Cacau inteiro ou partido, em bruto ou torrado",
-              var == "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" ~ "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada",
+              var == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled",
+              var == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
+              var == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
               TRUE ~ var
               ),
               label = case_when(
-                  label == "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ~ "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
-                  label == "Whole or broken cocoa, raw or roasted" ~ "Cacau inteiro ou partido, em bruto ou torrado",
-                  label == "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" ~ "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada",
+                  label == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ,
+                  label == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
+                  label == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
                   TRUE ~ label
               )
            )
