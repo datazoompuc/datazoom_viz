@@ -45,6 +45,7 @@ param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e
                               )
 #Mudanças específicas no server
 param$label_no_variable<- paste0("Variável não selecionada")
+param$x_label<- "Valor"
 param$ranking_intro<- "Ranking de"
 param$label_amazon<- paste0("Amazônia Legal")
 

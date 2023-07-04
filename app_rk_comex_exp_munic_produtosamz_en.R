@@ -45,6 +45,7 @@ param$x_choices$Comex <- list("Coconuts, Brazil nuts, and cashew nuts, fresh or 
 
 #Mudanças específicas no server
 param$label_no_variable<- "No variable selected"
+param$x_label<- "Value"
 param$ranking_intro<- "Ranking of "
 param$label_amazon<- "Legal Amazon"
 
