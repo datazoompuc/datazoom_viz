@@ -205,6 +205,8 @@ saveRDS(data, "data/dz_munic_saude.rds")
 
 # dictionary --------------------------------------------------------------
 
+data <- readRDS("data/dz_munic_saude.rds")
+
 # for the non-datasus variables
 dic_dz_munic <- read_csv(file = 'data/dz_munic_dic.csv') %>% 
   filter(var %in% names(data)) %>% 
