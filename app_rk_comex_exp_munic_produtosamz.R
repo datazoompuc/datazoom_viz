@@ -31,6 +31,7 @@ param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
+param$lang <- FALSE
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
@@ -43,7 +44,6 @@ param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e
                               param$x_choices$Comex$`Madeira em bruto, mesmo descascada, desalburnada ou esquadriada`
                               )
 #Mudanças específicas no server
-
 param$label_no_variable<- paste0("Variável não selecionada")
 param$ranking_intro<- "Ranking de"
 param$label_amazon<- paste0("Amazônia Legal")

@@ -30,6 +30,7 @@ param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
+param$lang <- TRUE
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
@@ -37,13 +38,12 @@ param$plot_desc <- "The municipalities who are the biggest product exporters of 
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
-param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados`, 
-                              param$x_choices$Comex$`Cacau inteiro ou partido, em bruto ou torrado`,
-                              param$x_choices$Comex$`Madeira em bruto, mesmo descascada, desalburnada ou esquadriada`
+param$x_choices$Comex <- list("Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled", 
+                              "Whole or broken cocoa, raw or roasted",
+                              "Raw wood, whether or not stripped of bark or sapwood, or roughly squared"
 )
 
 #Mudanças específicas no server
-
 param$label_no_variable<- "No variable selected"
 param$ranking_intro<- "Ranking of "
 param$label_amazon<- "Legal Amazon"
