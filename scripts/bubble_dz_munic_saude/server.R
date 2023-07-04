@@ -135,7 +135,7 @@ get_server <- function(files, param) {
         color_col <- param$table[which(param$table$var == input$color), ]
         size_col <- param$table[which(param$table$var == input$size), ]
 
-        text <- paste0(param$label_considering, color_col$label, " e ", size_col$label)
+        text <- paste(param$label_considering, color_col$label, param$and, size_col$label, sep = " ")
       }
 
       text
