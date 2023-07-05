@@ -16,6 +16,30 @@ get_server <- function(files, param) {
     select(time, group, starts_with("Cocos"), 
            starts_with("Madeira"), starts_with("Cacau")) %>% 
     right_join(tidyr::expand(., time, group))
+  
+  if(param$lang){
+      #translating the column names from the dataframe
+      df <- df %>%
+          rename("Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" = "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
+                 "Whole or broken cocoa, raw or roasted" = "Cacau inteiro ou partido, em bruto ou torrado",
+                 "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" = "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada")
+      
+      #translating the names from the param$table
+      param$table <- param$table %>% 
+          mutate(var = case_when(
+              var == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled",
+              var == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
+              var == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
+              TRUE ~ var
+              ),
+              label = case_when(
+                  label == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ,
+                  label == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
+                  label == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
+                  TRUE ~ label
+              )
+           )
+  }
    
   df[is.na(df)] <- 0
   
@@ -60,7 +84,7 @@ get_server <- function(files, param) {
       if (!is.null(query[["x"]])) {
         # se tem x na url atribui valor ao selecinput x
         updateSelectInput(session, "x",
-          choices = param$x_choices,
+          choices = param$x_choices$Comex,
           selected = query[["x"]]
         )
       }
@@ -80,12 +104,12 @@ get_server <- function(files, param) {
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x) || input$x == "" ||
         is.null(input$color) || input$color == "") {
-        text <- "Variável não selecionada"
+        text <- param$label_no_variable
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
 
-        text <- paste0("Ranking de ", x_col$label)
+        text <- paste0(param$ranking_intro, x_col$label)
       }
 
       text
@@ -99,7 +123,7 @@ get_server <- function(files, param) {
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         color_col <- param$table[which(param$table$var == input$color), ]
-        text <- paste0("Amazônia Legal")
+        text <- param$label_amazon
       }
 
       text
@@ -331,7 +355,7 @@ get_server <- function(files, param) {
 
           # Layout eixos
           x_axis_layout <- list(
-            title = x_col$label,
+            title = param$x_label,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
