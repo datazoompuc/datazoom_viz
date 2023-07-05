@@ -205,6 +205,8 @@ saveRDS(data, "data/dz_munic_saude.rds")
 
 # dictionary --------------------------------------------------------------
 
+data <- readRDS("data/dz_munic_saude.rds")
+
 # for the non-datasus variables
 dic_dz_munic <- read_csv(file = 'data/dz_munic_dic.csv') %>% 
   filter(var %in% names(data)) %>% 
@@ -293,3 +295,98 @@ temp_param_table <- rbind(dic_dz_munic, dic_mortalidade)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/dz_munic_saude_dic.csv", fileEncoding = "UTF-8")
+
+#######################################
+# building English health dictionary
+#######################################
+ 
+#####################################
+# for the non-datasus variables
+#####################################
+dic_dz_munic <- read_csv(file = 'data/dz_munic_dic_en.csv') %>% 
+    filter(var %in% names(data)) %>% 
+    select(-`...1`)
+
+#################################################################
+dic_mortalidade <- tribble(
+    ~var, ~label, ~var_group,
+    "t_total", "Gross mortality per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_causas_externas", "Mortality from external causes per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_cardiovascular", "Mortality from circulatory system diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_respiratorio", "Mortality from respitarory system diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_infecciosas", "Mortality from some infectious and parasitic diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_neoplasias", "Mortality from neoplasms per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_cancer_mama", "Mortality from malignant neoplasm of the breast per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_cancer_colo_do_utero", "Cervical cancer mortality per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_comunicaveis", "Mortality from communicable diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_nao_comunicaveis", "Mortality from non-communicable diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_diabetes", "Mortality from diabetes mellitus per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_malaria", "Mortality from malaria per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_aids", "Mortality from HIV disease per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_autoprovocadas", "Voluntary self-harm mortality per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_agressoes", "Mortality from assaults per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_acidentes", "Mortality from accidents per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_transporte", "Mortality from transport accidents per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_pedestre", "Pedestrian mortality in transport accidents per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_motociclista", "Mortality of motorcyclists in transport accidents per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_ciclista", "Mortality of cyclists in transport accidents per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    
+    "t_srag", "Mortality from severe acute respiratory syndrome per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_cigarro_eletronico", "Mortality from vaporizer or electronic cigarette use disorders per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_covid_identificada", "Mortality from COVID-19 with identified virus per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_covid_nao_identificada", "Mortality from COVID-19 with unidentified virus per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_covid_historico", "Mortality from personal history of COVID-19 per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_pos_covid", "Mortality by cardiovascular conditions-COVID per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_inflamacao_covid", "Mortality from multisystemic inflammatory syndrome associated with COVID-19 per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    
+    "t_infantil", "Child Mortality per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_maternal", "Maternal mortality per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_fetal", "Foetal mortality per 100000 inhabitants per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    
+    "t_sangue", "Mortality from blood diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_endocrinas", "Mortality from endocrine, nutritional and metabolic diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_mentais", "Mortality from mental and behavioural disorders per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_nervoso", "Mortality from diseases of the nervous system per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_olho", "Mortality from diseases of the eye and adnexa per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_ouvido", "Mortality from diseases of the ear and mastoid appendage per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_digestivo", "Mortality from digestive tract diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_pele", "Mortality from skin diseases per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_osteomuscular", "Mortality from diseases of the musculoskeletal system and connective tissue per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_genitourinario", "Mortality from diseases of the genitourinary system per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_gravidez", "Mortality from pregnancy, childbirth or puerperium per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_perinatal", "Mortality from some perinatal conditions per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_malformacoes", "Mortality due to congenital malformations, deformities and chromosomal abnormalities per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_anormais", "Mortality from symptoms, signs and abnormal findings on clinical and laboratory examinations per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_lesoes", "Mortality from injuries, poisoning and some other external causes per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    "t_influencia", "Mortality by factors influencing contact with health services per 100,000 inhabitants", "Saúde - DATASUS - SIM",
+    
+    "n_leitos_existentes", "Number of existing beds per 100,000 inhabitants",  "Saúde - DATASUS - CNES",
+    "n_leitos_sus", "Number of beds available for SUS per 100,000 inhabitants",  "Saúde - DATASUS - CNES",
+    "n_leitos_nao_sus", "Number of beds not available for SUS per 100,000 inhabitants",  "Saúde - DATASUS - CNES",
+)
+
+dic_mortalidade <- dic_mortalidade %>%
+    filter(var %in% names(data))
+
+# Adding the remainder of the dictionary columns
+
+dic_mortalidade <- dic_mortalidade %>%
+    mutate(var = var,
+           x = TRUE,
+           y = TRUE,
+           color = FALSE,
+           size = FALSE,
+           slider = FALSE,
+           geometry = FALSE,
+           label = label,
+           desc = var,
+           var_group = var_group,
+           unidade = NA,
+           categoria = "Social",
+           subcategoria = "Saúde")
+
+# join dictionaries
+temp_param_table <- rbind(dic_dz_munic, dic_mortalidade)
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/dz_munic_saude_dic_en.csv", fileEncoding = "UTF-8")

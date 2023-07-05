@@ -118,7 +118,7 @@ get_server <- function(files, param) {
         x_col <- param$table[which(param$table$var == input$x), ]
         y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0(x_col$label, " por ", y_col$label)
+        text <- paste0(x_col$label, param$label_by, y_col$label)
       }
 
       text
@@ -135,7 +135,7 @@ get_server <- function(files, param) {
         color_col <- param$table[which(param$table$var == input$color), ]
         size_col <- param$table[which(param$table$var == input$size), ]
 
-        text <- paste0("considerando ", color_col$label, " e ", size_col$label)
+        text <- paste(param$label_considering, color_col$label, param$and, size_col$label, sep = " ")
       }
 
       text
@@ -250,7 +250,7 @@ get_server <- function(files, param) {
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
             # Edita slider
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = "Ano: ", font = f1))
+            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = param$label_year), font = f1)
 
             # Botões da animação
             #  edita botão padrão (editar move ele para o updatemenus)
