@@ -45,7 +45,7 @@ param$AL <- "Legal Amazon"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Occupation type"
+param$plot_desc <- "Occupation type - Aggregated data of municipalities in the Legal Amazon (Source: IBGE)"
 
 # Outros parâmetros e configurações
 param$x_choices$`IBGE - Continuous PNAD`$`Occupation type` <- NULL

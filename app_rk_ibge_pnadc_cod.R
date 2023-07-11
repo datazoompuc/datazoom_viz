@@ -45,7 +45,7 @@ param$AL <- "Amazônia Legal"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Tipo de Ocupação"
+param$plot_desc <- "Tipo de Ocupação - Dados agregados dos municípios da Amazônia Legal (Fonte : IBGE)"
 
 # Outros parâmetros e configurações
 param$x_choices$`IBGE - PNAD Contínua`$`Tipo de ocupação` <- NULL
