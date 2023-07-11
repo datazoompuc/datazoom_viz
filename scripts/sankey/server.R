@@ -14,6 +14,8 @@ get_server <- function(files, param) {
 
     # Carrega dados
     df <- readRDS(files$db_file)
+    
+    browser()
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {

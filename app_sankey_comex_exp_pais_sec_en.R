@@ -40,8 +40,8 @@ param$year_inicio <- 1997
 param$year_final <- 2021
 
 param$label_var_name <- "VARIABLES:"
-param$label_x_name <- "Export Category (SEC agreggation)"
-param$label_colour_name <- "Year"
+param$label_x_name <- "Year"
+param$label_colour_name <- "Export Category (SEC agreggation)"
 param$link <- "https://datazoom.shinyapps.io/app_sankey_comex_exp_pais_sec_en/"
 
 
