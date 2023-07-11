@@ -175,6 +175,11 @@ dz_varias_amazonias_cross_section <- dz_varias_amazonias_cross_section %>% group
 # Filtra colunas onde são NA
 dz_varias_amazonias_cross_section <- dz_varias_amazonias_cross_section[which(!is.na(dz_varias_amazonias_cross_section$front_2020)), ]
 
+# altera a unidade de medida de decimal para porcentagem de algumas variáveis:
+dz_varias_amazonias_cross_section<- dz_varias_amazonias_cross_section %>%
+    mutate(prop_desmatado = prop_desmatado*100 )%>%
+    mutate(prop_floresta = prop_floresta*100 )
+
 # save data
 saveRDS(dz_varias_amazonias_cross_section,
   file = "./data/dz_varias_amazonias_cross_section.rds"
