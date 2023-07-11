@@ -20,10 +20,10 @@ source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "" # variável padrão do eixo x
+param$x_def <- "Sand" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
-param$color_def <- "AREIA" # variável padrão de cor
+param$color_def <- "Sand" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id
