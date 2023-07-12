@@ -15,6 +15,35 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
     
+    if(param$lang){
+        df<-df %>%
+            rename("Weapons and ammunition; their parts and accessories" =
+                       "Armas e munições; suas partes e acessórios",
+                   "Footwear, hats, and similar articles; umbrellas, parasols, walking sticks,
+                 whips" = "Calçado, chapéus e artefatos de uso semelhante, guarda-chuvas, guarda-sóis, bengalas, chicotes",
+                   "Animal or vegetable fats and oils; products of their cleavage; edible fats" = "Gorduras e óleos animais ou vegetais; Produtos da sua dossociação; Gorduras alimentares elabor",
+                   "Optical, photographic, cinematographic, measuring, control or precision instruments and apparatus" = "Instrumentos e aparelhos de ótica, fotografia ou cinematografia, medida, controle ou de precis",
+                   "Wood, charcoal, and wood articles; cork and articles of cork; basketware and wickerwork" = "Madeira, carvão vegetal e obras de madeira; Cortiça e suas obras; Obras de espartaria ou de ce",
+                   "Machinery and mechanical appliances; electrical equipment; parts thereof; sound recorders and reproducers" = "Máquinas e aparelhos, material elétrico e suas partes; Aparelhos de gravação ou reprodução de ",
+                   "Transportation equipment" = "Material de transporte",
+                   "Textiles and textile articles" = "Matérias têxteis e suas obras",
+                   "Miscellaneous manufactured articles" = "Mercadorias e produtos diversos",
+                   "Base metals and articles of base metal" = "Metais comuns e suas obras",
+                   "Works of art, collectors' pieces, and antiques" = "Objetos de arte, de coleção e antiguidades",
+                   "Stone, plaster, cement, asbestos, mica, or similar materials; ceramic products" = "Obras de pedra, gesso, cimento, amianto, mica ou de matérias semelhantes; Produtos cerâmicos; ",
+                   "Wood pulp or other fibrous cellulose material; recovered (waste and scrap) paper or paperboard" = "Pastas de madeira ou de outras matérias fibrosas celulósicas; Papel ou cartão para reciclar (d",
+                   "Skins and other parts of birds, with their feathers or down; articles of leather or of composition leather" = "Peles, couros, peles com pelo e obras destas matérias; Artigos de correeiro ou de seleiro; Art",
+                   "Natural or cultured pearls, precious or semi-precious stones, precious metals" = "Pérolas naturais ou cultivadas, pedras preciosas ou semipreciosas e semelhantes, metais precio",
+                   "Plastics and articles thereof; rubber and articles thereof" = "Plásticos e suas obras; Borracha e suas obras",
+                   "Chemical or allied industries products" = "Produtos das indústrias químicas ou indústrias conexas",
+                   "Food industry products; beverages, spirits, and vinegar; tobacco" = "Produtos das indútrias alimentares; Bebidas, líquidos alcoólicos e vinagres; Tabaco e seus suc",
+                   "Vegetable products" = "Produtos do reino vegetal",
+                   "Mineral products" = "Produtos minerais",
+                   "Special transactions" = "Transações especiais")
+        
+    }
+    
+    
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       selected <- sample(sample(param$y_choices, 1)[[1]], 1)
