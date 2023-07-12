@@ -175,6 +175,11 @@ dz_varias_amazonias_cross_section <- dz_varias_amazonias_cross_section %>% group
 # Filtra colunas onde são NA
 dz_varias_amazonias_cross_section <- dz_varias_amazonias_cross_section[which(!is.na(dz_varias_amazonias_cross_section$front_2020)), ]
 
+# altera a unidade de medida de decimal para porcentagem de algumas variáveis:
+dz_varias_amazonias_cross_section<- dz_varias_amazonias_cross_section %>%
+    mutate(prop_desmatado = prop_desmatado*100 )%>%
+    mutate(prop_floresta = prop_floresta*100 )
+
 # save data
 saveRDS(dz_varias_amazonias_cross_section,
   file = "./data/dz_varias_amazonias_cross_section.rds"
@@ -240,7 +245,7 @@ temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km² em 2021"
 temp_param_table$unidade[temp_param_table$var == "prop_desmatado"] <- "Percentual em 2021"
 temp_param_table$unidade[temp_param_table$var == "prop_floresta"] <- "Percentual em 2021"
 
-temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- "Grãos em 2019"
+temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- " Área plantada/destinada à colheira (ha) em 2019"
 temp_param_table$unidade[temp_param_table$var == "num_v2670"] <- "Cabeça de animais em 2019"
 
 temp_param_table$unidade[temp_param_table$var == "pib_percapita_preco_corrente"] <- "R$ em 2019"
@@ -387,13 +392,13 @@ temp_param_table$label[temp_param_table$var == "population_density"] <- "Populat
 temp_param_table$unidade[temp_param_table$var == "ips_amazonia_2021"] <- "Index from 0 to 100"
 temp_param_table$unidade[temp_param_table$var == "qualidade_da_educacao_ideb_2019"] <- "IDEB Grade (0-10)"
 
-temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km2 in 2021"
-temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km2 in 2021"
+temp_param_table$unidade[temp_param_table$var == "desmatado"] <- "Km²in 2021"
+temp_param_table$unidade[temp_param_table$var == "floresta"] <- "Km² in 2021"
 
 temp_param_table$unidade[temp_param_table$var == "prop_desmatado"] <-"Percentage in 2021"
 temp_param_table$unidade[temp_param_table$var == "prop_floresta"] <- "Percentage in 2021"
 
-temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- "Gr\u00e3os in 2019"
+temp_param_table$unidade[temp_param_table$var == "quant_v40124"] <- " Area planted/destined for harvesting (ha) in 2019"
 temp_param_table$unidade[temp_param_table$var == "num_v2670"] <- "Animal heads in 2019"
 
 temp_param_table$unidade[temp_param_table$var == "pib_percapita_preco_corrente"] <- "R$ in 2019"
