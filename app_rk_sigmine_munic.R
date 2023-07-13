@@ -23,7 +23,7 @@ param <- get_db_param(files$param_file, files$db_file) # carrega lista de variá
 param$x_def <- "Areia" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
-param$color_def <- "Areia" # variável padrão de cor
+param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$id_def <- "group" # variável padrão de id

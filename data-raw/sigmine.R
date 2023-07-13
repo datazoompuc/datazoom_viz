@@ -40,6 +40,12 @@ colnames(datafinal) <- c("time", "group", labl)
 datafinal[is.na(datafinal)] <- 0
 datafinal$TOTAL <- rowSums(as.data.frame(datafinal[,3:327]))
 datafinal <- datafinal[order(datafinal$group, datafinal$time),]
+
+datafinal <- datafinal %>%
+    tidyr::complete(time, group)
+
+datafinal[is.na(datafinal)] <- 0
+
 saveRDS(datafinal, "data/sigmine_munic.rds")
 
 #####################
@@ -74,7 +80,7 @@ temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "Município"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 326))
-temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 326))
+temp_param_table$color <- c(rep(FALSE, 1), TRUE, rep(FALSE, 326))
 temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 326))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 326))
 
@@ -760,7 +766,7 @@ temp_param_table$desc[328] <- "Total"
 temp_param_table$desc[2] <- "Municipality"
 temp_param_table$desc[1] <- "Year"
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 326))
-temp_param_table$color <- c(rep(FALSE, 2), rep(TRUE, 326))
+temp_param_table$color <- c(rep(FALSE, 1), TRUE, rep(FALSE, 326))
 temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 326))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 326))
 
