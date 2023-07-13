@@ -12,7 +12,8 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
   
   # Carrega dados
-  df <- readRDS(files$db_file)
+  df <- readRDS(files$db_file) |> 
+      filter(time > 2015)
   
   server <- function(input, output, session) {
     
