@@ -182,7 +182,7 @@ get_server <- function(files, param) {
             x_col$label, ": ", format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
+                                      big.mark = ".")," ", x_col$unidade, "<br>",
             y_col$label, ": ", df_p$y, "<br>",
             color_col$label, ": ", df_p$color
           )

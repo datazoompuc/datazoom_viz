@@ -70,7 +70,7 @@ temp_param_table <- tibble(
   desc = columns,
   var_group = "Sigmine",
   tipo = 1,
-  unidade = "m^2",
+  unidade = "m<sup>2</sup>",
   categoria= "Mineração", 
   subcategoria = "Uso da terra"
 )
@@ -101,7 +101,7 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Sigmine",
     tipo = 1,
-    unidade = "m^2",
+    unidade = "m<sup>2</sup>",
     categoria= "Mineração", 
     subcategoria = "Uso da terra"
 )
