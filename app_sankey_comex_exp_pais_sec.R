@@ -40,10 +40,10 @@ param$year_inicio <- 1997
 param$year_final <- 2021
 
 param$label_var_name <- "VARIÁVEIS:"
-param$label_x_name <- "Categoria de exportação (Agregação da SEC)"
-param$label_colour_name <- "Ano"
+param$label_x_name <- "Ano"
+param$label_colour_name <- "Categoria de exportação (Agregação da SEC)"
 param$link <- "https://datazoom.shinyapps.io/app_sankey_comex_exp_pais_sec/"
-
+param$lang = FALSE
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

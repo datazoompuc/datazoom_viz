@@ -577,7 +577,9 @@ temp_param_table$slider <- c(FALSE, FALSE, TRUE)
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_tot_sh2_dic.csv", fileEncoding = "UTF-8")
 
-
+#############################
+# Build dictionary in english
+#############################
 
 ### exportação por pais da amazônia por tipo sec
 datafinal <- readRDS(file = "data/comex_exp_sec_pais.rds")
@@ -650,8 +652,55 @@ temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 22))
 temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 22))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 22))
 
+# translate
+temp_param_table$label[3] <- "Live animals and products of the animal kingdom"
+temp_param_table$label[4] <- "Weapons and ammunition; their parts and accessories"
+temp_param_table$label[5] <- "Footwear, hats, and similar articles; umbrellas, parasols, walking sticks, whips"
+temp_param_table$label[6] <- "Animal or vegetable fats and oils; products of their cleavage; edible fats"
+temp_param_table$label[7] <- "Optical, photographic, cinematographic, measuring, control or precision instruments and apparatus"
+temp_param_table$label[8] <- "Wood, charcoal, and wood articles; cork and articles of cork; basketware and wickerwork"
+temp_param_table$label[9] <- "Machinery and mechanical appliances; electrical equipment; parts thereof; sound recorders and reproducers"
+temp_param_table$label[10] <- "Transportation equipment"
+temp_param_table$label[11] <- "Textiles and textile articles"
+temp_param_table$label[12] <- "Miscellaneous manufactured articles"
+temp_param_table$label[13] <- "Base metals and articles of base metal"
+temp_param_table$label[14] <- "Works of art, collectors' pieces, and antiques"
+temp_param_table$label[15] <- "Stone, plaster, cement, asbestos, mica, or similar materials; ceramic products"
+temp_param_table$label[16] <- "Wood pulp or other fibrous cellulose material; recovered (waste and scrap) paper or paperboard"
+temp_param_table$label[17] <- "Skins and other parts of birds, with their feathers or down; articles of leather or of composition leather"
+temp_param_table$label[18] <- "Natural or cultured pearls, precious or semi-precious stones, precious metals"
+temp_param_table$label[19] <- "Plastics and articles thereof; rubber and articles thereof"
+temp_param_table$label[20] <- "Chemical or allied industries products"
+temp_param_table$label[21] <- "Food industry products; beverages, spirits, and vinegar; tobacco"
+temp_param_table$label[22] <- "Vegetable products"
+temp_param_table$label[23] <- "Mineral products"
+temp_param_table$label[24] <- "Special transactions"
+
+temp_param_table$var[3] <- "Live animals and products of the animal kingdom"
+temp_param_table$var[4] <- "Weapons and ammunition; their parts and accessories"
+temp_param_table$var[5] <- "Footwear, hats, and similar articles; umbrellas, parasols, walking sticks, whips"
+temp_param_table$var[6] <- "Animal or vegetable fats and oils; products of their cleavage; edible fats"
+temp_param_table$var[7] <- "Optical, photographic, cinematographic, measuring, control or precision instruments and apparatus"
+temp_param_table$var[8] <- "Wood, charcoal, and wood articles; cork and articles of cork; basketware and wickerwork"
+temp_param_table$var[9] <- "Machinery and mechanical appliances; electrical equipment; parts thereof; sound recorders and reproducers"
+temp_param_table$var[10] <- "Transportation equipment"
+temp_param_table$var[11] <- "Textiles and textile articles"
+temp_param_table$var[12] <- "Miscellaneous manufactured articles"
+temp_param_table$var[13] <- "Base metals and articles of base metal"
+temp_param_table$var[14] <- "Works of art, collectors' pieces, and antiques"
+temp_param_table$var[15] <- "Stone, plaster, cement, asbestos, mica, or similar materials; ceramic products"
+temp_param_table$var[16] <- "Wood pulp or other fibrous cellulose material; recovered (waste and scrap) paper or paperboard"
+temp_param_table$var[17] <- "Skins and other parts of birds, with their feathers or down; articles of leather or of composition leather"
+temp_param_table$var[18] <- "Natural or cultured pearls, precious or semi-precious stones, precious metals"
+temp_param_table$var[19] <- "Plastics and articles thereof; rubber and articles thereof"
+temp_param_table$var[20] <- "Chemical or allied industries products"
+temp_param_table$var[21] <- "Food industry products; beverages, spirits, and vinegar; tobacco"
+temp_param_table$var[22] <- "Vegetable products"
+temp_param_table$var[23] <- "Mineral products"
+temp_param_table$var[24] <- "Special transactions"
+
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_pais_sec_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/comex_exp_pais_sec_dic_en.csv", fileEncoding = "UTF-8")
 
 
 
