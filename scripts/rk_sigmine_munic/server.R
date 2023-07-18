@@ -12,8 +12,10 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
   
   # Carrega dados
-  df <- readRDS(files$db_file) |> 
-      filter(time %in% tail(unique(df$time), 6)) # Seleciona os últimos 6 anos
+  df <- readRDS(files$db_file)
+  time_vector <- tail(unique(df$time), 6) # Seleciona os últimos 6 anos
+  df <- df |> 
+      filter(time %in% time_vector) 
   
   server <- function(input, output, session) {
     
