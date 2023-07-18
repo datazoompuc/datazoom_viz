@@ -13,7 +13,7 @@ get_server <- function(files, param) {
   
   # Carrega dados
   df <- readRDS(files$db_file) |> 
-      filter(time > 2000)
+      filter(time %in% tail(unique(df$time), 6)) # Seleciona os últimos 6 anos
   
   server <- function(input, output, session) {
     
@@ -394,8 +394,7 @@ get_server <- function(files, param) {
         }
       )
       fig
-    }) %>%
-      bindCache(input$x, input$color)
+    }) 
 
     # Observa eventos
     observe({

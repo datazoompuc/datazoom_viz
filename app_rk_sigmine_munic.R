@@ -1,7 +1,3 @@
-# Cache
-cache_folder <- "./cache/app_rk_sigmine_munic/"
-shinyOptions(cache = cachem::cache_disk(cache_folder))
-
 # Carrega bibliotecas
 library(shiny)
 library(ggplot2)
