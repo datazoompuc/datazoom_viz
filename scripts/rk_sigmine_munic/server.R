@@ -13,7 +13,7 @@ get_server <- function(files, param) {
   
   # Carrega dados
   df <- readRDS(files$db_file) |> 
-      filter(time > 2015)
+      filter(time > 2000)
   
   server <- function(input, output, session) {
     
