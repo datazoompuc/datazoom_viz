@@ -13,7 +13,7 @@ get_server <- function(files, param) {
   
   # Carrega dados
   df <- readRDS(files$db_file)
-  
+
   server <- function(input, output, session) {
     
     # Cria opções para seleção de grupos
@@ -182,6 +182,7 @@ get_server <- function(files, param) {
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
+            param$server3,": ", x_col$unidade, "<br>",
             y_col$label, ": ", df_p$y, "<br>",
             color_col$label, ": ", df_p$color
           )
@@ -394,7 +395,7 @@ get_server <- function(files, param) {
       )
       fig
     }) %>%
-      bindCache(input$x, input$color)
+        bindCache(input$x, input$color)
 
     # Observa eventos
     observe({

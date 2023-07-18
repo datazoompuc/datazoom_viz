@@ -10,7 +10,7 @@ files$ui_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/ui.R"
 files$server_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/server.R"
 files$param_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/mapbiomas_cobertura_munic_dic.csv"
+files$param_file <- "data/mapbiomas_cobertura_munic_percentual_dic.csv"
 files$db_file <- "data/mapbiomas_cobertura_munic_percentual.rds"
 
 # Carrega scripts
@@ -38,6 +38,7 @@ param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura_munic_pe
 param$server0 <- "Variável não selecionada"
 param$server1 <- "Ranking de "
 param$server2 <- "Amazônia Legal"
+param$server3 <- "Unidade de medida"
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"

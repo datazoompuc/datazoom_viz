@@ -22,7 +22,7 @@ aux$CD_GCMUN <- as.character(aux$CD_GCMUN)
 aux$AR_MUN_2020 <- as.character(aux$AR_MUN_2020)
 dat$territory_id <- str_replace_all(dat$territory_id, setNames(aux$AR_MUN_2020, aux$CD_GCMUN))
 dat$territory_id <- as.numeric(dat$territory_id) * 100 # From km2 to ha
-dat$Area <-dat$Area/dat$territory_id
+dat$Area <-dat$Area/dat$territory_id*100
 
 
 # Data for level_4
@@ -128,3 +128,113 @@ translated_labl <- c("Mosaico de Cultivos", "Soja", "Pastagem", "Infraestrutura 
 colnames(datafinal) <- c("time", "group", translated_labl)
 datafinal[is.na(datafinal)] <- 0
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic_percentual.rds")
+
+
+datafinal <- readRDS("data/mapbiomas_cobertura_munic.rds")
+
+#####################
+# Build Dictionary 
+#####################
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Mapbiomas",
+    tipo = 1,
+    unidade = "% da área total do município",
+    categoria= "Meio ambiente", 
+    subcategoria = "Uso da terra"
+)
+
+temp_param_table$label[1] <- "Ano"
+temp_param_table$label[2] <- "Município"
+temp_param_table$desc[1] <- "Ano"
+temp_param_table$desc[2] <- "Município"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 30))
+temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 30))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 30))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_percentual_dic.csv", fileEncoding = "UTF-8")
+
+
+##############################
+# Build Dictionary in English
+##############################
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Mapbiomas",
+    tipo = 1,
+    unidade = "% of total municipality area",
+    categoria= "Meio ambiente", 
+    subcategoria = "Uso da terra"
+)
+
+temp_param_table$label[1] <- "Year"
+temp_param_table$label[2] <- "Municipality"
+temp_param_table$desc[1] <- "Year"
+temp_param_table$desc[2] <- "Municipality"
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 30))
+temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 30))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 30))
+temp_param_table$label[temp_param_table$var=="Mosaico de Cultivos"] <- "Mosaic of Crops"
+temp_param_table$label[temp_param_table$var=="Soja"] <- "Soy Beans"
+temp_param_table$label[temp_param_table$var=="Pastagem"] <- "Pasture"
+temp_param_table$label[temp_param_table$var=="Infraestrutura Urbana"] <- "Urban Infrastructure"
+temp_param_table$label[temp_param_table$var=="Formação de Floresta"] <- "Forest Formation"
+temp_param_table$label[temp_param_table$var=="Pradaria"] <- "Grassland"
+temp_param_table$label[temp_param_table$var=="Rios, Lagos ou Oceanos"] <- "River, Lake and Ocean"
+temp_param_table$label[temp_param_table$var=="Não Observado"] <- "Non Observed"
+temp_param_table$label[temp_param_table$var=="Formação de Savana"] <- "Savanna Formation"
+temp_param_table$label[temp_param_table$var=="Outras áreas não vegetadas"] <- "Other Non Vegetated Area"
+temp_param_table$label[temp_param_table$var=="Plantação de Floresta"] <- "Forest Plantation"
+temp_param_table$label[temp_param_table$var=="Mineiração"] <- "Mining"
+temp_param_table$label[temp_param_table$var=="Cana-de-açúcar"] <- "Sugar Cane"
+temp_param_table$label[temp_param_table$var=="Mangue"] <- "Magrove"
+temp_param_table$label[temp_param_table$var=="Salar"] <- "Salt flat"
+temp_param_table$label[temp_param_table$var=="Praia e Dunas"] <- "Beach and Dune"
+temp_param_table$label[temp_param_table$var=="Pântano"] <- "Wetland"
+temp_param_table$label[temp_param_table$var=="Cultivos perenes"] <- "Perennial Crops"
+temp_param_table$label[temp_param_table$var=="Mosaico de Agricultura e Pastagem"] <-"Mosaic of Agriculture and Pasture"
+temp_param_table$label[temp_param_table$var=="Cultivos temporários"] <- "Temporary Crops"
+temp_param_table$label[temp_param_table$var=="Agricultura"] <- " Agriculture"
+temp_param_table$label[temp_param_table$var=="Floresta Natural"] <- "Natural Forest"
+temp_param_table$label[temp_param_table$var=="Floresta"] <- "Forest"
+temp_param_table$label[temp_param_table$var=="Formação Natural sem ser Floresta"] <- "Natural Formation without being Forest"
+temp_param_table$label[temp_param_table$var=="Fazenda"] <- "Farm"
+temp_param_table$label[temp_param_table$var=="Área não Vegetada"] <- "Non Vegetated Area"
+temp_param_table$label[temp_param_table$var=="Água"] <- "Water"
+temp_param_table$label[temp_param_table$var=="Formação Antrópica"] <- "Anthropic Formation"
+temp_param_table$label[temp_param_table$var=="Formação Natural"] <- "Natural Formation"
+temp_param_table$label[temp_param_table$var=="Não Identificado"] <- "Not identified"
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_percentual_dic_en.csv", fileEncoding = "UTF-8")
+
+
