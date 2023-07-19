@@ -42,6 +42,7 @@ param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cnae_en/"
 param$novar <- "No variable selected"
 param$title <- "Ranking of "
 param$AL <- "Legal Amazon"
+param$lang <- TRUE
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
