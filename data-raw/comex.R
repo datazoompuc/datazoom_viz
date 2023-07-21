@@ -1389,11 +1389,6 @@ temp_param_table <- tibble(
     subcategoria = "Trade"
 )
 
-
-
-
-
-
 temp_param_table$label[3] <- "Afghanistan"
 temp_param_table$label[4] <- "South Africa"
 temp_param_table$label[5] <- "Albania"
@@ -1898,8 +1893,8 @@ temp_param_table$label[6] <- "Fats and vegetable or animal oils; their dissociat
 temp_param_table$label[5] <- "Footwear, hats and similar purpose artifacts, umbrellas, sunshades, canes and whips"
 temp_param_table$label[4] <- "Guns and ammunition: their parts and accessories"
 temp_param_table$label[3] <- "Live animals and animal kingdom products"
-temp_param_table$label[2] <- "Year"
-temp_param_table$label[1] <- "Country"
+temp_param_table$label[2] <- "Country"
+temp_param_table$label[1] <- "Year"
 temp_param_table$desc[24] <- "Special transactions"
 temp_param_table$desc[23] <- "Mineral products"
 temp_param_table$desc[22] <- "Plant kingdom products"
