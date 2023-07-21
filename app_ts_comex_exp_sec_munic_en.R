@@ -41,6 +41,7 @@ param$label_axis_name <- "proportional to starting year (*)"
 param$label_mun_filter <- "Amazon Municipalities"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_sec_munic_en/"
 param$currency <- "Per R$"
+param$measurement <- "R$ "
 
 # Outros parâmetros e configurações
 
