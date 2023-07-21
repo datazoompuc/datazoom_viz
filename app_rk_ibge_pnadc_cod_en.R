@@ -38,11 +38,13 @@ param$xaxis <- "Ranking - horizontal axis (x):"
 param$cor <- "Bar colors:"
 param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cod_en/"
 
+
 # Parâmetros específicos do server
 param$novar <- "No variable selected"
 param$title <- "Ranking of "
 param$AL <- "Legal Amazon"
-
+param$lang <- TRUE
+    
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "Occupation type - Aggregated data of municipalities in the Legal Amazon (Source: IBGE)"
