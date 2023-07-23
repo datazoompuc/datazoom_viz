@@ -46,6 +46,7 @@ param$server2 <- "Ranking da Propor\u00e7\u00e3o das Exporta\u00e7\u00f5es Mundi
 param$server3 <- "Amaz\u00f4nia Legal"
 param$server4 <- "Unidade de medida: <b>"
 param$server5 <- "Ano: "
+param$lang <- FALSE
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

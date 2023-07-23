@@ -46,6 +46,7 @@ param$server2 <- "Proportions of world exports coming from the Amazon Ranking"
 param$server3 <- "Legal Amazon"
 param$server4 <- "Unit measure: <b>"
 param$server5 <- "Year: "
+param$lang <- TRUE
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
