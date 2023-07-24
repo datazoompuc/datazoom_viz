@@ -36,6 +36,7 @@ param$id_def <- "id" # variável padrão de id
 
 param$text_def <- "id" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "id" # variável de agrupamento
+param$lang <- FALSE
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Dados compilados da Ag\u00eancia Nacional de Energia El\u00e9trica (ANEEL)"

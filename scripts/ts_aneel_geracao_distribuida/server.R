@@ -14,6 +14,56 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file)
   
+  if(param$lang){
+      df$id <- df$id %>%
+          str_replace_all(c("R. Nordeste" = "Northeast",
+                                "R. Norte" = "North",
+                                "R. Centro-Oeste" = "Midwest",
+                                "R. Sudeste" = "Southeast",
+                                "R. Sul" = "South",
+                                "Fora da" = "Outside the",
+                                "Amazônia Legal" = "Legal Amazon"))
+      df <- df %>% 
+          mutate(dsc_fonte_geracao = case_when(dsc_fonte_geracao ==
+              "Bagaço de Cana de Açúcar" ~ "Sugarcane Bagasse", dsc_fonte_geracao ==
+              "Biogás-AGR" ~ "Biogas - Agroindustrial", dsc_fonte_geracao ==
+              "Biogás - Floresta" ~ "Biogas - Forest", dsc_fonte_geracao ==
+              "Biogás - RA" ~ "Biogas - Animal Residue", dsc_fonte_geracao ==
+              "Biogás - RU" ~ "Biogas - Urban Residue", dsc_fonte_geracao ==
+              "Casca de Arroz" ~ "Rice Husk", dsc_fonte_geracao ==
+              "Cinética do vento" ~ "Wind Kinetics", dsc_fonte_geracao ==
+              "Gás de Alto Forno - Biomassa" ~ "Blast Furnace Gas - Biomass", dsc_fonte_geracao ==
+              "Gás Natural" ~ "Natural Gas", dsc_fonte_geracao ==
+              "Potencial hidráulico" ~ "Hydraulic Potential", dsc_fonte_geracao ==
+              "Radiação solar" ~ "Solar Radiation", dsc_fonte_geracao ==
+              "Resíduos Florestais" ~ "Forest Residues", dsc_fonte_geracao ==
+              "Resíduos Sólidos Urbanos - RU" ~ "Urban Solid Waste - Urban Residue"
+          )) %>%
+          mutate(dsc_porte = case_when(
+              dsc_porte == "Microgeração" ~ "Microgeneration", 
+              dsc_porte == "Minigeração" ~ "Minigeneration"
+              
+          )) %>%
+          mutate(sig_modalidade_empreendimento = case_when(
+              sig_modalidade_empreendimento == "Indefinido" ~ "Undefined", sig_modalidade_empreendimento ==
+              "Geração compartilhada" ~ "Shared Generation", sig_modalidade_empreendimento ==
+              "Múltiplas unidades consumidoras" ~ "Multiple Consumer Units", sig_modalidade_empreendimento ==
+              "Microgeração ou Minigeração distribuída" ~ "Distributed Microgeneration or Minigeneration", sig_modalidade_empreendimento ==
+              "Autoconsumo remoto" ~ "Remote Self-consumption"
+          ))
+          
+  }
+  
+  if(param$lang == FALSE){
+  df <- df %>% 
+      mutate(dsc_fonte_geracao = case_when(dsc_fonte_geracao ==
+                                               "Biogás-AGR" ~ "Biogás - Agroindustrial", dsc_fonte_geracao ==
+                                               "Biogás - RA" ~ "Biogás - Resíduo Animal", dsc_fonte_geracao ==
+                                               "Biogás - RU" ~ "Biogás - Resíduo Urbano", dsc_fonte_geracao ==
+                                               "Resíduos Sólidos Urbanos - RU" ~ "Resíduos Sólidos Urbanos"
+      ))
+  }
+  
   server <- function(input, output, session) {
     
     # filtra dados de composicao demografica
