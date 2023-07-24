@@ -42,10 +42,11 @@ param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cnae_en/"
 param$novar <- "No variable selected"
 param$title <- "Ranking of "
 param$AL <- "Legal Amazon"
+param$lang <- TRUE
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Economic Activities"
+param$plot_desc <- "Economic Activities - Aggregated data of municipalities in the Legal Amazon (Source: IBGE)"
 
 # Outros parâmetros e configurações
 param$x_choices$`IBGE - Continuous PNAD`$`Economic activity` <- NULL

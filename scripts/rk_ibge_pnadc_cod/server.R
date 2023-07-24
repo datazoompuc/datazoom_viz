@@ -14,6 +14,43 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file)
   
+  if(param$lang){
+      
+      df <- df %>% 
+          mutate(group = case_when( group ==
+              "Administradores e especialista em gestão" ~ "Administrators and management specialists", group ==
+              "Agricultores elementares" ~ "Elementary farmers", group ==
+              "Agricultores qualificados" ~ "Skilled farmers", group ==
+              "Ambulantes" ~ "Street vendors", group ==
+              "Apoio administrativo" ~ "Administrative support", group ==
+              "Artesões e artes gráficas" ~ "Artisans and graphic arts", group ==
+              "Atendimento direto ao público" ~ "Direct customer service", group ==
+              "Cientistas e engenheiros" ~ "Scientists and engineers", group ==
+              "Coletores de lixo" ~ "Garbage collectors", group ==
+              "Dirigentes e gerentes" ~ "Executives and managers", group ==
+              "Domésticos" ~ "Domestic workers", group ==
+              "Escriturários" ~ "Clerks", group ==
+              "Extrativistas florestais" ~ "Forest extractivists", group ==
+              "Montadores e condutores de veículos" ~ "Assemblers and vehicle drivers", group ==
+              "Operários da construção, metalurgia e indústria" ~ "Construction, metallurgy, and industrial workers", group ==
+              "Operários de processamento e instalações" ~ "Processing and facilities workers", group ==
+              "Pecuaristas e criadores de animais" ~ "Livestock farmers and animal breeders", group ==
+              "Profissionais da saúde" ~ "Health professionals", group ==
+              "Profissionais de segurança" ~ "Security professionals", group ==
+              "Profissionais do ensino" ~ "Teaching professionals", group ==
+              "Profissionais em alimentação" ~ "Food service professionals", group ==
+              "Serviços de TI e comunicação" ~ "IT and communication services", group ==
+              "Serviços e cuidados pessoais" ~ "Personal care services", group ==
+              "Serviços financeiros e administrativos" ~ "Financial and administrative services", group ==
+              "Serviços jurídicos" ~ "Legal services", group ==
+              "Serviços sociais e culturais" ~ "Social and cultural services", group ==
+              "Trabalhadores no governo" ~ "Government workers", group ==
+              "Técnicos de eletricidade e eletrônica" ~ "Electrical and electronic technicians", group ==
+              "Vendedores" ~ "Salespersons", TRUE ~ group
+              ))
+      
+  }
+  
   server <- function(input, output, session) {
     
     # Cria opções para seleção de grupos
