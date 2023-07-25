@@ -12,7 +12,106 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
   
   # Carrega dados
-  df <- readRDS(files$db_file)
+  df <- readRDS(files$db_file) %>% 
+    ungroup
+  
+  if(param$lang) {
+
+    df <- df %>%
+      mutate(dsc_fonte_geracao = case_when(
+        dsc_fonte_geracao == "Bagaço de Cana de Açúcar"         ~ "Sugarcane Bagasse",
+        dsc_fonte_geracao == "Biogás-AGR"                       ~ "Biogas-AGR",
+        dsc_fonte_geracao == "Biogás - Floresta"                ~ "Biogas - Forest",
+        dsc_fonte_geracao == "Biogás - RA"                      ~ "Biogas - RA",
+        dsc_fonte_geracao == "Biogás - RU"                      ~ "Biogas - RU",
+        dsc_fonte_geracao == "Casca de Arroz"                   ~ "Rice Husk",
+        dsc_fonte_geracao == "Cinética do vento"                ~ "Wind Kinetics",
+        dsc_fonte_geracao == "Gás de Alto Forno - Biomassa"     ~ "Blast Furnace Gas - Biomass",
+        dsc_fonte_geracao == "Gás Natural"                      ~ "Natural Gas",
+        dsc_fonte_geracao == "Potencial hidráulico"             ~ "Hydropower",
+        dsc_fonte_geracao == "Radiação solar"                   ~ "Solar Radiation",
+        dsc_fonte_geracao == "Resíduos Florestais"              ~ "Forest Waste",
+        dsc_fonte_geracao == "Resíduos Sólidos Urbanos - RU"    ~ "Urban Solid Waste - RU"),
+
+        sig_modalidade_empreendimento = case_when(
+        sig_modalidade_empreendimento == "Indefinido"                                ~ "Undefined",
+        sig_modalidade_empreendimento == "Geração compartilhada"                    ~ "Shared Generation",
+        sig_modalidade_empreendimento == "Múltiplas unidades consumidoras"           ~ "Multiple Consumer Units",
+        sig_modalidade_empreendimento == "Microgeração ou Minigeração distribuída"   ~ "Microgeneration or Distributed Minigeneration",
+        sig_modalidade_empreendimento == "Autoconsumo remoto"                        ~ "Remote Self-consumption"),
+
+        dsc_porte = case_when(
+        dsc_porte == "Microgeração"    ~ "Microgeneration",
+        dsc_porte == "Minigeração"     ~ "Minigeneration"
+      ),
+      id = case_when(
+        id == "Amazônia Legal"            ~ "Legal Amazon",
+        id == "Fora da Amazônia Legal"    ~ "Outside Legal Amazon",
+        id == "R. Centro-Oeste: DF"       ~ "Central-West Region: DF",
+        id == "R. Centro-Oeste: GO"       ~ "Central-West Region: GO",
+        id == "R. Centro-Oeste: MS"       ~ "Central-West Region: MS",
+        id == "R. Centro-Oeste: MT"       ~ "Central-West Region: MT",
+        id == "R. Nordeste: AL"          ~ "Northeast Region: AL",
+        id == "R. Nordeste: BA"          ~ "Northeast Region: BA",
+        id == "R. Nordeste: CE"          ~ "Northeast Region: CE",
+        id == "R. Nordeste: MA"          ~ "Northeast Region: MA",
+        id == "R. Nordeste: PB"          ~ "Northeast Region: PB",
+        id == "R. Nordeste: PE"          ~ "Northeast Region: PE",
+        id == "R. Nordeste: RN"          ~ "Northeast Region: RN",
+        id == "R. Nordeste: SE"          ~ "Northeast Region: SE",
+        id == "R. Norte: AC"             ~ "North Region: AC",
+        id == "R. Norte: AM"             ~ "North Region: AM",
+        id == "R. Norte: AP"             ~ "North Region: AP",
+        id == "R. Norte: PA"             ~ "North Region: PA",
+        id == "R. Norte: RO"             ~ "North Region: RO",
+        id == "R. Norte: RR"             ~ "North Region: RR",
+        id == "R. Norte: TO"             ~ "North Region: TO",
+        id == "R. Sudeste: ES"           ~ "Southeast Region: ES",
+        id == "R. Sudeste: MG"           ~ "Southeast Region: MG",
+        id == "R. Sudeste: RJ"           ~ "Southeast Region: RJ",
+        id == "R. Sudeste: SP"           ~ "Southeast Region: SP",
+        id == "R. Sul: PR"               ~ "South Region: PR",
+        id == "R. Sul: RS"               ~ "South Region: RS",
+        id == "R. Sul: SC"               ~ "South Region: SC",
+        TRUE                            ~ id  # Else condition (keep the original value)
+      ),
+      group = case_when(
+        group == "Amazônia Legal"            ~ "Legal Amazon",
+        group == "Fora da Amazônia Legal"    ~ "Outside Legal Amazon",
+        group == "R. Centro-Oeste: DF"       ~ "Central-West Region: DF",
+        group == "R. Centro-Oeste: GO"       ~ "Central-West Region: GO",
+        group == "R. Centro-Oeste: MS"       ~ "Central-West Region: MS",
+        group == "R. Centro-Oeste: MT"       ~ "Central-West Region: MT",
+        group == "R. Nordeste: AL"          ~ "Northeast Region: AL",
+        group == "R. Nordeste: BA"          ~ "Northeast Region: BA",
+        group == "R. Nordeste: CE"          ~ "Northeast Region: CE",
+        group == "R. Nordeste: MA"          ~ "Northeast Region: MA",
+        group == "R. Nordeste: PB"          ~ "Northeast Region: PB",
+        group == "R. Nordeste: PE"          ~ "Northeast Region: PE",
+        group == "R. Nordeste: RN"          ~ "Northeast Region: RN",
+        group == "R. Nordeste: SE"          ~ "Northeast Region: SE",
+        group == "R. Norte: AC"             ~ "North Region: AC",
+        group == "R. Norte: AM"             ~ "North Region: AM",
+        group == "R. Norte: AP"             ~ "North Region: AP",
+        group == "R. Norte: PA"             ~ "North Region: PA",
+        group == "R. Norte: RO"             ~ "North Region: RO",
+        group == "R. Norte: RR"             ~ "North Region: RR",
+        group == "R. Norte: TO"             ~ "North Region: TO",
+        group == "R. Sudeste: ES"           ~ "Southeast Region: ES",
+        group == "R. Sudeste: MG"           ~ "Southeast Region: MG",
+        group == "R. Sudeste: RJ"           ~ "Southeast Region: RJ",
+        group == "R. Sudeste: SP"           ~ "Southeast Region: SP",
+        group == "R. Sul: PR"               ~ "South Region: PR",
+        group == "R. Sul: RS"               ~ "South Region: RS",
+        group == "R. Sul: SC"               ~ "South Region: SC",
+        TRUE                            ~ group  # Else condition (keep the original value)
+      ))
+
+
+
+  }
+  
+  
   
   server <- function(input, output, session) {
     
