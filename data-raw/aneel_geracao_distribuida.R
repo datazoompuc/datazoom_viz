@@ -308,11 +308,14 @@ temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Year"
 temp_param_table$unidade[str_detect(temp_param_table$var, regex("mda_potencia_instalada_kw", ignore_case = TRUE))] <- "kilowatt"
 temp_param_table$unidade[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "Sum of consumer units"
 
+# var_group variables
+temp_param_table$var_group[str_detect(temp_param_table$var, regex("mda_potencia_instalada_kw", ignore_case = TRUE))] <- "INSTALLED CAPACITY::"
+temp_param_table$var_group[str_detect(temp_param_table$var, regex("qtd_uc_recebe_credito", ignore_case = TRUE))] <- "NUMBER OF CONSUMER UNITS:"
 
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table,
-          file = "data/aneel_geracao_distribuida_dic_en.csv",
+          file = "./data/aneel_geracao_distribuida_dic_en.csv",
           fileEncoding = "UTF-8"
 
 )
