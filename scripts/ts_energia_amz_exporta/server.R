@@ -16,24 +16,51 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file) %>%
       mutate(`total produzido`= as.numeric(`total produzido`))
     
+    if(param$translate_names) {
+      df <- df %>% 
+        mutate(uf = case_when(
+          uf == "Amazônia Legal" ~ "Legal Amazon",
+          uf == "Fora da Amazônia Legal" ~ "Outside Legal Amazon"
+        ))
+    }
+    
     # Cria opções para seleção de grupos
     #param$filter_choices <- sort(unique(df$group))
     #param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
     
     # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      updateSelectInput(session,
-                        "y",
-                        choices = param$y_choices,
-                        selected = c("total produzido", "consumo total") 
-      )
-      
-      updateSelectInput(session,
-                        "filter1",
-                        choices = param$filter_choices,
-                        selected = c("Amazônia Legal", "Fora da Amazônia Legal")
-      )
+    
+    if(param$translate_names == FALSE) {
+      random_inputs <- function() {
+        updateSelectInput(session,
+                          "y",
+                          choices = param$y_choices,
+                          selected = c("total produzido", "consumo total") 
+        )
+        
+        updateSelectInput(session,
+                          "filter1",
+                          choices = param$filter_choices,
+                          selected = c("Amazônia Legal", "Fora da Amazônia Legal")
+        )
+      }
+    } else {
+      random_inputs <- function() {
+        updateSelectInput(session,
+                          "y",
+                          choices = param$y_choices,
+                          selected = c("total produzido", "consumo total") 
+        )
+        
+        updateSelectInput(session,
+                          "filter1",
+                          choices = param$filter_choices,
+                          selected = c("Legal Amazon", "Outside Legal Amazon")
+        )
+      }
     }
+    
+    
     
     
     # Função para atualizar url do app com parâmetros dos inputs
@@ -253,17 +280,32 @@ get_server <- function(files, param) {
           if (all(is.na(df_p$color))) {
             df_p$color <- " "
           }
-       
-          # Monta html do tooltip
-          df_p$tooltip <- paste0(
-            "<b>", df_p$color, "</b><br>",
-            x_col$label, ": ", df_p$x, "<br>",
-            df_p$text, ": ", format(df_p$y, scientific = FALSE,
+          
+          if(param$translate_names == FALSE){
+            # Monta html do tooltip
+            df_p$tooltip <- paste0(
+              "<b>", df_p$color, "</b><br>",
+              x_col$label, ": ", df_p$x, "<br>",
+              df_p$text, ": ", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            "Unidade de medida: <b>", df_p$unidade, "</b>"
-          )
+              "Unidade de medida: <b>", df_p$unidade, "</b>"
+            )
+          } else {
+            # Monta html do tooltip
+            df_p$tooltip <- paste0(
+              "<b>", df_p$color, "</b><br>",
+              x_col$label, ": ", df_p$x, "<br>",
+              df_p$text, ": ", format(df_p$y, scientific = FALSE,
+                                      digits = 2,
+                                      decimal.mark = ",", 
+                                      big.mark = "."), "<br>",
+              "Measurment Unit: <b> % of Brazil's total </b>"
+            )
+          }
+       
+         
           
           # Define paleta de cores
           pallete <- pallete_discrete
