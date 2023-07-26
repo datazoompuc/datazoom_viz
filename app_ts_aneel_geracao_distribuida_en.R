@@ -61,9 +61,6 @@ param$x_choices[[1]] <- NULL
 param$y_choices[[1]] <- NULL
 param$color_choices[[1]] <- NULL
 
-# Outros parâmetros e configurações
-param$filter_choices <- list("Installed Capacity" = list("Comercial", "Residential", "Industrial", "Rural", "Public Authority", "Public Lightning", "Total Installed Capacity"),
-                             "Number of Units" = list("Comercial", "Residential", "Industrial", "Rural", "Public Authority", "Public Lightning", "Total Number of Units"))
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
