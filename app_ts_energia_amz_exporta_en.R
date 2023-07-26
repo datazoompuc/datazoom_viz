@@ -47,8 +47,8 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_energia_amz_exporta_en/"
 param$translate_names <- TRUE
 
 # Outros parâmetros e configurações
-param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal"),
-                             "UF" = owdbr::uflist()$UF)
+param$filter_choices <- list("Legal Amazon" = list("Legal Amazon", "Outside Legal Amazon"),
+                             "States" = owdbr::uflist()$UF)
 param$y_choices$`Fonte de dados` <- NULL
 param$y_choices[[1]] <- NULL
 
