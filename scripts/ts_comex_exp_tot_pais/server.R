@@ -14,7 +14,255 @@ get_server <- function(files, param) {
 
     # Carrega dados
     df <- readRDS(files$db_file)
-
+    
+    #######
+    #Translating country names
+    if(param$lang){
+        
+        df <- df %>% 
+            mutate(group = case_when(group == 
+                                         "Afeganistão" ~ "Afghanistan", group ==
+                                         "África do Sul" ~ "South Africa", group ==
+                                         "Albânia" ~ "Albania", group ==
+                                         "Alemanha" ~ "Germany", group ==
+                                         "Andorra" ~ "Andorra", group ==
+                                         "Angola" ~ "Angola", group ==
+                                         "Anguilla" ~ "Anguilla", group ==
+                                         "Antígua e Barbuda" ~ "Antigua and Barbuda", group ==
+                                         "Antilhas Holandesas" ~ "Netherlands Antilles", group ==
+                                         "Arábia Saudita" ~ "Saudi Arabia", group ==
+                                         "Argélia" ~ "Algeria", group ==
+                                         "Argentina" ~ "Argentina", group ==
+                                         "Armênia" ~ "Armenia", group ==
+                                         "Aruba" ~ "Aruba", group ==
+                                         "Austrália" ~ "Australia", group ==
+                                         "Áustria" ~ "Austria", group ==
+                                         "Azerbaijão" ~ "Azerbaijan", group ==
+                                         "Bahamas" ~ "Bahamas", group ==
+                                         "Bahrein" ~ "Bahrain", group ==
+                                         "Bangladesh" ~ "Bangladesh", group ==
+                                         "Barbados" ~ "Barbados", group ==
+                                         "Belarus" ~ "Belarus", group ==
+                                         "Bélgica" ~ "Belgium", group ==
+                                         "Belize" ~ "Belize", group ==
+                                         "Benin" ~ "Benin", group ==
+                                         "Bermudas" ~ "Bermuda", group ==
+                                         "Bolívia" ~ "Bolivia", group ==
+                                         "Bonaires, Saint Eustatius e Saba" ~ "Bonaire, Saint Eustatius and Saba", group ==
+                                         "Bósnia-Herzegovina" ~ "Bosnia and Herzegovina", group ==
+                                         "Botsuana" ~ "Botswana", group ==
+                                         "Bouvet, Ilha" ~ "Bouvet Island", group ==
+                                         "Brasil" ~ "Brazil", group ==
+                                         "Brunei" ~ "Brunei", group ==
+                                         "Bulgária" ~ "Bulgaria", group ==
+                                         "Burkina Faso" ~ "Burkina Faso", group ==
+                                         "Cabo Verde" ~ "Cape Verde", group ==
+                                         "Camarões" ~ "Cameroon", group ==
+                                         "Camboja" ~ "Cambodia", group ==
+                                         "Canadá" ~ "Canada", group ==
+                                         "Canárias, group == Ilhas" ~ "Canary Islands", group ==
+                                         "Catar" ~ "Qatar", group ==
+                                         "Cayman, Ilhas" ~ "Cayman Islands", group ==
+                                         "Cazaquistão" ~ "Kazakhstan", group ==
+                                         "Chade" ~ "Chad", group ==
+                                         "Chile" ~ "Chile", group ==
+                                         "China" ~ "China", group ==
+                                         "Chipre" ~ "Cyprus", group ==
+                                         "Cingapura" ~ "Singapore", group ==
+                                         "Colômbia" ~ "Colombia", group ==
+                                         "Comores" ~ "Comoros", group ==
+                                         "Congo" ~ "Congo", group ==
+                                         "Cook, Ilhas" ~ "Cook Islands", group ==
+                                         "Coreia do Norte" ~ "North Korea", group ==
+                                         "Coreia do Sul" ~ "South Korea", group ==
+                                         "Costa do Marfim" ~ "Ivory Coast", group ==
+                                         "Costa Rica" ~ "Costa Rica", group ==
+                                         "Croácia" ~ "Croatia", group ==
+                                         "Cuba" ~ "Cuba", group ==
+                                         "Curaçao" ~ "Curaçao", group ==
+                                         "Dinamarca" ~ "Denmark", group ==
+                                         "Djibuti" ~ "Djibouti", group ==
+                                         "Dominica" ~ "Dominica", group ==
+                                         "Egito" ~ "Egypt", group ==
+                                         "El Salvador" ~ "El Salvador", group ==
+                                         "Emirados Árabes Unidos" ~ "United Arab Emirates", group ==
+                                         "Equador" ~ "Ecuador", group ==
+                                         "Eritreia" ~ "Eritrea", group ==
+                                         "Eslováquia" ~ "Slovakia", group ==
+                                         "Eslovênia" ~ "Slovenia", group ==
+                                         "Espanha" ~ "Spain", group ==
+                                         "Estados Unidos" ~ "United States", group ==
+                                         "Estônia" ~ "Estonia", group ==
+                                         "Etiópia" ~ "Ethiopia", group ==
+                                         "Falkland, Ilhas (Malvinas)" ~ "Falkland Islands (Malvinas)", group ==
+                                         "Faroé, Ilhas" ~ "Faroe Islands", group ==
+                                         "Fiji" ~ "Fiji", group ==
+                                         "Filipinas" ~ "Philippines", group ==
+                                         "Finlândia" ~ "Finland", group ==
+                                         "França" ~ "France", group ==
+                                         "Gabão" ~ "Gabon", group ==
+                                         "Gâmbia" ~ "Gambia", group ==
+                                         "Gana" ~ "Ghana", group ==
+                                         "Geórgia" ~ "Georgia", group ==
+                                         "Geórgia do Sul e Ilhas Sandwich do Sul" ~ "South Georgia and the South Sandwich Islands", group ==
+                                         "Gibraltar" ~ "Gibraltar", group ==
+                                         "Grécia" ~ "Greece", group ==
+                                         "Grenada" ~ "Grenada", group ==
+                                         "Groenlândia" ~ "Greenland", group ==
+                                         "Guadalupe" ~ "Guadeloupe", group ==
+                                         "Guam" ~ "Guam", group ==
+                                         "Guatemala" ~ "Guatemala", group ==
+                                         "Guiana" ~ "Guyana", group ==
+                                         "Guiana Francesa" ~ "French Guiana", group ==
+                                         "Guiné" ~ "Guinea", group ==
+                                         "Guiné Equatorial" ~ "Equatorial Guinea", group ==
+                                         "Guiné-Bissau" ~ "Guinea-Bissau", group ==
+                                         "Haiti" ~ "Haiti", group ==
+                                         "Holanda (Países Baixos)" ~ "Netherlands", group ==
+                                         "Honduras" ~ "Honduras", group ==
+                                         "Hong Kong" ~ "Hong Kong", group ==
+                                         "Hungria" ~ "Hungary", group ==
+                                         "Iêmen" ~ "Yemen", group ==
+                                         "Ilha Heard e Ilhas McDonald" ~ "Heard Island and McDonald Islands", group ==
+                                         "Ilhas Maldivas" ~ "Maldives", group ==
+                                         "Ilhas Marianas do Norte" ~ "Northern Mariana Islands", group ==
+                                         "Ilhas Marshall" ~ "Marshall Islands", group ==
+                                         "Ilhas Menores Distantes dos Estados Unidos" ~ "United States Minor Outlying Islands", group ==
+                                         "Ilhas Norfolk" ~ "Norfolk Island", group ==
+                                         "Ilhas Pitcairn" ~ "Pitcairn Islands", group ==
+                                         "Ilhas Salomão" ~ "Solomon Islands", group ==
+                                         "Ilhas Turcas e Caicos" ~ "Turks and Caicos Islands", group ==
+                                         "Ilhas Virgens, Britânicas" ~ "British Virgin Islands", group ==
+                                         "Ilhas Virgens, EUA" ~ "United States Virgin Islands", group ==
+                                         "Ilhas Wallis e Futuna" ~ "Wallis and Futuna", group ==
+                                         "Índia" ~ "India", group ==
+                                         "Indonésia" ~ "Indonesia", group ==
+                                         "Irã" ~ "Iran", group ==
+                                         "Iraque" ~ "Iraq", group ==
+                                         "Irlanda" ~ "Ireland", group ==
+                                         "Islândia" ~ "Iceland", group ==
+                                         "Israel" ~ "Israel", group ==
+                                         "Itália" ~ "Italy", group ==
+                                         "Jamaica" ~ "Jamaica", group ==
+                                         "Japão" ~ "Japan", group ==
+                                         "Jersey" ~ "Jersey", group ==
+                                         "Jordânia" ~ "Jordan", group ==
+                                         "Kiribati" ~ "Kiribati", group ==
+                                         "Kuwait" ~ "Kuwait", group ==
+                                         "Laos" ~ "Laos", group ==
+                                         "Lesoto" ~ "Lesotho", group ==
+                                         "Letônia" ~ "Latvia", group ==
+                                         "Líbano" ~ "Lebanon", group ==
+                                         "Libéria" ~ "Liberia", group ==
+                                         "Líbia" ~ "Libya", group ==
+                                         "Liechtenstein" ~ "Liechtenstein", group ==
+                                         "Lituânia" ~ "Lithuania", group ==
+                                         "Luxemburgo" ~ "Luxembourg", group ==
+                                         "Macau" ~ "Macau", group ==
+                                         "Macedônia" ~ "Macedonia", group ==
+                                         "Madagascar" ~ "Madagascar", group ==
+                                         "Malásia" ~ "Malaysia", group ==
+                                         "Malawi" ~ "Malawi", group ==
+                                         "Mali" ~ "Mali", group ==
+                                         "Malta" ~ "Malta", group ==
+                                         "Marrocos" ~ "Morocco", group ==
+                                         "Martinica" ~ "Martinique", group ==
+                                         "Maurício" ~ "Mauritius", group ==
+                                         "Mauritânia" ~ "Mauritania", group ==
+                                         "Mayotte" ~ "Mayotte", group ==
+                                         "México" ~ "Mexico", group ==
+                                         "Micronésia" ~ "Micronesia", group ==
+                                         "Moçambique" ~ "Mozambique", group ==
+                                         "Moldávia" ~ "Moldova", group ==
+                                         "Mônaco" ~ "Monaco", group ==
+                                         "Mongólia" ~ "Mongolia", group ==
+                                         "Montenegro" ~ "Montenegro", group ==
+                                         "Montserrat" ~ "Montserrat", group ==
+                                         "Myanmar" ~ "Myanmar", group ==
+                                         "Namíbia" ~ "Namibia", group ==
+                                         "Nauru" ~ "Nauru", group ==
+                                         "Nepal" ~ "Nepal", group ==
+                                         "Nicarágua" ~ "Nicaragua", group ==
+                                         "Níger" ~ "Niger", group ==
+                                         "Nigéria" ~ "Nigeria", group ==
+                                         "Niue" ~ "Niue", group ==
+                                         "Noruega" ~ "Norway", group ==
+                                         "Nova Caledônia" ~ "New Caledonia", group ==
+                                         "Nova Zelândia" ~ "New Zealand", group ==
+                                         "Omã" ~ "Oman", group ==
+                                         "Palau" ~ "Palau", group ==
+                                         "Palestina" ~ "Palestine", group ==
+                                         "Panamá" ~ "Panama", group ==
+                                         "Papua-Nova Guiné" ~ "Papua New Guinea", group ==
+                                         "Paquistão" ~ "Pakistan", group ==
+                                         "Paraguai" ~ "Paraguay", group ==
+                                         "Peru" ~ "Peru", group ==
+                                         "Polinésia Francesa" ~ "French Polynesia", group ==
+                                         "Polônia" ~ "Poland", group ==
+                                         "Porto Rico" ~ "Puerto Rico", group ==
+                                         "Portugal" ~ "Portugal", group ==
+                                         "Quênia" ~ "Kenya", group ==
+                                         "Reino Unido" ~ "United Kingdom", group ==
+                                         "República Centro-Africana" ~ "Central African Republic", group ==
+                                         "República Dominicana" ~ "Dominican Republic", group ==
+                                         "República Tcheca" ~ "Czech Republic", group ==
+                                         "Reunião" ~ "Réunion", group ==
+                                         "Romênia" ~ "Romania", group ==
+                                         "Ruanda" ~ "Rwanda", group ==
+                                         "Rússia" ~ "Russia", group ==
+                                         "Saara Ocidental" ~ "Western Sahara", group ==
+                                         "Samoa" ~ "Samoa", group ==
+                                         "Samoa Americana" ~ "American Samoa", group ==
+                                         "Santa Helena" ~ "Saint Helena", group ==
+                                         "Santa Lúcia" ~ "Saint Lucia", group ==
+                                         "Santa Sé (Cidade-Estado do Vaticano)" ~ "Vatican City", group ==
+                                         "São Bartolomeu" ~ "Saint Barthélemy", group ==
+                                         "São Cristóvão e Neves" ~ "Saint Kitts and Nevis", group ==
+                                         "São Martinho (França)" ~ "Saint Martin (French part)", group ==
+                                         "São Martinho (Países Baixos)" ~ "Sint Maarten (Dutch part)", group ==
+                                         "São Tomé e Príncipe" ~ "Sao Tome and Principe", group ==
+                                         "São Vicente e Granadinas" ~ "Saint Vincent and the Grenadines", group ==
+                                         "Senegal" ~ "Senegal", group ==
+                                         "Serra Leoa" ~ "Sierra Leone", group ==
+                                         "Sérvia" ~ "Serbia", group ==
+                                         "Seychelles" ~ "Seychelles", group ==
+                                         "Síria" ~ "Syria", group ==
+                                         "Somália" ~ "Somalia", group ==
+                                         "Sri Lanka" ~ "Sri Lanka", group ==
+                                         "Suazilândia" ~ "Eswatini", group ==
+                                         "Sudão" ~ "Sudan", group ==
+                                         "Suécia" ~ "Sweden", group ==
+                                         "Suíça" ~ "Switzerland", group ==
+                                         "Suriname" ~ "Suriname", group ==
+                                         "Svalbard e Jan Mayen" ~ "Svalbard and Jan Mayen", group ==
+                                         "Tadjiquistão" ~ "Tajikistan", group ==
+                                         "Tailândia" ~ "Thailand", group ==
+                                         "Taiwan" ~ "Taiwan", group ==
+                                         "Tanzânia" ~ "Tanzania", group ==
+                                         "Terras Austrais e Antárticas Francesas" ~ "French Southern Territories", group ==
+                                         "Território Britânico do Oceano Índico" ~ "British Indian Ocean Territory", group ==
+                                         "Timor-Leste" ~ "Timor-Leste", group ==
+                                         "Togo" ~ "Togo", group ==
+                                         "Tokelau" ~ "Tokelau", group ==
+                                         "Tonga" ~ "Tonga", group ==
+                                         "Trinidad e Tobago" ~ "Trinidad and Tobago", group ==
+                                         "Tunísia" ~ "Tunisia", group ==
+                                         "Turquemenistão" ~ "Turkmenistan", group ==
+                                         "Turquia" ~ "Turkey", group ==
+                                         "Tuvalu" ~ "Tuvalu", group ==
+                                         "Ucrânia" ~ "Ukraine", group ==
+                                         "Uganda" ~ "Uganda", group ==
+                                         "Uruguai" ~ "Uruguay", group ==
+                                         "Uzbequistão" ~ "Uzbekistan", group ==
+                                         "Vanuatu" ~ "Vanuatu", group ==
+                                         "Venezuela" ~ "Venezuela", group ==
+                                         "Vietnã" ~ "Vietnam", group ==
+                                         "Zâmbia" ~ "Zambia", group ==
+                                         "Zimbábue" ~ "Zimbabwe"))
+        
+        
+    }
+    
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -180,6 +428,7 @@ get_server <- function(files, param) {
                 y_option = (y / aux1) * 100
               )
             df_p$y <- df_p$y_option
+            param$measurement <- ""
           }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
@@ -191,7 +440,10 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": R$", df_p$y, "<br>"
+            y_col$label, ": ", param$measurement, format(df_p$y, scientific = FALSE,
+                                         digits = 2,
+                                         decimal.mark = ",", 
+                                         big.mark = "."), "<br>"
           )
 
           # Define paleta de cores

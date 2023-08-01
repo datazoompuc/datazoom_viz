@@ -15,6 +15,39 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
 
+    if(param$lang){
+        
+        df <- df %>%
+            mutate(group = case_when( 
+                group ==
+                "Animais vivos e produtos do reino animal" ~ "Live animals and animal products", group ==
+                "Calçado, chapéus e artefatos de uso semelhante, guarda-chuvas, guarda-sóis, bengalas, chicotes e suas partes; Penas preparadas e suas obras; Flores artificiais; Obras de cabelo" ~ "Footwear, headgear, and similar articles; umbrellas, sun umbrellas, walking-sticks, whips; prepared feathers and articles made of feathers; artificial flowers; articles of human hair", group ==
+                "Gorduras e óleos animais ou vegetais; Produtos da sua dissociação; Gorduras alimentares elaboradas; Ceras de origem animal ou vegetal" ~ "Animal or vegetable fats and oils; prepared edible fats; animal or vegetable waxes", group ==
+                "Instrumentos e aparelhos de ótica, fotografia ou cinematografia, medida, controle ou de precisão; Instrumentos e aparelhos médico-cirúrgicos; Relógios e aparelhos semelhantes; Instrumentos musicais; Suas partes e acessórios" ~ "Optical, photographic, cinematographic, measuring, checking, precision, medical or surgical instruments and apparatus; clocks and watches; musical instruments; parts and accessories thereof", group ==
+                "Madeira, carvão vegetal e obras de madeira; Cortiça e suas obras; Obras de espartaria ou de cestaria" ~ "Wood and articles of wood; wood charcoal; cork and articles of cork; basketware and wickerwork", group ==
+                "Máquinas e aparelhos, material elétrico e suas partes; Aparelhos de gravação ou reprodução de som, aparelhos de gravação ou reprodução de imagens e de som em televisão, e suas partes e acessórios" ~ "Machinery, electrical equipment, and their parts; sound recorders and reproducers; television image and sound recorders and reproducers, parts and accessories", group ==
+                "Material de transporte" ~ "Vehicles, aircraft, vessels, and associated transport equipment", group ==
+                "Matérias têxteis e suas obras" ~ "Textiles and textile articles", group ==
+                "Mercadorias e produtos diversos" ~ "Miscellaneous manufactured articles", group ==
+                "Metais comuns e suas obras" ~ "Base metals and articles of base metal", group ==
+                "Obras de pedra, gesso, cimento, amianto, mica ou de matérias semelhantes; Produtos cerâmicos; Vidro e suas obras" ~ "Articles of stone, plaster, cement, asbestos, mica, or similar materials; ceramic products; glass and glassware", group ==
+                "Pastas de madeira ou de outras matérias fibrosas celulósicas; Papel ou cartão para reciclar (desperdícios e aparas); Papel e suas obras" ~ "Wood pulp or other fibrous cellulosic material; recovered (waste and scrap) paper or paperboard; paper and paperboard and articles thereof", group ==
+                "Peles, couros, peles com pelo e obras destas matérias; Artigos de correeiro ou de seleiro; Artigos de viagem, bolsas e artefatos semelhantes; Obras de tripa" ~ "Raw hides and skins (other than furskins) and leather; articles of leather; saddlery and harness; travel goods, handbags, and similar articles; gut (other than silk-worm gut)", group ==
+                "Pérolas naturais ou cultivadas, pedras preciosas ou semipreciosas e semelhantes, metais preciosos, metais folheados ou chapeados de metais preciosos, e suas obras; Bijuteria; Moedas" ~ "Natural or cultured pearls, precious or semi-precious stones, precious metals, metals clad with precious metal, and articles thereof; imitation jewelry; coin", group ==
+                "Plásticos e suas obras; Borracha e suas obras" ~ "Plastics and articles thereof; rubber and articles thereof", group ==
+                "Produtos das indústrias químicas ou indústrias conexas" ~ "Chemical products or related industries", group ==
+                "Produtos das indútrias alimentares; Bebidas, líquidos alcoólicos e vinagres; Tabaco e seus sucedâneos manufaturados" ~ "Food industry products; beverages, alcoholic liquids, and vinegars; tobacco and manufactured tobacco substitutes", group ==
+                "Produtos do reino vegetal" ~ "Vegetable products", group ==
+                "Produtos minerais" ~ "Mineral products", group ==
+                "Transações especiais" ~ "Special transactions", group ==
+                "Armas e munições; suas partes e acessórios" ~ "Weapons and ammunition; parts and accessories thereof", group ==
+                "Objetos de arte, de coleção e antiguidades" ~ "Works of art, collectors' pieces, and antiques"
+            
+            ))
+        
+        
+    }
+    
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -180,6 +213,7 @@ get_server <- function(files, param) {
                 y_option = (y / aux1) * 100
               )
             df_p$y <- df_p$y_option
+            param$measurement <- ""
           }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
@@ -191,7 +225,10 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": R$", df_p$y, "<br>"
+            y_col$label, ": ", param$measurement, format(df_p$y, scientific = FALSE,
+                                                         digits = 2,
+                                                         decimal.mark = ",", 
+                                                         big.mark = "."), "<br>"
           )
 
           # Define paleta de cores

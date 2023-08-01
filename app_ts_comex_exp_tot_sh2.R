@@ -29,6 +29,7 @@ param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
+param$lang <- FALSE
 
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
@@ -43,6 +44,7 @@ param$label_axis_name <- "proporcional ao ano inicial (*)"
 param$label_mun_filter <- "Categorias de exportação (agregação da SH2)"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_sh2/"
 param$currency <- "Por R$"
+param$measurement <- "R$ "
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
