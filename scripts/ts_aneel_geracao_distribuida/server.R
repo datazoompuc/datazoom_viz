@@ -15,12 +15,17 @@ get_server <- function(files, param) {
   df <- readRDS(files$db_file) %>% 
     ungroup
   
+  df <- df %>%
+      mutate(dsc_fonte_geracao = case_when(
+          dsc_fonte_geracao == "Biogás-AGR" ~ "Biogás - AGR",
+          TRUE                              ~ dsc_fonte_geracao))
+  
   if(param$lang) {
 
     df <- df %>%
       mutate(dsc_fonte_geracao = case_when(
         dsc_fonte_geracao == "Bagaço de Cana de Açúcar"         ~ "Sugarcane Bagasse",
-        dsc_fonte_geracao == "Biogás-AGR"                       ~ "Biogas-AGR",
+        dsc_fonte_geracao == "Biogás - AGR"                       ~ "Biogas - AGR",
         dsc_fonte_geracao == "Biogás - Floresta"                ~ "Biogas - Forest",
         dsc_fonte_geracao == "Biogás - RA"                      ~ "Biogas - RA",
         dsc_fonte_geracao == "Biogás - RU"                      ~ "Biogas - RU",
