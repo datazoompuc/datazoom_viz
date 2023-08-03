@@ -70,13 +70,17 @@ ppm_state_aquaculture <- ppm_state_aquaculture %>%
 # merge all data
 ###########################
 dz_state <- ppm_state_livestock_inventory %>%
-  full_join(ppm_state_animal_origin_production, by = c("group","ano"))   %>%
-  full_join(ppm_state_sheep_farming, by = c("group","ano"))   %>%
+  full_join(ppm_state_animal_origin_production, by = c("group","ano")) %>%
+  full_join(ppm_state_sheep_farming, by = c("group","ano"))  %>%
   full_join(ppm_state_cow_farming, by = c("group","ano")) %>% 
   full_join(ppm_state_aquaculture, by = c("group","ano")) %>% 
   arrange(group, ano) %>%
   relocate(group, ano)
 
+# remove unnecessary columns
+dz_state <- subset(dz_state, select = -c(time, time.x, time.y, time.y.y, time.x.x) )
+
+dz_state[is.na(dz_state)] <- 0
 # clean column names
 dz_state <- dz_state %>%
   janitor::clean_names()
@@ -94,8 +98,7 @@ dz_state$estado <- dz_state$group
 class(dz_state)
 colnames(dz_state)
 
-# remove unnecessary columns
-dz_state <- subset( dz_state, select = -c(time, time_x, time_y, time_y_y, time_x_x) )
+
 
 # keep only uf from amazon
 dz_state <- dz_state %>% dplyr::filter(estado == "AC" | estado == "AP" | estado == "AM" | estado == "PA" | estado == "MA" | estado == "RR" | estado == "RO" | estado == "MT" | estado == "TO") 
