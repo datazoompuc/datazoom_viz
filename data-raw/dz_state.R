@@ -520,6 +520,12 @@ temp_param_table$unidade[temp_param_table$var== "truta_valor_da_producao"] <- "T
 temp_param_table$unidade[temp_param_table$var== "tucunare_producao_da_aquicultura"] <- "Kilograms"
 temp_param_table$unidade[temp_param_table$var== "tucunare_valor_da_producao"] <- "Thousand 'Reais'"
 
-
-# save csv in utf-8 encoding
+temp_param_table$source[temp_param_table$source== "IBGE - PPM - Origem animal"] <- "IBGE - PPM - Animal Origin"
+temp_param_table$source[temp_param_table$source== "IBGE - PPM - Criação de vacas"] <- "IBGE - PPM - Cattle Farming"
+temp_param_table$source[temp_param_table$source== "IBGE - PPM - Efetivo dos rebanhos"] <- "IBGE - PPM - Livestock Population"
+temp_param_table$source[temp_param_table$source== "IBGE - PPM - Criação de ovelhas"] <- "IBGE - PPM - Sheep Farming"
+temp_param_table$source[temp_param_table$source== "IBGE - PPM - Aquicultura"] <- "IBGE - PPM - Aquaculture"
+temp_param_table$source[temp_param_table$source== "Geral"] <- "General"
+    
+    # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_state_dic_en.csv", fileEncoding = "UTF-8")
