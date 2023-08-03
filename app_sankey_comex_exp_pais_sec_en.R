@@ -42,7 +42,9 @@ param$label_var_name <- "VARIABLES:"
 param$label_x_name <- "Year"
 param$label_colour_name <- "Export Category (SEC agreggation)"
 param$link <- "https://datazoom.shinyapps.io/app_sankey_comex_exp_pais_sec_en/"
-param$lang = TRUE
+param$lang <- TRUE
+param$unit <- "Millions of "
+param$unit2 <- " in "
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
