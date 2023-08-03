@@ -41,13 +41,13 @@ get_server <- function(files, param) {
                                                              "Madeira perfilada, mesmo aplainada" ~ "Profiled wood, even planed", group == 
                                                              "Minérios de manganês e seus concentrados" ~ "Manganese ores and concentrates", group == 
                                                              "Açúcares no estado sólido" ~ "Solid sugars", group == 
-                                                             "Óleo de soja, não modificado" ~ "Soybean oil, not chemically modified", group == 
+                                                             "Óleo de soja e respectivas fracções, mesmo refinados, mas não quimicamente modificados" ~ "Soybean oil and its fractions, even refined, but not chemically modified", group == 
                                                              "Carnes e comestíveis de aves domésticas" ~ "Meat and edible offal of domestic poultry", group == 
                                                              "Cocos e castanhas do Brasil e de caju" ~ "Brazil nuts and cashew nuts", group == 
                                                              "Frutas e outros comestíveis de planta" ~ "Fruits and other plant edibles", group == 
                                                              "Cimentos hidráulicos" ~ "Hydraulic cements", group == 
                                                              "Obras de fibrocimento e cimento-celulose" ~ "Works of fibrous cement and cement-board", group == 
-                                                             "Carnes bovinas congeladas" ~ "Frozen beef", group == 
+                                                             "Carnes de animais da espécie bovina, congeladas" ~ "Frozen beef", group == 
                                                              "Madeira contraplacada ou compensada" ~ "Plywood or veneered wood", group == 
                                                              "Folhas de madeira para folheados" ~ "Wood veneer sheets", group == 
                                                              "Outras gorduras e óleos vegetais" ~ "Other vegetable fats and oils", group == 
@@ -60,7 +60,7 @@ get_server <- function(files, param) {
                                                              "Outras sementes e oleaginosos" ~ "Other seeds and oleaginous fruits", group == 
                                                              "Partes para veículos de sh4 8711 a 8713" ~ "Parts for vehicles of HS 8711 to 8713", group == 
                                                              "Partes para motores de sh4 8407 e 8408" ~ "Parts for engines of HS 8407 and 8408", group == 
-                                                             "Miudezas comestíveis bovina, suína, etc" ~ "Edible offal of bovine, swine, etc.", group == 
+                                                             "Miudezas comestíveis de animais das espécies bovina, suína, ovina, caprina, cavalar, asinina e muar, frescas, refrigeradas ou congeladas" ~ "Edible offal of animals of the bovine, swine, ovine, caprine, equine, asinine, and mule species, fresh, chilled, or frozen", group == 
                                                              "Obras de carpintaria para construção" ~ "Carpentry works for construction", group == 
                                                              "Minérios de nióbio, tântalo, vanádio, zircônio" ~ "Niobium, tantalum, vanadium, zirconium ores", group == 
                                                              "Minerios de titanio e seus concentrados" ~ "Titanium ores and concentrates", group == 
@@ -79,7 +79,7 @@ get_server <- function(files, param) {
                                                              "Automóveis para transporte de mercadorias" ~ "Automobiles for goods transportation", group == 
                                                              "Resíduos da extração do óleo de soja" ~ "Residues from soybean oil extraction", group == 
                                                              "Retroescavadoras e carregadoras" ~ "Backhoe loaders and loaders", group == 
-                                                             "Tripas de animais, exceto peixes" ~ "Animal casings, except fish", group == 
+                                                             "Tripas, bexigas e estômagos de animais, exceto peixes, inteiros ou em pedaços, frescos, refrigerados, congelados, salgados, secos ou defumados" ~ "Intestines, bladders, and stomachs of animals, except fish, whole or in pieces, fresh, chilled, frozen, salted, dried, or smoked", group == 
                                                              "Peixes vivos" ~ "Live fish", group == 
                                                              "Preparações para alimentação animal" ~ "Preparations for animal feeding", group == 
                                                              "Instrumentos de medida de energia e radiação" ~ "Instruments for energy and radiation measurement", group == 
@@ -206,7 +206,7 @@ get_server <- function(files, param) {
                                                              "Aparelhos para medicina e veterinária" ~ "Medical and veterinary instruments", group == 
                                                              "Chaves de porcas e de caixa" ~ "Wrenches and spanners", group == 
                                                              "Aparelhos de laboratórios fotográficos" ~ "Photographic laboratory equipment", group == 
-                                                             "Carnes bovinas frescas ou refrigeradas" ~ "Fresh or chilled beef", group == 
+                                                             "Carnes de animais da espécie bovina, frescas ou refrigeradas" ~ "Fresh or chilled beef", group == 
                                                              "Aparelhos para selecionar pedras" ~ "Stone sorting apparatus", group == 
                                                              "Gelatina e colas de origem animal" ~ "Gelatin and animal glues", group == 
                                                              "Dispositivo para tratamento de materiais" ~ "Materials treatment devices", group == 
@@ -223,7 +223,8 @@ get_server <- function(files, param) {
                                                              "Granito e outras pedras para construção" ~ "Granite and other stones for construction", group == 
                                                              "Outros couros e peles em bruto" ~ "Other raw hides and skins", group == 
                                                              "Couros e peles de animais sem pelos" ~ "Hairless animal hides and skins", group == 
-                                                             "Melaços da extração e refino do açúcar" ~ "Molasses from sugar extraction and refining",
+                                                             "Melaços da extração e refino do açúcar" ~ "Molasses from sugar extraction and refining", group == 
+                                                             "Âmbar-cinzento, castóreo, algália e almíscar; bílis, mesmo seca; glândulas e outras substâncias de origem animal utilizadas na preparação de produtos farmacêuticos, frescas, refrigeradas, congeladas ou provisoriamente conservadas de outro modo" ~ "Ambergris, castoreum, musk, and civet; bile, whether or not dried; glands and other animal substances used in the preparation of pharmaceutical products, fresh, chilled, frozen, or provisionally preserved in other ways" ,
                                                          TRUE ~ group
                                                          #######
       ))
