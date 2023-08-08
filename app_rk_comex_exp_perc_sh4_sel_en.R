@@ -44,8 +44,9 @@ param$ui3 <- "https://datazoom.shinyapps.io/app_rk_comex_exp_perc_sh4_sel_en/"
 param$server1 <- "No variable selected"
 param$server2 <- "Proportions of world exports coming from the Amazon Ranking"
 param$server3 <- "Legal Amazon"
-param$server4 <- "Unit measure: <b>"
+param$server4 <- "Measurement Unit: <b>"
 param$server5 <- "Year: "
+param$lang <- TRUE
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
