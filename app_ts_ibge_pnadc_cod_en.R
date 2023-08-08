@@ -29,6 +29,7 @@ param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
+param$lang <- TRUE
 
 
 # Descrição da visualização no eixo de opções

@@ -29,6 +29,7 @@ param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
+param$lang <- FALSE
 
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"

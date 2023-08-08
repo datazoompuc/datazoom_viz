@@ -26,6 +26,7 @@ param$slider_def <- "time"
 param$color_def <- "composicao_demografica" # variável padrão de cor
 param$text_def <- "id" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "id" # variável de agrupamento
+param$lang <- FALSE
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
