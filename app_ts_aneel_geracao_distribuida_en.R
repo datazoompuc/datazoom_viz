@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(dplyr)
 
 
 # Define nome de arquivos a serem carregados
@@ -53,11 +54,13 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_aneel_geracao_distribuida_en
 ### Parametros especificos no server
 param$subtitle_init <- "by regions of interest and filtered by " # primeira palavra do subtitulo
 param$subtitle_sep <- "and"                                      # separador no subtitulo
+param$lang <- TRUE
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
 param$y_choices[[1]] <- NULL
 param$color_choices[[1]] <- NULL
+
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
