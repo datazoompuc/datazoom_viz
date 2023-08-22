@@ -1,7 +1,7 @@
 ############################################################
 #### Generate rds data in the folder ./data/
 ############################################################
-
+./data
 #### Packages
 library(tidyverse)
 library(tibble)
@@ -18,7 +18,7 @@ library(scales) # to use label_percent()
 # TERRABRASILIS
 ###################
 # read shapefile
-shapefile <- st_read("data/shapefiles/municipalities_legal_amazon.shp")
+shapefile <- st_read("./data/shapefiles/municipalities_legal_amazon.shp")
 
 # data too heavy (over 100mb)
 # solution: simplify geometry
@@ -30,7 +30,7 @@ shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
 ###################
 # CENSUS
 ###################
-income <- readRDS(file = "data/income.rds")
+income <- readRDS(file = "./data/income.rds")
 income$Ano <- income$Year
 income <- income %>%
     separate(Municipality, c("name_munic", "Estado"), " - ") %>%
@@ -51,7 +51,7 @@ income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
 ###################
 # INPE - PRODES
 ###################
-prodes <- readRDS(file = "data/prodes.rds")
+prodes <- readRDS(file = "./data/prodes.rds")
 prodes <- prodes %>%
     janitor::clean_names()
 
@@ -86,7 +86,7 @@ prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 ###################
 # INPE - DETER
 ###################
-# deter <- readRDS(file = "data/deter.rds")
+# deter <- readRDS(file = "./data/deter.rds")
 # deter$Estado <- deter$UF
 # class(deter$CodIBGE) <-  'character'
 # deter$UF <- NULL
@@ -98,10 +98,10 @@ prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 ###################
 # IBGE - PIB
 ###################
-# gdp <- readRDS(file = "data/pib_municipality_dza.rds") # necessario atualizar com esses dados aqui
+# gdp <- readRDS(file = "./data/pib_municipality_dza.rds") # necessario atualizar com esses dados aqui
 
 #código da atualização para incluir dados de 2018 e 2019
-# gdp10_19_= read.csv2("data/pibsmunics10_19_.csv")
+# gdp10_19_= read.csv2("./data/pibsmunics10_19_.csv")
 # 
 # gdp18_19= gdp10_19_%>%
 #   dplyr::filter(Ano >= 2018)%>%
@@ -128,9 +128,9 @@ prodes <- prodes %>% distinct(cod_munic_ibge, ano, .keep_all = TRUE)
 #   dplyr::arrange(CodIBGE)
 # gdpatt$X= 1:13896
 # 
-# saveRDS(gdpatt, file = "data/gdp.rds")
+# saveRDS(gdpatt, file = "./data/gdp.rds")
 
-gdp <- readRDS(file = "data/gdp.rds")
+gdp <- readRDS(file = "./data/gdp.rds")
 gdp <- gdp %>%
     
     janitor::clean_names()
@@ -200,14 +200,14 @@ gdp$gdp_deflacionado[gdp$ano == 2021] <- gdp$gdp_deflacionado[gdp$ano == 2021] *
 ###################
 # INPE - DEGRAD
 ##################
-# degrad <- readRDS(file = "data/degrad.rds")
+# degrad <- readRDS(file = "./data/degrad.rds")
 # degrad$Ano <- degrad$year
 # degrad$Year <- NULL
 
 ###################
 # IMAZON - IPS
 ###################
-ips <- readRDS(file = "data/ips.rds")
+ips <- readRDS(file = "./data/ips.rds")
 ips <- ips %>%
     janitor::clean_names()
 # Reshaping data.frame from long  to wide format
@@ -222,21 +222,21 @@ ips <- ips %>%
 ###################
 # IBGE - CEMPRE
 ###################
-cempre_municipality <- readRDS(file = "data/cempre_municipality_dza.rds")
+cempre_municipality <- readRDS(file = "./data/cempre_municipality_dza.rds")
 
 ###################
 # SEEG
 ###################
 
-# seeg <- readRDS(file = "data/seeg.rds")
+# seeg <- readRDS(file = "./data/seeg.rds")
 
 ###################
 #PPM - IBGE
 ###################
 
-ppm_livestock <- readRDS(file = "data/ppm_municipality_livestock_inventory.rds")
+ppm_livestock <- readRDS(file = "./data/ppm_municipality_livestock_inventory.rds")
 
-#munics <- readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls") %>%
+#munics <- readxl::read_xls("./data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls") %>%
 # dplyr::select("Código Município Completo", "Nome_Município")
 #ppm_livestock$group <- plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município, to = munics$`Código Município Completo`)
 
@@ -268,9 +268,9 @@ ppm_livestock= ppm_livestock%>%
 # pam_municipality_all_crops_2000_19= pam_municipality_all_crops_2000_19%>%
 #   dplyr::select(.data$geo_id, .data$ano, dplyr::ends_with('40124'), dplyr::ends_with('40102'), dplyr::ends_with('40122'), dplyr::ends_with('40119') )
 # 
-# saveRDS(pam_municipality_all_crops_2000_19, "data/pam_municipality_all_crops_2000_19.rds")
+# saveRDS(pam_municipality_all_crops_2000_19, "./data/pam_municipality_all_crops_2000_19.rds")
 
-pam_municipality_all_crops= readRDS('data/pam_municipality_all_crops.rds') %>%
+pam_municipality_all_crops= readRDS('./data/pam_municipality_all_crops.rds') %>%
     filter(ano >= 2000)
 pam_municipality_all_crops[is.na(pam_municipality_all_crops)] <- 0  
 
@@ -703,7 +703,7 @@ temp_param_table$x[temp_param_table$var == "group"] <- FALSE
 temp_param_table= temp_param_table%>%
     dplyr::filter(!startsWith(.data$var, 'num'))
 #adding ppm dictionary
-metappm= read.csv(file = 'data/ppm_municipality_livestock_inventory_dic.csv')
+metappm= read.csv(file = './data/ppm_municipality_livestock_inventory_dic.csv')
 metappm <- metappm%>%
     dplyr::mutate(geometry = FALSE, desc= var)%>%
     dplyr::rename(var_group = source)%>%
@@ -745,7 +745,7 @@ temp_param_table= temp_param_table%>%
 
 
 #adding pam dictionary
-metapam= read.csv(file = 'data/pam_state_all_crops_dic.csv')
+metapam= read.csv(file = './data/pam_state_all_crops_dic.csv')
 metapam <- metapam%>%
     dplyr::mutate(geometry = FALSE, desc= var)%>%
     dplyr::rename(var_group = source)%>%
@@ -756,6 +756,8 @@ metapam$var_group= 'IBGE - PAM'
 
 temp_param_table= dplyr::bind_rows(temp_param_table, metapam)
 
+temp_param_table <- temp_param_table %>%
+  mutate(unidade = str_replace(unidade, "Cabecas", "Cabeças"))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_dic.csv", fileEncoding = "UTF-8")
