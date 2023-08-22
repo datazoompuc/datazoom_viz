@@ -335,6 +335,10 @@ temp_param_table$label[40] <- "Total of consumers"
 #unidades de cada var
 temp_param_table$unidade[2:40] <- "% of Brazil's total"
 
+# Seleciona groupos de variaveis nas opções do UI
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumption", ignore_case = TRUE))] <- "ENERGY CONSUMPTION - PROPORTION IN RELATION TO BRAZIL"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("consumers", ignore_case = TRUE))] <- "ENERGY CONSUMERS - PROPORTION IN RELATION TO BRAZIL"
+temp_param_table$var_group[str_detect(temp_param_table$label, regex("Energy produced", ignore_case = TRUE))] <- "ENERGY PRODUCED - PROPORTION IN RELATION TO BRAZIL"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_amz_exporta_dic_en.csv", fileEncoding = "UTF-8")

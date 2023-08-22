@@ -2,6 +2,8 @@ General View:
 
 The datazoom_viz repository is used for developing visualizations in shiny R codes and fueling the https://datazoomamazonia.com.br/ website.
 
+All the apps are listed in this sheet. (https://docs.google.com/spreadsheets/d/1oSR_vybaRs9JEy8NC7MuBFfOlE6mA2Mxf_Ugm4E_HgA/edit?usp=sharing). It shows if there are any issues related to the app, if it is updated, translated, published and working well. 
+
 Repository organization:
  Main Directories:
  - "./data": contains all the .rds databases and .csv files that are used in the generation of the visualizations. The files' names are organized in order to follow a pattern: xxxx.rds for the databases and xxxx_dic for the .csv dictionaries that correspond to the same database.

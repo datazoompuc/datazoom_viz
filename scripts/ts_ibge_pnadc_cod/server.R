@@ -15,6 +15,40 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
 
+    if(param$lang){
+        df$group <- df$group %>%
+            stringr::str_replace_all(c("Administradores e especialista em gestão" = "Administrators and management specialists",
+                                      "Agricultores elementares" = "Elementary farmers",
+                                      "Agricultores qualificados" = "Skilled farmers",
+                                      "Ambulantes" = "Street vendors",
+                                      "Apoio administrativo" = "Administrative support",
+                                      "Artesões e artes gráficas" = "Artisans and graphic arts",
+                                      "Atendimento direto ao público" = "Direct customer service",
+                                      "Cientistas e engenheiros" = "Scientists and engineers",
+                                      "Coletores de lixo" = "Garbage collectors",
+                                      "Dirigentes e gerentes" = "Executives and managers",
+                                      "Domésticos" = "Domestic workers",
+                                      "Escriturários" = "Clerks",
+                                      "Extrativistas florestais" = "Forest extractivists",
+                                      "Montadores e condutores de veículos" = "Assemblers and vehicle drivers",
+                                      "Operários da construção, metalurgia e indústria" = "Construction, metallurgy, and industrial workers",
+                                      "Operários de processamento e instalações" = "Processing and facilities workers",
+                                      "Pecuaristas e criadores de animais" = "Livestock farmers and animal breeders",
+                                      "Profissionais da saúde" = "Health professionals",
+                                      "Profissionais de segurança" = "Security professionals",
+                                      "Profissionais do ensino" = "Teaching professionals",
+                                      "Profissionais em alimentação" = "Food service professionals",
+                                      "Serviços de TI e comunicação" = "IT and communication services",
+                                      "Serviços e cuidados pessoais" = "Personal care services",
+                                      "Serviços financeiros e administrativos" = "Financial and administrative services",
+                                      "Serviços jurídicos" = "Legal services",
+                                      "Serviços sociais e culturais" = "Social and cultural services",
+                                      "Trabalhadores no governo" = "Government workers",
+                                      "Técnicos de eletricidade e eletrônica" = "Electrical and electronic technicians",
+                                      "Vendedores" = "Salespersons"
+            ))
+    }
+    
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]

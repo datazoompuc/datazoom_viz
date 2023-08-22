@@ -390,7 +390,7 @@ get_server <- function(files, param) {
             type = "sankey",
             orientation = "h",
             valueformat = ".2f",
-            valuesuffix = " milhões US$",
+            valuesuffix = paste0(" (", param$unit, y_col$unidade, param$unit2 ,input$x, ") "),
             hoverlabel = list(namelength = -1),
             
             node = list(

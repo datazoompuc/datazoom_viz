@@ -41,7 +41,7 @@ param$label_var_name<- "VARIABLES"
 param$label_x_name<- "Variable Selection:"
 param$label_munic_name<- "Municipality name: "
 param$label_state<- "State: "
-param$label_measurement_unit<- "Measurement Unit :"
+param$label_measurement_unit<- "Measurement Unit: "
 param$link<-"https://datazoom.shinyapps.io/app_mapstatic_ips_2021_eng/"
 
 # Outros parâmetros e configurações

@@ -180,6 +180,7 @@ get_server <- function(files, param) {
                 y_option = (y / aux1) * 100
               )
             df_p$y <- df_p$y_option
+            param$measurement <- ""
           }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
@@ -195,6 +196,7 @@ get_server <- function(files, param) {
                                                            nsmall = 2,
                                                            decimal.mark = ",", 
                                                            big.mark = "."), "<br>"
+
           )
 
           # Define paleta de cores

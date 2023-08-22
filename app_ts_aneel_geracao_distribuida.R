@@ -53,6 +53,8 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_aneel_geracao_distribuida/"
 ### Parametros especificos no server
 param$subtitle_init <- "por recorte regional e filtrado por " # primeira palavra do subtitulo
 param$subtitle_sep <- "e"                                     # separador no subtitulo
+param$lang <- FALSE
+
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL

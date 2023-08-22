@@ -114,7 +114,10 @@ get_server <- function(files, param) {
           labels <- paste0(
             param$label_munic_name, "<b>", df$nm_municip, "</b><br>",
             param$label_state, "<b>", df$uf, "</b><br>",
-            x_col$label, ": ", "<b>", df[[input$x]], "</b><br>",
+            x_col$label, ": ", "<b>", format(df[[input$x]], scientific = FALSE,
+                                             digits = 2,
+                                             decimal.mark = ",", 
+                                             big.mark = "."), "</b><br>",
             param$label_measurement_unit, "<b>", x_col$unidade, "</b><br>"
           ) %>%
             lapply(htmltools::HTML)
