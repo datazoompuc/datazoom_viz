@@ -756,8 +756,6 @@ metapam$var_group= 'IBGE - PAM'
 
 temp_param_table= dplyr::bind_rows(temp_param_table, metapam)
 
-temp_param_table <- temp_param_table %>%
-  mutate(unidade = str_replace(unidade, "Cabecas", "Cabeças"))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "./data/dz_munic_dic.csv", fileEncoding = "UTF-8")

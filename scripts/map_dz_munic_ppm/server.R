@@ -13,7 +13,7 @@ get_server <- function(files, param) {
 
   # Carrega dados
   df <- readRDS(files$db_file) %>% st_transform(crs = "+init=epsg:4326")
- 
+
   server <- function(input, output, session) {
     df_reactived <- reactive({
       w <- df %>%
