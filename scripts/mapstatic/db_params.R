@@ -48,7 +48,26 @@ get_db_param <-
 
 
     # Carrega arquivo de parâmetros
-    param_table <- fread(param_filename, encoding = "UTF-8")
+    param_table <- fread(param_filename, encoding = "UTF-8") %>% 
+      #adicionando unidade de medida e ano em algumas variáveis
+      mutate(label = ifelse(label == "Rendimento médio - Censo 2000",
+                            "Rendimento médio - Censo 2000 (R$ em 2000)",
+                            ifelse(label == "Rendimento médio - Censo 2010",
+                                   "Rendimento médio - Censo 2000 (R$ em 2010)",
+                                   ifelse(label == "Rendimento mediano - Censo 2000",
+                                          "Rendimento mediano - Censo 2000 (R$ em 2000)",
+                                          ifelse(label == "Rendimento mediano - Censo 2010",
+                                                 "Rendimento mediano - Censo 2000 (R$ em 2010)",
+                                                 ifelse(label == "População",
+                                                        "População em 2021",
+                                                        ifelse(label == "PIB nominal",
+                                                               "PIB nominal (em 1000,00 R$ de 2021)",
+                                                               ifelse(label == "PIB per capita nominal",
+                                                                      "PIB per capita nominal (R$ de 2021)",
+                                                                      label))))))))
+    
+    
+    
 
     # Cria lista de parâmetros
     param <- list(
