@@ -1,0 +1,11 @@
+﻿Column1,var,x,y,color,size,slider,geometry,label,desc,var_group,unidade,categoria,subcategoria
+1,cod_ibge,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE,cod_ibge,Geral,Geral,Social,Uso da Terra
+2,municipality,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Município,municipality,Geral,Geral,Social,Uso da Terra
+3,abbrev_state,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Estado,abbrev_state,Geral,Geral,Social,Uso da Terra
+4,muni_area,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área do Município,muni_area,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
+5,pasture_area,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área de Pastagem,pasture_area,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
+6,share_past,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de Pastagem,share_past,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
+7,cow,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Cabeças de Gado em 2017,cow,Mapbiomas,IPS Amazônia 2021 - Escala de 0 a 100,Social,Uso da Terra
+8,stock_density,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Densidade de Estoque (quantidade de gado por unidade de área de pastagem),stock_density,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
+9,land_efficiency,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Eficiência do uso da terra (quantidade de área de pastagem disponível por unidade de gado),land_efficiency,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
+10,geometry,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,geometry,,,,

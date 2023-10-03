@@ -165,6 +165,13 @@ saveRDS(data1, "C:/Users/msses/Documents/GitHub/datazoom_viz/data/mapbiomas8_cov
 data2 <- final %>% ungroup %>% 
   filter(ano == 2017)
 
+#creating new variables
+
+data2 <- data2 %>%
+  mutate(cow = as.numeric(cow),
+         stock_density = ifelse(pasture_area == 0, NA, cow/pasture_area),
+         land_efficiency = ifelse(cow == 0, NA, pasture_area/cow))
+
 
 saveRDS(data2, "C:/Users/msses/Documents/GitHub/datazoom_viz/data/mapbiomas8_cover_pastCattle.rds")
 
