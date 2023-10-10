@@ -115,15 +115,17 @@ get_server <- function(files, param) {
       
       # Calculate breaks based on your requirements
       breaks_stats <- c(min(df[[input$x]], na.rm = TRUE),
-                        sorted[as.integer(length(sorted)/10)*1], 
-                        sorted[as.integer(length(sorted)/10)*2], 
-                        sorted[as.integer(length(sorted)/10)*3], 
-                        sorted[as.integer(length(sorted)/10)*4], 
-                        sorted[as.integer(length(sorted)/10)*5], 
-                        sorted[as.integer(length(sorted)/10)*6],
-                        sorted[as.integer(length(sorted)/10)*7],
-                        sorted[as.integer(length(sorted)/10)*8],
-                        sorted[as.integer(length(sorted)/10)*9],
+                        unique(c(
+                          sorted[as.integer(length(sorted)/10)*1], 
+                          sorted[as.integer(length(sorted)/10)*2], 
+                          sorted[as.integer(length(sorted)/10)*3], 
+                          sorted[as.integer(length(sorted)/10)*4], 
+                          sorted[as.integer(length(sorted)/10)*5], 
+                          sorted[as.integer(length(sorted)/10)*6],
+                          sorted[as.integer(length(sorted)/10)*7],
+                          sorted[as.integer(length(sorted)/10)*8],
+                          sorted[as.integer(length(sorted)/10)*9]
+                        )),
                         max(df[[input$x]], na.rm = TRUE))
       
       # Ensure the last break extends to the maximum value of the data

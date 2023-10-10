@@ -8,7 +8,4 @@
 7,cow,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Cabeças de Gado em 2017,cow,Mapbiomas,Nº de cabeças de gado,Social,Uso da Terra
 8,stock_density,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Densidade de Estoque (gado por área de pastagem),stock_density,Mapbiomas,Nº de cabeças de gado/Hectar de pastagem,Social,Uso da Terra
 9,land_efficiency,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Eficiência do uso da terra (área de pastagem por gado),land_efficiency,Mapbiomas,Hectares de pastagem/Nº de cabeças de gado,Social,Uso da Terra
-10,geometry,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,geometry,,,,
-11,area_savana,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área que Transicionou de Pastagem para Savana,area_savana,Mapbiomas,Hectares,Social,Uso da Terra
-12,cow_savana,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Densidade de Estoque (gado por área de pastagem que tornou-se savana),cow_savana,Mapbiomas,Hectares,Social,Uso da Terra
-13,savana_cow,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Eficiência do uso da terra (área de pastagem que virou savana por gado),savana_cow,Mapbiomas,Hectares,Social,Uso da Terra
+15,geometry,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,geometry,,,,
