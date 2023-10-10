@@ -5,10 +5,6 @@ library(tidyverse)
 library(geobr)
 library(datazoom.amazonia)
 
-# l <- load_mapbiomas(dataset = "mapbiomas_cover",
-#                raw_data = F,
-#                geo_level = "municipality",
-#                cover_level = 4)
 
 # loading data ----------------------------------------------------------------
 
@@ -16,9 +12,9 @@ library(datazoom.amazonia)
 x <- readxl::read_xlsx("C:/Users/msses/Desktop/gado_pastagem/gado_pastagem/tabela_geral_mapbiomas_col8_biomas_municipios.xlsx",
                         sheet = 2)
 
-# w <- readxl::read_xlsx("C:/Users/msses/Desktop/gado_pastagem/gado_pastagem/tabela_geral_mapbiomas_col8_biomas_municipios.xlsx",
-#                         sheet = 5)
-#municipalities
+w <- readxl::read_xlsx("C:/Users/msses/Desktop/gado_pastagem/gado_pastagem/tabela_geral_mapbiomas_col8_biomas_municipios.xlsx",
+                        sheet = 5)
+# municipalities
 muni <- read_municipality(year = 2021)
 
 #cattle data
@@ -29,7 +25,7 @@ cattle <- read.csv("C:/Users/msses/Downloads/censoagro.csv")
 #tidying dta ----------------------------------------------------------------
 
 cover <- x %>% ungroup
-# trans <- w %>% ungroup
+trans <- w %>% ungroup
 
 
 #selecting and filtering to relevant variables and turning data into long type
@@ -54,16 +50,16 @@ cover <- cover %>%
 
 #transition db
 
-# trans <- trans %>% 
-#   select(-feature_id,-biome,-state_acronym,
-#          -("class_id_to":"to_level_3"),
-#          -("to_color":"from_level_3"),
-#          -("from_color":"2014-2015"))
-# 
-# trans <- trans %>% 
-#   pivot_longer(cols = ("2015-2016":"2021-2022"),
-#                names_to = "year",
-#                values_to = "area_trans")
+trans <- trans %>%
+  select(-feature_id,-biome,-state_acronym,
+         -("class_id_to":"to_level_3"),
+         -("to_color":"from_level_3"),
+         -("from_color":"2014-2015"))
+
+trans <- trans %>%
+  pivot_longer(cols = ("2015-2016":"2021-2022"),
+               names_to = "year",
+               values_to = "area_trans")
 
 muni <- muni %>% 
   select(code_muni, abbrev_state) %>% 
@@ -84,46 +80,46 @@ cover <- cover %>%
 
 # same thing for trans db
 
-# trans <- trans %>% 
-#   filter(from_level_4 == "Pasture") %>% 
-#   filter(!is.na(area_trans)) %>% 
-#   filter(to_level_4 %in% c("Urban Infrastructure",
-#                            "Mining",
-#                            "Other Non Vegetated Area",
-#                            "Other Non Forest Natural Formation", 
-#                            "Savanna Formation")) %>%
-#   filter(to_level_4 == "Savanna Formation") %>% 
-#   group_by(geocode,year,municipality) %>%
-#   summarise(area_deg = sum(area_trans, na.rm = T), 
-#             area_savana = sum(area_trans, na.rm = T)) %>%
-#   ungroup()
-# 
-# trans <- trans %>% 
-#   filter((year != "2015-2020") & (year !=  "2016-2022") & (year !=  "2018-2022")) %>%
-#   mutate(year = substr(year, 1, 4)) %>% 
-#   filter(year!=2015)
+trans <- trans %>%
+  filter(from_level_4 == "Pasture") %>%
+  filter(!is.na(area_trans)) %>%
+  filter(to_level_4 %in% c("Urban Infrastructure",
+                           "Mining",
+                           "Other Non Vegetated Area",
+                           "Other Non Forest Natural Formation",
+                           "Savanna Formation")) %>%
+  filter(to_level_4 == "Savanna Formation") %>%
+  group_by(geocode,year,municipality) %>%
+  summarise(area_deg = sum(area_trans, na.rm = T),
+            area_savana = sum(area_trans, na.rm = T)) %>%
+  ungroup()
+
+trans <- trans %>%
+  filter((year != "2015-2020") & (year !=  "2016-2022") & (year !=  "2018-2022")) %>%
+  mutate(year = substr(year, 1, 4)) %>%
+  filter(year!=2015)
 
 # joining cover e transition
 
-# eeaao <- cover %>% 
-#   left_join(trans) %>% 
-#   mutate(area_deg = ifelse(is.na(area_deg),
-#                            0,
-#                            area_deg),
-#          area_savana = ifelse(is.na(area_savana),
-#                            0,
-#                            area_savana))
+eeaao <- cover %>%
+  left_join(trans) %>%
+  mutate(area_deg = ifelse(is.na(area_deg),
+                           0,
+                           area_deg),
+         area_savana = ifelse(is.na(area_savana),
+                           0,
+                           area_savana),
+         area_savana_past = area_savana/pasture_area,
+         area_savana_deg = area_deg/pasture_area)
 
 
-# erro... dando shares pasto/savana e pasto/deg maiores do que 1 muitas vezes  talvez nao possa comparar
-# dados de transicao com dados de land cover
 
 #joining with muni to get geometry
 cover <- muni %>% 
-  left_join(cover)
+  left_join(eeaao)
 
 #removing other dbs from environment
-rm( x,muni)
+rm(w,trans, x,muni)
 
 # raw <- eeaao
 
@@ -153,7 +149,8 @@ final <- final %>%
 
 
 data1 <- final %>% 
-  select(-cow)
+  select(-cow, -area_deg, -area_savana_deg, -area_savana_past) %>% 
+  ungroup()
 
 class(data1)
 
@@ -169,14 +166,17 @@ data2 <- final %>% ungroup %>%
 
 data2 <- data2 %>%
   mutate(cow = as.numeric(cow),
-         stock_density = ifelse(pasture_area == 0, NA, cow/pasture_area),
-         land_efficiency = ifelse(cow == 0, NA, pasture_area/cow))
+         stock_density = ifelse(pasture_area == 0, 0, cow/pasture_area),
+         land_efficiency = ifelse(cow == 0, 0, pasture_area/cow),
+         cow_savana = ifelse(area_savana == 0, 0, cow/area_savana),
+         savana_cow = ifelse(cow == 0, 0, area_savana/cow)) %>% 
+  select(-area_deg, -area_savana_deg, -area_savana_past)
 
 
 saveRDS(data2, "C:/Users/msses/Documents/GitHub/datazoom_viz/data/mapbiomas8_cover_pastCattle.rds")
 
 #criar o código para os dicionários
-#dic data1 criado a mao
+#dic data1 e data2 criados a mao
 
 
 # dictionary --------------------------------------------------------------

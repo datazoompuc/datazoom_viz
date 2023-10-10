@@ -62,7 +62,7 @@ get_db_param <-
     )
 
     # Define escolhas agrupadas para cada selectinput
-    param$x_choices <- c("Área de Pastagem" = "pasture_area", "Percentual de Pastagem" = "share_past")
+    param$x_choices <- c("Área de Pastagem" = "pasture_area", "Percentual de Pastagem" = "share_past", "Área de Pastagem que se tornou Savana" = "area_savana")
     param$y_choices <- append("", grouped_list(param$y_cols))
     param$color_choices <- append("", grouped_list(param$color_cols))
     param$size_choices <- append("", grouped_list(param$size_cols))

@@ -100,8 +100,32 @@ get_server <- function(files, param) {
         pal1 <- pallete_discrete
       }
 
-      # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
+      # Compute mean and standard deviation values
+      sorted <- sort(c(df[[input$x]]), na.last = FALSE)
+      max_val <- min(df[[input$x]], na.rm = TRUE)  # Calculate the maximum value
+      
+      # Calculate breaks based on your requirements
+      breaks_stats <- c(min(df[[input$x]], na.rm = TRUE),
+                        sorted[as.integer(length(sorted)/10)*1], 
+                        sorted[as.integer(length(sorted)/10)*2], 
+                        sorted[as.integer(length(sorted)/10)*3], 
+                        sorted[as.integer(length(sorted)/10)*4], 
+                        sorted[as.integer(length(sorted)/10)*5], 
+                        sorted[as.integer(length(sorted)/10)*6],
+                        sorted[as.integer(length(sorted)/10)*7],
+                        sorted[as.integer(length(sorted)/10)*8],
+                        sorted[as.integer(length(sorted)/10)*9],
+                        max(df[[input$x]], na.rm = TRUE))
+      
+      # Ensure the last break extends to the maximum value of the data
+      if (max_val > tail(breaks_stats, n=1)) {
+        breaks_stats <- c(breaks_stats, max_val)
+      }
+      
+      # Use colorBin with the breaks
+      pal <- colorBin(palette = pal1, bins = breaks_stats, domain = df[[input$x]])
+      
+      
 
       tryCatch(
         {
@@ -112,8 +136,8 @@ get_server <- function(files, param) {
           x_col <- param$table[which(param$table$var == input$x), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
-            param$label_munic_name, "<b>", df$nm_municip, "</b><br>",
-            param$label_state, "<b>", df$uf, "</b><br>",
+            param$label_munic_name, "<b>", df$municipality, "</b><br>",
+            param$label_state, "<b>", df$abbrev_state, "</b><br>",
             x_col$label, ": ", "<b>", format(df[[input$x]], scientific = FALSE,
                                              digits = 2,
                                              decimal.mark = ",", 

@@ -2,10 +2,13 @@
 1,cod_ibge,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE,cod_ibge,Geral,Geral,Social,Uso da Terra
 2,municipality,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Município,municipality,Geral,Geral,Social,Uso da Terra
 3,abbrev_state,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Estado,abbrev_state,Geral,Geral,Social,Uso da Terra
-4,muni_area,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área do Município,muni_area,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
-5,pasture_area,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área de Pastagem,pasture_area,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
-6,share_past,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de Pastagem,share_past,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
-7,cow,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Cabeças de Gado em 2017,cow,Mapbiomas,IPS Amazônia 2021 - Escala de 0 a 100,Social,Uso da Terra
-8,stock_density,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Densidade de Estoque (quantidade de gado por unidade de área de pastagem),stock_density,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
-9,land_efficiency,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Eficiência do uso da terra (quantidade de área de pastagem disponível por unidade de gado),land_efficiency,Mapbiomas,Escala de 0 a 100,Social,Uso da Terra
+4,muni_area,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área do Município,muni_area,Mapbiomas,Hectares,Social,Uso da Terra
+5,pasture_area,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área de Pastagem,pasture_area,Mapbiomas,Hectares,Social,Uso da Terra
+6,share_past,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de Pastagem,share_past,Mapbiomas,%,Social,Uso da Terra
+7,cow,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Cabeças de Gado em 2017,cow,Mapbiomas,Nº de cabeças de gado,Social,Uso da Terra
+8,stock_density,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Densidade de Estoque (gado por área de pastagem),stock_density,Mapbiomas,Nº de cabeças de gado/Hectar de pastagem,Social,Uso da Terra
+9,land_efficiency,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Eficiência do uso da terra (área de pastagem por gado),land_efficiency,Mapbiomas,Hectares de pastagem/Nº de cabeças de gado,Social,Uso da Terra
 10,geometry,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,,geometry,,,,
+11,area_savana,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área que Transicionou de Pastagem para Savana,area_savana,Mapbiomas,Hectares,Social,Uso da Terra
+12,cow_savana,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Densidade de Estoque (gado por área de pastagem que tornou-se savana),cow_savana,Mapbiomas,Hectares,Social,Uso da Terra
+13,savana_cow,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Eficiência do uso da terra (área de pastagem que virou savana por gado),savana_cow,Mapbiomas,Hectares,Social,Uso da Terra

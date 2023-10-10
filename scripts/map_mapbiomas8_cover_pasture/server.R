@@ -109,8 +109,31 @@ get_server <- function(files, param) {
         pal1 <- pallete_discrete
       }
       
-      # Palette for legend
-      pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
+      # Compute mean and standard deviation values
+      sorted <- sort(c(df[[input$x]]), na.last = FALSE)
+      max_val <- min(df[[input$x]], na.rm = TRUE)  # Calculate the maximum value
+      
+      # Calculate breaks based on your requirements
+      breaks_stats <- c(min(df[[input$x]], na.rm = TRUE),
+                        sorted[as.integer(length(sorted)/10)*1], 
+                        sorted[as.integer(length(sorted)/10)*2], 
+                        sorted[as.integer(length(sorted)/10)*3], 
+                        sorted[as.integer(length(sorted)/10)*4], 
+                        sorted[as.integer(length(sorted)/10)*5], 
+                        sorted[as.integer(length(sorted)/10)*6],
+                        sorted[as.integer(length(sorted)/10)*7],
+                        sorted[as.integer(length(sorted)/10)*8],
+                        sorted[as.integer(length(sorted)/10)*9],
+                        max(df[[input$x]], na.rm = TRUE))
+      
+      # Ensure the last break extends to the maximum value of the data
+      if (max_val > tail(breaks_stats, n=1)) {
+        breaks_stats <- c(breaks_stats, max_val)
+      }
+      
+      
+      # Use colorBin with the breaks
+      pal <- colorBin(palette = pal1, bins = breaks_stats, domain = df[[input$x]])
       
       # Tooltip labels
       title_legend <- if(input$x == "pasture_area") "Pasture Area" else "Share of Pasture"
@@ -153,81 +176,6 @@ get_server <- function(files, param) {
       return(fig)
     })
     
-
-    # # Output gráfico
-    # output$map <- renderLeaflet({
-    #   # random_inputs() #preenche inputs se estiverem vazios
-    #   update_my_queryString() # atualiza url com parametros dos inputs
-    #   
-    #   
-    #   
-    #   # Define paleta de cores
-    #   pal1 <- pallete_continuous
-    #   print("Initial value of pal1:")
-    #   print(pal1)
-    #   
-    #   if (!is.numeric(df_reactived()[[input$x]])) {
-    #     pal1 <- pallete_discrete
-    #     print("Inside the conditional. Updated value of pal1:")
-    #     print(pal1)
-    #   }
-    #   
-    #   
-    #   # Determina a paleta para as legendas
-    #   pal <- colorBin(palette = pal1, 9, domain = df_reactived[[input$x]])
-    #   
-    #   tryCatch(
-    #     {
-    #       # Monta mapa
-    #       
-    #       # Monta html do tooltip
-    #       title_legend <- if(input$x == "pasture_area") "Pasture Area" else "Share of Pasture"
-    #       
-    #       labels <- paste0(
-    #         "Municipality: ", df_reactived()$municipality, "<br>",
-    #         "State: ", df_reactived()$abbrev_state, "<br>",
-    #         title_legend, ": <b>", format(df_reactived()[[input$x]], 
-    #                                       scientific = FALSE,
-    #                                       digits = 2,
-    #                                       decimal.mark = ",", 
-    #                                       big.mark = "."), "</b>"
-    #       ) %>%
-    #         lapply(htmltools::HTML)
-    #       fig_p <- df_reactived() %>% 
-    #         leaflet() %>%
-    #         addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
-    #         setView(-58, -7, zoom = 5) %>%
-    #         addPolygons(
-    #           label = labels,
-    #           stroke = FALSE,
-    #           smoothFactor = .5,
-    #           fillOpacity = 0.7,
-    #           fillColor = ~ pal(df_reactived()[[input$x]]),
-    #           highlightOptions = highlightOptions(
-    #             weight = 5,
-    #             fillOpacity = 1,
-    #             color = "black",
-    #             opacity = 1,
-    #             bringToFront = TRUE
-    #           )
-    #         ) %>%
-    #         addLegend("bottomright",
-    #                   pal = pal,
-    #                   values = ~ df_reactived()[[input$x]],
-    #                   title = title_legend,
-    #                   opacity = 0.7
-    #         )
-    #       
-    #       fig <- fig_p # retorna a figura do gráfico
-    #     },
-    #     error = function(cond) {
-    #       # se encontrar erro retorna fig em branco
-    #       print("Plot error in tryCatch environment")
-    #     }
-    #   )
-    #   fig
-    # })
-    # 
 
     # Observa eventos
     observe({
