@@ -79,3 +79,4 @@ get_db_param <-
     # Retorna lista de parâmetros
     param
   }
+

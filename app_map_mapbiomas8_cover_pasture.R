@@ -32,7 +32,7 @@ param$text_def <- "municipality" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Sa\u00fade na Amaz\u00f4nia: Mortalidade ao n\u00edvel municipal"
+param$plot_desc <- "Alterar Descrição"
 
 param$year_inicio <- 2017
 param$year_final <- 2022

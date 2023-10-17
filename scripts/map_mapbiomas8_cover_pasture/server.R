@@ -153,11 +153,11 @@ get_server <- function(files, param) {
       ###definindo limites para os estados da amazonia legal
       brazil_states <- read_state()
       
-      amazon_legal_states <- c(
+      legal_amazon_states <- c(
           "Acre", "Amapá", "Amazonas", "Maranhão", "Mato Grosso", 
           "Pará", "Rondônia", "Roraima", "Tocantins"
       )
-      amazon_legal_boundaries <- brazil_states[brazil_states$name_state %in% amazon_legal_states, ]
+      legal_amazon_boundaries <- brazil_states[brazil_states$name_state %in% legal_amazon_states, ]
       
       
       fig <- df_reactived() %>% 
@@ -185,7 +185,7 @@ get_server <- function(files, param) {
                   opacity = 0.7
         )
       fig <- fig %>%
-          addPolylines(data = amazon_legal_boundaries, color = "black", weight = 2)
+          addPolylines(data = legal_amazon_boundaries, color = "black", weight = 2)
       
       return(fig)
     })
@@ -206,3 +206,4 @@ get_server <- function(files, param) {
   # Retorna objeto server
   server
 }
+
