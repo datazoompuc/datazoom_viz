@@ -151,15 +151,10 @@ get_server <- function(files, param) {
         lapply(htmltools::HTML)
       
       ###definindo limites para os estados da amazonia legal
-      brazil_states <- read_state()
       
-      legal_amazon_states <- c(
-          "Acre", "Amapá", "Amazonas", "Maranhão", "Mato Grosso", 
-          "Pará", "Rondônia", "Roraima", "Tocantins"
-      )
-      legal_amazon_boundaries <- brazil_states[brazil_states$name_state %in% legal_amazon_states, ]
-      
-      
+      amazonialegal = st_read("data/shapefiles/Limites_Amazonia_Legal_2022.shx")
+
+
       fig <- df_reactived() %>% 
         leaflet() %>%
         addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
@@ -185,7 +180,7 @@ get_server <- function(files, param) {
                   opacity = 0.7
         )
       fig <- fig %>%
-          addPolylines(data = legal_amazon_boundaries, color = "black", weight = 2)
+          addPolylines(data = amazonialegal, color = "black", weight = 3)
       
       return(fig)
     })
