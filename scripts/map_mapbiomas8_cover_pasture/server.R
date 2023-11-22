@@ -152,6 +152,17 @@ get_server <- function(files, param) {
       
 <<<<<<< HEAD
       ###definindo limites para os estados da amazonia legal
+<<<<<<< HEAD
+=======
+      brazil_states <- read_state()
+      
+      amazon_legal_states <- c(
+          "Acre", "Amapá", "Amazonas", "Maranhão", "Mato Grosso", 
+          "Pará", "Rondônia", "Roraima", "Tocantins"
+      )
+      amazon_legal_boundaries <- brazil_states[brazil_states$name_state %in% amazon_legal_states, ]
+      
+>>>>>>> parent of 90e15e6 (adjusting variables)
       
       amazonialegal = st_read("data/shapefiles/Limites_Amazonia_Legal_2022.shx")
 
@@ -184,9 +195,13 @@ get_server <- function(files, param) {
         )
 <<<<<<< HEAD
       fig <- fig %>%
+<<<<<<< HEAD
           addPolylines(data = amazonialegal, color = "black", weight = 3)
 =======
 >>>>>>> parent of 1524314 (Adding border to Legal Amazon States)
+=======
+          addPolylines(data = amazon_legal_boundaries, color = "black", weight = 2)
+>>>>>>> parent of 90e15e6 (adjusting variables)
       
       return(fig)
     })
@@ -207,4 +222,3 @@ get_server <- function(files, param) {
   # Retorna objeto server
   server
 }
-
