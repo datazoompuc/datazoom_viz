@@ -33,10 +33,14 @@ param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 <<<<<<< HEAD
+<<<<<<< HEAD
 param$plot_desc <- "Áreas de pastagem no Brasil (colocar obs dados)"
 =======
 param$plot_desc <- "Sa\u00fade na Amaz\u00f4nia: Mortalidade ao n\u00edvel municipal"
 >>>>>>> parent of 90e15e6 (adjusting variables)
+=======
+param$plot_desc <- "Alterar Descrição"
+>>>>>>> parent of a0643c6 (Correcting border Legal Amazon)
 
 param$year_inicio <- 2017
 param$year_final <- 2022
@@ -50,7 +54,7 @@ param$label_selected_variable<- "Vari\u00e1vel selecionada:"
 param$label_munic_name<- "Nome do município <b>"
 param$label_state_name<- "Estado: <b>"
 param$label_measurement_unit<- "Unidade de medida: <b>"
-param$link<- "https://datazoom.shinyapps.io/app_map_saude_mortalidade/" #######prov mudar isso
+param$link<- "https://datazoom.shinyapps.io/app_map_saude_mortalidade/"
 # Outros parâmetros e configurações
 #param$x_choices[[1]] <- NULL
 
@@ -59,4 +63,3 @@ ui <- get_ui(files, param)
 server <- get_server(files, param)
 
 shinyApp(ui = ui, server = server)
-

@@ -32,7 +32,7 @@ param$text_def <- "municipality" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Dados compilados do Instituto do Homem e do Meio Ambiente da Amaz\u00f4nia (Imazon)" ####mudar isso?
+param$plot_desc <- "Dados compilados do Instituto do Homem e do Meio Ambiente da Amaz\u00f4nia (Imazon)"
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
@@ -45,7 +45,7 @@ param$label_x_name<- "Seleciona vari\u00e1vel"
 param$label_munic_name<- "Nome do munic\u00edpio: "
 param$label_state<- "Estado: "
 param$label_measurement_unit<- "Unidade de Medida: "
-param$link<-"https://datazoom.shinyapps.io/app_mapstatic_ips_2021/"#####mudar isso?
+param$link<-"https://datazoom.shinyapps.io/app_mapstatic_ips_2021/"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

@@ -153,6 +153,7 @@ get_server <- function(files, param) {
 <<<<<<< HEAD
       ###definindo limites para os estados da amazonia legal
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       brazil_states <- read_state()
       
@@ -169,6 +170,17 @@ get_server <- function(files, param) {
 
 =======
 >>>>>>> parent of 1524314 (Adding border to Legal Amazon States)
+=======
+      brazil_states <- read_state()
+      
+      legal_amazon_states <- c(
+          "Acre", "Amapá", "Amazonas", "Maranhão", "Mato Grosso", 
+          "Pará", "Rondônia", "Roraima", "Tocantins"
+      )
+      legal_amazon_boundaries <- brazil_states[brazil_states$name_state %in% legal_amazon_states, ]
+      
+      
+>>>>>>> parent of a0643c6 (Correcting border Legal Amazon)
       fig <- df_reactived() %>% 
         leaflet() %>%
         addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
@@ -196,12 +208,16 @@ get_server <- function(files, param) {
 <<<<<<< HEAD
       fig <- fig %>%
 <<<<<<< HEAD
+<<<<<<< HEAD
           addPolylines(data = amazonialegal, color = "black", weight = 3)
 =======
 >>>>>>> parent of 1524314 (Adding border to Legal Amazon States)
 =======
           addPolylines(data = amazon_legal_boundaries, color = "black", weight = 2)
 >>>>>>> parent of 90e15e6 (adjusting variables)
+=======
+          addPolylines(data = legal_amazon_boundaries, color = "black", weight = 2)
+>>>>>>> parent of a0643c6 (Correcting border Legal Amazon)
       
       return(fig)
     })
