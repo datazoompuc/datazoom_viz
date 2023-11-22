@@ -150,11 +150,14 @@ get_server <- function(files, param) {
       ) %>%
         lapply(htmltools::HTML)
       
+<<<<<<< HEAD
       ###definindo limites para os estados da amazonia legal
       
       amazonialegal = st_read("data/shapefiles/Limites_Amazonia_Legal_2022.shx")
 
 
+=======
+>>>>>>> parent of 1524314 (Adding border to Legal Amazon States)
       fig <- df_reactived() %>% 
         leaflet() %>%
         addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
@@ -179,8 +182,11 @@ get_server <- function(files, param) {
                   title = title_legend,
                   opacity = 0.7
         )
+<<<<<<< HEAD
       fig <- fig %>%
           addPolylines(data = amazonialegal, color = "black", weight = 3)
+=======
+>>>>>>> parent of 1524314 (Adding border to Legal Amazon States)
       
       return(fig)
     })

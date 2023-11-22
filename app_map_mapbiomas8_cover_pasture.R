@@ -4,7 +4,7 @@ library(tidyverse)
 library(leaflet)
 library(sf)
 library(htmlwidgets)
-library(geobr)
+
 
 # Define nome de arquivos a serem carregados
 files <- list()
