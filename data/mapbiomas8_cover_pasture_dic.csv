@@ -1,0 +1,5 @@
+﻿Column1,...1,var,x,y,color,size,slider,geometry,label,desc,var_group,unidade,categoria,subcategoria
+1,1,cod_ibge,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Código do município,cod_ibge,Fonte de dados,Unidade de medida,Categoria principal,Subcategoria
+2,4,ano,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,Ano,ano,NA,Ano,Unidade de tempo,Ano
+3,39,muni_area,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área municipal,muni_area,Mapbiomas,Hectares,Social,Uso da Terra
+4,40,pasture_area,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Área de pastagem do município,pasture_area,Mapbiomas,Hectares,Social,Uso da Terra
