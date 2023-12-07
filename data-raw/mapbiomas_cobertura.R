@@ -1,13 +1,16 @@
+################################################################################
+#   SETUP
+################################################################################
+
+# Directory
+setwd("C:/Users/carol/iCloudDrive/PUC/DATAZOOM/datazoom_viz/datazoom_viz")
+
+# Memory
+#Sys.setenv(R_MEM_SIZE = "8G")
+
+
 Sys.setlocale("LC_ALL","English")
 devtools::install_github("datazoompuc/datazoom.amazonia")
-setwd("C:/Users/carol/iCloudDrive/PUC/DATAZOOM/datazoom_viz/datazoom_viz")
-Sys.setenv(R_MAX_MEM_SIZE = "8G")
-
-# Check the current memory limit
-memory.limit()
-
-# Set the memory limit to 8 gigabytes
-memory.limit(size = 8000)
 
 
 # Installing and loading packages (if not exist)
@@ -24,14 +27,18 @@ for (package in packages_to_install) {
   install_and_load_package(package)
 }
 
-
-
 library(datazoom.amazonia)
 library(readxl)
 library(tidyverse)
 library(stringr)
 library(sf)
 library(sp)
+
+
+
+################################################################################
+#   DADOS PARA O      files$db_file
+################################################################################
 
 # load data from MAPBIOMAS ---------------------------------------------------------------
 
@@ -54,6 +61,12 @@ shapefile <- st_read("data/shapefiles/municipalities_legal_amazon.shp") %>%
 
 shapefile <- shapefile[!st_is_empty(shapefile), , drop=FALSE]
 
+# load data OF AMAZONIA LEGAL?  ---------------------------------------------------------------
+# Source: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html
+#amazonialegal = st_read("data/shapefiles/Limites_Amazonia_Legal_2022.shx")
+
+
+
 # Merging data + shapefile ---------------------------------------------------------------
 # merge with shape --------------------------------------------------------
 data <- sp::merge(shapefile, data.frame(df_wider)) %>% 
@@ -74,6 +87,32 @@ colnames(data) <- cols
 
 
 saveRDS(data, "data/mapbiomas_cobertura.rds")
+
+
+################################################################################
+#   DADOS DICIONARIO PARA O      files$param_file
+################################################################################
+
+# dictionary --------------------------------------------------------------
+# extract variables from data
+temp_param_table <- read_csv("data/dz_munic_saude_dic.csv")
+
+columns <- colnames(df)
+
+temp_param_table <- temp_param_table %>%
+  filter(var %in% columns) %>%
+  mutate(unidade = case_when(
+    stringr::str_detect(var, "t_") ~ "Mortalidade por 100 mil habitantes",
+    stringr::str_detect(var, "n_") ~ "Leitos por 100 mil habitantes",
+    TRUE ~ unidade
+  ))
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/saude_mortalidade_dic.csv", fileEncoding = "UTF-8")
+
+
+
+
 
 
 
