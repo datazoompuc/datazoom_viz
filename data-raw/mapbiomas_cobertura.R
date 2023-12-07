@@ -65,7 +65,12 @@ shapefile <- shapefile[!st_is_empty(shapefile), , drop=FALSE]
 # Source: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html
 #amazonialegal = st_read("data/shapefiles/Limites_Amazonia_Legal_2022.shx")
 
+"C:\Users\carol\iCloudDrive\PUC\DATAZOOM\datazoom_viz\datazoom_viz\data\shapefiles\Limites_Amazonia_Legal_2022.shp"
+amazonialegallimite_shapefile <- st_read("data/shapefiles/Limites_Amazonia_Legal_2022.shp") %>% 
+  sf::st_simplify(dTolerance = 400) %>% 
+  sf::st_make_valid()
 
+amazonialegallimite_shapefile <- shapefile[!st_is_empty(amazonialegallimite_shapefile), , drop=FALSE]
 
 # Merging data + shapefile ---------------------------------------------------------------
 # merge with shape --------------------------------------------------------
