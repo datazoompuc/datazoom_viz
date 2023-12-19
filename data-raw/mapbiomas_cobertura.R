@@ -3,7 +3,7 @@
 ################################################################################
 
 # Directory
-setwd("C:/Users/carol/iCloudDrive/PUC/DATAZOOM/datazoom_viz/datazoom_viz")
+#setwd("C:/Users/carol/iCloudDrive/PUC/DATAZOOM/datazoom_viz/datazoom_viz")
 setwd("C:/Users/carolinamoura/Documents/GitHub/datazoom_viz")
 # Memory
 #Sys.setenv(R_MEM_SIZE = "8G")
@@ -59,13 +59,14 @@ shapefile <- st_read("data/shapefiles/municipalities_legal_amazon.shp") %>%
   sf::st_simplify(dTolerance = 400) %>% 
   sf::st_make_valid()
 
+colnames(shapefile)
+#[1] "fid"        "nm_municip" "cd_geocmu"  "uf"         "cod_ibge"   "geometry"  
+# nao tem variavel amazonia legal 
 shapefile <- shapefile[!st_is_empty(shapefile), , drop=FALSE]
 
 # load data OF LIMITES AMAZONIA LEGAL?  ---------------------------------------------------------------
 # Source: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html
 #amazonialegal = st_read("data/shapefiles/Limites_Amazonia_Legal_2022.shx")
-
-"C:\Users\carol\iCloudDrive\PUC\DATAZOOM\datazoom_viz\datazoom_viz\data\shapefiles\Limites_Amazonia_Legal_2022.shp"
 
 amazonialegallimite_shapefile <- st_read("data/shapefiles/Limites_Amazonia_Legal_2022_shp/Limites_Amazonia_Legal_2022.shp") %>% 
   sf::st_simplify(dTolerance = 400) %>% 
