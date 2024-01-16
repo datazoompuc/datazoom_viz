@@ -12,7 +12,7 @@ files$ui_script <- "scripts/map_mapbiomas_cobertura/ui.R"
 files$server_script <- "scripts/map_mapbiomas_cobertura/server.R"
 files$param_script <- "scripts/map_mapbiomas_cobertura/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/mapbiomas_cobertura_dic.csv"
+files$param_file <- "data/mapbiomas_cobertura_munic_savana_dic_en.csv"
 files$db_file <- "data/mapbiomas_cobertura.rds"
 
 # Carrega scripts
