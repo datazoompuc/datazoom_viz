@@ -14,7 +14,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 
 # Installing and loading packages (if not exist)
-packages_to_install <- c("magrittr","devtools","readxl","tidyverse","stringr","googledrive","sf","sp")
+packages_to_install <- c("magrittr","devtools","readxl","tidyverse","stringr","googledrive","sf","sp","rmapshaper")
 # Function to install and load a package if not already installed
 install_and_load_package <- function(package_name) {
   if (!require(package_name, character.only = TRUE)) {
@@ -55,57 +55,47 @@ df_wider <- df %>%
 
 
 # load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
-shapefile <- st_read("data/shapefiles/municipalities_legal_amazon.shp") %>% 
+municipalities <- datazoom.amazonia::municipalities
+shapefile_mun <- datazoom.amazonia:::external_download("geo_municipalities",source="internal")
+
+municipalities_with_geom <- inner_join(shapefile_mun,municipalities,by="code_muni")
+
+municipalities_with_geom <- municipalities_with_geom[,c("code_muni","geom","legal_amazon")]
+
+municipalities_with_geom <- municipalities_with_geom %>%
+  rename(municipality_code=code_muni)
+
+
+#st_geometry(municipalities_with_geom) <- municipalities_with_geom$geom
+
+#shapefile <- municipalities_with_geom[!st_is_empty(municipalities_with_geom), , drop=FALSE]
+
+
+shapefile <- municipalities_with_geom %>% 
   sf::st_simplify(dTolerance = 400) %>% 
   sf::st_make_valid()
 
-colnames(shapefile)
-#[1] "fid"        "nm_municip" "cd_geocmu"  "uf"         "cod_ibge"   "geometry"  
-# nao tem variavel amazonia legal 
-shapefile <- shapefile[!st_is_empty(shapefile), , drop=FALSE]
-
-# load data OF LIMITES AMAZONIA LEGAL?  ---------------------------------------------------------------
-# Source: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html
-#amazonialegal = st_read("data/shapefiles/Limites_Amazonia_Legal_2022.shx")
-
-amazonialegallimite_shapefile <- st_read("data/shapefiles/Limites_Amazonia_Legal_2022_shp/Limites_Amazonia_Legal_2022.shp") %>% 
-  sf::st_simplify(dTolerance = 400) %>% 
-  sf::st_make_valid()
-
-amazonialegallimite_shapefile <- shapefile[!st_is_empty(amazonialegallimite_shapefile), , drop=FALSE]
-
-amazonialegallimite_shapefile <-amazonialegallimite_shapefile %>% 
-  select(-fid, -cd_geocmu)
-
-amazonialegallimite_shapefile <-amazonialegallimite_shapefile %>% 
-  rename(geometry_amazonialegallimite =geometry)
-
+#colnames(shapefile)
 
 # Merging data + shapefiles ---------------------------------------------------------------
 # merge data with shape --------------------------------------------------------
-data <- sp::merge(shapefile, data.frame(df_wider)) %>% 
-  select(-fid, -cd_geocmu)
+data <- right_join(shapefile,df_wider, by="municipality_code") 
 
-# merge data-shape with amazonialegallimite_shapefile --------------------------------------
-data <- sp::merge(amazonialegallimite_shapefile, data) 
 
 # Declare wich colum has the geographical info --------------------------------------------
 
-# I do the line below, but I am not surethat is possible to set 2 times geometry for a unique data frame. In the script server, we may have to run again the line below. Or even, we have to save the amazonia legal limites shapefile in a different file
-st_geometry(data) <- data$geometry_amazonialegallimite
-
-st_geometry(data) <- data$geometry
+#st_geometry(data) <- data$geom
 
 
 # saving in the data folder ---------------------------------------------------------------
 # export ------------------------------------------------------------------
 # save simplified sf for faster maps
-cols <- colnames(data)
-data <- rmapshaper::ms_simplify(data, 
-                                keep_shapes = TRUE, 
-                                keep = 0.01)
+#cols <- colnames(data)
+#data <- rmapshaper::ms_simplify(data, 
+                                # keep_shapes = TRUE, 
+                                # keep = 0.01)
 
-colnames(data) <- cols
+#colnames(data) <- cols
 
 
 saveRDS(data, "data/mapbiomas_cobertura.rds")
@@ -115,9 +105,143 @@ saveRDS(data, "data/mapbiomas_cobertura.rds")
 #   DADOS DICIONARIO PARA O      files$param_file
 ################################################################################
 
-# dictionary --------------------------------------------------------------
-# extract variables from data
+datafinal<-readRDS("data/mapbiomas_cobertura.rds")
 
+#####################
+# Build Dictionary 
+#####################
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Mapbiomas",
+  tipo = 1,
+  unidade = "ha",
+  categoria= "Meio ambiente", 
+  subcategoria = "Uso da terra"
+)
+
+# tentando resolver a questão de terem várias linhas NA 
+temp_param_table <-temp_param_table %>%
+  drop_na()
+
+# remover o codigo do municipio, pois nao será utilizado aqui
+temp_param_table <- temp_param_table %>%
+  filter(var != "municipality_code")
+
+
+temp_param_table$label[5] <- "Ano"
+temp_param_table$label[3] <- "Município"
+temp_param_table$desc[5] <- "Ano"
+temp_param_table$desc[3] <- "Município"
+temp_param_table$x[1:5] <- FALSE
+temp_param_table$x[36] <- FALSE
+temp_param_table$y[1:5] <- FALSE
+temp_param_table$y[36] <- FALSE
+
+#temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 37))
+#temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 37))
+temp_param_table$slider[5] <- TRUE
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_savana_dic.csv", fileEncoding = "UTF-8")
+
+
+##############################
+# Build Dictionary in English
+##############################
+
+#exclui a variável que não será utilizada na construção do dicionário
+datafinal<-datafinal %>%
+  select(-municipality_code)
+
+# extract variables from data
+columns <- colnames(datafinal)
+
+# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Mapbiomas",
+  tipo = 1,
+  unidade = "ha",
+  categoria= "Environment", 
+  subcategoria = "Use of land"
+)
+
+
+temp_param_table$label[5] <- "Year"
+temp_param_table$label[3] <- "Municipality"
+temp_param_table$desc[5] <- "Year"
+temp_param_table$desc[3] <- "Municipality"
+temp_param_table$x[1:5] <- FALSE
+temp_param_table$x[36] <- FALSE
+temp_param_table$y[1:5] <- FALSE
+temp_param_table$y[36] <- FALSE
+
+#temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 37))
+#temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 37))
+temp_param_table$slider[5] <- TRUE
+
+
+# temp_param_table$label[temp_param_table$var==	 "Aquicultura"]= "Aquaculture"  
+# temp_param_table$label[temp_param_table$var==	 "Praia e Dunas"]="Beach and Dune" 
+# temp_param_table$label[temp_param_table$var==	 "Cítricos"] = "Citrus"
+# temp_param_table$label[temp_param_table$var==	   "Café" ] = "Coffe"    
+# temp_param_table$label[temp_param_table$var==	 "Algodão" ]= "Cotton"
+# temp_param_table$label[temp_param_table$var==	 "Formação de Floresta"] = "Forest Formation"
+# temp_param_table$label[temp_param_table$var==	   " Plantação de Floresta" ]= "Forest Plantation"         
+# temp_param_table$label[temp_param_table$var==	  "Pradaria" ]= "Grassland"                  
+# temp_param_table$label[temp_param_table$var==	 "Mineiração"]= "Mining" 
+# temp_param_table$label[temp_param_table$var==	 "Mosaico de Uso da Terra"]="Land Use Mosaic"
+# temp_param_table$label[temp_param_table$var==	 "Cana-de-açúcar"] = "Sugar Cane" 
+# temp_param_table$label[temp_param_table$var==	"Mangue"]= "Magrove"  
+# temp_param_table$label[temp_param_table$var==	  "Salar"] = "Salt flat"                
+# temp_param_table$label[temp_param_table$var==	  "Não observado"]="Non Observed"                     
+# temp_param_table$label[temp_param_table$var==	  "Outras formações naturais não florestais"]= "Other Non Forest Natural Formation"
+# temp_param_table$label[temp_param_table$var==	 "Outras áreas não vegetadas"]= "Other Non Vegetated Area" 
+# temp_param_table$label[temp_param_table$var==	  "Outras Culturas Perenes"] =  "Other Perennial Crops"           
+# temp_param_table$label[temp_param_table$var==	 "Outras Culturas Temporárias"]=  "Other Temporary Crops"            
+# temp_param_table$label[temp_param_table$var==	 "Arroz"] =  "Rice"                        
+# temp_param_table$label[temp_param_table$var==	 "Rios, Lagos ou Oceanos"] =  "River, Lake and Ocean"            
+# temp_param_table$label[temp_param_table$var==	"Afloramento rochoso"] =  "Rocky outcrop"                     
+# temp_param_table$label[temp_param_table$var==	  "Formação de Savana" ]=  "Savanna Formation"              
+# temp_param_table$label[temp_param_table$var==	  "Soja"] =  "Soy Beans"
+# temp_param_table$label[temp_param_table$var==	 "Pastagem" ]=  "Pasture" 
+# temp_param_table$label[temp_param_table$var==	"Infraestrutura Urbana"] =  "Urban Infrastructure"
+# temp_param_table$label[temp_param_table$var==	"Formação de Floresta"]=  "Forest Formation"                     
+# temp_param_table$label[temp_param_table$var==	"Pântano"]=  "Wetland"                          
+# temp_param_table$label[temp_param_table$var==	  "Restinga Arborizada"]=  "Wooded Restinga"                 
+# temp_param_table$label[temp_param_table$var==	  "Culturas Perenes"]=  "Perennial Crops"                
+# temp_param_table$label[temp_param_table$var==	  "Culturas Temporárias" ]=  "Temporary Crops"                
+# temp_param_table$label[temp_param_table$var==	 "Agricultura"] =  "Agriculture"                     
+# temp_param_table$label[temp_param_table$var==	  "Floresta" ]=  "Forest"                       
+# temp_param_table$label[temp_param_table$var==	 "Formação Natural Não Florestal"] =  " Non Forest Natural Formation"   
+# temp_param_table$label[temp_param_table$var==	 "Fazenda" ]=  " Farming"                      
+# temp_param_table$label[temp_param_table$var==	  "Áreas não vegetadas" ]=  "Non Vegetated Area"           
+# temp_param_table$label[temp_param_table$var==	  "Água"] = "Water"                    
+# temp_param_table$label[temp_param_table$var==	  "Antrópico"] = "Anthropic"                       
+# temp_param_table$label[temp_param_table$var==	"Natural"]=  "Natural"    
+
+
+# save csv in utf-8 encoding
+write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_savana_dic_en.csv", fileEncoding = "UTF-8")
 
 
 
