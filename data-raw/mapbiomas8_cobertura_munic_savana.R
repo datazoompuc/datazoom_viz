@@ -201,18 +201,18 @@ datafinal <- datafinal%>%
 
 saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
 
-datafinal_antes <- readRDS("data/mapbiomas_cobertura_munic.rds")
+datafinal <- readRDS("data/mapbiomas_cobertura_munic.rds")
 
 #####################
 # Build Dictionary 
 #####################
 
 # extract variables from data
-columns_antes <- colnames(datafinal_antes)
+columns <- colnames(datafinal)
 
 # generate dictionary
-temp_param_table_antes <- tibble(
-    var = columns_antes,
+temp_param_table <- tibble(
+    var = columns,
     x = TRUE,
     y = TRUE,
     color = FALSE,
@@ -228,11 +228,11 @@ temp_param_table_antes <- tibble(
 )
 
 # tentando resolver a questão de terem várias linhas NA 
-temp_param_table_antes <-temp_param_table_antes %>%
+temp_param_table <-temp_param_table %>%
     drop_na()
 
 # remover o codigo do municipio, pois nao será utilizado aqui
-temp_param_table_antes <- temp_param_table_antes %>%
+temp_param_table <- temp_param_table %>%
     filter(var != "municipality_code")
 
 

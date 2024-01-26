@@ -15,22 +15,22 @@ get_server <- function(files, param) {
   library(sf)
   
   library(sf)
-  df <- readRDS(files$db_file)
+  df <- st_read(files$db_file)
 
   server <- function(input, output, session) {
     df_reactived <- reactive({
       w <- df %>%
-        filter(year == input$filter1)
+        filter(ano == input$filter1)
 
       return(w)
     })
 
     # Cria opções para seleção de datas
-    param$filter_choices <- sort(unique(df$year))
+    param$filter_choices <- sort(unique(df$ano))
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      selected <- "Savanna Formation"
+      selected <- "t_total"
       updateSelectInput(session,
         "x",
         choices = param$x_choices,
