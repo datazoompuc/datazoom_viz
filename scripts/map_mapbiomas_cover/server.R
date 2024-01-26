@@ -27,6 +27,10 @@ get_server <- function(files, param) {
       w <- df %>%
         filter(year == input$filter1)
       
+      # quando e escolhida a caixinha de proporcao,
+      # input$yprop se torna TRUE.
+      # nesse caso, modifico o data frame para dividir pela area
+      # do municipio
       if (input$yprop) {
           w[[input$x]] <- w[[input$x]]/w[["area_km2"]]
       }
@@ -132,7 +136,7 @@ get_server <- function(files, param) {
       }
 
       # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
+      pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
 
       tryCatch(
         {
@@ -140,17 +144,30 @@ get_server <- function(files, param) {
           # Monta mapa
 
           # Monta html do tooltip
-          x_col <- param$table[which(param$table$var == input$x), ]
-          title_legend <- paste0("", x_col$label)
+          x_col <- reactive(
+              {
+                col <- param$table[which(param$table$var == input$x), ]
+              
+                # mudar a unidade quanto se escolhe proporcao
+                if (input$yprop) {
+                    col$unidade <- "%"
+                }
+              
+                return(col)
+              }
+          )
+          
+
+          title_legend <- paste0("", x_col()[["label"]])
           labels <- paste0(
-            param$label_munic_name, df_reactived()$nm_municip, "</b> <br>",
-            param$label_state_name, df_reactived()$uf, "</b> <br>",
-            x_col$label, ": <b>", format(df_reactived()[[input$x]], 
+            param$label_munic_name, df_reactived()[[param$text_def]], "</b> <br>",
+            param$label_state_name, df_reactived()[[param$state]], "</b> <br>",
+            x_col()[["label"]], ": <b>", format(df_reactived()[[input$x]], 
                                          scientific = FALSE,
                                          digits = 2,
                                          decimal.mark = ",", 
                                          big.mark = "."), "</b> <br>",
-            param$label_measurement_unit, x_col$unidade, "</b>"
+            param$label_measurement_unit, x_col()[["unidade"]], "</b>"
           ) %>%
             lapply(htmltools::HTML)
 

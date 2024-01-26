@@ -34,6 +34,7 @@ param$size_def <- "" # variável padrão de tamanho
 param$slider_def <- "year" # variável padrão do slider
 param$text_def <- "municipality" # variável padrão de texto
 param$id_def <- "municipality" # variável padrão de id
+param$state <- "state" # coluna de estado
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Cobertura da terra na Amaz\u00f4nia"
