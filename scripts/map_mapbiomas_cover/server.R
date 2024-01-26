@@ -13,18 +13,27 @@ get_server <- function(files, param) {
 
   # Carrega dados
   library(sf)
-  
-  library(sf)
   df <- readRDS(files$db_file)
+  
+  areas_mun <- readr::read_rds(files$areas_mun) %>%
+      rename("municipality_code" = cod_municipio) %>%
+      mutate(across(municipality_code, as.numeric))
 
+  df <- df %>%
+      left_join(areas_mun, by = "municipality_code")
+  
   server <- function(input, output, session) {
     df_reactived <- reactive({
       w <- df %>%
         filter(year == input$filter1)
-
+      
+      if (input$yprop) {
+          w[[input$x]] <- w[[input$x]]/w[["area_km2"]]
+      }
+      
       return(w)
     })
-
+    
     # Cria opções para seleção de datas
     param$filter_choices <- sort(unique(df$year))
 
@@ -42,6 +51,7 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?", "x=", input$x,
+        "&", "prop=", input$yprop,
         "&", "filter=", input$filter1
       )
 
@@ -104,7 +114,7 @@ get_server <- function(files, param) {
 
       text
     })
-
+    
     # Output gráfico
     output$map <- renderLeaflet({
 
@@ -168,7 +178,16 @@ get_server <- function(files, param) {
               title = title_legend,
               opacity = 0.7
             )
-
+            
+          legal_amazon_boundary <- readr::read_rds(files$legal_amazon)
+          
+          states_boundary <- readr::read_rds(files$states_boundary)
+          
+          fig_p <- fig_p %>%
+              addPolylines(data = states_boundary, color = "grey", weight = 1) %>%
+              addPolylines(data = legal_amazon_boundary, color = "black", weight = 2)
+              
+          
           fig <- fig_p # retorna a figura do gráfico
         },
         error = function(cond) {

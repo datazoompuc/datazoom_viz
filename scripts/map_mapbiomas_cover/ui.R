@@ -45,6 +45,12 @@ get_ui <- function(files, param) {
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
+          ),
+          checkboxInput(
+              inputId = "yprop",
+              "Propor\u00e7\u00e3o da \u00e1rea dos munic\u00edpios",
+              value = FALSE,
+              width = "100%"
           )
         ),
         # espaço vazio
