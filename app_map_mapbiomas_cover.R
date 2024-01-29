@@ -8,12 +8,15 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/map_mapbiomas_cobertura_e_savana/ui.R"
-files$server_script <- "scripts/map_mapbiomas_cobertura_e_savana/server.R"
-files$param_script <- "scripts/map_mapbiomas_cobertura_e_savana/db_params.R"
+files$ui_script <- "scripts/map_mapbiomas_cover/ui.R"
+files$server_script <- "scripts/map_mapbiomas_cover/server.R"
+files$param_script <- "scripts/map_mapbiomas_cover/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/mapbiomas_cobertura_munic_savana_dic_en.csv"
 files$db_file <- "data/mapbiomas_cobertura.rds"
+files$legal_amazon <- "data/legal_amazon_boundary.rds"
+files$states_boundary <- "data/states_boundary.rds"
+files$areas_mun <- "data/area_municipios.rds"
 
 
 # Carrega scripts
@@ -31,9 +34,10 @@ param$size_def <- "" # variável padrão de tamanho
 param$slider_def <- "year" # variável padrão do slider
 param$text_def <- "municipality" # variável padrão de texto
 param$id_def <- "municipality" # variável padrão de id
+param$state <- "state" # coluna de estado
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Sa\u00fade na Amaz\u00f4nia: Mortalidade ao n\u00edvel municipal"
+param$plot_desc <- "Cobertura da terra na Amaz\u00f4nia"
 
 param$year_inicio <- 1985
 param$year_final <- 2022
@@ -47,7 +51,7 @@ param$label_selected_variable<- "Vari\u00e1vel selecionada:"
 param$label_munic_name<- "Nome do município <b>"
 param$label_state_name<- "Estado: <b>"
 param$label_measurement_unit<- "Unidade de medida: <b>"
-param$link<- "https://datazoom.shinyapps.io/app_map_mapbiomas_cobertura_e_savana/"
+param$link<- "https://datazoom.shinyapps.io/app_map_mapbiomas_cover/"
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
 
