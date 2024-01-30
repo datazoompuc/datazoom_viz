@@ -37,7 +37,8 @@ param$id_def <- "municipality" # variável padrão de id
 param$state <- "state" # coluna de estado
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Cobertura da terra na Amaz\u00f4nia"
+param$plot_desc <- "Mapeamento anual do uso e cobertura da terra no Brasil (Fonte: Mapbiomas)"
+    #"Cobertura da terra na Amaz\u00f4nia"
 
 param$year_inicio <- 1985
 param$year_final <- 2022
