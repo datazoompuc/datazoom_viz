@@ -17,6 +17,9 @@ get_server <- function(files, param) {
   library(sf)
   df <- readRDS(files$db_file)
 
+  micro <- geobr::lookup_muni("all") %>%
+      select("municipality_code" = code_muni, code_micro, name_micro)
+
   server <- function(input, output, session) {
     df_reactived <- reactive({
       w <- df
@@ -120,8 +123,37 @@ get_server <- function(files, param) {
         pal1 <- pallete_discrete
       }
 
-      # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
+      # Compute mean and standard deviation values
+      sorted <- sort(c(df[[input$x]]), na.last = FALSE)
+      max_val <- min(df[[input$x]], na.rm = TRUE)  # Calculate the maximum value
+      
+      # Calculate breaks based on your requirements
+      breaks_stats <- c(min(df[[input$x]], na.rm = TRUE),
+                        sorted[as.integer(length(sorted)/10)*1], 
+                        sorted[as.integer(length(sorted)/10)*2], 
+                        sorted[as.integer(length(sorted)/10)*3], 
+                        sorted[as.integer(length(sorted)/10)*4], 
+                        sorted[as.integer(length(sorted)/10)*5], 
+                        sorted[as.integer(length(sorted)/10)*6],
+                        sorted[as.integer(length(sorted)/10)*7],
+                        sorted[as.integer(length(sorted)/10)*8],
+                        sorted[as.integer(length(sorted)/10)*9],
+                        max(df[[input$x]], na.rm = TRUE))
+      
+      # Ensure the last break extends to the maximum value of the data
+      if (max_val > tail(breaks_stats, n=1)) {
+          breaks_stats <- c(breaks_stats, max_val)
+      }
+      
+      # Use colorBin with the breaks
+          if (input$x == "Heads of Cattle / Pasture"){
+              pal <- colorBin(palette = pal1, bins = breaks_stats, domain = df_reactived()[[input$x]])
+          }
+          else {
+              pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
+          }
+      
+    
 
       tryCatch(
         {
