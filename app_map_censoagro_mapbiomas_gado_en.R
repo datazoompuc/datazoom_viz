@@ -14,6 +14,8 @@ files$param_script <- "scripts/map_censoagro_mapbiomas_gado_en/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/censoagro_mapbiomas_gado_dic_en.csv"
 files$db_file <- "data/censoagro_mapbiomas_gado.rds"
+files$legal_amazon <- "data/legal_amazon_boundary.rds"
+files$states_boundary <- "data/states_boundary.rds"
 
 
 # Carrega scripts

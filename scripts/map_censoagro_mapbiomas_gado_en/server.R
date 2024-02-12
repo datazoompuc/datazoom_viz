@@ -200,6 +200,15 @@ get_server <- function(files, param) {
               opacity = 0.7
             )
 
+          legal_amazon_boundary <- readr::read_rds(files$legal_amazon)
+          
+          states_boundary <- readr::read_rds(files$states_boundary)
+          
+          fig_p <- fig_p %>%
+              addPolylines(data = states_boundary, color = "grey", weight = 1) %>%
+              addPolylines(data = legal_amazon_boundary, color = "black", weight = 2)
+          
+          
           fig <- fig_p # retorna a figura do gráfico
         },
         error = function(cond) {
