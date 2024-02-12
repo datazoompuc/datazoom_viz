@@ -19,8 +19,7 @@ get_server <- function(files, param) {
 
   server <- function(input, output, session) {
     df_reactived <- reactive({
-      w <- df %>%
-        filter(year == input$filter1)
+      w <- df
 
       return(w)
     })

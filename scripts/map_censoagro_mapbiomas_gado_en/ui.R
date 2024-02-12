@@ -49,21 +49,6 @@ get_ui <- function(files, param) {
         ),
         # espaço vazio
         div(class = "fakecheckbox", ),
-        div(
-          class = "var_selec_group",
-          # Seleciona variável do eixo de data
-          sliderInput(inputId = "filter1",
-                      label = param$label_year,
-                      min = param$year_inicio,
-                      max = param$year_final,
-                      value = param$year_final,
-                      step = 1,
-                      width = "100%",
-                      animate = animationOptions(interval = 3000,
-                                                 playButton = "\u25B6",
-                                                 pauseButton = "\u23F8"),
-                      sep = "")
-        ),
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
