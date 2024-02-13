@@ -15,10 +15,9 @@ get_server <- function(files, param) {
   library(sf)
   df <- readRDS(files$db_file)
   
-  areas_mun <- readr::read_rds(files$areas_mun) %>%
-      rename("municipality_code" = cod_municipio) %>%
-      mutate(across(municipality_code, as.numeric))
+  areas_mun <- readr::read_rds(files$areas_mun)
 
+  # adding area of each municipality
   df <- df %>%
       left_join(areas_mun, by = "municipality_code")
   
@@ -43,7 +42,7 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      selected <- "Savanna Formation"
+      selected <- param$x_def
       updateSelectInput(session,
         "x",
         choices = param$x_choices,

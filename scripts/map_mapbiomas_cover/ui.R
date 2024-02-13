@@ -48,7 +48,7 @@ get_ui <- function(files, param) {
           ),
           checkboxInput(
               inputId = "yprop",
-              "Propor\u00e7\u00e3o da \u00e1rea dos munic\u00edpios",
+              param$label_toggle,
               value = FALSE,
               width = "100%"
           )

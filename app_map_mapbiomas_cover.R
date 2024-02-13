@@ -37,7 +37,7 @@ param$id_def <- "municipality" # variável padrão de id
 param$state <- "state" # coluna de estado
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Mapeamento anual do uso e cobertura da terra no Brasil (Fonte: Mapbiomas)"
+param$plot_desc <- "Mapeamento anual do uso e cobertura da terra no Brasil (Fonte: MapBiomas)"
     #"Cobertura da terra na Amaz\u00f4nia"
 
 param$year_inicio <- 1985
@@ -45,13 +45,14 @@ param$year_final <- 2022
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARI\u00C1VEIS:"
-param$label_x_name<- "Seleciona variável (y)"
+param$label_x_name<- "Seleciona variável"
 param$label_year<- "Ano referente"
-param$label_title<- "Mapa dos munic\u00edpios da Amaz\u00f4nia Legal"
+param$label_title<- "Mapa dos munic\u00edpios do Brasil com contorno da Amaz\u00f4nia Legal"
 param$label_selected_variable<- "Vari\u00e1vel selecionada:"
 param$label_munic_name<- "Nome do município <b>"
 param$label_state_name<- "Estado: <b>"
 param$label_measurement_unit<- "Unidade de medida: <b>"
+param$label_toggle <- "Propor\u00e7\u00e3o da \u00e1rea dos munic\u00edpios"
 param$link<- "https://datazoom.shinyapps.io/app_map_mapbiomas_cover/"
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL

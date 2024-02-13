@@ -25,7 +25,7 @@ grouped_list <- function(df) {
 
 # Função para retornar parâmetros da base
 get_db_param <-
-  function(param_filename = "data/mapbiomas_cobertura_dic.csv", db_filename = "data/mapbiomas_cobertura.rds") {
+  function(param_filename = files$param_file, db_filename = files$db_file) {
     # Se arquivo de parametros não existe, cria um vazio
     if (!file.exists(param_filename)) {
       temp_db <- read.csv(db_filename)

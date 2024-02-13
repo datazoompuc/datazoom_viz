@@ -34,7 +34,10 @@ dat <- readxl::read_xls("C:/Users/igorr/Downloads/AR_BR_RG_UF_RGINT_MES_MIC_MUN_
 dat <- dat %>%
     janitor::clean_names() %>%
     select(
-        "cod_municipio" = cd_mun, "area_km2" = ar_mun_2022
+        "municipality_code" = cd_mun, "area_km2" = ar_mun_2022
+    ) %>%
+    mutate(
+        across(municipality_code, as.numeric)
     )
 
 readr::write_rds(dat, "data/area_municipios.rds")
