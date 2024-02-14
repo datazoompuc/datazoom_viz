@@ -205,7 +205,7 @@ temp_param_table <- tibble(
   slider = FALSE,
   label = columns,
   desc = columns,
-  var_group = "Censo Agro and Mapbiomas",
+  var_group = "Censo Agro and MapBiomas",
   tipo = 1,
   unidade = "",
   categoria= "", 
@@ -229,7 +229,7 @@ temp_param_table$desc[1] <- "Municipality"
 temp_param_table$desc[2] <- "State"
 temp_param_table$y[3] <- TRUE
 temp_param_table$x[5:7] <- TRUE
-temp_param_table$unidade[5] <- "Number of heads"
+temp_param_table$unidade[5] <- "Number"
 temp_param_table$unidade[6] <- "ha"
 temp_param_table$unidade[7] <- "Proportion"
 
@@ -241,90 +241,55 @@ temp_param_table$unidade[7] <- "Proportion"
 write.csv(temp_param_table, file = "data/censoagro_mapbiomas_gado_dic_en.csv", fileEncoding = "UTF-8")
 
 
-##############################
-# Build Dictionary in English
-##############################
-
-#exclui a variável que não será utilizada na construção do dicionário
-datafinal<-datafinal %>%
-  select(-municipality_code)
+##################################
+# Build Dictionary in Portuguese #
+##################################
 
 # extract variables from data
 columns <- colnames(datafinal)
 
 # generate dictionary
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Mapbiomas",
-  tipo = 1,
-  unidade = "ha",
-  categoria= "Environment", 
-  subcategoria = "Use of land"
+    var = columns,
+    x = FALSE,
+    y = FALSE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Censo Agro e MapBiomas",
+    tipo = 1,
+    unidade = "",
+    categoria= "", 
+    subcategoria = ""
 )
 
+# tentando resolver a questão de terem várias linhas NA 
+temp_param_table <-temp_param_table %>%
+    drop_na()
 
-temp_param_table$label[5] <- "Year"
-temp_param_table$label[3] <- "Municipality"
-temp_param_table$desc[5] <- "Year"
-temp_param_table$desc[3] <- "Municipality"
-temp_param_table$x[1:5] <- FALSE
-temp_param_table$x[36] <- FALSE
-temp_param_table$y[1:5] <- FALSE
-temp_param_table$y[36] <- FALSE
-
-#temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 37))
-#temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 37))
-temp_param_table$slider[5] <- TRUE
+# remover o codigo do municipio, pois nao será utilizado aqui
+temp_param_table <- temp_param_table %>%
+    filter(var != "municipality_code")
 
 
-# temp_param_table$label[temp_param_table$var==	 "Aquicultura"]= "Aquaculture"  
-# temp_param_table$label[temp_param_table$var==	 "Praia e Dunas"]="Beach and Dune" 
-# temp_param_table$label[temp_param_table$var==	 "Cítricos"] = "Citrus"
-# temp_param_table$label[temp_param_table$var==	   "Café" ] = "Coffe"    
-# temp_param_table$label[temp_param_table$var==	 "Algodão" ]= "Cotton"
-# temp_param_table$label[temp_param_table$var==	 "Formação de Floresta"] = "Forest Formation"
-# temp_param_table$label[temp_param_table$var==	   " Plantação de Floresta" ]= "Forest Plantation"         
-# temp_param_table$label[temp_param_table$var==	  "Pradaria" ]= "Grassland"                  
-# temp_param_table$label[temp_param_table$var==	 "Mineiração"]= "Mining" 
-# temp_param_table$label[temp_param_table$var==	 "Mosaico de Uso da Terra"]="Land Use Mosaic"
-# temp_param_table$label[temp_param_table$var==	 "Cana-de-açúcar"] = "Sugar Cane" 
-# temp_param_table$label[temp_param_table$var==	"Mangue"]= "Magrove"  
-# temp_param_table$label[temp_param_table$var==	  "Salar"] = "Salt flat"                
-# temp_param_table$label[temp_param_table$var==	  "Não observado"]="Non Observed"                     
-# temp_param_table$label[temp_param_table$var==	  "Outras formações naturais não florestais"]= "Other Non Forest Natural Formation"
-# temp_param_table$label[temp_param_table$var==	 "Outras áreas não vegetadas"]= "Other Non Vegetated Area" 
-# temp_param_table$label[temp_param_table$var==	  "Outras Culturas Perenes"] =  "Other Perennial Crops"           
-# temp_param_table$label[temp_param_table$var==	 "Outras Culturas Temporárias"]=  "Other Temporary Crops"            
-# temp_param_table$label[temp_param_table$var==	 "Arroz"] =  "Rice"                        
-# temp_param_table$label[temp_param_table$var==	 "Rios, Lagos ou Oceanos"] =  "River, Lake and Ocean"            
-# temp_param_table$label[temp_param_table$var==	"Afloramento rochoso"] =  "Rocky outcrop"                     
-# temp_param_table$label[temp_param_table$var==	  "Formação de Savana" ]=  "Savanna Formation"              
-# temp_param_table$label[temp_param_table$var==	  "Soja"] =  "Soy Beans"
-# temp_param_table$label[temp_param_table$var==	 "Pastagem" ]=  "Pasture" 
-# temp_param_table$label[temp_param_table$var==	"Infraestrutura Urbana"] =  "Urban Infrastructure"
-# temp_param_table$label[temp_param_table$var==	"Formação de Floresta"]=  "Forest Formation"                     
-# temp_param_table$label[temp_param_table$var==	"Pântano"]=  "Wetland"                          
-# temp_param_table$label[temp_param_table$var==	  "Restinga Arborizada"]=  "Wooded Restinga"                 
-# temp_param_table$label[temp_param_table$var==	  "Culturas Perenes"]=  "Perennial Crops"                
-# temp_param_table$label[temp_param_table$var==	  "Culturas Temporárias" ]=  "Temporary Crops"                
-# temp_param_table$label[temp_param_table$var==	 "Agricultura"] =  "Agriculture"                     
-# temp_param_table$label[temp_param_table$var==	  "Floresta" ]=  "Forest"                       
-# temp_param_table$label[temp_param_table$var==	 "Formação Natural Não Florestal"] =  " Non Forest Natural Formation"   
-# temp_param_table$label[temp_param_table$var==	 "Fazenda" ]=  " Farming"                      
-# temp_param_table$label[temp_param_table$var==	  "Áreas não vegetadas" ]=  "Non Vegetated Area"           
-# temp_param_table$label[temp_param_table$var==	  "Água"] = "Water"                    
-# temp_param_table$label[temp_param_table$var==	  "Antrópico"] = "Anthropic"                       
-# temp_param_table$label[temp_param_table$var==	"Natural"]=  "Natural"    
-
+temp_param_table$label[3] <- "Ano"
+temp_param_table$label[1] <- "Município"
+temp_param_table$label[2] <- "Estado"
+temp_param_table$desc[3] <- "Ano"
+temp_param_table$desc[1] <- "Município"
+temp_param_table$desc[2] <- "Estado"
+temp_param_table$y[3] <- TRUE
+temp_param_table$x[5:7] <- TRUE
+temp_param_table$unidade[5] <- "Número"
+temp_param_table$unidade[6] <- "ha"
+temp_param_table$unidade[7] <- "Proporção" 
+temp_param_table$label[5] <- temp_param_table$desc[5] <- "Cabeças de Gado"
+temp_param_table$label[6] <- temp_param_table$desc[6] <- "Área de Pastagem"
+temp_param_table$label[7] <- temp_param_table$desc[7] <- "Gado / Área de Pastagem"
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/censoagro_mapbiomas_gado_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/censoagro_mapbiomas_gado_dic.csv", fileEncoding = "UTF-8")
 
 

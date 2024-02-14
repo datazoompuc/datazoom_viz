@@ -45,11 +45,11 @@ param$year_final <- 2022
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARI\u00C1VEIS:"
-param$label_x_name<- "Seleciona variável"
+param$label_x_name<- "Vari\u00e1vel selecionada:"
 param$label_year<- "Ano referente"
 param$label_title<- "Mapa dos munic\u00edpios do Brasil com contorno da Amaz\u00f4nia Legal"
 param$label_selected_variable<- "Vari\u00e1vel selecionada:"
-param$label_munic_name<- "Nome do município <b>"
+param$label_munic_name<- "Munic\u00edpio <b>"
 param$label_state_name<- "Estado: <b>"
 param$label_measurement_unit<- "Unidade de medida: <b>"
 param$label_toggle <- "Propor\u00e7\u00e3o da \u00e1rea dos munic\u00edpios"

@@ -32,7 +32,7 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      selected <- "head of cattle"
+      selected <- param$x_def
       updateSelectInput(session,
         "x",
         choices = param$x_choices,
