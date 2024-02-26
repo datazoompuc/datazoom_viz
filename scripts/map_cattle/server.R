@@ -41,7 +41,10 @@ get_server <- function(files, param) {
       
       if (input$yprop) {
         if(input$x=="Heads of Cattle / Pasture"){
-          w[[input$x]] <- NA
+          w[[input$x]] <- w[[input$x]]
+          
+          showNotification(param$warning_prop, type = "warning")
+          
         }else{
           w[[input$x]] <- w[[input$x]]/w[["area_km2"]]
         }
@@ -51,6 +54,9 @@ get_server <- function(files, param) {
       return(w)
     })
 
+
+    
+    
     # Cria opções para seleção de datas
     param$filter_choices <- sort(unique(df$year))
 
@@ -203,7 +209,15 @@ get_server <- function(files, param) {
           if (input$yprop) {
             x_col$unidade <- "%"
               }
-          
+          if (input$yprop) {
+            if(input$x=="Heads of Cattle / Pasture"){
+              x_col$unidade <- param$warning_prop_label
+              
+            }else{
+              x_col$unidade <- "%"
+            }
+            
+          }
           
           title_legend <- paste0("", x_col$label)
           #title_legend <- paste0("", x_col()[["label"]])

@@ -51,6 +51,9 @@ param$label_munic_name<- "Munic\u00edpio: <b>"
 param$label_state_name<- "Estado: <b>"
 param$label_measurement_unit<- "Unidade de medida: <b>"
 param$label_toggle <- "Propor\u00e7\u00e3o da \u00e1rea dos munic\u00edpios"
+param$warning_prop <-"Atenção: Esta opção não é valida, no lugar estamos mostrando Gado/ \u00c1rea de Pastagem."
+param$warning_prop_label <-"Propor\u00e7\u00e3o"
+
 param$link<- "https://datazoom.shinyapps.io/app_map_cattle/"
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL

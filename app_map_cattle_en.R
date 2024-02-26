@@ -52,6 +52,9 @@ param$label_munic_name<- "Municipality: <b>"
 param$label_state_name<- "State: <b>"
 param$label_measurement_unit<- "Unit: <b>"
 param$label_toggle <- "Proportion of municipality area"
+param$warning_prop <-"Warning: This option is not valid, instead we are showing Heads of Cattle / Pasture area."
+param$warning_prop_label <-"Proportion"
+
 param$link<- "https://datazoom.shinyapps.io/app_map_cattle_en/"
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
