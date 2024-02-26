@@ -16,6 +16,7 @@ files$param_file <- "data/censoagro_mapbiomas_gado_dic_en.csv"
 files$db_file <- "data/censoagro_mapbiomas_gado.rds"
 files$legal_amazon <- "data/legal_amazon_boundary.rds"
 files$states_boundary <- "data/states_boundary.rds"
+files$areas_mun <- "data/area_municipios.rds"
 
 
 # Carrega scripts
@@ -50,6 +51,7 @@ param$label_selected_variable<- "Selected variable:"
 param$label_munic_name<- "Municipality: <b>"
 param$label_state_name<- "State: <b>"
 param$label_measurement_unit<- "Unit: <b>"
+param$label_toggle <- "Proportion of municipality area"
 param$link<- "https://datazoom.shinyapps.io/app_map_cattle_en/"
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL

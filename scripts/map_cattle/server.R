@@ -16,7 +16,13 @@ get_server <- function(files, param) {
   
   library(sf)
   df <- readRDS(files$db_file)
-
+  
+  areas_mun <- readr::read_rds(files$areas_mun)
+  
+  # adding area of each municipality
+  df <- df %>%
+    left_join(areas_mun, by = "municipality_code")
+  
   micro <- geobr::lookup_muni("all") %>%
       select("municipality_code" = code_muni, code_micro, name_micro)
 
@@ -24,6 +30,24 @@ get_server <- function(files, param) {
     df_reactived <- reactive({
       w <- df
 
+      
+      # quando e escolhida a caixinha de proporcao,
+      # input$yprop se torna TRUE.
+      # nesse caso, modifico o data frame para dividir pela area
+      # do municipio
+      # if (input$yprop ) {
+      #   w[[input$x]] <- w[[input$x]]/w[["area_km2"]]
+      # }
+      
+      if (input$yprop) {
+        if(input$x=="Heads of Cattle / Pasture"){
+          w[[input$x]] <- NA
+        }else{
+          w[[input$x]] <- w[[input$x]]/w[["area_km2"]]
+        }
+
+      }
+      
       return(w)
     })
 
@@ -44,6 +68,7 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?", "x=", input$x,
+        "&", "prop=", input$yprop,
         "&", "filter=", input$filter1
       )
 
@@ -161,8 +186,28 @@ get_server <- function(files, param) {
           # Monta mapa
 
           # Monta html do tooltip
+          # x_col <- reactive(
+          #   {
+          #     col <- param$table[which(param$table$var == input$x), ]
+          #     
+          #     # mudar a unidade quanto se escolhe proporcao
+          #     if (input$yprop) {
+          #       col$unidade <- "%"
+          #     }
+          #     
+          #     return(col)
+          #   }
+          # )
           x_col <- param$table[which(param$table$var == input$x), ]
+          
+          if (input$yprop) {
+            x_col$unidade <- "%"
+              }
+          
+          
           title_legend <- paste0("", x_col$label)
+          #title_legend <- paste0("", x_col()[["label"]])
+          
           labels <- paste0(
             param$label_munic_name, df_reactived()$municipality_name, "</b> <br>",
             param$label_state_name, df_reactived()$state_name, "</b> <br>",
