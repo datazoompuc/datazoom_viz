@@ -40,6 +40,16 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Mapeamento anual do uso e cobertura da terra no Brasil (Fonte: MapBiomas)"
     #"Cobertura da terra na Amaz\u00f4nia"
 
+####### HEAD
+####### HEAD
+param$plot_desc <- "Áreas de pastagem no Brasil (colocar obs dados)"
+
+param$plot_desc <- "Sa\u00fade na Amaz\u00f4nia: Mortalidade ao n\u00edvel municipal"
+####### parent of 90e15e6 (adjusting variables)
+
+param$plot_desc <- "Cobertura vegetal a nível municipal"
+####### parent of a0643c6 (Correcting border Legal Amazon)
+
 param$year_inicio <- 1985
 param$year_final <- 2022
 
