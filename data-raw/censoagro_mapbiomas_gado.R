@@ -179,6 +179,9 @@ data <- data %>%
 data <- data %>%
   relocate(geom , .after = year)
 
+data <- data %>%
+  mutate(state_name=ifelse(state_name=="Amazônas","Amazonas",state_name))
+
 saveRDS(data, "data/censoagro_mapbiomas_gado.rds")
 
 
