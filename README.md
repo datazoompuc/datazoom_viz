@@ -74,18 +74,14 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 |                             |                                 |
 |-----------------------------|---------------------------------|
 | **[COMEX](#comex)**         | *Brazilian international trade* |
-| **[BACI](#baci)**           | *Global international trade*    |
-| **[PIB-Munic](#pib-munic)** | *Municipal GDP*                 |
 | **[CEMPRE](#cempre)**       | *Central register of companies* |
-| **[PAM](#pam)**             | *Agricultural production*       |
+| **[PPM](#ppm)**             | *Livestock farming*             |
 
 </td>
 <td>
 
 |                         |                           |
 |-------------------------|---------------------------|
-| **[PEVS](#pevs)**       | *Forestry and extraction* |
-| **[PPM](#ppm)**         | *Livestock farming*       |
 | **[SIGMINE](#sigmine)** | *Mining*                  |
 | **[ANEEL](#aneel)**     | *Energy development*      |
 | **[EPE](#epe)**         | *Energy consumption*      |
@@ -278,129 +274,34 @@ granularity of location.
 
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**: there are four choices:
+- `app_map_comex_exp_sh4_sel`: map of foreign trade in the amazon: value of the product's export. (english version: `app_map_comex_exp_sh4_sel_en`)
 
-    - `"comex_export_mun"`: selects exports data by municipality
-    - `"comex_import_mun"`: selects imports data by municipality
-    - `"comex_export_prod"`: selects exports data by producer
-    - `"comex_import_prod"`: selects imports data by producer
+- `app_rk_comex_exp_munic_produtosamz`: ranking of biggest product exporters municipalities in the legal amazon. (english version: `app_rk_comex_exp_munic_produtosamz_en`)
 
-2.  **raw_data**: there are two options:
+- `app_rk_comex_exp_paises`: ranking of countries that import the most from the legal amazon. (english version: `app_rk_comex_exp_paises_en`)
 
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
+- `app_rk_comex_exp_perc_sh4_sel`: ranking of foreign trade in the amazon compared to internacional commerce (BACI): proportion of products export values. (english version: `app_rk_comex_exp_perc_sh4_sel_en`)
 
-3.  **time_period**: picks the years for which the data will be
-    downloaded
+- `app_sankey_comex_exp_pais_sec`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_sankey_comex_exp_pais_sec_en`)
 
-4.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
+- `app_ts_comex_exp_munic_sec`: graphic of external trade in the amazon: products export value per municipality. (english version: `app_ts_comex_exp_munic_sec_en`)
 
-------------------------------------------------------------------------
+- `app_ts_comex_exp_munic_sh2`: ????não sei diferenciar do de cima????. (english version: `app_ts_comex_exp_munic_sh2_en`)
 
-**Examples:**
+- `app_ts_comex_exp_pais_sec`: OUTRA VERSÃO DE app_sankey_comex_exp_pais_sec*** graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_pais_sec_en`)
 
-``` r
-# download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
-# from 2020 to 2021 (time_period = 2020:2021)
-data <- load_br_trade(
-  dataset = "comex_export_mun",
-  raw_data = FALSE,
-  time_period = 2020:2021
-)
-# download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
-# from 2020 to 2021 (time_period = 2020:2021)
-data <- load_br_trade(
-  dataset = "comex_import_mun",
-  raw_data = FALSE,
-  time_period = 2020:2021
-)
-```
+- `app_ts_comex_exp_sec_munic`: graphic of external trade in the amazon: products export value per municipality. (english version: `app_ts_comex_exp_sec_munic_en`)
 
-## BACI
+- `app_ts_comex_exp_sec_pais`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_sec_pais_en`)
 
-Loads disaggregated data on bilateral trade flows for more than 5000
-products and 200 countries. The data is from the
-[CEPII](http://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37)
-and is built from data directly reported by each country to the United
-Nations Statistical Division (Comtrade).
+- `app_ts_comex_exp_sh2_munic`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_sh2_munic_en`)
 
-As all of the data is packed into one single .zip file in the website,
-data on all years must be downloaded, even if not all of it is used.
-Therefore, downloading the data can take a long time.
+- `app_ts_comex_exp_tot_pais`: graphic of external trade in the amazon: total products export value of amazonia legal per destination country. (english version: `app_ts_comex_exp_tot_pais_en`)
 
-------------------------------------------------------------------------
+- `app_ts_comex_exp_tot_sh2`: graphic of external trade in the amazon: products export value per type of product. (english version: `app_ts_comex_exp_tot_sh2_en`)
 
-**Options:**
-
-1.  **dataset**: there is one choice:
-
-    - `"HS92"` which follows the Harmonized System method
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **time_period**: picks the years for which the data will be
-    downloaded
-
-4.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# download treated data for 2016 (takes a long time to download)
-clean_baci <- load_baci(
-  raw_data = FALSE,
-  time_period = 2016
-)
-```
-
-## PIB-Munic
-
-Loads IBGE information on gross domestic product at current prices,
-taxes, net of subsidies, on products at current prices and gross value
-added at current prices, total and by economic activity, and respective
-shares. Data is available at country, state and municipality level and
-from 2002 to 2018.
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: `"pibmunic"`
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded
-
-5.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# download treated municipal GDP data at the state level for 2010 to 2012
-data <- load_pibmunic(
-  raw_data = FALSE,
-  geo_level = "state",
-  time_period = 2010:2012
-)
-```
 
 ## CEMPRE
 
@@ -413,302 +314,10 @@ National Register of Legal Entities. Data is available between 2006 and
 
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**: `"cempre"`
+- `app_map_dz_munic_cempre`: map of data compilation at municipality level. (english version: `app_map_dz_munic_cempre_en`)
 
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **geo_level**: `"country"`, `"state"` or `"municipality"`
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded
-
-5.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-6.  **sectors**: defines if the data will be return separated by sectors
-    (`sectors = TRUE`) or not (`sectors = FALSE`)
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Download raw data (raw_data = TRUE) at the country level
-# from 2008 to 2010 (time_period = 2008:2010).
-data <- load_cempre(
-  raw_data = TRUE,
-  geo_level = "country",
-  time_period = 2008:2010
-)
-# Download treted data (raw_data = FALSE) by state (geo_level = "state")
-# from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
-# In this example, data is split by sector (sectors = TRUE)
-data <- load_cempre(
-  raw_data = FALSE,
-  geo_level = "state",
-  time_period = 2008:2010,
-  language = "pt",
-  sectors = TRUE
-)
-```
-
-## PAM
-
-[Municipal Agricultural
-Production](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/16773-municipal-agricultural-production-temporary-and-permanent-crops.html?=&t=o-que-e)
-(PAM, in Portuguese) is a nationwide annual survey conducted by IBGE
-(Brazilian Institute of Geography and Statistics) which provides
-information on agricultural products, such as quantity produced, area
-planted and harvested, average quantity of output and monetary value of
-such output. The products are divided in permanent and temporary farmed
-land, as well as dedicated surveys to the four products that yield
-multiple harvests a year (beans, potato, peanut and corn), which all sum
-to a total survey of 64 agricultural products (31 of temporary tillage
-and 33 of permanent tillage). Output, however, is only included in the
-dataset if the planted area occupies over 1 acre or if output exceeds
-one tonne.
-
-Permanent farming is characterized by a cycle of long duration, whose
-harvests may be done multiple times across the years without the need of
-planting seeds again. Temporary farming, on the other hand, consists of
-cycles of short and medium duration, which after harvesting require
-planting seeds again.
-
-The data also has multiple aggregation levels, such as nationwide, by
-region, mesoregion and microregion, as well as state and municipality.
-
-The data available has a yearly frequency and is available from 1974 to
-the present, with the exception of the four multiple-harvest products,
-which are only available from 2003. More information can be found on
-[this
-link](https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#:~:text=A%20pesquisa%20Produ%C3%A7%C3%A3o%20Agr%C3%ADcola%20Municipal,s%C3%A3o%20da%20cesta%20b%C3%A1sica%20do)
-(only in Portuguese).
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: See tables below
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
-    `"municipality"`
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded
-
-5.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-The datasets supported are shown in the tables below, made up of both
-the original databases and their narrower subsets. Note that downloading
-only specific crops is considerably faster.
-
-<details>
-<summary>
-Full datasets provided by IBGE:
-</summary>
-
-| dataset         |
-|:----------------|
-| all_crops       |
-| temporary_crops |
-| permanent_crops |
-| corn            |
-| potato          |
-| peanut          |
-| beans           |
-
-</details>
-<details>
-<summary>
-Datasets generated from Temporary Crops:
-</summary>
-
-| dataset           |          Name (pt)           |          Name (eng)           |
-|:------------------|:----------------------------:|:-----------------------------:|
-| pineapple         |           Abacaxi            |           Pineapple           |
-| alfafa            |        Alfafa Fenada         |         Alfafa Fenada         |
-| cotton_herbaceous | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
-| garlic            |             Alho             |            Garlic             |
-| peanut_temporary  |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
-| rice              |       Arroz (em Casca)       |        Rice (in husk)         |
-| oats              |       Aveia (em Grao)        |        Oats (in grain)        |
-| sweet_potato      |         Batata Doce          |         Sweet potato          |
-| potato_temporary  |        Batata Inglesa        |        English potato         |
-| sugar_cane        |        Cana de Acucar        |          Sugar cane           |
-| forage_cane       |      Cana para Forragem      |          Forage cane          |
-| onion             |            Cebola            |             Onion             |
-| rye               |      Centeio (em Grao)       |        Rye (in grain)         |
-| barley            |       Cevada (em Grao)       |       Barley (in Grain)       |
-| pea               |      Ervilha (em Grao)       |        Pea (in Grain)         |
-| broad_bean        |        Fava (em Grao)        |     Broad Bean (in Grain)     |
-| beans_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
-| tobacco           |       Fumo (em Folha)        |       Smoke (in Sheet)        |
-| sunflower_seeds   |      Girassol (em Grao)      |     Sunflower (in Grain)      |
-| jute_fiber        |         Juta (Fibra)         |         Jute (Fiber)          |
-| linen_seeds       |       Linho (Semente)        |         Linen (Seed)          |
-| malva_fiber       |        Malva (Fibra)         |         Malva (Fiber)         |
-| castor_bean       |        Mamona (Baga)         |      Castor bean (Berry)      |
-| cassava           |           Mandioca           |            Cassava            |
-| watermelon        |           Melancia           |          watermelon           |
-| melon             |            Melao             |             Melon             |
-| corn_temporary    |       Milho (em Grao)        |        corn (in grain)        |
-| ramie_fiber       |         Rami (Fibra)         |         Ramie (Fiber)         |
-| soybean           |        Soja (em Grao)        |      Soybean (in grain)       |
-| sorghum           |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
-| tomato            |            Tomate            |            Tomato             |
-| wheat             |       Trigo (em Grao)        |        Wheat in grain)        |
-| triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
-| temporary_total   |            Total             |             Total             |
-
-</details>
-<details>
-<summary>
-Datasets generated from Permanent Crops:
-</summary>
-
-| dataset                 |          Name (pt)          |         Name (eng)         |
-|:------------------------|:---------------------------:|:--------------------------:|
-| avocado                 |           Abacate           |          Avocado           |
-| cotton_arboreo          | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
-| acai                    |            Acai             |            Acai            |
-| olive                   |          Azeitona           |           Olive            |
-| banana                  |       Banana (Cacho)        |       Banana (Bunch)       |
-| rubber_coagulated_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
-| rubber_liquid_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
-| cocoa_beans             |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
-| coffee_total            |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
-| coffee_arabica          |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
-| coffee_canephora        |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
-| cashew                  |            Caju             |           Cashew           |
-| khaki                   |            Caqui            |           Khaki            |
-| cashew_nut              |      Castanha de Caju       |        Cashew Nuts         |
-| india_tea               | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
-| coconut                 |        Coco da Baia         |          Coconut           |
-| coconut_bunch           |    Dende (Cacho de Coco)    |       Coconut Bunch        |
-| yerba_mate              |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
-| fig                     |            Figo             |            Fig             |
-| guava                   |           Goiaba            |           Guava            |
-| guarana_seeds           |      Guarana (Semente)      |       Guarana (Seed)       |
-| orange                  |           Laranja           |           Orange           |
-| lemon                   |            Limao            |           Lemon            |
-| apple                   |            Maca             |           Apple            |
-| papaya                  |            Mamao            |           Papaya           |
-| mango                   |            Manga            |           Mango            |
-| passion_fruit           |          Maracuja           |       Passion fruit        |
-| quince                  |           Marmelo           |           Quince           |
-| walnut                  |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
-| heart_of_palm           |           Palmito           |         Palm heart         |
-| pear                    |            Pera             |            Pear            |
-| peach                   |           Pessego           |           Peach            |
-| black_pepper            |      Pimenta do Reino       |        Black pepper        |
-| sisal_or_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
-| tangerine               |          Tangerina          |         Tangerine          |
-| tung                    |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
-| annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
-| grape                   |             Uva             |           Grape            |
-| permanent_total         |            Total            |           Total            |
-
-</details>
-
-**Examples:**
-
-``` r
-# download treated data at the state level from 2010 to 2011 for all crops
-data <- load_pam(
-  dataset = "all_crops",
-  raw_data = FALSE,
-  geo_level = "state",
-  time_period = 2010:2011,
-  language = "eng"
-)
-```
-
-## PEVS
-
-Loads information on the amount and value of the production of the
-exploitation of native plant resources and planted forest massifs, as
-well as existing total and harvested areas of forest crops.
-
-Data is from the Silviculture and Forestry Extraction Production (PEVS,
-in Portuguese), a nationwide annual survey conducted by IBGE (Brazilian
-Institute of Geography and Statistics). The data also has multiple
-aggregation levels, such as nationwide, by region, mesoregion and
-microregion, as well as state and municipality.
-
-The data available has a yearly frequency and is available from 1986 to
-the present, with the exception of the data on total area for
-production, which are only available from 2013 onwards. More information
-can be found in [this
-link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e).
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: there are three choices:
-
-    - `"pevs_forest_crops"`: provides data related to both quantity and
-      value of the forestry activities. The data goes from 1986 to 2019
-      and it is divided by type of product.
-    - `"pevs_silviculture"`: provides data related to both quantity and
-      value of the silviculture. The data goes from 1986 to 2019 and it
-      is divided by type of product.
-    - `"pevs_silviculture_area"`: total existing area used for
-      silviculture in 12/31.The data goes from 2013 to 2019 and it is
-      divided by forestry species.
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
-    `"municipality"`
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded
-
-5.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture')
-# by state (geo_level = 'state') from 2012 (time_period =  2012)
-# in portuguese (language = "pt")
-data <- load_pevs(
-  dataset = "pevs_silviculture",
-  raw_data = FALSE,
-  geo_level = "state",
-  time_period = 2012,
-  language = "pt"
-)
-
-# Download raw (raw_data = TRUE) forest crops data by region
-# from 2012 to 2013 in english
-data <- load_pevs(
-  dataset = "pevs_forest_crops",
-  raw_data = TRUE,
-  geo_level = "region",
-  time_period = 2012:2013
-)
-```
 
 ## PPM
 
@@ -726,51 +335,13 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**: there are five possible choices: \*
-    `"ppm_livestock_inventory"` \* `"ppm_sheep_farming"` \*
-    `"ppm_animal_orig_production"` \* `"ppm_cow_farming"` \*
-    `"ppm_aquaculture"`
+- `app_map_dz_munic_ppm`: map of data compiled at the municipality level. (english version: `app_map_dz_munic_ppm_en`)
 
-2.  **raw_data**: there are two options:
+- `app_map_dz_state`: map of data compiled at the state level. (english version: `app_map_dz_state_en`)
 
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
-    `"municipality"`
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded
-
-5.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture")
-# from 2013 to 2015 (time_period = 2013:2015) in english
-# with the level of aggregation being the country (geo_level = "country").
-data <- load_ppm(
-  dataset = "ppm_aquaculture",
-  raw_data = FALSE,
-  geo_level = "country",
-  time_period = 2013:2015
-)
-
-# Download raw data about sheep farming by state from 1980 to 1995 in portuguese (language = "pt")
-data <- load_ppm(
-  dataset = "ppm_sheep_farming",
-  raw_data = TRUE,
-  geo_level = "state",
-  time_period = 1980:1995,
-  language = "pt"
-)
-```
+- `app_ts_dz_state`: graphic of economic output by state. (english version: `app_ts_dz_state_en`)
 
 ## SIGMINE
 
@@ -781,30 +352,11 @@ Agency (ANM) is responsible for this survey.
 
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**: `"sigmine_active"`
+- `app_rk_sigmine_munic`: ranking of transition/ change of cover and use of land at municipality level. (english version: `app_rk_sigmine_munic_en`)
 
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Download treated data (raw_data = FALSE) in portuguese (language = "pt").
-data <- load_sigmine(
-  dataset = "sigmine_active",
-  raw_data = FALSE,
-  language = "pt"
-)
-```
+- `app_ts_sigmine_munic`: graphic of transition/ change in coverage and soil use at municipality level. (english version: `app_ts_sigmine_munic_en`)
 
 ## ANEEL
 
@@ -814,87 +366,15 @@ Energy (MME). ANEEL works to provide favorable conditions for the
 Electrical Energy Market to develop with balance and for the benefit of
 society.
 
-As for now, there are three different datasets available for download:
-the Energy Development Budget and the Energy Generation.
-
-#### Energy Development Budget
-
-The Energy Development Budget dataset showcases the Energy Development
-Account’s (CDE) anual budget expenses. The CDE is designed to promote
-the Brazilian energy development and is managed by the Electrical Energy
-Commercialization Chamber (CCEE).
-
-The dataset makes available the year of the observation – from 2013 to
-2022 –, the type of expense, its value in R\$ (Reais) and its share over
-the total amount of CDE budget expenses on the year\*.
-
-\*Note that ‘share_of_total’ values sum to 1 for each year available.
-
-#### Energy Generation
-
-The Energy Generation dataset showcases information about ANEEL’s
-Generation Informations System (SIGA). SIGA provides information about
-the Brazilian electrical energy generation installed capacity.
-
-The dataset provides information at the individual venture/entity level.
-It contains information about the power, source, stage, type of
-permission, origin and final fuel with which each venture/entity
-operates, as well as other legal, technical and geographical
-information.\* Operation start dates contained in the dataset go as far
-back as 1924 up to 2022.
-
-\* For more details on each variable, access [This
-link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9)
-and select “Manual do Usuario”.
-
-#### Energy Enterprises
-
-The Energy Enterprises dataset showcases information about distributed
-micro and mini generators, covered by the Regulatory Resolution nº
-482/2012. The list of projects is classified by variables that make up
-their identification, namely: connected distributor, project code,
-numerical nucleus of the project code, owner name, production class,
-subgroup, name of the owner, number of consumer units that receive
-credits, connection date, type of generating unit, source, installed
-power, municipality, and federative unit where it is located.
-
-The data is expressed in quantities and installed power in kW
-(kilowatt). The quantity corresponds to the number of distributed micro
-or mini generators installed in the specified period. The installed
-power is defined by the sum of the nominal active electric power of the
-generating units.
-
-\* For more details on each variable, access [This
-link](https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida)
-and select “Dicionário de dados”.
-
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**: there are three choices:
-    - `"energy_development_budget"`: government spending towards energy
-      sources
-    - `"energy_generation"`: energy generation by entity/corporation
-    - `"energy_enterprises_distributed"`: distributed micro and mini
-      generators
-2.  **raw_data**: there are two options:
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-3.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
+- `app_rk_energia_geracao_distribuida`: ranking of states with the greatest installed energy power in the legal amazon. (english version: `app_rk_energia_geracao_distribuida_en`)
 
-------------------------------------------------------------------------
+- `app_ts_aneel_geracao_distribuida`: graphic of data compiled at state level. (english version: `app_ts_aneel_geracao_distribuida_en`)
 
-**Examples:**
 
-``` r
-# download treated data about energy generation
-clean_aneel <- load_aneel(
-  dataset = "energy generation",
-  raw_data = FALSE
-)
-```
 
 ## EPE
 
@@ -905,82 +385,12 @@ Brazil’s energy infrastructure. EPE’s duty on that mission is to support
 MME with quality research and studies in order to aid Brazil’s energy
 infrastructure planning.
 
-As for now, there are two different datasets available for download: the
-Energy Consumption Per Class and the National Energy Balance. Both of
-them were obtained from the [EPE
-website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
-
-#### Energy Consumption Per Class
-
-The Energy Consumption Per Class dataset provides monthly data about
-energy consumption and consumers from 2004 to 2022, for each class of
-energy consumption.
-
-The different classes are Total consumption (and consumers), Industrial
-consumption (and consumers), Residential consumption (and consumers),
-Commercial consumption (and consumers), Captive consumption\* and Other
-consumption (and consumers).\*\*
-
-\*Note that there is no consumer data for ‘Captive’ class at all.
-
-\*\*There is also no consumer data for ‘Industrial’, ‘Commercial’ and
-‘Other’ classes when the geographical level is ‘Subsystem’ or ‘Region’.
-
-There are three different aggregation levels: The Region level
-encompasses the five Brazilian geographical regions (North, Northeast,
-Midwest, Southeast and South). The Subsystem level encompasses the five
-Brazilian Electric Subsystems (North, Northeast, Southeast/Midwest,
-South, Isolated Systems). The State level encompasses the 26 Brazilian
-States and the Federal District.
-
-#### National Energy Balance
-
-The National Energy Balance is a thorough and extensive research
-developed and published by EPE that contains useful data about energy
-consumption, generation, exportation and many more subjects.
-
-As for now, the National Energy Balance dataset provides yearly data
-about energy generation per source of production. The sources can be
-divided into two groups: the renewable sources (hydro, wind, solar,
-nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the
-non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil,
-diesel).
-
-The dataset has information at the Brazilian state level, including the
-Federal District, from 2011 to 2021 and also indicates whether the state
-is in the Legal Amazon or not.
-
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**: there are two choices:
-    - `"energy_consumption_per_class"`: monthly energy consumption and
-      consumers by State, Region or Electric Subsystem
-    - `"national_energy_balance"`: yearly energy generation per source,
-      by State
-2.  **raw_data**: there are two options:
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-3.  **geo_level**: only applies to the `"energy_consumption_per_class"`
-    dataset.
-    - `"state"`
-    - `"subsystem"`
-4.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
+- `app_ts_energia_amz_exporta`: graphic of energy data on proportion of energy production, consumption and consumers at state level. (english version: `app_ts_energia_amz_exporta_en`)
 
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# download treated data about energy consumption at the state level
-clean_epe <- load_epe(
-  dataset = "energy_consumption_per_class",
-  geo_level = "state",
-  raw_data = FALSE
-)
-```
 
 # Other tools
 
