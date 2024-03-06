@@ -42,16 +42,9 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 |                       |                                        |
 |-----------------------|----------------------------------------|
 | **[PRODES](#prodes)** | *Yearly deforestation*                 |
-
-</td>
-<td>
-
-|                                   |                                     |
-|-----------------------------------|-------------------------------------|
 | **[MapBiomas](#mapbiomas)**       | *Land cover and land use*           |
-| **[TerraClimate](#terraclimate)** | *Climate data*                      |
 | **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
-| **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
+
 
 </td>
 </tr>
@@ -67,8 +60,6 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 |-------------------------------|---------------------------------------------------------|
 | **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
 | **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
-| **[IEMA](#iema)**             | *Access to electricity in the Amazon region*            |
-| **[Population](#population)** | *Population*                                            |
 
 </td>
 </tr>
@@ -166,88 +157,25 @@ The data has yearly frequency and is available starting from the year
 
 - `app_map_mapbiomas_cover`: map of annual land use and land cover in brazil. (english version: `app_map_mapbiomas_cover_en`)
 
-- `app_rk_mapbiomas_cobertura_est`: ranking of annual land use and cover among brazilian states. (english version: `app_rk_mapbiomas_cobertura_est_en`)
+- `app_rk_mapbiomas_cobertura_est`: ranking of annual land use and cover at state level. (english version: `app_rk_mapbiomas_cobertura_est_en`)
 
-- `app_rk_mapbiomas_cobertura_munic`: ranking of annual land use and cover among brazilian municipalities. (english version: `app_rk_mapbiomas_cobertura_munic_en`)
+- `app_rk_mapbiomas_cobertura_munic`: ranking of annual land use and cover at the municipality level. (english version: `app_rk_mapbiomas_cobertura_munic_en`)
 
 - `app_rk_mapbiomas_cobertura_munic_percentual`: ????como diferenciar do de cima???? (english version: `app_rk_mapbiomas_cobertura_munic_percentual_en`)
 
-- `app_rk_mapbiomas_transicao_est`: ranking of transition/change of soil cover and use among states through the years (english version: `app_rk_mapbiomas_transicao_est_en`)
- 
+- `app_rk_mapbiomas_transicao_est`: ranking of transition/change of soil cover and use at state level through the years. (english version: `app_rk_mapbiomas_transicao_est_en`)
 
-## TerraClimate
+- `app_rk_mapbiomas_transicao_munic_5`: ranking of transition/change of soil cover and use at the municipality level through the years. (english version: `app_rk_mapbiomas_transicao_munic_5_en`)
 
-Spatial data on several climate variables, extracted from Climatology
-Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
-The table below shows all possible variables to be extracted, which are
-chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
+- `app_tab_mapbiomas_transicao_est`: table of transition/change of soil cover and use at state level through the years.
 
-Netcdf files are downloaded from the
-[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
-web server, as recommended for rectangular subsets of the global data.
+- `app_ts_mapbiomas_cobertura_est`: graphic of annual mapping of land use and coverage at state level. (english version: `app_ts_mapbiomas_cobertura_est_en`)
 
-<details>
-<summary>
-Click to see all dataset options
-</summary>
+- `app_ts_mapbiomas_cobertura_munic`: graphic of annual mapping of land use and coverage at the municipality level. (english version: `app_ts_mapbiomas_cobertura_munic_en`)
 
-| Dataset                       | Code | Description                                      |  Units   |
-|:------------------------------|:----:|:-------------------------------------------------|:--------:|
-| max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
-| min_temperature               | tmin | Minimum 2-m Temperature                          |   degC   |
-| wind_speed                    |  ws  | Wind Speed at 10-m                               |   m/s    |
-| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                           |   kPa    |
-| vapor_pressure                | vap  | 2-m Vapor Pressure                               |   kPa    |
-| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month            |    mm    |
-| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
-| soil_moisture                 | soil | Soil Moisture at End of Month                    |    mm    |
-| runoff                        |  q   | Runoff                                           |    mm    |
-| precipitation                 | ppt  | Accumulated Precipitation                        |    mm    |
-| potential_evaporation         | pet  | Reference Evapotranspiration                     |    mm    |
-| climatic_water_deficit        | def  | Climatic Water Deficit                           |    mm    |
-| water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
-| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
+- `app_ts_mapbiomas_transicao_est`: graphic of transition/ change of land cover and use at state level. (english version: `app_ts_mapbiomas_transicao_est_en`)
 
-</details>
 
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: picks the variable to be read. Possible options are
-    shown in the table above.
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **time_period**: picks the years for which the data will be
-    downloaded
-
-4.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-5.  **legal_amazon_only**: if set to `TRUE`, only downloads data from
-    the Legal Amazon region
-
-OBS: A good internet connection is needed, because the data is heavy.
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Downloading maximum temperature data from 2000 to 2001
-max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2001)
-
-# Downloading precipitation data only for the legal Amazon in 2010
-amz_precipitation <- load_climate(
-  dataset = "precipitation",
-  time_period = 2010,
-  legal_amazon_only = TRUE
-)
-```
 
 ## SEEG
 
@@ -275,143 +203,18 @@ considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion
 to carbon equivalence (CO2e) also included, both in the metric of GWP
 (Global Warming Potential) and GTP (Global Temperature Potential).
 
-The data is downloaded from the SEEG website in the form of one single
-file, so the option to select a certain range of years is not available.
-Also, due to the size of the file, a stable internet connection is
-necessary, and the function may take time to run.
 
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**: there are six choices:
+- `app_ts_seeg_state_energy`: graphic of greenhouse gas emissions in the energy sector at state level. (english version: `app_ts_seeg_state_energy_en`)
 
-    - `"seeg"`: provides all sectors in a same dataframe. Only works
-      with `raw_data = TRUE`
-    - `"seeg_farming"`
-    - `"seeg_industry"`
-    - `"seeg_energy"`
-    - `"seeg_land"`
-    - `"seeg_residuals"`
+- `app_ts_seeg_state_farming`: graphic of greenhouse gas emissions in farming at state level. (english version: `app_ts_seeg_state_farming_en`)
 
-2.  **raw_data**: there are two options:
+- `app_ts_seeg_state_industry`: graphic of greenhouse gas emissions in industry at state level. (english version: `app_ts_seeg_state_industry_en`)
 
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
 
-3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
-
-4.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg")
-# by state (geo_level = "state")
-data <- load_seeg(
-  dataset = "seeg",
-  raw_data = TRUE,
-  geo_level = "state"
-)
-
-# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")
-data <- load_seeg(
-  dataset = "seeg_industry",
-  raw_data = FALSE,
-  geo_level = "state"
-)
-```
-
-🔴 This function uses the `googledrive` package to download data at the
-municipality level. In case of authentication errors, see
-[googledrive](#googledrive).
-
-## CENSOAGRO
-
-The census of agriculture collects information about agricultural
-establishments and the agricultural activities carried out there,
-covering characteristics of the producer and establishment, economy and
-employment in rural areas, livestock, farming and agroindustry.
-
-Data is collected by IBGE and is available at country, state and
-municipality level.
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**:there are 10 possible choices:
-
-    - `"agricultural_land_area"`: area and number of agricultural
-      properties
-    - `"agricultural_area_use"`: area of agricultural properties by use
-    - `"agricultural_employees_tractors"`: number of employees and
-      tractors in agricultural properties
-    - `"agricultural_producer_condition"`: condition of agricultural
-      producer, whether they own the land
-    - `"animal_production"`: number of animals farmed, by species
-    - `"animal_products"`: amount of animal products, by product type
-    - `"vegetable_production_area"`: area and amount produced, by
-      vegetable product
-    - `"vegetable_production_temporary"`: amount produced, by temporary
-      crop
-    - `"vegetable_production_permanent"`: amount produced, by permanent
-      crop
-    - `"livestock_production"`: amount of bovine cattle, and number of
-      agricultural properties
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **geo_level**: `"country"` or `"state"`. For dataset
-    `"livestock_production"`, it can also be `"municipality"`
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded:
-
-    - For datasets `"agricultural_land_area"`,
-      `"agricultural_producer_condition"`, `"animal_products"`, and
-      `"vegetable_production_area"`, it can be one of 1920, 1940, 1950,
-      1960, 1970, 1975, 1980, 1985, 1995, or 2006.
-    - For datasets `"vegetable_production_permanent"` and
-      `"vegetable_production_permanent"`, it can only be from 1940
-      onwards
-    - For datasets `"agricultural_area_use"`,
-      `"agricultural_employees_tractors"`, `"animal_production"`, it can
-      only be from 1970 onwards
-    - For dataset `"livestock_production"`, it can only be 2017
-
-5.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Download total land area data at the country level in year 2006
-data <- load_censoagro(
-  dataset = "agricultural_land_area",
-  raw_data = TRUE,
-  geo_level = "country",
-  time_period = 2006
-)
-
-# Download temporary production crops data by state (geo_level = "state") in year 2006
-# in portuguese (language = "pt")
-data <- load_censoagro(
-  dataset = "vegetable_production_temporary",
-  raw_data = FALSE,
-  geo_level = "state",
-  time_period = 1996,
-  language = "pt"
-)
-```
 
 # Social Data
 
@@ -428,273 +231,27 @@ level and data is available in 2014 and 2018.
 
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**:
+- `app_mapstatic_ips`: map of compiled data from the Institute of Man and Environment of the Amazon (IMAZON). (english version: `app_mapstatic_ips_en`)
 
-    - `"all"`, `"life_quality"`, `"sanit_habit"`, `"violence"`,
-      `"educ"`, `"communic"`, `"mortality"`, or `"deforest"`
 
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **time_period**: can be 2014, 2018, 2021, or a vector with some
-    combination thereof
-
-4.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Download raw data from 2014
-data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
-
-# Download treated deforest data from 2018 in portuguese
-data <- load_ips(
-  dataset = "deforest", raw_data = FALSE,
-  time_period = 2018, language = "pt"
-)
-```
 
 ## DATASUS
 
 DATASUS is the IT department of SUS – the Brazilian Unified Health
 System. They provide data on health establishments, mortality, access to
-health services and several health indicators nationwide. This function
-allows for an easy download of several DATASUS raw datasets, and also
-cleans the data in a couple of datasets. The sections below explains
-each avaliable dataset.
+health services and several health indicators nationwide. 
 
 ------------------------------------------------------------------------
 
-**Options:**
+**Files:**
 
-1.  **dataset**:
+- `app_map_saude_mortalidade`: health conditions at amazon: mortality at the municipal level. (english version: `app_map_saude_mortalidade_en`)
 
-    - `"datasus_sim_do"` has SIM-DO mortality data
-    - Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal),
-      `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"`
-      (Children), `"datasus_sim_domat"` (Maternal)
-    - `"datasus_sih"` has SIH hospitalization data.
-    - `"datasus_cnes_lt"` has data on the number of hospital beds.
-    - further subsets of CNES are listed later, but those only allow for
-      the download of raw data.
+- `app_ts_saude_municipality`: health data at the municipal level. (english version: `app_ts_saude_municipality_en`)
 
-2.  **raw_data**: there are two options:
 
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data. Only
-      effective for SIM-DO and subsets, SIH, and CNES-LT.
-
-3.  **keep_all**: only applies when raw_data is FALSE. There are two
-    options:
-
-    - `TRUE`: keeps all original variables, adding variable labels and
-      possibly constructing extra variables.
-    - `FALSE`: aggregates data at the municipality, thereby losing
-      individual-level data, and only keeping aggregate measures.
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded
-
-5.  **states**: a vector of states by which to filter the data. Only
-    works for datasets whose data is provided in separate files by
-    state.
-
-6.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-##### DATASUS - SIM (System of Mortality Information)
-
-Each original SIM data file contains rows corresponding to a declaration
-of death (DO), and columns with several characteristics of the person,
-the place of death, and the cause of death. The data comes from the main
-SIM-DO (Declarations of Death) dataset, which goes by the option
-`"datasus_sim_do"`. There are also 4 subsets of SIM-DO, namely SIM-DOFET
-(Fetal), SIM-DOMAT (Maternal), SIM-DOINF (Children), and SIM-DOEXT
-(External Causes), with corresponding dataset options
-`"datasus_sim_dofet", "datasus_sim_domat", "datasus_sim_doinf", "datasus_sim_doext"`.
-Note that only SIM-DO provides separate files for each state, so all
-other dataset options always contain data from the whole country.
-
-Below is an example of downloading the raw data, and also using the
-`raw_data = FALSE` option to obtain treated data. When this option is
-selected, we create several variables for deaths from each cause, which
-are encoded by their CID-10 codes. The function then returns, by
-default, the aggregated data of mortality sources at the municipality
-level. In this process, all the individual information such as age, sex,
-race, and schooling are lost, so we also offer the option of
-`keep_all = TRUE`, which creates all the indicator variables for cause
-of death, adds variable labels, and does not aggregate, thereby keeping
-all individual-level variables.
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# download raw data for the year 2010 in the state of AM.
-data <- load_datasus(
-  dataset = "datasus_sim_do",
-  time_period = 2010,
-  states = "AM",
-  raw_data = TRUE
-)
-
-# download treated data with the number of deaths by cause in AM and PA.
-data <- load_datasus(
-  dataset = "datasus_sim_do",
-  time_period = 2010,
-  states = c("AM", "PA"),
-  raw_data = FALSE
-)
-
-# download treated data with the number of deaths by cause in AM and PA
-# keeping all individual variables.
-data <- load_datasus(
-  dataset = "datasus_sim_do",
-  time_period = 2010,
-  states = c("AM", "PA"),
-  raw_data = FALSE,
-  keep_all = TRUE
-)
-```
-
-##### DATASUS - CNES (National Register of Health Establishments)
-
-Provides information on health establishments, avaliable hospital beds,
-and active physicians. The data is split into 13 datasets: LT (Beds), ST
-(Establishments), DC (Complimentary data), EQ (Equipment), SR
-(Specialized services), HB (License), PF (Practitioner), EP (Teams), RC
-(Contractual Rules), IN (Incentives), EE (Teaching establishments), EF
-(Philanthropic establishments), and GM (Management and goals).
-
-Raw data is avaliable for all of them using the dataset option
-`datasus_cnes_lt, datasus_cnes_st`, and so on, and treated data is only
-avaliable for CNES - LT. When `raw_data = FALSE` is chosen, we return
-data on the number of total hospital beds and the ones avaliable through
-SUS, which can be aggregated by municipality (with option
-`keep_all = FALSE`) or keeping all original variables
-(`keep_all = TRUE`).
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# download treated data with the number of avaliable beds in AM and PA.
-data <- load_datasus(
-  dataset = "datasus_cnes_lt",
-  time_period = 2010,
-  states = c("AM", "PA"),
-  raw_data = FALSE
-)
-```
-
-##### DATASUS - SIH (System of Hospital Information)
-
-Contains data on hospitalizations. Treated data only gains variable
-labels, with no extra manipulation. Beware that this is a much heavier
-dataset.
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# download raw data
-data <- load_datasus(
-  dataset = "datasus_sih",
-  time_period = 2010,
-  states = "AM",
-  raw_data = TRUE
-)
-
-# download data in a single tibble, with variable labels
-data <- load_datasus(
-  dataset = "datasus_sih",
-  time_period = 2010,
-  states = "AM",
-  raw_data = FALSE
-)
-```
-
-## IEMA
-
-Data from the Institute of Environment and Water Resources (IEMA),
-documenting the number of people without access to eletric energy
-throughout the Amazon region in the year 2018.
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: `"iema"`
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# Download treated data
-data <- load_iema(raw_data = FALSE)
-```
-
-🔴 This function uses the `googledrive` package to download data. In
-case of authentication errors, see [googledrive](#googledrive).
-
-## Population
-
-Loads IBGE information on estimated population (2001-2006, 2008-2009,
-2011-2021) or population (2007 and 2010) data. Data is available at
-country, state and municipality level and from 2001 to 2021.
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: `"population"`
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-
-3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded
-
-5.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# download treated population data at the state level for 2010 to 2012
-data <- load_population(
-  raw_data = FALSE,
-  geo_level = "state",
-  time_period = 2010:2012
-)
-```
 
 # Economic Data
 
