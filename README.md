@@ -60,6 +60,8 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 |-------------------------------|---------------------------------------------------------|
 | **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
 | **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
+| **[PNADC](#pnadc)**             | *Households socioeconomic status* |
+
 
 </td>
 </tr>
@@ -90,7 +92,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 </tr>
 </table>
 
-**[4 - Other tools](#other-tools)**
+**[4 - Multiple data](#multiple-data)**
 
 <table>
 <tr>
@@ -98,8 +100,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 |                                                                 |                                                                             |
 |-----------------------------------------------------------------|-----------------------------------------------------------------------------|
-| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with brazilian cities and whether they belong to the Legal Amazon* |
-| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
+| **[Non specified](#non-specified)** | *Land, energy, mortality etc* |
 
 </table>
 
@@ -248,6 +249,26 @@ health services and several health indicators nationwide.
 - `app_ts_saude_municipality`: health data at the municipal level. (english version: `app_ts_saude_municipality_en`)
 
 
+## PNADC
+
+PNAD was an annual research focused on brazilian households, which revealed general characteristics of the population, including education, work, habitation etc. It started at 1967 with a diferent periodicity and ended on 2016 with the divulgation of 2015's data. PNAD was replaced by PNADC (continuous pnad) with a new method that allows a better territorial coverage and delivers new data about the workforce every three months.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_rk_ibge_pnadc_cnae`: ranking of economic activities in the legal amazon at municipality level. (english version: `app_rk_ibge_pnadc_cnae_en`)
+
+- `app_rk_ibge_pnadc_cod`: ranking of ocupation type in the legal amazon at municipality level. (english version: `app_rk_ibge_pnadc_cod_en`)
+
+- `app_ts_ibge_pnadc_cnae`: graphic of compiled data about economic activities generated from the quarterly continuous pnad. (english version: `app_ts_ibge_pnadc_cnae_en`)
+
+- `app_ts_ibge_pnadc_cod`: graphic of compiled data about type of work occupation generated from the quarterly continuous pnad. (english version: `app_ts_ibge_pnadc_cod_en`)
+
+- `app_ts_ibge_pnadc_trabalho`: graphic of labor market. (english version: `app_ts_ibge_pnadc_trabalho_en`)
+
+- `app_ts_ibge_pnadc_trabalho_insercao`: graphic of insertion of employed persons in the labor market. (english version: `app_ts_ibge_pnadc_trabalho_insercao_en`)
+
 
 # Economic Data
 
@@ -392,51 +413,23 @@ infrastructure planning.
 - `app_ts_energia_amz_exporta`: graphic of energy data on proportion of energy production, consumption and consumers at state level. (english version: `app_ts_energia_amz_exporta_en`)
 
 
-# Other tools
+# Multiple data
 
-## Legal Amazon Municipalities
+## Non specified
 
-Many of our functions use a dataset with Brazilian municipalities, their
-municipality codes, whether they belong to the Legal Amazon, their
-state, and some more variables. It was constructed from the [IBGE
-spreadsheet](https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=acesso-ao-produto)
-with Legal Amazon municipalities, along with a data frame from the
-‘geobr’ package. For more information on the columns, run
-`??datazoom.amazonia::municipalities`.
+**Files:**
 
-``` r
-# load Brazilian municipalities dataset
-data <- datazoom.amazonia::municipalities
-```
+- `app_bar_dz_varias_amazonias`: graphic of diference between multiple amazons in more recent indicators. (english version: `app_bar_dz_varias_amazonias_en`)
 
-## <a name="googledrive"></a> The ‘googledrive’ package
+- `app_bubble_dz_munic`: graphic of compilation of data at the municipality level. (english version: `app_bubble_dz_munic_en`)
 
-For some of our functions, the original data is stored in Google Drive
-and exceeds the file size limit for which direct downloads are possible.
-As a result, the `googledrive` package is required to download the data
-though the Google Drive API and run the function.
+- `app_bubble_dz_munic_saude`: graphic of compilation of data at the municipality level. (english version: `app_bubble_dz_munic_saude_en`)
 
-The first time the package is called, it requires you to link your
-Google account and grant permissions to be able to download data through
-the Google Drive API.
+- `app_mapstatic_dz_munic`: graphic of compilation of data at the municipality level. (english version: `app_mapstatic_dz_munic_en`)
 
-You **must** tick all boxes when the permissions page opens, or else the
-following error will occur:
+- `app_ts_dz_munic`: graphic of compilation of data at the municipality level. (english version: `app_ts_dz_munic_en`)
 
-``` r
-# Error in `gargle_abort_request_failed()`:
-# ! Client error: (403) Forbidden
-# Insufficient Permission: Request had insufficient authentication scopes.
-# • domain: global
-# • reason: insufficientPermissions
-# • message: Insufficient Permission: Request had insufficient authentication
-#  scopes.
-# Run `rlang::last_error()` to see where the error occurred.
-```
-
-For further information, click
-[here](https://googledrive.tidyverse.org/) to access the official
-package page.
+- `app_ts_sistemas_isolados`: graphic of data from isolated sistems of energy. (english version: `app_ts_sistemas_isolados_en`)
 
 ## Credits
 
@@ -444,7 +437,7 @@ DataZoom is developed by a team at Pontifícia Universidade Católica do
 Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
 is at: <https://www.econ.puc-rio.br/datazoom/>.
 
-To cite package `datazoom.amazonia` in publications use:
+To cite package `datazoom_viz` in publications use:
 
 > Data Zoom (2023). Data Zoom: Simplifying Access To Brazilian
 > Microdata.  
