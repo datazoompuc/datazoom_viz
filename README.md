@@ -17,21 +17,19 @@ Main Directories:
  - "./scripts": contains .R scripts that generate the visualizations using the Shiny Apps technology.
 
 
-## Installation (NEEDS CHANGES)
+## Glossary
 
-You can install the released version of `datazoom.amazonia` from
-[CRAN](https://CRAN.R-project.org/package=datazoom.amazonia) with:
+The files names were given according to the type of graphic that was used:
 
-``` r
-install.packages("datazoom.amazonia")
-```
+- `app_bar`: bar chart
+- `app_bubble`: scatter plot
+- `app_hist`: histogram
+- `app_map` and `app_mapstatic`: map
+- `app_rk`and `app_rkstatic`: ranking
+- `app_sankey`: sankey graphic
+- `app_tab`: table
+- `app_ts`: curve graphic
 
-And the development version from GitHub with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("datazoompuc/datazoom.amazonia")
-```
 
 **[1 - Environmental data](#environmental-data)**
 
