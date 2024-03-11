@@ -58,7 +58,7 @@ The files names were given according to the type of graphic that was used:
 |-------------------------------|---------------------------------------------------------|
 | **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
 | **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
-| **[PNADC](#pnadc)**             | *Households socoeconomic status* |
+| **[PNADC](#pnadc)**             | *Households socioeconomic status* |
 
 
 </td>
@@ -125,11 +125,46 @@ spatial data, rather than agregated, municipality-level data.
 
 **Files:**
 
+  
 - `app_map_dz_munic_prodes`: map of deforestation, hydrogaphy and forest data at the municipality level. (english version: `app_map_dz_munic_prodes_en`)
   
 - `app_rkstatic_dz_munic`: ranking of deforestation champion states. (english version: `app_rkstatic_dz_munic_en`)
 
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_dz_munic_prodes.R</td>
+    <td>dz_munic_dic.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_prodes/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
 
+  <tr>
+    <td>app_map_dz_munic_prodes_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_prodes/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rkstatic_dz_munic.R</td>
+    <td>dz_munic_dic.csv and dz_munic.rds</td>
+    <td>/rkstatic_dz_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rkstatic_dz_munic_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic.rds</td>
+    <td>/rkstatic_dz_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+</table>
 
 
 ## MapBiomas
@@ -170,7 +205,174 @@ The data has yearly frequency and is available starting from the year
 
 - `app_ts_mapbiomas_transicao_est`: graphic of transition/ change of land cover and use at state level. (english version: `app_ts_mapbiomas_transicao_est_en`)
 
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_hist_mapbiomas_bovinos.R</td>
+    <td>dz_munic_ppm_mapbiomas_dic.csv and dz_munic_ppm_mapbiomas.rds</td>
+    <td>hist_mapbiomas_bovinos</td>
+    <td>Texto para Data-Raw</td>
+  </tr>
 
+  <tr>
+    <td>app_hist_mapbiomas_bovinos_en.R</td>
+    <td>dz_munic_ppm_mapbiomas_dic_en.csv and dz_munic_ppm_mapbiomas_en.rds</td>
+    <td>/hist_mapbiomas_bovinos/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_cattle.R</td>
+    <td>censoagro_mapbiomas_gado_dic.csv and censoagro_mapbiomas_gado.rds and legal_amazon_boundary.rds and states_boundary.rds and area_municipios.rds</td>
+    <td>/map_cattle/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_cattle_en.R</td>
+    <td>censoagro_mapbiomas_gado_dic_en.csv and censoagro_mapbiomas_gado.rds and legal_amazon_boundary.rds and states_boundary.rds and area_municipios.rds</td>
+    <td>/map_cattle/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_map_mapbiomas_cover.R</td>
+    <td>mapbiomas_cobertura_munic_savana_dic.csv and mapbiomas_cobertura.rds and legal_amazon_boundary.rds and states_boundary.rds and area_municipios.rds</td>
+    <td>/map_mapbiomas_cover/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_mapbiomas_cover_en.R</td>
+    <td>mapbiomas_cobertura_munic_savana_dic_en.csv and mapbiomas_cobertura.rds and legal_amazon_boundary.rds and states_boundary.rds and area_municipios.rds</td>
+    <td>/map_mapbiomas_cover/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_est.R</td>
+    <td>mapbiomas_cobertura_est_dic.csv and mapbiomas_cobertura_est.rds</td>
+    <td>/rk_mapbiomas_cobertura_est/ and /rk/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_est_en.R</td>
+    <td>mapbiomas_cobertura_est_dic_en.csv and mapbiomas_cobertura_est.rds</td>
+    <td>/rk/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_munic.R</td>
+    <td>mapbiomas_cobertura_munic_dic.csv and mapbiomas_cobertura_munic.rds</td>
+    <td>/rk_mapbiomas_cobertura_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_rk_mapbiomas_cobertura_munic_en.R</td>
+    <td>mapbiomas_cobertura_munic_dic_en.csv and mapbiomas_cobertura_munic.rds</td>
+    <td>/rk_mapbiomas_cobertura_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_munic_percentual.R</td>
+    <td>mapbiomas_cobertura_munic_percentual_dic.csv and mapbiomas_cobertura_munic_percentual.rds</td>
+    <td>/rk_mapbiomas_cobertura_munic_percentual/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_munic_percentual_en.R</td>
+    <td>mapbiomas_cobertura_munic_percentual_dic_en.csv and mapbiomas_cobertura_munic_percentual.rds</td>
+    <td>/rk_mapbiomas_cobertura_munic_percentual/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_rk_mapbiomas_transicao_est.R</td>
+    <td>mapbiomas_transicao_est_dic.csv and mapbiomas_transicao_est.rds</td>
+    <td>/rk_mapbiomas_transition_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_transicao_est_en.R</td>
+    <td>mapbiomas_transicao_est_dic_en.csv and mapbiomas_transicao_est.rds</td>
+    <td>/rk_mapbiomas_transition_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_rk_mapbiomas_transicao_munic_5.R</td>
+    <td>mapbiomas_transicao_munic_dic.csv and mapbiomas_transicao_munic_5.rds</td>
+    <td>/rk_mapbiomas_transition_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_transicao_munic_5_en.R</td>
+    <td>mapbiomas_transicao_munic_dic_en.csv and mapbiomas_transicao_munic_5.rds</td>
+    <td>/rk_mapbiomas_transition_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_tab_mapbiomas_transicao_est.R</td>
+    <td>mapbiomas_transicao_est_tab_dic.csv and mapbiomas_transicao_est_tab.rds</td>
+    <td>/tab/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_mapbiomas_cobertura_est.R</td>
+    <td>mapbiomas_cobertura_est_dic.csv and mapbiomas_cobertura_est.rds</td>
+    <td>/ts_mapbiomas_cobertura_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_mapbiomas_cobertura_est_en.R</td>
+    <td>mapbiomas_cobertura_est_dic_en.csv and mapbiomas_cobertura_est.rds</td>
+    <td>/ts_mapbiomas_cobertura_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_mapbiomas_cobertura_munic.R</td>
+    <td>mapbiomas_cobertura_munic_dic.csv and mapbiomas_cobertura_munic.rds</td>
+    <td>/ts_mapbiomas_cobertura_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_mapbiomas_cobertura_munic_en.R</td>
+    <td>mapbiomas_cobertura_munic_dic_en.csv and mapbiomas_cobertura_munic.rds</td>
+    <td>/ts_mapbiomas_cobertura_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_mapbiomas_transicao_est.R</td>
+    <td>mapbiomas_transicao_est_dic.csv and mapbiomas_transicao_est.rds</td>
+    <td>/ts_mapbiomas_transicao/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+ <tr>
+    <td>app_ts_mapbiomas_transicao_est_en.R</td>
+    <td>mapbiomas_transicao_est_dic_en.csv and mapbiomas_transicao_est.rds</td>
+    <td>/ts_mapbiomas_transicao/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+</table>
 
 ## SEEG
 
