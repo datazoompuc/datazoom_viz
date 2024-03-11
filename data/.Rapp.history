@@ -1,0 +1,2 @@
+load("/Users/mari/Documents/GitHub/datazoom_viz/data/mapbiomas_cobertura_munic_percentual.rds")
+load("/Users/mari/Documents/GitHub/datazoom_viz/data/mapbiomas_cobertura_munic.rds")
