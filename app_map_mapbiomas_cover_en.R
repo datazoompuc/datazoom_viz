@@ -40,7 +40,7 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Annual land use and land cover in Brazil (Source: MapBiomas)"
     #"Cobertura da terra na Amaz\u00f4nia"
 
-param$year_inicio <- 1985
+param$year_inicio <- 1986
 param$year_final <- 2022
 
 #parâmetros específicos no UI

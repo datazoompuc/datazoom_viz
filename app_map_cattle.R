@@ -27,7 +27,7 @@ source(files$server_script)
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
 param <- get_db_param(files$param_file, files$db_file) # car
-param$y_def <- "" # variável padrão do eixo y
+param$y_def <- "Heads of Cattle" # variável padrão do eixo y
 param$color_def <- "" # variável padrão de cor
 param$size_def <- "" # variável padrão de tamanho
 param$text_def <- "Municipality" # variável padrão de texto
@@ -43,7 +43,7 @@ param$year_final <- 2017
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARI\u00C1VEIS:"
-param$label_x_name<- "Selecione vari\u00e1vel:"
+param$label_x_name<- "Vari\u00e1vel Selecionada: "
 param$label_year<- "Ano"
 param$label_title<- "Mapa dos munic\u00edpios do Brasil com contorno da Amaz\u00f4nia Legal"
 param$label_selected_variable<- "Vari\u00e1vel selecionada:"
