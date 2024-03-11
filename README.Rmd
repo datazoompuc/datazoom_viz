@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 
+=======
+      
+>>>>>>> Stashed changes
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # datazoom_viz
@@ -411,6 +415,58 @@ to carbon equivalence (CO2e) also included, both in the metric of GWP
 
 - `app_ts_seeg_state_industry`: graphic of greenhouse gas emissions in industry at state level. (english version: `app_ts_seeg_state_industry_en`)
 
+<<<<<<< Updated upstream
+=======
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_ts_seeg_state_energy.R</td>
+    <td>seeg_state_energy_dic.csv and seeg_state_energy.rds</td>
+    <td>/ts_seeg_state_energy/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_seeg_state_energy_en.R</td>
+    <td>seeg_state_energy_dic_en.csv and seeg_state_energy.rds</td>
+    <td>/ts_seeg_state_energy/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_seeg_state_farming.R</td>
+    <td>seeg_state_farming_dic.csv and seeg_state_farming.rds</td>
+    <td>/ts_seeg_state_farming/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_seeg_state_farming_en.R</td>
+    <td>seeg_state_farming_dic_en.csv and seeg_state_farming.rds</td>
+    <td>/ts_seeg_state_farming/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_seeg_state_industry.R</td>
+    <td>seeg_state_industry_dic.csv and seeg_state_industry.rds</td>
+    <td>/ts_seeg_state_industry/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_seeg_state_industry_en.R</td>
+    <td>seeg_state_industry_dic_en.csv and seeg_state_industry.rds</td>
+    <td>/ts_seeg_state_industry/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+</table>
+>>>>>>> Stashed changes
 
 
 # Social Data
@@ -432,6 +488,31 @@ level and data is available in 2014 and 2018.
 
 - `app_mapstatic_ips`: map of compiled data from the Institute of Man and Environment of the Amazon (IMAZON). (english version: `app_mapstatic_ips_en`)
 
+<<<<<<< Updated upstream
+=======
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_mapstatic_ips.R</td>
+    <td>ips_2021_dic.csv and ips_2021.rds</td>
+    <td>/mapstatic_ips/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_mapstatic_ips.R</td>
+    <td>ips_2021_dic_en.csv and ips_2021.rds</td>
+    <td>/mapstatic_ips/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+>>>>>>> Stashed changes
 
 
 ## DATASUS
@@ -448,6 +529,44 @@ health services and several health indicators nationwide.
 
 - `app_ts_saude_municipality`: health data at the municipal level. (english version: `app_ts_saude_municipality_en`)
 
+<<<<<<< Updated upstream
+=======
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_saude_mortalidade.R</td>
+    <td>saude_mortalidade_dic.csv and saude_mortalidade.rds</td>
+    <td>/map_saude_mortalidade/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_map_saude_mortalidade_en.R</td>
+    <td>saude_mortalidade_dic_en.csv and saude_mortalidade.rds</td>
+    <td>/map_saude_mortalidade/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_saude_municipality.R</td>
+    <td>saude_municipality_dic.csv and saude_municipality.rds</td>
+    <td>/ts_saude_municipality/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_saude_municipality_en.R</td>
+    <td>saude_municipality_dic_en.csv and saude_municipality.rds</td>
+    <td>/ts_saude_municipality/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+>>>>>>> Stashed changes
 
 ## PNADC
 
@@ -469,6 +588,100 @@ PNAD was an annual research focused on brazilian households, which revealed gene
 
 - `app_ts_ibge_pnadc_trabalho_insercao`: graphic of insertion of employed persons in the labor market. (english version: `app_ts_ibge_pnadc_trabalho_insercao_en`)
 
+<<<<<<< Updated upstream
+=======
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_rk_ibge_pnadc_cnae.R</td>
+    <td>ibge_pnadc_ranking_cnae_dic.csv and ibge_pnadc_ranking_cnae.rds</td>
+    <td>/rk_ibge_pnadc_cnae/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_rk_ibge_pnadc_cnae_en.R</td>
+     <td>ibge_pnadc_ranking_cnae_dic_en.csv and ibge_pnadc_ranking_cnae.rds</td>
+    <td>/rk_ibge_pnadc_cnae/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_rk_ibge_pnadc_cod.R</td>
+    <td>ibge_pnadc_ranking_cod_dic.csv and ibge_pnadc_ranking_cod.rds</td>
+    <td>/rk_ibge_pnadc_cod/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_rk_ibge_pnadc_cod_en.R</td>
+    <td>ibge_pnadc_ranking_cod_dic_en.csv and ibge_pnadc_ranking_cod.rds</td>
+    <td>/rk_ibge_pnadc_cod/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_ibge_pnadc_cnae.R</td>
+    <td>ibge_pnadc_cnae_dic.csv and ibge_pnadc_cnae.rds</td>
+    <td>/ts_ibge_pnadc_cnae/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_ibge_pnadc_cnae_en.R</td>
+    <td>ibge_pnadc_cnae_dic_en.csv and ibge_pnadc_cnae.rds</td>
+    <td>/ts_ibge_pnadc_cnae/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_ibge_pnadc_cod.R</td>
+    <td>ibge_pnadc_cod_dic.csv and ibge_pnadc_cod.rds</td>
+    <td>/ts_ibge_pnadc_cod/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_ibge_pnadc_cod_en.R</td>
+    <td>ibge_pnadc_cod_dic_en.csv and ibge_pnadc_cod.rds</td>
+    <td>/ts_ibge_pnadc_cod/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_ibge_pnadc_trabalho.R</td>
+    <td>ibge_pnadc_trabalho_dic.csv and ibge_pnadc_trabalho.rds</td>
+    <td>/ts_ibge_pnadc_trabalho/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_ibge_pnadc_trabalho_en.R</td>
+    <td>ibge_pnadc_trabalho_dic_en.csv and ibge_pnadc_trabalho.rds</td>
+    <td>/ts_ibge_pnadc_trabalho/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_ibge_pnadc_trabalho_insercao.R</td>
+    <td>ibge_pnadc_trabalho_insercao_dic.csv and ibge_pnadc_trabalho_insercao.rds</td>
+    <td>/ts_ibge_pnadc_trabalho_insercao/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_ibge_pnadc_trabalho_insercao_en.R</td>
+    <td>ibge_pnadc_trabalho_insercao_dic_en.csv and ibge_pnadc_trabalho_insercao.rds</td>
+    <td>/ts_ibge_pnadc_trabalho_insercao/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+>>>>>>> Stashed changes
 
 # Economic Data
 
