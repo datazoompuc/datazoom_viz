@@ -45,7 +45,7 @@ param$year_final <- 2022
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARIABLES:"
-param$label_x_name<- "Seleciona variável (y)"
+param$label_x_name<- "Select variable:"
 param$label_year<- "Year:"
 param$label_title<- "Map of Brazilian municipalities with Legal Amazon outline"
 param$label_selected_variable<- "Selected variable:"
