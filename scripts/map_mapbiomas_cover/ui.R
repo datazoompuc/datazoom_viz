@@ -63,7 +63,7 @@ get_ui <- function(files, param) {
                       min = param$year_inicio,
                       max = param$year_final,
                       value = param$year_final,
-                      step = 1,
+                      step = 12,
                       width = "100%",
                       animate = animationOptions(interval = 3000,
                                                  playButton = "\u25B6",

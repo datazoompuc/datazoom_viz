@@ -72,8 +72,9 @@ municipalities_with_geom <- municipalities_with_geom %>%
 
 
 shapefile <- municipalities_with_geom %>% 
-  sf::st_simplify(dTolerance = 400) %>% 
-  sf::st_make_valid()
+    sf::st_make_valid() %>%
+    sf::st_simplify(dTolerance = 400) 
+  
 
 #colnames(shapefile)
 
@@ -98,7 +99,45 @@ data <- right_join(shapefile,df_wider, by="municipality_code")
 #colnames(data) <- cols
 
 
+areas_mun <- readr::read_rds("data/area_municipios.rds")
+
+# adding area of each municipality
+data <- data %>%
+    tidyr::drop_na(municipality_code) %>%
+    left_join(areas_mun, by = "municipality_code")
+
+# making it lighter
+
+# data <- data %>%
+#     select(
+#         - c(
+#         "Non Observed", starts_with("Other")
+#         )
+#     )
+# 
+# data <- data %>%
+#     filter(
+#         year %in% c(
+#             "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020", "2022"
+#         )
+#     )
+
+data <- data %>%
+    relocate(
+        municipality_code, municipality, state, year, "Forest Formation",
+        "Savanna Formation", "Pasture", "Soy Beans", "Mining"
+    )
+
+# data <- data %>%
+#     mutate(across(where(is.numeric), as.integer))
+
+data <- data %>%
+    filter(
+        as.numeric(year) %% 12 == 6
+    )
+
 saveRDS(data, "data/mapbiomas_cobertura.rds")
+
 
 
 ################################################################################

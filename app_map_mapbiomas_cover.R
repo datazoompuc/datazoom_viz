@@ -16,7 +16,6 @@ files$param_file <- "data/mapbiomas_cobertura_munic_savana_dic.csv"
 files$db_file <- "data/mapbiomas_cobertura.rds"
 files$legal_amazon <- "data/legal_amazon_boundary.rds"
 files$states_boundary <- "data/states_boundary.rds"
-files$areas_mun <- "data/area_municipios.rds"
 
 
 # Carrega scripts
@@ -50,7 +49,7 @@ param$plot_desc <- "Sa\u00fade na Amaz\u00f4nia: Mortalidade ao n\u00edvel munic
 param$plot_desc <- "Cobertura vegetal a nível municipal"
 ####### parent of a0643c6 (Correcting border Legal Amazon)
 
-param$year_inicio <- 1985
+param$year_inicio <- 1986
 param$year_final <- 2022
 
 #parâmetros específicos no UI

@@ -15,12 +15,6 @@ get_server <- function(files, param) {
   library(sf)
   df <- readRDS(files$db_file)
   
-  areas_mun <- readr::read_rds(files$areas_mun)
-
-  # adding area of each municipality
-  df <- df %>%
-      left_join(areas_mun, by = "municipality_code")
-  
   server <- function(input, output, session) {
     df_reactived <- reactive({
       w <- df %>%
