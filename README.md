@@ -720,6 +720,195 @@ granularity of location.
 
 - `app_ts_comex_exp_tot_sh2`: graphic of external trade in the amazon: products export value per type of product. (english version: `app_ts_comex_exp_tot_sh2_en`)
 
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_comex_exp_sh4_sel.R</td>
+    <td>comex_exp_munic_sh4_sel_dic.csv and comex_exp_munic_sh4_sel.rds</td>
+    <td>/map_comex_exp_sh4_sel/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_comex_exp_sh4_sel_en.R</td>
+    <td>comex_exp_munic_sh4_sel_dic_en.csv and comex_exp_munic_sh4_sel.rds</td>
+    <td>/map_comex_exp_sh4_sel/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_rk_comex_exp_munic_produtosamz.R</td>
+    <td>comex_exp_sh4_munic_dic.csv and comex_exp_sh4_munic.rds</td>
+    <td>/rk_comex_exp_munic_produtosamz/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_comex_exp_munic_produtosamz_en.R</td>
+    <td>comex_exp_sh4_munic_dic_en.csv and comex_exp_sh4_munic.rds</td>
+    <td>/rk_comex_exp_munic_produtosamz/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_rk_comex_exp_paises.R</td>
+    <td>comex_exp_tot_pais_dic.csv and comex_exp_tot_pais.rds</td>
+    <td>/rk_comex_exp_paises/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_rk_comex_exp_paises_en.R</td>
+    <td>comex_exp_tot_pais_dic_en.csv and comex_exp_tot_pais.rds</td>
+    <td>/rk_comex_exp_paises/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_rk_comex_exp_perc_sh4_sel.R</td>
+    <td>comex_exp_perc_sh4_sel_dic.csv and comex_exp_perc_sh4_sel.rds</td>
+    <td>/rk_comex_exp_perc_sh4_sel/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_comex_exp_perc_sh4_sel_en.R</td>
+    <td>comex_exp_perc_sh4_sel_dic_en.csv and comex_exp_perc_sh4_sel.rds</td>
+    <td>/rk_comex_exp_perc_sh4_sel/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_sankey_comex_exp_pais_sec.R</td>
+    <td>comex_exp_pais_sec_dic.csv and comex_exp_pais_sec.rds</td>
+    <td>/sankey/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_sankey_comex_exp_pais_sec_en.R</td>
+    <td>comex_exp_pais_sec_dic_en.csv and comex_exp_pais_sec.rds</td>
+    <td>/sankey/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_munic_sec.R</td>
+    <td>comex_exp_munic_sec_dic.csv and comex_exp_munic_sec.rds</td>
+    <td>/ts_comex_exp_munic_sec/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_munic_sec_en.R</td>
+    <td>comex_exp_munic_sec_dic_en.csv and comex_exp_munic_sec.rds</td>
+    <td>/ts_comex_exp_munic_sec/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_munic_sh2.R</td>
+    <td>comex_exp_munic_sh2_dic.csv and comex_exp_munic_sh2.rds</td>
+    <td>/ts_comex_exp_munic_sh2/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_munic_sh2_en.R</td>
+    <td>comex_exp_munic_sh2_dic_en.csv and comex_exp_munic_sh2.rds</td>
+    <td>/ts_comex_exp_munic_sh2/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_pais_sec.R</td>
+    <td>comex_exp_pais_sec_dic.csv and comex_exp_pais_sec.rds</td>
+    <td>/ts_comex_exp_pais_sec/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_pais_sec_en.R</td>
+    <td>comex_exp_pais_sec_dic_en.csv and comex_exp_pais_sec.rds</td>
+    <td>/ts_comex_exp_pais_sec/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+    <tr>
+   <td>app_ts_comex_exp_sec_munic.R</td>
+    <td>comex_exp_sec_munic_dic.csv and comex_exp_sec_munic.rds</td>
+    <td>/ts_comex_exp_sec_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_sec_munic_en.R</td>
+    <td>comex_exp_sec_munic_dic_en.csv and comex_exp_sec_munic.rds</td>
+    <td>/ts_comex_exp_sec_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_sec_pais.R</td>
+    <td>comex_exp_sec_pais_dic.csv and comex_exp_sec_pais.rds</td>
+    <td>/ts_comex_exp_sec_pais/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_sec_pais_en.R</td>
+    <td>comex_exp_sec_pais_dic_en.csv and comex_exp_sec_pais.rds</td>
+    <td>/ts_comex_exp_sec_pais/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_sh2_munic.R</td>
+    <td>comex_exp_sh2_munic_dic.csv and comex_exp_sh2_munic.rds</td>
+    <td>/ts_comex_exp_sh2_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_sh2_munic_en.R</td>
+    <td>comex_exp_sh2_munic_dic_en.csv and comex_exp_sh2_munic.rds</td>
+    <td>/ts_comex_exp_sh2_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_tot_pais.R</td>
+    <td>comex_exp_tot_pais_dic.csv and comex_exp_tot_pais.rds</td>
+    <td>/ts_comex_exp_tot_pais/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_tot_pais_en.R</td>
+    <td>comex_exp_tot_pais_dic_en.csv and comex_exp_tot_pais.rds</td>
+    <td>/ts_comex_exp_tot_pais/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_tot_sh2.R</td>
+    <td>comex_exp_tot_sh2_dic.csv and comex_exp_tot_sh2.rds</td>
+    <td>/ts_comex_exp_tot_sh2/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_tot_sh2_en.R</td>
+    <td>comex_exp_tot_sh2_dic_en.csv and comex_exp_tot_sh2.rds</td>
+    <td>/ts_comex_exp_tot_sh2/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
 
 ## CEMPRE
 
@@ -736,6 +925,27 @@ National Register of Legal Entities. Data is available between 2006 and
 
 - `app_map_dz_munic_cempre`: map of data compilation at municipality level. (english version: `app_map_dz_munic_cempre_en`)
 
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_dz_munic_cempre.R</td>
+    <td>dz_munic_dic.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_cempre/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+     <td>app_map_dz_munic_cempre_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_cempre/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
 
 ## PPM
 
@@ -761,6 +971,57 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 
 - `app_ts_dz_state`: graphic of economic output by state. (english version: `app_ts_dz_state_en`)
 
+
+  <table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_dz_munic_ppm.R</td>
+    <td>dz_munic_dic.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_ppm/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_dz_munic_ppm_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_ppm/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_map_dz_state.R</td>
+    <td>dz_state_dic.csv and dz_state_simplified.rds</td>
+    <td>/map_dz_state/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_map_dz_state_en.R</td>
+    <td>dz_state_dic_en.csv and dz_state_simplified.rds</td>
+    <td>/map_dz_state/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+    <tr>
+    <td>app_ts_dz_state.R</td>
+    <td>dz_state_dic.csv and dz_state.rds</td>
+    <td>/ts_dz_state/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_dz_state_en.R</td>
+    <td>dz_state_dic_en.csv and dz_state.rds</td>
+    <td>/ts_dz_state/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
 ## SIGMINE
 
 Loads information the mines being explored legally in Brazil, including
@@ -775,6 +1036,42 @@ Agency (ANM) is responsible for this survey.
 - `app_rk_sigmine_munic`: ranking of transition/ change of cover and use of land at municipality level. (english version: `app_rk_sigmine_munic_en`)
 
 - `app_ts_sigmine_munic`: graphic of transition/ change in coverage and soil use at municipality level. (english version: `app_ts_sigmine_munic_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_rk_sigmine_munic.R</td>
+    <td>sigmine_munic_dic.csv and sigmine_munic.rds</td>
+    <td>/rk_sigmine_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_sigmine_munic_en.R</td>
+    <td>sigmine_munic_dic_en.csv and sigmine_munic.rds</td>
+    <td>/rk_sigmine_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_sigmine_munic.R</td>
+    <td>sigmine_munic_dic.csv and sigmine_munic.rds</td>
+    <td>/ts_sigmine/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_sigmine_munic_en.R</td>
+    <td>sigmine_munic_dic_en.csv and sigmine_munic.rds</td>
+    <td>/ts_sigmine/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
 
 ## ANEEL
 
@@ -792,6 +1089,41 @@ society.
 
 - `app_ts_aneel_geracao_distribuida`: graphic of data compiled at state level. (english version: `app_ts_aneel_geracao_distribuida_en`)
 
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_rk_energia_geracao_distribuida.R</td>
+    <td>aneel_siga_geracao_distribuida_dic.csv and aneel_siga_geracao_distribuida.rds</td>
+    <td>/rk_energia_geracao_distribuida/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_energia_geracao_distribuida_en.R</td>
+    <td>aneel_siga_geracao_distribuida_dic_en.csv and aneel_siga_geracao_distribuida.rds</td>
+    <td>/rk_energia_geracao_distribuida/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_aneel_geracao_distribuida.R</td>
+    <td>aneel_geracao_distribuida_dic.csv and aneel_geracao_distribuida.rds</td>
+    <td>/ts_aneel_geracao_distribuida/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_aneel_geracao_distribuida_en.R</td>
+    <td>aneel_geracao_distribuida_dic_en.csv and aneel_geracao_distribuida.rds</td>
+    <td>/ts_aneel_geracao_distribuida/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
 
 
 ## EPE
@@ -808,6 +1140,29 @@ infrastructure planning.
 **Files:**
 
 - `app_ts_energia_amz_exporta`: graphic of energy data on proportion of energy production, consumption and consumers at state level. (english version: `app_ts_energia_amz_exporta_en`)
+  
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_ts_energia_amz_exporta.R</td>
+    <td>energia_amz_exporta_dic.csv and energia_amz_exporta.rds</td>
+    <td>/ts_energia_amz_exporta/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+     <td>app_ts_energia_amz_exporta_en.R</td>
+    <td>energia_amz_exporta_dic_en.csv and energia_amz_exporta.rds</td>
+    <td>/ts_energia_amz_exporta/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
 
 
 # Multiple data
@@ -827,6 +1182,98 @@ infrastructure planning.
 - `app_ts_dz_munic`: graphic of compilation of data at the municipality level. (english version: `app_ts_dz_munic_en`)
 
 - `app_ts_sistemas_isolados`: graphic of data from isolated sistems of energy. (english version: `app_ts_sistemas_isolados_en`)
+
+  <table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_bar_dz_varias_amazonias.R</td>
+    <td>dz_varias_amazonias_cross_section_dic.csv and dz_varias_amazonias_cross_section.rds</td>
+    <td>/bar_dz_varias_amazonias/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_bar_dz_varias_amazonias_en.R</td>
+    <td>dz_varias_amazonias_cross_section_dic_en.csv and dz_varias_amazonias_cross_section.rds</td>
+    <td>/bar_dz_varias_amazonias/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_bubble_dz_munic.R</td>
+    <td>dz_munic_dic.csv and dz_munic.rds</td>
+    <td>/bubble/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_bubble_dz_munic_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic.rds</td>
+    <td>/bubble/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_bubble_dz_munic_saude.R</td>
+    <td>dz_munic_saude_dic.csv and dz_munic_saude.rds</td>
+    <td>/bubble_dz_munic_saude/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_bubble_dz_munic_saude_en.R</td>
+    <td>dz_munic_saude_dic_en.csv and dz_munic_saude.rds</td>
+    <td>/bubble_dz_munic_saude/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_mapstatic_dz_munic.R</td>
+    <td>dz_munic_dic.csv and dz_munic_simplified.rds</td>
+    <td>/mapstatic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_mapstatic_dz_munic_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic_simplified.rds</td>
+    <td>/mapstatic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_dz_munic.R</td>
+    <td>dz_munic_dic.csv and dz_munic.rds</td>
+    <td>/ts_dz_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_dz_munic_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic.rds</td>
+    <td>/ts_dz_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_sistemas_isolados.R</td>
+    <td>energia_sistemas_isolados_dic.csv and energia_sistemas_isolados.rds</td>
+    <td>/ts_energia_sistemas_isolados/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_sistemas_isolados_en.R</td>
+    <td>energia_sistemas_isolados_dic_en.csv and energia_sistemas_isolados.rds</td>
+    <td>/ts_energia_sistemas_isolados/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
 
 ## Credits
 
