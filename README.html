@@ -375,15 +375,20 @@ specific geographic aggregation of the researches.</p></li>
 <li><p>“./scripts”: contains .R scripts that generate the visualizations
 using the Shiny Apps technology.</p></li>
 </ul>
-<div id="installation-needs-changes" class="section level2">
-<h2>Installation (NEEDS CHANGES)</h2>
-<p>You can install the released version of
-<code>datazoom.amazonia</code> from <a href="https://CRAN.R-project.org/package=datazoom.amazonia">CRAN</a>
-with:</p>
-<pre class="r"><code>install.packages(&quot;datazoom.amazonia&quot;)</code></pre>
-<p>And the development version from GitHub with:</p>
-<pre class="r"><code># install.packages(&quot;devtools&quot;)
-devtools::install_github(&quot;datazoompuc/datazoom.amazonia&quot;)</code></pre>
+<div id="glossary" class="section level2">
+<h2>Glossary</h2>
+<p>The files names were given according to the type of graphic that was
+used:</p>
+<ul>
+<li><code>app_bar</code>: bar chart</li>
+<li><code>app_bubble</code>: scatter plot</li>
+<li><code>app_hist</code>: histogram</li>
+<li><code>app_map</code> and <code>app_mapstatic</code>: map</li>
+<li><code>app_rk</code>and <code>app_rkstatic</code>: ranking</li>
+<li><code>app_sankey</code>: sankey graphic</li>
+<li><code>app_tab</code>: table</li>
+<li><code>app_ts</code>: curve graphic</li>
+</ul>
 <p><strong><a href="#environmental-data">1 - Environmental
 data</a></strong></p>
 <table>
@@ -524,6 +529,78 @@ hydrogaphy and forest data at the municipality level. (english version:
 champion states. (english version:
 <code>app_rkstatic_dz_munic_en</code>)</p></li>
 </ul>
+<table border="1">
+<tr>
+<td>
+<strong>App</strong>
+</td>
+<td>
+<strong>Data</strong>
+</td>
+<td>
+<strong>Scripts</strong>
+</td>
+<td>
+<strong>Data-Raw</strong>
+</td>
+</tr>
+<tr>
+<td>
+app_map_dz_munic_prodes.R
+</td>
+<td>
+dz_munic_dic.csv and dz_munic_simplified.rds
+</td>
+<td>
+/map_dz_munic_prodes/
+</td>
+<td>
+Texto para Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_map_dz_munic_prodes_en.R
+</td>
+<td>
+dz_munic_dic_en.csv and dz_munic_simplified.rds
+</td>
+<td>
+/map_dz_munic_prodes/
+</td>
+<td>
+Texto para Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rkstatic_dz_munic.R
+</td>
+<td>
+dz_munic_dic.csv and dz_munic.rds
+</td>
+<td>
+/rkstatic_dz_munic/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rkstatic_dz_munic_en.R
+</td>
+<td>
+dz_munic_dic_en.csv and dz_munic.rds
+</td>
+<td>
+/rkstatic_dz_munic/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+</table>
 </div>
 <div id="mapbiomas" class="section level2">
 <h2>MapBiomas</h2>
@@ -575,6 +652,354 @@ version: <code>app_ts_mapbiomas_cobertura_munic_en</code>)</p></li>
 transition/ change of land cover and use at state level. (english
 version: <code>app_ts_mapbiomas_transicao_est_en</code>)</p></li>
 </ul>
+<table border="1">
+<tr>
+<td>
+<strong>App</strong>
+</td>
+<td>
+<strong>Data</strong>
+</td>
+<td>
+<strong>Scripts</strong>
+</td>
+<td>
+<strong>Data-Raw</strong>
+</td>
+</tr>
+<tr>
+<td>
+app_hist_mapbiomas_bovinos.R
+</td>
+<td>
+dz_munic_ppm_mapbiomas_dic.csv and dz_munic_ppm_mapbiomas.rds
+</td>
+<td>
+hist_mapbiomas_bovinos
+</td>
+<td>
+Texto para Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_hist_mapbiomas_bovinos_en.R
+</td>
+<td>
+dz_munic_ppm_mapbiomas_dic_en.csv and dz_munic_ppm_mapbiomas_en.rds
+</td>
+<td>
+/hist_mapbiomas_bovinos/
+</td>
+<td>
+Texto para Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_map_cattle.R
+</td>
+<td>
+censoagro_mapbiomas_gado_dic.csv and censoagro_mapbiomas_gado.rds and
+legal_amazon_boundary.rds and states_boundary.rds and
+area_municipios.rds
+</td>
+<td>
+/map_cattle/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_map_cattle_en.R
+</td>
+<td>
+censoagro_mapbiomas_gado_dic_en.csv and censoagro_mapbiomas_gado.rds and
+legal_amazon_boundary.rds and states_boundary.rds and
+area_municipios.rds
+</td>
+<td>
+/map_cattle/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_map_mapbiomas_cover.R
+</td>
+<td>
+mapbiomas_cobertura_munic_savana_dic.csv and mapbiomas_cobertura.rds and
+legal_amazon_boundary.rds and states_boundary.rds and
+area_municipios.rds
+</td>
+<td>
+/map_mapbiomas_cover/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_map_mapbiomas_cover_en.R
+</td>
+<td>
+mapbiomas_cobertura_munic_savana_dic_en.csv and mapbiomas_cobertura.rds
+and legal_amazon_boundary.rds and states_boundary.rds and
+area_municipios.rds
+</td>
+<td>
+/map_mapbiomas_cover/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_cobertura_est.R
+</td>
+<td>
+mapbiomas_cobertura_est_dic.csv and mapbiomas_cobertura_est.rds
+</td>
+<td>
+/rk_mapbiomas_cobertura_est/ and /rk/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_cobertura_est_en.R
+</td>
+<td>
+mapbiomas_cobertura_est_dic_en.csv and mapbiomas_cobertura_est.rds
+</td>
+<td>
+/rk/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_cobertura_munic.R
+</td>
+<td>
+mapbiomas_cobertura_munic_dic.csv and mapbiomas_cobertura_munic.rds
+</td>
+<td>
+/rk_mapbiomas_cobertura_munic/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_cobertura_munic_en.R
+</td>
+<td>
+mapbiomas_cobertura_munic_dic_en.csv and mapbiomas_cobertura_munic.rds
+</td>
+<td>
+/rk_mapbiomas_cobertura_munic/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_cobertura_munic_percentual.R
+</td>
+<td>
+mapbiomas_cobertura_munic_percentual_dic.csv and
+mapbiomas_cobertura_munic_percentual.rds
+</td>
+<td>
+/rk_mapbiomas_cobertura_munic_percentual/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_cobertura_munic_percentual_en.R
+</td>
+<td>
+mapbiomas_cobertura_munic_percentual_dic_en.csv and
+mapbiomas_cobertura_munic_percentual.rds
+</td>
+<td>
+/rk_mapbiomas_cobertura_munic_percentual/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_transicao_est.R
+</td>
+<td>
+mapbiomas_transicao_est_dic.csv and mapbiomas_transicao_est.rds
+</td>
+<td>
+/rk_mapbiomas_transition_est/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_transicao_est_en.R
+</td>
+<td>
+mapbiomas_transicao_est_dic_en.csv and mapbiomas_transicao_est.rds
+</td>
+<td>
+/rk_mapbiomas_transition_est/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_transicao_munic_5.R
+</td>
+<td>
+mapbiomas_transicao_munic_dic.csv and mapbiomas_transicao_munic_5.rds
+</td>
+<td>
+/rk_mapbiomas_transition_est/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_rk_mapbiomas_transicao_munic_5_en.R
+</td>
+<td>
+mapbiomas_transicao_munic_dic_en.csv and mapbiomas_transicao_munic_5.rds
+</td>
+<td>
+/rk_mapbiomas_transition_est/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_tab_mapbiomas_transicao_est.R
+</td>
+<td>
+mapbiomas_transicao_est_tab_dic.csv and mapbiomas_transicao_est_tab.rds
+</td>
+<td>
+/tab/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_ts_mapbiomas_cobertura_est.R
+</td>
+<td>
+mapbiomas_cobertura_est_dic.csv and mapbiomas_cobertura_est.rds
+</td>
+<td>
+/ts_mapbiomas_cobertura_est/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_ts_mapbiomas_cobertura_est_en.R
+</td>
+<td>
+mapbiomas_cobertura_est_dic_en.csv and mapbiomas_cobertura_est.rds
+</td>
+<td>
+/ts_mapbiomas_cobertura_est/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_ts_mapbiomas_cobertura_munic.R
+</td>
+<td>
+mapbiomas_cobertura_munic_dic.csv and mapbiomas_cobertura_munic.rds
+</td>
+<td>
+/ts_mapbiomas_cobertura_munic/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_ts_mapbiomas_cobertura_munic_en.R
+</td>
+<td>
+mapbiomas_cobertura_munic_dic_en.csv and mapbiomas_cobertura_munic.rds
+</td>
+<td>
+/ts_mapbiomas_cobertura_munic/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_ts_mapbiomas_transicao_est.R
+</td>
+<td>
+mapbiomas_transicao_est_dic.csv and mapbiomas_transicao_est.rds
+</td>
+<td>
+/ts_mapbiomas_transicao/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+<tr>
+<td>
+app_ts_mapbiomas_transicao_est_en.R
+</td>
+<td>
+mapbiomas_transicao_est_dic_en.csv and mapbiomas_transicao_est.rds
+</td>
+<td>
+/ts_mapbiomas_transicao/
+</td>
+<td>
+Nova Data-Raw
+</td>
+</tr>
+</table>
 </div>
 <div id="seeg" class="section level2">
 <h2>SEEG</h2>

@@ -58,7 +58,7 @@ The files names were given according to the type of graphic that was used:
 |-------------------------------|---------------------------------------------------------|
 | **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
 | **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
-| **[PNADC](#pnadc)**             | *Households socioeconomic status* |
+| **[PNADC](#pnadc)**             | *Households socoeconomic status* |
 
 
 </td>
