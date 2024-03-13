@@ -174,13 +174,18 @@ class(data$`Heads of Cattle`)
 class(data$Pasture)
 
 data <- data %>%
-  mutate(`Heads of Cattle / Pasture` = `Heads of Cattle` / Pasture)
-
-data <- data %>%
   relocate(geom , .after = year)
 
 data <- data %>%
   mutate(state_name=ifelse(state_name=="Amazônas","Amazonas",state_name))
+
+# adding munic areas
+
+areas_mun <- readr::read_rds("data/area_municipios.rds")
+
+# adding area of each municipality
+data <- data %>%
+    left_join(areas_mun, by = "municipality_code")
 
 saveRDS(data, "data/censoagro_mapbiomas_gado.rds")
 
