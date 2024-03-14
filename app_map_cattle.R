@@ -1,3 +1,7 @@
+# Cache
+cache_folder <- "./cache/app_map_cattle/"
+shinyOptions(cache = cachem::cache_disk(cache_folder))
+
 # Carrega bibliotecas
 library(shiny)
 library(tidyverse)
