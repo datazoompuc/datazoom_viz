@@ -215,7 +215,7 @@ The data has yearly frequency and is available starting from the year
   <tr>
     <td>app_hist_mapbiomas_bovinos.R</td>
     <td>dz_munic_ppm_mapbiomas_dic.csv and dz_munic_ppm_mapbiomas.rds</td>
-    <td>hist_mapbiomas_bovinos</td>
+    <td>/hist_mapbiomas_bovinos/</td>
     <td>Texto para Data-Raw</td>
   </tr>
 
