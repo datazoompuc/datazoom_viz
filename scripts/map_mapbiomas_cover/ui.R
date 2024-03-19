@@ -67,9 +67,7 @@ get_ui <- function(files, param) {
                       value = param$year_final,
                       step = 12,
                       width = "100%",
-                      animate = animationOptions(interval = 6000,
-                                                 playButton = "\u25B6",
-                                                 pauseButton = "\u23F8"),
+                      animate = FALSE,
                       sep = "")
         ),
         # espaço vazio
