@@ -1,3 +1,7 @@
+# Cache
+cache_folder <- "./cache/app_map_cattle/"
+shinyOptions(cache = cachem::cache_disk(cache_folder))
+
 # Carrega bibliotecas
 library(shiny)
 library(tidyverse)
@@ -16,7 +20,6 @@ files$param_file <- "data/censoagro_mapbiomas_gado_dic.csv"
 files$db_file <- "data/censoagro_mapbiomas_gado.rds"
 files$legal_amazon <- "data/legal_amazon_boundary.rds"
 files$states_boundary <- "data/states_boundary.rds"
-files$areas_mun <- "data/area_municipios.rds"
 
 
 # Carrega scripts
@@ -27,7 +30,7 @@ source(files$server_script)
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
 param <- get_db_param(files$param_file, files$db_file) # car
-param$y_def <- "Heads of Cattle" # variável padrão do eixo y
+param$x_def <- "Heads of Cattle" # variável padrão do eixo y
 param$color_def <- "" # variável padrão de cor
 param$size_def <- "" # variável padrão de tamanho
 param$text_def <- "Municipality" # variável padrão de texto
@@ -43,15 +46,20 @@ param$year_final <- 2017
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARI\u00C1VEIS:"
-param$label_x_name<- "Vari\u00e1vel Selecionada: "
+param$label_x_name<- "Vari\u00e1vel Selecionada:"
 param$label_year<- "Ano"
 param$label_title<- "Mapa dos munic\u00edpios do Brasil com contorno da Amaz\u00f4nia Legal"
-param$label_selected_variable<- "Vari\u00e1vel selecionada:"
+param$label_selected_variable<- "Vari\u00e1vel selecionada: "
 param$label_munic_name<- "Munic\u00edpio: <b>"
 param$label_state_name<- "Estado: <b>"
 param$label_measurement_unit<- "Unidade de medida: <b>"
-param$label_toggle <- "Propor\u00e7\u00e3o da \u00e1rea dos munic\u00edpios"
-param$warning_prop <-"Atenção: Esta opção não é valida, no lugar estamos mostrando Gado/ \u00c1rea de Pastagem."
+param$label_check <- "Em propor\u00e7\u00e3o:"
+param$label_toggle <- list(
+    tags$span(style = "color:white", "Valores Absolutos"),
+    tags$span(style = "color:white", "Propor\u00e7\u00e3o da \u00e1rea dos munic\u00edpios"),
+    tags$span(style = "color:white", "Propor\u00e7\u00e3o da \u00e1rea de pastagem")
+    )
+param$warning_prop <-"Aten\u00e7\u00e3o: Esta opção n\u00e3o \u00e9 v\u00e1lida. Mostrando \u00e1rea de pastagem."
 param$warning_prop_label <-"Propor\u00e7\u00e3o"
 
 param$link<- "https://datazoom.shinyapps.io/app_map_cattle/"

@@ -16,46 +16,20 @@ get_server <- function(files, param) {
   
   library(sf)
   df <- readRDS(files$db_file)
-  
-  areas_mun <- readr::read_rds(files$areas_mun)
-  
-  # adding area of each municipality
-  df <- df %>%
-    left_join(areas_mun, by = "municipality_code")
-  
-  micro <- geobr::lookup_muni("all") %>%
-      select("municipality_code" = code_muni, code_micro, name_micro)
 
   server <- function(input, output, session) {
     df_reactived <- reactive({
       w <- df
-
       
-      # quando e escolhida a caixinha de proporcao,
-      # input$yprop se torna TRUE.
-      # nesse caso, modifico o data frame para dividir pela area
-      # do municipio
-      # if (input$yprop ) {
-      #   w[[input$x]] <- w[[input$x]]/w[["area_km2"]]
-      # }
-      
-      if (input$yprop) {
-        if(input$x=="Heads of Cattle / Pasture"){
-          w[[input$x]] <- w[[input$x]]
-          
-          showNotification(param$warning_prop, type = "warning")
-          
-        }else{
+      if (input$yprop == "munic") {
           w[[input$x]] <- w[[input$x]]/w[["area_km2"]]
-        }
-
+      }
+      else if (input$yprop == "pasture") {
+            w[[input$x]] <- w[[input$x]]/w[["Pasture"]]
       }
       
       return(w)
     })
-
-
-    
     
     # Cria opções para seleção de datas
     param$filter_choices <- sort(unique(df$year))
@@ -155,11 +129,11 @@ get_server <- function(files, param) {
       }
 
       # Compute mean and standard deviation values
-      sorted <- sort(c(df[[input$x]]), na.last = FALSE)
-      max_val <- min(df[[input$x]], na.rm = TRUE)  # Calculate the maximum value
+      sorted <- sort(c(df_reactived()[[input$x]]), na.last = FALSE)
+      max_val <- min(df_reactived()[[input$x]], na.rm = TRUE)  # Calculate the maximum value
       
       # Calculate breaks based on your requirements
-      breaks_stats <- c(min(df[[input$x]], na.rm = TRUE),
+      breaks_stats <- c(min(df_reactived()[[input$x]], na.rm = TRUE),
                         sorted[as.integer(length(sorted)/10)*1], 
                         sorted[as.integer(length(sorted)/10)*2], 
                         sorted[as.integer(length(sorted)/10)*3], 
@@ -169,7 +143,7 @@ get_server <- function(files, param) {
                         sorted[as.integer(length(sorted)/10)*7],
                         sorted[as.integer(length(sorted)/10)*8],
                         sorted[as.integer(length(sorted)/10)*9],
-                        max(df[[input$x]], na.rm = TRUE))
+                        max(df_reactived()[[input$x]], na.rm = TRUE))
       
       # Ensure the last break extends to the maximum value of the data
       if (max_val > tail(breaks_stats, n=1)) {
@@ -177,46 +151,21 @@ get_server <- function(files, param) {
       }
       
       # Use colorBin with the breaks
-          if (input$x == "Heads of Cattle / Pasture"){
-              pal <- colorBin(palette = pal1, bins = breaks_stats, domain = df_reactived()[[input$x]])
-          }
-          else {
-              pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
-          }
+      pal <- colorBin(palette = pal1, bins = breaks_stats, domain = df_reactived()[[input$x]])
       
-    
+      if (input$x == "Pasture" & input$yprop == "pasture") {
+          pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
+      }
 
       tryCatch(
         {
           
           # Monta mapa
 
-          # Monta html do tooltip
-          # x_col <- reactive(
-          #   {
-          #     col <- param$table[which(param$table$var == input$x), ]
-          #     
-          #     # mudar a unidade quanto se escolhe proporcao
-          #     if (input$yprop) {
-          #       col$unidade <- "%"
-          #     }
-          #     
-          #     return(col)
-          #   }
-          # )
           x_col <- param$table[which(param$table$var == input$x), ]
           
-          if (input$yprop) {
+          if (input$yprop %in% c("munic", "pasture")) {
             x_col$unidade <- "%"
-              }
-          if (input$yprop) {
-            if(input$x=="Heads of Cattle / Pasture"){
-              x_col$unidade <- param$warning_prop_label
-              
-            }else{
-              x_col$unidade <- "%"
-            }
-            
           }
           
           title_legend <- paste0("", x_col$label)
@@ -276,7 +225,8 @@ get_server <- function(files, param) {
         }
       )
       fig
-    })
+    }) %>%
+        bindCache(input$x, input$yprop)
 
     # Observa eventos
     observe({

@@ -45,13 +45,15 @@ get_ui <- function(files, param) {
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
-          ),
-          checkboxInput(
-              inputId = "yprop",
-              param$label_toggle,
-              value = FALSE,
-              width = "100%"
           )
+        ),
+        div(
+            checkboxInput(
+                inputId = "yprop",
+                param$label_toggle,
+                value = FALSE,
+                width = "100%"
+            )
         ),
         # espaço vazio
         div(class = "fakecheckbox", ),
@@ -65,7 +67,7 @@ get_ui <- function(files, param) {
                       value = param$year_final,
                       step = 12,
                       width = "100%",
-                      animate = animationOptions(interval = 3000,
+                      animate = animationOptions(interval = 6000,
                                                  playButton = "\u25B6",
                                                  pauseButton = "\u23F8"),
                       sep = "")

@@ -206,7 +206,8 @@ get_server <- function(files, param) {
         }
       )
       fig
-    })
+    }) %>%
+        bindCache(input$x, input$yprop, input$filter1)
 
     # Observa eventos
     observe({
