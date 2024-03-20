@@ -74,6 +74,9 @@ municipalities_with_geom <- municipalities_with_geom %>%
 shapefile <- municipalities_with_geom %>% 
     sf::st_make_valid() %>%
     sf::st_simplify(dTolerance = 400) 
+
+shapefile <- shapefile %>%
+    rmapshaper::ms_simplify()
   
 
 #colnames(shapefile)
