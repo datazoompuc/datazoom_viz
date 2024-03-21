@@ -159,57 +159,94 @@ temp1 <- temp %>% mutate(
 )"
 
 PIA_23 <- pnadc_2023_4 %>% filter(V2009 >= 15 & V2009 <= 64) %>% 
-  select(UF,V2007,V2009,V3002,V3009A,V4001,V4029,V4071) %>% mutate_all(as.numeric)
+  select(UF,V1028,V2007,V2009,V3002,VD3005,VD4001,VD4002,VD4005,V4029,V4071) %>% mutate_all(as.numeric)
 
-Norte <- PIA_23 %>% filter(UF == c(11:17))
+PIA_23 <- PIA_23 %>% rename(peso = V1028) %>% 
+  mutate(Regioes = cut(UF, breaks = c(11, 17, 29, 35, 43, 53), 
+                       labels = c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste")))
 
-#North zone statistics 
-Taxas.Norte <- Norte %>%
-  #everyone
-  summarise(PIA = n(), 
-            empregados = sum(V4001 == 1),
-            desempregados = sum(V4071 == 1, na.rm = T),
-            informais = sum(V4029 == 2, na.rm = T),
-            PEA = empregados + desempregados,
-            nem_nem = sum(V3002 == 2 & V4001 == 2),
-            taxa_de_participacao_N = PEA/PIA * 100,
-            taxa_de_ocupacao_N = empregados/PEA * 100,
-            taxa_de_desemprego_N = desempregados/PEA * 100,
-            taxa_de_informalidade_N = informais/PEA * 100,
-            taxa_nem_nem_N = nem_nem/PIA * 100
-            )
+#Zone statistics 
 
-  #gender
-Taxas.Norte.genero <- Norte %>%
-  group_by(V2007) %>%
-  summarise(PIA = n(), 
-            empregados = sum(V4001 == 1),
-            desempregados = sum(V4071 == 1, na.rm = T),
-            informais = sum(V4029 == 2, na.rm = T),
-            PEA = empregados + desempregados,
-            nem_nem = sum(V3002 == 2 & V4001 == 2),
-            taxa_de_participacao_N = PEA/PIA * 100,
-            taxa_de_ocupacao_N = empregados/PEA * 100,
-            taxa_de_desemprego_N = desempregados/PEA * 100,
-            taxa_de_informalidade_N = informais/PEA * 100,
-            taxa_nem_nem_N = nem_nem/PIA * 100)
-  
-  #education level
-Taxas.Norte.educ <- Norte %>% drop_na(V3009A) %>%
-  group_by(V3009A) %>%
-  summarise(PIA = n(), 
-            empregados = sum(V4001 == 1),
-            desempregados = sum(V4071 == 1, na.rm = T),
-            informais = sum(V4029 == 2, na.rm = T),
-            PEA = empregados + desempregados,
-            nem_nem = sum(V3002 == 2 & V4001 == 2),
-            taxa_de_participacao_N = PEA/PIA * 100,
-            taxa_de_ocupacao_N = empregados/PEA * 100,
-            taxa_de_desemprego_N = desempregados/PEA * 100,
-            taxa_de_informalidade_N = informais/PEA * 100,
-            taxa_nem_nem_N = nem_nem/PIA * 100) 
+#everyone
+Taxas.Brasil <- PIA_23 %>% drop_na(Regioes) %>%
+  group_by(Regioes) %>%
+  summarise(PIA = sum(peso), 
+            ocupados = sum((VD4002 == 1) * peso, na.rm = T),
+            informais = sum((V4029 == 2) * peso, na.rm = T),
+            PEA = sum((VD4001 == 1) * peso),
+            desempregados = PEA - ocupados,
+            nem_nem = sum((V3002 == 2 & VD4002 == 2) * peso, na.rm = T),
+            desalentados = sum((VD4005 == 1) * peso, na.rm = T),
+            taxa_de_participacao = PEA/PIA * 100,
+            taxa_de_ocupacao = ocupados/PEA * 100,
+            taxa_de_desemprego = desempregados/PEA * 100,
+            taxa_de_informalidade = informais/PEA * 100,
+            taxa_nem_nem = nem_nem/PIA * 100,
+            taxa_desalentados = desalentados/(PEA + desalentados) * 100)
 
-  #
+#gender
+Taxas.Brasil.genero <- PIA_23 %>%
+  group_by(Regioes,V2007) %>% drop_na(Regioes) %>%
+  summarise(PIA = sum(peso), 
+            ocupados = sum((VD4002 == 1) * peso, na.rm = T),
+            informais = sum((V4029 == 2) * peso, na.rm = T),
+            PEA = sum((VD4001 == 1) * peso),
+            desempregados = PEA - ocupados,
+            nem_nem = sum((V3002 == 2 & VD4002 == 2) * peso, na.rm = T),
+            desalentados = sum((VD4005 == 1) * peso, na.rm = T),
+            taxa_de_participacao = PEA/PIA * 100,
+            taxa_de_ocupacao = ocupados/PEA * 100,
+            taxa_de_desemprego = desempregados/PEA * 100,
+            taxa_de_informalidade = informais/PEA * 100,
+            taxa_nem_nem = nem_nem/PIA * 100,
+            taxa_desalentados = desalentados/(PEA + desalentados) * 100)
+
+#education level
+Taxas.Brasil.educ <- PIA_23 %>% 
+  mutate(faixa_educ = cut(VD3005, breaks = c(0, 1, 7, 11, 14, 16), 
+                                 labels = c("0 anos de estudo", "1 a 7 anos de estudo", "8 a 11 anos de estudo", "11 a 14 anos de estudo", "15 anos ou mais de estudo"))) %>%
+  group_by(Regioes,faixa_educ) %>% drop_na(Regioes, faixa_educ) %>%
+  summarise(PIA = sum(peso), 
+            ocupados = sum((VD4002 == 1) * peso, na.rm = T),
+            informais = sum((V4029 == 2) * peso, na.rm = T),
+            PEA = sum((VD4001 == 1) * peso),
+            desempregados = PEA - ocupados,
+            nem_nem = sum((V3002 == 2 & VD4002 == 2) * peso, na.rm = T),
+            desalentados = sum((VD4005 == 1) * peso, na.rm = T),
+            taxa_de_participacao = PEA/PIA * 100,
+            taxa_de_ocupacao = ocupados/PEA * 100,
+            taxa_de_desemprego = desempregados/PEA * 100,
+            taxa_de_informalidade = informais/PEA * 100,
+            taxa_nem_nem = nem_nem/PIA * 100,
+            taxa_desalentados = desalentados/(PEA + desalentados) * 100)
+
+#Age groups
+Taxas.Brasil.idade <- PIA_23 %>% 
+  mutate(faixa_idade = cut(V2009, 
+                          breaks = c(14,17,24,29,39,49,59,64), 
+                          labels = c("14 a 17 anos de idade", "18 a 24 anos de idade", "25 a 29 anos de idade", 
+                                     "30 a 39 anos de idade", "40 a 49 anos de idade", "50 a 59 anos de idade", 
+                                     "60 a 64 anos de idade"))) %>%
+  group_by(Regioes,faixa_idade) %>% drop_na(Regioes,faixa_idade) %>%
+  summarise(PIA = sum(peso), 
+            ocupados = sum((VD4002 == 1) * peso, na.rm = T),
+            informais = sum((V4029 == 2) * peso, na.rm = T),
+            PEA = sum((VD4001 == 1) * peso),
+            desempregados = PEA - ocupados,
+            nem_nem = sum((V3002 == 2 & VD4002 == 2) * peso, na.rm = T),
+            desalentados = sum((VD4005 == 1) * peso, na.rm = T),
+            taxa_de_participacao = PEA/PIA * 100,
+            taxa_de_ocupacao = ocupados/PEA * 100,
+            taxa_de_desemprego = desempregados/PEA * 100,
+            taxa_de_informalidade = informais/PEA * 100,
+            taxa_nem_nem = nem_nem/PIA * 100,
+            taxa_desalentados = desalentados/(PEA + desalentados) * 100)
+
+Taxas.Regioes <- bind_rows(Taxas.Brasil,Taxas.Brasil.genero,Taxas.Brasil.educ,Taxas.Brasil.idade)
+
+
+#Legal Amazon
+
 
 
 
