@@ -11,7 +11,7 @@ library(tidyverse)
 library(haven)
 library(tibble)
 library(zoo)
-
+library(tidyr)
 #################################################
 ## Mercado de Trabalho na Amazônia Legal
 ## Ouput data from:
@@ -21,7 +21,11 @@ library(zoo)
 # set path to raw data
 github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
-# call raw data
+load_pnadc(save_to = getwd(),2023,quarter = 4,raw_data = F, panel = "none")
+pnadc_2023_4 <- readRDS("C:/Users/breno/OneDrive/Documentos/GitHub/datazoom.social/pnadc_2023_4.rds")
+
+
+"# call raw data
 base1 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
 base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas (PIA)")
 
@@ -152,7 +156,62 @@ temp1 <- temp %>% mutate(
   taxa_de_nemnem_faixa_etaria5 = ((n_de_nemnem_faixa_etaria5) / n_faixa_etaria5) * 100,
   taxa_de_nemnem_faixa_etaria6 = ((n_de_nemnem_faixa_etaria6) / n_faixa_etaria6) * 100,
   taxa_de_nemnem_faixa_etaria7 = ((n_de_nemnem_faixa_etaria7) / n_faixa_etaria7) * 100
-)
+)"
+
+PIA_23 <- pnadc_2023_4 %>% filter(V2009 >= 15 & V2009 <= 64) %>% 
+  select(UF,V2007,V2009,V3002,V3009A,V4001,V4029,V4071) %>% mutate_all(as.numeric)
+
+Norte <- PIA_23 %>% filter(UF == c(11:17))
+
+#North zone statistics 
+Taxas.Norte <- Norte %>%
+  #everyone
+  summarise(PIA = n(), 
+            empregados = sum(V4001 == 1),
+            desempregados = sum(V4071 == 1, na.rm = T),
+            informais = sum(V4029 == 2, na.rm = T),
+            PEA = empregados + desempregados,
+            nem_nem = sum(V3002 == 2 & V4001 == 2),
+            taxa_de_participacao_N = PEA/PIA * 100,
+            taxa_de_ocupacao_N = empregados/PEA * 100,
+            taxa_de_desemprego_N = desempregados/PEA * 100,
+            taxa_de_informalidade_N = informais/PEA * 100,
+            taxa_nem_nem_N = nem_nem/PIA * 100
+            )
+
+  #gender
+Taxas.Norte.genero <- Norte %>%
+  group_by(V2007) %>%
+  summarise(PIA = n(), 
+            empregados = sum(V4001 == 1),
+            desempregados = sum(V4071 == 1, na.rm = T),
+            informais = sum(V4029 == 2, na.rm = T),
+            PEA = empregados + desempregados,
+            nem_nem = sum(V3002 == 2 & V4001 == 2),
+            taxa_de_participacao_N = PEA/PIA * 100,
+            taxa_de_ocupacao_N = empregados/PEA * 100,
+            taxa_de_desemprego_N = desempregados/PEA * 100,
+            taxa_de_informalidade_N = informais/PEA * 100,
+            taxa_nem_nem_N = nem_nem/PIA * 100)
+  
+  #education level
+Taxas.Norte.educ <- Norte %>% drop_na(V3009A) %>%
+  group_by(V3009A) %>%
+  summarise(PIA = n(), 
+            empregados = sum(V4001 == 1),
+            desempregados = sum(V4071 == 1, na.rm = T),
+            informais = sum(V4029 == 2, na.rm = T),
+            PEA = empregados + desempregados,
+            nem_nem = sum(V3002 == 2 & V4001 == 2),
+            taxa_de_participacao_N = PEA/PIA * 100,
+            taxa_de_ocupacao_N = empregados/PEA * 100,
+            taxa_de_desemprego_N = desempregados/PEA * 100,
+            taxa_de_informalidade_N = informais/PEA * 100,
+            taxa_nem_nem_N = nem_nem/PIA * 100) 
+
+  #
+
+
 
 # convert every data set from wide to long format and then merge altogether
 taxa_de_desemprego_por_faixa <- tidyr::pivot_longer(temp1,
@@ -1014,6 +1073,271 @@ saveRDS(temp,
 
 #####################
 # Build Dictionary
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #####################
 
 # extract variables from data
