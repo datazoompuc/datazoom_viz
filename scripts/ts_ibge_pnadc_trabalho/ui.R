@@ -44,10 +44,11 @@ get_ui <- function(files, param) {
         selectizeInput(
           "filter1",
           param$label_geo_name,
-          choices = NULL,
+          choices = param$filter_choices,
           multiple = TRUE,
           options = list(maxItems = 20),
-          width = "100%"
+          width = "100%",
+          selected = list("Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal")
         ),
         
         # espaço vazio
@@ -55,10 +56,10 @@ get_ui <- function(files, param) {
         
         # Seleciona composicao demografica
         selectInput(
-          "filter_composicao_demografica",
-          param$label_comp_name,
-          choices = NULL,
-          selected = "Todas as pessoas",
+          inputId = "filter_composicao_demografica",
+          label = param$label_comp_name,
+          choices = param$filter_composicao_demografica_choices,
+          selected = "Todos",
           width = "100%"
         ),
         

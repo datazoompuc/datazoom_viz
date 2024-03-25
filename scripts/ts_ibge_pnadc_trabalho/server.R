@@ -53,35 +53,6 @@ get_server <- function(files, param) {
       return(w)
     })
 
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-    
-    param$filter_composicao_demografica_choices <- sort(unique(df$composicao_demografica))
-
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      updateSelectizeInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = sample(param$filter_choices, 1) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
-      )
-      
-      selected_composicao_demografica <- sample(param$filter_composicao_demografica_choices, 1)
-      updateSelectInput(session,
-                        "filter_composicao_demografica",
-                        choices = param$filter_composicao_demografica_choices,
-                        selected = selected_composicao_demografica
-      )
-
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
-      updateSelectInput(session,
-        "y",
-        choices = param$y_choices,
-        selected = selected
-      )
-    }
-
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
@@ -106,12 +77,12 @@ get_server <- function(files, param) {
       updateSelectizeInput(session,
         "filter1",
         choices = param$filter_choices,
-        selected = NULL
+        selected = list("Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal")
       )
       updateSelectInput(session,
         "filter_composicao_demografica",
         choices = param$filter_composicao_demografica_choices,
-        selected = NULL
+        selected = "Todos"
       )
 
       # Pega parametros da url e atribui aos selectinputs
@@ -140,11 +111,6 @@ get_server <- function(files, param) {
         )
       }
 
-      # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter"]]) && is.null(query[["y"]])
-          && is.null(query[["filter_composicao"]])) {
-        random_inputs() # preenche inputs se estiverem vazios
-      }
     }
 
     # Output título do gráfico
@@ -157,7 +123,7 @@ get_server <- function(files, param) {
         # Monta título a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == input$y), ]
 
-        text <- paste0(y_col$label)
+        text <- paste0(y_col$desc)
       }
 
       text
@@ -228,10 +194,10 @@ get_server <- function(files, param) {
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", paste0(year(df_p$x), '-', 'T', quarter(df_p$x)),"<br>",
             param$tooltip , paste0(input$filter_composicao_demografica),"<br>",
-            y_col$label, ": ", format(df_p$y, scientific = FALSE,
+            y_col$label, ": ", format(100*df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>"
+                                      big.mark = "."), "%", "<br>"
           )
 
           # Define paleta de cores
@@ -262,6 +228,7 @@ get_server <- function(files, param) {
             title = y_col$label,
             titlefont = f1,
             tickfont = f2,
+            tickformat = ".2%",
             automargin = FALSE,
             autorange = TRUE,
             showgrid = FALSE,

@@ -1,11 +1,10 @@
-"","var","x","y","color","label","desc","var_group","categoria","subcategoria"
-"1","id",TRUE,FALSE,TRUE,"Recorte regional","id","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"2","composicao_demografica",TRUE,FALSE,TRUE,"Composição demográfica","composicao_demografica","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"3","time",TRUE,FALSE,TRUE,"Ano-Trimestre","time","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"4","taxa_de_informalidade",TRUE,TRUE,TRUE,"Taxa de informalidade (%)","taxa_de_informalidade","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"5","taxa_de_participacao",TRUE,TRUE,TRUE,"Taxa de participação (%)","taxa_de_participacao","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"6","taxa_de_ocupacao",TRUE,TRUE,TRUE,"Taxa de ocupação (%)","taxa_de_ocupacao","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"7","taxa_de_desemprego",TRUE,TRUE,TRUE,"Taxa de desemprego (%)","taxa_de_desemprego","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"8","taxa_de_desalento",TRUE,TRUE,TRUE,"Taxa de desalentados (%)","taxa_de_desalento","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"9","taxa_de_nemnem",TRUE,TRUE,TRUE,"Taxa de Nem-Nem (%)","taxa_de_nemnem","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
-"10","group",TRUE,FALSE,TRUE,"Recorte regional","group","IBGE - PNAD Contínua","Economia","Mercado de Trabalho"
+var,x,y,color,label,desc,var_group,categoria,subcategoria
+group,TRUE,FALSE,TRUE,Recorte Regional,Recorte Regional,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
+composicao_demografica,TRUE,FALSE,TRUE,Composiç£o Demográfica,Composiç£o Demográfica,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
+time,TRUE,FALSE,TRUE,Ano - Trimestre,Ano - Trimestre,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
+taxa_participacao,TRUE,TRUE,TRUE,Taxa de Participaç£o,Taxa de Participaç£o sobre a PIA,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
+taxa_ocupacao,TRUE,TRUE,TRUE,Taxa de Ocupaç£o,Taxa de Ocupaç£o sobra a PIA,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
+taxa_desemprego,TRUE,TRUE,TRUE,Taxa de Desemprego,Taxa de Desemprego sobre a Força de Trabalho,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
+taxa_informalidade,TRUE,TRUE,TRUE,Taxa de Informalidade,Taxa de Informalidade sobre os Ocupados,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
+taxa_desalento,TRUE,TRUE,TRUE,Taxa de Desalento,Taxa de Desalento sobre a PIA,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
+taxa_nem_nem,TRUE,TRUE,TRUE,Taxa de Nem-Nem,Taxa de Nem-Nem sobre a PIA,IBGE - PNAD Contínua,Economia,Mercado de Trabalho
