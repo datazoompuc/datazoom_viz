@@ -38,7 +38,7 @@ describe_pnad <- function(df) {
         rename("peso" = V1028) %>%
         mutate( # so that the ratios make sense
             nem_nem = nem_nem * pia,
-            desalentado = desalentado * pia)
+            desalentado = desalentado * pia) %>%
         group_by(Ano, Trimestre, .add = TRUE) %>%
         summarise(
             across(
