@@ -449,10 +449,6 @@ COD <- COD %>%
 
 #Variables
 
-#rendimento de todos os trabalhadores
-CNAE <- CNAE %>% mutate(rendatotal = ifelse(!is.na(VD4019), VD4019, 0))
-COD <- COD %>% mutate(rendatotal = ifelse(!is.na(VD4019), VD4019, 0))
-
 #ocupados
 CNAE <- CNAE %>% mutate(ocupado = ifelse(VD4002 == 1, 1, 0))
 COD <- COD %>% mutate(ocupado = ifelse(VD4002 == 1, 1, 0))
@@ -476,35 +472,16 @@ COD <- COD %>% mutate(informal = ifelse((VD4002 == 1 & VD4009 %in% c("02","04","
                                         ifelse((VD4002 == 1 & VD4009 %in% c("08","09") & VD4012 == 2),1,0)))
 
 #ocupado no setor publico
-
 CNAE <- CNAE %>% mutate(publico = ifelse(V4012 %in% c(2,4), 1, 0))
 COD <- COD %>% mutate(publico = ifelse(V4012 %in% c(2,4), 1, 0))
 
 #privado no setor privado
-
 CNAE <- CNAE %>% mutate(privado = ifelse(V4012 %in% c(1,3,5,6,7), 1, 0))
 COD <- COD %>% mutate(privado = ifelse(V4012 %in% c(1,3,5,6,7), 1, 0))
 
-
-#numero de ocupação por tipo de atividade
-
-stat1.cnae <- CNAE %>% mutate(iten1 = ifelse(ocupado == 1,V1028,0)) %>% 
-    group_by(Ano, Trimestre, titulo) %>% summarise(n_ocu_cnae = sum(iten1)) %>% 
-    mutate(n_ocu_cnae = round(n_ocu_cnae))
-
-stat1.cod <- COD  %>% mutate(iten1 = ifelse(ocupado == 1,V1028,0)) %>% 
-    group_by(Ano, Trimestre, titulo) %>% summarise(n_ocu_cod = sum(iten1)) %>% 
-    mutate(n_ocu_cod = round(n_ocu_cod))
-
-#numero de ocupação formal por tipo de atividade
-
-stat2.cnae <- CNAE %>% mutate(iten1 = ifelse((ocupado == 1 & formal == 1), V1028, 0)) %>%
-    group_by(Ano, Trimestre,titulo) %>% summarise(n_ocu_cnae_formal = sum(iten1)) %>%
-    mutate(n_ocu_cnae_formal = round(n_ocu_cnae_formal))
-    
-stat2.cod <- COD %>% mutate(iten1 = ifelse((ocupado == 1 & formal == 1), V1028, 0)) %>%
-    group_by(Ano, Trimestre,titulo) %>% summarise(n_ocu_cod_formal = sum(iten1)) %>%
-    mutate(n_ocu_cod_formal = round(n_ocu_cod_formal))
+#rendimento Real
+CNAE <- CNAE %>% mutate(rendimento_real = (VD4019 * Habitual))
+COD <- COD %>% mutate(rendimento_real = (VD4019 * Habitual))
 
 
 
