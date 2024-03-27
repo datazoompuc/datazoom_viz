@@ -1,11 +1,3 @@
-############################################################
-##
-## Generate rds data in the folder ./data/
-##
-## This script must be run periodically to update databases.
-##
-############################################################
-
 # call packages
 library(tidyverse)
 library(haven)
@@ -51,7 +43,11 @@ describe_pnad <- function(df) {
                 c("pia", "ocupado", "desocupado", "formal",
                   "informal", "fora_forca_trab", "forca_trab",
                   "idade_de_trabalhar", "pea", "desempregado",
-                  "desalentado", "nem_nem"),
+                  "desalentado", "nem_nem", "empregado_sc",
+                  "empregado_cc", "conta_propria", "conta_propria_contrib",
+                  "conta_propria_nao_contrib", "empregador",
+                  "militar_estatutario", "home_office",
+                  "rendimento_habitual_real"),
                 ~ sum(. * peso, na.rm = TRUE)
             )
         )
@@ -60,12 +56,25 @@ describe_pnad <- function(df) {
         
     df <- df %>%
         mutate(
+            # pnad trabalho
             taxa_participacao = pea/pia,
             taxa_ocupacao = ocupado/pia,
             taxa_desemprego = desempregado/forca_trab,
             taxa_informalidade = informal/ocupado,
             taxa_desalento = desalentado/pia,
-            taxa_nem_nem = nem_nem/pia
+            taxa_nem_nem = nem_nem/pia,
+            # pnad insercao
+            prop_empregado_sc = empregado_sc/ocupado,
+            prop_empregado_cc = empregado_cc/ocupado,
+            prop_conta_propria = conta_propria/ocupado,
+            prop_conta_propria_contrib = conta_propria_contrib/ocupado,
+            prop_conta_propria_nao_contrib = conta_propria_nao_contrib/ocupado,
+            prop_empregador = empregador/ocupado,
+            prop_militar_estatutario = militar_estatutario/ocupado,
+            prop_home_office = home_office/ocupado,
+            # renda
+            rendimento_medio = rendimento_habitual_real/ocupado,
+            massa_salarial = rendimento_habitual_real
         )
     
     return(df)
@@ -296,195 +305,6 @@ describe_quarter <- function(df) {
 
 # Big loop to run one of those for each quarter
 
-
-
-
-
-#views CNAE e COD
-#picking the firt 2 digits of V4013 and V4010
-
-CNAE  <- pnadc_2023_4 %>% mutate(prefixo = substr(V4013, 1, 2)) 
-COD <- pnadc_2023_4 %>% mutate(prefixo = substr(V4010, 1, 2))
-
-#creating the 
-CNAE <- CNAE %>%
-    mutate(titulo = case_match(prefixo,
-                                '00' ~ "Outros",
-                                '01' ~ "Agricultura",
-                                '02' ~ "Extração florestal",
-                                '03' ~ "Pesca, caça e aquicultura",
-                                '05' ~ "Extração mineral e de carvão, petróleo e gás",
-                                '06' ~ "Extração mineral e de carvão, petróleo e gás",
-                                '07' ~ "Extração mineral e de carvão, petróleo e gás",
-                                '08' ~ "Extração mineral e de carvão, petróleo e gás",
-                                '09' ~ "Extração mineral e de carvão, petróleo e gás",
-                                '10' ~ "Alimentos, bebidas e fumo",
-                                '11' ~ "Alimentos, bebidas e fumo",
-                                '12' ~ "Pecuária e criação de animais",
-                                '13' ~ "Têxtil, vestuário, couro e calçados",
-                                '14' ~ "Pecuária e criação de animais",
-                                '15' ~ "Pesca, caça e aquicultura",
-                                '16' ~ "Madeira, celulose e papel",
-                                '17' ~ "Madeira, celulose e papel",
-                                '18' ~ "Madeira, celulose e papel",
-                                '19' ~ "Químicos, farmacêuticos, borracha e plástico",
-                                '20' ~ "Químicos, farmacêuticos, borracha e plástico",
-                                '21' ~ "Químicos, farmacêuticos, borracha e plástico",
-                                '22' ~ "Químicos, farmacêuticos, borracha e plástico",
-                                '23' ~ "Produtos de metal, minerais não-metálicos e metalurgia",
-                                '24' ~ "Produtos de metal, minerais não-metálicos e metalurgia",
-                                '25' ~ "Produtos de metal, minerais não-metálicos e metalurgia",
-                                '26' ~ "Serviços jurídicos",
-                                '27' ~ "Eletrônicos, máquinas e equipamentos",
-                                '28' ~ "Eletrônicos, máquinas e equipamentos",
-                                '29' ~ "Automóveis e equipamentos de transporte",
-                                '30' ~ "Automóveis e equipamentos de transporte",
-                                '31' ~ "Móveis",
-                                '32' ~ "Outros",
-                                '34' ~ "Serviços jurídicos",
-                                '33' ~ "Eletrônicos, máquinas e equipamentos",
-                                '35' ~ "Eletrônicos, máquinas e equipamentos",
-                                '36' ~ "Eletrônicos, máquinas e equipamentos",
-                                '37' ~ "Eletrônicos, máquinas e equipamentos",
-                                '38' ~ "Eletrônicos, máquinas e equipamentos",
-                                '39' ~ "Eletrônicos, máquinas e equipamentos",
-                                '41' ~ "Construção",
-                                '42' ~ "Construção",
-                                '43' ~ "Construção",
-                                '45' ~ "Comércio",
-                                '48' ~ "Comércio",
-                                '49' ~ "Transporte e correio",
-                                '50' ~ "Transporte e correio",
-                                '51' ~ "Transporte e correio",
-                                '52' ~ "Transporte e correio",
-                                '53' ~ "Transporte e correio",
-                                '55' ~ "Estadia e turismo",
-                                '56' ~ "Serviços de alimentação",
-                                '58' ~ "Serviços de informação e comunicação",
-                                '59' ~ "Serviços de informação e comunicação",
-                                '60' ~ "Serviços de informação e comunicação",
-                                '61' ~ "Serviços de informação e comunicação",
-                                '62' ~ "Serviços de informação e comunicação",
-                                '63' ~ "Serviços de informação e comunicação",
-                                '64' ~ "Serviços financeiros e de seguros",
-                                '65' ~ "Serviços financeiros e de seguros",
-                                '66' ~ "Serviços financeiros e de seguros",
-                                '68' ~ "Atividades profissionais, científicas e técnicas",
-                                '69' ~ "Atividades profissionais, científicas e técnicas",
-                                '70' ~ "Atividades profissionais, científicas e técnicas",
-                                '71' ~ "Atividades profissionais, científicas e técnicas",
-                                '72' ~ "Atividades profissionais, científicas e técnicas",
-                                '73' ~ "Atividades profissionais, científicas e técnicas",
-                                '74' ~ "Atividades profissionais, científicas e técnicas",
-                                '75' ~ "Atividades profissionais, científicas e técnicas",
-                                '78' ~ "Terceirização de mão-de-obra",
-                                '79' ~ "Estadia e turismo",
-                                '80' ~ "Segurança e edifícios",
-                                '81' ~ "Segurança e edifícios",
-                                '82' ~ "Segurança e edifícios",
-                                '84' ~ "Administração pública, defesa e seguridade social",
-                                '85' ~ "Educação",
-                                '86' ~ "Saúde e assistência social",
-                                '87' ~ "Saúde e assistência social",
-                                '88' ~ "Saúde e assistência social",
-                                '90' ~ "Artes, cultura, esportes e recreação",
-                                '91' ~ "Artes, cultura, esportes e recreação",
-                                '92' ~ "Artes, cultura, esportes e recreação",
-                                '93' ~ "Artes, cultura, esportes e recreação",
-                                '94' ~ "Organizações religiosas, sindicais e patronais",
-                                '95' ~ "Serviços de informação e comunicação",
-                                '96' ~ "Serviços pessoais (cabelereiros, lavanderias, etc.)",
-                                '97' ~ "Serviços domésticos",
-                                '99' ~ "Outros"))
-
-COD <- COD %>% 
-    mutate(titulo = case_match(prefixo,
-                                '01' ~ "Policiais, bombeiros e forças armadas",
-                                '02' ~ "Policiais, bombeiros e forças armadas",
-                                '04' ~ "Policiais, bombeiros e forças armadas",
-                                '05' ~ "Policiais, bombeiros e forças armadas",
-                                '11' ~ "Trabalhadores no governo",
-                                '12' ~ "Dirigentes e gerentes",
-                                '13' ~ "Dirigentes e gerentes",
-                                '14' ~ "Dirigentes e gerentes",
-                                '21' ~ "Cientistas e engenheiros",
-                                '22' ~ "Profissionais da saúde",
-                                '23' ~ "Profissionais do ensino",
-                                '24' ~ "Administradores e especialista em gestão",
-                                '25' ~ "Serviços de TI e comunicação",
-                                '26' ~ "Serviços jurídicos",
-                                '31' ~ "Cientistas e engenheiros",
-                                '32' ~ "Profissionais da saúde",
-                                '33' ~ "Serviços financeiros e administrativos",
-                                '34' ~ "Serviços jurídicos",
-                                '35' ~ "Serviços de TI e comunicação",
-                                '41' ~ "Escriturários",
-                                '42' ~ "Atendimento direto ao público",
-                                '43' ~ "Apoio administrativo",
-                                '44' ~ "Apoio administrativo",
-                                '51' ~ "Serviços e cuidados pessoais",
-                                '52' ~ "Vendedores",
-                                '53' ~ "Serviços e cuidados pessoais",
-                                '54' ~ "Profissionais de segurança",
-                                '61' ~ "Pecuaristas e criadores de animais",
-                                '62' ~ "Pecuaristas e criadores de animais",
-                                '71' ~ "Operários da construção, metalurgia e indústria",
-                                '72' ~ "Operários da construção, metalurgia e indústria",
-                                '73' ~ "Artesões e artes gráficas",
-                                '74' ~ "Técnicos de eletricidade e eletrônica",
-                                '75' ~ "Operários de processamento e instalações",
-                                '81' ~ "Operários de processamento e instalações",
-                                '82' ~ "Montadores e condutores de veículos",
-                                '83' ~ "Montadores e condutores de veículos",
-                                '91' ~ "Domésticos",
-                                '92' ~ "Pecuaristas e criadores de animais",
-                                '93' ~ "Operários da construção, metalurgia e indústria",
-                                '94' ~ "Profissionais em alimentação",
-                                '95' ~ "Ambulantes",
-                                '96' ~ "Coletores de lixo"))  %>% 
-    mutate(titulo = ifelse(V4010 == 9215, "Extrativistas florestais",titulo))
-
-
-#Statistics
-
-#Variables
-
-#ocupados
-CNAE <- CNAE %>% mutate(ocupado = ifelse(VD4002 == 1, 1, 0))
-COD <- COD %>% mutate(ocupado = ifelse(VD4002 == 1, 1, 0))
-
-#desocupados
-CNAE <- CNAE %>% mutate(desocupado = ifelse(VD4002 == 2, 1, 0))
-COD <- COD  %>% mutate(desocupado = ifelse(VD4002 == 2, 1, 0))
-
-#trabalhador formal
-CNAE <- CNAE %>% mutate(formal = ifelse((VD4002 == 1 & VD4009 %in% c("01","03","05","07")), 1,
-                                        ifelse((VD4002 == 01 & VD4009 %in% c("08","09") & VD4012 == 1), 1, 0)))
-
-COD <- COD  %>% mutate(formal = ifelse((VD4002 == 1 & VD4009 %in% c("01","03","05","07")), 1,
-                                       ifelse((VD4002 == 1 & VD4009 %in% c("08","09") & VD4012 == 1), 1, 0)))
-
-#trabalhador informal
-CNAE <- CNAE %>% mutate(informal = ifelse((VD4002 == 1 & VD4009 %in% c("02","04","06","10")), 1,
-                                           ifelse((VD4002 == 1 & VD4009 %in% c("08","09") & VD4012 == 2),1,0)))
-    
-COD <- COD %>% mutate(informal = ifelse((VD4002 == 1 & VD4009 %in% c("02","04","06","10")), 1,
-                                        ifelse((VD4002 == 1 & VD4009 %in% c("08","09") & VD4012 == 2),1,0)))
-
-#ocupado no setor publico
-CNAE <- CNAE %>% mutate(publico = ifelse(V4012 %in% c(2,4), 1, 0))
-COD <- COD %>% mutate(publico = ifelse(V4012 %in% c(2,4), 1, 0))
-
-#privado no setor privado
-CNAE <- CNAE %>% mutate(privado = ifelse(V4012 %in% c(1,3,5,6,7), 1, 0))
-COD <- COD %>% mutate(privado = ifelse(V4012 %in% c(1,3,5,6,7), 1, 0))
-
-#rendimento Real
-CNAE <- CNAE %>% mutate(rendimento_real = (VD4019 * Habitual))
-COD <- COD %>% mutate(rendimento_real = (VD4019 * Habitual))
-
-
-
 dat <- purrr::map_dfr(
     files,
     function(file_name) {
@@ -504,9 +324,9 @@ dat <- dat %>%
 
 readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds")
 
-################
-## Dictionary ##
-################
+############################
+## Dictionary -- Trabalho ##
+############################
 
 temp_param_table <- tibble::tibble(
     var = c("group", "composicao_demografica", "time",
@@ -553,7 +373,7 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-readr::write_csv(temp_param_table, "data/ibge_pnadc_trabalho_dic.csv")
+write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
 
 ## English dictionary
 
@@ -602,4 +422,295 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-readr::write_csv(temp_param_table, "data/ibge_pnadc_trabalho_dic_en.csv")
+write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
+
+############################
+## Dictionary -- Insercao ##
+############################
+
+temp_param_table <- tibble::tibble(
+    var = c("group", "composicao_demografica", "time",
+            "empregado_sc",
+            "empregado_cc", "conta_propria", "conta_propria_contrib",
+            "conta_propria_nao_contrib", "empregador",
+            "militar_estatutario", "home_office"),
+    x = TRUE,
+    y = FALSE,
+    color = TRUE,
+    label = NA,
+    desc = NA,
+    var_group = "IBGE - PNAD Cont\u00ednua",
+    categoria = "Economia",
+    subcategoria = "Mercado de Trabalho"
+)
+
+################
+## CNAE e COD ##
+################
+
+# All of Brazil
+
+describe_brazil <- function(df) {
+    df1 <- df %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = "Todos",
+            id = "All"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(cnae_2dig) %>%
+        group_by(cnae_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = cnae_2dig,
+            id = "CNAE"
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(cod_2dig) %>%
+        group_by(cod_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = cod_2dig,
+            id = "COD"
+        )
+    
+    bind_rows(
+        df1, df2, df3
+    )
+}
+
+# By region
+
+describe_region <- function(df) {
+    df1 <- df %>%
+        tidyr::drop_na(regiao) %>%
+        group_by(regiao) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = "Todos",
+            id = "All"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(regiao, cnae_2dig) %>%
+        group_by(regiao, cnae_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = cnae_2dig,
+            id = "CNAE"
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(regiao, cod_2dig) %>%
+        group_by(regiao, cod_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = cod_2dig,
+            id = "COD"
+        )
+    
+    bind_rows(
+        df1, df2, df3
+    )
+}
+
+# By legal amazon
+
+describe_amazon <- function(df) {
+    df <- df %>%
+        mutate(legal_amazon = ifelse(UF %in% c(11, 12, 13, 14, 15, 16, 17, 21, 51),
+                                     "Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal"))
+    
+    df1 <- df %>%
+        tidyr::drop_na(legal_amazon) %>%
+        group_by(legal_amazon) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = "Todos",
+            id = "All"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(legal_amazon, cnae_2dig) %>%
+        group_by(legal_amazon, cnae_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = cnae_2dig,
+            id = "CNAE"
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(legal_amazon, cod_2dig) %>%
+        group_by(legal_amazon, cod_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = cod_2dig,
+            id = "COD"
+        )
+    
+    bind_rows(
+        df1, df2, df3
+    )
+}
+
+# By state
+
+describe_states <- function(df) {
+    df <- df %>%
+        dplyr::mutate(
+            sigla_uf = dplyr::case_match(
+                UF,
+                11 ~ "RO",
+                12 ~ "AC",
+                13 ~ "AM",
+                14 ~ "RO",
+                15 ~ "PA",
+                16 ~ "AP",
+                17 ~ "TO",
+                21 ~ "MA",
+                22 ~ "PI",
+                23 ~ "CE",
+                24 ~ "RN",
+                25 ~ "PB",
+                26 ~ "PE",
+                27 ~ "AL",
+                28 ~ "SE",
+                29 ~ "BA",
+                31 ~ "MG",
+                32 ~ "ES",
+                33 ~ "RJ",
+                35 ~ "SP",
+                41 ~ "PR",
+                42 ~ "SC",
+                43 ~ "RS",
+                50 ~ "MS",
+                51 ~ "MT",
+                52 ~ "GO",
+                53 ~ "DF"
+            )
+        )
+    
+    df1 <- df %>%
+        tidyr::drop_na(sigla_uf) %>%
+        group_by(sigla_uf) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = "Todos",
+            id = "All"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(sigla_uf, cnae_2dig) %>%
+        group_by(sigla_uf, cnae_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = cnae_2dig,
+            id = "CNAE"
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(sigla_uf, cod_2dig) %>%
+        group_by(sigla_uf, cod_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = cod_2dig,
+            id = "COD"
+        )
+    
+    bind_rows(
+        df1, df2, df3
+    )
+}
+
+# Big loop to run one of those for each quarter
+
+dat <- purrr::map_dfr(
+    files,
+    function(file_name) {
+        message(file_name)
+        df <- readr::read_rds(file_name)
+        
+        # todos
+        df1 <- df %>%
+            describe_quarter() %>%
+            mutate(setor = "todos")
+        
+        # formal
+        df2 <- df %>%
+            filter(formal == 1) %>%
+            describe_quarter() %>%
+            mutate(setor = "formal")
+        
+        # informal
+        df3 <- df %>%
+            filter(informal == 1) %>%
+            describe_quarter() %>%
+            mutate(setor = "informal")
+        
+        # publico
+        df4 <- df %>%
+            filter(publico == 1) %>%
+            describe_quarter() %>%
+            mutate(setor = "publico")
+        
+        # privado
+        df5 <- df %>%
+            filter(privado == 1) %>%
+            describe_quarter() %>%
+            mutate(setor = "privado")
+        
+        bind_rows(
+            df1, df2,df3, df4, df5
+        )
+            
+    }
+)
+
+# setting up time variable
+
+dat <- dat %>%
+    mutate(Mes = 3*Trimestre - 2) %>%
+    mutate(time = lubridate::make_date(Ano, Mes))
+
+# saving data files
+
+dat_cnae <- dat %>%
+    filter(id %in% c("All", "CNAE"))
+
+readr::write_rds(dat, "data/ibge_pnadc_cnae.rds")
+
+dat_cnae <- dat %>%
+    filter(id %in% c("All", "COD"))
+
+readr::write_rds(dat, "data/ibge_pnadc_cod.rds")
+
+##############################
+## Dictionary -- CNAE e COD ##
+##############################
+
+temp_param_table <- tibble::tibble(
+    var = c("group", "setor", "composicao_demografica", "time",
+            "ocupado", "rendimento_medio", "massa_salarial"),
+    x = TRUE,
+    y = FALSE,
+    color = TRUE,
+    label = NA,
+    desc = NA,
+    var_group = "IBGE - PNAD Cont\u00ednua",
+    categoria = "Economia",
+    subcategoria = "Mercado de Trabalho"
+)
