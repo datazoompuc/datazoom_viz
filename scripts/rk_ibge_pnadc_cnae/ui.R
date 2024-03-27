@@ -39,12 +39,15 @@ get_ui <- function(files, param) {
         div(
           class = "var_selec_group",
           # Seleciona variável de cor
-          selectInput(
-            inputId = "color",
-            label = param$cor,
-            choices = param$color_choices,
-            selected = param$color_def,
-            width = "100%"
+          radioButtons(
+              inputId = "sector",
+              label = "",
+              selected = "todos",
+              inline = FALSE,
+              width = '100%',
+              choiceNames = param$label_toggle,
+              choiceValues = c("todos", "formal", "informal",
+                               "publico", "privado")
           )
         ),
         # espaço vazio
