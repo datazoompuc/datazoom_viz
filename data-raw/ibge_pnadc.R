@@ -320,6 +320,9 @@ dat <- dat %>%
     mutate(Mes = 3*Trimestre - 2) %>%
     mutate(time = lubridate::make_date(Ano, Mes))
 
+dat <- dat %>%
+    mutate(prop_informal = taxa_informalidade)
+
 # saving data file
 
 readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds")
@@ -395,7 +398,7 @@ temp_param_table <- tibble::tibble(
 temp_param_table <- temp_param_table %>%
     mutate(
         y = ifelse(
-            stringr::str_detect(var, "taxa")
+            stringr::str_detect(var, "taxa"), TRUE, FALSE
         ),
         label = dplyr::case_match(
             var,
@@ -430,10 +433,10 @@ write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic_en.csv", fileEn
 
 temp_param_table <- tibble::tibble(
     var = c("group", "composicao_demografica", "time",
-            "empregado_sc",
-            "empregado_cc", "conta_propria", "conta_propria_contrib",
-            "conta_propria_nao_contrib", "empregador",
-            "militar_estatutario", "home_office"),
+            "prop_empregado_sc", "prop_informal",
+            "prop_empregado_cc", "prop_conta_propria", "prop_conta_propria_contrib",
+            "prop_conta_propria_nao_contrib", "prop_empregador",
+            "prop_militar_estatutario", "prop_home_office"),
     x = TRUE,
     y = FALSE,
     color = TRUE,
@@ -443,6 +446,35 @@ temp_param_table <- tibble::tibble(
     categoria = "Economia",
     subcategoria = "Mercado de Trabalho"
 )
+
+temp_param_table <- temp_param_table %>%
+    mutate(
+        y = ifelse(
+            stringr::str_detect(var, "prop"), TRUE, FALSE
+        ),
+        label = dplyr::case_match(
+            var,
+            "group" ~ "Região",
+            "composicao_demografica" ~ "Composição Demográfica",
+            "time" ~ "Ano - Trimestre",
+            "prop_empregado_sc" ~ "Proporção de Empregados Sem Carteira",
+            "prop_empregado_cc" ~ "Proporção de Empregados Com Carteira",
+            "prop_conta_propria" ~ "Proporção de Conta-Própria",
+            "prop_conta_propria_contrib" ~ "Proporção de Conta-Própria Contribuintes",
+            "prop_conta_propria_nao_contrib" ~ "Proporção de Conta-Própria Não-Contribuintes",
+            "prop_empregador" ~ "Proporção de Empregadores",
+            "prop_militar_estatutario" ~ "Proporção de Militares e Estatutários",
+            "prop_home_office" ~ "Proporção de Home Office",
+            "prop_informal" ~ "Proporção de Informais"
+        ),
+        desc = label,
+        desc = ifelse(
+            stringr::str_detect(var, "prop"), paste(label, "entre Total de Ocupados"), desc
+        )
+    )
+
+write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_insercao_dic.csv", fileEncoding = "UTF-8")
+
 
 ################
 ## CNAE e COD ##
@@ -689,18 +721,22 @@ dat <- dat %>%
 # saving data files
 
 dat_cnae <- dat %>%
-    filter(id %in% c("All", "CNAE"))
+    filter(id %in% c("All", "CNAE")) %>%
+    select(-id)
 
 readr::write_rds(dat, "data/ibge_pnadc_cnae.rds")
 
 dat_cnae <- dat %>%
-    filter(id %in% c("All", "COD"))
+    filter(id %in% c("All", "COD")) %>%
+    select(-id)
 
 readr::write_rds(dat, "data/ibge_pnadc_cod.rds")
 
 ##############################
 ## Dictionary -- CNAE e COD ##
 ##############################
+
+## CNAE
 
 temp_param_table <- tibble::tibble(
     var = c("group", "setor", "composicao_demografica", "time",
@@ -714,3 +750,39 @@ temp_param_table <- tibble::tibble(
     categoria = "Economia",
     subcategoria = "Mercado de Trabalho"
 )
+
+temp_param_table <- temp_param_table %>%
+    mutate(
+        y = ifelse(
+            var %in% c("ocupado", "rendimento_medio", "massa_salarial"), TRUE, FALSE
+        ),
+        label = dplyr::case_match(
+            var,
+            "group" ~ "Região",
+            "setor" ~ "Setor",
+            "composicao_demografica" ~ "Atividade Econômica",
+            "time" ~ "Ano - Trimestre",
+            "ocupado" ~ "Número de ocupados",
+            "rendimento_medio" ~ "Rendimento Médio",
+            "massa_salarial" ~ "Massa Salarial"
+        ),
+        desc = label,
+        desc = case_match(
+            var,
+            "composicao_demografica" ~ "Atividade Econômica - Código CNAE",
+            "rendimento_medio" ~ "Rendimento Habitual Médio Real",
+            .default = desc
+        )
+    )
+
+write.csv(temp_param_table, file = "data/ibge_pnadc_cnae.csv", fileEncoding = "UTF-8")
+
+## COD
+
+temp_param_table <- temp_param_table %>%
+    mutate(
+        label = ifelse(var == "composicao_demografica", "Tipo de Ocupação"),
+        desc = ifelse(var == "composicao_demografica", "Ocupação - Código COD")
+    )
+
+write.csv(temp_param_table, file = "data/ibge_pnadc_cod.csv", fileEncoding = "UTF-8")
