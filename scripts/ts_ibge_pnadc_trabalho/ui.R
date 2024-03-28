@@ -1,5 +1,4 @@
-@ -1,91 +1,92 @@
-    #  -------------------------------- Define UI --------------------------------
+#  -------------------------------- Define UI --------------------------------
 
 # Funcão para retornar objeto server
 get_ui <- function(files, param) {
@@ -45,7 +44,6 @@ get_ui <- function(files, param) {
                    selectizeInput(
                        "filter1",
                        param$label_geo_name,
-                       choices = NULL,
                        choices = param$filter_choices,
                        multiple = TRUE,
                        options = list(maxItems = 20),
@@ -58,10 +56,6 @@ get_ui <- function(files, param) {
                    
                    # Seleciona composicao demografica
                    selectInput(
-                       "filter_composicao_demografica",
-                       param$label_comp_name,
-                       choices = NULL,
-                       selected = "Todas as pessoas",
                        inputId = "filter_composicao_demografica",
                        label = param$label_comp_name,
                        choices = param$filter_composicao_demografica_choices,

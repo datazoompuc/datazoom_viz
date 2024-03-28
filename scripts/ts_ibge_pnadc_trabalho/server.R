@@ -1,4 +1,4 @@
-    # -------------------------------- Define lógica do server --------------------------------
+# -------------------------------- Define lógica do server --------------------------------
 
 # Paleta de cores
 pallete_discrete <- c("#fcff84", "#ffcf48", "#c3ff83", "#007e47", "#00596d", "#4fdf94", "#99b0c8", "#261c4e", "#000098", "#c368b1", "#60458c", "#757575")
@@ -14,34 +14,6 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
     
-    if(param$lang){
-        df <- df %>%
-            mutate(composicao_demografica  = case_when(
-                composicao_demografica  == "Faixa étaria entre 18 e 24 anos" ~ "Age group between 18-24 years old",
-                composicao_demografica  == "Faixa étaria entre 25 e 29 anos"  ~ "Age group between 25-29 year old",
-                composicao_demografica  == "Faixa étaria entre 30 e 39 anos" ~ "Age group between 30-39 years old",
-                composicao_demografica  ==  "Faixa étaria entre 40 e 49 anos" ~ "Age group between 40-49 years old",
-                composicao_demografica  == "Faixa étaria entre 50 e 59 anos" ~ "Age group between 50-59 years old",
-                composicao_demografica  == "Faixa étaria maior que 60 anos" ~ "Age group older than 60 years old",
-                composicao_demografica  == "Nível escolar 0 anos de estudo (sem instrução)" ~ "Education level 0 years (uneducated)",
-                composicao_demografica  == "Nível escolar 1 a 7 anos de estudo" ~ "Education level from 1-7 years",
-                composicao_demografica  == "Nível escolar 8 a 11 anos de estudo" ~ "Education level from 8-11 years",
-                composicao_demografica  == "Nível escolar 9 a 14 anos de estudo" ~ "Education level from 9-14 years",
-                composicao_demografica  == "Nível escolar mais de 15 anos de estudo" ~ "Education level higher than 15 years",
-                composicao_demografica  == "Sexo feminino" ~ "Female",
-                composicao_demografica  == "Sexo masculino" ~ "Male",
-                composicao_demografica  == "Todas as pessoas (PIA)" ~ "All (from Working-Age Population)"),
-                group = case_when(
-                    group == "Amazônia Legal"     ~ "Legal Amazon",
-                    group == "Restante do Brasil" ~ "Rest of Brazil",
-                    TRUE                          ~ group)
-                
-            )
-        
-    }
-    
-    
-    
     server <- function(input, output, session) {
         
         # filtra dados de composicao demografica
@@ -52,35 +24,6 @@ get_server <- function(files, param) {
             
             return(w)
         })
-        
-        # Cria opções para seleção de grupos
-        param$filter_choices <- sort(unique(df$group))
-        param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-        
-        param$filter_composicao_demografica_choices <- sort(unique(df$composicao_demografica))
-        
-        # Funcão para preencher inputs com coluna/variável aleatória
-        random_inputs <- function() {
-            updateSelectizeInput(session,
-                                 "filter1",
-                                 choices = param$filter_choices,
-                                 selected = sample(param$filter_choices, 1) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
-            )
-            
-            selected_composicao_demografica <- sample(param$filter_composicao_demografica_choices, 1)
-            updateSelectInput(session,
-                              "filter_composicao_demografica",
-                              choices = param$filter_composicao_demografica_choices,
-                              selected = selected_composicao_demografica
-            )
-            
-            selected <- sample(sample(param$y_choices, 1)[[1]], 1)
-            updateSelectInput(session,
-                              "y",
-                              choices = param$y_choices,
-                              selected = selected
-            )
-        }
         
         # Função para atualizar url do app com parâmetros dos inputs
         update_my_queryString <- function() {
@@ -106,13 +49,11 @@ get_server <- function(files, param) {
             updateSelectizeInput(session,
                                  "filter1",
                                  choices = param$filter_choices,
-                                 selected = NULL
-                                 selected = list("Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal")
+                                 selected = param$filter_geo_def
             )
             updateSelectInput(session,
                               "filter_composicao_demografica",
                               choices = param$filter_composicao_demografica_choices,
-                              selected = NULL
                               selected = "Todos"
             )
             
@@ -142,11 +83,6 @@ get_server <- function(files, param) {
                 )
             }
             
-            # Se query está vazia, preenche aleatório
-            if (is.null(query[["filter"]]) && is.null(query[["y"]])
-                && is.null(query[["filter_composicao"]])) {
-                random_inputs() # preenche inputs se estiverem vazios
-            }
         }
         
         # Output título do gráfico
@@ -159,7 +95,6 @@ get_server <- function(files, param) {
                 # Monta título a partir de variáveis selecionadas nos inputs
                 y_col <- param$table[which(param$table$var == input$y), ]
                 
-                text <- paste0(y_col$label)
                 text <- paste0(y_col$desc)
             }
             
@@ -231,11 +166,9 @@ get_server <- function(files, param) {
                         "<b>", df_p$text, "</b><br>",
                         x_col$label, ": ", paste0(year(df_p$x), '-', 'T', quarter(df_p$x)),"<br>",
                         param$tooltip , paste0(input$filter_composicao_demografica),"<br>",
-                        y_col$label, ": ", format(df_p$y, scientific = FALSE,
-                                                  y_col$label, ": ", format(100*df_p$y, scientific = FALSE,
-                                                                            digits = 2,
-                                                                            decimal.mark = ",", 
-                                                                            big.mark = "."), "<br>"
+                        y_col$label, ": ", format(100*df_p$y, scientific = FALSE,
+                                                  digits = 2,
+                                                  decimal.mark = ",", 
                                                   big.mark = "."), "%", "<br>"
                     )
                     

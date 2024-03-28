@@ -420,7 +420,7 @@ temp_param_table <- temp_param_table %>%
             "taxa_desemprego" ~ "Unemployment Rate over the Workforce",
             "taxa_informalidade" ~ "Informality Rate over the Occupied",
             "taxa_desalento" ~ "Discouraged Rate over the working age population",
-            "taxa_nem_nem" ~ "NEET Rate over the working age population"
+            "taxa_nem_nem" ~ "NEET Rate over the working age population",
             .default = desc
         )
     )
@@ -775,14 +775,14 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_cnae.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
 
 ## COD
 
 temp_param_table <- temp_param_table %>%
     mutate(
-        label = ifelse(var == "composicao_demografica", "Tipo de Ocupação"),
-        desc = ifelse(var == "composicao_demografica", "Ocupação - Código COD")
+        label = ifelse(var == "composicao_demografica", "Tipo de Ocupação", label),
+        desc = ifelse(var == "composicao_demografica", "Ocupação - Código COD", desc)
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_cod.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
