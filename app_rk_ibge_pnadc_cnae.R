@@ -24,7 +24,7 @@ source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "n_ocu_cnae" # variável padrão do eixo x
+param$x_def <- "ocupado" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
@@ -50,6 +50,14 @@ param$plot_desc <- "Atividades Econômicas - Dados agregados dos municípios da 
 
 # Outros parâmetros e configurações
 param$x_choices$`IBGE - PNAD Contínua`$`Atividade econômica` <- NULL
+
+param$label_toggle <- list(
+    tags$span(style = "color:white", "Todos"),
+    tags$span(style = "color:white", "Setor Formal"),
+    tags$span(style = "color:white", "Setor Informal"),
+    tags$span(style = "color:white", "Setor P\u00fablico"),
+    tags$span(style = "color:white", "Setor Privado")
+)
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

@@ -14,50 +14,15 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file)
   
-  if(param$lang){
-    
-    df <- df %>% 
-      mutate(group = case_when(
-        group == "Administração pública, defesa e seguridade social"                     ~ "Public Administration, Defense, and Social Security",
-        group == "Agricultura"                                                            ~ "Agriculture",
-        group == "Alimentos, bebidas e fumo"                                              ~ "Food, Beverages, and Tobacco",
-        group == "Artes, cultura, esportes e recreação"                                   ~ "Arts, Culture, Sports, and Recreation",
-        group == "Atividades profissionais, científicas e técnicas"                       ~ "Professional, Scientific, and Technical Activities",
-        group == "Automóveis e equipamentos de transporte"                                ~ "Automobiles and Transport Equipment",
-        group == "Comércio"                                                                ~ "Commerce",
-        group == "Construção"                                                              ~ "Construction",
-        group == "Educação"                                                                ~ "Education",
-        group == "Eletricidade, gás, água e esgoto"                                       ~ "Electricity, Gas, Water, and Sewerage",
-        group == "Eletrônicos, máquinas e equipamentos"                                   ~ "Electronics, Machinery, and Equipment",
-        group == "Estadia e turismo"                                                       ~ "Accommodation and Tourism",
-        group == "Extração florestal"                                                      ~ "Forestry",
-        group == "Extração mineral e de carvão, petróleo e gás"                            ~ "Mineral and Coal Extraction, Oil and Gas",
-        group == "Madeira, celulose e papel"                                               ~ "Wood, Pulp, and Paper",
-        group == "Móveis"                                                                  ~ "Furniture",
-        group == "Organizações religiosas, sindicais e patronais"                          ~ "Religious, Trade Union, and Employer Organizations",
-        group == "Outros"                                                                  ~ "Other",
-        group == "Pecuária e criação de animais"                                           ~ "Livestock and Animal Farming",
-        group == "Pesca, caça e aquicultura"                                               ~ "Fishing, Hunting, and Aquaculture",
-        group == "Produtos de metal, minerais não-metálicos e metalurgia"                  ~ "Metal Products, Non-Metallic Minerals, and Metallurgy",
-        group == "Químicos, farmacêuticos, borracha e plástico"                            ~ "Chemicals, Pharmaceuticals, Rubber, and Plastics",
-        group == "Saúde e assistência social"                                              ~ "Health and Social Assistance",
-        group == "Segurança e edifícios"                                                    ~ "Security and Buildings",
-        group == "Serviços de alimentação"                                                 ~ "Food Services",
-        group == "Serviços de escritório"                                                  ~ "Office Services",
-        group == "Serviços de informação e comunicação"                                    ~ "Information and Communication Services",
-        group == "Serviços domésticos"                                                      ~ "Domestic Services",
-        group == "Serviços financeiros e de seguros"                                       ~ "Financial and Insurance Services",
-        group == "Serviços pessoais (cabelereiros, lavanderias, etc.)"                     ~ "Personal Services (Hairdressers, Laundries, etc.)",
-        group == "Terceirização de mão-de-obra"                                            ~ "Labor Outsourcing",
-        group == "Transporte e correio"                                                     ~ "Transportation and Postal Services",
-        group == "Têxtil, vestuário, couro e calçados"                                      ~ "Textile, Clothing, Leather, and Footwear"
-      ))
-    
-  }
-  
-  
   server <- function(input, output, session) {
     
+      df_reactived <- reactive({
+          w <- df %>%
+              filter(setor == input$sector)
+          
+          return(w)
+      })  
+      
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -173,13 +138,13 @@ get_server <- function(files, param) {
           y_col$label <- "Ranking"
 
           df_p <- data.frame(
-            df[x_col$var],
+            df_reactived()[x_col$var],
             NA,
-            df[color_col$var],
-            df[slider_col$var],
-            df["group"],
-            df["group"],
-            df[id_col$var]
+            df_reactived()[color_col$var],
+            df_reactived()[slider_col$var],
+            df_reactived()["group"],
+            df_reactived()["group"],
+            df_reactived()[id_col$var]
           )
 
           colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
@@ -224,7 +189,7 @@ get_server <- function(files, param) {
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
+            y_col$label, ": ", df_p$y, "%", "<br>",
             color_col$label, ": ", df_p$color
           )
 
@@ -376,6 +341,7 @@ get_server <- function(files, param) {
             title = y_col$label,
             titlefont = f1,
             tickfont = f2,
+            tickformat = ".2%",
             automargin = FALSE,
             autorange = FALSE,
             showgrid = FALSE,

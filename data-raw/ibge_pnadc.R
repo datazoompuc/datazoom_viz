@@ -1,16 +1,11 @@
-############################################################
-##
-## Generate rds data in the folder ./data/
-##
-## This script must be run periodically to update databases.
-##
-############################################################
-
 # call packages
 library(tidyverse)
 library(haven)
 library(tibble)
 library(zoo)
+library(tidyr)
+library(PNADcIBGE)
+
 
 #################################################
 ## Mercado de Trabalho na Amazônia Legal
@@ -19,1086 +14,775 @@ library(zoo)
 #################################################
 
 # set path to raw data
-github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
+#github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
-# call raw data
-base1 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
-base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas (PIA)")
+# PNAD files must be downloaded to the computer
+source <- "F:/Dados/PNADC"
 
-base2 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
-base2 <- base2 %>% mutate(id = "Restante do Brasil", composicao_demografica = "Todas as pessoas (PIA)")
+# only run this if not already downloaded: takes a long time
+load_pnadc(save_to = source, 2012:2023, raw_data = FALSE, panel = "none")
 
-base3 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_rondonia.dta"))
-base3 <- base3 %>% mutate(id = "Rondônia", composicao_demografica = "Todas as pessoas (PIA)")
+# and then all files must be read
 
-base4 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_acre.dta"))
-base4 <- base4 %>% mutate(id = "Acre", composicao_demografica = "Todas as pessoas (PIA)")
+files <- list.files(source, pattern = "*.rds", full.names = TRUE)
 
-base5 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonas.dta"))
-base5 <- base5 %>% mutate(id = "Amazonas", composicao_demografica = "Todas as pessoas (PIA)")
+# function that calculates summary statistics by grouping variable
 
-base6 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_roraima.dta"))
-base6 <- base6 %>% mutate(id = "Roraima", composicao_demografica = "Todas as pessoas (PIA)")
+describe_pnad <- function(df) {
+    
+    # calculando numeros absolutos
+    
+    df <- df %>%
+        rename("peso" = V1028) %>%
+        mutate( # so that the ratios make sense
+            nem_nem = nem_nem * pia,
+            desalentado = desalentado * pia) %>%
+        group_by(Ano, Trimestre, .add = TRUE) %>%
+        summarise(
+            across(
+                c("pia", "ocupado", "desocupado", "formal",
+                  "informal", "fora_forca_trab", "forca_trab",
+                  "idade_de_trabalhar", "pea", "desempregado",
+                  "desalentado", "nem_nem", "empregado_sc",
+                  "empregado_cc", "conta_propria", "conta_propria_contrib",
+                  "conta_propria_nao_contrib", "empregador",
+                  "militar_estatutario", "home_office",
+                  "rendimento_habitual_real"),
+                ~ sum(. * peso, na.rm = TRUE)
+            )
+        )
+        
+     # calculando taxas
+        
+    df <- df %>%
+        mutate(
+            # pnad trabalho
+            taxa_participacao = pea/pia,
+            taxa_ocupacao = ocupado/pia,
+            taxa_desemprego = desempregado/forca_trab,
+            taxa_informalidade = informal/ocupado,
+            taxa_desalento = desalentado/pia,
+            taxa_nem_nem = nem_nem/pia,
+            # pnad insercao
+            prop_empregado_sc = empregado_sc/ocupado,
+            prop_empregado_cc = empregado_cc/ocupado,
+            prop_conta_propria = conta_propria/ocupado,
+            prop_conta_propria_contrib = conta_propria_contrib/ocupado,
+            prop_conta_propria_nao_contrib = conta_propria_nao_contrib/ocupado,
+            prop_empregador = empregador/ocupado,
+            prop_militar_estatutario = militar_estatutario/ocupado,
+            prop_home_office = home_office/ocupado,
+            # renda
+            rendimento_medio = rendimento_habitual_real/ocupado,
+            massa_salarial = rendimento_habitual_real
+        )
+    
+    return(df)
+}
 
-base7 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_para.dta"))
-base7 <- base7 %>% mutate(id = "Pará", composicao_demografica = "Todas as pessoas (PIA)")
+# All of Brazil
 
-base8 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amapa.dta"))
-base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pessoas (PIA)")
+describe_brazil <- function(df) {
+    df1 <- df %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = "Todos"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(sexo) %>%
+        group_by(sexo) %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = sexo
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(faixa_idade) %>%
+        group_by(faixa_idade) %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = faixa_idade
+        )
+    
+    df4 <- df %>%
+        tidyr::drop_na(faixa_educ) %>%
+        group_by(faixa_educ) %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = faixa_educ
+        )
+    
+    bind_rows(
+        df1, df2, df3, df4
+    )
+}
 
-base9 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_tocantins.dta"))
-base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas (PIA)")
+# By region
 
-base10 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_matogrosso.dta"))
-base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas (PIA)")
+describe_region <- function(df) {
+    df1 <- df %>%
+        tidyr::drop_na(regiao) %>%
+        group_by(regiao) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = "Todos"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(regiao, sexo) %>%
+        group_by(regiao, sexo) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = sexo
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(regiao, faixa_idade) %>%
+        group_by(regiao, faixa_idade) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = faixa_idade
+        )
+    
+    df4 <- df %>%
+        tidyr::drop_na(regiao, faixa_educ) %>%
+        group_by(regiao, faixa_educ) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = faixa_educ
+        )
+    
+    bind_rows(
+        df1, df2, df3, df4
+    )
+}
 
-# append all data
-temp <- rbind(base1, base2)
-temp <- rbind(temp, base2)
-temp <- rbind(temp, base3)
-temp <- rbind(temp, base4)
-temp <- rbind(temp, base5)
-temp <- rbind(temp, base6)
-temp <- rbind(temp, base7)
-temp <- rbind(temp, base8)
-temp <- rbind(temp, base9)
-temp <- rbind(temp, base10)
+# By legal amazon
 
-# convert time data to quarterly
-temp <- temp %>%
-  mutate(time = paste0(temp$Ano, "-", temp$Trimestre))
+describe_amazon <- function(df) {
+    df <- df %>%
+        mutate(legal_amazon = ifelse(UF %in% c(11, 12, 13, 14, 15, 16, 17, 21, 51),
+                                     "Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal"))
+    
+    df1 <- df %>%
+        tidyr::drop_na(legal_amazon) %>%
+        group_by(legal_amazon) %>%
+    describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = "Todos"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(legal_amazon, sexo) %>%
+        group_by(legal_amazon, sexo) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = sexo
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(legal_amazon, faixa_idade) %>%
+        group_by(legal_amazon, faixa_idade) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = faixa_idade
+        )
+    
+    df4 <- df %>%
+        tidyr::drop_na(legal_amazon, faixa_educ) %>%
+        group_by(legal_amazon, faixa_educ) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = faixa_educ
+        )
+    
+    bind_rows(
+        df1, df2, df3, df4
+    )
+}
 
-temp$time <- as.Date(as.yearqtr(temp$time))
-temp$Trimestre <- NULL
-temp$Ano <- NULL
+# By state
 
-# generate variables for each demographic composition
-temp1 <- temp %>% mutate(
-  taxa_de_desemprego_faixa_genero1 = ((n_de_pea_faixa_genero1 - n_de_ocupado_faixa_genero1) / n_de_pea_faixa_genero1) * 100,
-  taxa_de_desemprego_faixa_genero2 = ((n_de_pea_faixa_genero2 - n_de_ocupado_faixa_genero2) / n_de_pea_faixa_genero2) * 100,
-  taxa_de_desemprego_faixa_educ1 = ((n_de_pea_faixa_educ1 - n_de_ocupado_faixa_educ1) / n_de_pea_faixa_educ1) * 100,
-  taxa_de_desemprego_faixa_educ2 = ((n_de_pea_faixa_educ2 - n_de_ocupado_faixa_educ2) / n_de_pea_faixa_educ2) * 100,
-  taxa_de_desemprego_faixa_educ3 = ((n_de_pea_faixa_educ3 - n_de_ocupado_faixa_educ3) / n_de_pea_faixa_educ3) * 100,
-  taxa_de_desemprego_faixa_educ4 = ((n_de_pea_faixa_educ4 - n_de_ocupado_faixa_educ4) / n_de_pea_faixa_educ4) * 100,
-  taxa_de_desemprego_faixa_educ5 = ((n_de_pea_faixa_educ5 - n_de_ocupado_faixa_educ5) / n_de_pea_faixa_educ5) * 100,
-  taxa_de_desemprego_faixa_etaria2 = ((n_de_pea_faixa_etaria2 - n_de_ocupado_faixa_etaria2) / n_de_pea_faixa_etaria2) * 100,
-  taxa_de_desemprego_faixa_etaria3 = ((n_de_pea_faixa_etaria3 - n_de_ocupado_faixa_etaria3) / n_de_pea_faixa_etaria3) * 100,
-  taxa_de_desemprego_faixa_etaria4 = ((n_de_pea_faixa_etaria4 - n_de_ocupado_faixa_etaria4) / n_de_pea_faixa_etaria4) * 100,
-  taxa_de_desemprego_faixa_etaria5 = ((n_de_pea_faixa_etaria5 - n_de_ocupado_faixa_etaria5) / n_de_pea_faixa_etaria5) * 100,
-  taxa_de_desemprego_faixa_etaria6 = ((n_de_pea_faixa_etaria6 - n_de_ocupado_faixa_etaria6) / n_de_pea_faixa_etaria6) * 100,
-  taxa_de_desemprego_faixa_etaria7 = ((n_de_pea_faixa_etaria7 - n_de_ocupado_faixa_etaria7) / n_de_pea_faixa_etaria7) * 100,
-  taxa_de_ocupacao_faixa_genero1 = ((n_de_ocupado_faixa_genero1) / n_faixa_genero1) * 100,
-  taxa_de_ocupacao_faixa_genero2 = ((n_de_ocupado_faixa_genero2) / n_faixa_genero2) * 100,
-  taxa_de_ocupacao_faixa_educ1 = ((n_de_ocupado_faixa_educ1) / n_faixa_educ1) * 100,
-  taxa_de_ocupacao_faixa_educ2 = ((n_de_ocupado_faixa_educ2) / n_faixa_educ2) * 100,
-  taxa_de_ocupacao_faixa_educ3 = ((n_de_ocupado_faixa_educ3) / n_faixa_educ3) * 100,
-  taxa_de_ocupacao_faixa_educ4 = ((n_de_ocupado_faixa_educ4) / n_faixa_educ4) * 100,
-  taxa_de_ocupacao_faixa_educ5 = ((n_de_ocupado_faixa_educ5) / n_faixa_educ5) * 100,
-  taxa_de_ocupacao_faixa_etaria2 = ((n_de_ocupado_faixa_etaria2) / n_faixa_etaria2) * 100,
-  taxa_de_ocupacao_faixa_etaria3 = ((n_de_ocupado_faixa_etaria3) / n_faixa_etaria3) * 100,
-  taxa_de_ocupacao_faixa_etaria4 = ((n_de_ocupado_faixa_etaria4) / n_faixa_etaria4) * 100,
-  taxa_de_ocupacao_faixa_etaria5 = ((n_de_ocupado_faixa_etaria5) / n_faixa_etaria5) * 100,
-  taxa_de_ocupacao_faixa_etaria6 = ((n_de_ocupado_faixa_etaria6) / n_faixa_etaria6) * 100,
-  taxa_de_ocupacao_faixa_etaria7 = ((n_de_ocupado_faixa_etaria7) / n_faixa_etaria7) * 100,
-  taxa_de_participacao_faixa_genero1 = ((n_de_pea_faixa_genero1) / n_faixa_genero1) * 100,
-  taxa_de_participacao_faixa_genero2 = ((n_de_pea_faixa_genero2) / n_faixa_genero2) * 100,
-  taxa_de_participacao_faixa_educ1 = ((n_de_pea_faixa_educ1) / n_faixa_educ1) * 100,
-  taxa_de_participacao_faixa_educ2 = ((n_de_pea_faixa_educ2) / n_faixa_educ2) * 100,
-  taxa_de_participacao_faixa_educ3 = ((n_de_pea_faixa_educ3) / n_faixa_educ3) * 100,
-  taxa_de_participacao_faixa_educ4 = ((n_de_pea_faixa_educ4) / n_faixa_educ4) * 100,
-  taxa_de_participacao_faixa_educ5 = ((n_de_pea_faixa_educ5) / n_faixa_educ5) * 100,
-  taxa_de_participacao_faixa_etaria2 = ((n_de_pea_faixa_etaria2) / n_faixa_etaria2) * 100,
-  taxa_de_participacao_faixa_etaria3 = ((n_de_pea_faixa_etaria3) / n_faixa_etaria3) * 100,
-  taxa_de_participacao_faixa_etaria4 = ((n_de_pea_faixa_etaria4) / n_faixa_etaria4) * 100,
-  taxa_de_participacao_faixa_etaria5 = ((n_de_pea_faixa_etaria5) / n_faixa_etaria5) * 100,
-  taxa_de_participacao_faixa_etaria6 = ((n_de_pea_faixa_etaria6) / n_faixa_etaria6) * 100,
-  taxa_de_participacao_faixa_etaria7 = ((n_de_pea_faixa_etaria7) / n_faixa_etaria7) * 100,
-  taxa_de_informalidade_faixa_genero1 = ((n_de_informal_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
-  taxa_de_informalidade_faixa_genero2 = ((n_de_informal_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
-  taxa_de_informalidade_faixa_educ1 = ((n_de_informal_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
-  taxa_de_informalidade_faixa_educ2 = ((n_de_informal_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
-  taxa_de_informalidade_faixa_educ3 = ((n_de_informal_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
-  taxa_de_informalidade_faixa_educ4 = ((n_de_informal_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
-  taxa_de_informalidade_faixa_educ5 = ((n_de_informal_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
-  taxa_de_informalidade_faixa_etaria2 = ((n_de_informal_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
-  taxa_de_informalidade_faixa_etaria3 = ((n_de_informal_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
-  taxa_de_informalidade_faixa_etaria4 = ((n_de_informal_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
-  taxa_de_informalidade_faixa_etaria5 = ((n_de_informal_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
-  taxa_de_informalidade_faixa_etaria6 = ((n_de_informal_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
-  taxa_de_informalidade_faixa_etaria7 = ((n_de_informal_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100,
-  taxa_de_desalento_faixa_genero1 = ((n_de_desa_faixa_genero1) / n_faixa_genero1) * 100,
-  taxa_de_desalento_faixa_genero2 = ((n_de_desa_faixa_genero2) / n_faixa_genero2) * 100,
-  taxa_de_desalento_faixa_educ1 = ((n_de_desa_faixa_educ1) / n_faixa_educ1) * 100,
-  taxa_de_desalento_faixa_educ2 = ((n_de_desa_faixa_educ2) / n_faixa_educ2) * 100,
-  taxa_de_desalento_faixa_educ3 = ((n_de_desa_faixa_educ3) / n_faixa_educ3) * 100,
-  taxa_de_desalento_faixa_educ4 = ((n_de_desa_faixa_educ4) / n_faixa_educ4) * 100,
-  taxa_de_desalento_faixa_educ5 = ((n_de_desa_faixa_educ5) / n_faixa_educ5) * 100,
-  taxa_de_desalento_faixa_etaria2 = ((n_de_desa_faixa_etaria2) / n_faixa_etaria2) * 100,
-  taxa_de_desalento_faixa_etaria3 = ((n_de_desa_faixa_etaria3) / n_faixa_etaria3) * 100,
-  taxa_de_desalento_faixa_etaria4 = ((n_de_desa_faixa_etaria4) / n_faixa_etaria4) * 100,
-  taxa_de_desalento_faixa_etaria5 = ((n_de_desa_faixa_etaria5) / n_faixa_etaria5) * 100,
-  taxa_de_desalento_faixa_etaria6 = ((n_de_desa_faixa_etaria6) / n_faixa_etaria6) * 100,
-  taxa_de_desalento_faixa_etaria7 = ((n_de_desa_faixa_etaria7) / n_faixa_etaria7) * 100,
-  taxa_de_nemnem_faixa_genero1 = ((n_de_nemnem_faixa_genero1) / n_faixa_genero1) * 100,
-  taxa_de_nemnem_faixa_genero2 = ((n_de_nemnem_faixa_genero2) / n_faixa_genero2) * 100,
-  taxa_de_nemnem_faixa_educ1 = ((n_de_nemnem_faixa_educ1) / n_faixa_educ1) * 100,
-  taxa_de_nemnem_faixa_educ2 = ((n_de_nemnem_faixa_educ2) / n_faixa_educ2) * 100,
-  taxa_de_nemnem_faixa_educ3 = ((n_de_nemnem_faixa_educ3) / n_faixa_educ3) * 100,
-  taxa_de_nemnem_faixa_educ4 = ((n_de_nemnem_faixa_educ4) / n_faixa_educ4) * 100,
-  taxa_de_nemnem_faixa_educ5 = ((n_de_nemnem_faixa_educ5) / n_faixa_educ5) * 100,
-  taxa_de_nemnem_faixa_etaria2 = ((n_de_nemnem_faixa_etaria2) / n_faixa_etaria2) * 100,
-  taxa_de_nemnem_faixa_etaria3 = ((n_de_nemnem_faixa_etaria3) / n_faixa_etaria3) * 100,
-  taxa_de_nemnem_faixa_etaria4 = ((n_de_nemnem_faixa_etaria4) / n_faixa_etaria4) * 100,
-  taxa_de_nemnem_faixa_etaria5 = ((n_de_nemnem_faixa_etaria5) / n_faixa_etaria5) * 100,
-  taxa_de_nemnem_faixa_etaria6 = ((n_de_nemnem_faixa_etaria6) / n_faixa_etaria6) * 100,
-  taxa_de_nemnem_faixa_etaria7 = ((n_de_nemnem_faixa_etaria7) / n_faixa_etaria7) * 100
+describe_states <- function(df) {
+    df <- df %>%
+        dplyr::mutate(
+            sigla_uf = dplyr::case_match(
+                UF,
+                11 ~ "RO",
+                12 ~ "AC",
+                13 ~ "AM",
+                14 ~ "RO",
+                15 ~ "PA",
+                16 ~ "AP",
+                17 ~ "TO",
+                21 ~ "MA",
+                22 ~ "PI",
+                23 ~ "CE",
+                24 ~ "RN",
+                25 ~ "PB",
+                26 ~ "PE",
+                27 ~ "AL",
+                28 ~ "SE",
+                29 ~ "BA",
+                31 ~ "MG",
+                32 ~ "ES",
+                33 ~ "RJ",
+                35 ~ "SP",
+                41 ~ "PR",
+                42 ~ "SC",
+                43 ~ "RS",
+                50 ~ "MS",
+                51 ~ "MT",
+                52 ~ "GO",
+                53 ~ "DF"
+            )
+        )
+    
+    df1 <- df %>%
+        tidyr::drop_na(sigla_uf) %>%
+        group_by(sigla_uf) %>%
+    describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = "Todos"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(sigla_uf, sexo) %>%
+        group_by(sigla_uf, sexo) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = sexo
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(sigla_uf, faixa_idade) %>%
+        group_by(sigla_uf, faixa_idade) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = faixa_idade
+        )
+    
+    df4 <- df %>%
+        tidyr::drop_na(sigla_uf, faixa_educ) %>%
+        group_by(sigla_uf, faixa_educ) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = faixa_educ
+        )
+    
+    bind_rows(
+        df1, df2, df3, df4
+    )
+}
+
+# Running all of the above
+
+describe_quarter <- function(df) {
+    df1 <- describe_brazil(df)
+    df2 <- describe_region(df)
+    df3 <- describe_amazon(df)
+    df4 <- describe_states(df)
+    
+    bind_rows(df1, df2, df3, df4)
+}
+
+# Big loop to run one of those for each quarter
+
+dat <- purrr::map_dfr(
+    files,
+    function(file_name) {
+        message(file_name)
+        readr::read_rds(file_name) %>%
+            describe_quarter()
+    }
 )
 
-# convert every data set from wide to long format and then merge altogether
-taxa_de_desemprego_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("taxa_de_desemprego_"),
-  names_to = "composicao",
-  names_prefix = "taxa_de_desemprego_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    taxa_de_desemprego = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
+# setting up time variable
 
-taxa_de_ocupacao_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("taxa_de_ocupacao_"),
-  names_to = "composicao",
-  names_prefix = "taxa_de_ocupacao_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    taxa_de_ocupacao = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
+dat <- dat %>%
+    mutate(Mes = 3*Trimestre - 2) %>%
+    mutate(time = lubridate::make_date(Ano, Mes))
 
-taxa_de_informalidade_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("taxa_de_informalidade_"),
-  names_to = "composicao",
-  names_prefix = "taxa_de_informalidade_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    taxa_de_informalidade = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
+dat <- dat %>%
+    mutate(prop_informal = taxa_informalidade)
 
-taxa_de_participacao_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("taxa_de_participacao_"),
-  names_to = "composicao",
-  names_prefix = "taxa_de_participacao_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    taxa_de_participacao = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
+# saving data file
 
-taxa_de_nemnem_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("taxa_de_nemnem_"),
-  names_to = "composicao",
-  names_prefix = "taxa_de_nemnem_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    taxa_de_nemnem = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
+readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds")
 
-taxa_de_desalento_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("taxa_de_desalento_"),
-  names_to = "composicao",
-  names_prefix = "taxa_de_desalento_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    taxa_de_desalento = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
+############################
+## Dictionary -- Trabalho ##
+############################
 
-# merge data altogether
-mycolnames <- c("time", "id", "composicao_demografica")
-merge_datasets <- right_join(taxa_de_desemprego_por_faixa, taxa_de_informalidade_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, taxa_de_ocupacao_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, taxa_de_participacao_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, taxa_de_desalento_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, taxa_de_nemnem_por_faixa, by = mycolnames)
-
-new_data <- bind_rows(temp, merge_datasets) %>%
-  select(
-    id,
-    composicao_demografica,
-    time,
-    taxa_de_informalidade,
-    taxa_de_participacao,
-    taxa_de_ocupacao,
-    taxa_de_desemprego,
-    taxa_de_desalento,
-    taxa_de_nemnem
-  ) %>%
-  group_by(id, composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-# recover
-temp <- new_data
-
-# groups at the level:
-temp$group <- temp$id
-
-# edit names in data
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ1"] <- "Nível escolar 0 anos de estudo (sem instrução)"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ2"] <- "Nível escolar 1 a 7 anos de estudo"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ3"] <- "Nível escolar 8 a 11 anos de estudo"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ4"] <- "Nível escolar 9 a 14 anos de estudo"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ5"] <- "Nível escolar mais de 15 anos de estudo"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria2"] <- "Faixa étaria entre 18 e 24 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria3"] <- "Faixa étaria entre 25 e 29 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria4"] <- "Faixa étaria entre 30 e 39 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria5"] <- "Faixa étaria entre 40 e 49 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria6"] <- "Faixa étaria entre 50 e 59 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria7"] <- "Faixa étaria maior que 60 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_genero2"] <- "Sexo feminino"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_genero1"] <- "Sexo masculino"
-
-# limiting decimal places
-temp <- temp %>%
-  mutate(across(where(is.numeric), ~ as.numeric(formatC(., digits = 2, format = "f")))) %>%
-  group_by(id, composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-
-# save at rds format
-saveRDS(temp,
-  file = "./data/ibge_pnadc_trabalho.rds"
-)
-
-#####################
-# Build Dictionary
-#####################
-
-# call data
-temp <- readRDS("./data/ibge_pnadc_trabalho.rds")
-
-# extract variables from data
-columns <- colnames(temp)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = TRUE,
-  label = columns,
-  desc = columns,
-  var_group = "IBGE - PNAD Contínua",
-  categoria = "Economia",
-  subcategoria = "Mercado de Trabalho"
-)
-
-# label variables
-temp_param_table$label[temp_param_table$var == "id"] <- "Recorte regional"
-temp_param_table$label[temp_param_table$var == "time"] <- "Ano-Trimestre"
-temp_param_table$label[temp_param_table$var == "group"] <- "Recorte regional"
-temp_param_table$label[temp_param_table$var == "composicao_demografica"] <- "Composição demográfica"
-temp_param_table$label[temp_param_table$var == "taxa_de_desemprego"] <- "Taxa de desemprego (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_ocupacao"] <- "Taxa de ocupação (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_participacao"] <- "Taxa de participação (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_informalidade"] <- "Taxa de informalidade (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_desalento"] <- "Taxa de desalentados (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_nemnem"] <- "Taxa de Nem-Nem (%)"
-
-# block variables in graphs y-axis
-temp_param_table$y[temp_param_table$var == "id"] <- FALSE
-temp_param_table$y[temp_param_table$var == "composicao_demografica"] <- FALSE
-temp_param_table$y[temp_param_table$var == "time"] <- FALSE
-temp_param_table$y[temp_param_table$var == "group"] <- FALSE
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
-
-##############################
-# Build Dictionary in English
-#############################
-
-# call data
-temp <- readRDS("./data/ibge_pnadc_trabalho.rds")
-
-# extract variables from data
-columns <- colnames(temp)
-
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
+temp_param_table <- tibble::tibble(
+    var = c("group", "composicao_demografica", "time",
+            "taxa_participacao", "taxa_ocupacao",
+            "taxa_desemprego", "taxa_informalidade",
+            "taxa_desalento", "taxa_nem_nem"),
     x = TRUE,
-    y = TRUE,
+    y = FALSE,
     color = TRUE,
-    label = columns,
-    desc = columns,
-    var_group = "IBGE - PNAD Contínua",
+    label = NA,
+    desc = NA,
+    var_group = "IBGE - PNAD Cont\u00ednua",
     categoria = "Economia",
     subcategoria = "Mercado de Trabalho"
 )
 
-# label variables
-temp_param_table$label[temp_param_table$var == "id"] <- "Region"
-temp_param_table$label[temp_param_table$var == "time"] <- "Quarter-year"
-temp_param_table$label[temp_param_table$var == "group"] <- "Region"
-temp_param_table$label[temp_param_table$var == "composicao_demografica"] <- "Demographic composition"
-temp_param_table$label[temp_param_table$var == "taxa_de_desemprego"] <- "Unemployment rate (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_ocupacao"] <- "Employment rate (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_participacao"] <- " Labor participation rate (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_informalidade"] <- "Informality rate (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_desalento"] <- "Rate of discouragement (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_nemnem"] <- "Neither-Nor rate (%)"
+temp_param_table <- temp_param_table %>%
+    mutate(
+        y = ifelse(
+            stringr::str_detect(var, "taxa"), TRUE, FALSE
+        ),
+        label = dplyr::case_match(
+            var,
+            "group" ~ "Recorte Regional",
+            "composicao_demografica" ~ "Composi\u00e7\u00e3o Demogr\u00e1fica",
+            "time" ~ "Ano - Trimestre",
+            "taxa_participacao" ~ "Taxa de Participa\u00e7\u00e3o",
+            "taxa_ocupacao" ~ "Taxa de Ocupa\u00e7\u00e3o",
+            "taxa_desemprego" ~ "Taxa de Desemprego",
+            "taxa_informalidade" ~ "Taxa de Informalidade",
+            "taxa_desalento" ~ "Taxa de Desalento",
+            "taxa_nem_nem" ~ "Taxa de Nem-Nem"
+        ),
+        desc = label,
+        desc = case_match(
+            var,
+            "taxa_participacao" ~ "Taxa de Participa\u00e7\u00e3o sobre a PIA",
+            "taxa_ocupacao" ~ "Taxa de Ocupa\u00e7\u00e3o sobra a PIA",
+            "taxa_desemprego" ~ "Taxa de Desemprego sobre a For\u00e7a de Trabalho",
+            "taxa_informalidade" ~ "Taxa de Informalidade sobre os Ocupados",
+            "taxa_desalento" ~ "Taxa de Desalento sobre a PIA",
+            "taxa_nem_nem" ~ "Taxa de Nem-Nem sobre a PIA",
+            .default = desc
+        )
+    )
 
-# block variables in graphs y-axis
-temp_param_table$y[temp_param_table$var == "id"] <- FALSE
-temp_param_table$y[temp_param_table$var == "composicao_demografica"] <- FALSE
-temp_param_table$y[temp_param_table$var == "time"] <- FALSE
-temp_param_table$y[temp_param_table$var == "group"] <- FALSE
+write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
+## English dictionary
 
-#################################################
-## Inserção no Mercado de Trabalho na Amazônia Legal
-## Input data from:
-## github: https://github.com/datazoompuc/datazoom_labour_amazon
-#################################################
-
-# set path to raw data
-github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
-
-# call raw data
-base1 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonia_legal.dta"))
-base1 <- base1 %>% mutate(id = "Amazônia Legal", composicao_demografica = "Todas as pessoas (PIA)")
-
-base2 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_resto_brasil.dta"))
-base2 <- base2 %>% mutate(id = "Restante do Brasil", composicao_demografica = "Todas as pessoas (PIA)")
-
-base3 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_rondonia.dta"))
-base3 <- base3 %>% mutate(id = "Rondônia", composicao_demografica = "Todas as pessoas (PIA)")
-
-base4 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_acre.dta"))
-base4 <- base4 %>% mutate(id = "Acre", composicao_demografica = "Todas as pessoas (PIA)")
-
-base5 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amazonas.dta"))
-base5 <- base5 %>% mutate(id = "Amazonas", composicao_demografica = "Todas as pessoas (PIA)")
-
-base6 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_roraima.dta"))
-base6 <- base6 %>% mutate(id = "Roraima", composicao_demografica = "Todas as pessoas (PIA)")
-
-base7 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_para.dta"))
-base7 <- base7 %>% mutate(id = "Pará", composicao_demografica = "Todas as pessoas (PIA)")
-
-base8 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_amapa.dta"))
-base8 <- base8 %>% mutate(id = "Amapá", composicao_demografica = "Todas as pessoas (PIA)")
-
-base9 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_tocantins.dta"))
-base9 <- base9 %>% mutate(id = "Tocantins", composicao_demografica = "Todas as pessoas (PIA)")
-
-base10 <- read_dta(paste0(github_folder_path, "_estrutura_emprego_matogrosso.dta"))
-base10 <- base10 %>% mutate(id = "Mato Grosso", composicao_demografica = "Todas as pessoas (PIA)")
-
-# append all data
-temp <- rbind(base1, base2)
-temp <- rbind(temp, base2)
-temp <- rbind(temp, base3)
-temp <- rbind(temp, base4)
-temp <- rbind(temp, base5)
-temp <- rbind(temp, base6)
-temp <- rbind(temp, base7)
-temp <- rbind(temp, base8)
-temp <- rbind(temp, base9)
-temp <- rbind(temp, base10)
-
-# convert time data to quarterly
-temp <- temp %>%
-  mutate(time = paste0(temp$Ano, "-", temp$Trimestre))
-
-temp$time <- as.Date(as.yearqtr(temp$time))
-temp$Trimestre <- NULL
-temp$Ano <- NULL
-
-# generate variables for each demographic composition
-temp1 <- temp %>% mutate(
-  taxa_de_informalidade_faixa_genero1 = ((n_de_informal_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
-  taxa_de_informalidade_faixa_genero2 = ((n_de_informal_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
-  taxa_de_informalidade_faixa_educ1 = ((n_de_informal_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
-  taxa_de_informalidade_faixa_educ2 = ((n_de_informal_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
-  taxa_de_informalidade_faixa_educ3 = ((n_de_informal_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
-  taxa_de_informalidade_faixa_educ4 = ((n_de_informal_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
-  taxa_de_informalidade_faixa_educ5 = ((n_de_informal_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
-  taxa_de_informalidade_faixa_etaria2 = ((n_de_informal_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
-  taxa_de_informalidade_faixa_etaria3 = ((n_de_informal_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
-  taxa_de_informalidade_faixa_etaria4 = ((n_de_informal_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
-  taxa_de_informalidade_faixa_etaria5 = ((n_de_informal_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
-  taxa_de_informalidade_faixa_etaria6 = ((n_de_informal_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
-  taxa_de_informalidade_faixa_etaria7 = ((n_de_informal_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100,
-  prop_empregadoCC_faixa_genero1 = ((n_de_empregadoCC_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
-  prop_empregadoCC_faixa_genero2 = ((n_de_empregadoCC_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
-  prop_empregadoCC_faixa_educ1 = ((n_de_empregadoCC_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
-  prop_empregadoCC_faixa_educ2 = ((n_de_empregadoCC_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
-  prop_empregadoCC_faixa_educ3 = ((n_de_empregadoCC_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
-  prop_empregadoCC_faixa_educ4 = ((n_de_empregadoCC_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
-  prop_empregadoCC_faixa_educ5 = ((n_de_empregadoCC_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
-  prop_empregadoCC_faixa_etaria2 = ((n_de_empregadoCC_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
-  prop_empregadoCC_faixa_etaria3 = ((n_de_empregadoCC_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
-  prop_empregadoCC_faixa_etaria4 = ((n_de_empregadoCC_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
-  prop_empregadoCC_faixa_etaria5 = ((n_de_empregadoCC_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
-  prop_empregadoCC_faixa_etaria6 = ((n_de_empregadoCC_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
-  prop_empregadoCC_faixa_etaria7 = ((n_de_empregadoCC_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100,
-  prop_empregadoSC_faixa_genero1 = ((n_de_empregadoSC_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
-  prop_empregadoSC_faixa_genero2 = ((n_de_empregadoSC_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
-  prop_empregadoSC_faixa_educ1 = ((n_de_empregadoSC_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
-  prop_empregadoSC_faixa_educ2 = ((n_de_empregadoSC_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
-  prop_empregadoSC_faixa_educ3 = ((n_de_empregadoSC_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
-  prop_empregadoSC_faixa_educ4 = ((n_de_empregadoSC_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
-  prop_empregadoSC_faixa_educ5 = ((n_de_empregadoSC_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
-  prop_empregadoSC_faixa_etaria2 = ((n_de_empregadoSC_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
-  prop_empregadoSC_faixa_etaria3 = ((n_de_empregadoSC_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
-  prop_empregadoSC_faixa_etaria4 = ((n_de_empregadoSC_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
-  prop_empregadoSC_faixa_etaria5 = ((n_de_empregadoSC_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
-  prop_empregadoSC_faixa_etaria6 = ((n_de_empregadoSC_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
-  prop_empregadoSC_faixa_etaria7 = ((n_de_empregadoSC_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100,
-  prop_empregador_faixa_genero1 = ((n_de_empregador_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
-  prop_empregador_faixa_genero2 = ((n_de_empregador_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
-  prop_empregador_faixa_educ1 = ((n_de_empregador_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
-  prop_empregador_faixa_educ2 = ((n_de_empregador_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
-  prop_empregador_faixa_educ3 = ((n_de_empregador_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
-  prop_empregador_faixa_educ4 = ((n_de_empregador_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
-  prop_empregador_faixa_educ5 = ((n_de_empregador_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
-  prop_empregador_faixa_etaria2 = ((n_de_empregador_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
-  prop_empregador_faixa_etaria3 = ((n_de_empregador_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
-  prop_empregador_faixa_etaria4 = ((n_de_empregador_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
-  prop_empregador_faixa_etaria5 = ((n_de_empregador_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
-  prop_empregador_faixa_etaria6 = ((n_de_empregador_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
-  prop_empregador_faixa_etaria7 = ((n_de_empregador_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100,
-  prop_cpropriaC_faixa_genero1 = ((n_de_cpropriaC_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
-  prop_cpropriaC_faixa_genero2 = ((n_de_cpropriaC_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
-  prop_cpropriaC_faixa_educ1 = ((n_de_cpropriaC_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
-  prop_cpropriaC_faixa_educ2 = ((n_de_cpropriaC_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
-  prop_cpropriaC_faixa_educ3 = ((n_de_cpropriaC_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
-  prop_cpropriaC_faixa_educ4 = ((n_de_cpropriaC_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
-  prop_cpropriaC_faixa_educ5 = ((n_de_cpropriaC_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
-  prop_cpropriaC_faixa_etaria2 = ((n_de_cpropriaC_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
-  prop_cpropriaC_faixa_etaria3 = ((n_de_cpropriaC_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
-  prop_cpropriaC_faixa_etaria4 = ((n_de_cpropriaC_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
-  prop_cpropriaC_faixa_etaria5 = ((n_de_cpropriaC_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
-  prop_cpropriaC_faixa_etaria6 = ((n_de_cpropriaC_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
-  prop_cpropriaC_faixa_etaria7 = ((n_de_cpropriaC_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100,
-  prop_cpropriaNc_faixa_genero1 = ((n_de_cpropriaNc_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
-  prop_cpropriaNc_faixa_genero2 = ((n_de_cpropriaNc_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
-  prop_cpropriaNc_faixa_educ1 = ((n_de_cpropriaNc_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
-  prop_cpropriaNc_faixa_educ2 = ((n_de_cpropriaNc_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
-  prop_cpropriaNc_faixa_educ3 = ((n_de_cpropriaNc_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
-  prop_cpropriaNc_faixa_educ4 = ((n_de_cpropriaNc_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
-  prop_cpropriaNc_faixa_educ5 = ((n_de_cpropriaNc_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
-  prop_cpropriaNc_faixa_etaria2 = ((n_de_cpropriaNc_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
-  prop_cpropriaNc_faixa_etaria3 = ((n_de_cpropriaNc_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
-  prop_cpropriaNc_faixa_etaria4 = ((n_de_cpropriaNc_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
-  prop_cpropriaNc_faixa_etaria5 = ((n_de_cpropriaNc_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
-  prop_cpropriaNc_faixa_etaria6 = ((n_de_cpropriaNc_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
-  prop_cpropriaNc_faixa_etaria7 = ((n_de_cpropriaNc_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100,
-  prop_militar_faixa_genero1 = ((n_de_militar_faixa_genero1) / n_de_ocupado_faixa_genero1) * 100,
-  prop_militar_faixa_genero2 = ((n_de_militar_faixa_genero2) / n_de_ocupado_faixa_genero2) * 100,
-  prop_militar_faixa_educ1 = ((n_de_militar_faixa_educ1) / n_de_ocupado_faixa_educ1) * 100,
-  prop_militar_faixa_educ2 = ((n_de_militar_faixa_educ2) / n_de_ocupado_faixa_educ2) * 100,
-  prop_militar_faixa_educ3 = ((n_de_militar_faixa_educ3) / n_de_ocupado_faixa_educ3) * 100,
-  prop_militar_faixa_educ4 = ((n_de_militar_faixa_educ4) / n_de_ocupado_faixa_educ4) * 100,
-  prop_militar_faixa_educ5 = ((n_de_militar_faixa_educ5) / n_de_ocupado_faixa_educ5) * 100,
-  prop_militar_faixa_etaria2 = ((n_de_militar_faixa_etaria2) / n_de_ocupado_faixa_etaria2) * 100,
-  prop_militar_faixa_etaria3 = ((n_de_militar_faixa_etaria3) / n_de_ocupado_faixa_etaria3) * 100,
-  prop_militar_faixa_etaria4 = ((n_de_militar_faixa_etaria4) / n_de_ocupado_faixa_etaria4) * 100,
-  prop_militar_faixa_etaria5 = ((n_de_militar_faixa_etaria5) / n_de_ocupado_faixa_etaria5) * 100,
-  prop_militar_faixa_etaria6 = ((n_de_militar_faixa_etaria6) / n_de_ocupado_faixa_etaria6) * 100,
-  prop_militar_faixa_etaria7 = ((n_de_militar_faixa_etaria7) / n_de_ocupado_faixa_etaria7) * 100
-)
-
-# convert every data set from wide to long format and then merge altogether
-taxa_de_informalidade_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("taxa_de_informalidade_"),
-  names_to = "composicao",
-  names_prefix = "taxa_de_informalidade_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    taxa_de_informalidade = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-prop_empregadoCC_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("prop_empregadoCC_"),
-  names_to = "composicao",
-  names_prefix = "prop_empregadoCC_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    prop_empregadoCC = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-prop_empregadoSC_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("prop_empregadoSC_"),
-  names_to = "composicao",
-  names_prefix = "prop_empregadoSC_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    prop_empregadoSC = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-prop_empregador_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("prop_empregador_"),
-  names_to = "composicao",
-  names_prefix = "prop_empregador_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    prop_empregador = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-prop_cpropriaC_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("prop_cpropriaC_"),
-  names_to = "composicao",
-  names_prefix = "prop_cpropriaC_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    prop_cpropriaC = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-prop_cpropriaNc_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("prop_cpropriaNc_"),
-  names_to = "composicao",
-  names_prefix = "prop_cpropriaNc_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    prop_cpropriaNc = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-prop_militar_por_faixa <- tidyr::pivot_longer(temp1,
-  cols = starts_with("prop_militar_"),
-  names_to = "composicao",
-  names_prefix = "prop_militar_",
-  values_to = "xxx",
-  names_repair = "minimal"
-) %>%
-  select("time", "id", "composicao", starts_with("xx")) %>%
-  rename(
-    prop_militar = xxx,
-    composicao_demografica = composicao
-  ) %>%
-  group_by(composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-# merge data altogether
-mycolnames <- c("time", "id", "composicao_demografica")
-merge_datasets <- right_join(prop_empregadoCC_por_faixa, prop_empregadoSC_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, prop_empregador_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, prop_cpropriaC_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, prop_cpropriaNc_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, prop_militar_por_faixa, by = mycolnames)
-merge_datasets <- right_join(merge_datasets, taxa_de_informalidade_por_faixa, by = mycolnames)
-
-new_data <- bind_rows(temp, merge_datasets) %>%
-  select(
-    id,
-    composicao_demografica,
-    time,
-    prop_empregadoCC,
-    prop_empregadoSC,
-    prop_empregador,
-    prop_cpropriaC,
-    prop_cpropriaNc,
-    prop_militar,
-    taxa_de_informalidade
-  ) %>%
-  group_by(id, composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-# recover
-temp <- new_data
-
-# groups at the level:
-temp$group <- temp$id
-
-# edit names in data
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ1"] <- "Nível escolar 0 anos de estudo (sem instrução)"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ2"] <- "Nível escolar 1 a 7 anos de estudo"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ3"] <- "Nível escolar 8 a 11 anos de estudo"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ4"] <- "Nível escolar 9 a 14 anos de estudo"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_educ5"] <- "Nível escolar mais de 15 anos de estudo"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria2"] <- "Faixa étaria entre 18 e 24 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria3"] <- "Faixa étaria entre 25 e 29 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria4"] <- "Faixa étaria entre 30 e 39 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria5"] <- "Faixa étaria entre 40 e 49 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria6"] <- "Faixa étaria entre 50 e 59 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_etaria7"] <- "Faixa étaria maior que 60 anos"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_genero2"] <- "Sexo feminino"
-temp$composicao_demografica[temp$composicao_demografica == "faixa_genero1"] <- "Sexo masculino"
-
-# limiting decimal places
-temp <- temp %>%
-  mutate(across(where(is.numeric), ~ as.numeric(formatC(., digits = 2, format = "f")))) %>%
-  group_by(id, composicao_demografica) %>%
-  arrange(id, composicao_demografica, time)
-
-# save at rds format
-saveRDS(temp,
-  file = "./data/ibge_pnadc_trabalho_insercao.rds"
-)
-
-#####################
-# Build Dictionary
-#####################
-
-# call data
-temp <- readRDS("./data/ibge_pnadc_trabalho_insercao.rds")
-
-# extract variables from data
-columns <- colnames(temp)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = TRUE,
-  label = columns,
-  desc = columns,
-  var_group = "IBGE - PNAD Contínua",
-  categoria = "Economia",
-  subcategoria = "Inserção no Trabalho"
-)
-
-# label variables
-temp_param_table$label[temp_param_table$var == "id"] <- "Recorte regional"
-temp_param_table$label[temp_param_table$var == "time"] <- "Ano-Trimestre"
-temp_param_table$label[temp_param_table$var == "group"] <- "Recorte regional"
-temp_param_table$label[temp_param_table$var == "composicao_demografica"] <- "Composição demográfica"
-temp_param_table$label[temp_param_table$var == "prop_empregadoCC"] <- "Proporção de com carteira em relação aos ocupados (%)"
-temp_param_table$label[temp_param_table$var == "prop_empregadoSC"] <- "Proporção de sem carteira em relação aos ocupados (%)"
-temp_param_table$label[temp_param_table$var == "prop_empregador"] <- "Proporção de empregadores em relação aos ocupados (%)"
-temp_param_table$label[temp_param_table$var == "prop_cpropriaC"] <- "Proporção de conta própria que contribui em relação aos ocupados (%)"
-temp_param_table$label[temp_param_table$var == "prop_cpropriaNc"] <- "Proporção de conta própria que não contribui em relação aos ocupados (%)"
-temp_param_table$label[temp_param_table$var == "prop_militar"] <- "Proporção servidores públicos e militares em relação aos ocupados (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_informalidade"] <- "Taxa de informalidade (%)"
-
-# block variables in graphs y-axis
-temp_param_table$y[temp_param_table$var == "id"] <- FALSE
-temp_param_table$y[temp_param_table$var == "composicao_demografica"] <- FALSE
-temp_param_table$y[temp_param_table$var == "time"] <- FALSE
-temp_param_table$y[temp_param_table$var == "group"] <- FALSE
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_insercao_dic.csv", fileEncoding = "UTF-8")
-
-#############################
-# Build Dictionary in English
-#############################
-
-# call data
-temp <- readRDS("./data/ibge_pnadc_trabalho_insercao.rds")
-
-# extract variables from data
-columns <- colnames(temp)
-
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
+temp_param_table <- tibble::tibble(
+    var = c("group", "composicao_demografica", "time",
+            "taxa_participacao", "taxa_ocupacao",
+            "taxa_desemprego", "taxa_informalidade",
+            "taxa_desalento", "taxa_nem_nem"),
     x = TRUE,
-    y = TRUE,
+    y = FALSE,
     color = TRUE,
-    label = columns,
-    desc = columns,
-    var_group = "IBGE - PNAD Contínua",
+    label = NA,
+    desc = NA,
+    var_group = "IBGE - Continuous PNAD",
     categoria = "Economia",
-    subcategoria = "Inserção no Trabalho"
+    subcategoria = "Mercado de Trabalho"
 )
 
-# relabel variables
-temp_param_table$label[temp_param_table$var == "id"] <- "Region"
-temp_param_table$label[temp_param_table$var == "time"] <- "Quarter-year"
-temp_param_table$label[temp_param_table$var == "group"] <- "Region"
-temp_param_table$label[temp_param_table$var == "composicao_demografica"] <- "Demographic composition"
-temp_param_table$label[temp_param_table$var == "prop_empregadoCC"] <- "Proportion of people with a formal contract in relation to employed persons (%)"
-temp_param_table$label[temp_param_table$var == "prop_empregadoSC"] <- "Proportion of people without a formal contract in relation to employed persons (%)"
-temp_param_table$label[temp_param_table$var == "prop_empregador"] <- "Proportion of employers in relation to the employed persons (%)"
-temp_param_table$label[temp_param_table$var == "prop_cpropriaC"] <- "Proportion of self-employed people who contribute in relation to employed persons (%)"
-temp_param_table$label[temp_param_table$var == "prop_cpropriaNc"] <- "Proportion of self-employed people who do not contribute in relation to employed persons (%)"
-temp_param_table$label[temp_param_table$var == "prop_militar"] <- "Proportion of civil servants and military in relation to employed persons (%)"
-temp_param_table$label[temp_param_table$var == "taxa_de_informalidade"] <- "Informality rate(%)"
+temp_param_table <- temp_param_table %>%
+    mutate(
+        y = ifelse(
+            stringr::str_detect(var, "taxa"), TRUE, FALSE
+        ),
+        label = dplyr::case_match(
+            var,
+            "group" ~ "Region",
+            "composicao_demografica" ~ "Demographic Group",
+            "time" ~ "Year - Quarter",
+            "taxa_participacao" ~ "Participation Rate",
+            "taxa_ocupacao" ~ "Occupation Rate",
+            "taxa_desemprego" ~ "Unemployment Rate",
+            "taxa_informalidade" ~ "Informality Rate",
+            "taxa_desalento" ~ "Discouraged Rate",
+            "taxa_nem_nem" ~ "NEET Rate"
+        ),
+        desc = label,
+        desc = case_match(
+            var,
+            "taxa_participacao" ~ "Participation Rate over the working age population",
+            "taxa_ocupacao" ~ "Occupation Rate over the working age population",
+            "taxa_desemprego" ~ "Unemployment Rate over the Workforce",
+            "taxa_informalidade" ~ "Informality Rate over the Occupied",
+            "taxa_desalento" ~ "Discouraged Rate over the working age population",
+            "taxa_nem_nem" ~ "NEET Rate over the working age population",
+            .default = desc
+        )
+    )
 
-# block variables in graphs y-axis
-temp_param_table$y[temp_param_table$var == "id"] <- FALSE
-temp_param_table$y[temp_param_table$var == "composicao_demografica"] <- FALSE
-temp_param_table$y[temp_param_table$var == "time"] <- FALSE
-temp_param_table$y[temp_param_table$var == "group"] <- FALSE
+write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_trabalho_insercao_dic_en.csv", fileEncoding = "UTF-8")
-
-#################################################
-## Atividade Econômica na Amazônia Legal
-## Ouput data from:
-## Dinamismo Economico na Amazonia
-## github: https://github.com/datazoompuc/datazoom_labour_amazon
-#################################################
-
-# set path to raw data
-github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Economic_Dynamism/output/" # set github structure path
-
-# call raw data
-base1 <- read_dta(paste0(github_folder_path, "_amz_ac_numero_ocupados_por_atividade_2digitos.dta"))
-base1 <- base1 %>% mutate(UF = "AC")
-base2 <- read_dta(paste0(github_folder_path, "_amz_am_numero_ocupados_por_atividade_2digitos.dta"))
-base2 <- base2 %>% mutate(UF = "AM")
-base3 <- read_dta(paste0(github_folder_path, "_amz_ap_numero_ocupados_por_atividade_2digitos.dta"))
-base3 <- base3 %>% mutate(UF = "AP")
-base4 <- read_dta(paste0(github_folder_path, "_amz_ma_numero_ocupados_por_atividade_2digitos.dta"))
-base4 <- base4 %>% mutate(UF = "MA")
-base5 <- read_dta(paste0(github_folder_path, "_amz_mt_numero_ocupados_por_atividade_2digitos.dta"))
-base5 <- base5 %>% mutate(UF = "MT")
-base6 <- read_dta(paste0(github_folder_path, "_amz_pa_numero_ocupados_por_atividade_2digitos.dta"))
-base6 <- base6 %>% mutate(UF = "PA")
-base7 <- read_dta(paste0(github_folder_path, "_amz_ro_numero_ocupados_por_atividade_2digitos.dta"))
-base7 <- base7 %>% mutate(UF = "RO")
-base8 <- read_dta(paste0(github_folder_path, "_amz_rr_numero_ocupados_por_atividade_2digitos.dta"))
-base8 <- base8 %>% mutate(UF = "RR")
-base9 <- read_dta(paste0(github_folder_path, "_amz_to_numero_ocupados_por_atividade_2digitos.dta"))
-base9 <- base9 %>% mutate(UF = "TO")
-
-# append all data
-temp <- rbind(base1, base2, base3, base4, base5, base6, base7, base8, base9)
-
-# remove rows with missing data
-temp <- na.omit(temp)
-
-temp <- temp %>%
-  filter(titulo != "")
-
-# convert time data to quarterly
-temp <- temp %>%
-  mutate(time = paste0(temp$Ano, "-", temp$Trimestre))
-temp$time <- as.Date(as.yearqtr(temp$time))
-temp$Trimestre <- NULL
-temp$Ano <- NULL
-
-# groups at the level: Estado e Atividade Economica
-temp$group <- paste0(temp$UF, " - ", temp$titulo)
-
-# change column order
-temp <- temp %>%
-  relocate(group, time)
-
-# save data at rds format
-saveRDS(temp,
-  file = "./data/ibge_pnadc_cnae.rds"
-)
-
-#####################
-# Build Dictionary
-#####################
-
-# extract variables from data
-columns <- colnames(temp)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = TRUE,
-  size = TRUE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "IBGE - PNAD Contínua",
-  tipo = 1,
-  categoria = "Economia",
-  subcategoria = "Mercado de trabalho"
-)
-
-# label variables
-temp_param_table$label[1] <- "Atividade econômica"
-temp_param_table$label[2] <- "Trimestre-Ano"
-temp_param_table$label[3] <- "Atividade econômica"
-temp_param_table$label[4] <- "Número de ocupados"
-temp_param_table$label[5] <- "Número de ocupados no setor formal"
-temp_param_table$label[6] <- "Número de ocupados no setor informal"
-temp_param_table$label[7] <- "Número de ocupados no setor público"
-temp_param_table$label[8] <- "Número de ocupados no setor privado"
-temp_param_table$label[9] <- "Rendimento mensal médio (R$)"
-temp_param_table$label[10] <- "Rendimento mensal médio no setor formal (R$)"
-temp_param_table$label[11] <- "Rendimento mensal médio no setor informal (R$)"
-temp_param_table$label[12] <- "Massa salarial (R$)"
-temp_param_table$label[13] <- "Estado"
-
-
-# block variables in graphs y-axis
-temp_param_table$y[1] <- FALSE # Recorte regional
-temp_param_table$y[2] <- FALSE # Ano-Trimestre
-temp_param_table$y[3] <- FALSE # "Atividade econômica"
-temp_param_table$y[13] <- FALSE # Estado
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
-
-#############################
-# Build Dictionary in English
+############################
+## Dictionary -- Insercao ##
 ############################
 
-# extract variables from data
-columns <- colnames(temp)
-
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
+temp_param_table <- tibble::tibble(
+    var = c("group", "composicao_demografica", "time",
+            "prop_empregado_sc", "prop_informal",
+            "prop_empregado_cc", "prop_conta_propria", "prop_conta_propria_contrib",
+            "prop_conta_propria_nao_contrib", "prop_empregador",
+            "prop_militar_estatutario", "prop_home_office"),
     x = TRUE,
-    y = TRUE,
+    y = FALSE,
     color = TRUE,
-    size = TRUE,
-    slider = FALSE,
-    label = columns,
-    desc = columns,
-    var_group = "IBGE - PNAD Contínua",
-    tipo = 1,
+    label = NA,
+    desc = NA,
+    var_group = "IBGE - PNAD Cont\u00ednua",
     categoria = "Economia",
-    subcategoria = "Mercado de trabalho"
+    subcategoria = "Mercado de Trabalho"
 )
 
-# relabel in english
+temp_param_table <- temp_param_table %>%
+    mutate(
+        y = ifelse(
+            stringr::str_detect(var, "prop"), TRUE, FALSE
+        ),
+        label = dplyr::case_match(
+            var,
+            "group" ~ "Região",
+            "composicao_demografica" ~ "Composição Demográfica",
+            "time" ~ "Ano - Trimestre",
+            "prop_empregado_sc" ~ "Proporção de Empregados Sem Carteira",
+            "prop_empregado_cc" ~ "Proporção de Empregados Com Carteira",
+            "prop_conta_propria" ~ "Proporção de Conta-Própria",
+            "prop_conta_propria_contrib" ~ "Proporção de Conta-Própria Contribuintes",
+            "prop_conta_propria_nao_contrib" ~ "Proporção de Conta-Própria Não-Contribuintes",
+            "prop_empregador" ~ "Proporção de Empregadores",
+            "prop_militar_estatutario" ~ "Proporção de Militares e Estatutários",
+            "prop_home_office" ~ "Proporção de Home Office",
+            "prop_informal" ~ "Proporção de Informais"
+        ),
+        desc = label,
+        desc = ifelse(
+            stringr::str_detect(var, "prop"), paste(label, "entre Total de Ocupados"), desc
+        )
+    )
 
-temp_param_table$label[1] <- "Economic Activity"
-temp_param_table$label[2] <- "Quarter-year"
-temp_param_table$label[3] <- "Economic Activity"
-temp_param_table$label[4] <- "Employed persons"
-temp_param_table$label[5] <- "Employed persons in the formal sector"
-temp_param_table$label[6] <- "Employed persons in the informal sector"
-temp_param_table$label[7] <- "Employed persons in the public sector"
-temp_param_table$label[8] <- "Employed persons in the private sector"
-temp_param_table$label[9] <- "Mean monthly income (R$)"
-temp_param_table$label[10] <- "Mean monthly income in the formal sector (R$)"
-temp_param_table$label[11] <- "Mean monthly income in the informal sector (R$)"
-temp_param_table$label[12] <- " Total wage (R$)"
-temp_param_table$label[13] <- "State"
+write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_insercao_dic.csv", fileEncoding = "UTF-8")
 
 
+################
+## CNAE e COD ##
+################
 
-# block variables in graphs y-axis
-temp_param_table$y[1] <- FALSE # Recorte regional
-temp_param_table$y[2] <- FALSE # Ano-Trimestre
-temp_param_table$y[3] <- FALSE # "Atividade econômica"
-temp_param_table$y[13] <- FALSE # Estado
+# All of Brazil
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_cnae_dic_en.csv", fileEncoding = "UTF-8")
+describe_brazil <- function(df) {
+    df1 <- df %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = "Todos",
+            id = "All"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(cnae_2dig) %>%
+        group_by(cnae_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = cnae_2dig,
+            id = "CNAE"
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(cod_2dig) %>%
+        group_by(cod_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = "Brasil",
+            composicao_demografica = cod_2dig,
+            id = "COD"
+        )
+    
+    bind_rows(
+        df1, df2, df3
+    )
+}
 
+# By region
 
+describe_region <- function(df) {
+    df1 <- df %>%
+        tidyr::drop_na(regiao) %>%
+        group_by(regiao) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = "Todos",
+            id = "All"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(regiao, cnae_2dig) %>%
+        group_by(regiao, cnae_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = cnae_2dig,
+            id = "CNAE"
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(regiao, cod_2dig) %>%
+        group_by(regiao, cod_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = regiao,
+            composicao_demografica = cod_2dig,
+            id = "COD"
+        )
+    
+    bind_rows(
+        df1, df2, df3
+    )
+}
 
-#################################################
-## Ocupações na Amazônia Legal
-## Ouput data from:
-## Dinamismo Economico na Amazonia
-## github: https://github.com/datazoompuc/datazoom_labour_amazon
-#################################################
+# By legal amazon
 
-# set path to raw data
-github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Economic_Dynamism/output/" # set github structure path
+describe_amazon <- function(df) {
+    df <- df %>%
+        mutate(legal_amazon = ifelse(UF %in% c(11, 12, 13, 14, 15, 16, 17, 21, 51),
+                                     "Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal"))
+    
+    df1 <- df %>%
+        tidyr::drop_na(legal_amazon) %>%
+        group_by(legal_amazon) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = "Todos",
+            id = "All"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(legal_amazon, cnae_2dig) %>%
+        group_by(legal_amazon, cnae_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = cnae_2dig,
+            id = "CNAE"
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(legal_amazon, cod_2dig) %>%
+        group_by(legal_amazon, cod_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = legal_amazon,
+            composicao_demografica = cod_2dig,
+            id = "COD"
+        )
+    
+    bind_rows(
+        df1, df2, df3
+    )
+}
 
-# call raw data
-base1 <- read_dta(paste0(github_folder_path, "_amz_ac_numero_ocupados_por_ocupacao_2digitos.dta"))
-base1 <- base1 %>% mutate(UF = "AC")
-base2 <- read_dta(paste0(github_folder_path, "_amz_am_numero_ocupados_por_ocupacao_2digitos.dta"))
-base2 <- base2 %>% mutate(UF = "AM")
-base3 <- read_dta(paste0(github_folder_path, "_amz_ap_numero_ocupados_por_ocupacao_2digitos.dta"))
-base3 <- base3 %>% mutate(UF = "AP")
-base4 <- read_dta(paste0(github_folder_path, "_amz_ma_numero_ocupados_por_ocupacao_2digitos.dta"))
-base4 <- base4 %>% mutate(UF = "MA")
-base5 <- read_dta(paste0(github_folder_path, "_amz_mt_numero_ocupados_por_ocupacao_2digitos.dta"))
-base5 <- base5 %>% mutate(UF = "MT")
-base6 <- read_dta(paste0(github_folder_path, "_amz_pa_numero_ocupados_por_ocupacao_2digitos.dta"))
-base6 <- base6 %>% mutate(UF = "PA")
-base7 <- read_dta(paste0(github_folder_path, "_amz_ro_numero_ocupados_por_ocupacao_2digitos.dta"))
-base7 <- base7 %>% mutate(UF = "RO")
-base8 <- read_dta(paste0(github_folder_path, "_amz_rr_numero_ocupados_por_ocupacao_2digitos.dta"))
-base8 <- base8 %>% mutate(UF = "RR")
-base9 <- read_dta(paste0(github_folder_path, "_amz_to_numero_ocupados_por_ocupacao_2digitos.dta"))
-base9 <- base9 %>% mutate(UF = "TO")
+# By state
 
-# append all data
-temp <- rbind(base1, base2, base3, base4, base5, base6, base7, base8, base9)
+describe_states <- function(df) {
+    df <- df %>%
+        dplyr::mutate(
+            sigla_uf = dplyr::case_match(
+                UF,
+                11 ~ "RO",
+                12 ~ "AC",
+                13 ~ "AM",
+                14 ~ "RO",
+                15 ~ "PA",
+                16 ~ "AP",
+                17 ~ "TO",
+                21 ~ "MA",
+                22 ~ "PI",
+                23 ~ "CE",
+                24 ~ "RN",
+                25 ~ "PB",
+                26 ~ "PE",
+                27 ~ "AL",
+                28 ~ "SE",
+                29 ~ "BA",
+                31 ~ "MG",
+                32 ~ "ES",
+                33 ~ "RJ",
+                35 ~ "SP",
+                41 ~ "PR",
+                42 ~ "SC",
+                43 ~ "RS",
+                50 ~ "MS",
+                51 ~ "MT",
+                52 ~ "GO",
+                53 ~ "DF"
+            )
+        )
+    
+    df1 <- df %>%
+        tidyr::drop_na(sigla_uf) %>%
+        group_by(sigla_uf) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = "Todos",
+            id = "All"
+        )
+    
+    df2 <- df %>%
+        tidyr::drop_na(sigla_uf, cnae_2dig) %>%
+        group_by(sigla_uf, cnae_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = cnae_2dig,
+            id = "CNAE"
+        )
+    
+    df3 <- df %>%
+        tidyr::drop_na(sigla_uf, cod_2dig) %>%
+        group_by(sigla_uf, cod_2dig) %>%
+        describe_pnad() %>%
+        mutate(
+            group = sigla_uf,
+            composicao_demografica = cod_2dig,
+            id = "COD"
+        )
+    
+    bind_rows(
+        df1, df2, df3
+    )
+}
 
-# remove rows with missing data
-temp <- na.omit(temp)
-temp <- temp %>%
-  filter(titulo != "")
+# Big loop to run one of those for each quarter
 
-# convert time data to quarterly
-temp <- temp %>%
-  mutate(time = paste0(temp$Ano, "-", temp$Trimestre))
-temp$time <- as.Date(as.yearqtr(temp$time))
-temp$Trimestre <- NULL
-temp$Ano <- NULL
-
-# groups at the level: Estado e Ocupações
-temp$group <- paste0(temp$UF, " - ", temp$titulo)
-
-# change column order
-temp <- temp %>%
-  relocate(group, time)
-
-# save data at rds format
-saveRDS(temp,
-  file = "./data/ibge_pnadc_cod.rds"
+dat <- purrr::map_dfr(
+    files,
+    function(file_name) {
+        message(file_name)
+        df <- readr::read_rds(file_name)
+        
+        # todos
+        df1 <- df %>%
+            describe_quarter() %>%
+            mutate(setor = "todos")
+        
+        # formal
+        df2 <- df %>%
+            filter(formal == 1) %>%
+            describe_quarter() %>%
+            mutate(setor = "formal")
+        
+        # informal
+        df3 <- df %>%
+            filter(informal == 1) %>%
+            describe_quarter() %>%
+            mutate(setor = "informal")
+        
+        # publico
+        df4 <- df %>%
+            filter(publico == 1) %>%
+            describe_quarter() %>%
+            mutate(setor = "publico")
+        
+        # privado
+        df5 <- df %>%
+            filter(privado == 1) %>%
+            describe_quarter() %>%
+            mutate(setor = "privado")
+        
+        bind_rows(
+            df1, df2,df3, df4, df5
+        )
+            
+    }
 )
 
-#####################
-# Build Dictionary
-#####################
+# setting up time variable
 
-# extract variables from data
-columns <- colnames(temp)
+dat <- dat %>%
+    mutate(Mes = 3*Trimestre - 2) %>%
+    mutate(time = lubridate::make_date(Ano, Mes))
 
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = TRUE,
-  label = columns,
-  desc = columns,
-  var_group = "PNADC IBGE",
-  tipo = 1,
-  categoria = "Economia",
-  subcategoria = "Trabalho"
-)
+# saving data files
 
-# label variables
-temp_param_table$label[1] <- "Ocupação"
-temp_param_table$label[2] <- "Trimestre-Ano"
-temp_param_table$label[3] <- "Ocupação"
-temp_param_table$label[4] <- "Número de ocupados"
-temp_param_table$label[5] <- "Número de ocupados no setor formal"
-temp_param_table$label[6] <- "Número de ocupados no setor informal"
-temp_param_table$label[7] <- "Número de ocupados no setor público"
-temp_param_table$label[8] <- "Número de ocupados no setor privado"
-temp_param_table$label[9] <- "Rendimento mensal médio (R$)"
-temp_param_table$label[10] <- "Rendimento mensal médio no setor formal (R$)"
-temp_param_table$label[11] <- "Rendimento mensal médio no setor informal (R$)"
-temp_param_table$label[12] <- "Massa salarial (R$)"
-temp_param_table$label[13] <- "Estado"
+dat_cnae <- dat %>%
+    filter(id %in% c("All", "CNAE")) %>%
+    select(-id)
 
-# block variables in graphs y-axis
-temp_param_table$y[1] <- FALSE # Ocupação
-temp_param_table$y[2] <- FALSE # Ano-Trimestre
-temp_param_table$y[3] <- FALSE # Ocupação
-temp_param_table$y[13] <- FALSE # Estado
+readr::write_rds(dat, "data/ibge_pnadc_cnae.rds")
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
+dat_cnae <- dat %>%
+    filter(id %in% c("All", "COD")) %>%
+    select(-id)
 
-#############################
-# Build Dictionary in English
-############################
+readr::write_rds(dat, "data/ibge_pnadc_cod.rds")
 
-# extract variables from data
-columns <- colnames(temp)
+##############################
+## Dictionary -- CNAE e COD ##
+##############################
 
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
+## CNAE
+
+temp_param_table <- tibble::tibble(
+    var = c("group", "setor", "composicao_demografica", "time",
+            "ocupado", "rendimento_medio", "massa_salarial"),
     x = TRUE,
-    y = TRUE,
+    y = FALSE,
     color = TRUE,
-    label = columns,
-    desc = columns,
-    var_group = "PNADC IBGE",
-    tipo = 1,
+    label = NA,
+    desc = NA,
+    var_group = "IBGE - PNAD Cont\u00ednua",
     categoria = "Economia",
-    subcategoria = "Trabalho"
+    subcategoria = "Mercado de Trabalho"
 )
 
-# label variables
-temp_param_table$label[1] <- "Occupation"
-temp_param_table$label[2] <-  "Quarter-year"
-temp_param_table$label[3] <- "Ocupação"
-temp_param_table$label[4] <- "Employed persons"
-temp_param_table$label[5] <- "Employed persons in the formal sector"
-temp_param_table$label[6] <- "Employed persons in the informal sector"
-temp_param_table$label[7] <- "Employed persons in the public sector"
-temp_param_table$label[8] <- "Employed persons in the private sector"
-temp_param_table$label[9] <- "Mean monthly income (R$)"
-temp_param_table$label[10] <- "Mean monthly income in the formal sector (R$)"
-temp_param_table$label[11] <- "Mean monthly income in the informal sector (R$)"
-temp_param_table$label[12] <- "Total wage (R$)"
-temp_param_table$label[13] <- "State"
+temp_param_table <- temp_param_table %>%
+    mutate(
+        y = ifelse(
+            var %in% c("ocupado", "rendimento_medio", "massa_salarial"), TRUE, FALSE
+        ),
+        label = dplyr::case_match(
+            var,
+            "group" ~ "Região",
+            "setor" ~ "Setor",
+            "composicao_demografica" ~ "Atividade Econômica",
+            "time" ~ "Ano - Trimestre",
+            "ocupado" ~ "Número de ocupados",
+            "rendimento_medio" ~ "Rendimento Médio",
+            "massa_salarial" ~ "Massa Salarial"
+        ),
+        desc = label,
+        desc = case_match(
+            var,
+            "composicao_demografica" ~ "Atividade Econômica - Código CNAE",
+            "rendimento_medio" ~ "Rendimento Habitual Médio Real",
+            .default = desc
+        )
+    )
 
-# block variables in graphs y-axis
-temp_param_table$y[1] <- FALSE # Ocupação
-temp_param_table$y[2] <- FALSE # Ano-Trimestre
-temp_param_table$y[3] <- FALSE # Ocupação
-temp_param_table$y[13] <- FALSE # Estado
+write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_cod_dic_en.csv", fileEncoding = "UTF-8")
+## COD
 
+temp_param_table <- temp_param_table %>%
+    mutate(
+        label = ifelse(var == "composicao_demografica", "Tipo de Ocupação", label),
+        desc = ifelse(var == "composicao_demografica", "Ocupação - Código COD", desc)
+    )
+
+write.csv(temp_param_table, file = "data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")

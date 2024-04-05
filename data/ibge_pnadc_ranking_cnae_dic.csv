@@ -1,8 +1,0 @@
-"","var","x","y","color","size","slider","label","desc","var_group","tipo","categoria","subcategoria"
-"1","group",TRUE,TRUE,TRUE,TRUE,FALSE,"Atividade econômica","group","IBGE - PNAD Contínua",1,"Economia","Mercado de trabalho"
-"2","time",FALSE,FALSE,FALSE,FALSE,FALSE,"Trimestre-Ano","time","IBGE - PNAD Contínua",1,"Economia","Mercado de trabalho"
-"3","n_ocu_cnae",TRUE,TRUE,FALSE,FALSE,FALSE,"Número de ocupados","n_ocu_cnae","IBGE - PNAD Contínua",1,"Economia","Mercado de trabalho"
-"4","n_ocu_cnae_formal",TRUE,TRUE,FALSE,FALSE,FALSE,"Número de ocupados no setor formal","n_ocu_cnae_formal","IBGE - PNAD Contínua",1,"Economia","Mercado de trabalho"
-"5","n_ocu_cnae_informal",TRUE,TRUE,FALSE,FALSE,FALSE,"Número de ocupados no setor informal","n_ocu_cnae_informal","IBGE - PNAD Contínua",1,"Economia","Mercado de trabalho"
-"6","n_ocu_cnae_publico",TRUE,TRUE,FALSE,FALSE,FALSE,"Número de ocupados no setor público","n_ocu_cnae_publico","IBGE - PNAD Contínua",1,"Economia","Mercado de trabalho"
-"7","n_ocu_cnae_privado",TRUE,TRUE,FALSE,FALSE,FALSE,"Número de ocupados no setor privado","n_ocu_cnae_privado","IBGE - PNAD Contínua",1,"Economia","Mercado de trabalho"
