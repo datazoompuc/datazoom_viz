@@ -55,11 +55,20 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          param$label_type_name,
+          param$label_region_name,
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
           width = "100%"
+        ),
+        
+        selectizeInput(
+            "filter2",
+            param$label_type_name,
+            choices = NULL,
+            multiple = TRUE,
+            options = list(maxItems = 20),
+            width = "100%"
         ),
         
         # espaço vazio

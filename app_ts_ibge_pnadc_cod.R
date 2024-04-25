@@ -29,6 +29,7 @@ param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
+param$ocup <- "cod_2dig"
 param$lang <- FALSE
 
 
@@ -40,7 +41,8 @@ param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "eixo vertical (y)"
 param$label_scale_name <- "escala log"
 param$label_prop_name <- "proporcional ao trimestre inicial (*)"
-param$label_type_name <- "Estado - tipo de ocupação "
+param$label_region_name <- "Estado"
+param$label_type_name <- "Ocupação"
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cod/"
 
 ### Parametros especificos no server
