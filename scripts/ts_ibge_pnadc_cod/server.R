@@ -88,8 +88,8 @@ get_server <- function(files, param) {
 
       updateSelectInput(session, 
         "filter2", 
-        choices = param$filter_ocupation_choices, 
-        selected = param$filter_ocupation_def
+        choices = param$sector_choices, 
+        selected = param$sector_def
       )
       
       # Pega parametros da url e atribui aos selectinputs
@@ -127,18 +127,11 @@ get_server <- function(files, param) {
        if (!is.null(query[["filter"]])) {
         updateSelectInput(session,
           "filter2",
-          choices = param$filter_ocupation_choices,
+          choices = param$sector_choices,
           selected = selected
               )
        }
     }
-      
-      
-    ' # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter"]]) && is.null(query[["y"]])) {
-        random_inputs() # preenche inputs se estiverem vazios
-      }'
-    
 
     # Output título do gráfico
     output$plot_title <- renderText({

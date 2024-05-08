@@ -54,7 +54,7 @@ param$y_choices[[1]] <- NULL
 
 
 ## 
-param$filter_ocupation_choices <- list("Administradores e especialista em gestão",
+param$sector_choices <- list("Administradores e especialista em gestão",
                              "Ambulantes",
                              "Apoio administrativo",
                              "Artesões e artes gráficas",
@@ -81,7 +81,7 @@ param$filter_ocupation_choices <- list("Administradores e especialista em gestã
                              "Vendedores")
 
     
-param$filter_ocupation_def <- list("Ambulantes","Vendedores")    
+param$sector_def <- list("Ambulantes","Vendedores")    
            
     
     

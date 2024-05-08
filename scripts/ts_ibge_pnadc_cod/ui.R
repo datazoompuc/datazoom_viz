@@ -69,11 +69,11 @@ get_ui <- function(files, param) {
         selectizeInput(
             "filter2",
             param$label_type_name,
-            choices = param$filter_ocupation_choices,
+            choices = param$sector_choices,
             multiple = TRUE,
             options = list(maxItems = 20),
             width = "100%",
-            selected = param$filter_ocupation_def
+            selected = param$sector_def
         ),
         
         # espaço vazio
