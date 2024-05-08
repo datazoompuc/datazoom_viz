@@ -62,13 +62,18 @@ get_ui <- function(files, param) {
           width = "100%"
         ),
         
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        
+        #Seleciona filtro de ocupação
         selectizeInput(
             "filter2",
             param$label_type_name,
-            choices = NULL,
+            choices = param$filter_ocupation_choices,
             multiple = TRUE,
             options = list(maxItems = 20),
-            width = "100%"
+            width = "100%",
+            selected = param$filter_ocupation_def
         ),
         
         # espaço vazio

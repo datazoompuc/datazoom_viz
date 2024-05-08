@@ -53,6 +53,42 @@ param$subtitle_init <- "por tipo de ocupação" # expressão subtitulo
 param$y_choices[[1]] <- NULL
 
 
+## 
+param$filter_ocupation_choices <- list("Administradores e especialista em gestão",
+                             "Ambulantes",
+                             "Apoio administrativo",
+                             "Artesões e artes gráficas",
+                             "Cientistas e engenheiros",
+                             "Coletores de lixo",
+                             "Dirigentes e gerentes",
+                             "Domésticos",
+                             "Escriturários",
+                             "Extrativistas florestais",
+                             "Montadores e condutores de veículos",
+                             "Operários da construção, metalurgia e indústria",
+                             "Operários de processamento e instalações",
+                             "Pecuaristas e criadores de animais",
+                             "Profissionais da saúde",
+                             "Profissionais de segurança",
+                             "Profissionais do ensino",
+                             "Profissionais em alimentação",
+                             "Serviços de TI e comunicação",
+                             "Serviços e cuidados pessoais",
+                             "Serviços financeiros e administrativos",
+                             "Serviços jurídicos",
+                             "Trabalhadores no governo",
+                             "Técnicos de eletricidade e eletrônica",
+                             "Vendedores")
+
+    
+param$filter_ocupation_def <- list("Ambulantes","Vendedores")    
+           
+    
+    
+    
+    
+    
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)

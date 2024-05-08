@@ -16,14 +16,11 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file)
 
     if(param$lang){
-        df$group <- df$group %>%
+        df$cod_2dig <- df$cod_2dig %>%
             stringr::str_replace_all(c("Administradores e especialista em gestão" = "Administrators and management specialists",
-                                      "Agricultores elementares" = "Elementary farmers",
-                                      "Agricultores qualificados" = "Skilled farmers",
                                       "Ambulantes" = "Street vendors",
                                       "Apoio administrativo" = "Administrative support",
                                       "Artesões e artes gráficas" = "Artisans and graphic arts",
-                                      "Atendimento direto ao público" = "Direct customer service",
                                       "Cientistas e engenheiros" = "Scientists and engineers",
                                       "Coletores de lixo" = "Garbage collectors",
                                       "Dirigentes e gerentes" = "Executives and managers",
@@ -42,41 +39,17 @@ get_server <- function(files, param) {
                                       "Serviços e cuidados pessoais" = "Personal care services",
                                       "Serviços financeiros e administrativos" = "Financial and administrative services",
                                       "Serviços jurídicos" = "Legal services",
-                                      "Serviços sociais e culturais" = "Social and cultural services",
                                       "Trabalhadores no governo" = "Government workers",
                                       "Técnicos de eletricidade e eletrônica" = "Electrical and electronic technicians",
                                       "Vendedores" = "Salespersons"
             ))
     }
     
+    
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
 
-    param$filter2_choices <- sort(unique(df$cod_2dig))
-    param$filter2_choices <- param$filter2_choices[which(param$filter2_choices != " - ")]
-    
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = c("Amazônia Legal", "Brasil") # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
-      )
-        
-      updateSelectInput(session, 
-        "filter2", 
-        choices = param$filter2_choices, 
-        selected = sample(param$filter2_choices, 2) 
-        )
-
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
-      updateSelectInput(session,
-        "y",
-        choices = param$y_choices,
-        selected = selected
-      )
-    }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
@@ -110,13 +83,13 @@ get_server <- function(files, param) {
       updateSelectInput(session,
         "filter1",
         choices = param$filter_choices,
-        selected = NULL
+        selected = c("Amazônia Legal", "Brasil")
       )
 
       updateSelectInput(session, 
-                         "filter2", 
-                         choices = param$filter2_choices,
-                         selected = NULL
+        "filter2", 
+        choices = param$filter_ocupation_choices, 
+        selected = param$filter_ocupation_def
       )
       
       # Pega parametros da url e atribui aos selectinputs
@@ -149,12 +122,23 @@ get_server <- function(files, param) {
           selected = selected
         )
       }
-
-      # Se query está vazia, preenche aleatório
+      
+      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+       if (!is.null(query[["filter"]])) {
+        updateSelectInput(session,
+          "filter2",
+          choices = param$filter_ocupation_choices,
+          selected = selected
+              )
+       }
+    }
+      
+      
+    ' # Se query está vazia, preenche aleatório
       if (is.null(query[["filter"]]) && is.null(query[["y"]])) {
         random_inputs() # preenche inputs se estiverem vazios
-      }
-    }
+      }'
+    
 
     # Output título do gráfico
     output$plot_title <- renderText({
@@ -207,7 +191,8 @@ get_server <- function(files, param) {
           color_col <- param$table[which(param$table$var == param$color_def), ]
 
           # Filtra dataframe com grupos selecionados
-          df_filtered <- df[which(df$group %in% input$filter1), ]
+          df_filtered <- df %>% 
+              dplyr::filter((group %in% input$filter1) & (cod_2dig %in% input$filter2))
 
           df_p <- data.frame(
             df_filtered[x_col$var],
@@ -345,4 +330,5 @@ get_server <- function(files, param) {
 
   # Retorna objeto server
   server
-}
+  }
+
