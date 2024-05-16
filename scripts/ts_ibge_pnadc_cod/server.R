@@ -45,11 +45,6 @@ get_server <- function(files, param) {
             ))
     }
     
-    
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {

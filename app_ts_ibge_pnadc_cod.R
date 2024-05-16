@@ -54,40 +54,47 @@ param$y_choices[[1]] <- NULL
 
 
 ## 
-param$sector_choices <- list("Administradores e especialista em gestão",
-                             "Ambulantes",
-                             "Apoio administrativo",
-                             "Artesões e artes gráficas",
-                             "Cientistas e engenheiros",
-                             "Coletores de lixo",
-                             "Dirigentes e gerentes",
-                             "Domésticos",
-                             "Escriturários",
-                             "Extrativistas florestais",
-                             "Montadores e condutores de veículos",
-                             "Operários da construção, metalurgia e indústria",
-                             "Operários de processamento e instalações",
-                             "Pecuaristas e criadores de animais",
-                             "Profissionais da saúde",
-                             "Profissionais de segurança",
-                             "Profissionais do ensino",
-                             "Profissionais em alimentação",
-                             "Serviços de TI e comunicação",
-                             "Serviços e cuidados pessoais",
-                             "Serviços financeiros e administrativos",
-                             "Serviços jurídicos",
-                             "Trabalhadores no governo",
-                             "Técnicos de eletricidade e eletrônica",
-                             "Vendedores")
+param$filter_choices <- list(
+    "Brasil" = list("Brasil", ""),
+    "Amaz\u00f4nia Legal" = list("Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal"),
+    "Regi\u00e3o" = list("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"),
+    "UF" = list("RO", "AC", "AM", "RO", "PA", "AP", "TO",
+                "MA", "PI", "CE", "RN", "PB", "PE", "AL",
+                "SE", "BA", "MG", "ES", "RJ", "SP", "PR",
+                "SC", "RS", "MS", "MT", "GO", "DF")
+)
 
+param$sector_choices <- list(
+    "Dirigentes e Trabalhadores no Governo" = list("Dirigentes e gerentes", 
+                                                   "Trabalhadores no governo"),
+    "Gestão e Profissionais de Saúde e Ensino" = list("Administradores e especialista em gestão", 
+                                                      "Profissionais da saúde", 
+                                                      "Profissionais do ensino"),
+    "Cientistas, Profissionais de TI, Jurídicos e Financeiros" = list("Cientistas e engenheiros", 
+                                                                      "Serviços de TI e comunicação", 
+                                                                      "Serviços jurídicos", 
+                                                                      "Serviços financeiros e administrativos"),
+    "Apoio Administrativo e Atendimento" = list("Apoio administrativo", 
+                                                "Atendimento direto ao público", 
+                                                "Escriturários"),
+    "Segurança, Cuidados Pessoais e Vendas" = list("Profissionais de segurança", 
+                                                   "Serviços e cuidados pessoais", 
+                                                   "Vendedores"),
+    "Artesãos e Técnicos" = list("Artesões e artes gráficas", 
+                                 "Técnicos de eletricidade e eletrônica"),
+    "Montagem, Processamento e Instalação" = list("Montadores e condutores de veículos", 
+                                                  "Operários de processamento e instalações"),
+    "Trabalhos Diversos" = list("Ambulantes", 
+                                "Coletores de lixo", 
+                                "Domésticos", 
+                                "Extrativistas florestais", 
+                                "Operários da construção, metalurgia e indústria", 
+                                "Pecuaristas e criadores de animais", 
+                                "Profissionais em alimentação")
+)
     
 param$sector_def <- list("Ambulantes","Vendedores")    
            
-    
-    
-    
-    
-    
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
