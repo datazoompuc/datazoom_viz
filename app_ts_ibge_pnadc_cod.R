@@ -111,14 +111,14 @@ param$ocupation_choices <- list(
 param$ocupation_def <- list("Ambulantes","Vendedores") 
 
 param$sector_choices <- list(
-    "todos",
-    "formal",
-    "informal",
-    "publico",
-    "privado"
+    "Todos" = "todos",
+    "Formal" = "formal",
+    "Informal" = "informal",
+    "Público" = "publico",
+    "Privado" = "privado"
     )
 
-param$sector_def <- "formal"
+param$sector_def <- "Formal"
  
 #colocar um filtro de opções unico no estilo em que está agora, porém pela coluna de setor
 #essa coluna tem publico, privado, formal, informal e todos (eu acho)
