@@ -30,6 +30,7 @@ param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$ocup <- "cod_2dig"
+param$sector <- "setor"
 param$lang <- FALSE
 
 
@@ -43,6 +44,7 @@ param$label_scale_name <- "escala log"
 param$label_prop_name <- "proporcional ao trimestre inicial (*)"
 param$label_region_name <- "Estado"
 param$label_type_name <- "Ocupação"
+param$label_sector_name <- "Setor"
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cod/"
 
 ### Parametros especificos no server
@@ -64,37 +66,62 @@ param$filter_choices <- list(
                 "SC", "RS", "MS", "MT", "GO", "DF")
 )
 
-param$sector_choices <- list(
-    "Dirigentes e Trabalhadores no Governo" = list("Dirigentes e gerentes", 
-                                                   "Trabalhadores no governo"),
-    "Gestão e Profissionais de Saúde e Ensino" = list("Administradores e especialista em gestão", 
-                                                      "Profissionais da saúde", 
-                                                      "Profissionais do ensino"),
-    "Cientistas, Profissionais de TI, Jurídicos e Financeiros" = list("Cientistas e engenheiros", 
-                                                                      "Serviços de TI e comunicação", 
-                                                                      "Serviços jurídicos", 
-                                                                      "Serviços financeiros e administrativos"),
-    "Apoio Administrativo e Atendimento" = list("Apoio administrativo", 
-                                                "Atendimento direto ao público", 
-                                                "Escriturários"),
-    "Segurança, Cuidados Pessoais e Vendas" = list("Profissionais de segurança", 
-                                                   "Serviços e cuidados pessoais", 
-                                                   "Vendedores"),
-    "Artesãos e Técnicos" = list("Artesões e artes gráficas", 
-                                 "Técnicos de eletricidade e eletrônica"),
-    "Montagem, Processamento e Instalação" = list("Montadores e condutores de veículos", 
-                                                  "Operários de processamento e instalações"),
-    "Trabalhos Diversos" = list("Ambulantes", 
-                                "Coletores de lixo", 
-                                "Domésticos", 
-                                "Extrativistas florestais", 
-                                "Operários da construção, metalurgia e indústria", 
-                                "Pecuaristas e criadores de animais", 
-                                "Profissionais em alimentação")
+param$ocupation_choices <- list(
+    "Dirigentes e Trabalhadores no Governo" = list("Dirigentes e gerentes", "Trabalhadores no governo"),
+    "Gestão e Profissionais de Saúde e Ensino" = list(
+        "Administradores e especialista em gestão",
+        "Profissionais da saúde",
+        "Profissionais do ensino"
+    ),
+    "Cientistas, Profissionais de TI, Jurídicos e Financeiros" = list(
+        "Cientistas e engenheiros",
+        "Serviços de TI e comunicação",
+        "Serviços jurídicos",
+        "Serviços financeiros e administrativos"
+    ),
+    "Apoio Administrativo e Atendimento" = list(
+        "Apoio administrativo",
+        "Atendimento direto ao público",
+        "Escriturários"
+    ),
+    "Segurança, Cuidados Pessoais e Vendas" = list(
+        "Profissionais de segurança",
+        "Serviços e cuidados pessoais",
+        "Vendedores"
+    ),
+    "Artesãos e Técnicos" = list(
+        "Artesões e artes gráficas",
+        "Técnicos de eletricidade e eletrônica"
+    ),
+    "Montagem, Processamento e Instalação" = list(
+        "Montadores e condutores de veículos",
+        "Operários de processamento e instalações"
+    ),
+    "Trabalhos Diversos" = list(
+        "Ambulantes",
+        "Coletores de lixo",
+        "Domésticos",
+        "Extrativistas florestais",
+        "Operários da construção, metalurgia e indústria",
+        "Pecuaristas e criadores de animais",
+        "Profissionais em alimentação"
+    )
 )
-    
-param$sector_def <- list("Ambulantes","Vendedores")    
-           
+
+param$ocupation_def <- list("Ambulantes","Vendedores") 
+
+param$sector_choices <- list(
+    "todos",
+    "formal",
+    "informal",
+    "publico",
+    "privado"
+    )
+
+param$sector_def <- "formal"
+ 
+#colocar um filtro de opções unico no estilo em que está agora, porém pela coluna de setor
+#essa coluna tem publico, privado, formal, informal e todos (eu acho)
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

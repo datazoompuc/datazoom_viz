@@ -68,6 +68,14 @@ get_server <- function(files, param) {
           )
           
       }
+      
+      for (k in input$filter3) {
+          q_string <- paste0(
+              q_string,
+              "&","filter3=",k
+          )
+          
+      }
 
       updateQueryString(q_string, mode = "replace")
     }
@@ -83,6 +91,12 @@ get_server <- function(files, param) {
 
       updateSelectInput(session, 
         "filter2", 
+        choices = param$ocupation_choices, 
+        selected = param$ocupation_def
+      )
+      
+      updateSelectInput(session, 
+        "filter3", 
         choices = param$sector_choices, 
         selected = param$sector_def
       )
@@ -122,9 +136,18 @@ get_server <- function(files, param) {
        if (!is.null(query[["filter"]])) {
         updateSelectInput(session,
           "filter2",
-          choices = param$sector_choices,
+          choices = param$ocupation_choices,
           selected = selected
               )
+       }
+      
+      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+      if (!is.null(query[["filter"]])) {
+        updateSelectInput(session,
+           "filter3",
+           choices = param$sector_choices,
+           selected = selected
+                )
        }
     }
 
@@ -180,7 +203,9 @@ get_server <- function(files, param) {
 
           # Filtra dataframe com grupos selecionados
           df_filtered <- df %>% 
-              dplyr::filter((group %in% input$filter1) & (cod_2dig %in% input$filter2))
+              dplyr::filter((group %in% input$filter1) &
+                                (cod_2dig %in% input$filter2) &
+                                (setor %in% input$filter3))
 
           df_p <- data.frame(
             df_filtered[x_col$var],
@@ -233,7 +258,7 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
             x = ~x,
             y = ~y,
-            color = ~group,
+            color = ~ group,
             type = "scatter",
             mode = "lines",
             text = ~tooltip,

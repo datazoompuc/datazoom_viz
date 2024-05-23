@@ -56,8 +56,8 @@ get_ui <- function(files, param) {
         selectizeInput(
           "filter1",
           param$label_region_name,
-          choices = NULL,
-          multiple = TRUE,
+          choices = param$filter_choices,
+          multiple = T,
           options = list(maxItems = 20),
           width = "100%"
         ),
@@ -69,9 +69,23 @@ get_ui <- function(files, param) {
         selectizeInput(
             "filter2",
             param$label_type_name,
-            choices = param$sector_choices,
+            choices = param$ocupation_choices,
             multiple = TRUE,
             options = list(maxItems = 20),
+            width = "100%",
+            selected = param$ocupation_def
+        ),
+        
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        
+        #seleciona filtro de setor
+        selectizeInput(
+            "filter3",
+            param$label_sector_name,
+            choices = param$sector_choices,
+            multiple = T,
+            options = list(maxItems = 1),
             width = "100%",
             selected = param$sector_def
         ),
