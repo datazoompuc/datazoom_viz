@@ -108,7 +108,7 @@ param$ocupation_choices <- list(
     )
 )
 
-param$ocupation_def <- list("Ambulantes","Vendedores") 
+param$ocupation_def <- list("Profissionais da saúde","Profissionais do ensino") 
 
 param$sector_choices <- list(
     "Todos" = "todos",
@@ -118,10 +118,8 @@ param$sector_choices <- list(
     "Privado" = "privado"
     )
 
-param$sector_def <- "Formal"
+param$sector_def <- "formal"
  
-#colocar um filtro de opções unico no estilo em que está agora, porém pela coluna de setor
-#essa coluna tem publico, privado, formal, informal e todos (eu acho)
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

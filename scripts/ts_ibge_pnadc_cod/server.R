@@ -214,6 +214,7 @@ get_server <- function(files, param) {
           )
           colnames(df_p) <- c("x", "y", "color")
           df_p$group <- df_filtered$group
+          df_p$cod <- df_filtered$cod_2dig
           df_p$text <- df_p$group
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
@@ -254,11 +255,14 @@ get_server <- function(files, param) {
           # Define paleta de cores
           pallete <- pallete_discrete
 
+          #Define variável de cor
+          df_p$combined <- paste0(df_p$group, "-", df_p$cod)
+          
           # Monta gráfico
           fig_p <- plot_ly(df_p,
             x = ~x,
             y = ~y,
-            color = ~ group,
+            color = ~ combined,
             type = "scatter",
             mode = "lines",
             text = ~tooltip,
