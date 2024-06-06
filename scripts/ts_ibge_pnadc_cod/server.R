@@ -226,15 +226,18 @@ get_server <- function(files, param) {
             stop()
           }
 
+          #Define variável de cor
+          df_p$combined <- paste(df_p$group, "-", df_p$cod)
+          
           # Alternativa de medida para y
           if (input$y_option & is.numeric(df_p$y)) {
             df_p <- df_p %>%
-              group_by(df_p$group) %>%
-              mutate(
-                aux1 = first(y),
-                y_option = (y / aux1) * 100
-              )
-            df_p$y <- df_p$y_option
+                ungroup() %>%
+                arrange(x) %>%
+                mutate(
+                    y = 100 * y/first(y),
+                    .by = combined
+                )
           }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
@@ -254,9 +257,6 @@ get_server <- function(files, param) {
 
           # Define paleta de cores
           pallete <- pallete_discrete
-
-          #Define variável de cor
-          df_p$combined <- paste0(df_p$group, "-", df_p$cod)
           
           # Monta gráfico
           fig_p <- plot_ly(df_p,
