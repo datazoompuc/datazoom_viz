@@ -1,8 +1,0 @@
-"","var","x","y","color","size","slider","label","desc","var_group","tipo","categoria","subcategoria"
-"1","group",TRUE,TRUE,TRUE,TRUE,FALSE,"Economic activity","group","IBGE - Continuous PNAD",1,"Economy","Labor market"
-"2","time",FALSE,FALSE,FALSE,FALSE,FALSE,"Quarter-year","time","IBGE - Continuous PNAD",1,"Economy","Labor market"
-"3","n_ocu_cnae",TRUE,TRUE,FALSE,FALSE,FALSE,"Number of employed workers","n_ocu_cnae","IBGE - Continuous PNAD",1,"Economy","Labor market"
-"4","n_ocu_cnae_formal",TRUE,TRUE,FALSE,FALSE,FALSE,"Number of workers employed in the formal sector","n_ocu_cnae_formal","IBGE - Continuous PNAD",1,"Economy","Labor market"
-"5","n_ocu_cnae_informal",TRUE,TRUE,FALSE,FALSE,FALSE,"Number of workers employed in the informal sector","n_ocu_cnae_informal","IBGE - Continuous PNAD",1,"Economy","Labor market"
-"6","n_ocu_cnae_publico",TRUE,TRUE,FALSE,FALSE,FALSE,"Number of workers employed in the public sector","n_ocu_cnae_publico","IBGE - Continuous PNAD",1,"Economy","Labor market"
-"7","n_ocu_cnae_privado",TRUE,TRUE,FALSE,FALSE,FALSE,"Number of workers employed in the private sector","n_ocu_cnae_privado","IBGE - Continuous PNAD",1,"Economy","Labor market"

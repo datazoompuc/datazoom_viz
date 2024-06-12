@@ -1,0 +1,1297 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# datazoom_viz
+
+
+
+The datazoom_viz repository is used for developing visualizations in shiny R codes and fueling the https://datazoomamazonia.com.br/ website.
+
+All the apps are listed in this sheet. (https://docs.google.com/spreadsheets/d/1oSR_vybaRs9JEy8NC7MuBFfOlE6mA2Mxf_Ugm4E_HgA/edit?usp=sharing). It shows if there are any issues related to the app, if it is updated, translated, published and working well. 
+
+Main Directories:
+ - "./data": contains all the .rds databases and .csv files that are used in the generation of the visualizations. The files' names are organized in order to follow a pattern: xxxx.rds for the databases and xxxx_dic for the .csv dictionaries that correspond to the same database.
+ 
+ - "./data-raw": contains .R scripts that generates both the .rds databases and the .csv files that are recorded in the "./data" directory. In order to generate the databases, the scripts use the datazoom.amazonia R package, developed by the Datazoom team. Each .R script is responsible for generating the .rds and .csv files for specific geographic aggregation of the researches. 
+ 
+ - "./scripts": contains .R scripts that generate the visualizations using the Shiny Apps technology.
+
+
+## Glossary
+
+The files names were given according to the type of graphic that was used:
+
+- `app_bar`: bar chart
+- `app_bubble`: scatter plot
+- `app_hist`: histogram
+- `app_map` and `app_mapstatic`: map
+- `app_rk`and `app_rkstatic`: ranking
+- `app_sankey`: sankey graphic
+- `app_tab`: table
+- `app_ts`: curve graphic
+
+
+**[1 - Environmental data](#environmental-data)**
+
+<table>
+<tr>
+<td>
+
+|                       |                                        |
+|-----------------------|----------------------------------------|
+| **[PRODES](#prodes)** | *Yearly deforestation*                 |
+| **[MapBiomas](#mapbiomas)**       | *Land cover and land use*           |
+| **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
+
+
+</td>
+</tr>
+</table>
+
+**[2 - Social data](#social-data)**
+
+<table>
+<tr>
+<td>
+
+|                               |                                                         |
+|-------------------------------|---------------------------------------------------------|
+| **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
+| **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
+| **[PNADC](#pnadc)**             | *Households socioeconomic status* |
+
+
+</td>
+</tr>
+</table>
+
+**[3 - Economic data](#economic-data)**
+
+<table>
+<tr>
+<td>
+
+|                             |                                 |
+|-----------------------------|---------------------------------|
+| **[COMEX](#comex)**         | *Brazilian international trade* |
+| **[CEMPRE](#cempre)**       | *Central register of companies* |
+| **[PPM](#ppm)**             | *Livestock farming*             |
+
+</td>
+<td>
+
+|                         |                           |
+|-------------------------|---------------------------|
+| **[SIGMINE](#sigmine)** | *Mining*                  |
+| **[ANEEL](#aneel)**     | *Energy development*      |
+| **[EPE](#epe)**         | *Energy consumption*      |
+
+</td>
+</tr>
+</table>
+
+**[4 - Multiple data](#multiple-data)**
+
+<table>
+<tr>
+<td>
+
+|                                                                 |                                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **[Non specified](#non-specified)** | *Land, energy, mortality etc* |
+
+</table>
+
+# Environmental Data
+
+## PRODES
+
+The PRODES project uses satellites to monitor deforestation in Brazil’s
+Legal Amazon. The raw data reports total and incremental (year-by-year)
+low-cut deforested area at the municipality level, going back to the
+year 2000.
+
+Data is collected based on the PRODES-year, which starts at August 1st
+and ends on July 31st. Accordingly, 2018 deforestation data covers the
+period from 01/08/2017 to 31/07/2018.
+
+INPE’s most recent data is now published at
+[TerraBrasilis](http://terrabrasilis.dpi.inpe.br/downloads/). We have
+refrained from updating to this new source, as it only contains detailed
+spatial data, rather than agregated, municipality-level data.
+
+------------------------------------------------------------------------
+
+
+**Files:**
+
+  
+- `app_map_dz_munic_prodes`: map of deforestation, hydrogaphy and forest data at the municipality level. (english version: `app_map_dz_munic_prodes_en`)
+  
+- `app_rkstatic_dz_munic`: ranking of deforestation champion states. (english version: `app_rkstatic_dz_munic_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_dz_munic_prodes.R</td>
+    <td>dz_munic_dic.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_prodes/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_dz_munic_prodes_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_prodes/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rkstatic_dz_munic.R</td>
+    <td>dz_munic_dic.csv and dz_munic.rds</td>
+    <td>/rkstatic_dz_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rkstatic_dz_munic_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic.rds</td>
+    <td>/rkstatic_dz_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+</table>
+
+
+## MapBiomas
+
+The MapBiomas project gathers data reporting the type of land covering
+each year by area, that is, for example, the area used for a temporary
+crop of soybeans. It also reports the transitions in land coverage
+between years.
+
+The data has yearly frequency and is available starting from the year
+1989.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_hist_mapbiomas_bovinos`: histogram graphic about the distribution of municipalities according to cattle per hectares of grazing areas. (english version: `app_hist_mapbiomas_bovinos_en`)
+  
+- `app_map_cattle`: map of heads of cattle and pasture area data. (english version: `app_map_cattle_en`)
+
+- `app_map_mapbiomas_cover`: map of annual land use and land cover in brazil. (english version: `app_map_mapbiomas_cover_en`)
+
+- `app_rk_mapbiomas_cobertura_est`: ranking of annual land use and cover at state level. (english version: `app_rk_mapbiomas_cobertura_est_en`)
+
+- `app_rk_mapbiomas_cobertura_munic`: ranking of annual land use and cover at the municipality level. (english version: `app_rk_mapbiomas_cobertura_munic_en`)
+
+- `app_rk_mapbiomas_cobertura_munic_percentual`: ????como diferenciar do de cima???? (english version: `app_rk_mapbiomas_cobertura_munic_percentual_en`)
+
+- `app_rk_mapbiomas_transicao_est`: ranking of transition/change of soil cover and use at state level through the years. (english version: `app_rk_mapbiomas_transicao_est_en`)
+
+- `app_rk_mapbiomas_transicao_munic_5`: ranking of transition/change of soil cover and use at the municipality level through the years. (english version: `app_rk_mapbiomas_transicao_munic_5_en`)
+
+- `app_tab_mapbiomas_transicao_est`: table of transition/change of soil cover and use at state level through the years.
+
+- `app_ts_mapbiomas_cobertura_est`: graphic of annual mapping of land use and coverage at state level. (english version: `app_ts_mapbiomas_cobertura_est_en`)
+
+- `app_ts_mapbiomas_cobertura_munic`: graphic of annual mapping of land use and coverage at the municipality level. (english version: `app_ts_mapbiomas_cobertura_munic_en`)
+
+- `app_ts_mapbiomas_transicao_est`: graphic of transition/ change of land cover and use at state level. (english version: `app_ts_mapbiomas_transicao_est_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_hist_mapbiomas_bovinos.R</td>
+    <td>dz_munic_ppm_mapbiomas_dic.csv and dz_munic_ppm_mapbiomas.rds</td>
+    <td>/hist_mapbiomas_bovinos/</td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_hist_mapbiomas_bovinos_en.R</td>
+    <td>dz_munic_ppm_mapbiomas_dic_en.csv and dz_munic_ppm_mapbiomas_en.rds</td>
+    <td>/hist_mapbiomas_bovinos/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_cattle.R</td>
+    <td>censoagro_mapbiomas_gado_dic.csv and censoagro_mapbiomas_gado.rds and legal_amazon_boundary.rds and states_boundary.rds and area_municipios.rds</td>
+    <td>/map_cattle/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_cattle_en.R</td>
+    <td>censoagro_mapbiomas_gado_dic_en.csv and censoagro_mapbiomas_gado.rds and legal_amazon_boundary.rds and states_boundary.rds and area_municipios.rds</td>
+    <td>/map_cattle/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_map_mapbiomas_cover.R</td>
+    <td>mapbiomas_cobertura_munic_savana_dic.csv and mapbiomas_cobertura.rds and legal_amazon_boundary.rds and states_boundary.rds and area_municipios.rds</td>
+    <td>/map_mapbiomas_cover/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_mapbiomas_cover_en.R</td>
+    <td>mapbiomas_cobertura_munic_savana_dic_en.csv and mapbiomas_cobertura.rds and legal_amazon_boundary.rds and states_boundary.rds and area_municipios.rds</td>
+    <td>/map_mapbiomas_cover/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_est.R</td>
+    <td>mapbiomas_cobertura_est_dic.csv and mapbiomas_cobertura_est.rds</td>
+    <td>/rk_mapbiomas_cobertura_est/ and /rk/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_est_en.R</td>
+    <td>mapbiomas_cobertura_est_dic_en.csv and mapbiomas_cobertura_est.rds</td>
+    <td>/rk/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_munic.R</td>
+    <td>mapbiomas_cobertura_munic_dic.csv and mapbiomas_cobertura_munic.rds</td>
+    <td>/rk_mapbiomas_cobertura_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_rk_mapbiomas_cobertura_munic_en.R</td>
+    <td>mapbiomas_cobertura_munic_dic_en.csv and mapbiomas_cobertura_munic.rds</td>
+    <td>/rk_mapbiomas_cobertura_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_munic_percentual.R</td>
+    <td>mapbiomas_cobertura_munic_percentual_dic.csv and mapbiomas_cobertura_munic_percentual.rds</td>
+    <td>/rk_mapbiomas_cobertura_munic_percentual/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_cobertura_munic_percentual_en.R</td>
+    <td>mapbiomas_cobertura_munic_percentual_dic_en.csv and mapbiomas_cobertura_munic_percentual.rds</td>
+    <td>/rk_mapbiomas_cobertura_munic_percentual/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_rk_mapbiomas_transicao_est.R</td>
+    <td>mapbiomas_transicao_est_dic.csv and mapbiomas_transicao_est.rds</td>
+    <td>/rk_mapbiomas_transition_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_transicao_est_en.R</td>
+    <td>mapbiomas_transicao_est_dic_en.csv and mapbiomas_transicao_est.rds</td>
+    <td>/rk_mapbiomas_transition_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_rk_mapbiomas_transicao_munic_5.R</td>
+    <td>mapbiomas_transicao_munic_dic.csv and mapbiomas_transicao_munic_5.rds</td>
+    <td>/rk_mapbiomas_transition_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_mapbiomas_transicao_munic_5_en.R</td>
+    <td>mapbiomas_transicao_munic_dic_en.csv and mapbiomas_transicao_munic_5.rds</td>
+    <td>/rk_mapbiomas_transition_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_tab_mapbiomas_transicao_est.R</td>
+    <td>mapbiomas_transicao_est_tab_dic.csv and mapbiomas_transicao_est_tab.rds</td>
+    <td>/tab/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_mapbiomas_cobertura_est.R</td>
+    <td>mapbiomas_cobertura_est_dic.csv and mapbiomas_cobertura_est.rds</td>
+    <td>/ts_mapbiomas_cobertura_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_mapbiomas_cobertura_est_en.R</td>
+    <td>mapbiomas_cobertura_est_dic_en.csv and mapbiomas_cobertura_est.rds</td>
+    <td>/ts_mapbiomas_cobertura_est/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_mapbiomas_cobertura_munic.R</td>
+    <td>mapbiomas_cobertura_munic_dic.csv and mapbiomas_cobertura_munic.rds</td>
+    <td>/ts_mapbiomas_cobertura_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_mapbiomas_cobertura_munic_en.R</td>
+    <td>mapbiomas_cobertura_munic_dic_en.csv and mapbiomas_cobertura_munic.rds</td>
+    <td>/ts_mapbiomas_cobertura_munic/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_mapbiomas_transicao_est.R</td>
+    <td>mapbiomas_transicao_est_dic.csv and mapbiomas_transicao_est.rds</td>
+    <td>/ts_mapbiomas_transicao/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+ <tr>
+    <td>app_ts_mapbiomas_transicao_est_en.R</td>
+    <td>mapbiomas_transicao_est_dic_en.csv and mapbiomas_transicao_est.rds</td>
+    <td>/ts_mapbiomas_transicao/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+</table>
+
+## SEEG
+
+Loads estimates of emission of greenhouse gases of Brazilian cities and
+states from SEEG. SEEG is the System of Estimates of Emissions and
+Removals of Greenhouse Gases (SEEG), an initiative of the Observatório
+do Clima, a network of institutions focused on climate change research
+in Brazil.
+
+The data provided in SEEG’s Collection 9 is a series covering the period
+from 1970 to 2020, except for the Land Use Change Sector that has the
+series from 1990 to 2020.
+
+Using data collected from government entities, institutes, research
+centers, NGOs and other institutions, the estimates are created using
+the methodology of the Brazilian Inventory of Anthropic Emissions and
+Removals of Greenhouse Gases, assembled by the Ministry of Science,
+Technology and Innovation (MCTI), and the directives of
+Intergovernmental Panel on Climate Change (IPCC)
+
+Emissions are divided in five main sources: Agricultural and Cattle
+Raising, Energy, Changes in Use of Land, Industrial Processes and
+Residues. All greenhouse gases contained in the national inventory are
+considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion
+to carbon equivalence (CO2e) also included, both in the metric of GWP
+(Global Warming Potential) and GTP (Global Temperature Potential).
+
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_ts_seeg_state_energy`: graphic of greenhouse gas emissions in the energy sector at state level. (english version: `app_ts_seeg_state_energy_en`)
+
+- `app_ts_seeg_state_farming`: graphic of greenhouse gas emissions in farming at state level. (english version: `app_ts_seeg_state_farming_en`)
+
+- `app_ts_seeg_state_industry`: graphic of greenhouse gas emissions in industry at state level. (english version: `app_ts_seeg_state_industry_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_ts_seeg_state_energy.R</td>
+    <td>seeg_state_energy_dic.csv and seeg_state_energy.rds</td>
+    <td>/ts_seeg_state_energy/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_seeg_state_energy_en.R</td>
+    <td>seeg_state_energy_dic_en.csv and seeg_state_energy.rds</td>
+    <td>/ts_seeg_state_energy/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_seeg_state_farming.R</td>
+    <td>seeg_state_farming_dic.csv and seeg_state_farming.rds</td>
+    <td>/ts_seeg_state_farming/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_seeg_state_farming_en.R</td>
+    <td>seeg_state_farming_dic_en.csv and seeg_state_farming.rds</td>
+    <td>/ts_seeg_state_farming/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_seeg_state_industry.R</td>
+    <td>seeg_state_industry_dic.csv and seeg_state_industry.rds</td>
+    <td>/ts_seeg_state_industry/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_seeg_state_industry_en.R</td>
+    <td>seeg_state_industry_dic_en.csv and seeg_state_industry.rds</td>
+    <td>/ts_seeg_state_industry/</td>
+    <td>Nova Data-Raw</td>
+  </tr>
+</table>
+
+
+# Social Data
+
+## IPS
+
+Loads information on the social and environmental performance of the
+Legal Amazon.
+
+Data from the Amazon Social Progress Index, an initiative from Imazon
+with support from the Social Progress Imperative that measures the
+social and environmental progress of its locations. Namely, the 772
+municipalities in the Amazon region. Survey is done at the municipal
+level and data is available in 2014 and 2018.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_mapstatic_ips`: map of compiled data from the Institute of Man and Environment of the Amazon (IMAZON). (english version: `app_mapstatic_ips_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_mapstatic_ips.R</td>
+    <td>ips_2021_dic.csv and ips_2021.rds</td>
+    <td>/mapstatic_ips/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_mapstatic_ips.R</td>
+    <td>ips_2021_dic_en.csv and ips_2021.rds</td>
+    <td>/mapstatic_ips/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+
+
+## DATASUS
+
+DATASUS is the IT department of SUS – the Brazilian Unified Health
+System. They provide data on health establishments, mortality, access to
+health services and several health indicators nationwide. 
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_map_saude_mortalidade`: health conditions at amazon: mortality at the municipal level. (english version: `app_map_saude_mortalidade_en`)
+
+- `app_ts_saude_municipality`: health data at the municipal level. (english version: `app_ts_saude_municipality_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_saude_mortalidade.R</td>
+    <td>saude_mortalidade_dic.csv and saude_mortalidade.rds</td>
+    <td>/map_saude_mortalidade/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_map_saude_mortalidade_en.R</td>
+    <td>saude_mortalidade_dic_en.csv and saude_mortalidade.rds</td>
+    <td>/map_saude_mortalidade/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_saude_municipality.R</td>
+    <td>saude_municipality_dic.csv and saude_municipality.rds</td>
+    <td>/ts_saude_municipality/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_saude_municipality_en.R</td>
+    <td>saude_municipality_dic_en.csv and saude_municipality.rds</td>
+    <td>/ts_saude_municipality/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+## PNADC
+
+PNAD was an annual research focused on brazilian households, which revealed general characteristics of the population, including education, work, habitation etc. It started at 1967 with a diferent periodicity and ended on 2016 with the divulgation of 2015's data. PNAD was replaced by PNADC (continuous pnad) with a new method that allows a better territorial coverage and delivers new data about the workforce every three months.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_rk_ibge_pnadc_cnae`: ranking of economic activities in the legal amazon at municipality level. (english version: `app_rk_ibge_pnadc_cnae_en`)
+
+- `app_rk_ibge_pnadc_cod`: ranking of ocupation type in the legal amazon at municipality level. (english version: `app_rk_ibge_pnadc_cod_en`)
+
+- `app_ts_ibge_pnadc_cnae`: graphic of compiled data about economic activities generated from the quarterly continuous pnad. (english version: `app_ts_ibge_pnadc_cnae_en`)
+
+- `app_ts_ibge_pnadc_cod`: graphic of compiled data about type of work occupation generated from the quarterly continuous pnad. (english version: `app_ts_ibge_pnadc_cod_en`)
+
+- `app_ts_ibge_pnadc_trabalho`: graphic of labor market. (english version: `app_ts_ibge_pnadc_trabalho_en`)
+
+- `app_ts_ibge_pnadc_trabalho_insercao`: graphic of insertion of employed persons in the labor market. (english version: `app_ts_ibge_pnadc_trabalho_insercao_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_rk_ibge_pnadc_cnae.R</td>
+    <td>ibge_pnadc_ranking_cnae_dic.csv and ibge_pnadc_ranking_cnae.rds</td>
+    <td>/rk_ibge_pnadc_cnae/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_rk_ibge_pnadc_cnae_en.R</td>
+     <td>ibge_pnadc_ranking_cnae_dic_en.csv and ibge_pnadc_ranking_cnae.rds</td>
+    <td>/rk_ibge_pnadc_cnae/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_rk_ibge_pnadc_cod.R</td>
+    <td>ibge_pnadc_ranking_cod_dic.csv and ibge_pnadc_ranking_cod.rds</td>
+    <td>/rk_ibge_pnadc_cod/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_rk_ibge_pnadc_cod_en.R</td>
+    <td>ibge_pnadc_ranking_cod_dic_en.csv and ibge_pnadc_ranking_cod.rds</td>
+    <td>/rk_ibge_pnadc_cod/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_ibge_pnadc_cnae.R</td>
+    <td>ibge_pnadc_cnae_dic.csv and ibge_pnadc_cnae.rds</td>
+    <td>/ts_ibge_pnadc_cnae/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_ibge_pnadc_cnae_en.R</td>
+    <td>ibge_pnadc_cnae_dic_en.csv and ibge_pnadc_cnae.rds</td>
+    <td>/ts_ibge_pnadc_cnae/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_ibge_pnadc_cod.R</td>
+    <td>ibge_pnadc_cod_dic.csv and ibge_pnadc_cod.rds</td>
+    <td>/ts_ibge_pnadc_cod/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_ibge_pnadc_cod_en.R</td>
+    <td>ibge_pnadc_cod_dic_en.csv and ibge_pnadc_cod.rds</td>
+    <td>/ts_ibge_pnadc_cod/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_ibge_pnadc_trabalho.R</td>
+    <td>ibge_pnadc_trabalho_dic.csv and ibge_pnadc_trabalho.rds</td>
+    <td>/ts_ibge_pnadc_trabalho/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_ibge_pnadc_trabalho_en.R</td>
+    <td>ibge_pnadc_trabalho_dic_en.csv and ibge_pnadc_trabalho.rds</td>
+    <td>/ts_ibge_pnadc_trabalho/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_ibge_pnadc_trabalho_insercao.R</td>
+    <td>ibge_pnadc_trabalho_insercao_dic.csv and ibge_pnadc_trabalho_insercao.rds</td>
+    <td>/ts_ibge_pnadc_trabalho_insercao/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_ibge_pnadc_trabalho_insercao_en.R</td>
+    <td>ibge_pnadc_trabalho_insercao_dic_en.csv and ibge_pnadc_trabalho_insercao.rds</td>
+    <td>/ts_ibge_pnadc_trabalho_insercao/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+# Economic Data
+
+## COMEX
+
+The Comex dataset gathers data extracted from [Siscomex (Integrated
+System of Foreign
+Trade)](https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/),
+which is a database containing information from all products that are
+imported to or exported from Brazil. Using data reported from the
+companies which are responsible for the process of transporting the
+products, the system adheres to internationally standardized
+nomenclatures, such as the Harmonized System and the Mercosul Common
+Nomenclature (which pertains to members of the Mercosul organization).
+
+The data has a monthly frequency and is available starting from the year
+1989. From 1989 to 1996, a different system of nomenclatures was
+adopted, but all conversions are available on a dictionary in the Comex
+website
+(<https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/>).
+Systems of nomenclature vary in the degree of detail in terms of the
+product involved, as well as other characteristics, such as unit and
+granularity of location.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_map_comex_exp_sh4_sel`: map of foreign trade in the amazon: value of the product's export. (english version: `app_map_comex_exp_sh4_sel_en`)
+
+- `app_rk_comex_exp_munic_produtosamz`: ranking of biggest product exporters municipalities in the legal amazon. (english version: `app_rk_comex_exp_munic_produtosamz_en`)
+
+- `app_rk_comex_exp_paises`: ranking of countries that import the most from the legal amazon. (english version: `app_rk_comex_exp_paises_en`)
+
+- `app_rk_comex_exp_perc_sh4_sel`: ranking of foreign trade in the amazon compared to internacional commerce (BACI): proportion of products export values. (english version: `app_rk_comex_exp_perc_sh4_sel_en`)
+
+- `app_sankey_comex_exp_pais_sec`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_sankey_comex_exp_pais_sec_en`)
+
+- `app_ts_comex_exp_munic_sec`: graphic of external trade in the amazon: products export value per municipality. (english version: `app_ts_comex_exp_munic_sec_en`)
+
+- `app_ts_comex_exp_munic_sh2`: ????não sei diferenciar do de cima????. (english version: `app_ts_comex_exp_munic_sh2_en`)
+
+- `app_ts_comex_exp_pais_sec`: OUTRA VERSÃO DE app_sankey_comex_exp_pais_sec*** graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_pais_sec_en`)
+
+- `app_ts_comex_exp_sec_munic`: graphic of external trade in the amazon: products export value per municipality. (english version: `app_ts_comex_exp_sec_munic_en`)
+
+- `app_ts_comex_exp_sec_pais`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_sec_pais_en`)
+
+- `app_ts_comex_exp_sh2_munic`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_sh2_munic_en`)
+
+- `app_ts_comex_exp_tot_pais`: graphic of external trade in the amazon: total products export value of amazonia legal per destination country. (english version: `app_ts_comex_exp_tot_pais_en`)
+
+- `app_ts_comex_exp_tot_sh2`: graphic of external trade in the amazon: products export value per type of product. (english version: `app_ts_comex_exp_tot_sh2_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_comex_exp_sh4_sel.R</td>
+    <td>comex_exp_munic_sh4_sel_dic.csv and comex_exp_munic_sh4_sel.rds</td>
+    <td>/map_comex_exp_sh4_sel/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_comex_exp_sh4_sel_en.R</td>
+    <td>comex_exp_munic_sh4_sel_dic_en.csv and comex_exp_munic_sh4_sel.rds</td>
+    <td>/map_comex_exp_sh4_sel/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_rk_comex_exp_munic_produtosamz.R</td>
+    <td>comex_exp_sh4_munic_dic.csv and comex_exp_sh4_munic.rds</td>
+    <td>/rk_comex_exp_munic_produtosamz/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_comex_exp_munic_produtosamz_en.R</td>
+    <td>comex_exp_sh4_munic_dic_en.csv and comex_exp_sh4_munic.rds</td>
+    <td>/rk_comex_exp_munic_produtosamz/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_rk_comex_exp_paises.R</td>
+    <td>comex_exp_tot_pais_dic.csv and comex_exp_tot_pais.rds</td>
+    <td>/rk_comex_exp_paises/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_rk_comex_exp_paises_en.R</td>
+    <td>comex_exp_tot_pais_dic_en.csv and comex_exp_tot_pais.rds</td>
+    <td>/rk_comex_exp_paises/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_rk_comex_exp_perc_sh4_sel.R</td>
+    <td>comex_exp_perc_sh4_sel_dic.csv and comex_exp_perc_sh4_sel.rds</td>
+    <td>/rk_comex_exp_perc_sh4_sel/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_comex_exp_perc_sh4_sel_en.R</td>
+    <td>comex_exp_perc_sh4_sel_dic_en.csv and comex_exp_perc_sh4_sel.rds</td>
+    <td>/rk_comex_exp_perc_sh4_sel/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_sankey_comex_exp_pais_sec.R</td>
+    <td>comex_exp_pais_sec_dic.csv and comex_exp_pais_sec.rds</td>
+    <td>/sankey/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_sankey_comex_exp_pais_sec_en.R</td>
+    <td>comex_exp_pais_sec_dic_en.csv and comex_exp_pais_sec.rds</td>
+    <td>/sankey/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_munic_sec.R</td>
+    <td>comex_exp_munic_sec_dic.csv and comex_exp_munic_sec.rds</td>
+    <td>/ts_comex_exp_munic_sec/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_munic_sec_en.R</td>
+    <td>comex_exp_munic_sec_dic_en.csv and comex_exp_munic_sec.rds</td>
+    <td>/ts_comex_exp_munic_sec/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_munic_sh2.R</td>
+    <td>comex_exp_munic_sh2_dic.csv and comex_exp_munic_sh2.rds</td>
+    <td>/ts_comex_exp_munic_sh2/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_munic_sh2_en.R</td>
+    <td>comex_exp_munic_sh2_dic_en.csv and comex_exp_munic_sh2.rds</td>
+    <td>/ts_comex_exp_munic_sh2/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_pais_sec.R</td>
+    <td>comex_exp_pais_sec_dic.csv and comex_exp_pais_sec.rds</td>
+    <td>/ts_comex_exp_pais_sec/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_pais_sec_en.R</td>
+    <td>comex_exp_pais_sec_dic_en.csv and comex_exp_pais_sec.rds</td>
+    <td>/ts_comex_exp_pais_sec/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+    <tr>
+   <td>app_ts_comex_exp_sec_munic.R</td>
+    <td>comex_exp_sec_munic_dic.csv and comex_exp_sec_munic.rds</td>
+    <td>/ts_comex_exp_sec_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_sec_munic_en.R</td>
+    <td>comex_exp_sec_munic_dic_en.csv and comex_exp_sec_munic.rds</td>
+    <td>/ts_comex_exp_sec_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_sec_pais.R</td>
+    <td>comex_exp_sec_pais_dic.csv and comex_exp_sec_pais.rds</td>
+    <td>/ts_comex_exp_sec_pais/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_sec_pais_en.R</td>
+    <td>comex_exp_sec_pais_dic_en.csv and comex_exp_sec_pais.rds</td>
+    <td>/ts_comex_exp_sec_pais/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+   <td>app_ts_comex_exp_sh2_munic.R</td>
+    <td>comex_exp_sh2_munic_dic.csv and comex_exp_sh2_munic.rds</td>
+    <td>/ts_comex_exp_sh2_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_sh2_munic_en.R</td>
+    <td>comex_exp_sh2_munic_dic_en.csv and comex_exp_sh2_munic.rds</td>
+    <td>/ts_comex_exp_sh2_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_tot_pais.R</td>
+    <td>comex_exp_tot_pais_dic.csv and comex_exp_tot_pais.rds</td>
+    <td>/ts_comex_exp_tot_pais/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_tot_pais_en.R</td>
+    <td>comex_exp_tot_pais_dic_en.csv and comex_exp_tot_pais.rds</td>
+    <td>/ts_comex_exp_tot_pais/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_tot_sh2.R</td>
+    <td>comex_exp_tot_sh2_dic.csv and comex_exp_tot_sh2.rds</td>
+    <td>/ts_comex_exp_tot_sh2/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+   <td>app_ts_comex_exp_tot_sh2_en.R</td>
+    <td>comex_exp_tot_sh2_dic_en.csv and comex_exp_tot_sh2.rds</td>
+    <td>/ts_comex_exp_tot_sh2/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+## CEMPRE
+
+Employment, salary and firm data from IBGE’s [Cadastro Central de
+Empresas (CEMPRE)](https://sidra.ibge.gov.br/pesquisa/cempre/tabelas).
+Loads information on companies and other organizations and their
+respective formally constituted local units, registered with the CNPJ -
+National Register of Legal Entities. Data is available between 2006 and
+2019.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_map_dz_munic_cempre`: map of data compilation at municipality level. (english version: `app_map_dz_munic_cempre_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_dz_munic_cempre.R</td>
+    <td>dz_munic_dic.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_cempre/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+     <td>app_map_dz_munic_cempre_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_cempre/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+## PPM
+
+Data on livestock inventories (e.g:cattle, pigs and hogs) in Brazilian
+Municipalities, as well as amount and value of animal products
+(e.g:output of milk, hen eggs, quail eggs, honey).
+
+The periodicity of the survey is annual. The geographic coverage is
+national, with results released for Brazil, Major Regions, Federation
+Units, Mesoregions, Microregions and Municipalities.
+
+The data available has a yearly frequency and is available from 1974 to
+the present. More information can be found in [this
+link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e).
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_map_dz_munic_ppm`: map of data compiled at the municipality level. (english version: `app_map_dz_munic_ppm_en`)
+
+- `app_map_dz_state`: map of data compiled at the state level. (english version: `app_map_dz_state_en`)
+
+- `app_ts_dz_state`: graphic of economic output by state. (english version: `app_ts_dz_state_en`)
+
+
+  <table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_map_dz_munic_ppm.R</td>
+    <td>dz_munic_dic.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_ppm/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_map_dz_munic_ppm_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic_simplified.rds</td>
+    <td>/map_dz_munic_ppm/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_map_dz_state.R</td>
+    <td>dz_state_dic.csv and dz_state_simplified.rds</td>
+    <td>/map_dz_state/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_map_dz_state_en.R</td>
+    <td>dz_state_dic_en.csv and dz_state_simplified.rds</td>
+    <td>/map_dz_state/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+    <tr>
+    <td>app_ts_dz_state.R</td>
+    <td>dz_state_dic.csv and dz_state.rds</td>
+    <td>/ts_dz_state/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_dz_state_en.R</td>
+    <td>dz_state_dic_en.csv and dz_state.rds</td>
+    <td>/ts_dz_state/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+## SIGMINE
+
+Loads information the mines being explored legally in Brazil, including
+their location, status, product being mined and area in square meters
+etc. Survey is done at municipal and state level. The National Mining
+Agency (ANM) is responsible for this survey.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_rk_sigmine_munic`: ranking of transition/ change of cover and use of land at municipality level. (english version: `app_rk_sigmine_munic_en`)
+
+- `app_ts_sigmine_munic`: graphic of transition/ change in coverage and soil use at municipality level. (english version: `app_ts_sigmine_munic_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_rk_sigmine_munic.R</td>
+    <td>sigmine_munic_dic.csv and sigmine_munic.rds</td>
+    <td>/rk_sigmine_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_sigmine_munic_en.R</td>
+    <td>sigmine_munic_dic_en.csv and sigmine_munic.rds</td>
+    <td>/rk_sigmine_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_sigmine_munic.R</td>
+    <td>sigmine_munic_dic.csv and sigmine_munic.rds</td>
+    <td>/ts_sigmine/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_sigmine_munic_en.R</td>
+    <td>sigmine_munic_dic_en.csv and sigmine_munic.rds</td>
+    <td>/ts_sigmine/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+## ANEEL
+
+Loads data from the National Electrical Energy Agency (ANEEL), a
+Brazilian independent federal agency linked to the Ministry of Mines and
+Energy (MME). ANEEL works to provide favorable conditions for the
+Electrical Energy Market to develop with balance and for the benefit of
+society.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_rk_energia_geracao_distribuida`: ranking of states with the greatest installed energy power in the legal amazon. (english version: `app_rk_energia_geracao_distribuida_en`)
+
+- `app_ts_aneel_geracao_distribuida`: graphic of data compiled at state level. (english version: `app_ts_aneel_geracao_distribuida_en`)
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_rk_energia_geracao_distribuida.R</td>
+    <td>aneel_siga_geracao_distribuida_dic.csv and aneel_siga_geracao_distribuida.rds</td>
+    <td>/rk_energia_geracao_distribuida/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_rk_energia_geracao_distribuida_en.R</td>
+    <td>aneel_siga_geracao_distribuida_dic_en.csv and aneel_siga_geracao_distribuida.rds</td>
+    <td>/rk_energia_geracao_distribuida/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_aneel_geracao_distribuida.R</td>
+    <td>aneel_geracao_distribuida_dic.csv and aneel_geracao_distribuida.rds</td>
+    <td>/ts_aneel_geracao_distribuida/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_aneel_geracao_distribuida_en.R</td>
+    <td>aneel_geracao_distribuida_dic_en.csv and aneel_geracao_distribuida.rds</td>
+    <td>/ts_aneel_geracao_distribuida/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+
+## EPE
+
+Loads data from the Energy Research Company (EPE), a Brazilian public
+company that works closely with the Brazilian Ministry of Mines and
+Energy (MME) and other agencies to ensure the sustainable development of
+Brazil’s energy infrastructure. EPE’s duty on that mission is to support
+MME with quality research and studies in order to aid Brazil’s energy
+infrastructure planning.
+
+------------------------------------------------------------------------
+
+**Files:**
+
+- `app_ts_energia_amz_exporta`: graphic of energy data on proportion of energy production, consumption and consumers at state level. (english version: `app_ts_energia_amz_exporta_en`)
+  
+
+<table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_ts_energia_amz_exporta.R</td>
+    <td>energia_amz_exporta_dic.csv and energia_amz_exporta.rds</td>
+    <td>/ts_energia_amz_exporta/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+     <td>app_ts_energia_amz_exporta_en.R</td>
+    <td>energia_amz_exporta_dic_en.csv and energia_amz_exporta.rds</td>
+    <td>/ts_energia_amz_exporta/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+
+# Multiple data
+
+## Non specified
+
+**Files:**
+
+- `app_bar_dz_varias_amazonias`: graphic of diference between multiple amazons in more recent indicators. (english version: `app_bar_dz_varias_amazonias_en`)
+
+- `app_bubble_dz_munic`: graphic of compilation of data at the municipality level. (english version: `app_bubble_dz_munic_en`)
+
+- `app_bubble_dz_munic_saude`: graphic of compilation of data at the municipality level. (english version: `app_bubble_dz_munic_saude_en`)
+
+- `app_mapstatic_dz_munic`: graphic of compilation of data at the municipality level. (english version: `app_mapstatic_dz_munic_en`)
+
+- `app_ts_dz_munic`: graphic of compilation of data at the municipality level. (english version: `app_ts_dz_munic_en`)
+
+- `app_ts_sistemas_isolados`: graphic of data from isolated sistems of energy. (english version: `app_ts_sistemas_isolados_en`)
+
+  <table border="1">
+  <tr>
+    <td><strong>App</strong></td>
+    <td><strong>Data</strong></td>
+    <td><strong>Scripts</strong></td>
+    <td><strong>Data-Raw</strong></td>
+  </tr>
+  <tr>
+    <td>app_bar_dz_varias_amazonias.R</td>
+    <td>dz_varias_amazonias_cross_section_dic.csv and dz_varias_amazonias_cross_section.rds</td>
+    <td>/bar_dz_varias_amazonias/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_bar_dz_varias_amazonias_en.R</td>
+    <td>dz_varias_amazonias_cross_section_dic_en.csv and dz_varias_amazonias_cross_section.rds</td>
+    <td>/bar_dz_varias_amazonias/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_bubble_dz_munic.R</td>
+    <td>dz_munic_dic.csv and dz_munic.rds</td>
+    <td>/bubble/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_bubble_dz_munic_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic.rds</td>
+    <td>/bubble/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_bubble_dz_munic_saude.R</td>
+    <td>dz_munic_saude_dic.csv and dz_munic_saude.rds</td>
+    <td>/bubble_dz_munic_saude/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_bubble_dz_munic_saude_en.R</td>
+    <td>dz_munic_saude_dic_en.csv and dz_munic_saude.rds</td>
+    <td>/bubble_dz_munic_saude/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_mapstatic_dz_munic.R</td>
+    <td>dz_munic_dic.csv and dz_munic_simplified.rds</td>
+    <td>/mapstatic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_mapstatic_dz_munic_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic_simplified.rds</td>
+    <td>/mapstatic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_dz_munic.R</td>
+    <td>dz_munic_dic.csv and dz_munic.rds</td>
+    <td>/ts_dz_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+   <tr>
+    <td>app_ts_dz_munic_en.R</td>
+    <td>dz_munic_dic_en.csv and dz_munic.rds</td>
+    <td>/ts_dz_munic/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_sistemas_isolados.R</td>
+    <td>energia_sistemas_isolados_dic.csv and energia_sistemas_isolados.rds</td>
+    <td>/ts_energia_sistemas_isolados/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+
+  <tr>
+    <td>app_ts_sistemas_isolados_en.R</td>
+    <td>energia_sistemas_isolados_dic_en.csv and energia_sistemas_isolados.rds</td>
+    <td>/ts_energia_sistemas_isolados/ </td>
+    <td>Texto para Data-Raw</td>
+  </tr>
+</table>
+
+## Credits
+
+DataZoom is developed by a team at Pontifícia Universidade Católica do
+Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
+is at: <https://www.econ.puc-rio.br/datazoom/>.
+
+To cite package `datazoom_viz` in publications use:
+
+> Data Zoom (2023). Data Zoom: Simplifying Access To Brazilian
+> Microdata.  
+> <https://www.econ.puc-rio.br/datazoom/english/index.html>
+
+A BibTeX entry for LaTeX users is:
+
+    @Unpublished{DataZoom2023,
+        author = {Data Zoom},
+        title = {Data Zoom: Simplifying Access To Brazilian Microdata},
+        url = {https://www.econ.puc-rio.br/datazoom/english/index.html},
+        year = {2023},
+    }
