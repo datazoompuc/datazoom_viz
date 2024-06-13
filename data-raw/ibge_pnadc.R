@@ -724,13 +724,13 @@ dat_cnae <- dat %>%
     filter(id %in% c("All", "CNAE")) %>%
     select(-id)
 
-readr::write_rds(dat, "data/ibge_pnadc_cnae.rds")
+readr::write_rds(dat_cnae, "data/ibge_pnadc_cnae.rds", compress = "gz")
 
-dat_cnae <- dat %>%
+dat_cod <- dat %>%
     filter(id %in% c("All", "COD")) %>%
     select(-id)
 
-readr::write_rds(dat, "data/ibge_pnadc_cod.rds")
+readr::write_rds(dat_cod, "data/ibge_pnadc_cod.rds")
 
 ##############################
 ## Dictionary -- CNAE e COD ##
