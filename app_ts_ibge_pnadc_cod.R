@@ -29,8 +29,6 @@ param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
-param$ocup <- "cod_2dig"
-param$sector <- "setor"
 param$lang <- FALSE
 
 

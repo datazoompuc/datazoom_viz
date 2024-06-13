@@ -54,12 +54,35 @@ get_ui <- function(files, param) {
 
         # Seleciona filtro de municípios
         selectizeInput(
-          "filter1",
-          param$label_eco_name,
-          choices = NULL,
-          multiple = TRUE,
-          options = list(maxItems = 20),
-          width = "100%"
+            "filter1",
+            param$label_region_name,
+            choices = param$filter_choices,
+            multiple = T,
+            options = list(maxItems = 20),
+            width = "100%"
+        ),
+        
+        #Seleciona filtro de ocupação
+        selectizeInput(
+            "filter2",
+            param$label_type_name,
+            choices = param$ocupation_choices,
+            multiple = TRUE,
+            options = list(maxItems = 20),
+            width = "100%",
+            selected = param$ocupation_def
+        ),
+        
+        
+        #seleciona filtro de setor
+        selectizeInput(
+            "filter3",
+            param$label_sector_name,
+            choices = param$sector_choices,
+            multiple = T,
+            options = list(maxItems = 1),
+            width = "100%",
+            selected = param$sector_def
         ),
         
         # espaço vazio
