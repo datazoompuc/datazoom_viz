@@ -194,13 +194,14 @@ get_server <- function(files, param) {
         df_p$combined <- paste(df_p$group, "-", df_p$cnae)
         
         # Alternativa de medida para y
-        #browser()
         if (input$y_option & is.numeric(df_p$y)) {
-          df_p <- df_p %>%
-            group_by(df_p$group) %>%
-            mutate(aux1 = first(y),
-                   y_option = (y/aux1)*100)
-          df_p$y <- df_p$y_option
+            df_p <- df_p %>%
+                ungroup() %>%
+                arrange(x) %>%
+                mutate(
+                    y = 100 * y/first(y),
+                    .by = combined
+                )
         }
         
         # Se a coluna de cor for toda NA, preenche com strings em branco
