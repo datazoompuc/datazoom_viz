@@ -24,31 +24,43 @@ get_ui <- function(files, param) {
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", param$plot_desc),
         hr(),
-        p(class = "vars", param$vars),
+        p(class = "vars",  param$label_var_name),
         div(
-          class = "var_selec_group",
-          # Seleciona variável do eixo x
-          selectInput(
-            inputId = "x",
-            label = param$xaxis,
-            choices = param$x_choices,
-            selected = param$x_def,
-            width = "100%"
-          )
+            class = "var_selec_group",
+            # Seleciona variável do eixo y
+            selectInput(
+                inputId = "x",
+                label = param$label_x_name,
+                choices = param$x_choices,
+                selected = param$x_def,
+                width = "100%"
+            )
         ),
-        div(
-          class = "var_selec_group",
-          # Seleciona variável de cor
-          radioButtons(
-              inputId = "sector",
-              label = "",
-              selected = "todos",
-              inline = FALSE,
-              width = '100%',
-              choiceNames = param$label_toggle,
-              choiceValues = c("todos", "formal", "informal",
-                               "publico", "privado")
-          )
+        
+        # Seleciona filtro de municípios
+        selectizeInput(
+            "filter1",
+            param$label_region_name,
+            choices = param$filter_choices,
+            width = "100%"
+        ),
+        
+        #Seleciona filtro de ocupação
+        selectizeInput(
+            "filter2",
+            param$label_type_name,
+            choices = param$ocupation_choices,
+            width = "100%",
+            selected = param$ocupation_def
+        ),
+        
+        #seleciona filtro de setor
+        selectizeInput(
+            "filter3",
+            param$label_sector_name,
+            choices = param$sector_choices,
+            width = "100%",
+            selected = param$sector_def
         ),
         # espaço vazio
         div(class = "fakecheckbox", ),

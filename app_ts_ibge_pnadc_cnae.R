@@ -25,7 +25,6 @@ param$y_def <- "rendimento_medio" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
-param$group <- "group" # variável de agrupamento
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
