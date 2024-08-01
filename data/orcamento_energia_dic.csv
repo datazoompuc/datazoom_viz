@@ -1,3 +1,0 @@
-"","var","x","y","color","size","slider","geometry","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","Ano",TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,"Ano","Ano","Energia - ANEEL",1,"","Economia","Energia"
-"2","Valor",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Valor do orçamento (R$)","Valor","Energia - ANEEL",1,"","Economia","Energia"

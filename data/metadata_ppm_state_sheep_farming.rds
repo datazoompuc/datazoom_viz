@@ -1,4 +1,0 @@
-"","var","x","y","color","size","slider","label","source","tipo","unidade","categoria","subcategoria"
-"1","group",TRUE,TRUE,FALSE,FALSE,FALSE,"Identificador Geografico","IBGE",1,NA,"Localização","Identificador Geográfico"
-"2","time",TRUE,TRUE,FALSE,FALSE,FALSE,"Ano da Pesquisa","IBGE",1,NA,"Unidade de Tempo","Ano da Pesquisa"
-"3","ovinos_tosquiados_nos_estabelecimentos_agropecuarios",TRUE,TRUE,FALSE,FALSE,FALSE,"Ovinos Tosquiados nos Estabelecimentos Agropecuarios","IBGE",1,"Cabecas","Pecuaria","Atividade Pecuaria"
