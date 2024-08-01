@@ -7,6 +7,8 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(readr)
+ibge_pnadc_cnae_dic <- read_csv("~/GitHub/datazoom_viz/data/ibge_pnadc_cnae_dic.csv")
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -15,6 +17,8 @@ files$server_script <- "scripts/rk_ibge_pnadc_cnae/server.R"
 files$param_script <- "scripts/rk_ibge_pnadc_cnae/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "ibge_pnadc_cnae_dic.csv"
+ibge_pnadc_cnae_dic <- ibge_pnadc_cnae_dic %>% mutate(slider = c(F,F,F,T,F,F,F))
+
 files$db_file <- "data/ibge_pnadc_cnae.rds"
 
 # Carrega scripts
@@ -26,7 +30,7 @@ source(files$server_script)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "rendimento_medio" # variável padrão do eixo x
 param$y_def <- "time" # variável padrão do eixo y
-param$slider_def <- TRUE
+param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "group" # variável de agrupamento
@@ -110,13 +114,12 @@ param$sector_choices <- list(
 param$sector_def <- "formal"
 
 
-'param$label_toggle <- list(
+param$label_toggle <- list(
     tags$span(style = "color:white", "Todos"),
     tags$span(style = "color:white", "Setor Formal"),
     tags$span(style = "color:white", "Setor Informal"),
     tags$span(style = "color:white", "Setor Publico"),
-    tags$span(style = "color:white", "Setor Privado")
-)'
+    tags$span(style = "color:white", "Setor Privado"))
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

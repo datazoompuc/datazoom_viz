@@ -151,7 +151,7 @@ get_server <- function(files, param) {
             )
         }
     }
-
+    
     '# Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       # Pega parametros da url e atribui aos selectinputs
@@ -207,10 +207,10 @@ get_server <- function(files, param) {
 
       text
     })
-
+    
     # Output gráfico
     output$plot <- renderPlotly({
-
+        
       # random_inputs() #preenche inputs se estiverem vazios
       update_my_queryString() # atualiza url com parametros dos inputs
 
@@ -225,11 +225,11 @@ get_server <- function(files, param) {
             fig <- plotly_empty()
             stop()
           }
-
+            browser()
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def), ]
+          x_col <- param$table[which(param$table$var == input$x), ]
           y_col <- param$table[which(param$table$var == param$y_def),]
-          color_col <- param$table[which(param$table$var == input$color), ]
+          color_col <- param$table[which(param$table$var == param$color), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
           text_col <- param$table[which(param$table$var == param$text_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
@@ -238,7 +238,7 @@ get_server <- function(files, param) {
           y_col <- list()
           y_col$var <- "rank"
           y_col$label <- "Ranking"
-
+          
           'df_p <- data.frame(
             df()[x_col$var],
             NA,
@@ -249,7 +249,7 @@ get_server <- function(files, param) {
           )
 
           colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")'
-
+          
           # Filtra dataframe com grupos selecionados
           df_filtered <- df %>% 
               dplyr::filter((group %in% input$filter1) &
@@ -284,7 +284,8 @@ get_server <- function(files, param) {
             group_by(slider) %>% # para cada ano
             mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
             arrange(y, .by_group = TRUE) # ordena por rank e ano
-
+          
+          
           # Se o rank for NA coloca para o final do ranking e zera x
           df_p$y[is.na(df_p$y)] <- max(df_p$y) + 1
           df_p$x[is.na(df_p$x)] <- 0
@@ -298,7 +299,7 @@ get_server <- function(files, param) {
           top_n <- 10
           top_cnae <- unique(df_p$cnae[which(df_p$y <= top_n)])
           df_p <- df_p %>% filter(cnae %in% top_cnae)
-
+          
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
