@@ -1,7 +1,0 @@
-"","var","x","y","color","size","slider","geometry","label","desc","var_group","unidade","categoria","subcategoria"
-"1","nm_municip",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"nm_municip","nm_municip","","Unidade de medida","Social","Desenvolvimento"
-"2","code_muni",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"code_muni","code_muni","","Unidade de medida","Social","Desenvolvimento"
-"3","area",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"area","area","","Unidade de medida","Social","Desenvolvimento"
-"4","uf",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"uf","uf","","Unidade de medida","Social","Desenvolvimento"
-"5","front_2020",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"front_2020","front_2020","","Unidade de medida","Social","Desenvolvimento"
-"6","front_2020_label",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"front_2020_label","front_2020_label","","Unidade de medida","Social","Desenvolvimento"
