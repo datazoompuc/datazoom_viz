@@ -42,7 +42,7 @@ param$ui3 <- "https://datazoom.shinyapps.io/app_rk_comex_exp_perc_sh4_sel/"
 
 # Parâmetros específicos do server
 param$server1 <- "Vari\u00e1vel n\u00e3o selecionada"
-param$server2 <- "Ranking da Propor\u00e7\u00e3o das Exporta\u00e7\u00f5es Mundiais Vindas da Amaz\u00f4nia"
+param$server2 <- "Ranking da Propor\u00e7\u00e3o das Exporta\u00e7\u00f5es Mundiais Vindas da Amaz\u00f4nia (2019)"
 param$server3 <- "Amaz\u00f4nia Legal"
 param$server4 <- "Unidade de medida: <b>"
 param$server5 <- "Ano: "
