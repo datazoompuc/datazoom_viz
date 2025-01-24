@@ -235,23 +235,6 @@ get_server <- function(files, param) {
             textposition = "middle right"
           )
 
-          if (!is.numeric(df_p$color)) {
-            # adiciona barra sem split para a legenda
-            fig_p <- fig_p %>% add_segments(
-              hoverinfo = "none",
-              showlegend = TRUE,
-              x = 0,
-              xend = 0,
-              y = ~y,
-              yend = ~y,
-              color = ~color,
-              line = list(width = 30),
-              opacity = 0.7
-            )
-          } else {
-            fig_p <- fig_p %>% colorbar(title = color_col$label)
-          }
-
 
 
           # Parâmetros animação e slider (se tiver mais de um frame)
