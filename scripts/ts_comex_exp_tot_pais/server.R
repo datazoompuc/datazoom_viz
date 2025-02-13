@@ -340,17 +340,10 @@ get_server <- function(files, param) {
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
         y_col <- param$table[which(param$table$var == param$y_def), ]
 
         text <- paste0("", y_col$label)
-        if (param$y_def) {
-          text <- paste0("", y_col$label, "*")
-        }
-      }
       
       text
     })
