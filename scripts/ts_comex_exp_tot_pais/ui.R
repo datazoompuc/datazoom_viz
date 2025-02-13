@@ -25,18 +25,8 @@ get_ui <- function(files, param) {
         p(class = "plot_desc", param$plot_desc),
         hr(),
         p(class = "vars", param$label_var_name),
-        div(
-          class = "var_selec_group",
-          # Seleciona variÃ¡vel do eixo y
-          selectInput(
-            inputId = "y",
-            label = param$label_y_name,
-            choices = param$y_choices,
-            selected = param$y_def,
-            width = "100%"
-          )
-        ),
 
+        
         # Seleciona eixo log
         checkboxInput(
           inputId = "ylog",
@@ -44,13 +34,7 @@ get_ui <- function(files, param) {
           value = FALSE,
           width = "100%"
         ),
-        # Seleciona eixo
-        checkboxInput(
-          inputId = "y_option",
-          param$label_axis_name,
-          value = FALSE,
-          width = "100%"
-        ),
+     
 
         # Seleciona filtro de municÃ­pios
         selectizeInput(

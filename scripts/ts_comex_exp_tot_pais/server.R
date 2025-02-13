@@ -275,20 +275,12 @@ get_server <- function(files, param) {
         selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
 
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
-      updateSelectInput(session,
-        "y",
-        choices = param$y_choices,
-        selected = selected
-      )
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "y=", input$y,
-        "&", "ylog=", input$ylog,
-        "&", "y_option=", input$y_option
+        "&", "y_option=", param$y_def
       )
 
       for (i in input$filter1) {
@@ -327,11 +319,7 @@ get_server <- function(files, param) {
         )
       }
 
-      if (!is.null(query[["y_option"]])) {
-        updateCheckboxInput(session, "y_option",
-          value = (query[["y_option"]] == "TRUE")
-        )
-      }
+
 
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       if (!is.null(query[["filter"]])) {
@@ -356,20 +344,20 @@ get_server <- function(files, param) {
         text <- " "
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
+        y_col <- param$table[which(param$table$var == param$y_def), ]
 
         text <- paste0("", y_col$label)
-        if (input$y_option) {
+        if (param$y_def) {
           text <- paste0("", y_col$label, "*")
         }
       }
-
+      
       text
     })
     output$plot_subtitle <- renderText({
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
-        text <- " "
+      if (is.null(param$y_def) || param$y_def == "") {
+        text <- ""
       } else {
         text <- paste0("",param$currency,"")
       }
@@ -385,7 +373,7 @@ get_server <- function(files, param) {
       tryCatch(
         {
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$y) || input$y == "" ||
+          if (is.null(param$y_def) || param$y_def == "" ||
             is.null(input$filter1) || length(input$filter1) < 1) {
             fig <- plotly_empty()
             stop()
@@ -394,7 +382,7 @@ get_server <- function(files, param) {
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           # Cria dataframe do gráfico
           x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y), ]
+          y_col <- param$table[which(param$table$var == param$y_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
           color_col <- param$table[which(param$table$var == param$color_def), ]
 
@@ -419,17 +407,6 @@ get_server <- function(files, param) {
             stop()
           }
 
-          # Alternativa de medida para y
-          if (input$y_option & is.numeric(df_p$y)) {
-            df_p <- df_p %>%
-              group_by(df_p$group) %>%
-              mutate(
-                aux1 = first(y),
-                y_option = (y / aux1) * 100
-              )
-            df_p$y <- df_p$y_option
-            param$measurement <- ""
-          }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
           if (all(is.na(df_p$color))) {
@@ -484,10 +461,10 @@ get_server <- function(files, param) {
             y_axis_layout$type <- "log"
           }
 
-          if (input$y_option) {
-            y_axis_layout$title <- paste0(y_col$label, "*")
-          }
 
+              y_axis_layout$title <- paste0(y_col$label, "*")
+        
+          
           # Layout hover/tooltip
           tooltip <- list(
             bordercolor = "rgba(255, 255, 255, 1)",
