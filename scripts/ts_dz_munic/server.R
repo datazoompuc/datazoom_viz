@@ -165,7 +165,8 @@ get_server <- function(files, param) {
             df_filtered[color_col$var]
           )
           colnames(df_p) <- c("x", "y", "color")
-          df_p$group <- df_filtered$group
+          
+          df_p$group <- paste0(df_filtered$nm_municip, " (", df_filtered$uf, ")")
           df_p$text <- df_p$group
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
