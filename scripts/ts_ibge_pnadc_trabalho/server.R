@@ -68,7 +68,7 @@ get_server <- function(files, param) {
             }
             
             if (!is.null(query[["filter_composicao"]])) {
-                updateSelectInput(session, "filter_composicao_demografica",
+                updateSelectInput(session, "filter_composicao",
                                   choices = param$filter_composicao_demografica_choices,
                                   selected = query[["filter_composicao"]]
                 )
