@@ -15,26 +15,6 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
 
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-    
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function( ) {
-      updateSelectInput(session, 
-                        "filter1", 
-                        choices = param$filter_choices, 
-                        selected = sample(param$filter_choices,2) #2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
-      )
-      
-      selected <- sample(sample(param$y_choices,1)[[1]],1)
-      updateSelectInput(session, 
-                        "y", 
-                        choices = param$y_choices, 
-                        selected = selected
-      )
-    }
-    
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
@@ -50,18 +30,45 @@ get_server <- function(files, param) {
         )
       }
       
+      for (j in input$filter2) {
+          q_string <- paste0(
+              q_string,
+              "&","filter2=",j
+          )
+          
+      }
+      
+      for (k in input$filter3) {
+          q_string <- paste0(
+              q_string,
+              "&","filter3=",k
+          )
+          
+      }
       
       updateQueryString(q_string, mode = "replace")
     }
     
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
-      # Preenche filtro vazio
-      updateSelectInput(session, 
-                        "filter1", 
-                        choices = param$filter_choices,
-                        selected = NULL
-      )
+        # Preenche filtro vazio
+        updateSelectInput(session,
+                          "filter1",
+                          choices = param$filter_choices,
+                          selected = c("Amazônia Legal", "Brasil")
+        )
+        
+        updateSelectInput(session, 
+                          "filter2", 
+                          choices = param$ocupation_choices, 
+                          selected = param$ocupation_def
+        )
+        
+        updateSelectInput(session, 
+                          "filter3", 
+                          choices = param$sector_choices, 
+                          selected = param$sector_def
+        )
       
       #Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
@@ -82,20 +89,32 @@ get_server <- function(files, param) {
                             value = (query[['y_option']] == "TRUE"))
       }
       
-      selected <- unlist(query[names(query) == "filter"], use.names=FALSE)
-      if (!is.null(query[['filter']])) {
-        updateSelectInput(session, 
-                          "filter1", 
-                          choices = param$filter_choices,
-                          selected = selected
-        )
+      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+      if (!is.null(query[["filter"]])) {
+          updateSelectInput(session,
+                            "filter1",
+                            choices = param$filter_choices,
+                            selected = selected
+          )
       }
       
-      # Se query está vazia, preenche aleatório
-      if (is.null(query[['filter']]) && is.null(query[['y']]) ) {
-        random_inputs() #preenche inputs se estiverem vazios
+      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+      if (!is.null(query[["filter"]])) {
+          updateSelectInput(session,
+                            "filter2",
+                            choices = param$ocupation_choices,
+                            selected = selected
+          )
       }
       
+      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+      if (!is.null(query[["filter"]])) {
+          updateSelectInput(session,
+                            "filter3",
+                            choices = param$sector_choices,
+                            selected = selected
+          )
+      }
     }
     
     # Output título do gráfico
@@ -148,7 +167,10 @@ get_server <- function(files, param) {
         color_col <- param$table[which(param$table$var == param$color_def), ]
         
         # Filtra dataframe com grupos selecionados
-        df_filtered <- df[which(df$group %in% input$filter1),]
+        df_filtered <- df %>% 
+            dplyr::filter((group %in% input$filter1) &
+                              (cnae_2dig %in% input$filter2) &
+                              (setor %in% input$filter3))
         
         df_p <- data.frame(df_filtered[x_col$var],
                            df_filtered[y_col$var],
@@ -156,6 +178,7 @@ get_server <- function(files, param) {
         )
         colnames(df_p) <- c("x", "y", "color")
         df_p$group <- df_filtered$group
+        df_p$cnae <- df_filtered$cnae_2dig
         df_p$text <- df_p$group
         
         # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
@@ -167,14 +190,18 @@ get_server <- function(files, param) {
           stop()
         }
         
+        #Define variável de cor
+        df_p$combined <- paste(df_p$group, "-", df_p$cnae)
+        
         # Alternativa de medida para y
-        #browser()
         if (input$y_option & is.numeric(df_p$y)) {
-          df_p <- df_p %>%
-            group_by(df_p$group) %>%
-            mutate(aux1 = first(y),
-                   y_option = (y/aux1)*100)
-          df_p$y <- df_p$y_option
+            df_p <- df_p %>%
+                ungroup() %>%
+                arrange(x) %>%
+                mutate(
+                    y = 100 * y/first(y),
+                    .by = combined
+                )
         }
         
         # Se a coluna de cor for toda NA, preenche com strings em branco
@@ -199,7 +226,7 @@ get_server <- function(files, param) {
         fig_p <- plot_ly(df_p, 
                          x = ~x,
                          y = ~y,
-                         color = ~group,
+                         color = ~combined,
                          type = "scatter", 
                          mode = "lines",
                          text = ~tooltip,

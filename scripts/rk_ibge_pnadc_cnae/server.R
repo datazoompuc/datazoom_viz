@@ -10,29 +10,31 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
-  
-  # Carrega dados
+ 
   df <- readRDS(files$db_file)
-  
-  server <- function(input, output, session) {
     
-      df_reactived <- reactive({
+  server <- function(input, output, session) {
+      
+      # Carrega dados
+      df <- readRDS(files$db_file)
+      
+      'df_reactived <- reactive({
           w <- df %>%
               filter(setor == input$sector)
           
           return(w)
-      })  
+      })' 
       
-    # Cria opções para seleção de grupos
+    '# Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
+    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]'
 
-    # Funcão para preencher inputs com coluna/variável aleatória
+    '# Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       # se input está vazio preenche com valor aleatório da lista de colunas
       if (input$x == "") {
         updateSelectInput(session, "x",
-          choices = param$x_choices,
+          choices = param$ocupation_choices,
           selected = sample(param$x_cols$var, 1)
         )
       }
@@ -43,18 +45,114 @@ get_server <- function(files, param) {
           selected = sample(param$color_cols$var, 1)
         )
       }
-    }
+    }'
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
         "?", "x=", input$x,
-        "&", "color=", input$color
+        "&", "color=", input$color,
+        "&","x_option=",input$x_option
       )
-      updateQueryString(q_string, mode = "replace")
+        
+        for (i in input$filter1) {
+            q_string <- paste0(
+                q_string,
+                "&","filter=",i
+            )
+        }
+        
+        for (j in input$filter2) {
+            q_string <- paste0(
+                q_string,
+                "&","filter2=",j
+            )
+            
+        }
+        
+        for (k in input$filter3) {
+            q_string <- paste0(
+                q_string,
+                "&","filter3=",k
+            )
+            
+        }
+        
+        updateQueryString(q_string, mode = "replace")
     }
-
+    
     # Função para atualizar inputs a partir da URL
+    update_my_inputs <- function() {
+        # Preenche filtro vazio
+        updateSelectInput(session,
+                          "filter1",
+                          choices = param$filter_choices,
+                          selected = c("Amazônia Legal", "Brasil")
+        )
+        
+        updateSelectInput(session, 
+                          "filter2", 
+                          choices = param$ocupation_choices, 
+                          selected = param$ocupation_def
+        )
+        
+        updateSelectInput(session, 
+                          "filter3", 
+                          choices = param$sector_choices, 
+                          selected = param$sector_def
+        )
+        
+        #Pega parametros da url e atribui aos selectinputs
+        query <- parseQueryString(session$clientData$url_search)
+        
+        if (!is.null(query[['x']])) {
+            updateSelectInput(session,  "x",
+                              choices = param$x_choices,
+                              selected = query[['x']])
+        } 
+        
+        if (!is.null(query[['x_option']])) {
+            updateCheckboxInput(session, "x_option",
+                                value = (query[['x_option']] == "TRUE"))
+        }
+        
+        if (!is.null(query[["color"]])) {
+            updateSelectInput(session, "color",
+                              choices = param$color_choices,
+                              selected = query[["color"]]
+            )
+        }
+        
+        selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+        if (!is.null(query[["filter"]])) {
+            updateSelectInput(session,
+                              "filter1",
+                              choices = param$filter_choices,
+                              selected = selected
+            )
+        }
+        
+        selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+        if (!is.null(query[["filter"]])) {
+            updateSelectInput(session,
+                              "filter2",
+                              choices = param$ocupation_choices,
+                              selected = selected
+            )
+        }
+        
+        
+        selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+        if (!is.null(query[["filter"]])) {
+            updateSelectInput(session,
+                              "filter3",
+                              choices = param$sector_choices,
+                              selected = selected
+            )
+        }
+    }
+    
+    '# Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
@@ -73,21 +171,24 @@ get_server <- function(files, param) {
           selected = query[["color"]]
         )
       }
-    }
-
+    }'
+        
+    
 
     # Output título do gráfico
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "" ||
-        is.null(input$color) || input$color == "") {
-        text <- param$novar
+      if(is.null(input$y) || input$y == "") {
+          text <- "Vari\u00e1vel n\u00e3o selecionada"
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
-
-        text <- paste0(param$title, x_col$label)
+          x_col <- param$table[which(param$table$var == input$x), ]
+          
+          text <-  paste0(param$title_init, " ", x_col$label)
+          if(input$x_option)  {
+              text <-  paste0(param$title_init, " ", x_col$label, "*")
+          }
       }
 
       text
@@ -106,10 +207,10 @@ get_server <- function(files, param) {
 
       text
     })
-
+    
     # Output gráfico
     output$plot <- renderPlotly({
-
+        
       # random_inputs() #preenche inputs se estiverem vazios
       update_my_queryString() # atualiza url com parametros dos inputs
 
@@ -124,10 +225,11 @@ get_server <- function(files, param) {
             fig <- plotly_empty()
             stop()
           }
-
+            browser()
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == input$x), ]
-          color_col <- param$table[which(param$table$var == input$color), ]
+          y_col <- param$table[which(param$table$var == param$y_def),]
+          color_col <- param$table[which(param$table$var == param$color), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
           text_col <- param$table[which(param$table$var == param$text_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
@@ -136,19 +238,35 @@ get_server <- function(files, param) {
           y_col <- list()
           y_col$var <- "rank"
           y_col$label <- "Ranking"
-
-          df_p <- data.frame(
-            df_reactived()[x_col$var],
+          
+          'df_p <- data.frame(
+            df()[x_col$var],
             NA,
-            df_reactived()[color_col$var],
-            df_reactived()[slider_col$var],
-            df_reactived()["group"],
-            df_reactived()["group"],
-            df_reactived()[id_col$var]
+            df()[color_col$var],
+            df()[slider_col$var],
+            df()["group"],
+            df[id_col$var]
           )
 
-          colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
-
+          colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")'
+          
+          # Filtra dataframe com grupos selecionados
+          df_filtered <- df %>% 
+              dplyr::filter((group %in% input$filter1) &
+                                (cnae_2dig %in% input$filter2) &
+                                (setor %in% input$filter3))
+          
+          df_p <- data.frame(df_filtered[x_col$var],
+                             NA,
+                             df_filtered[color_col$var],
+                             df_filtered[slider_col$var],
+                             df_filtered[id_col$var]
+          )
+          colnames(df_p) <- c("x", "y", "color", "slider", "id")
+          df_p$group <- df_filtered$group
+          df_p$cnae <- df_filtered$cnae_2dig
+          df_p$text <- df_p$group
+          
           # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
 
@@ -159,14 +277,15 @@ get_server <- function(files, param) {
           }
 
           # Filtra sem grupo
-          df_p <- df_p[which(df_p$group != " - "), ]
+          df_p$combined <- paste(df_p$group, "-", df_p$cnae)
 
           # Ordena base por variável de ranking e preenche y
           df_p <- df_p %>%
             group_by(slider) %>% # para cada ano
             mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
             arrange(y, .by_group = TRUE) # ordena por rank e ano
-
+          
+          
           # Se o rank for NA coloca para o final do ranking e zera x
           df_p$y[is.na(df_p$y)] <- max(df_p$y) + 1
           df_p$x[is.na(df_p$x)] <- 0
@@ -178,9 +297,9 @@ get_server <- function(files, param) {
 
           # Deixa somente grupos que tem rank <n em algum momento
           top_n <- 10
-          top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
-          df_p <- df_p %>% filter(group %in% top_groups)
-
+          top_cnae <- unique(df_p$cnae[which(df_p$y <= top_n)])
+          df_p <- df_p %>% filter(cnae %in% top_cnae)
+          
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
@@ -195,9 +314,6 @@ get_server <- function(files, param) {
 
           # Define paleta de cores
           pallete <- pallete_continuous
-          if (!is.numeric(df_p$color)) {
-            pallete <- pallete_discrete
-          }
 
           # Calcula menor e maior valor de x
           min_x <- min(0, min(df_p$x))
@@ -209,7 +325,7 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(df_p,
             x = ~x,
             y = ~y,
-            color = ~color,
+            color = ~combined,
             colors = pallete,
             frame = ~slider,
             text = ~tooltip,

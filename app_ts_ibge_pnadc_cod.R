@@ -40,7 +40,9 @@ param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "eixo vertical (y)"
 param$label_scale_name <- "escala log"
 param$label_prop_name <- "proporcional ao trimestre inicial (*)"
-param$label_type_name <- "Estado - tipo de ocupação "
+param$label_region_name <- "Estado"
+param$label_type_name <- "Ocupação"
+param$label_sector_name <- "Setor"
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cod/"
 
 ### Parametros especificos no server
@@ -50,6 +52,72 @@ param$subtitle_init <- "por tipo de ocupação" # expressão subtitulo
 # Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL
 
+
+## 
+param$filter_choices <- list(
+    "Brasil" = list("Brasil", ""),
+    "Amaz\u00f4nia Legal" = list("Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal"),
+    "Regi\u00e3o" = list("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"),
+    "UF" = list("RO", "AC", "AM", "RO", "PA", "AP", "TO",
+                "MA", "PI", "CE", "RN", "PB", "PE", "AL",
+                "SE", "BA", "MG", "ES", "RJ", "SP", "PR",
+                "SC", "RS", "MS", "MT", "GO", "DF")
+)
+
+param$ocupation_choices <- list(
+    "Dirigentes e Trabalhadores no Governo" = list("Dirigentes e gerentes", "Trabalhadores no governo"),
+    "Gestão e Profissionais de Saúde e Ensino" = list(
+        "Administradores e especialista em gestão",
+        "Profissionais da saúde",
+        "Profissionais do ensino"
+    ),
+    "Cientistas, Profissionais de TI, Jurídicos e Financeiros" = list(
+        "Cientistas e engenheiros",
+        "Serviços de TI e comunicação",
+        "Serviços jurídicos",
+        "Serviços financeiros e administrativos"
+    ),
+    "Apoio Administrativo e Atendimento" = list(
+        "Apoio administrativo",
+        "Atendimento direto ao público",
+        "Escriturários"
+    ),
+    "Segurança, Cuidados Pessoais e Vendas" = list(
+        "Profissionais de segurança",
+        "Serviços e cuidados pessoais",
+        "Vendedores"
+    ),
+    "Artesãos e Técnicos" = list(
+        "Artesões e artes gráficas",
+        "Técnicos de eletricidade e eletrônica"
+    ),
+    "Montagem, Processamento e Instalação" = list(
+        "Montadores e condutores de veículos",
+        "Operários de processamento e instalações"
+    ),
+    "Trabalhos Diversos" = list(
+        "Ambulantes",
+        "Coletores de lixo",
+        "Domésticos",
+        "Extrativistas florestais",
+        "Operários da construção, metalurgia e indústria",
+        "Pecuaristas e criadores de animais",
+        "Profissionais em alimentação"
+    )
+)
+
+param$ocupation_def <- list("Profissionais da saúde","Profissionais do ensino") 
+
+param$sector_choices <- list(
+    "Todos" = "todos",
+    "Formal" = "formal",
+    "Informal" = "informal",
+    "Público" = "publico",
+    "Privado" = "privado"
+    )
+
+param$sector_def <- "formal"
+ 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
