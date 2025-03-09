@@ -4,8 +4,9 @@ library(haven)
 library(tibble)
 library(zoo)
 library(tidyr)
-library(PNADcIBGE)
 
+library(datazoom.social)
+# make sure it is updated and from github
 
 #################################################
 ## Mercado de Trabalho na Amazônia Legal
@@ -17,10 +18,11 @@ library(PNADcIBGE)
 #github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # PNAD files must be downloaded to the computer
-source <- "F:/Dados/PNADC"
+source <- "F:/Dados/PNADC/R"
 
 # only run this if not already downloaded: takes a long time
-load_pnadc(save_to = source, 2012:2023, raw_data = FALSE, panel = "none")
+# não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
+load_pnadc(save_to = source, 2012:2015, raw_data = FALSE, panel = "none")
 
 # and then all files must be read
 
@@ -325,7 +327,7 @@ dat <- dat %>%
 
 # saving data file
 
-readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds")
+readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##
@@ -730,7 +732,7 @@ dat_cod <- dat %>%
     filter(id %in% c("All", "COD")) %>%
     select(-id)
 
-readr::write_rds(dat_cod, "data/ibge_pnadc_cod.rds")
+readr::write_rds(dat_cod, "data/ibge_pnadc_cod.rds", compress = "gz")
 
 ##############################
 ## Dictionary -- CNAE e COD ##
@@ -786,3 +788,4 @@ temp_param_table <- temp_param_table %>%
     )
 
 write.csv(temp_param_table, file = "data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
+
