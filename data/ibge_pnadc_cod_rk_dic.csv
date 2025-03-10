@@ -1,0 +1,8 @@
+"","var","x","y","color","label","desc","var_group","categoria","subcategoria","slider"
+"1","group",FALSE,FALSE,TRUE,"Região","Região","IBGE - PNAD Contínua","Economia","Mercado de Trabalho",FALSE
+"2","setor",FALSE,FALSE,TRUE,"Setor","Setor","IBGE - PNAD Contínua","Economia","Mercado de Trabalho",FALSE
+"3","composicao_demografica",FALSE,FALSE,TRUE,"Tipo de Ocupação","Ocupação - Código COD","IBGE - PNAD Contínua","Economia","Mercado de Trabalho",FALSE
+"4","time",FALSE,FALSE,TRUE,"Ano - Trimestre","Ano - Trimestre","IBGE - PNAD Contínua","Economia","Mercado de Trabalho",TRUE
+"5","ocupado",TRUE,FALSE,TRUE,"Número de ocupados","Número de ocupados","IBGE - PNAD Contínua","Economia","Mercado de Trabalho",FALSE
+"6","rendimento_medio",TRUE,FALSE,TRUE,"Rendimento Médio","Rendimento Habitual Médio Real","IBGE - PNAD Contínua","Economia","Mercado de Trabalho",FALSE
+"7","massa_salarial",TRUE,FALSE,TRUE,"Massa Salarial","Massa Salarial","IBGE - PNAD Contínua","Economia","Mercado de Trabalho",FALSE

@@ -4,8 +4,9 @@ library(haven)
 library(tibble)
 library(zoo)
 library(tidyr)
-library(PNADcIBGE)
 
+library(datazoom.social)
+# make sure it is updated and from github
 
 #################################################
 ## Mercado de Trabalho na Amazônia Legal
@@ -17,10 +18,11 @@ library(PNADcIBGE)
 #github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # PNAD files must be downloaded to the computer
-source <- "F:/Dados/PNADC"
+source <- "F:/Dados/PNADC/R"
 
 # only run this if not already downloaded: takes a long time
-load_pnadc(save_to = source, 2012:2023, raw_data = FALSE, panel = "none")
+# não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
+load_pnadc(save_to = source, 2012:2025, raw_data = FALSE, panel = "none")
 
 # and then all files must be read
 
@@ -325,7 +327,7 @@ dat <- dat %>%
 
 # saving data file
 
-readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds")
+readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##
@@ -730,7 +732,7 @@ dat_cod <- dat %>%
     filter(id %in% c("All", "COD")) %>%
     select(-id)
 
-readr::write_rds(dat_cod, "data/ibge_pnadc_cod.rds")
+readr::write_rds(dat_cod, "data/ibge_pnadc_cod.rds", compress = "gz")
 
 ##############################
 ## Dictionary -- CNAE e COD ##
@@ -777,7 +779,50 @@ temp_param_table <- temp_param_table %>%
 
 write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
 
+temp_param_table <- temp_param_table %>%
+    mutate(slider = c(F,F,F,T,F,F,F)) %>%
+    mutate(x = y, y = FALSE)
+
+write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_rk_dic.csv", fileEncoding = "UTF-8")
+
 ## COD
+
+temp_param_table <- tibble::tibble(
+    var = c("group", "setor", "composicao_demografica", "time",
+            "ocupado", "rendimento_medio", "massa_salarial"),
+    x = TRUE,
+    y = FALSE,
+    color = TRUE,
+    label = NA,
+    desc = NA,
+    var_group = "IBGE - PNAD Cont\u00ednua",
+    categoria = "Economia",
+    subcategoria = "Mercado de Trabalho"
+)
+
+temp_param_table <- temp_param_table %>%
+    mutate(
+        y = ifelse(
+            var %in% c("ocupado", "rendimento_medio", "massa_salarial"), TRUE, FALSE
+        ),
+        label = dplyr::case_match(
+            var,
+            "group" ~ "Região",
+            "setor" ~ "Setor",
+            "composicao_demografica" ~ "Atividade Econômica",
+            "time" ~ "Ano - Trimestre",
+            "ocupado" ~ "Número de ocupados",
+            "rendimento_medio" ~ "Rendimento Médio",
+            "massa_salarial" ~ "Massa Salarial"
+        ),
+        desc = label,
+        desc = case_match(
+            var,
+            "composicao_demografica" ~ "Atividade Econômica - Código CNAE",
+            "rendimento_medio" ~ "Rendimento Habitual Médio Real",
+            .default = desc
+        )
+    )
 
 temp_param_table <- temp_param_table %>%
     mutate(
@@ -786,3 +831,9 @@ temp_param_table <- temp_param_table %>%
     )
 
 write.csv(temp_param_table, file = "data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
+
+temp_param_table <- temp_param_table %>%
+    mutate(slider = c(F,F,F,T,F,F,F)) %>%
+    mutate(x = y, y = FALSE)
+
+write.csv(temp_param_table, file = "data/ibge_pnadc_cod_rk_dic.csv", fileEncoding = "UTF-8")
