@@ -10,101 +10,104 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
-  
-  # Carrega dados
-  df <- readRDS(files$db_file)
-  
-  server <- function(input, output, session) {
-    
-      df_reactived <- reactive({
-          w <- df %>%
-              filter(setor == input$sector)
-          
-          return(w)
-      })  
+    server <- function(input, output, session) {
+        
+        # Carrega dados
+        df <- readRDS(files$db_file) %>%
+            filter(composicao_demografica != "Todos")
       
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      # se input está vazio preenche com valor aleatório da lista de colunas
-      if (input$x == "") {
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = sample(param$x_cols$var, 1)
-        )
-      }
-
-      if (input$color == "") {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = sample(param$color_cols$var, 1)
-        )
-      }
-    }
-
-    # Função para atualizar url do app com parâmetros dos inputs
-    update_my_queryString <- function() {
-      q_string <- paste0(
-        "?", "x=", input$x,
-        "&", "color=", input$color
-      )
-      updateQueryString(q_string, mode = "replace")
-    }
-
-    # Função para atualizar inputs a partir da URL
-    update_my_inputs <- function() {
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-
-      if (!is.null(query[["x"]])) {
-        # se tem x na url atribui valor ao selecinput x
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = query[["x"]]
-        )
-      }
-
-      if (!is.null(query[["color"]])) {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = query[["color"]]
-        )
-      }
-    }
+        # Função para atualizar url do app com parâmetros dos inputs
+        update_my_queryString <- function() {
+            q_string <- paste0(
+                "?","x=",input$x
+            )
+            
+            for (i in input$filter1) {
+                q_string <- paste0(
+                    q_string,
+                    "&","filter=",i
+                )
+            }
+            
+            for (k in input$filter3) {
+                q_string <- paste0(
+                    q_string,
+                    "&","filter3=",k
+                )
+                
+            }
+            
+            updateQueryString(q_string, mode = "replace")
+        }
+        
+        # Função para atualizar inputs a partir da URL
+        update_my_inputs <- function() {
+            # Preenche filtro vazio
+            updateSelectInput(session,
+                              "filter1",
+                              choices = param$filter_choices,
+                              selected = c("Amazônia Legal", "Brasil")
+            )
+            
+            updateSelectInput(session, 
+                              "filter3", 
+                              choices = param$sector_choices, 
+                              selected = param$sector_def
+            )
+            
+            #Pega parametros da url e atribui aos selectinputs
+            query <- parseQueryString(session$clientData$url_search)
+            
+            if (!is.null(query[['x']])) {
+                updateSelectInput(session,  "x",
+                                  choices = param$x_choices,
+                                  selected = query[['x']])
+            } 
+            
+            selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+            if (!is.null(query[["filter"]])) {
+                updateSelectInput(session,
+                                  "filter1",
+                                  choices = param$filter_choices,
+                                  selected = selected
+                )
+            }
+            
+            selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
+            if (!is.null(query[["filter"]])) {
+                updateSelectInput(session,
+                                  "filter3",
+                                  choices = param$sector_choices,
+                                  selected = selected
+                )
+            }
+        }
 
 
     # Output título do gráfico
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "" ||
-        is.null(input$color) || input$color == "") {
+      if (is.null(input$x) || input$x == "") {
         text <- param$novar
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
         x_col <- param$table[which(param$table$var == input$x), ]
-
-        text <- paste0(param$title, x_col$label)
+        
+        text <-  paste0(param$title_init, " ", x_col$label)
       }
 
       text
     })
     output$plot_subtitle <- renderText({
-      text <- " "
-
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$color) || input$color == "") {
-        text <- " "
-      } else {
-        # Monta título a partir de variáveis selecionadas nos inputs
-        color_col <- param$table[which(param$table$var == input$color), ]
-        text <- paste0(param$AL)
-      }
-
-      text
+        # Se algum campo estiver vazio retorna texto vazio
+        if(is.null(input$x) || input$x == "") {
+            text <- " "
+        } else {
+            text <- paste0(param$subtitle_init)
+        }
+        
+        text
     })
 
     # Output gráfico
@@ -119,15 +122,14 @@ get_server <- function(files, param) {
         {
 
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$x) || input$x == "" ||
-            is.null(input$color) || input$color == "") {
+          if (is.null(input$x) || input$x == "") {
             fig <- plotly_empty()
             stop()
           }
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == input$x), ]
-          color_col <- param$table[which(param$table$var == input$color), ]
+          color_col <- param$table[which(param$table$var == param$color_def), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
           text_col <- param$table[which(param$table$var == param$text_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
@@ -137,14 +139,18 @@ get_server <- function(files, param) {
           y_col$var <- "rank"
           y_col$label <- "Ranking"
 
+          df_filtered <- df %>%
+              dplyr::filter((group %in% input$filter1) &
+                                (setor %in% input$filter3))
+          
           df_p <- data.frame(
-            df_reactived()[x_col$var],
+            df_filtered[x_col$var],
             NA,
-            df_reactived()[color_col$var],
-            df_reactived()[slider_col$var],
-            df_reactived()["group"],
-            df_reactived()["group"],
-            df_reactived()[id_col$var]
+            df_filtered[color_col$var],
+            df_filtered[slider_col$var],
+            df_filtered[text_col$var],
+            df_filtered[color_col$var],
+            df_filtered[id_col$var]
           )
 
           colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
@@ -157,9 +163,6 @@ get_server <- function(files, param) {
             fig <- plotly_empty()
             stop()
           }
-
-          # Filtra sem grupo
-          df_p <- df_p[which(df_p$group != " - "), ]
 
           # Ordena base por variável de ranking e preenche y
           df_p <- df_p %>%
@@ -178,8 +181,8 @@ get_server <- function(files, param) {
 
           # Deixa somente grupos que tem rank <n em algum momento
           top_n <- 10
-          top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
-          df_p <- df_p %>% filter(group %in% top_groups)
+          top_groups <- unique(df_p$color[which(df_p$y <= top_n)])
+          df_p <- df_p %>% filter(color %in% top_groups)
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
@@ -189,7 +192,7 @@ get_server <- function(files, param) {
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "%", "<br>",
+            y_col$label, ": ", df_p$y, "<br>",
             color_col$label, ": ", df_p$color
           )
 
@@ -243,25 +246,6 @@ get_server <- function(files, param) {
             textfont = f1,
             textposition = "middle right"
           )
-
-          if (!is.numeric(df_p$color)) {
-            # adiciona barra sem split para a legenda
-            fig_p <- fig_p %>% add_segments(
-              hoverinfo = "none",
-              showlegend = TRUE,
-              x = 0,
-              xend = 0,
-              y = ~y,
-              yend = ~y,
-              color = ~color,
-              line = list(width = 30),
-              opacity = 0.7
-            )
-          } else {
-            fig_p <- fig_p %>% colorbar(title = color_col$label)
-          }
-
-
 
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
@@ -341,7 +325,7 @@ get_server <- function(files, param) {
             title = y_col$label,
             titlefont = f1,
             tickfont = f2,
-            tickformat = ".2%",
+            tickformat = "1",
             automargin = FALSE,
             autorange = FALSE,
             showgrid = FALSE,
@@ -351,11 +335,6 @@ get_server <- function(files, param) {
             range = c(top_n + 0.5, 0.5), # fixa range do y somente para top 10
             type = "numeric"
           )
-
-          # Tipo de eixo (se log selecionado)
-          # if (input$xlog & is.numeric(df_p$x)) {
-          #  x_axis_layout$type <- "log"
-          # }
 
           # Layout hover/tooltip
           tooltip <- list(
@@ -375,7 +354,7 @@ get_server <- function(files, param) {
               hoverlabel = tooltip
             )
 
-          fig <- fig %>% animation_opts(
+          fig_p <- fig_p %>% animation_opts(
             1500,
             easing = "linear", redraw = FALSE
           )
@@ -402,7 +381,7 @@ get_server <- function(files, param) {
       )
       fig
     }) %>%
-      bindCache(input$x, input$color)
+      bindCache(input$x, input$filter1, input$filter3)
 
     # Observa eventos
     observe({

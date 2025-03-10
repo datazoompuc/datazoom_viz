@@ -28,14 +28,14 @@ param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando 
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Dados compilados sobre atividades econ\u00f4micas gerados a partir da PNAD Cont\u00ednua Trimestral - IBGE"
+param$plot_desc <- "Dados sobre atividades econ\u00f4micas gerados a partir da PNAD Cont\u00ednua Trimestral - IBGE"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "eixo vertical (y)"
 param$label_scale_name <- "escala log"
 param$label_prop_name <- "proporcional ao trimestre inicial (*)"
-param$label_region_name <- "Estado"
+param$label_region_name <- "Recorte regional"
 param$label_type_name <- "Atividade econômica"
 param$label_sector_name <- "Setor"
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cnae/"

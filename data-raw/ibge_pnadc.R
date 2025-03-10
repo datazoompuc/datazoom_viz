@@ -22,7 +22,7 @@ source <- "F:/Dados/PNADC/R"
 
 # only run this if not already downloaded: takes a long time
 # não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
-load_pnadc(save_to = source, 2012:2015, raw_data = FALSE, panel = "none")
+load_pnadc(save_to = source, 2013:2025, raw_data = FALSE, panel = "none")
 
 # and then all files must be read
 
@@ -779,7 +779,50 @@ temp_param_table <- temp_param_table %>%
 
 write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
 
+temp_param_table <- temp_param_table %>%
+    mutate(slider = c(F,F,F,T,F,F,F)) %>%
+    mutate(x = y, y = FALSE)
+
+write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_rk_dic.csv", fileEncoding = "UTF-8")
+
 ## COD
+
+temp_param_table <- tibble::tibble(
+    var = c("group", "setor", "composicao_demografica", "time",
+            "ocupado", "rendimento_medio", "massa_salarial"),
+    x = TRUE,
+    y = FALSE,
+    color = TRUE,
+    label = NA,
+    desc = NA,
+    var_group = "IBGE - PNAD Cont\u00ednua",
+    categoria = "Economia",
+    subcategoria = "Mercado de Trabalho"
+)
+
+temp_param_table <- temp_param_table %>%
+    mutate(
+        y = ifelse(
+            var %in% c("ocupado", "rendimento_medio", "massa_salarial"), TRUE, FALSE
+        ),
+        label = dplyr::case_match(
+            var,
+            "group" ~ "Região",
+            "setor" ~ "Setor",
+            "composicao_demografica" ~ "Atividade Econômica",
+            "time" ~ "Ano - Trimestre",
+            "ocupado" ~ "Número de ocupados",
+            "rendimento_medio" ~ "Rendimento Médio",
+            "massa_salarial" ~ "Massa Salarial"
+        ),
+        desc = label,
+        desc = case_match(
+            var,
+            "composicao_demografica" ~ "Atividade Econômica - Código CNAE",
+            "rendimento_medio" ~ "Rendimento Habitual Médio Real",
+            .default = desc
+        )
+    )
 
 temp_param_table <- temp_param_table %>%
     mutate(
@@ -789,3 +832,8 @@ temp_param_table <- temp_param_table %>%
 
 write.csv(temp_param_table, file = "data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
 
+temp_param_table <- temp_param_table %>%
+    mutate(slider = c(F,F,F,T,F,F,F)) %>%
+    mutate(x = y, y = FALSE)
+
+write.csv(temp_param_table, file = "data/ibge_pnadc_cod_rk_dic.csv", fileEncoding = "UTF-8")
