@@ -22,7 +22,7 @@ source <- "F:/Dados/PNADC/R"
 
 # only run this if not already downloaded: takes a long time
 # não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
-load_pnadc(save_to = source, 2013:2025, raw_data = FALSE, panel = "none")
+load_pnadc(save_to = source, 2012:2025, raw_data = FALSE, panel = "none")
 
 # and then all files must be read
 

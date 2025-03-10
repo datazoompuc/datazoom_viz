@@ -46,7 +46,7 @@ param$subtitle_init <- "por atividade econômica" # expressão subtitulo
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Dados sobre atividades econ\u00f4micas gerados a partir da PNAD Cont\u00ednua Trimestral - IBGE"
+param$plot_desc <- "Mercado de Trabalho"
 
 # Outros parâmetros e configurações
 

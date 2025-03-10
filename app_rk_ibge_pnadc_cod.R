@@ -38,15 +38,15 @@ param$label_x_name <- "eixo horizontal (x)"
 
 param$label_region_name <- "Recorte regional"
 param$label_sector_name <- "Setor"
-param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cnae/"
+param$link <- "https://datazoom.shinyapps.io/app_rk_ibge_pnadc_cod/"
 
 ### Parametros especificos no server
 param$title_init <- "Ranking" # expressão titulo
-param$subtitle_init <- "por atividade econômica" # expressão subtitulo
+param$subtitle_init <- "por ocupação" # expressão subtitulo
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Dados sobre atividades econ\u00f4micas gerados a partir da PNAD Cont\u00ednua Trimestral - IBGE"
+param$plot_desc <- "Mercado de Trabalho"
 
 # Outros parâmetros e configurações
 

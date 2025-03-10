@@ -28,7 +28,7 @@ param$text_def <- "group" # variável padrão de texto sobre o gráfico (quando 
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Dados sobre ocupações gerados a partir da PNAD Cont\u00ednua Trimestral - IBGE"
+param$plot_desc <- "Mercado de Trabalho"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
