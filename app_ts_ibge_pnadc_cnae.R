@@ -61,6 +61,7 @@ param$filter_choices <- list(
 )
 
 param$ocupation_choices <- list(
+    "Todos",
     "Administração pública, defesa e seguridade social",     
     "Alimentos, bebidas e fumo",                          
     "Artes, cultura, esportes e recreação",                  
@@ -92,7 +93,7 @@ param$ocupation_choices <- list(
     "Têxtil, vestuário, couro e calçados"
 )
 
-param$ocupation_def <- list("Educação","Saúde e assistência social") 
+param$ocupation_def <- list("Todos") 
 
 param$sector_choices <- list(
     "Todos" = "todos",

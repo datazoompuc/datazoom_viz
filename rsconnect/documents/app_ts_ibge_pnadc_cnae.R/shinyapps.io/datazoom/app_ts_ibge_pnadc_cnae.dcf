@@ -5,7 +5,7 @@ account: datazoom
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4296479
-bundleId: 9916712
+bundleId: 9944501
 url: https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cnae/
 asMultiple: FALSE
 asStatic: FALSE

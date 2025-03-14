@@ -61,6 +61,7 @@ param$filter_choices <- list(
 )
 
 param$ocupation_choices <- list(
+    "Todos",
     "Administradores e especialista em gestão",
     "Ambulantes",
     "Apoio administrativo",
@@ -89,7 +90,7 @@ param$ocupation_choices <- list(
     "Vendedores"
 )
 
-param$ocupation_def <- list("Profissionais do ensino", "Profissionais da saúde") 
+param$ocupation_def <- list("Todos") 
 
 param$sector_choices <- list(
     "Todos" = "todos",
