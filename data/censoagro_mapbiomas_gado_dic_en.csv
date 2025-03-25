@@ -1,8 +1,7 @@
-"","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","municipality_name",FALSE,FALSE,FALSE,FALSE,FALSE,"Municipality","Municipality","Censo Agro and MapBiomas",1,"","",""
-"2","state_name",FALSE,FALSE,FALSE,FALSE,FALSE,"State","State","Censo Agro and MapBiomas",1,"","",""
-"3","year",FALSE,TRUE,FALSE,FALSE,FALSE,"Year","Year","Censo Agro and MapBiomas",1,"","",""
-"4","geom",FALSE,FALSE,FALSE,FALSE,FALSE,"geom","geom","Censo Agro and MapBiomas",1,"","",""
-"5","Heads of Cattle",TRUE,FALSE,FALSE,FALSE,FALSE,"Heads of Cattle","Heads of Cattle","Censo Agro and MapBiomas",1,"Number","",""
-"6","Pasture",TRUE,FALSE,FALSE,FALSE,FALSE,"Pasture","Pasture","Censo Agro and MapBiomas",1,"ha","",""
-"7","Heads of Cattle / Pasture",TRUE,FALSE,FALSE,FALSE,FALSE,"Heads of Cattle / Pasture","Heads of Cattle / Pasture","Censo Agro and MapBiomas",1,"Proportion","",""
+...1,var,x,y,color,size,slider,label,desc,var_group,tipo,unidade,categoria,subcategoria
+1,municipality_name,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Censo Agro e MapBiomas,1,NA,NA,NA
+2,state_name,FALSE,FALSE,FALSE,FALSE,FALSE,Estado,Estado,Censo Agro e MapBiomas,1,NA,NA,NA
+3,year,FALSE,TRUE,FALSE,FALSE,FALSE,Ano,Ano,Censo Agro e MapBiomas,1,NA,NA,NA
+4,geom,FALSE,FALSE,FALSE,FALSE,FALSE,geom,geom,Censo Agro e MapBiomas,1,NA,NA,NA
+5,Heads of Cattle,TRUE,FALSE,FALSE,FALSE,FALSE,Heads of Cattle,Cabeças de Gado,Censo Agro e MapBiomas,1,Número,NA,NA
+6,Pasture,TRUE,FALSE,FALSE,FALSE,FALSE,Pasture Area,Área de Pastagem,Censo Agro e MapBiomas,1,ha,NA,NA

@@ -1,3 +1,7 @@
+# Cache
+cache_folder <- "./cache/app_map_cattle_en/"
+shinyOptions(cache = cachem::cache_disk(cache_folder))
+
 # Carrega bibliotecas
 library(shiny)
 library(tidyverse)
@@ -16,7 +20,6 @@ files$param_file <- "data/censoagro_mapbiomas_gado_dic_en.csv"
 files$db_file <- "data/censoagro_mapbiomas_gado.rds"
 files$legal_amazon <- "data/legal_amazon_boundary.rds"
 files$states_boundary <- "data/states_boundary.rds"
-files$areas_mun <- "data/area_municipios.rds"
 
 
 # Carrega scripts
@@ -26,9 +29,8 @@ source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 
-param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "Heads of Cattle" # variável padrão do eixo x
-param$y_def <- "" # variável padrão do eixo y
+param <- get_db_param(files$param_file, files$db_file) # car
+param$x_def <- "Heads of Cattle" # variável padrão do eixo y
 param$color_def <- "" # variável padrão de cor
 param$size_def <- "" # variável padrão de tamanho
 param$text_def <- "Municipality" # variável padrão de texto
@@ -51,8 +53,13 @@ param$label_selected_variable<- "Selected variable:"
 param$label_munic_name<- "Municipality: <b>"
 param$label_state_name<- "State: <b>"
 param$label_measurement_unit<- "Unit: <b>"
-param$label_toggle <- "Proportion of municipality area"
-param$warning_prop <-"Warning: This option is not valid, instead we are showing Heads of Cattle / Pasture area."
+param$label_check <- "In proportion:"
+param$label_toggle <- list(
+    tags$span(style = "color:white", "Absolute Values"),
+    tags$span(style = "color:white", "Proportion of municipal area"),
+    tags$span(style = "color:white", "Proportion of pasture area")
+)
+param$warning_prop <-"Warning: This option is not valid, instead we are showing Pasture Area."
 param$warning_prop_label <-"Proportion"
 
 param$link<- "https://datazoom.shinyapps.io/app_map_cattle_en/"
