@@ -13,8 +13,7 @@ get_server <- function(files, param) {
 
   # Carrega dados
   library(sf)
-  
-  library(sf)
+    
   df <- readRDS(files$db_file)
 
   server <- function(input, output, session) {
