@@ -30,19 +30,13 @@ get_server <- function(files, param) {
         )
       }
 
-      if (input$color == "") {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = sample(param$color_cols$var, 1)
-        )
-      }
+     
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "x=", input$x,
-        "&", "color=", input$color
+        "?", "x=", input$x
       )
       updateQueryString(q_string, mode = "replace")
     }
@@ -73,8 +67,7 @@ get_server <- function(files, param) {
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "" ||
-        is.null(input$color) || input$color == "") {
+      if (is.null(input$x) || input$x == "" ) {
         text <- param$server0
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
@@ -89,13 +82,13 @@ get_server <- function(files, param) {
       text <- " "
 
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$color) || input$color == "") {
-        text <- " "
-      } else {
+      
+     
         # Monta título a partir de variáveis selecionadas nos inputs
-        color_col <- param$table[which(param$table$var == input$color), ]
+      
+        color_col <- param$table[which(param$table$var == param$color_def), ]
         text <- paste0(param$server2)
-      }
+      
 
       text
     })
@@ -113,14 +106,14 @@ get_server <- function(files, param) {
 
           # Se algum campo estiver vazio retorna gráfico vazio
           if (is.null(input$x) || input$x == "" ||
-            is.null(input$color) || input$color == "") {
+            is.null(param$color_def) || param$color_def == "") {
             fig <- plotly_empty()
             stop()
           }
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           x_col <- param$table[which(param$table$var == input$x), ]
-          color_col <- param$table[which(param$table$var == input$color), ]
+          color_col <- param$table[which(param$table$var == param$color_def), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
           text_col <- param$table[which(param$table$var == param$text_def), ]
           id_col <- param$table[which(param$table$var == param$id_def), ]
@@ -395,7 +388,7 @@ get_server <- function(files, param) {
       )
       fig
     }) %>%
-        bindCache(input$x, input$color)
+        bindCache(input$x, param$color_def)
 
     # Observa eventos
     observe({

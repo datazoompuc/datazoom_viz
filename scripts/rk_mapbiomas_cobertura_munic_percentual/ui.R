@@ -36,17 +36,6 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
-        div(
-          class = "var_selec_group",
-          # Seleciona variável de cor
-          selectInput(
-            inputId = "color",
-            label = param$ui3,
-            choices = param$color_choices,
-            selected = param$color_def,
-            width = "100%"
-          )
-        ),
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
