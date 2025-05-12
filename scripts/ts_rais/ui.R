@@ -21,79 +21,89 @@ get_ui <- function(files, param) {
                    h2(class = "plot_name", param$plot_name),
                    p(class = "plot_desc", param$plot_desc),
                    hr(),
+                   p(class = "vars", param$label_var_name),
                    
                    # Controles de visualização
-                   selectInput("y", param$label_y_name,
-                               choices = list(
-                                   "Salário Médio" = "real_avg_w",
-                                   "Número de Vínculos" = "num_vinculos",
-                                   "Tempo no Emprego" = "tenure"
-                               ),
-                               selected = param$y_def
+                   div(
+                       class = "var_selec_group",
+                       selectInput(
+                           inputId = "y",
+                           label = param$label_y_name,
+                           choices = list(
+                               "Salário Médio" = "real_avg_w",
+                               "Número de Vínculos" = "num_vinculos",
+                               "Tempo no Emprego" = "tenure"
+                           ),
+                           selected = param$y_def,
+                           width = "100%"
+                       )
                    ),
                    
-                   selectInput("x", "Eixo horizontal (x):",
-                               choices = list(
-                                   "Ano" = "year",
-                                   "UF" = "uf",
-                                   "Setor Econômico" = "setor",
-                                   "Ocupação" = "ocupacao",
-                                   "Sexo" = "sexo"
-                               ),
-                               selected = param$x_def
+                   checkboxInput(
+                       inputId = "ylog",
+                       label = param$label_scale_name,
+                       value = FALSE,
+                       width = "100%"
                    ),
                    
-                   selectInput("color", "Cor por:",
-                               choices = list(
-                                   "Nenhum" = "none",
-                                   "UF" = "uf",
-                                   "Setor" = "setor",
-                                   "Sexo" = "sexo",
-                                   "Faixa Etária" = "faixa_etaria"
-                               ),
-                               selected = param$color_def
+                   checkboxInput(
+                       inputId = "y_option",
+                       label = param$label_prop_name,
+                       value = FALSE,
+                       width = "100%"
                    ),
                    
-                   checkboxGroupInput("options", "Opções:",
-                                      choices = list(
-                                          "Escala logarítmica" = "logscale",
-                                          "Mostrar valores" = "showvalues"
-                                      )
+                   
+                   
+                   # Filtro geográfico
+                   div(
+                       class = "var_selec_group",
+                       selectizeInput(
+                           inputId = "filter_geo",
+                           label = param$label_geo,  # Mesmo estilo que label_y_name
+                           choices = NULL,
+                           multiple = TRUE,
+                           options = list(placeholder = 'Selecione regiões/estados...', maxItems = 20),
+                           width = "100%"
+                       )
                    ),
                    
-                   # Filtros
-                   selectizeInput("filter_uf", param$label_geo,
-                                  choices = NULL, multiple = TRUE,
-                                  options = list(placeholder = 'Selecione UFs...')
+                   # Filtro de setor
+                   div(
+                       class = "var_selec_group",
+                       selectizeInput(
+                           inputId = "filter_setor",
+                           label = param$label_sect,  # Mesmo estilo que label_y_name
+                           choices = NULL,
+                           multiple = TRUE,
+                           options = list(placeholder = 'Selecione setores...', maxItems = 20),
+                           width = "100%"
+                       )
                    ),
                    
-                   selectizeInput("filter_setor", param$label_sect,
-                                  choices = NULL, multiple = TRUE,
-                                  options = list(placeholder = 'Selecione setores...')
-                   ),
-                   
-                   actionButton('ab1', "Visualização Completa", 
-                                icon = icon("expand"), class = "btn-primary",
-                                onclick = paste0("window.open('", param$link, "', '_blank')")
+                   actionButton(
+                       'ab1', 
+                       label = "Fullscreen", 
+                       icon = icon("expand"), 
+                       class = "btn-primary",
+                       onclick = paste0("window.open('", param$link, "', '_blank')")
                    )
-            ),  # Fechamento da primeira column(3)
+            ),
             
             column(9,
                    class = "plotcol h-100",
-                   h3(textOutput("plot_title"), align = "center"),
-                   h4(textOutput("plot_subtitle"), align = "center"),
+                   textOutput("plot_title"),
+                   textOutput("plot_subtitle"),
                    div(
                        class = "plotrow row justify-content-center flex-grow-1 w-100",
                        div(
                            class = "plotdiv w-100 h-100",
-                           # Gráfico com spinner
-                           withSpinner(
-                               plotlyOutput("plot", width = "100%", height = "100%"),
-                               type = 4, color = "#41878C"
-                           )
+                           plotlyOutput("plot", width = "100%", height = "100%") %>% 
+                               withSpinner(type = 4, color = "#41878C")
                        )
                    )
-            )  # Fechamento da column(9)
-        )  # Fechamento do fluidRow
-    )  # Fechamento do div principal
+            )
+        )
+    )
 }
+

@@ -11,18 +11,46 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
     function(input, output, session) {
         
-        # Carrega dados
-        df <- readRDS(files$db_file) %>%
-            filter(year >= 1995)
+        # Carrega dados como reativo
+        dados <- reactive({
+            df <- readRDS(files$db_file) %>%
+                filter(year >= 2003) %>%
+                mutate(
+                    regiao = case_when(
+                        uf %in% c("Acre", "Amapá", "Amazonas", "Pará", "Rondônia", "Roraima", "Tocantins") ~ "Norte",
+                        uf %in% c("Alagoas", "Bahia", "Ceará", "Maranhão", "Paraíba", "Pernambuco", "Piauí", 
+                                  "Rio Grande do Norte", "Sergipe") ~ "Nordeste",
+                        uf %in% c("Espírito Santo", "Minas Gerais", "Rio de Janeiro", "São Paulo") ~ "Sudeste",
+                        uf %in% c("Paraná", "Rio Grande do Sul", "Santa Catarina") ~ "Sul",
+                        uf %in% c("Distrito Federal", "Goiás", "Mato Grosso", "Mato Grosso do Sul") ~ "Centro-Oeste",
+                        TRUE ~ "Outros"
+                    ),
+                    amazonia_legal = ifelse(
+                        uf %in% c("Acre", "Amapá", "Amazonas", "Maranhão", "Mato Grosso", 
+                                  "Pará", "Rondônia", "Roraima", "Tocantins"),
+                        "Amazônia Legal", 
+                        "Fora da Amazônia Legal"
+                    )
+                )
+            
+            return(df)
+        })
         
-        # Atualiza seletores com valores únicos dos dados
+        # Atualiza seletores
         observe({
-            # Atualiza filtro de UF
+            df <- dados()
+            
+            # Atualiza filtro geográfico
             updateSelectizeInput(
                 session, 
-                "filter_uf",
-                choices = c("Todos", sort(unique(df$uf))),
-                selected = "Todos"
+                "filter_geo",
+                choices = list(
+                    "Brasil" = "Brasil",
+                    "Amazônia Legal" = c("Amazônia Legal", "Fora da Amazônia Legal"),
+                    "Regiões" = c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"),
+                    "Estados" = sort(unique(df$uf))
+                ),
+                selected = "Brasil"
             )
             
             # Atualiza filtro de setor
@@ -36,163 +64,162 @@ get_server <- function(files, param) {
         
         # Gera título dinâmico
         output$plot_title <- renderText({
-            if(is.null(input$y)) return("Selecione uma variável")
+            req(input$y)  
             
             y_label <- switch(input$y,
                               "real_avg_w" = "Salário Médio",
                               "num_vinculos" = "Número de Vínculos",
                               "tenure" = "Tempo no Emprego")
             
-            paste("Evolução do", y_label, "na RAIS")
+            paste("Evolução do", y_label)
         })
         
-        output$plot_subtitle <- renderText({
-            if(is.null(input$x)) return("")
-            
-            x_label <- switch(input$x,
-                              "year" = "por Ano",
-                              "uf" = "por Estado",
-                              "setor" = "por Setor Econômico",
-                              "ocupacao" = "por Ocupação",
-                              "sexo" = "por Sexo")
-            
-            x_label
-        })
+       
         
         # Gera o gráfico principal
         output$plot <- renderPlotly({
-            # Requer seleção de variáveis
-            req(input$x, input$y)
+            req(input$y, input$filter_geo, input$filter_setor)
+            df <- dados()
             
-            # Filtra os dados
-            df_filtrado <- df
-            
-            # Aplica filtros
-            if(!is.null(input$filter_uf) && !"Todos" %in% input$filter_uf) {
-                df_filtrado <- df_filtrado %>% filter(uf %in% input$filter_uf)
+            # Aplica filtros geográficos
+            if(!"Brasil" %in% input$filter_geo) {
+                df <- df %>% 
+                    filter(uf %in% input$filter_geo | 
+                               regiao %in% input$filter_geo | 
+                               amazonia_legal %in% input$filter_geo)
+                
+                # Define o nome do grupo geográfico
+                df <- df %>%
+                    mutate(geo_group = case_when(
+                        uf %in% input$filter_geo ~ uf,
+                        regiao %in% input$filter_geo ~ regiao,
+                        amazonia_legal %in% input$filter_geo ~ amazonia_legal
+                    ))
+            } else {
+                df <- df %>% mutate(geo_group = "Brasil")
             }
             
-            if(!is.null(input$filter_setor) && !"Todos os setores" %in% input$filter_setor) {
-                df_filtrado <- df_filtrado %>% filter(setor %in% input$filter_setor)
+            # Aplica filtros de setor
+            if(!"Todos os setores" %in% input$filter_setor) {
+                df <- df %>% 
+                    filter(setor %in% input$filter_setor)
             }
             
-            # Verifica se há dados após filtragem
-            if(nrow(df_filtrado) == 0) {
+            # Agrupa os dados conforme os filtros selecionados
+            if("Brasil" %in% input$filter_geo && "Todos os setores" %in% input$filter_setor) {
+                # Caso 1: Brasil e todos os setores - agregar tudo
+                df_agg <- df %>%
+                    group_by(year) %>%
+                    summarize(
+                        y_value = case_when(
+                            input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
+                            input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
+                            input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
+                        ),
+                        .groups = "drop"
+                    ) %>%
+                    mutate(combinacao = "Todos os Setores")
+                
+            } else if ("Brasil" %in% input$filter_geo) {
+                # Caso 2: Brasil com setores específicos - agrupar por setor
+                df_agg <- df %>%
+                    group_by(year, setor) %>%
+                    summarize(
+                        y_value = case_when(
+                            input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
+                            input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
+                            input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
+                        ),
+                        .groups = "drop"
+                    ) %>%
+                    mutate(combinacao = as.character(setor))
+                
+            } else if ("Todos os setores" %in% input$filter_setor) {
+                # Caso 3: Regiões/Estados com todos os setores - agrupar por grupo geográfico
+                df_agg <- df %>%
+                    group_by(year, geo_group) %>%
+                    summarize(
+                        y_value = case_when(
+                            input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
+                            input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
+                            input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
+                        ),
+                        .groups = "drop"
+                    ) %>%
+                    mutate(combinacao = geo_group)
+                
+            } else {
+                # Caso 4: Regiões/Estados com setores específicos - agrupar por combinação
+                df_agg <- df %>%
+                    group_by(year, geo_group, setor) %>%
+                    summarize(
+                        y_value = case_when(
+                            input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
+                            input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
+                            input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
+                        ),
+                        .groups = "drop"
+                    ) %>%
+                    mutate(combinacao = paste(setor, "-", geo_group))
+            }
+            
+            # Verifica se há dados
+            if(nrow(df_agg) == 0) {
                 return(plotly_empty() %>% 
                            layout(title = list(text = "Nenhum dado encontrado com os filtros selecionados")))
             }
             
-            # Agrega os dados conforme necessário
-            df_agg <- df_filtrado %>%
-                group_by(across(all_of(c(input$x, input$color)))) %>%
-                summarize(
-                    y_value = case_when(
-                        input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
-                        input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
-                        input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
-                    ),
-                    .groups = "drop"
-                )
+            # Calcula evolução relativa se necessário
+            if(input$y_option) {
+                df_agg <- df_agg %>%
+                    group_by(combinacao) %>%
+                    mutate(
+                        y_value = 100 * y_value / first(na.omit(y_value))
+                    ) %>%
+                    ungroup()
+            }
             
-            # Prepara texto para tooltip
+            # Prepara tooltip
             df_agg$tooltip <- paste0(
-                "<b>", if(!is.null(input$color)) df_agg[[input$color]] else "Todos", "</b><br>",
-                switch(input$x,
-                       "year" = "Ano",
-                       "uf" = "UF",
-                       "setor" = "Setor",
-                       "ocupacao" = "Ocupação",
-                       "sexo" = "Sexo"), ": ", df_agg[[input$x]], "<br>",
+                "<b>", df_agg$combinacao, "</b><br>",
+                "Ano: ", df_agg$year, "<br>",
                 switch(input$y,
-                       "real_avg_w" = "Salário Médio",
-                       "num_vinculos" = "Nº de Vínculos",
-                       "tenure" = "Tempo Médio"), ": ", round(df_agg$y_value, 2)
+                       "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
+                       "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Nº de Vínculos",
+                       "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo (meses)"), 
+                ": ", round(df_agg$y_value, if(input$y_option) 1 else 2)
             )
             
             # Cria o gráfico
             p <- plot_ly(df_agg,
-                         x = ~get(input$x),
+                         x = ~year,
                          y = ~y_value,
-                         color = if(!is.null(input$color) && input$color != "none") ~get(input$color) else NULL,
+                         color = ~combinacao,
+                         colors = pallete_discrete,
                          type = 'scatter',
                          mode = 'lines+markers',
                          text = ~tooltip,
                          hoverinfo = 'text',
                          line = list(width = 2),
-                         marker = list(size = 8))
-            
-            # Configurações do layout
-            p <- p %>% layout(
-                xaxis = list(
-                    title = switch(input$x,
-                                   "year" = "Ano",
-                                   "uf" = "Unidade Federativa",
-                                   "setor" = "Setor Econômico",
-                                   "ocupacao" = "Ocupação",
-                                   "sexo" = "Sexo"),
-                    tickangle = if(input$x == "setor") 45 else 0
-                ),
-                yaxis = list(
-                    title = switch(input$y,
-                                   "real_avg_w" = "Salário Médio (R$)",
-                                   "num_vinculos" = "Número de Vínculos",
-                                   "tenure" = "Tempo no Emprego (meses)"),
-                    type = if("logscale" %in% input$options) "log" else "linear"
-                ),
-                legend = list(title = list(text = if(!is.null(input$color)) 
-                    switch(input$color,
-                           "uf" = "UF",
-                           "setor" = "Setor",
-                           "sexo" = "Sexo",
-                           "faixa_etaria" = "Faixa Etária") else NULL)),
-                hovermode = "closest",
-                margin = list(b = if(input$x == "setor") 100 else 50)
-            )
-            
-            # Adiciona valores se solicitado
-            if("showvalues" %in% input$options) {
-                p <- p %>% add_annotations(
-                    text = ~round(y_value, 2),
-                    showarrow = FALSE,
-                    yanchor = 'bottom'
+                         marker = list(size = 8)) %>%
+                layout(
+                    xaxis = list(title = "Ano"),
+                    yaxis = list(
+                        title = switch(input$y,
+                                       "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
+                                       "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Número de Vínculos",
+                                       "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo no Emprego (meses)"),
+                        type = if(input$ylog) "log" else "linear"
+                    ),
+                    hovermode = "closest",
+                    showlegend = TRUE
                 )
-            }
             
-            # Configurações adicionais
             p %>% config(
                 displayModeBar = TRUE,
                 modeBarButtonsToRemove = c("select2d", "lasso2d", "autoScale2d"),
                 locale = 'pt-BR'
             )
-        })
-        
-        # Observador para atualizar a cor quando o eixo X muda
-        observe({
-            x_var <- input$x
-            
-            # Evita que a cor seja a mesma variável do eixo X
-            if(!is.null(x_var)) {
-                current_color <- input$color
-                choices <- list(
-                    "Nenhum" = "none",
-                    "UF" = "uf",
-                    "Setor Econômico" = "setor",
-                    "Sexo" = "sexo",
-                    "Faixa Etária" = "faixa_etaria"
-                )
-                
-                # Remove a variável atual do eixo X das opções de cor
-                if(x_var %in% unlist(choices)) {
-                    choices <- choices[!choices %in% x_var]
-                }
-                
-                updateSelectInput(
-                    session, 
-                    "color",
-                    choices = choices,
-                    selected = if(current_color == x_var) "none" else current_color
-                )
-            }
         })
     }
 }

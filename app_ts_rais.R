@@ -1,9 +1,9 @@
 # Carrega bibliotecas
 library(shiny)
+library(dplyr)
 library(ggplot2)
 library(plotly)
-library(shinycssloaders)
-library(htmlwidgets)
+
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -34,7 +34,7 @@ param$plot_desc <- "Dados compilados sobre o mercado de trabalho brasileiro gera
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "eixo vertical (y)"
+param$label_y_name <- "Eixo vertical (y)"
 param$label_scale_name <- "escala log"
 param$label_prop_name <- "proporcional ao ano inicial (*)"
 param$label_geo <- "Recorte Geográfico"
