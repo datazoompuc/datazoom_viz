@@ -60,6 +60,19 @@ get_server <- function(files, param) {
                 choices = c("Todos os setores", sort(unique(df$setor))),
                 selected = "Todos os setores"
             )
+            
+            # Novo - Atualiza filtro de agrupamento
+            updateSelectizeInput(
+                session,
+                "filter_agrupar_por",
+                choices = c("Nenhum" = "nenhum",
+                            "Sexo" = "sexo",
+                            "Raça" = "raca",
+                            "Escolaridade" = "escolaridade",
+                            "Ocupação" = "ocupacao",
+                            "Faixa Etária" = "faixa_etaria"),
+                selected = "nenhum"
+            )
         })
         
         # Gera título dinâmico
@@ -74,8 +87,6 @@ get_server <- function(files, param) {
             paste("Evolução do", y_label)
         })
         
-       
-        
         # Gera o gráfico principal
         output$plot <- renderPlotly({
             req(input$y, input$filter_geo, input$filter_setor)
@@ -86,10 +97,7 @@ get_server <- function(files, param) {
                 df <- df %>% 
                     filter(uf %in% input$filter_geo | 
                                regiao %in% input$filter_geo | 
-                               amazonia_legal %in% input$filter_geo)
-                
-                # Define o nome do grupo geográfico
-                df <- df %>%
+                               amazonia_legal %in% input$filter_geo) %>%
                     mutate(geo_group = case_when(
                         uf %in% input$filter_geo ~ uf,
                         regiao %in% input$filter_geo ~ regiao,
@@ -101,66 +109,34 @@ get_server <- function(files, param) {
             
             # Aplica filtros de setor
             if(!"Todos os setores" %in% input$filter_setor) {
-                df <- df %>% 
-                    filter(setor %in% input$filter_setor)
+                df <- df %>% filter(setor %in% input$filter_setor)
             }
             
-            # Agrupa os dados conforme os filtros selecionados
-            if("Brasil" %in% input$filter_geo && "Todos os setores" %in% input$filter_setor) {
-                # Caso 1: Brasil e todos os setores - agregar tudo
-                df_agg <- df %>%
-                    group_by(year) %>%
-                    summarize(
-                        y_value = case_when(
-                            input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
-                            input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
-                            input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
-                        ),
-                        .groups = "drop"
-                    ) %>%
-                    mutate(combinacao = "Todos os Setores")
-                
-            } else if ("Brasil" %in% input$filter_geo) {
-                # Caso 2: Brasil com setores específicos - agrupar por setor
-                df_agg <- df %>%
-                    group_by(year, setor) %>%
-                    summarize(
-                        y_value = case_when(
-                            input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
-                            input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
-                            input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
-                        ),
-                        .groups = "drop"
-                    ) %>%
-                    mutate(combinacao = as.character(setor))
-                
-            } else if ("Todos os setores" %in% input$filter_setor) {
-                # Caso 3: Regiões/Estados com todos os setores - agrupar por grupo geográfico
-                df_agg <- df %>%
-                    group_by(year, geo_group) %>%
-                    summarize(
-                        y_value = case_when(
-                            input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
-                            input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
-                            input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
-                        ),
-                        .groups = "drop"
-                    ) %>%
-                    mutate(combinacao = geo_group)
-                
+            # Determina variáveis de agrupamento
+            group_vars <- c("year")
+            if(!"Brasil" %in% input$filter_geo) group_vars <- c(group_vars, "geo_group")
+            if(!"Todos os setores" %in% input$filter_setor) group_vars <- c(group_vars, "setor")
+            if(input$filter_agrupar_por != "nenhum") group_vars <- c(group_vars, input$filter_agrupar_por)
+            
+            # Agregação dinâmica
+            df_agg <- df %>%
+                group_by(across(all_of(group_vars))) %>%
+                summarize(
+                    y_value = case_when(
+                        input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
+                        input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
+                        input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
+                    ),
+                    .groups = "drop"
+                )
+            
+            # Cria combinação de forma segura
+            if(length(group_vars) > 1) {
+                # Pega todas as colunas exceto year e y_value para combinar
+                combine_cols <- setdiff(names(df_agg), c("year", "y_value"))
+                df_agg$combinacao <- apply(df_agg[, combine_cols], 1, function(x) paste(x, collapse = " - "))
             } else {
-                # Caso 4: Regiões/Estados com setores específicos - agrupar por combinação
-                df_agg <- df %>%
-                    group_by(year, geo_group, setor) %>%
-                    summarize(
-                        y_value = case_when(
-                            input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
-                            input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
-                            input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
-                        ),
-                        .groups = "drop"
-                    ) %>%
-                    mutate(combinacao = paste(setor, "-", geo_group))
+                df_agg$combinacao <- "Total"
             }
             
             # Verifica se há dados
@@ -173,9 +149,14 @@ get_server <- function(files, param) {
             if(input$y_option) {
                 df_agg <- df_agg %>%
                     group_by(combinacao) %>%
+                    arrange(year) %>%
                     mutate(
-                        y_value = 100 * y_value / first(na.omit(y_value))
+                        base_value = first(na.omit(y_value)),
+                        y_value = ifelse(!is.na(base_value) & base_value != 0,
+                                         100 * y_value / base_value,
+                                         NA_real_)
                     ) %>%
+                    select(-base_value) %>%
                     ungroup()
             }
             
@@ -183,6 +164,7 @@ get_server <- function(files, param) {
             df_agg$tooltip <- paste0(
                 "<b>", df_agg$combinacao, "</b><br>",
                 "Ano: ", df_agg$year, "<br>",
+                if(input$filter_agrupar_por != "nenhum") paste0(input$filter_agrupar_por, ": ", df_agg[[input$filter_agrupar_por]], "<br>"),
                 switch(input$y,
                        "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
                        "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Nº de Vínculos",
@@ -212,7 +194,13 @@ get_server <- function(files, param) {
                         type = if(input$ylog) "log" else "linear"
                     ),
                     hovermode = "closest",
-                    showlegend = TRUE
+                    showlegend = TRUE,
+                    legend = list(
+                        orientation = "h",
+                        y = -0.2,
+                        x = 0.5,
+                        xanchor = "center"
+                    )
                 )
             
             p %>% config(

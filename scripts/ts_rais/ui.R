@@ -81,6 +81,20 @@ get_ui <- function(files, param) {
                        )
                    ),
                    
+                   
+                   # Filtro de agrupamento
+                   div(
+                       class = "var_selec_group",
+                       selectizeInput(
+                           inputId = "filter_agrupar_por",
+                           label = "Agrupar por:",
+                           choices = NULL,
+                           multiple = FALSE,
+                           options = list(placeholder = 'Selecione uma opção...'),
+                           width = "100%"
+                       )
+                   ),
+                   
                    actionButton(
                        'ab1', 
                        label = "Fullscreen", 
