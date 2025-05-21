@@ -112,7 +112,7 @@ get_ui <- function(files, param) {
                        class = "plotrow row justify-content-center flex-grow-1 w-100",
                        div(
                            class = "plotdiv w-100 h-100",
-                           plotlyOutput("plot", width = "100%", height = "100%") %>% 
+                           plotlyOutput("plot", width = "100%", height = "600px") %>% 
                                withSpinner(type = 4, color = "#41878C")
                        )
                    )

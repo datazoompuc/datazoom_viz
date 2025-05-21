@@ -118,6 +118,7 @@ get_server <- function(files, param) {
             if(!"Todos os setores" %in% input$filter_setor) group_vars <- c(group_vars, "setor")
             if(input$filter_agrupar_por != "nenhum") group_vars <- c(group_vars, input$filter_agrupar_por)
             
+            
             # Agregação dinâmica
             df_agg <- df %>%
                 group_by(across(all_of(group_vars))) %>%
@@ -129,6 +130,20 @@ get_server <- function(files, param) {
                     ),
                     .groups = "drop"
                 )
+            
+            # Filtra linhas com valores zero ou NA
+            df_agg <- df_agg %>%
+                filter(
+                    !is.na(y_value),          # Remove valores NA
+                    y_value != 0,             # Remove valores zero
+                    !is.infinite(y_value)     # Remove infinitos se houver
+                )
+            
+            # Verifica se ainda há dados após o filtro
+            if(nrow(df_agg) == 0) {
+                return(plotly_empty() %>% 
+                           layout(title = list(text = "Nenhum dado válido encontrado")))
+            }
             
             # Cria combinação de forma segura
             if(length(group_vars) > 1) {
@@ -193,6 +208,9 @@ get_server <- function(files, param) {
                                        "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo no Emprego (meses)"),
                         type = if(input$ylog) "log" else "linear"
                     ),
+                    autosize = TRUE,
+                    height = 600,
+                    margin = list(l = 50, r = 50, b = 100, t = 50, pad = 4),
                     hovermode = "closest",
                     showlegend = TRUE,
                     legend = list(
