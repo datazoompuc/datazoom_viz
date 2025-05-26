@@ -124,9 +124,9 @@ get_server <- function(files, param) {
                 group_by(across(all_of(group_vars))) %>%
                 summarize(
                     y_value = case_when(
-                        input$y == "real_avg_w" ~ mean(real_avg_w, na.rm = TRUE),
+                        input$y == "real_avg_w" ~ sum(real_avg_w * num_vinculos, na.rm = TRUE)/sum(num_vinculos, na.rm = TRUE),
                         input$y == "num_vinculos" ~ sum(num_vinculos, na.rm = TRUE),
-                        input$y == "tenure" ~ mean(tenure, na.rm = TRUE)
+                        input$y == "tenure" ~ sum(tenure * num_vinculos, na.rm = TRUE)/sum(tenure, na.rm = TRUE)
                     ),
                     .groups = "drop"
                 )
