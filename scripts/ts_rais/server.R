@@ -53,27 +53,16 @@ get_server <- function(files, param) {
                 selected = "Brasil"
             )
             
-            # Atualiza filtro de setor
+            # Atualiza filtro de agrupamento
             updateSelectizeInput(
                 session, 
-                "filter_setor",
-                choices = c("Todos os setores", sort(unique(df$setor))),
-                selected = "Todos os setores"
-            )
-            
-            # Novo - Atualiza filtro de agrupamento
-            updateSelectizeInput(
-                session,
-                "filter_agrupar_por",
-                choices = c("Nenhum" = "nenhum",
-                            "Sexo" = "sexo",
-                            "Raça" = "raca",
-                            "Escolaridade" = "escolaridade",
-                            "Ocupação" = "ocupacao",
-                            "Faixa Etária" = "faixa_etaria"),
-                selected = "nenhum"
+                "filter_group",
+                choices = param$group_categories,
+                selected = "Todos",
+                options = list(placeholder = 'Selecione um grupo...')
             )
         })
+        
         
         # Gera título dinâmico
         output$plot_title <- renderText({
@@ -87,9 +76,10 @@ get_server <- function(files, param) {
             paste("Evolução do", y_label)
         })
         
+        
         # Gera o gráfico principal
         output$plot <- renderPlotly({
-            req(input$y, input$filter_geo, input$filter_setor)
+            req(input$y, input$filter_geo, input$filter_group)
             df <- dados()
             
             # Aplica filtros geográficos
@@ -107,17 +97,21 @@ get_server <- function(files, param) {
                 df <- df %>% mutate(geo_group = "Brasil")
             }
             
-            # Aplica filtros de setor
-            if(!"Todos os setores" %in% input$filter_setor) {
-                df <- df %>% filter(setor %in% input$filter_setor)
+            # Aplica filtros de grupo
+            if(input$filter_group != "Todos") {
+                df <- df %>% filter(group == input$filter_group)
             }
             
             # Determina variáveis de agrupamento
             group_vars <- c("year")
-            if(!"Brasil" %in% input$filter_geo) group_vars <- c(group_vars, "geo_group")
-            if(!"Todos os setores" %in% input$filter_setor) group_vars <- c(group_vars, "setor")
-            if(input$filter_agrupar_por != "nenhum") group_vars <- c(group_vars, input$filter_agrupar_por)
             
+            if(!"Brasil" %in% input$filter_geo) {
+                group_vars <- c(group_vars, "geo_group")
+            }
+            
+            if(input$filter_group != "Todos") {
+                group_vars <- c(group_vars, "group")
+            }
             
             # Agregação dinâmica
             df_agg <- df %>%
@@ -140,18 +134,18 @@ get_server <- function(files, param) {
                 )
             
             # Verifica se ainda há dados após o filtro
-            if(nrow(df_agg) == 0) {
-                return(plotly_empty() %>% 
-                           layout(title = list(text = "Nenhum dado válido encontrado")))
-            }
-            
-            # Cria combinação de forma segura
-            if(length(group_vars) > 1) {
-                # Pega todas as colunas exceto year e y_value para combinar
-                combine_cols <- setdiff(names(df_agg), c("year", "y_value"))
-                df_agg$combinacao <- apply(df_agg[, combine_cols], 1, function(x) paste(x, collapse = " - "))
+            if(!"Brasil" %in% input$filter_geo) {
+                if(input$filter_group != "Todos" && "group" %in% names(df_agg)) {
+                    df_agg$combinacao <- paste(df_agg$geo_group, "-", df_agg$group)
+                } else {
+                    df_agg$combinacao <- df_agg$geo_group
+                }
             } else {
-                df_agg$combinacao <- "Total"
+                if(input$filter_group != "Todos" && "group" %in% names(df_agg)) {
+                    df_agg$combinacao <- df_agg$group
+                } else {
+                    df_agg$combinacao <- "Total"
+                }
             }
             
             # Verifica se há dados
@@ -164,14 +158,9 @@ get_server <- function(files, param) {
             if(input$y_option) {
                 df_agg <- df_agg %>%
                     group_by(combinacao) %>%
-                    arrange(year) %>%
                     mutate(
-                        base_value = first(na.omit(y_value)),
-                        y_value = ifelse(!is.na(base_value) & base_value != 0,
-                                         100 * y_value / base_value,
-                                         NA_real_)
+                        y_value = 100 * y_value / first(na.omit(y_value))
                     ) %>%
-                    select(-base_value) %>%
                     ungroup()
             }
             
@@ -179,7 +168,6 @@ get_server <- function(files, param) {
             df_agg$tooltip <- paste0(
                 "<b>", df_agg$combinacao, "</b><br>",
                 "Ano: ", df_agg$year, "<br>",
-                if(input$filter_agrupar_por != "nenhum") paste0(input$filter_agrupar_por, ": ", df_agg[[input$filter_agrupar_por]], "<br>"),
                 switch(input$y,
                        "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
                        "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Nº de Vínculos",
@@ -198,7 +186,9 @@ get_server <- function(files, param) {
                          text = ~tooltip,
                          hoverinfo = 'text',
                          line = list(width = 2),
-                         marker = list(size = 8)) %>%
+                         marker = list(size = 8),
+                         height = 600
+                ) %>%
                 layout(
                     xaxis = list(title = "Ano"),
                     yaxis = list(
@@ -208,8 +198,6 @@ get_server <- function(files, param) {
                                        "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo no Emprego (meses)"),
                         type = if(input$ylog) "log" else "linear"
                     ),
-                    autosize = TRUE,
-                    height = 600,
                     margin = list(l = 50, r = 50, b = 100, t = 50, pad = 4),
                     hovermode = "closest",
                     showlegend = TRUE,

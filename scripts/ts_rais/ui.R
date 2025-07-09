@@ -68,29 +68,15 @@ get_ui <- function(files, param) {
                        )
                    ),
                    
-                   # Filtro de setor
+                   # Filtro de grupos
                    div(
                        class = "var_selec_group",
                        selectizeInput(
-                           inputId = "filter_setor",
-                           label = param$label_sect,  # Mesmo estilo que label_y_name
-                           choices = NULL,
-                           multiple = TRUE,
-                           options = list(placeholder = 'Selecione setores...', maxItems = 20),
-                           width = "100%"
-                       )
-                   ),
-                   
-                   
-                   # Filtro de agrupamento
-                   div(
-                       class = "var_selec_group",
-                       selectizeInput(
-                           inputId = "filter_agrupar_por",
-                           label = "Agrupar por:",
-                           choices = NULL,
+                           inputId = "filter_group",
+                           label = param$label_group,
+                           choices = param$group_categories,
                            multiple = FALSE,
-                           options = list(placeholder = 'Selecione uma opção...'),
+                           options = list(placeholder = 'Selecione grupos...'),
                            width = "100%"
                        )
                    ),

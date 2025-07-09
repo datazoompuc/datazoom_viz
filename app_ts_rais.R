@@ -39,12 +39,12 @@ param$label_y_name <- "Eixo vertical (y)"
 param$label_scale_name <- "escala log"
 param$label_prop_name <- "proporcional ao ano inicial (*)"
 param$label_geo <- "Recorte Geográfico"
-param$label_sect <- "Setores econômicos"
+param$label_group <- "Agrupamentos"
 param$link <- "https://datazoom.shinyapps.io/app_ts_rais/"
 
 ### Parametros especificos no server
 param$title_init <- "Evolução anual de" # expressão titulo
-param$subtitle_init <- "por setor econômico" # expressão subtitulo
+param$subtitle_init <- "por grupo selecionado" # expressão subtitulo
 
 
 # Outros parâmetros e configurações
@@ -59,29 +59,74 @@ param$geo_choices <- list(
         "Mato Grosso", "Mato Grosso do Sul", "Minas Gerais", "Pará", 
         "Paraíba", "Paraná", "Pernambuco", "Piauí", "Rio de Janeiro",
         "Rio Grande do Norte", "Rio Grande do Sul", "Rondônia", 
-        "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins"
+        "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins",
+    "Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal")
     )
 )
-param$sect_choices <- list(
-    "Todos os setores" = "Todos os setores",
-    "Administração Pública" = "Administração pública, Defesa e Seguridade social",
-    "Agricultura e Pecuária" = "Agricultura, Pecuária, Produção Florestal, Pesca e Aquicultura",
-    "Alojamento e Alimentação" = "Alojamento e Alimentação",
-    "Artes e Cultura" = "Artes, Cultura, Esporte e Recreação",
-    "Comércio" = "Comércio; Reparação de veículos automotores e motocicletas",
-    "Construção" = "Construção",
-    "Educação" = "Educação",
-    "Energia e Saneamento" = c("Eletricidade e Gás", "Água, Esgoto, Atividades de Gestão de resíduos e Descontaminação"),
-    "Finanças e Seguros" = "Atividades financeiras, de seguros e serviços relacionados",
-    "Indústrias" = c("Indústrias de transformação", "Indústrias extrativas"),
-    "Informação e Comunicação" = "Informação e Comunicação",
-    "Profissionais e Técnicos" = "Atividades Profissionais, Científicas e Técnicas",
-    "Saúde e Serviços Sociais" = "Saúde humana e Serviços sociais",
-    "Serviços Administrativos" = "Atividades administrativas e serviços complementares",
-    "Serviços Domésticos" = "Serviços domésticos",
-    "Transporte e Correio" = "Transporte, Armazenagem e Correio",
-    "Outros Serviços" = c("Outras atividades de serviços", "Atividades imobiliárias", "Organismos internacionais e outras instituições extraterritoriais")
+
+param$group_categories <- list(
+    "Todos" = "Todos",
+    "Escolaridade" = list(
+        "Sem fundamental completo",
+        "Médio completo", 
+        "Superior completo"
+    ),
+    "Sexo" = list(
+        "Feminino",
+        "Masculino"
+    ),
+    "Faixa Etária" = list(
+        "Menor de 18 anos",
+        "Entre 18 e 24 anos",
+        "Entre 25 e 29 anos",
+        "Entre 30 e 39 anos",
+        "Entre 40 e 49 anos",
+        "Entre 50 e 59 anos",
+        "60 anos ou mais"
+    ),
+    "Raça/Cor" = list(
+        "Branca",
+        "Preta",
+        "Parda",
+        "Amarela",
+        "Indígena"
+    ),
+    "Ocupação" = list(
+        "Membros superiores do poder público, Dirigentes de organizações de interesse público e de empresas, Gerentes",
+        "Profissionais das ciências e das artes",
+        "Técnicos de nível médio",
+        "Trabalhadores de serviços administrativos",
+        "Trabalhadores dos serviços, vendedores do comércio em lojas e mercados",
+        "Trabalhadores em serviços de reparação e manutenção",
+        "Trabalhadores da produção de bens e serviços industriais",
+        "Trabalhadores agropecuários, florestais e da pesca",
+        "Membros das forças armadas, Policiais e bombeiros militares"
+    ),
+    "Setor Econômico" = list(
+        "Administração pública, Defesa e Seguridade social",
+        "Educação",
+        "Saúde humana e Serviços sociais",
+        "Atividades Profissionais, Científicas e Técnicas",
+        "Informação e Comunicação",
+        "Atividades financeiras, de seguros e serviços relacionados",
+        "Atividades imobiliárias",
+        "Comércio; Reparação de veículos automotores e motocicletas",
+        "Alojamento e Alimentação",
+        "Transporte, Armazenagem e Correio",
+        "Artes, Cultura, Esporte e Recreação",
+        "Outras atividades de serviços",
+        "Atividades administrativas e serviços complementares",
+        "Serviços domésticos",
+        "Indústrias de transformação",
+        "Indústrias extrativas",
+        "Construção",
+        "Eletricidade e Gás",
+        "Água, Esgoto, Atividades de Gestão de resíduos e Descontaminação",
+        "Agricultura, Pecuária, Produção Florestal, Pesca e Aquicultura",
+        "Organismos internacionais e outras instituições extraterritoriais"
+    )
 )
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
