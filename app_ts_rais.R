@@ -92,38 +92,38 @@ param$group_categories <- list(
         "Indígena"
     ),
     "Ocupação" = list(
+        "Membros das forças armadas, Policiais e bombeiros militares",
         "Membros superiores do poder público, Dirigentes de organizações de interesse público e de empresas, Gerentes",
         "Profissionais das ciências e das artes",
         "Técnicos de nível médio",
+        "Trabalhadores agropecuários, florestais e da pesca",
+        "Trabalhadores da produção de bens e serviços industriais",
         "Trabalhadores de serviços administrativos",
         "Trabalhadores dos serviços, vendedores do comércio em lojas e mercados",
-        "Trabalhadores em serviços de reparação e manutenção",
-        "Trabalhadores da produção de bens e serviços industriais",
-        "Trabalhadores agropecuários, florestais e da pesca",
-        "Membros das forças armadas, Policiais e bombeiros militares"
+        "Trabalhadores em serviços de reparação e manutenção"
     ),
     "Setor Econômico" = list(
         "Administração pública, Defesa e Seguridade social",
-        "Educação",
-        "Saúde humana e Serviços sociais",
+        "Agricultura, Pecuária, Produção Florestal, Pesca e Aquicultura",
+        "Água, Esgoto, Atividades de Gestão de resíduos e Descontaminação",
+        "Alojamento e Alimentação",
+        "Artes, Cultura, Esporte e Recreação",
         "Atividades Profissionais, Científicas e Técnicas",
-        "Informação e Comunicação",
+        "Atividades administrativas e serviços complementares",
         "Atividades financeiras, de seguros e serviços relacionados",
         "Atividades imobiliárias",
         "Comércio; Reparação de veículos automotores e motocicletas",
-        "Alojamento e Alimentação",
-        "Transporte, Armazenagem e Correio",
-        "Artes, Cultura, Esporte e Recreação",
-        "Outras atividades de serviços",
-        "Atividades administrativas e serviços complementares",
-        "Serviços domésticos",
-        "Indústrias de transformação",
-        "Indústrias extrativas",
         "Construção",
+        "Educação",
         "Eletricidade e Gás",
-        "Água, Esgoto, Atividades de Gestão de resíduos e Descontaminação",
-        "Agricultura, Pecuária, Produção Florestal, Pesca e Aquicultura",
-        "Organismos internacionais e outras instituições extraterritoriais"
+        "Indústrias extrativas",
+        "Indústrias de transformação",
+        "Informação e Comunicação",
+        "Organismos internacionais e outras instituições extraterritoriais",
+        "Outras atividades de serviços",
+        "Saúde humana e Serviços sociais",
+        "Serviços domésticos",
+        "Transporte, Armazenagem e Correio"
     )
 )
 

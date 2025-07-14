@@ -76,6 +76,21 @@ get_server <- function(files, param) {
             paste("Evolução do", y_label)
         })
         
+        # Gera subtítulo
+        output$plot_subtitle <- renderText({
+            req(input$filter_group)
+            
+            if(input$filter_group != "Todos") {
+                
+                categoria <- names(which(sapply(param$group_categories[-1], function(x) {
+                    any(unlist(x) == input$filter_group)
+                })))
+                
+                
+                paste0(tolower(categoria), ": ", input$filter_group)
+            }
+        })
+        
         
         # Gera o gráfico principal
         output$plot <- renderPlotly({
@@ -135,18 +150,18 @@ get_server <- function(files, param) {
             
             # Verifica se ainda há dados após o filtro
             if(!"Brasil" %in% input$filter_geo) {
-                if(input$filter_group != "Todos" && "group" %in% names(df_agg)) {
-                    df_agg$combinacao <- paste(df_agg$geo_group, "-", df_agg$group)
-                } else {
-                    df_agg$combinacao <- df_agg$geo_group
-                }
+                df_agg$combinacao <- df_agg$geo_group
             } else {
-                if(input$filter_group != "Todos" && "group" %in% names(df_agg)) {
-                    df_agg$combinacao <- df_agg$group
-                } else {
-                    df_agg$combinacao <- "Total"
-                }
+                df_agg$combinacao <- "Brasil"
             }
+            
+            # Mantém o grupo completo para o tooltip
+            df_agg$combinacao_completa <- if(input$filter_group != "Todos" && "group" %in% names(df_agg)) {
+                paste(df_agg$combinacao, "-", df_agg$group)
+            } else {
+                df_agg$combinacao
+            }
+            
             
             # Verifica se há dados
             if(nrow(df_agg) == 0) {
@@ -166,7 +181,7 @@ get_server <- function(files, param) {
             
             # Prepara tooltip
             df_agg$tooltip <- paste0(
-                "<b>", df_agg$combinacao, "</b><br>",
+                "<b>", df_agg$combinacao_completa, "</b><br>",
                 "Ano: ", df_agg$year, "<br>",
                 switch(input$y,
                        "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
