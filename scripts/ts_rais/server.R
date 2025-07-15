@@ -14,7 +14,6 @@ get_server <- function(files, param) {
         # Carrega dados como reativo
         dados <- reactive({
             df <- readRDS(files$db_file) %>%
-                filter(year >= 2003) %>%
                 mutate(
                     regiao = case_when(
                         uf %in% c("Acre", "Amapá", "Amazonas", "Pará", "Rondônia", "Roraima", "Tocantins") ~ "Norte",
@@ -130,6 +129,7 @@ get_server <- function(files, param) {
             
             # Agregação dinâmica
             df_agg <- df %>%
+                { if(input$y == "real_avg_w") filter(., year >= 1995) else . } %>%
                 group_by(across(all_of(group_vars))) %>%
                 summarize(
                     y_value = case_when(
@@ -181,6 +181,7 @@ get_server <- function(files, param) {
             
             # Prepara tooltip
             df_agg$tooltip <- paste0(
+                "<span style='color:black !important;'>",
                 "<b>", df_agg$combinacao_completa, "</b><br>",
                 "Ano: ", df_agg$year, "<br>",
                 switch(input$y,
