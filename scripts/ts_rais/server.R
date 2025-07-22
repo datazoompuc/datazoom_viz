@@ -129,7 +129,6 @@ get_server <- function(files, param) {
             
             # Agregação dinâmica
             df_agg <- df %>%
-                { if(input$y == "real_avg_w") filter(., year >= 1995) else . } %>%
                 group_by(across(all_of(group_vars))) %>%
                 summarize(
                     y_value = case_when(
@@ -138,7 +137,8 @@ get_server <- function(files, param) {
                         input$y == "tenure" ~ sum(tenure * num_vinculos, na.rm = TRUE)/sum(num_vinculos, na.rm = TRUE)
                     ),
                     .groups = "drop"
-                )
+                ) %>%
+                { if(input$y == "real_avg_w") filter(., year >= 1995) else . }
             
             # Filtra linhas com valores zero ou NA
             df_agg <- df_agg %>%
@@ -181,15 +181,51 @@ get_server <- function(files, param) {
             
             # Prepara tooltip
             df_agg$tooltip <- paste0(
-                "<span style='color:black !important;'>",
                 "<b>", df_agg$combinacao_completa, "</b><br>",
                 "Ano: ", df_agg$year, "<br>",
                 switch(input$y,
                        "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
                        "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Nº de Vínculos",
                        "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo (meses)"), 
-                ": ", round(df_agg$y_value, if(input$y_option) 1 else 2)
+                ": ", format(round(df_agg$y_value, if(input$y_option) 1 else 2),
+                             scientific = FALSE,
+                             digits = 2,
+                             decimal.mark = ",",
+                             big.mark = ".",
+                             nsmall = if(input$y_option) 1 else 2)
             )
+            
+            # Layout hover/tooltip
+            tooltip <- list(
+                bordercolor = "rgba(255, 255, 255, 1)",
+                bgopacity = "0.5",
+                font = f1
+            )
+            
+            
+            # Título eixo y
+            y_title <- switch(input$y,
+                              "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
+                              "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Número de Vínculos",
+                              "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo no Emprego (meses)")
+            
+            # Layout eixos
+                x_axis_layout <- list(
+                    title = "Ano",
+                    titlefont = f1, 
+                    tickfont = f2, 
+                    showgrid = FALSE,
+                    zeroline = FALSE
+                )
+                
+                y_axis_layout <- list(
+                    title = y_title,
+                    titlefont = f1, 
+                    tickfont = f2,   
+                    type = if(input$ylog) "log" else "linear",
+                    showgrid = FALSE,
+                    zeroline = FALSE
+                )
             
             # Cria o gráfico
             p <- plot_ly(df_agg,
@@ -198,31 +234,18 @@ get_server <- function(files, param) {
                          color = ~combinacao,
                          colors = pallete_discrete,
                          type = 'scatter',
-                         mode = 'lines+markers',
+                         mode = 'lines',
                          text = ~tooltip,
                          hoverinfo = 'text',
-                         line = list(width = 2),
-                         marker = list(size = 8),
-                         height = 600
+                         hoverlabel = tooltip
                 ) %>%
                 layout(
-                    xaxis = list(title = "Ano"),
-                    yaxis = list(
-                        title = switch(input$y,
-                                       "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
-                                       "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Número de Vínculos",
-                                       "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo no Emprego (meses)"),
-                        type = if(input$ylog) "log" else "linear"
-                    ),
+                    font = f1,
+                    xaxis = x_axis_layout,
+                    yaxis = y_axis_layout,
                     margin = list(l = 50, r = 50, b = 100, t = 50, pad = 4),
                     hovermode = "closest",
-                    showlegend = TRUE,
-                    legend = list(
-                        orientation = "h",
-                        y = -0.2,
-                        x = 0.5,
-                        xanchor = "center"
-                    )
+                    showlegend = TRUE
                 )
             
             p %>% config(
