@@ -51,7 +51,7 @@ get_ui <- function(files, param) {
             checkboxInput(
                 inputId = "yprop",
                 param$label_toggle,
-                value = FALSE,
+                value = TRUE,
                 width = "100%"
             )
         ),

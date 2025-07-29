@@ -43,7 +43,7 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Mapeamento anual do uso e cobertura da terra no Brasil (Fonte: MapBiomas)"
     #"Cobertura da terra na Amaz\u00f4nia"
 
-####### HEAD
+
 ####### HEAD
 param$plot_desc <- "Áreas de pastagem no Brasil (colocar obs dados)"
 
