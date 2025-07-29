@@ -10916,3 +10916,15 @@ color: rgba(0, 0, 0, 0.6);
 }
 
 html,body{height:100%;}
+
+/* Alinhamento da checkbox "yprop" com o texto */
+.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: normal;
+}
+
+.checkbox input[type="checkbox"] {
+  margin-top: 0 !important;
+}

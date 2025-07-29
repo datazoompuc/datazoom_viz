@@ -1,6 +1,6 @@
 #  -------------------------------- Define UI --------------------------------
 
-# Funcão para retornar objeto server
+# Funcão para retornar objeto ui
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Incluí script CSS
@@ -48,6 +48,7 @@ get_ui <- function(files, param) {
           )
         ),
         div(
+            style = "margin-top: 10px;",
             checkboxInput(
                 inputId = "yprop",
                 param$label_toggle,
