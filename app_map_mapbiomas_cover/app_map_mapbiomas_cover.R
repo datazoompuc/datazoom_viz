@@ -1,5 +1,5 @@
 # Cache
-cache_folder <- "./cache"
+cache_folder <- "cache"
 shinyOptions(cache = cachem::cache_disk(cache_folder))
 
 # Carrega bibliotecas
@@ -12,14 +12,14 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "./ui.R"
-files$server_script <- "./server.R"
-files$param_script <- "./db_params.R"
-files$CSS_script <- "./dza_lumen.css"
-files$param_file <- "../data/mapbiomas_cobertura_munic_savana_dic.csv"
-files$db_file <- "../data/mapbiomas_cobertura.rds"
-files$legal_amazon <- "../data/legal_amazon_boundary.rds"
-files$states_boundary <- "../data/states_boundary.rds"
+files$ui_script <- "ui.R"
+files$server_script <- "server.R"
+files$param_script <- "../global/db_params.R"
+files$CSS_script <- "../global/dza_lumen.css"
+files$param_file <- "mapbiomas_cobertura_munic_savana_dic.csv"
+files$db_file <- "mapbiomas_cobertura.rds"
+files$legal_amazon <- "../global/legal_amazon_boundary.rds"
+files$states_boundary <- "../global/states_boundary.rds"
 
 
 # Carrega scripts
