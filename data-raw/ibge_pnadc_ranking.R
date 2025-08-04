@@ -81,14 +81,14 @@ temp <-  temp %>%
 
 # save data at rds format
 saveRDS(temp,
-        file = "./data/ibge_pnadc_ranking_cnae.rds")
+        file = "../data/ibge_pnadc_ranking_cnae.rds")
 
 #####################
 # Build Dictionary 
 #####################
 
 # extract variables from data
-temp <- readRDS(file = "data/ibge_pnadc_ranking_cnae.rds")
+temp <- readRDS(file = "../data/ibge_pnadc_ranking_cnae.rds")
 columns <- colnames(temp)
 
 # generate dictionary
@@ -129,7 +129,7 @@ temp_param_table$color[temp_param_table$var == "group"] <- TRUE # Atividade econ
 # allow variables in graphs size and color-axis
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cnae_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "../data/ibge_pnadc_ranking_cnae_dic.csv", fileEncoding = "UTF-8")
 
 # relabel in english ----------------------------
 temp_param_table$var_group <- "IBGE - Continuous PNAD"
@@ -145,7 +145,7 @@ temp_param_table$label[temp_param_table$var == "n_ocu_cnae_publico"] <- "Number 
 temp_param_table$label[temp_param_table$var == "n_ocu_cnae_privado"] <- "Number of workers employed in the private sector"
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cnae_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "../data/ibge_pnadc_ranking_cnae_dic_en.csv", fileEncoding = "UTF-8")
 
 
 #################################################
@@ -217,14 +217,14 @@ temp <-  temp %>%
 
 # save data at rds format
 saveRDS(temp,
-        file = "./data/ibge_pnadc_ranking_cod.rds")
+        file = "../data/ibge_pnadc_ranking_cod.rds")
 
 #####################
 # Build Dictionary 
 #####################
 
 # extract variables from data
-temp <- readRDS(file = "data/ibge_pnadc_ranking_cod.rds")
+temp <- readRDS(file = "../data/ibge_pnadc_ranking_cod.rds")
 columns <- colnames(temp)
 
 # generate dictionary
@@ -266,7 +266,7 @@ temp_param_table$color[temp_param_table$var == "group"] <- TRUE # Atividade econ
 # allow variables in graphs size and color-axis
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cod_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "../data/ibge_pnadc_ranking_cod_dic.csv", fileEncoding = "UTF-8")
 
 # relabel in english ----------------------------
 temp_param_table$var_group <- "IBGE - Continuous PNAD"
@@ -282,4 +282,4 @@ temp_param_table$label[temp_param_table$var == "n_ocu_cod_publico"] <- "Number o
 temp_param_table$label[temp_param_table$var == "n_ocu_cod_privado"] <- "Number of workers employed in the private sector"
 
 # save csv in utf-8 encoding
-write.csv(temp_param_table, file = "./data/ibge_pnadc_ranking_cod_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "../data/ibge_pnadc_ranking_cod_dic_en.csv", fileEncoding = "UTF-8")
