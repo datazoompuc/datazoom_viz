@@ -5,3 +5,9 @@
 .DS_Store
 *.dcf
 /cache
+app_rk_ibge_pnadc_cnae/cache/app_rk_ibge_pnadc_cnae/7534b85e1b82ecfec6161fbc2d7ee1dc.rds
+app_rk_ibge_pnadc_cnae/cache/app_rk_ibge_pnadc_cnae/1a8c979f0b712d7177474881e9e6f86a.rds
+app_rk_ibge_pnadc_cnae/cache/app_rk_ibge_pnadc_cnae/2f59962387a0fcdd2485d054c646c3bc.rds
+app_rk_ibge_pnadc_cnae/cache/app_rk_ibge_pnadc_cnae/b452c5ab8c82b5f397964b98ea78711b.rds
+app_rk_ibge_pnadc_cnae/cache/app_rk_ibge_pnadc_cnae/d106bf5e7bb84f06ee7f201a36b683b6.rds
+app_rk_ibge_pnadc_cnae/server.R
