@@ -13,26 +13,19 @@ get_server <- function(files, param) {
 
   # Carrega dados
   library(sf)
-  df <- readRDS(files$db_file)
+  df <- arrow::open_dataset(files$db_file)
+  
+  # Recupera Polygon salvo em outro arquivo
+  shapefile <- readr::read_rds(files$shapefile)
   
   server <- function(input, output, session) {
-    df_reactived <- reactive({
-      w <- df %>%
-        filter(year == input$filter1)
-      
-      # quando e escolhida a caixinha de proporcao,
-      # input$yprop se torna TRUE.
-      # nesse caso, modifico o data frame para dividir pela area
-      # do municipio
-      if (input$yprop) {
-          w[[input$x]] <- w[[input$x]]/w[["area_km2"]]
-      }
-      
-      return(w)
-    })
-    
-    # Cria opções para seleção de datas
-    param$filter_choices <- sort(unique(df$year))
+
+    # Cria opções para seleção de datas com df em lazy loading
+    param$filter_choices <- df %>%
+        distinct(year) %>%
+        collect() %>%
+        arrange(year) %>%
+        pull(year)
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
@@ -114,6 +107,19 @@ get_server <- function(files, param) {
     
     # Output gráfico
     output$map <- renderLeaflet({
+        
+        # Define df_reactived aqui, carregando só as colunas necessárias
+        df_reactived <- df %>%
+            filter(year == input$filter1) %>%
+            select(all_of(c(input$x, "area_km2", param$text_def, param$state, "municipality_code"))) %>%
+            collect() # acaba o lazy loading
+        
+        if (input$yprop) {
+            df_reactived <- df_reactived %>%
+                mutate(!!input$x := .data[[input$x]] / area_km2)
+        }
+        
+        df_reactived <- inner_join(shapefile, df_reactived)
 
       # random_inputs() #preenche inputs se estiverem vazios
       update_my_queryString() # atualiza url com parametros dos inputs
@@ -124,12 +130,12 @@ get_server <- function(files, param) {
 
       # Define paleta de cores
       pal1 <- pallete_continuous
-      if (!is.numeric(df_reactived()[[input$x]])) {
+      if (!is.numeric(df_reactived[[input$x]])) {
         pal1 <- pallete_discrete
       }
 
       # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df_reactived()[[input$x]])
+      pal <- colorBin(palette = pal1, 9, domain = df_reactived[[input$x]])
 
       tryCatch(
         {
@@ -137,34 +143,26 @@ get_server <- function(files, param) {
           # Monta mapa
 
           # Monta html do tooltip
-          x_col <- reactive(
-              {
-                col <- param$table[which(param$table$var == input$x), ]
-              
-                # mudar a unidade quanto se escolhe proporcao
-                if (input$yprop) {
-                    col$unidade <- "%"
-                }
-              
-                return(col)
-              }
-          )
+            x_col <- param$table[which(param$table$var == input$x), ]
+            if (input$yprop) {
+                   x_col$unidade <- "%"
+                 }
           
 
-          title_legend <- paste0("", x_col()[["label"]])
+          title_legend <- paste0("", x_col[["label"]])
           labels <- paste0(
-            param$label_munic_name, df_reactived()[[param$text_def]], "</b> <br>",
-            param$label_state_name, df_reactived()[[param$state]], "</b> <br>",
-            x_col()[["label"]], ": <b>", format(df_reactived()[[input$x]], 
+            param$label_munic_name, df_reactived[[param$text_def]], "</b> <br>",
+            param$label_state_name, df_reactived[[param$state]], "</b> <br>",
+            x_col[["label"]], ": <b>", format(df_reactived[[input$x]], 
                                          scientific = FALSE,
                                          digits = 2,
                                          decimal.mark = ",", 
                                          big.mark = "."), "</b> <br>",
-            param$label_measurement_unit, x_col()[["unidade"]], "</b>"
+            param$label_measurement_unit, x_col[["unidade"]], "</b>"
           ) %>%
             lapply(htmltools::HTML)
 
-          fig_p <- df_reactived() %>% 
+          fig_p <- df_reactived %>% 
             leaflet() %>%
             addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
             setView(-58, -7, zoom = 5) %>%
@@ -173,7 +171,7 @@ get_server <- function(files, param) {
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = 0.7,
-              fillColor = ~ pal(df_reactived()[[input$x]]),
+              fillColor = ~ pal(df_reactived[[input$x]]),
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -184,7 +182,7 @@ get_server <- function(files, param) {
             ) %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df_reactived()[[input$x]],
+              values = ~ df_reactived[[input$x]],
               title = title_legend,
               opacity = 0.7
             )

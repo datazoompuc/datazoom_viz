@@ -8,6 +8,7 @@ library(tidyverse)
 library(leaflet)
 library(sf)
 library(htmlwidgets)
+library(arrow)
 
 
 # Define nome de arquivos a serem carregados
@@ -17,7 +18,8 @@ files$server_script <- "server.R"
 files$param_script <- "../global/db_params.R"
 files$CSS_script <- "../global/dza_lumen.css"
 files$param_file <- "mapbiomas_cobertura_munic_savana_dic.csv"
-files$db_file <- "mapbiomas_cobertura.rds"
+files$db_file <- "mapbiomas_cobertura.parquet"
+files$shapefile <- "../global/munic_shapefile.rds"
 files$legal_amazon <- "../global/legal_amazon_boundary.rds"
 files$states_boundary <- "../global/states_boundary.rds"
 
