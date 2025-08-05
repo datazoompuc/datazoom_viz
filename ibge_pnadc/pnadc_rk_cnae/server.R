@@ -158,7 +158,7 @@ get_server <- function(files, param) {
           # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
 
-          df_p <- df_p %>% dplyr::mutate(slider = paste0(lubridate::year(slider), lubridate::quarter(slider)))
+          df_p <- df_p %>% dplyr::mutate(slider = paste0(lubridate::year(slider), "-T", lubridate::quarter(slider)))
           
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {

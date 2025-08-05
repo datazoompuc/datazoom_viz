@@ -4,7 +4,7 @@ library(haven)
 library(tibble)
 library(zoo)
 library(tidyr)
-
+library(utils)
 library(datazoom.social)
 # make sure it is updated and from github
 
@@ -327,7 +327,7 @@ dat <- dat %>%
 
 # saving data file
 
-readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
+readr::write_rds(dat, "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_trabalho.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##
@@ -378,7 +378,7 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
 
 ## English dictionary
 
@@ -427,7 +427,7 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
 
 ############################
 ## Dictionary -- Insercao ##
@@ -475,7 +475,7 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_insercao_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_trabalho_insercao_dic.csv", fileEncoding = "UTF-8")
 
 
 ################
@@ -726,13 +726,13 @@ dat_cnae <- dat %>%
     filter(id %in% c("All", "CNAE")) %>%
     select(-id)
 
-readr::write_rds(dat_cnae, "data/ibge_pnadc_cnae.rds", compress = "gz")
+readr::write_rds(dat_cnae, "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_cnae.rds", compress = "gz")
 
 dat_cod <- dat %>%
     filter(id %in% c("All", "COD")) %>%
     select(-id)
 
-readr::write_rds(dat_cod, "data/ibge_pnadc_cod.rds", compress = "gz")
+readr::write_rds(dat_cod, "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_cod.rds", compress = "gz")
 
 ##############################
 ## Dictionary -- CNAE e COD ##
@@ -777,13 +777,13 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
 
 temp_param_table <- temp_param_table %>%
     mutate(slider = c(F,F,F,T,F,F,F)) %>%
     mutate(x = y, y = FALSE)
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_rk_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_cnae_rk_dic.csv", fileEncoding = "UTF-8")
 
 ## COD
 
@@ -830,10 +830,10 @@ temp_param_table <- temp_param_table %>%
         desc = ifelse(var == "composicao_demografica", "Ocupação - Código COD", desc)
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
 
 temp_param_table <- temp_param_table %>%
     mutate(slider = c(F,F,F,T,F,F,F)) %>%
     mutate(x = y, y = FALSE)
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_cod_rk_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom\\ibge_pnadc_cod_rk_dic.csv", fileEncoding = "UTF-8")
