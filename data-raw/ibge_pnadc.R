@@ -15,10 +15,10 @@ library(datazoom.social)
 #################################################
 
 # set path to raw data
-#github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
+github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # PNAD files must be downloaded to the computer
-source <- "../data/PNADCR"
+source <- "C:\\Users\\felip\\OneDrive\\Documentos\\PUC\\Data Zoom"
 
 # only run this if not already downloaded: takes a long time
 # não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
