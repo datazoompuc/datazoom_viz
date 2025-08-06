@@ -119,7 +119,10 @@ get_server <- function(files, param) {
                 mutate(!!input$x := .data[[input$x]] / area_km2)
         }
         
-        df_reactived <- inner_join(shapefile, df_reactived)
+        df_reactived <- inner_join(
+            shapefile, df_reactived,
+            by = "municipality_code"
+        )
 
       # random_inputs() #preenche inputs se estiverem vazios
       update_my_queryString() # atualiza url com parametros dos inputs
