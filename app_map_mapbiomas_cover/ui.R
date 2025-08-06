@@ -66,7 +66,7 @@ get_ui <- function(files, param) {
                       min = param$year_inicio,
                       max = param$year_final,
                       value = param$year_final,
-                      step = 12,
+                      step = 1,
                       width = "100%",
                       animate = FALSE,
                       sep = "")
