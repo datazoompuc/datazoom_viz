@@ -145,10 +145,10 @@ data <- data %>%
 
 # group data by year
 ## .parquet understands each one as a dif folder - loading is much faster
-data <- data %>% group_by(year)
-
-# Write data as .parquet
-arrow::write_parquet(data, "app_map_mapbiomas_cover/mapbiomas_cobertura.parquet")
+data |>
+    dplyr::group_by(year) |>
+    # Write data as .parquet
+    arrow::write_dataset(path = "app_map_mapbiomas_cover/mapbiomas_cobertura.parquet", format = "parquet")
 
 # Write spacial data as .rds 
 ## .parquet does not support spacial data
