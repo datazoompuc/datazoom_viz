@@ -232,7 +232,6 @@ get_server <- function(files, param) {
                          x = ~year,
                          y = ~y_value,
                          color = ~combinacao,
-                         colors = pallete_discrete,
                          type = 'scatter',
                          mode = 'lines',
                          text = ~tooltip,
