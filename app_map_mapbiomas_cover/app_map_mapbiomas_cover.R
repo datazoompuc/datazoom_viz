@@ -9,6 +9,7 @@ library(leaflet)
 library(sf)
 library(htmlwidgets)
 library(arrow)
+library(shinycssloaders)
 
 
 # Define nome de arquivos a serem carregados

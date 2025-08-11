@@ -89,7 +89,8 @@ get_ui <- function(files, param) {
           div(
             class = "plotdiv w-100 h-100",
             # Map
-            leafletOutput("map", width = "100%", height = "100%") # %>% withSpinner()
+            leafletOutput("map", width = "100%", height = "calc(100vh - 150px)") %>% withSpinner(type = 4,
+                                                                                   color = "#41878C")
           )
         )
       )
