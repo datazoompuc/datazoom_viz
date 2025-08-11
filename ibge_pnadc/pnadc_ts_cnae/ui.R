@@ -101,10 +101,15 @@ get_ui <- function(files, param) {
                    textOutput("plot_subtitle"),
                    div( # row do gráfico
                        class = "plotrow row justify-content-center flex-grow-1 w-100",
+                       style = "position: relative; display: flex; flex-direction: column;",
                        div(
                            class = "plotdiv w-100 h-100",
+                           style = "flex-grow: 1; position: relative;", 
                            # Gráfico
-                           plotlyOutput("plot", width = "100%", height = "100%")
+                           withSpinner(
+                               plotlyOutput("plot", width = "100%", height = "100%"),
+                               type = 4,
+                               color = "#41878C")
                        )
                    )
             )
