@@ -50,7 +50,7 @@ data <- load_mapbiomas(dataset = "mapbiomas_cover",
 
 # Only level 4 interests us 
 data <- data %>%
-  pivot_wider(id_cols=c("biome","municipality","state","municipality_code","year"), names_from=level_4, values_from = value)
+  pivot_wider(id_cols=c("biome","municipality","state","municipality_code","year"), names_from=class_level_4, values_from = value)
 
 
 # load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
@@ -126,10 +126,15 @@ data <- data %>%
 #         )
 #     )
 
+# mapbiomas_cover is not properly treates. Colnames appear as 1.1. Forest Formation instead of simply Forest Formation
+## code to remove the leading numbers and dots
+### this should no longer be necessary ater data treatment is fixed
+names(data) <- sub("^\\d+(\\.\\d+)*\\.?\\s*", "", names(data))
+
 data <- data %>%
     relocate(
         municipality_code, municipality, state, year, "Forest Formation",
-        "Savanna Formation", "Pasture", "Soy Beans", "Mining"
+        "Savanna Formation", "Pasture", "Soybean", "Mining"
     )
 
 # data <- data %>%

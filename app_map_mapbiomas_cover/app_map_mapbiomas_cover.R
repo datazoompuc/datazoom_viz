@@ -10,6 +10,7 @@ library(sf)
 library(htmlwidgets)
 library(arrow)
 library(shinycssloaders)
+library(shinyWidgets)
 
 
 # Define nome de arquivos a serem carregados
@@ -57,7 +58,7 @@ param$plot_desc <- "Cobertura vegetal a nível municipal"
 ####### parent of a0643c6 (Correcting border Legal Amazon)
 
 param$year_inicio <- 1986
-param$year_final <- 2022
+param$year_final <- 2023
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARI\u00C1VEIS:"
