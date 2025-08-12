@@ -47,11 +47,17 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
+        tags$style(HTML("
+      .switch-label {
+        color: white;
+      }
+    ")),
+        
         div(
             style = "margin-top: 10px;",
             materialSwitch(
                 inputId = "yprop",
-                label = "Proporção da área dos municípios",
+                label = tags$span(param$label_toggle, class = "switch-label"),
                 value = TRUE, 
                 status = "info"
             
