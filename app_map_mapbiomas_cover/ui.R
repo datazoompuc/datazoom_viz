@@ -49,11 +49,17 @@ get_ui <- function(files, param) {
         ),
         div(
             style = "margin-top: 10px;",
-            checkboxInput(
+            materialSwitch(
                 inputId = "yprop",
-                param$label_toggle,
-                value = TRUE,
-                width = "100%"
+                label = "Proporção da área dos municípios",
+                value = TRUE, 
+                status = "info"
+            
+            # checkboxInput(
+            #     inputId = "yprop",
+            #     param$label_toggle,
+            #     value = TRUE,
+            #     width = "100%"
             )
         ),
         # espaço vazio
