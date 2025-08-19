@@ -8,15 +8,15 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/map_mapbiomas_cover/ui.R"
-files$server_script <- "scripts/map_mapbiomas_cover/server.R"
-files$param_script <- "scripts/map_mapbiomas_cover/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/mapbiomas_cobertura_munic_savana_dic_en.csv"
-files$db_file <- "data/mapbiomas_cobertura.rds"
-files$legal_amazon <- "data/legal_amazon_boundary.rds"
-files$states_boundary <- "data/states_boundary.rds"
-files$areas_mun <- "data/area_municipios.rds"
+files$ui_script <- "ui.R"
+files$server_script <- "server.R"
+files$param_script <- "../global/db_params.R"
+files$CSS_script <- "../global/dza_lumen.css"
+files$param_file <- "dic_en.csv"
+files$db_file <- "mapbiomas_cobertura.parquet"
+files$shapefile <- "../global/munic_shapefile.rds"
+files$legal_amazon <- "../global/legal_amazon_boundary.rds"
+files$states_boundary <- "../global/states_boundary.rds"
 
 
 # Carrega scripts
