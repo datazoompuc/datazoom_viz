@@ -138,7 +138,7 @@ get_server <- function(files, param) {
                     ),
                     .groups = "drop"
                 ) %>%
-                { if(input$y == "real_avg_w") filter(., year >= 1995) else . }
+                { if(input$y == "real_avg_w") filter(., year >= 1995 & year <= 2021) else . }
             
             # Filtra linhas com valores zero ou NA
             df_agg <- df_agg %>%
