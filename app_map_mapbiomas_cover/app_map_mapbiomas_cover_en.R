@@ -41,7 +41,7 @@ param$plot_desc <- "Annual land use and land cover in Brazil (Source: MapBiomas)
     #"Cobertura da terra na Amaz\u00f4nia"
 
 param$year_inicio <- 1986
-param$year_final <- 2022
+param$year_final <- 2023
 
 #parâmetros específicos no UI
 param$label_var_name<- "VARIABLES:"

@@ -307,28 +307,34 @@ temp_param_table$slider[5] <- TRUE
 write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_savana_dic_en.csv", fileEncoding = "UTF-8")
 
 #### Gambiarra to Build Dictionary in English
-dictionary_en <- read_csv("app_map_mapbiomas_cover/dic_en.csv")
+dictionary <- read_csv("app_map_mapbiomas_cover/dic.csv")
 
-dictionary_en <- dictionary_en %>%
+dictionary_en <- dictionary %>%
+    mutate(label = desc) %>%
     mutate(
-        var = case_when(
-            var == "Soy Beans"                          ~ "Soybean",
-            var == "Non Observed"                       ~ "Not Observed",
-            var == "Flooded Forest"                     ~ "Floodable Forest",
-            var == "Urban Infrastructure"               ~ "Urban Area",
-            var == "Other Non Vegetated Area"           ~ "Other non Vegetated Areas",
-            var == "Rocky outcrop"                      ~ "Rocky Outcrop",
-            var == "Sugar Cane"                         ~ "Sugar cane",
-            var == "Magrove"                            ~ "Mangrove",
-            var == "Beach and Dune"                     ~ "Beach, Dune and Sand Spot",
-            var == "Salt flat"                          ~ "Hypersaline Tidal Flat",
-            var == "Mosaic of Agriculture and Pasture"  ~ "Mosaic of Uses",
-            var == "Coffe"                              ~ "Coffee",
-            var == "Restinga Herbacea/Arbustiva"        ~ "Herbaceous Sandbank Vegetation",
-            var == "Wooded Restinga"                    ~ "Wooded Sandbank Vegetation",
-            TRUE ~ var
+        label = case_when(
+            label == "Non Observed"                       ~ "Not Observed",
+            label == "Floresta Alagada"                   ~ "Flooded Forest",
+            label == "Ano"                                ~ "Year",
+            label == "state"                              ~ "State",
+            label == "Soybean"                            ~ "Soy Beans",
+            label == "Urban Infrastructure"               ~ "Urban Area",
+            label == "Other Non Vegetated Area"           ~ "Other non Vegetated Areas",
+            label == "Rocky outcrop"                      ~ "Rocky Outcrop",
+            label == "Sugar Cane"                         ~ "Sugar cane",
+            label == "Magrove"                            ~ "Mangrove",
+            label == "Beach and Dune"                     ~ "Beach, Dune and Sand Spot",
+            label == "Salt flat"                          ~ "Hypersaline Tidal Flat",
+            label == "Mosaico de Agricultura e Pastagem"  ~ "Mosaic of Agriculture and Pasture",
+            label == "Coffe"                              ~ "Coffee",
+            label == "Restinga Herbacea/Arbustiva"        ~ "Herbaceous Sandbank Vegetation",
+            label == "Wooded Restinga"                    ~ "Wooded Sandbank Vegetation",
+            label == "Óleo de Palma"                      ~ "Palm Oil",
+            TRUE ~ label
         )
-    )
+    ) %>%
+    select(-1,-2,-3) %>%
+    filter(desc != "Other Non Forest Natural Formation")
 
 write.csv(dictionary_en, file = "app_map_mapbiomas_cover/dic_en.csv", fileEncoding = "UTF-8")
 
