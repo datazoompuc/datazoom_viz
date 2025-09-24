@@ -333,7 +333,7 @@ dictionary_en <- dictionary %>%
             TRUE ~ label
         )
     ) %>%
-    select(-1,-2,-3) %>%
+    #select(-1,-2,-3) %>%
     filter(desc != "Other Non Forest Natural Formation")
 
 write.csv(dictionary_en, file = "app_map_mapbiomas_cover/dic_en.csv", fileEncoding = "UTF-8")
@@ -383,4 +383,8 @@ temp_param_table$label[temp_param_table$var== "Water"] = "Água"
 temp_param_table$label[temp_param_table$var== "Anthropic"] = "Antrópico"
 temp_param_table$label[temp_param_table$var== "Natural"] = "Natural"
 
-write.csv(temp_param_table, file = "app_map_mapbiomas_cover/dic.csv", fileEncoding = "UTF-8")
+dictionary <- read_csv("app_map_mapbiomas_cover/dic.csv") %>%
+    filter(var != "Other Non Forest Natural Formation") %>%
+    select(-1,-2,-3)
+
+write.csv(dictionary, file = "app_map_mapbiomas_cover/dic.csv", fileEncoding = "UTF-8")
