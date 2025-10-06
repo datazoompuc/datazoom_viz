@@ -18,6 +18,8 @@ source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
+
+
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "time" # variável padrão do eixo x

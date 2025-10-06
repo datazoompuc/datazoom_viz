@@ -1,0 +1,26 @@
+{
+    "id": "D5C9B5B6",
+    "path": "D:/Folders/PUCRIO/Datazoom/GitHub/datazoom_viz/app_ts_ibge_pnadc_cnae.R",
+    "project_path": "app_ts_ibge_pnadc_cnae.R",
+    "type": "r_source",
+    "hash": "2806811479",
+    "contents": "",
+    "dirty": false,
+    "created": 1759762939504.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "20,0",
+        "scrollLine": "4"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1759769189,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1759769189382,
+    "read_only": false,
+    "read_only_alternatives": []
+}
