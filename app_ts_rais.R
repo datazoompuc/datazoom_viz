@@ -20,7 +20,7 @@ source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
-# Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
+# Parâmetros 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "year" # variável padrão do eixo x
 param$y_def <- "real_avg_w" # variável padrão do eixo y
@@ -29,29 +29,31 @@ param$color_def <- "setor" # variável padrão de cor
 param$text_def <- "ocupacao" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "uf" # variável de agrupamento
 
-# Descrição da visualização no eixo de opções
+
 param$plot_name <- "Data Zoom RAIS"
 param$plot_desc <- "Dados compilados sobre o mercado de trabalho brasileiro gerados a partir da RAIS"
 
-### Parametros especificos no UI
+
 param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "Eixo vertical (y)"
 param$label_scale_name <- "escala log"
 param$label_prop_name <- "proporcional ao ano inicial (*)"
-param$label_geo <- "Recorte Geográfico"
-param$label_group <- "Agrupamentos"
+param$label_geo <- "Selecione recorte geográfico"
+param$label_group <- "Selecione agrupamento"
 param$link <- "https://datazoom.shinyapps.io/app_ts_rais/"
 
-### Parametros especificos no server
-param$title_init <- "Evolução anual de" # expressão titulo
+param$title_init <- "Evolução anual do" # expressão titulo
 param$subtitle_init <- "por grupo selecionado" # expressão subtitulo
+param$no_data_msg <- "Nenhum dado encontrado com os filtros selecionados"
+param$axis_x_title <- "Ano"
+param$axis_y_title <- "Valor"
+param$tooltip_year <- "Ano"
 
-
-# Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL
 
 param$geo_choices <- list(
-    "Brasil" = list("Brasil", ""),
+    "Brasil" = list("Brasil"),
+    "Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal"),
     "Regiões" = list("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"),
     "Estados" = list(
         "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", 
@@ -59,8 +61,7 @@ param$geo_choices <- list(
         "Mato Grosso", "Mato Grosso do Sul", "Minas Gerais", "Pará", 
         "Paraíba", "Paraná", "Pernambuco", "Piauí", "Rio de Janeiro",
         "Rio Grande do Norte", "Rio Grande do Sul", "Rondônia", 
-        "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins",
-    "Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal")
+        "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins"
     )
 )
 

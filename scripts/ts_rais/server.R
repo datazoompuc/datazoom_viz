@@ -12,7 +12,6 @@ get_server <- function(files, param) {
     function(input, output, session) {
         
         # Carrega dados como reativo
-        dados <- reactive({
             df <- readRDS(files$db_file) %>%
                 mutate(
                     regiao = case_when(
@@ -31,25 +30,26 @@ get_server <- function(files, param) {
                         "Fora da Amazônia Legal"
                     )
                 )
-            
-            return(df)
-        })
+        
+        dados <- reactive({df})
+
         
         # Atualiza seletores
+        
+        default_geo <- unname(unlist(param$geo_choices[[1]]))[1]
+        default_group <- unname(unlist(param$group_categories[1]))[1]
+        
         observe({
             df <- dados()
             
             # Atualiza filtro geográfico
+        
+            
             updateSelectizeInput(
                 session, 
                 "filter_geo",
-                choices = list(
-                    "Brasil" = "Brasil",
-                    "Amazônia Legal" = c("Amazônia Legal", "Fora da Amazônia Legal"),
-                    "Regiões" = c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"),
-                    "Estados" = sort(unique(df$uf))
-                ),
-                selected = "Brasil"
+                choices = param$geo_choices,
+                selected = default_geo
             )
             
             # Atualiza filtro de agrupamento
@@ -57,8 +57,8 @@ get_server <- function(files, param) {
                 session, 
                 "filter_group",
                 choices = param$group_categories,
-                selected = "Todos",
-                options = list(placeholder = 'Selecione um grupo...')
+                selected = default_group,
+                options = list(placeholder = param$label_group)
             )
         })
         
@@ -67,26 +67,18 @@ get_server <- function(files, param) {
         output$plot_title <- renderText({
             req(input$y)  
             
-            y_label <- switch(input$y,
-                              "real_avg_w" = "Salário Médio",
-                              "num_vinculos" = "Número de Vínculos",
-                              "tenure" = "Tempo no Emprego")
-            
-            paste("Evolução do", y_label)
+            y_label <- param$table$label[param$table$var == input$y]
+            paste(param$title_init, y_label)
         })
         
         # Gera subtítulo
         output$plot_subtitle <- renderText({
+            
             req(input$filter_group)
             
-            if(input$filter_group != "Todos") {
-                
-                categoria <- names(which(sapply(param$group_categories[-1], function(x) {
-                    any(unlist(x) == input$filter_group)
-                })))
-                
-                
-                paste0(tolower(categoria), ": ", input$filter_group)
+            first_choice <- names(param$group_categories)[1]
+            if (input$filter_group != first_choice) {
+                paste(param$subtitle_init, "-", input$filter_group)
             }
         })
         
@@ -97,10 +89,10 @@ get_server <- function(files, param) {
             df <- dados()
             
             # Aplica filtros geográficos
-            if(!"Brasil" %in% input$filter_geo) {
-                df <- df %>% 
-                    filter(uf %in% input$filter_geo | 
-                               regiao %in% input$filter_geo | 
+            if(!(param$geo_choices[[1]][[1]] %in% input$filter_geo)) {
+                df <- df %>%
+                    filter(uf %in% input$filter_geo |
+                               regiao %in% input$filter_geo |
                                amazonia_legal %in% input$filter_geo) %>%
                     mutate(geo_group = case_when(
                         uf %in% input$filter_geo ~ uf,
@@ -112,18 +104,18 @@ get_server <- function(files, param) {
             }
             
             # Aplica filtros de grupo
-            if(input$filter_group != "Todos") {
+            if(input$filter_group != default_group) {
                 df <- df %>% filter(group == input$filter_group)
             }
             
             # Determina variáveis de agrupamento
             group_vars <- c("year")
             
-            if(!"Brasil" %in% input$filter_geo) {
+            if(!(default_geo %in% input$filter_geo)) {
                 group_vars <- c(group_vars, "geo_group")
             }
             
-            if(input$filter_group != "Todos") {
+            if(input$filter_group != default_group) {
                 group_vars <- c(group_vars, "group")
             }
             
@@ -138,7 +130,7 @@ get_server <- function(files, param) {
                     ),
                     .groups = "drop"
                 ) %>%
-                { if(input$y == "real_avg_w") filter(., year >= 1995 & year <= 2021) else . }
+                filter(if (input$y == "real_avg_w") between(year, 1995, 2021) else TRUE)
             
             # Filtra linhas com valores zero ou NA
             df_agg <- df_agg %>%
@@ -149,14 +141,15 @@ get_server <- function(files, param) {
                 )
             
             # Verifica se ainda há dados após o filtro
-            if(!"Brasil" %in% input$filter_geo) {
+            
+            if(!(default_geo %in% input$filter_geo)) {
                 df_agg$combinacao <- df_agg$geo_group
             } else {
-                df_agg$combinacao <- "Brasil"
+                df_agg$combinacao <- default_geo
             }
             
             # Mantém o grupo completo para o tooltip
-            df_agg$combinacao_completa <- if(input$filter_group != "Todos" && "group" %in% names(df_agg)) {
+            df_agg$combinacao_completa <- if(input$filter_group != default_group && "group" %in% names(df_agg)) {
                 paste(df_agg$combinacao, "-", df_agg$group)
             } else {
                 df_agg$combinacao
@@ -166,7 +159,7 @@ get_server <- function(files, param) {
             # Verifica se há dados
             if(nrow(df_agg) == 0) {
                 return(plotly_empty() %>% 
-                           layout(title = list(text = "Nenhum dado encontrado com os filtros selecionados")))
+                           layout(title = list(text = param$no_data_msg)))
             }
             
             # Calcula evolução relativa se necessário
@@ -182,17 +175,12 @@ get_server <- function(files, param) {
             # Prepara tooltip
             df_agg$tooltip <- paste0(
                 "<b>", df_agg$combinacao_completa, "</b><br>",
-                "Ano: ", df_agg$year, "<br>",
-                switch(input$y,
-                       "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
-                       "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Nº de Vínculos",
-                       "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo (meses)"), 
-                ": ", format(round(df_agg$y_value, if(input$y_option) 1 else 2),
-                             scientific = FALSE,
-                             digits = 2,
-                             decimal.mark = ",",
-                             big.mark = ".",
-                             nsmall = if(input$y_option) 1 else 2)
+                param$axis_x_title, ": ", df_agg$year, "<br>",
+                param$table$label[param$table$var == input$y], ": ",
+                format(round(df_agg$y_value, 2),
+                       scientific = FALSE,
+                       decimal.mark = ifelse(grepl("en", files$param_file), ".", ","),
+                       big.mark = ifelse(grepl("en", files$param_file), ",", "."))
             )
             
             # Layout hover/tooltip
@@ -204,14 +192,18 @@ get_server <- function(files, param) {
             
             
             # Título eixo y
-            y_title <- switch(input$y,
-                              "real_avg_w" = if(input$y_option) "Salário Médio (% do ano base)" else "Salário Médio (R$)",
-                              "num_vinculos" = if(input$y_option) "Vínculos (% do ano base)" else "Número de Vínculos",
-                              "tenure" = if(input$y_option) "Tempo (% do ano base)" else "Tempo no Emprego (meses)")
+            y_label <- param$table$label[param$table$var == input$y]
+            if (input$y_option) {
+                y_title <- paste0(y_label, " (% of base year)")
+                if (!grepl("en", files$param_file)) y_title <- paste0(y_label, " (% do ano base)")
+            } else {
+                y_title <- y_label
+            }
+            
             
             # Layout eixos
                 x_axis_layout <- list(
-                    title = "Ano",
+                    title = param$axis_x_title,
                     titlefont = f1, 
                     tickfont = f2, 
                     showgrid = FALSE,
@@ -250,7 +242,7 @@ get_server <- function(files, param) {
             p %>% config(
                 displayModeBar = TRUE,
                 modeBarButtonsToRemove = c("select2d", "lasso2d", "autoScale2d"),
-                locale = 'pt-BR'
+                locale = ifelse(grepl("en", files$param_file), "en-US", "pt-BR")
             )
         })
     }

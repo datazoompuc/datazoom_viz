@@ -29,11 +29,8 @@ get_ui <- function(files, param) {
                        selectInput(
                            inputId = "y",
                            label = param$label_y_name,
-                           choices = list(
-                               "Salário Médio" = "real_avg_w",
-                               "Número de Vínculos" = "num_vinculos",
-                               "Tempo no Emprego" = "tenure"
-                           ),
+                           choices = setNames(param$table$var[param$table$y], 
+                                              param$table$label[param$table$y]),
                            selected = param$y_def,
                            width = "100%"
                        )
@@ -63,7 +60,7 @@ get_ui <- function(files, param) {
                            label = param$label_geo,  # Mesmo estilo que label_y_name
                            choices = NULL,
                            multiple = TRUE,
-                           options = list(placeholder = 'Selecione regiões/estados...', maxItems = 20),
+                           options = list(placeholder = param$label_geo, maxItems = 20),
                            width = "100%"
                        )
                    ),
@@ -76,7 +73,7 @@ get_ui <- function(files, param) {
                            label = param$label_group,
                            choices = param$group_categories,
                            multiple = FALSE,
-                           options = list(placeholder = 'Selecione grupos...'),
+                           options = list(placeholder = param$label_group),
                            width = "100%"
                        )
                    ),
