@@ -39,13 +39,19 @@ get_ui <- function(files, param) {
                            width = "100%"
                        )
                    ),
-                   
-                   # Seleciona eixo log
-                   checkboxInput(
+                   materialSwitch(
                        inputId = "ylog",
-                       param$label_scale_name,
-                       value = FALSE,
-                       width = "100%"
+                       label = tags$span(param$label_scale_name, class = "switch-label"),
+                       value = FALSE, 
+                       status = "info"
+                       
+                       # # Seleciona eixo log
+                       # checkboxInput(
+                       #     inputId = "ylog",
+                       #     param$label_scale_name,
+                       #     value = FALSE,
+                       #     width = "100%"
+                       # )
                    ),
                    # Seleciona eixo
                    checkboxInput(
