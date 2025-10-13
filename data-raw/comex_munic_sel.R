@@ -430,7 +430,7 @@ temp_param_table$label[temp_param_table$var == 'cod_sh4'] <- "C\u00f3digo no sis
 temp_param_table$label[temp_param_table$var == 'cod_sh2'] <- "C\u00f3digo no sistema unificado 2"
 temp_param_table$label[temp_param_table$var == 'nome_sh2'] <- "Nome no sistema unificado 2"
 
-temp_param_table$unidade[temp_param_table$var == 'maximo_produto'] <- "% das exporta\u00e7\u00f5es mundiais"
+temp_param_table$unidade[temp_param_table$var == 'maximo_produto'] <- "% das exporta\u00e7\u00f5es amaz\u00f4nicas do produto vindas do munic\u00edpio"
 
 temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
 temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
