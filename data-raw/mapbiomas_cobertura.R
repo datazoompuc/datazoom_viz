@@ -62,44 +62,12 @@ municipalities_with_geom <- municipalities_with_geom[,c("code_muni","geom","lega
 municipalities_with_geom <- municipalities_with_geom %>%
   rename(municipality_code=code_muni)
 
-
-#st_geometry(municipalities_with_geom) <- municipalities_with_geom$geom
-
-#shapefile <- municipalities_with_geom[!st_is_empty(municipalities_with_geom), , drop=FALSE]
-
-
 shapefile <- municipalities_with_geom %>% 
     sf::st_make_valid() %>%
     sf::st_simplify(dTolerance = 400) 
 
 shapefile <- shapefile %>%
     rmapshaper::ms_simplify()
-  
-
-#colnames(shapefile)
-
-# Merging data + shapefiles ---------------------------------------------------------------
-# merge data with shape --------------------------------------------------------
-
-# .parquet does not support shapefiles - let's keep them separate
-#data <- right_join(shapefile,data, by="municipality_code") 
-
-
-# Declare wich colum has the geographical info --------------------------------------------
-
-#st_geometry(data) <- data$geom
-
-
-# saving in the data folder ---------------------------------------------------------------
-# export ------------------------------------------------------------------
-# save simplified sf for faster maps
-#cols <- colnames(data)
-#data <- rmapshaper::ms_simplify(data, 
-                                # keep_shapes = TRUE, 
-                                # keep = 0.01)
-
-#colnames(data) <- cols
-
 
 areas_mun <- readr::read_rds("global/area_municipios.rds")
 
@@ -107,22 +75,6 @@ areas_mun <- readr::read_rds("global/area_municipios.rds")
 data <- data %>%
     tidyr::drop_na(municipality_code) %>%
     left_join(areas_mun, by = "municipality_code")
-
-# making it lighter
-
-# data <- data %>%
-#     select(
-#         - c(
-#         "Non Observed", starts_with("Other")
-#         )
-#     )
-# 
-# data <- data %>%
-#     filter(
-#         year %in% c(
-#             "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020", "2022"
-#         )
-#     )
 
 # mapbiomas_cover is not properly treates. Colnames appear as 1.1. Forest Formation instead of simply Forest Formation
 ## code to remove the leading numbers and dots
@@ -134,17 +86,6 @@ data <- data %>%
         municipality_code, municipality, state, year, "Forest Formation",
         "Savanna Formation", "Pasture", "Soybean", "Mining"
     )
-
-# data <- data %>%
-#     mutate(across(where(is.numeric), as.integer))
-
-# we no longer need to drop data to make it lighter
-# using .parquet allows us to keep everything
-
-#data <- data %>%
-#    filter(
-#        as.numeric(year) %% 12 == 6
-#    )
 
 # group data by year
 ## .parquet understands each one as a dif folder - loading is much faster

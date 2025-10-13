@@ -3,7 +3,7 @@
     "path": "~/GitHub/datazoom_viz/data-raw/mapbiomas_cobertura.R",
     "project_path": "data-raw/mapbiomas_cobertura.R",
     "type": "r_source",
-    "hash": "286678387",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1760371709741.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "22,57",
-        "scrollLine": "0"
+        "cursorPosition": "105,0",
+        "scrollLine": "115"
     },
     "folds": "",
-    "lastKnownWriteTime": 1760371746,
+    "lastKnownWriteTime": 1760371970,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1760371746328,
+    "last_content_update": 1760371971003,
     "read_only": false,
     "read_only_alternatives": []
 }
