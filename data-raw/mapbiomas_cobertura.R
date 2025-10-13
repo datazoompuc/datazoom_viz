@@ -4,27 +4,25 @@
 
 # Directory
 setwd("C:\\Users\\laura\\OneDrive\\Laura\\economia\\pibic\\datazoom_viz")
-# Memory
-#Sys.setenv(R_MEM_SIZE = "8G")
-
-
 Sys.setlocale("LC_ALL","English")
-devtools::install_github("datazoompuc/datazoom.amazonia")
 
 
 # Installing and loading packages (if not exist)
 packages_to_install <- c("magrittr","devtools","readxl","tidyverse","stringr","googledrive","sf","sp","rmapshaper")
-# Function to install and load a package if not already installed
+
+# Installing and loading packages
 install_and_load_package <- function(package_name) {
-  if (!require(package_name, character.only = TRUE)) {
-    install.packages(package_name)
-    library(package_name, character.only = TRUE)
-  }
+    if (!require(package_name, character.only = TRUE)) {
+        install.packages(package_name)
+        library(package_name, character.only = TRUE)
+    }
 }
-# Loop through the list of packages and install/load them
+
 for (package in packages_to_install) {
-  install_and_load_package(package)
+    install_and_load_package(package)
 }
+
+devtools::install_github("datazoompuc/datazoom.amazonia")
 
 library(datazoom.amazonia)
 library(readxl)
@@ -50,7 +48,9 @@ data <- load_mapbiomas(dataset = "mapbiomas_cover",
 
 # Only level 4 interests us 
 data <- data %>%
-  pivot_wider(id_cols=c("biome","municipality","state","municipality_code","year"), names_from=class_level_4, values_from = value)
+  pivot_wider(id_cols=c("biome","municipality","state","municipality_code","year"), 
+              names_from=class_level_4, 
+              values_from = value)
 
 
 # load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
