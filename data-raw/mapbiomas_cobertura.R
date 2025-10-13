@@ -6,11 +6,9 @@
 setwd("C:\\Users\\laura\\OneDrive\\Laura\\economia\\pibic\\datazoom_viz")
 Sys.setlocale("LC_ALL","English")
 
-
-# Installing and loading packages (if not exist)
+# Installing and loading packages
 packages_to_install <- c("magrittr","devtools","readxl","tidyverse","stringr","googledrive","sf","sp","rmapshaper")
 
-# Installing and loading packages
 install_and_load_package <- function(package_name) {
     if (!require(package_name, character.only = TRUE)) {
         install.packages(package_name)
