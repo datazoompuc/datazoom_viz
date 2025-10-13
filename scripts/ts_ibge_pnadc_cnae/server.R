@@ -255,6 +255,7 @@ get_server <- function(files, param) {
                 
                 if (input$ylog & is.numeric(df_p$y)) {
                     y_axis_layout$type <- "log"
+                    y_axis_layout$title <- paste0(y_axis_layout$title, " (log)")
                 }
                 
                 if (input$y_option) {
