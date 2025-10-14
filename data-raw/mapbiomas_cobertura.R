@@ -2,24 +2,6 @@
 #   SETUP
 ################################################################################
 
-# Directory
-setwd("C:\\Users\\laura\\OneDrive\\Laura\\economia\\pibic\\datazoom_viz")
-Sys.setlocale("LC_ALL","English")
-
-# Installing and loading packages
-packages_to_install <- c("magrittr","devtools","readxl","tidyverse","stringr","googledrive","sf","sp","rmapshaper")
-
-install_and_load_package <- function(package_name) {
-    if (!require(package_name, character.only = TRUE)) {
-        install.packages(package_name)
-        library(package_name, character.only = TRUE)
-    }
-}
-
-for (package in packages_to_install) {
-    install_and_load_package(package)
-}
-
 devtools::install_github("datazoompuc/datazoom.amazonia")
 
 library(datazoom.amazonia)
@@ -52,40 +34,27 @@ data <- data %>%
 
 
 # load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
-municipalities <- datazoom.amazonia::municipalities
-shapefile_mun <- datazoom.amazonia:::external_download("geo_municipalities",source="internal")
 
-municipalities_with_geom <- inner_join(shapefile_mun,municipalities,by="code_muni")
-
-municipalities_with_geom <- municipalities_with_geom[,c("code_muni","geom","legal_amazon")]
-
-municipalities_with_geom <- municipalities_with_geom %>%
-  rename(municipality_code=code_muni)
-
-shapefile <- municipalities_with_geom %>% 
-    sf::st_make_valid() %>%
-    sf::st_simplify(dTolerance = 400) 
-
-shapefile <- shapefile %>%
+shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source = "internal") %>% 
+    left_join(datazoom.amazonia::municipalities, by = "code_muni") %>% 
+    select(municipality_code = code_muni, geom, legal_amazon) %>% 
+    st_make_valid() %>% 
+    st_simplify(dTolerance = 400) %>%
     rmapshaper::ms_simplify()
 
 areas_mun <- readr::read_rds("global/area_municipios.rds")
 
 # adding area of each municipality
-data <- data %>%
-    tidyr::drop_na(municipality_code) %>%
-    left_join(areas_mun, by = "municipality_code")
-
 # mapbiomas_cover is not properly treates. Colnames appear as 1.1. Forest Formation instead of simply Forest Formation
 ## code to remove the leading numbers and dots
 ### this should no longer be necessary ater data treatment is fixed
-names(data) <- sub("^\\d+(\\.\\d+)*\\.?\\s*", "", names(data))
 
 data <- data %>%
-    relocate(
-        municipality_code, municipality, state, year, "Forest Formation",
-        "Savanna Formation", "Pasture", "Soybean", "Mining"
-    )
+    drop_na(municipality_code) %>%
+    left_join(areas_mun, by = "municipality_code") %>%
+    rename_with(~sub("^\\d+(\\.\\d+)*\\.?\\s*", "", .x)) %>%
+    relocate(municipality_code, municipality, state, year,
+             "Forest Formation", "Savanna Formation", "Pasture", "Soybean", "Mining")
 
 # group data by year
 ## .parquet understands each one as a dif folder - loading is much faster
