@@ -77,37 +77,162 @@ saveRDS(shapefile, "C:\\Users\\user\\Documents\\GitHub\\datazoom_viz\\app_map_ma
 datafinal<-readRDS("data/mapbiomas_cobertura.rds")
 
 #####################
-# Build Dictionary 
+# Function to generate base dictionary 
+#####################
+
+build_dictionary <- function(data, language = c("pt", "en")) {
+    language <- match.arg(language)
+    labels <- colnames(data)
+    
+    base_dict <- tibble(
+        var         = labels,
+        x           = TRUE,
+        y           = TRUE,
+        color       = FALSE,
+        size        = FALSE,
+        slider      = FALSE,
+        label       = labels,
+        desc        = labels,
+        var_group   = "Mapbiomas",
+        tipo        = 1,
+        unidade     = "ha",
+        categoria   = ifelse(language == "pt", "Meio ambiente", "Environment"),
+        subcategoria = ifelse(language == "pt", "Uso da terra", "Use of land")
+    ) |>
+        drop_na() |>
+        filter(var != "municipality_code") |> 
+        mutate(
+            x = replace(x, 1:5, FALSE),
+            y = replace(y, 1:5, FALSE),
+            slider = replace(slider, 5, TRUE),
+            label = replace(label, 3, ifelse(language == "pt", "Município", "Municipality")),
+            label = replace(label, 5, ifelse(language == "pt", "Ano", "Year")),
+            desc  = label
+        )
+    
+    return(base_dict)
+}
+
+#####################
+# Function to apply PT-EN translations
+#####################
+
+apply_label_translations <- function(dict, translations) {
+    dict |>
+        mutate(label = ifelse(var %in% names(translations),
+                              translations[var],
+                              label))
+}
+
+#####################
+# PT
+#####################
+
+translations_pt <- c(
+    "Aquaculture" = "Aquicultura",
+    "Beach, Dune and Sand Spot" = "Praias, Dunas e Pontos de Areia",
+    "Citrus" = "Cítricos",
+    "Coffee" = "Café",
+    "Cotton" = "Algodão",
+    "Forest Formation" = "Formação de Floresta",
+    "Forest Plantation" = "Plantação de Floresta",
+    "Floodable Forest" = "Floresta Inundável",
+    "Grassland" = "Pradaria",
+    "Hypersaline Tidal Flat" = "Planícies Hipersalinas Costeiras",
+    "Herbaceous Sandbank Vegetation" = "Restinga Herbácea",
+    "Mining" = "Mineração",
+    "Mosaic of Uses" = "Mosaico de Uso da Terra",
+    "Sugar cane" = "Cana-de-açúcar",
+    "Magrove" = "Mangue",
+    "Salt flat" = "Salar",
+    "Not Observed" = "Não observado",
+    "Other Non Forest Natural Formation" = "Outras formações naturais não florestais",
+    "Other non Vegetated Areas" = "Outras áreas não vegetadas",
+    "Other Perennial Crops" = "Outras Culturas Perenes",
+    "Other Temporary Crops" = "Outras Culturas Temporárias",
+    "Rice" = "Arroz",
+    "River, Lake and Ocean" = "Rios, Lagos ou Oceanos",
+    "Rocky Outcrop" = "Afloramento rochoso",
+    "Savanna Formation" = "Formação de Savana",
+    "Soybean" = "Soja",
+    "Pasture" = "Pastagem",
+    "Urban Area" = "Área Urbana",
+    "Wetland" = "Pântano",
+    "Wooded Sandbank Vegetation" = "Restinga Arborizada",
+    "Palm Oil" = "Óleo de Palma",
+    "Perennial Crops" = "Culturas Perenes",
+    "Temporary Crops" = "Culturas Temporárias",
+    "Agriculture" = "Agricultura",
+    "Forest" = "Floresta",
+    "Non Forest Natural Formation" = "Formação Natural Não Florestal",
+    "Farming" = "Fazenda",
+    "Non Vegetated Area" = "Áreas não vegetadas",
+    "Water" = "Água",
+    "Anthropic" = "Antrópico",
+    "Natural" = "Natural"
+)
+
+datafinal <- readRDS("data/mapbiomas_cobertura.rds")
+
+dic_pt <- build_dictionary(datafinal, "pt") |>
+    apply_label_translations(translations_pt)
+
+write_csv(dic_pt, "data/mapbiomas_cobertura_munic_savana_dic.csv")
+
+#####################
+# EN
+#####################
+
+dic_en <- build_dictionary(datafinal, "en")
+
+write_csv(dic_en, "data/mapbiomas_cobertura_munic_savana_dic_en.csv")
+
+## THE END
+
+
+
+
+
+
+
+## Sketch
+
+################################################################################ 
+# DADOS DICIONARIO PARA O files$param_file 
+################################################################################
+
+datafinal<-readRDS("data/mapbiomas_cobertura.rds")
+
+#####################
+# Build Dictionary
 #####################
 
 # extract variables from data
 columns <- colnames(data)
 
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Mapbiomas",
-  tipo = 1,
-  unidade = "ha",
-  categoria= "Meio ambiente", 
-  subcategoria = "Uso da terra"
-)
+# generate dictionary 
+temp_param_table <- tibble( 
+    var = columns, 
+    x = TRUE, 
+    y = TRUE, 
+    color = FALSE, 
+    size = FALSE, 
+    slider = FALSE, 
+    label = columns, 
+    desc = columns, 
+    var_group = "Mapbiomas", 
+    tipo = 1, 
+    unidade = "ha", 
+    categoria= "Meio ambiente", 
+    subcategoria = "Uso da terra" )
 
 # tentando resolver a questão de terem várias linhas NA 
 temp_param_table <-temp_param_table %>%
-  drop_na()
+    drop_na()
 
 # remover o codigo do municipio, pois nao será utilizado aqui
 temp_param_table <- temp_param_table %>%
-  filter(var != "municipality_code")
-
+    filter(var != "municipality_code")
 
 temp_param_table$label[5] <- "Ano"
 temp_param_table$label[3] <- "Município"
@@ -117,6 +242,7 @@ temp_param_table$x[1:5] <- FALSE
 temp_param_table$x[36] <- FALSE
 temp_param_table$y[1:5] <- FALSE
 temp_param_table$y[36] <- FALSE
+
 
 #temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 37))
 #temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 37))
