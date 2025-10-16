@@ -20,52 +20,54 @@ library(rmapshaper)
 # load data from MAPBIOMAS ---------------------------------------------------------------
 
 # download treated Mapbiomas Cover data in English
-data <- load_mapbiomas(dataset = "mapbiomas_cover",
-                       raw_data = FALSE,
-                       geo_level = "municipality",
-                       language = "eng")
-
-
-# Only level 4 interests us 
-data <- data %>%
-  pivot_wider(id_cols=c("biome","municipality","state","municipality_code","year"), 
-              names_from=class_level_4, 
-              values_from = value)
-
+data <- load_mapbiomas(
+    dataset = "mapbiomas_cover",
+    raw_data = FALSE,
+    geo_level = "municipality",
+    language = "eng"
+    ) |>
+    pivot_wider(
+        id_cols    = c("biome", "municipality", "state", "municipality_code", "year"),
+        names_from = class_level_4,
+        values_from = value
+    )
 
 # load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
 
-shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source = "internal") %>% 
-    left_join(datazoom.amazonia::municipalities, by = "code_muni") %>% 
-    select(municipality_code = code_muni, geom, legal_amazon) %>% 
-    st_make_valid() %>% 
-    st_simplify(dTolerance = 400) %>%
+shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source = "internal") |> 
+    left_join(datazoom.amazonia::municipalities, by = "code_muni") |> 
+    select(municipality_code = code_muni, geom, legal_amazon) |>
+    st_make_valid() |>
+    st_simplify(dTolerance = 400) |>
     rmapshaper::ms_simplify()
 
-areas_mun <- readr::read_rds("global/area_municipios.rds")
+# Add area of each municipality ------------------------------------------
+    
+areas_mun <- readr::read_rds("C:\\Users\\user\\Documents\\GitHub\\datazoom_viz\\app_map_mapbiomas_cover\\global\\area_municipios.rds")
 
-# adding area of each municipality
-# mapbiomas_cover is not properly treates. Colnames appear as 1.1. Forest Formation instead of simply Forest Formation
-## code to remove the leading numbers and dots
-### this should no longer be necessary ater data treatment is fixed
-
-data <- data %>%
-    drop_na(municipality_code) %>%
-    left_join(areas_mun, by = "municipality_code") %>%
-    rename_with(~sub("^\\d+(\\.\\d+)*\\.?\\s*", "", .x)) %>%
+data <- data |>
+    drop_na(municipality_code) |>
+    left_join(areas_mun, by = "municipality_code") |>
+    rename_with(~sub("^\\\\d+(\\\\.\\\\d+)*\\\\.?\\\\s*", "", .x)) |>
     relocate(municipality_code, municipality, state, year,
              "Forest Formation", "Savanna Formation", "Pasture", "Soybean", "Mining")
 
-# group data by year
-## .parquet understands each one as a dif folder - loading is much faster
+
+################################################################################
+# EXPORT
+################################################################################
+
+
+# Export data in parquet format (faster per year)
 data |>
     dplyr::group_by(year) |>
     # Write data as .parquet
-    arrow::write_dataset(path = "app_map_mapbiomas_cover/mapbiomas_cobertura.parquet", format = "parquet")
+    arrow::write_dataset(
+        path = "app_map_mapbiomas_cover/mapbiomas_cobertura.parquet", 
+        format = "parquet")
 
-# Write spacial data as .rds 
-## .parquet does not support spacial data
-saveRDS(shapefile, "global/munic_shapefile.rds")
+# Saves shapefile in .rds (parquet does not support geometry)
+saveRDS(shapefile, "C:\\Users\\user\\Documents\\GitHub\\datazoom_viz\\app_map_mapbiomas_cover\\global\\area_municipios.rds")
 
 
 ################################################################################
