@@ -11,6 +11,7 @@ library(stringr)
 library(sf)
 library(sp)
 library(rmapshaper)
+library(arrow)
 
 
 ################################################################################
@@ -43,7 +44,7 @@ shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source 
 
 # Add area of each municipality ------------------------------------------
     
-areas_mun <- readr::read_rds("C:\\Users\\user\\Documents\\GitHub\\datazoom_viz\\app_map_mapbiomas_cover\\global\\area_municipios.rds")
+areas_mun <- readr::read_rds(".\\app_map_mapbiomas_cover\\global\\area_municipios.rds")
 
 data <- data |>
     drop_na(municipality_code) |>
@@ -67,14 +68,14 @@ data |>
         format = "parquet")
 
 # Saves shapefile in .rds (parquet does not support geometry)
-saveRDS(shapefile, "C:\\Users\\user\\Documents\\GitHub\\datazoom_viz\\app_map_mapbiomas_cover\\global\\area_municipios.rds")
+saveRDS(shapefile, ".\\app_map_mapbiomas_cover\\global\\munic_shapefile.rds")
 
 
 ################################################################################
 #   DADOS DICIONARIO PARA O      files$param_file
 ################################################################################
 
-datafinal<-readRDS("data/mapbiomas_cobertura.rds")
+datafinal <- arrow::read_parquet("./app_map_mapbiomas_cover/mapbiomas_cobertura.parquet") %>% collect()
 
 #####################
 # Function to generate base dictionary 
@@ -172,12 +173,10 @@ translations_pt <- c(
     "Natural" = "Natural"
 )
 
-datafinal <- readRDS("data/mapbiomas_cobertura.rds")
-
 dic_pt <- build_dictionary(datafinal, "pt") |>
     apply_label_translations(translations_pt)
 
-write_csv(dic_pt, "data/mapbiomas_cobertura_munic_savana_dic.csv")
+write_csv(dic_pt, "./app_map_mapbiomas_cover/dic.csv")
 
 #####################
 # EN
@@ -185,4 +184,4 @@ write_csv(dic_pt, "data/mapbiomas_cobertura_munic_savana_dic.csv")
 
 dic_en <- build_dictionary(datafinal, "en")
 
-write_csv(dic_en, "data/mapbiomas_cobertura_munic_savana_dic_en.csv")
+write_csv(dic_en, "./app_map_mapbiomas_cover/dic.csv")
