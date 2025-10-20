@@ -33,15 +33,6 @@ data <- load_mapbiomas(
         values_from = value
     )
 
-# load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
-
-shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source = "internal") |> 
-    left_join(datazoom.amazonia::municipalities, by = "code_muni") |> 
-    select(municipality_code = code_muni, geom, legal_amazon) |>
-    st_make_valid() |>
-    st_simplify(dTolerance = 400) |>
-    rmapshaper::ms_simplify()
-
 # Add area of each municipality ------------------------------------------
 
 areas_mun <- readr::read_rds(".\\app_map_mapbiomas_cover\\global\\area_municipios.rds")
@@ -53,6 +44,14 @@ data <- data |>
     relocate(municipality_code, municipality, state, year,
              "Forest Formation", "Savanna Formation", "Pasture", "Soybean", "Mining")
 
+# load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
+
+shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source = "internal") |> 
+    left_join(datazoom.amazonia::municipalities, by = "code_muni") |> 
+    select(municipality_code = code_muni, geom, legal_amazon) |>
+    st_make_valid() |>
+    st_simplify(dTolerance = 400) |>
+    rmapshaper::ms_simplify()
 
 ################################################################################
 # EXPORT
@@ -75,7 +74,7 @@ saveRDS(shapefile, ".\\app_map_mapbiomas_cover\\global\\munic_shapefile.rds")
 #   DADOS DICIONARIO PARA O      files$param_file
 ################################################################################
 
-datafinal <- arrow::read_parquet("./app_map_mapbiomas_cover/mapbiomas_cobertura.parquet") %>% collect()
+datafinal <- data
 
 #####################
 # Function to generate base dictionary 
@@ -184,4 +183,4 @@ write_csv(dic_pt, "./app_map_mapbiomas_cover/dic.csv")
 
 dic_en <- build_dictionary(datafinal, "en")
 
-write_csv(dic_en, "./app_map_mapbiomas_cover/dic.csv")
+write_csv(dic_en, "./app_map_mapbiomas_cover_en/dic_en.csv")
