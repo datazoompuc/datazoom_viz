@@ -39,6 +39,14 @@ get_ui <- function(files, param) {
                            width = "100%"
                        )
                    ),
+                   div(class = "fakecheckbox", ),
+                   tags$style(HTML("
+                     .switch-label {
+                     color: white;
+                     }
+                   ")),
+                   div(
+                   #style = "margin-top: 10px;",
                    materialSwitch(
                        inputId = "ylog",
                        label = tags$span(param$label_scale_name, class = "switch-label"),
@@ -52,14 +60,21 @@ get_ui <- function(files, param) {
                        #     value = FALSE,
                        #     width = "100%"
                        # )
-                   ),
+                   )),
+                   div(style = "margin-top:10px;",
+                       materialSwitch(
+                           inputId = "y_option",
+                           label = tags$span(param$label_prop_name, class = "switch-label"),
+                           value = FALSE,
+                           status = "info"
+                       )),
                    # Seleciona eixo
-                   checkboxInput(
-                       inputId = "y_option",
-                       param$label_prop_name,
-                       value = FALSE,
-                       width = "100%"
-                   ),
+                   # checkboxInput(
+                   #     inputId = "y_option",
+                   #     param$label_prop_name,
+                   #     value = FALSE,
+                   #     width = "100%"
+                   # ),
                    
                    # Seleciona filtro de municípios
                    selectizeInput(
