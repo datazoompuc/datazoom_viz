@@ -1,3 +1,6 @@
+# library(shinyWidgets)
+# library(bslib)
+
 #  -------------------------------- Define UI --------------------------------
 
 # Funcão para retornar objeto server
@@ -36,22 +39,39 @@ get_ui <- function(files, param) {
                            width = "100%"
                        )
                    ),
-                   
-                   # Seleciona eixo log
-                   checkboxInput(
-                       inputId = "ylog",
-                       param$label_scale_name,
-                       value = FALSE,
-                       width = "100%"
-                   ),
-                   # Seleciona eixo
-                   checkboxInput(
-                       inputId = "y_option",
-                       param$label_prop_name,
-                       value = FALSE,
-                       width = "100%"
-                   ),
-                   
+              # labels e switches com texto em cima, switch embaixo
+              tags$style(HTML("
+                      .switch-group { margin-top: 10px; }
+                      .switch-title {
+                        display: block;
+                        color: white;
+                        font-weight: 500;
+                        letter-spacing: 0.5px;
+                        margin-bottom: 6px;
+                      }
+                    ")),
+                    
+                    # Escala log
+                    div(class = "switch-group",
+                        tags$span(param$label_scale_name, class = "switch-title"),
+                        materialSwitch(
+                            inputId = "ylog",
+                            label   = NULL,     # << texto fica acima, não ao lado
+                            value   = FALSE,
+                            status  = "info"
+                        )
+                    ),
+                    
+                    # Proporcional ao trimestre inicial (*)
+                    div(class = "switch-group",
+                        tags$span(param$label_prop_name, class = "switch-title"),
+                        materialSwitch(
+                            inputId = "y_option",
+                            label   = NULL,
+                            value   = FALSE,
+                            status  = "info"
+                        )
+                    ),
                    # Seleciona filtro de municípios
                    selectizeInput(
                        "filter1",
