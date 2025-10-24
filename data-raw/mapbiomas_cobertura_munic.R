@@ -8,6 +8,7 @@ library(tidyverse)
 library(tibble)
 library(zoo)
 library(readxl)
+library(dplyr)
 
 
 # load data[ ------------------------------------------------------------------------
@@ -17,17 +18,11 @@ saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
 
 
 # Data for level_4
-data1 <- dat
-data1$territory_id <- NULL
-data1$level_0 <- NULL
-data1$level_1 <- NULL
-data1$level_2 <- NULL
-data1$level_3 <- NULL
-data1$color <- NULL
-data1$class_id <- NULL
-data1$group <- paste(data1$municipality, " - ",data1$state)
-data1$municipality <- NULL
-data1$state <- NULL
+data1 <- dat %>%
+    mutate(group = paste(municipality, "-", state)) %>%
+    select(-municipality, -state, -class_level_0 ,-class_level_1, -class_level_2, -class_level_3, 
+           -biome, -class) %>% 
+    relocate(year, municipality_code, municipality_state, value, group)
 
 colnames(data1) <- c("time", "municipality_code", "aggregation", "area","group")
 
@@ -37,17 +32,11 @@ data1 <- aggregate(area ~ time + municipality_code+ group + aggregation, data1, 
 
 
 # Data for level_3
-data2 <- dat
-data2$territory_id <- NULL
-data2$level_0 <- NULL
-data2$level_1 <- NULL
-data2$level_2 <- NULL
-data2$level_4 <- NULL
-data2$color <- NULL
-data2$class_id <- NULL
-data2$group <- paste(data2$municipality, " - ",data2$state)
-data2$municipality <- NULL
-data2$state <- NULL
+data2 <- dat %>%
+    mutate(group = paste(municipality, "-", state)) %>%
+    select(-municipality, -state, -class_level_0 ,-class_level_1, -class_level_2, -class_level_4, 
+           -biome, -class) %>% 
+    relocate(year, municipality_code, municipality_state, value, group)
 
 colnames(data2) <- c("time","municipality_code", "aggregation", "area","group")
 
@@ -56,66 +45,44 @@ data2$area <- as.numeric(data2$area)
 data2 <- aggregate(area ~ time +  municipality_code+ group + aggregation, data2, sum)
 
 # Data for level_2
-data3 <- dat
-data3$territory_id <- NULL
-data3$level_0 <- NULL
-data3$level_1 <- NULL
-data3$level_3 <- NULL
-data3$level_4 <- NULL
-data3$color <- NULL
-data3$class_id <- NULL
-data3$group <- paste(data3$municipality, " - ",data3$state)
-data3$municipality <- NULL
-data3$state <- NULL
+data3 <- dat %>%
+    mutate(group = paste(municipality, "-", state)) %>%
+    select(-municipality, -state, -class_level_0 ,-class_level_1, -class_level_3, -class_level_4, 
+           -biome, -class) %>% 
+    relocate(year, municipality_code, municipality_state, value, group)
+
 
 colnames(data3) <- c("time","municipality_code", "aggregation", "area","group")
 
 #tentando resolver problema do aggregate
 data3$area <- as.numeric(data3$area)
-
 data3 <- aggregate(area ~ time +  municipality_code + group + aggregation, data3, sum)
 
 
 # Data for level_1
-data4 <- dat
-data4$territory_id <- NULL
-data4$level_0 <- NULL
-data4$level_2 <- NULL
-data4$level_3 <- NULL
-data4$level_4 <- NULL
-data4$color <- NULL
-data4$class_id <- NULL
-data4$group <- paste(data4$municipality, " - ",data4$state)
-data4$municipality <- NULL
-data4$state <- NULL
+data4 <- dat %>%
+    mutate(group = paste(municipality, "-", state)) %>%
+    select(-municipality, -state, -class_level_0 ,-class_level_1, -class_level_3, -class_level_4, 
+           -biome, -class) %>% 
+    relocate(year, municipality_code, municipality_state, value, group)
 
 colnames(data4) <- c("time","municipality_code", "aggregation", "area","group")
 
 #tentando resolver problema do aggregate
 data4$area <- as.numeric(data4$area)
-
 data4 <- aggregate(area ~ time +  municipality_code + group + aggregation, data4, sum)
 
-
-
 # Data for level_0
-data5 <- dat
-data5$territory_id <- NULL
-data5$level_1 <- NULL
-data5$level_2 <- NULL
-data5$level_3 <- NULL
-data5$level_4 <- NULL
-data5$color <- NULL
-data5$class_id <- NULL
-data5$group <- paste(data5$municipality, " - ",data5$state)
-data5$municipality <- NULL
-data5$state <- NULL
+data5 <- dat %>%
+    mutate(group = paste(municipality, "-", state)) %>%
+    select(-municipality, -state, -class_level_1 ,-class_level_2, -class_level_3, -class_level_4, 
+           -biome, -class) %>% 
+    relocate(year, municipality_code, municipality_state, value, group)
 
 colnames(data5) <- c("time", "municipality_code","aggregation", "area","group")
 
 #tentando resolver problema do aggregate
 data5$area <- as.numeric(data5$area)
-
 data5 <- aggregate(area ~ time  +  municipality_code+ group + aggregation, data5, sum)
 
 
@@ -125,8 +92,12 @@ data <- rbind(data1, data2, data3, data4, data5)
 # num de linhas= anos*agregação, ou seja, moda a area de cada agregação para cada ano
 # acho que os warnings ocorrem pq deve aparecer a mesma agregação em mais de uma dataX
 
-datafinal <- pivot_wider(unique(data), names_from = aggregation, values_from = area,
-                         values_fill = 0)
+datafinal <- pivot_wider(
+    unique(data),
+    names_from = aggregation,
+    values_from = area,
+    values_fill = 0
+)
 
 
 labl <- colnames(datafinal)
