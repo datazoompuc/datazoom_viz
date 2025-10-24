@@ -1,11 +1,8 @@
-############################################################
-#### Generate rds data in the folder ./data/ 
-############################################################
+#   SETUP
+################################################################################
 
-#devtools::install_github("https://github.com/datazoompuc/datazoom.amazonia")
+devtools::install_github("datazoompuc/datazoom.amazonia")
 
-
-# packages --------------------------------------------------------------------------
 library(datazoom.amazonia)
 library(tidyverse)
 library(tibble)
@@ -14,11 +11,8 @@ library(readxl)
 
 
 # load data[ ------------------------------------------------------------------------
-dat <- load_mapbiomas(dataset = "mapbiomas_cover", geo_level = "municipality", 
-                      cover_level = "none")
+dat <- load_mapbiomas(dataset = "mapbiomas_cover", geo_level = "municipality")
 
-
-#salva
 saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
 
 
