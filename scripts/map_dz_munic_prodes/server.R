@@ -93,7 +93,7 @@ get_server <- function(files, param) {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == x_col$label), ]
+        x_col <- param$table[which(param$table$var == input$x), ]
         text <- param$label_title
       }
 
