@@ -21,6 +21,16 @@ get_server <- function(files, param) {
 
       return(w)
     })
+    
+    x_var <- reactive({
+        if (isTRUE(input$x_prop)) {
+            nm <- paste0("prop_", input$x)
+            # se por algum motivo a coluna não existir, cai para a base
+            if (nm %in% names(df)) nm else input$x
+        } else {
+            input$x
+        }
+    })
 
     # Cria opções para seleção de datas
     param$filter_choices <- sort(unique(year(df$ano)))
@@ -83,7 +93,7 @@ get_server <- function(files, param) {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
+        x_col <- param$table[which(param$table$var == x_col$label), ]
         text <- param$label_title
       }
 
@@ -95,7 +105,7 @@ get_server <- function(files, param) {
         text <- param$variavel_none
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
+        x_col <- param$table[which(param$table$var == x_var()), ]
         text <- paste0(param$label_var_name, x_col$label)
       }
 
@@ -114,12 +124,12 @@ get_server <- function(files, param) {
 
       # Define paleta de cores
       pal1 <- pallete_continuous
-      if (!is.numeric(df_reactived()[[input$x]])) {
+      if (!is.numeric(df_reactived()[[x_var()]])) {
         pal1 <- pallete_discrete
       }
 
       # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
+      pal <- colorBin(palette = pal1, 9, domain = df[[x_var()]])
 
       tryCatch(
         {
@@ -127,12 +137,12 @@ get_server <- function(files, param) {
           # Monta mapa
 
           # Monta html do tooltip
-          x_col <- param$table[which(param$table$var == input$x), ]
+          x_col <- param$table[which(param$table$var == x_var()), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
             param$label_munic, df_reactived()$nm_municip, "</b> <br>",
             param$label_state, df_reactived()$estado, "</b> <br>",
-            x_col$label, ": <b>", df_reactived()[[input$x]], "</b> <br>",
+            x_col$label, ": <b>", df_reactived()[[x_var()]], "</b> <br>",
             param$label_measurement_unit, x_col$unidade, "</b>"
           ) %>%
             lapply(htmltools::HTML)
@@ -146,7 +156,7 @@ get_server <- function(files, param) {
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = 0.7,
-              fillColor = ~ pal(df_reactived()[[input$x]]),
+              fillColor = ~ pal(df_reactived()[[x_var()]]),
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -157,7 +167,7 @@ get_server <- function(files, param) {
             ) %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df_reactived()[[input$x]],
+              values = ~ df_reactived()[[x_var()]],
               title = title_legend,
               opacity = 0.7
             )

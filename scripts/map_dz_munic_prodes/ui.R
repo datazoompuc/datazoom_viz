@@ -47,6 +47,16 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
+        # Proporcional ao trimestre inicial (*)
+        div(class = "switch-group",
+            tags$span(param$label_prop_name, class = "switch-title"),
+            materialSwitch(
+                inputId = "x_prop",
+                label   = NULL,
+                value   = FALSE,
+                status  = "info"
+            )
+        ),
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
