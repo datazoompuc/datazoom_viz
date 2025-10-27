@@ -99,15 +99,12 @@ datafinal <- pivot_wider(
     values_fill = 0
 )
 
-
 labl <- colnames(datafinal)
 labl <- labl[-c(1,2,3)]
 labl <- substr(labl, 6, 100)
 sublabl <- labl[23:27]
 sublabl <- substr(sublabl, 5, 100)
 labl[23:27] <- sublabl
-
-
 
 #para evitar que a ordem esteja descasada, renomeei as colunas uma por uma:
 # removi a categoria "Nao aplicado" pois os resultados eram análogos ao "Não observado"
