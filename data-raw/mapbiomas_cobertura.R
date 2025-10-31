@@ -211,4 +211,4 @@ write.csv(dic_pt, "./app_map_mapbiomas_cover/dic.csv", fileEncoding = "UTF-8")
 
 dic_en <- build_dictionary(datafinal, "en")
 
-write_csv(dic_en, "./app_map_mapbiomas_cover_en/dic_en.csv")
+write.csv(dic_en, "./app_map_mapbiomas_cover_en/dic_en.csv", fileEncoding = "UTF-8")
