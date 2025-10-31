@@ -69,6 +69,12 @@ data |>
 # Saves shapefile in .rds (parquet does not support geometry)
 saveRDS(shapefile, ".\\app_map_mapbiomas_cover\\global\\munic_shapefile.rds")
 
+# Add legal_amazon and geom of shapefile in data  ------------------------------------------
+
+data <- data %>%
+    left_join(
+        shapefile,by = "municipality_code"
+    )
 
 ################################################################################
 #   DADOS DICIONARIO PARA O      files$param_file
@@ -82,31 +88,40 @@ datafinal <- data
 
 build_dictionary <- function(data, language = c("pt", "en")) {
     language <- match.arg(language)
-    labels <- colnames(data)
+    
+    ordem_final <- c(
+        "legal_amazon", "biome", "municipality", "state", "year",
+        "Forest Formation", "Savanna Formation", "Floodable Forest", "Wetland", "Grassland",
+        "Rocky Outcrop", "Pasture", "Soybean", "Other Temporary Crops", "Urban Area",
+        "River, Lake and Ocean", "Not Observed", "Mining", "Forest Plantation", "Mosaic of Uses",
+        "Other non Vegetated Areas", "Sugar cane", "Palm Oil", "Hypersaline Tidal Flat", "Mangrove",
+        "Beach, Dune and Sand Spot", "Rice", "Cotton", "Other Perennial Crops", "Aquaculture",
+        "Herbaceous Sandbank Vegetation", "Wooded Sandbank Vegetation", "Coffee", "Citrus", "geom"
+    )
+    
+    ordem_final <- intersect(ordem_final, colnames(data))
     
     base_dict <- tibble(
-        var         = labels,
+        var         = ordem_final,
         x           = TRUE,
         y           = TRUE,
         color       = FALSE,
         size        = FALSE,
         slider      = FALSE,
-        label       = labels,
-        desc        = labels,
+        label       = ordem_final,
+        desc        = ordem_final,
         var_group   = "Mapbiomas",
         tipo        = 1,
         unidade     = "ha",
         categoria   = ifelse(language == "pt", "Meio ambiente", "Environment"),
         subcategoria = ifelse(language == "pt", "Uso da terra", "Use of land")
     ) |>
-        drop_na() |>
-        filter(var != "municipality_code") |> 
         mutate(
-            x = replace(x, 1:5, FALSE),
-            y = replace(y, 1:5, FALSE),
-            slider = replace(slider, 5, TRUE),
-            label = replace(label, 3, ifelse(language == "pt", "Município", "Municipality")),
-            label = replace(label, 5, ifelse(language == "pt", "Ano", "Year")),
+            x = ifelse(var %in% c("legal_amazon", "biome", "municipality", "state", "year", "geom"), FALSE, x),
+            y = ifelse(var %in% c("legal_amazon", "biome", "municipality", "state", "year", "geom"), FALSE, y),
+            slider = ifelse(var == "year", TRUE, slider),
+            label = ifelse(var == "municipality" & language == "pt", "Município", label),
+            label = ifelse(var == "year" & language == "pt", "Ano", label),
             desc  = label
         )
     
@@ -136,7 +151,7 @@ translations_pt <- c(
     "Cotton" = "Algodão",
     "Forest Formation" = "Formação de Floresta",
     "Forest Plantation" = "Plantação de Floresta",
-    "Floodable Forest" = "Floresta Inundável",
+    "Floodable Forest" = "Floresta Alagada",
     "Grassland" = "Pradaria",
     "Hypersaline Tidal Flat" = "Planícies Hipersalinas Costeiras",
     "Herbaceous Sandbank Vegetation" = "Restinga Herbácea",
@@ -172,10 +187,23 @@ translations_pt <- c(
     "Natural" = "Natural"
 )
 
+apply_label_translations <- function(dict, translations) {
+    dict |>
+        mutate(
+            label = ifelse(
+                var %in% names(translations),
+                translations[var],
+                label
+            ),
+            desc = label
+        )
+}
+
+
 dic_pt <- build_dictionary(datafinal, "pt") |>
     apply_label_translations(translations_pt)
 
-write_csv(dic_pt, "./app_map_mapbiomas_cover/dic.csv")
+write.csv(dic_pt, "./app_map_mapbiomas_cover/dic.csv", fileEncoding = "UTF-8")
 
 #####################
 # EN
