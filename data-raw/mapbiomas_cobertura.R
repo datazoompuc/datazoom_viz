@@ -84,31 +84,48 @@ build_dictionary <- function(data, language = c("pt", "en")) {
     language <- match.arg(language)
     labels <- colnames(data)
     
+    # Vetor de variáveis que devem TER os valores FALSE para 'x' e 'y'
+    # e TRUE para 'slider' (se for 'year')
+    vars_condicionais <- c("biome", "municipality", "state", "year", "area_km2")
+    
     base_dict <- tibble(
-        var         = labels,
-        x           = TRUE,
-        y           = TRUE,
-        color       = FALSE,
-        size        = FALSE,
-        slider      = FALSE,
-        label       = labels,
-        desc        = labels,
-        var_group   = "Mapbiomas",
-        tipo        = 1,
-        unidade     = "ha",
-        categoria   = ifelse(language == "pt", "Meio ambiente", "Environment"),
+        var          = labels,
+        x            = TRUE,
+        y            = TRUE,
+        color        = FALSE,
+        size         = FALSE,
+        slider       = FALSE,
+        label        = labels,
+        desc         = labels,
+        var_group    = "Mapbiomas",
+        tipo         = 1,
+        unidade      = "ha",
+        categoria    = ifelse(language == "pt", "Meio ambiente", "Environment"),
         subcategoria = ifelse(language == "pt", "Uso da terra", "Use of land")
     ) |>
         drop_na() |>
         filter(var != "municipality_code") |> 
         mutate(
-            x = replace(x, 1:5, FALSE),
-            y = replace(y, 1:5, FALSE),
-            slider = replace(slider, 5, TRUE),
-            label = replace(label, 3, ifelse(language == "pt", "Município", "Municipality")),
-            label = replace(label, 5, ifelse(language == "pt", "Ano", "Year")),
-            desc  = label
-        )
+            # Verifica se 'var' está em 'vars_condicionais'
+            is_conditional = var %in% vars_condicionais,
+            
+            # Aplica FALSE para 'x' e 'y' se 'var' for uma das vars condicionais
+            x = if_else(is_conditional, FALSE, x),
+            y = if_else(is_conditional, FALSE, y),
+            
+            # Aplica TRUE para 'slider' SOMENTE se 'var' for "year"
+            slider = if_else(var == "year", TRUE, slider),
+            
+            # Modifica 'label' e 'desc' para as variáveis específicas
+            label = case_when(
+                var == "municipality" ~ if_else(language == "pt", "Município", "Municipality"),
+                var == "year"         ~ if_else(language == "pt", "Ano", "Year"),
+                TRUE                  ~ label # Mantém o valor original para todas as outras
+            ),
+            desc  = label # 'desc' segue 'label' após as alterações
+        ) |>
+        # Remove a coluna auxiliar 'is_conditional'
+        select(-is_conditional)
     
     return(base_dict)
 }
