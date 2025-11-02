@@ -2,29 +2,7 @@
 #   SETUP
 ################################################################################
 
-# Directory
-setwd("C:\\Users\\laura\\OneDrive\\Laura\\economia\\pibic\\datazoom_viz")
-# Memory
-#Sys.setenv(R_MEM_SIZE = "8G")
-
-
-Sys.setlocale("LC_ALL","English")
 devtools::install_github("datazoompuc/datazoom.amazonia")
-
-
-# Installing and loading packages (if not exist)
-packages_to_install <- c("magrittr","devtools","readxl","tidyverse","stringr","googledrive","sf","sp","rmapshaper")
-# Function to install and load a package if not already installed
-install_and_load_package <- function(package_name) {
-  if (!require(package_name, character.only = TRUE)) {
-    install.packages(package_name)
-    library(package_name, character.only = TRUE)
-  }
-}
-# Loop through the list of packages and install/load them
-for (package in packages_to_install) {
-  install_and_load_package(package)
-}
 
 library(datazoom.amazonia)
 library(readxl)
@@ -33,6 +11,7 @@ library(stringr)
 library(sf)
 library(sp)
 library(rmapshaper)
+library(arrow)
 
 
 ################################################################################
@@ -42,349 +21,183 @@ library(rmapshaper)
 # load data from MAPBIOMAS ---------------------------------------------------------------
 
 # download treated Mapbiomas Cover data in English
-data <- load_mapbiomas(dataset = "mapbiomas_cover",
-                       raw_data = FALSE,
-                       geo_level = "municipality",
-                       language = "eng")
-
-
-# Only level 4 interests us 
-data <- data %>%
-  pivot_wider(id_cols=c("biome","municipality","state","municipality_code","year"), names_from=class_level_4, values_from = value)
-
-
-# load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
-municipalities <- datazoom.amazonia::municipalities
-shapefile_mun <- datazoom.amazonia:::external_download("geo_municipalities",source="internal")
-
-municipalities_with_geom <- inner_join(shapefile_mun,municipalities,by="code_muni")
-
-municipalities_with_geom <- municipalities_with_geom[,c("code_muni","geom","legal_amazon")]
-
-municipalities_with_geom <- municipalities_with_geom %>%
-  rename(municipality_code=code_muni)
-
-
-#st_geometry(municipalities_with_geom) <- municipalities_with_geom$geom
-
-#shapefile <- municipalities_with_geom[!st_is_empty(municipalities_with_geom), , drop=FALSE]
-
-
-shapefile <- municipalities_with_geom %>% 
-    sf::st_make_valid() %>%
-    sf::st_simplify(dTolerance = 400) 
-
-shapefile <- shapefile %>%
-    rmapshaper::ms_simplify()
-  
-
-#colnames(shapefile)
-
-# Merging data + shapefiles ---------------------------------------------------------------
-# merge data with shape --------------------------------------------------------
-
-# .parquet does not support shapefiles - let's keep them separate
-#data <- right_join(shapefile,data, by="municipality_code") 
-
-
-# Declare wich colum has the geographical info --------------------------------------------
-
-#st_geometry(data) <- data$geom
-
-
-# saving in the data folder ---------------------------------------------------------------
-# export ------------------------------------------------------------------
-# save simplified sf for faster maps
-#cols <- colnames(data)
-#data <- rmapshaper::ms_simplify(data, 
-                                # keep_shapes = TRUE, 
-                                # keep = 0.01)
-
-#colnames(data) <- cols
-
-
-areas_mun <- readr::read_rds("global/area_municipios.rds")
-
-# adding area of each municipality
-data <- data %>%
-    tidyr::drop_na(municipality_code) %>%
-    left_join(areas_mun, by = "municipality_code")
-
-# making it lighter
-
-# data <- data %>%
-#     select(
-#         - c(
-#         "Non Observed", starts_with("Other")
-#         )
-#     )
-# 
-# data <- data %>%
-#     filter(
-#         year %in% c(
-#             "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020", "2022"
-#         )
-#     )
-
-# mapbiomas_cover is not properly treates. Colnames appear as 1.1. Forest Formation instead of simply Forest Formation
-## code to remove the leading numbers and dots
-### this should no longer be necessary ater data treatment is fixed
-names(data) <- sub("^\\d+(\\.\\d+)*\\.?\\s*", "", names(data))
-
-data <- data %>%
-    relocate(
-        municipality_code, municipality, state, year, "Forest Formation",
-        "Savanna Formation", "Pasture", "Soybean", "Mining"
+data <- load_mapbiomas(
+    dataset = "mapbiomas_cover",
+    raw_data = FALSE,
+    geo_level = "municipality",
+    language = "eng"
+) |>
+    pivot_wider(
+        id_cols    = c("biome", "municipality", "state", "municipality_code", "year"),
+        names_from = class_level_4,
+        values_from = value
     )
 
-# data <- data %>%
-#     mutate(across(where(is.numeric), as.integer))
+# Add area of each municipality ------------------------------------------
 
-# we no longer need to drop data to make it lighter
-# using .parquet allows us to keep everything
+areas_mun <- readr::read_rds(".\\app_map_mapbiomas_cover\\global\\area_municipios.rds")
 
-#data <- data %>%
-#    filter(
-#        as.numeric(year) %% 12 == 6
-#    )
+data <- data |>
+    drop_na(municipality_code) |>
+    left_join(areas_mun, by = "municipality_code") |>
+    rename_with(~sub("^\\\\d+(\\\\.\\\\d+)*\\\\.?\\\\s*", "", .x)) |>
+    relocate(municipality_code, municipality, state, year,
+             "Forest Formation", "Savanna Formation", "Pasture", "Soybean", "Mining")
 
-# group data by year
-## .parquet understands each one as a dif folder - loading is much faster
+# load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
+
+shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source = "internal") |> 
+    left_join(datazoom.amazonia::municipalities, by = "code_muni") |> 
+    select(municipality_code = code_muni, geom, legal_amazon) |>
+    st_make_valid() |>
+    st_simplify(dTolerance = 400) |>
+    rmapshaper::ms_simplify()
+
+################################################################################
+# EXPORT
+################################################################################
+
+
+# Export data in parquet format (faster per year)
 data |>
     dplyr::group_by(year) |>
     # Write data as .parquet
-    arrow::write_dataset(path = "app_map_mapbiomas_cover/mapbiomas_cobertura.parquet", format = "parquet")
+    arrow::write_dataset(
+        path = "app_map_mapbiomas_cover/mapbiomas_cobertura.parquet", 
+        format = "parquet")
 
-# Write spacial data as .rds 
-## .parquet does not support spacial data
-saveRDS(shapefile, "global/munic_shapefile.rds")
+# Saves shapefile in .rds (parquet does not support geometry)
+saveRDS(shapefile, ".\\app_map_mapbiomas_cover\\global\\munic_shapefile.rds")
 
 
 ################################################################################
 #   DADOS DICIONARIO PARA O      files$param_file
 ################################################################################
 
-datafinal<-readRDS("data/mapbiomas_cobertura.rds")
+datafinal <- data
 
 #####################
-# Build Dictionary 
+# Function to generate base dictionary 
 #####################
 
-# extract variables from data
-columns <- colnames(data)
+build_dictionary <- function(data, language = c("pt", "en")) {
+    language <- match.arg(language)
+    labels <- colnames(data)
+    
+    # Vetor de variáveis que devem TER os valores FALSE para 'x' e 'y'
+    # e TRUE para 'slider' (se for 'year')
+    vars_condicionais <- c("biome", "municipality", "state", "year", "area_km2")
+    
+    base_dict <- tibble(
+        var          = labels,
+        x            = TRUE,
+        y            = TRUE,
+        color        = FALSE,
+        size         = FALSE,
+        slider       = FALSE,
+        label        = labels,
+        desc         = labels,
+        var_group    = "Mapbiomas",
+        tipo         = 1,
+        unidade      = "ha",
+        categoria    = ifelse(language == "pt", "Meio ambiente", "Environment"),
+        subcategoria = ifelse(language == "pt", "Uso da terra", "Use of land")
+    ) |>
+        drop_na() |>
+        filter(var != "municipality_code") |> 
+        mutate(
+            # Verifica se 'var' está em 'vars_condicionais'
+            is_conditional = var %in% vars_condicionais,
+            
+            # Aplica FALSE para 'x' e 'y' se 'var' for uma das vars condicionais
+            x = if_else(is_conditional, FALSE, x),
+            y = if_else(is_conditional, FALSE, y),
+            
+            # Aplica TRUE para 'slider' SOMENTE se 'var' for "year"
+            slider = if_else(var == "year", TRUE, slider),
+            
+            # Modifica 'label' e 'desc' para as variáveis específicas
+            label = case_when(
+                var == "municipality" ~ if_else(language == "pt", "Município", "Municipality"),
+                var == "year"         ~ if_else(language == "pt", "Ano", "Year"),
+                TRUE                  ~ label # Mantém o valor original para todas as outras
+            ),
+            desc  = label # 'desc' segue 'label' após as alterações
+        ) |>
+        # Remove a coluna auxiliar 'is_conditional'
+        select(-is_conditional)
+    
+    return(base_dict)
+}
 
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Mapbiomas",
-  tipo = 1,
-  unidade = "ha",
-  categoria= "Meio ambiente", 
-  subcategoria = "Uso da terra"
+#####################
+# Function to apply PT-EN translations
+#####################
+
+apply_label_translations <- function(dict, translations) {
+    dict |>
+        mutate(label = ifelse(var %in% names(translations),
+                              translations[var],
+                              label))
+}
+
+#####################
+# PT
+#####################
+
+translations_pt <- c(
+    "Aquaculture" = "Aquicultura",
+    "Beach, Dune and Sand Spot" = "Praias, Dunas e Pontos de Areia",
+    "Citrus" = "Cítricos",
+    "Coffee" = "Café",
+    "Cotton" = "Algodão",
+    "Forest Formation" = "Formação de Floresta",
+    "Forest Plantation" = "Plantação de Floresta",
+    "Floodable Forest" = "Floresta Inundável",
+    "Grassland" = "Pradaria",
+    "Hypersaline Tidal Flat" = "Planícies Hipersalinas Costeiras",
+    "Herbaceous Sandbank Vegetation" = "Restinga Herbácea",
+    "Mining" = "Mineração",
+    "Mosaic of Uses" = "Mosaico de Uso da Terra",
+    "Sugar cane" = "Cana-de-açúcar",
+    "Magrove" = "Mangue",
+    "Salt flat" = "Salar",
+    "Not Observed" = "Não observado",
+    "Other Non Forest Natural Formation" = "Outras formações naturais não florestais",
+    "Other non Vegetated Areas" = "Outras áreas não vegetadas",
+    "Other Perennial Crops" = "Outras Culturas Perenes",
+    "Other Temporary Crops" = "Outras Culturas Temporárias",
+    "Rice" = "Arroz",
+    "River, Lake and Ocean" = "Rios, Lagos ou Oceanos",
+    "Rocky Outcrop" = "Afloramento rochoso",
+    "Savanna Formation" = "Formação de Savana",
+    "Soybean" = "Soja",
+    "Pasture" = "Pastagem",
+    "Urban Area" = "Área Urbana",
+    "Wetland" = "Pântano",
+    "Wooded Sandbank Vegetation" = "Restinga Arborizada",
+    "Palm Oil" = "Óleo de Palma",
+    "Perennial Crops" = "Culturas Perenes",
+    "Temporary Crops" = "Culturas Temporárias",
+    "Agriculture" = "Agricultura",
+    "Forest" = "Floresta",
+    "Non Forest Natural Formation" = "Formação Natural Não Florestal",
+    "Farming" = "Fazenda",
+    "Non Vegetated Area" = "Áreas não vegetadas",
+    "Water" = "Água",
+    "Anthropic" = "Antrópico",
+    "Natural" = "Natural"
 )
 
-# tentando resolver a questão de terem várias linhas NA 
-temp_param_table <-temp_param_table %>%
-  drop_na()
+dic_pt <- build_dictionary(datafinal, "pt") |>
+    apply_label_translations(translations_pt)
 
-# remover o codigo do municipio, pois nao será utilizado aqui
-temp_param_table <- temp_param_table %>%
-  filter(var != "municipality_code")
+write_csv(dic_pt, "./app_map_mapbiomas_cover/dic.csv")
 
+#####################
+# EN
+#####################
 
-temp_param_table$label[5] <- "Ano"
-temp_param_table$label[3] <- "Município"
-temp_param_table$desc[5] <- "Ano"
-temp_param_table$desc[3] <- "Município"
-temp_param_table$x[1:5] <- FALSE
-temp_param_table$x[36] <- FALSE
-temp_param_table$y[1:5] <- FALSE
-temp_param_table$y[36] <- FALSE
+dic_en <- build_dictionary(datafinal, "en")
 
-#temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 37))
-#temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 37))
-temp_param_table$slider[5] <- TRUE
-
-
-temp_param_table$label[temp_param_table$var== "Aquaculture"] = "Aquicultura"
-temp_param_table$label[temp_param_table$var== "Beach, Dune and Sand Spot"] = "Praias, Dunas e Pontos de Areia"
-temp_param_table$label[temp_param_table$var== "Citrus"] = "Cítricos"
-temp_param_table$label[temp_param_table$var== "Coffee"] = "Café"
-temp_param_table$label[temp_param_table$var== "Cotton"] = "Algodão"
-temp_param_table$label[temp_param_table$var== "Forest Formation"] = "Formação de Floresta"
-temp_param_table$label[temp_param_table$var== "Forest Plantation"] = " Plantação de Floresta"
-temp_param_table$label[temp_param_table$var== "Floodable Forest"] = " Floresta Inundável"
-temp_param_table$label[temp_param_table$var== "Grassland"] = "Pradaria"
-temp_param_table$label[temp_param_table$var== "Hypersaline Tidal Flat"] = "Planícies Hipersalinas Costeiras"
-temp_param_table$label[temp_param_table$var== "Herbaceous Sandbank Vegetation"] = "Restinga Herbácea"
-temp_param_table$label[temp_param_table$var== "Mining"] = "Mineiração"
-temp_param_table$label[temp_param_table$var== "Mosaic of Uses"] = "Mosaico de Uso da Terra"
-temp_param_table$label[temp_param_table$var== "Sugar cane"] = "Cana-de-açúcar"
-temp_param_table$label[temp_param_table$var== "Magrove"] = "Mangue"
-temp_param_table$label[temp_param_table$var== "Salt flat"] = "Salar"
-temp_param_table$label[temp_param_table$var== "Not Observed"] = "Não observado"
-temp_param_table$label[temp_param_table$var== "Other Non Forest Natural Formation"] = "Outras formações naturais não florestais"
-temp_param_table$label[temp_param_table$var== "Other non Vegetated Areas"] = "Outras áreas não vegetadas"
-temp_param_table$label[temp_param_table$var== "Other Perennial Crops"] = "Outras Culturas Perenes"
-temp_param_table$label[temp_param_table$var== "Other Temporary Crops"] = "Outras Culturas Temporárias"
-temp_param_table$label[temp_param_table$var== "Rice"] = "Arroz"
-temp_param_table$label[temp_param_table$var== "River, Lake and Ocean"] = "Rios, Lagos ou Oceanos"
-temp_param_table$label[temp_param_table$var== "Rocky Outcrop"] = "Afloramento rochoso"
-temp_param_table$label[temp_param_table$var== "Savanna Formation"] = "Formação de Savana"
-temp_param_table$label[temp_param_table$var== "Soybean"] = "Soja"
-temp_param_table$label[temp_param_table$var== "Pasture"] = "Pastagem"
-temp_param_table$label[temp_param_table$var== "Urban Area"] = "Área Urbana"
-temp_param_table$label[temp_param_table$var== "Forest Formation"] = "Formação de Floresta"
-temp_param_table$label[temp_param_table$var== "Wetland"] = "Pântano"
-temp_param_table$label[temp_param_table$var== "Wooded Sandbank Vegetation"] = "Restinga Arborizada"
-temp_param_table$label[temp_param_table$var== "Palm Oil"] = "Óleo de Palma"
-temp_param_table$label[temp_param_table$var== "Perennial Crops"] = "Culturas Perenes"
-temp_param_table$label[temp_param_table$var== "Temporary Crops"] = "Culturas Temporárias"
-temp_param_table$label[temp_param_table$var== "Agriculture"] = "Agricultura"
-temp_param_table$label[temp_param_table$var== "Forest"] = "Floresta"
-temp_param_table$label[temp_param_table$var== " Non Forest Natural Formation"] = "Formação Natural Não Florestal"
-temp_param_table$label[temp_param_table$var== " Farming"] = "Fazenda"
-temp_param_table$label[temp_param_table$var== "Non Vegetated Area"] = "Áreas não vegetadas"
-temp_param_table$label[temp_param_table$var== "Water"] = "Água"
-temp_param_table$label[temp_param_table$var== "Anthropic"] = "Antrópico"
-temp_param_table$label[temp_param_table$var== "Natural"] = "Natural"
-
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_savana_dic.csv", fileEncoding = "UTF-8")
-
-
-##############################
-# Build Dictionary in English
-##############################
-
-#exclui a variável que não será utilizada na construção do dicionário
-datafinal<-datafinal %>%
-  select(-municipality_code)
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Mapbiomas",
-  tipo = 1,
-  unidade = "ha",
-  categoria= "Environment", 
-  subcategoria = "Use of land"
-)
-
-
-temp_param_table$label[5] <- "Year"
-temp_param_table$label[3] <- "Municipality"
-temp_param_table$desc[5] <- "Year"
-temp_param_table$desc[3] <- "Municipality"
-temp_param_table$x[1:5] <- FALSE
-temp_param_table$x[36] <- FALSE
-temp_param_table$y[1:5] <- FALSE
-temp_param_table$y[36] <- FALSE
-
-#temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, 37))
-#temp_param_table$size <- c(FALSE, TRUE, rep(FALSE, 37))
-temp_param_table$slider[5] <- TRUE
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/mapbiomas_cobertura_munic_savana_dic_en.csv", fileEncoding = "UTF-8")
-
-#### Gambiarra to Build Dictionary in English
-dictionary <- read_csv("app_map_mapbiomas_cover/dic.csv")
-
-dictionary_en <- dictionary %>%
-    mutate(label = desc) %>%
-    mutate(
-        label = case_when(
-            label == "Non Observed"                       ~ "Not Observed",
-            label == "Floresta Alagada"                   ~ "Flooded Forest",
-            label == "Ano"                                ~ "Year",
-            label == "state"                              ~ "State",
-            label == "Soybean"                            ~ "Soy Beans",
-            label == "Urban Infrastructure"               ~ "Urban Area",
-            label == "Other Non Vegetated Area"           ~ "Other non Vegetated Areas",
-            label == "Rocky outcrop"                      ~ "Rocky Outcrop",
-            label == "Sugar Cane"                         ~ "Sugar cane",
-            label == "Magrove"                            ~ "Mangrove",
-            label == "Beach and Dune"                     ~ "Beach, Dune and Sand Spot",
-            label == "Salt flat"                          ~ "Hypersaline Tidal Flat",
-            label == "Mosaico de Agricultura e Pastagem"  ~ "Mosaic of Agriculture and Pasture",
-            label == "Coffe"                              ~ "Coffee",
-            label == "Restinga Herbacea/Arbustiva"        ~ "Herbaceous Sandbank Vegetation",
-            label == "Wooded Restinga"                    ~ "Wooded Sandbank Vegetation",
-            label == "Óleo de Palma"                      ~ "Palm Oil",
-            TRUE ~ label
-        )
-    ) %>%
-    #select(-1,-2,-3) %>%
-    filter(desc != "Other Non Forest Natural Formation")
-
-write.csv(dictionary_en, file = "app_map_mapbiomas_cover/dic_en.csv", fileEncoding = "UTF-8")
-
-temp_param_table <- dictionary_en
-
-temp_param_table$label[temp_param_table$var== "Aquaculture"] = "Aquicultura"
-temp_param_table$label[temp_param_table$var== "Beach, Dune and Sand Spot"] = "Praias, Dunas e Pontos de Areia"
-temp_param_table$label[temp_param_table$var== "Citrus"] = "Cítricos"
-temp_param_table$label[temp_param_table$var== "Coffee"] = "Café"
-temp_param_table$label[temp_param_table$var== "Cotton"] = "Algodão"
-temp_param_table$label[temp_param_table$var== "Forest Formation"] = "Formação de Floresta"
-temp_param_table$label[temp_param_table$var== "Forest Plantation"] = "Plantação de Floresta"
-temp_param_table$label[temp_param_table$var== "Floodable Forest"] = "Floresta Inundável"
-temp_param_table$label[temp_param_table$var== "Grassland"] = "Pradaria"
-temp_param_table$label[temp_param_table$var== "Hypersaline Tidal Flat"] = "Planícies Hipersalinas Costeiras"
-temp_param_table$label[temp_param_table$var== "Herbaceous Sandbank Vegetation"] = "Restinga Herbácea"
-temp_param_table$label[temp_param_table$var== "Mining"] = "Mineração"
-temp_param_table$label[temp_param_table$var== "Mosaic of Uses"] = "Mosaico de Uso da Terra"
-temp_param_table$label[temp_param_table$var== "Sugar cane"] = "Cana-de-açúcar"
-temp_param_table$label[temp_param_table$var== "Magrove"] = "Mangue"
-temp_param_table$label[temp_param_table$var== "Salt flat"] = "Salar"
-temp_param_table$label[temp_param_table$var== "Not Observed"] = "Não observado"
-temp_param_table$label[temp_param_table$var== "Other Non Forest Natural Formation"] = "Outras formações naturais não florestais"
-temp_param_table$label[temp_param_table$var== "Other non Vegetated Areas"] = "Outras áreas não vegetadas"
-temp_param_table$label[temp_param_table$var== "Other Perennial Crops"] = "Outras Culturas Perenes"
-temp_param_table$label[temp_param_table$var== "Other Temporary Crops"] = "Outras Culturas Temporárias"
-temp_param_table$label[temp_param_table$var== "Rice"] = "Arroz"
-temp_param_table$label[temp_param_table$var== "River, Lake and Ocean"] = "Rios, Lagos ou Oceanos"
-temp_param_table$label[temp_param_table$var== "Rocky Outcrop"] = "Afloramento rochoso"
-temp_param_table$label[temp_param_table$var== "Savanna Formation"] = "Formação de Savana"
-temp_param_table$label[temp_param_table$var== "Soybean"] = "Soja"
-temp_param_table$label[temp_param_table$var== "Pasture"] = "Pastagem"
-temp_param_table$label[temp_param_table$var== "Urban Area"] = "Área Urbana"
-temp_param_table$label[temp_param_table$var== "Forest Formation"] = "Formação de Floresta"
-temp_param_table$label[temp_param_table$var== "Wetland"] = "Pântano"
-temp_param_table$label[temp_param_table$var== "Wooded Sandbank Vegetation"] = "Restinga Arborizada"
-temp_param_table$label[temp_param_table$var== "Palm Oil"] = "Óleo de Palma"
-temp_param_table$label[temp_param_table$var== "Perennial Crops"] = "Culturas Perenes"
-temp_param_table$label[temp_param_table$var== "Temporary Crops"] = "Culturas Temporárias"
-temp_param_table$label[temp_param_table$var== "Agriculture"] = "Agricultura"
-temp_param_table$label[temp_param_table$var== "Forest"] = "Floresta"
-temp_param_table$label[temp_param_table$var== "Non Forest Natural Formation"] = "Formação Natural Não Florestal"
-temp_param_table$label[temp_param_table$var== "Farming"] = "Fazenda"
-temp_param_table$label[temp_param_table$var== "Non Vegetated Area"] = "Áreas não vegetadas"
-temp_param_table$label[temp_param_table$var== "Water"] = "Água"
-temp_param_table$label[temp_param_table$var== "Anthropic"] = "Antrópico"
-temp_param_table$label[temp_param_table$var== "Natural"] = "Natural"
-
-dictionary <- read_csv("app_map_mapbiomas_cover/dic.csv") %>%
-    filter(var != "Other Non Forest Natural Formation") %>%
-    select(-1,-2,-3)
-
-write.csv(dictionary, file = "app_map_mapbiomas_cover/dic.csv", fileEncoding = "UTF-8")
+write_csv(dic_en, "./app_map_mapbiomas_cover_en/dic_en.csv")
