@@ -17,13 +17,13 @@ library(shinyWidgets)
 files <- list()
 files$ui_script <- "ui.R"
 files$server_script <- "server.R"
-files$param_script <- "../global/db_params.R"
-files$CSS_script <- "../global/dza_lumen.css"
+files$param_script <- "global/db_params.R"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "dic.csv"
 files$db_file <- "mapbiomas_cobertura.parquet"
-files$shapefile <- "../global/munic_shapefile.rds"
-files$legal_amazon <- "../global/legal_amazon_boundary.rds"
-files$states_boundary <- "../global/states_boundary.rds"
+files$shapefile <- "global/munic_shapefile.rds"
+files$legal_amazon <- "global/legal_amazon_boundary.rds"
+files$states_boundary <- "global/states_boundary.rds"
 
 
 # Carrega scripts
