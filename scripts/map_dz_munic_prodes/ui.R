@@ -47,7 +47,7 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
-        # Proporcional ao trimestre inicial (*)
+        # Proporcional ao municipio(*)
         div(class = "switch-group",
             tags$span(param$label_prop_name, class = "switch-title"),
             materialSwitch(

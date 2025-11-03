@@ -128,8 +128,38 @@ get_server <- function(files, param) {
         pal1 <- pallete_discrete
       }
 
-      # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df[[x_var()]])
+      # # Determina a paleta para as legendas
+      # pal <- colorBin(palette = pal1, 9, domain = df[[x_var()]])
+      
+      # Paleta com bins condicionais para desmatamento ---
+      xv <- x_var()
+      x_col <- param$table[which(param$table$var == xv), ]
+      
+      is_numeric <- is.numeric(df[[xv]])
+      is_desmat  <- grepl("desmat", tolower(xv)) || grepl("desmat", tolower(x_col$label))
+      is_prop    <- startsWith(xv, "prop_") || grepl("propor", tolower(x_col$label))
+      
+      # bins especiais para desmatamento
+      bins <- NULL
+      if (is_numeric && is_desmat && !is_prop) {
+          # incremento absoluto (hectares)
+          bins <- c(0, 10, 25, 50, 100, 200, 400, 800, 1600, Inf)
+      } else if (is_numeric && is_desmat && is_prop) {
+          # proporção do município (percentual)
+          bins <- c(0, 1, 2, 3, 5, 10, 20, 40, 80, 100)
+      }
+      
+      if (is_numeric) {
+          if (!is.null(bins)) {
+              pal <- colorBin(palette = pal1, bins = bins, domain = df[[xv]], right = FALSE)
+          } else {
+              # fallback padrão (9 classes)
+              pal <- colorBin(palette = pal1, bins = 9, domain = df[[xv]])
+          }
+      } else {
+          # categóricas continuam indo pela paleta discreta (mantendo compatibilidade)
+          pal <- colorFactor(palette = pal1, domain = df[[xv]])
+      }
 
       tryCatch(
         {
@@ -156,7 +186,7 @@ get_server <- function(files, param) {
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = 0.7,
-              fillColor = ~ pal(df_reactived()[[x_var()]]),
+              fillColor = ~ pal(df_reactived()[[xv]]),
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -167,7 +197,7 @@ get_server <- function(files, param) {
             ) %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df_reactived()[[x_var()]],
+              values = ~ df_reactived()[[xv]],
               title = title_legend,
               opacity = 0.7
             )

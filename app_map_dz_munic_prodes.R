@@ -5,6 +5,8 @@ library(leaflet)
 library(sf)
 library(htmlwidgets)
 library(shinyWidgets)
+library(scales)
+library(classInt)
 
 
 # Define nome de arquivos a serem carregados
@@ -54,7 +56,7 @@ param$link<-"window.open('https://datazoom.shinyapps.io/app_map_dz_munic_prodes/
 
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app][[1]][1:5]
-param$label_prop_name <- "proporcional ao trimestre inicial (*)"
+param$label_prop_name <- "Proporção do município (*)"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
