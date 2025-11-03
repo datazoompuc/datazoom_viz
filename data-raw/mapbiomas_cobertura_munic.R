@@ -12,7 +12,8 @@ library(dplyr)
 
 
 # load data[ ------------------------------------------------------------------------
-dat <- load_mapbiomas(dataset = "mapbiomas_cover", geo_level = "municipality")
+dat <- load_mapbiomas(dataset = "mapbiomas_cover", 
+                      geo_level = "municipality")
 
 saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
 
