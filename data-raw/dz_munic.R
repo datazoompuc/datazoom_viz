@@ -9,7 +9,8 @@ library(zoo)
 library(sf)
 library(sp)
 library(scales) # to use label_percent()
-
+library(here)
+library(data.table)
 ####################
 # 1) Call and clean data
 ###################
@@ -20,9 +21,41 @@ library(scales) # to use label_percent()
 # read shapefile
 shapefile <- st_read("./data/shapefiles/municipalities_legal_amazon.shp")
 
+munic <- readRDS(here("global", "munic_shapefile.rds"))
+lgl_amazon <- readRDS(here("global", "legal_amazon_boundary.rds"))
+
+#st_crs(munic)
+#st_crs(lgl_amazon)
+
+
+# 1) Mesma projeção e tirar Z/M se houver
+munic      <- st_zm(munic, drop = TRUE, what = "ZM")
+lgl_amazon <- st_zm(lgl_amazon, drop = TRUE, what = "ZM")
+munic      <- st_transform(munic, st_crs(lgl_amazon))
+
+# 2) Corrigir geometrias inválidas
+munic_fix      <- st_make_valid(munic)
+lgl_amazon_fix <- lgl_amazon %>% 
+    st_make_valid() %>% 
+    st_union()              # vira 1 polígono contínuo
+
+# se ainda der erro com S2, desligar temporariamente
+sf_use_s2(FALSE)
+
+# Interseção / filtro espacial
+munic_amazon <- st_intersection(munic_fix, lgl_amazon_fix)
+
+# alternativa (costuma ser mais leve):
+# munic_amazon <- st_filter(munic_fix, lgl_amazon_fix, .predicate = st_intersects)
+
+# reativar S2 depois
+sf_use_s2(TRUE)
+
+#plot(st_geometry(munic_amazon))
+
 # data too heavy (over 100mb)
 # solution: simplify geometry
-shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
+#shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
 
 # plot(shapefile)
 # shapefile$cod_ibge
@@ -30,12 +63,20 @@ shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
 ###################
 # CENSUS
 ###################
-income <- readRDS(file = "./data/income.rds")
-income$Ano <- income$Year
+income <- fread(here("data", "income.csv"), encoding = "Latin-1")
+
+colnames(income) <- c("municipio", "renda_media_dom_per_capita")
+
+income <- income %>% 
+    mutate(cod_ibge = str_sub(municipio, end = 6),
+           municipio = str_sub(municipio, start = 7) %>% str_squish(),
+           Ano = 2010)
+
 income <- income %>%
     separate(Municipality, c("name_munic", "Estado"), " - ") %>%
     janitor::clean_names() %>%
     select(cod_ibge, name_munic, ano, employed, mean_income, median_income)
+
 class(income$ano) <- "numeric"
 # Reshaping data.frame from long  to wide format
 income <- income %>%
@@ -51,7 +92,7 @@ income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
 ###################
 # INPE - PRODES
 ###################
-prodes <- readRDS(file = "./data/prodes.rds")
+prodes <- readRDS(here("data", "prodes.rds"))
 prodes <- prodes %>%
     janitor::clean_names()
 
