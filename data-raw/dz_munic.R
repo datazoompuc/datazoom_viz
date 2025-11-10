@@ -72,22 +72,23 @@ income <- income %>%
            municipio = str_sub(municipio, start = 7) %>% str_squish(),
            Ano = 2010)
 
-income <- income %>%
-    separate(Municipality, c("name_munic", "Estado"), " - ") %>%
-    janitor::clean_names() %>%
-    select(cod_ibge, name_munic, ano, employed, mean_income, median_income)
-
+# income <- income %>%
+#     separate(Municipality, c("name_munic", "Estado"), " - ") %>%
+#     janitor::clean_names() %>%
+#     select(cod_ibge, name_munic, ano, employed, mean_income, median_income)
+income$ano <- 2010
 class(income$ano) <- "numeric"
+
 # Reshaping data.frame from long  to wide format
-income <- income %>%
-    tidyr::pivot_wider(
-        id_cols = c(cod_ibge),
-        names_from = ano,
-        names_prefix = "census",
-        values_from = c(employed, mean_income, median_income)
-    )
+# income <- income %>%
+#     tidyr::pivot_wider(
+#         id_cols = c(cod_ibge),
+#         names_from = ano,
+#         names_prefix = "census",
+#         values_from = c(employed, mean_income, median_income)
+#     )
 # Identify and remove duplicate data
-income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
+# income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
 
 ###################
 # INPE - PRODES
@@ -248,17 +249,35 @@ gdp$gdp_deflacionado[gdp$ano == 2021] <- gdp$gdp_deflacionado[gdp$ano == 2021] *
 ###################
 # IMAZON - IPS
 ###################
-ips <- readRDS(file = "./data/ips.rds")
-ips <- ips %>%
-    janitor::clean_names()
-# Reshaping data.frame from long  to wide format
-ips <- ips %>%
-    tidyr::pivot_wider(
-        id_cols = c(cod_municipio),
-        names_from = ano,
-        names_prefix = "ips",
-        values_from = ips
-    )
+# ips <- readRDS(file = "./data/ips.rds")
+# ips <- ips %>%
+#     janitor::clean_names()
+# # Reshaping data.frame from long  to wide format
+# ips <- ips %>%
+#     tidyr::pivot_wider(
+#         id_cols = c(cod_municipio),
+#         names_from = ano,
+#         names_prefix = "ips",
+#         values_from = ips
+#     )
+ips_2014 <- readxl::read_xlsx(here("data", "IPS_amazonia_2023.xlsx"),
+                              sheet = 4) %>%
+    janitor::clean_names() %>% 
+    select(cod_ibge = codigo_ibge, 
+           municipio,
+           estado,
+           ips_amazonia_2014)
+ips_2018 <- readxl::read_xlsx(here("data", "IPS_amazonia_2023.xlsx"),
+                              sheet = 3) %>%
+    janitor::clean_names() %>% 
+    select(cod_ibge = codigo_ibge, 
+           municipio,
+           estado,
+           ips_amazonia_2018)
+
+ips_2021 <- readRDS(here("data", "ips_2021_atualizado.rds")) %>% select(ips_2021 = ips_amazonia_2021)
+ips_2023 <- readRDS(here("data", "ips_2023.rds")) %>% select(ips_2023 = ips_amazonia_2023)
+ 
 
 ###################
 # IBGE - CEMPRE
