@@ -67,10 +67,6 @@ municipios_amazonia <- datazoom.amazonia::municipalities %>%
 datafinal <- datafinal %>%
     inner_join(municipios_amazonia, by = "municipality_code")
 
-saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
-
-datafinal <- readRDS("data/mapbiomas_cobertura_munic.rds")
-
 ################################################################################
 # 4. RENAME AND TRANSLATE MAPBIOMAS CLASSES
 ################################################################################
@@ -125,8 +121,6 @@ datafinal <- datafinal %>%
 
 datafinal[is.na(datafinal)] <- 0
 
-saveRDS(datafinal, "data/mapbiomas_cobertura_munic.rds")
-
 ################################################################################
 # 5. ADD MUNICIPAL AREA AND COMPUTE LAND USE SHARE (%)
 ################################################################################
@@ -141,46 +135,53 @@ datafinal_area <- datafinal %>%
 cols_classes <- setdiff(names(datafinal_area),
                         c("time", "municipality_code", "group", "area_km2"))
 
-datafinal_area <- datafinal_area %>%
-    mutate(across(all_of(cols_classes),
-                  ~ (.x / (area_km2 * 1e6)) * 100,
-                  .names = "{.col}_perc"))
-
-saveRDS(datafinal_area, "data/mapbiomas_cobertura_munic_area_part.rds")
+saveRDS(datafinal_area, "data/mapbiomas_cobertura_munic.rds")
 
 ################################################################################
 # 6. BUILD VARIABLE DICTIONARIES (PT / EN)
 ################################################################################
 
-columns <- colnames(datafinal)
+data_dic <- datafinal %>%
+    select(-municipality_code)
 
+columns <- colnames(data_dic)
+
+# gera o dicionário PT
 dic_pt <- tibble(
     var = columns,
-    x = c(FALSE, FALSE, TRUE, rep(TRUE, length(columns) - 3)),
-    y = c(FALSE, FALSE, TRUE, rep(TRUE, length(columns) - 3)),
-    color = c(FALSE, TRUE, rep(FALSE, length(columns) - 2)),
-    size = c(FALSE, TRUE, rep(FALSE, length(columns) - 2)),
-    slider = c(FALSE, FALSE, TRUE, rep(TRUE, length(columns) - 3)),
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = TRUE,
     label = columns,
     desc = columns,
     var_group = "Mapbiomas",
     tipo = 1,
-    unidade = "m²",
+    unidade = "m^2",
     categoria = "Meio ambiente",
     subcategoria = "Uso da terra"
 )
 
-dic_pt$label[1:3] <- c("Ano", "Código do Município", "Município")
-dic_pt$desc[1:3]  <- c("Ano", "Código do Município (IBGE)", "Município")
+# metadados fixos
+dic_pt$label[1:2] <- c("Ano", "Município")
+dic_pt$desc[1:2]  <- c("Ano", "Município")
 
-write.csv(dic_pt, "data/mapbiomas_cobertura_munic_dic.csv", fileEncoding = "UTF-8")
+# flags específicas (igual ao dicionário original)
+dic_pt$x[1:2] <- FALSE
+dic_pt$y[1:2] <- FALSE
+dic_pt$color <- c(FALSE, TRUE, rep(FALSE, length(columns) - 2))
+dic_pt$size  <- c(FALSE, TRUE, rep(FALSE, length(columns) - 2))
+dic_pt$slider[1:2] <- FALSE
+
+write.csv(dic_pt, "data/mapbiomas_cobertura_munic_dic.csv", fileEncoding = "UTF-8", row.names = FALSE)
 
 # English version
 dic_en <- dic_pt
-dic_en$label[1:3] <- c("Year", "Municipality Code", "Municipality")
-dic_en$desc[1:3]  <- c("Year", "Municipality Code (IBGE)", "Municipality")
-dic_en$unidade    <- "m²"
-dic_en$categoria  <- "Environment"
+dic_en$label[1:2] <- c("Year", "Municipality")
+dic_en$desc[1:2]  <- c("Year", "Municipality")
+dic_en$unidade <- "m^2"
+dic_en$categoria <- "Environment"
 dic_en$subcategoria <- "Land use"
 
-write.csv(dic_en, "data/mapbiomas_cobertura_munic_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(dic_en, "data/mapbiomas_cobertura_munic_dic_en.csv", fileEncoding = "UTF-8", row.names = FALSE)
