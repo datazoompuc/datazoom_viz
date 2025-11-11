@@ -13,7 +13,6 @@ suppressPackageStartupMessages({
     library(purrr)
 })
 
-
 ################################################################################
 # 2. LOAD AND SAVE RAW MAPBIOMAS DATA
 ################################################################################
@@ -28,7 +27,6 @@ saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
 ################################################################################
 
 make_level <- function(dat, drop_levels) {
-    # identifica automaticamente o último nível que sobrou
     remaining <- setdiff(paste0("class_level_", 0:4), drop_levels)
     last_level <- tail(remaining, 1)
     
@@ -68,61 +66,7 @@ datafinal <- datafinal %>%
     inner_join(municipios_amazonia, by = "municipality_code")
 
 ################################################################################
-# 4. RENAME AND TRANSLATE MAPBIOMAS CLASSES
-################################################################################
-
-datafinal <- datafinal %>%
-    select(
-        time,
-        municipality_code,
-        group,
-        "Aquicultura" = "Aquaculture",
-        "Praia e Dunas" = "Beach, Dune and Sand Spot",
-        "Cítricos" = "Citrus",
-        "Café" = "Coffee",
-        "Algodão" = "Cotton",
-        "Floresta Inundável" = "Floodable Forest",
-        "Formação de Floresta" = "Forest Formation",
-        "Plantação de Floresta" = "Forest Plantation",
-        "Pradaria" = "Grassland",
-        "Vegetação Herbácea de Restinga" = "Herbaceous Sandbank Vegetation",
-        "Salar" = "Hypersaline Tidal Flat",
-        "Mangue" = "Mangrove",
-        "Mineiração" = "Mining",
-        "Mosaico de Uso da Terra" = "Mosaic of Uses",
-        "Não observado" = "Not Observed",
-        "Outras áreas não vegetadas" = "Other non Vegetated Areas",
-        "Outras Culturas Perenes" = "Other Perennial Crops",
-        "Outras Culturas Temporárias" = "Other Temporary Crops",
-        "Dendê" = "Palm Oil",
-        "Pastagem" = "Pasture",
-        "Arroz" = "Rice",
-        "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
-        "Afloramento rochoso" = "Rocky Outcrop",
-        "Formação de Savana" = "Savanna Formation",
-        "Soja" = "Soybean",
-        "Cana-de-açúcar" = "Sugar cane",
-        "Infraestrutura Urbana" = "Urban Area",
-        "Pântano" = "Wetland",
-        "Restinga Arborizada" = "Wooded Sandbank Vegetation",
-        "Culturas Perenes" = "Perennial Crop",
-        "Culturas Temporárias" = "Temporary Crop",
-        "Agricultura" = "Agriculture",
-        "Fazenda" = "Farming",
-        "Floresta" = "Forest",
-        "Formação Natural Não Florestal" = "Non Forest Natural Formation",
-        "Áreas não vegetadas" = "Non vegetated area",
-        "Água" = "Water and Marine Environment",
-        "Antrópico" = "Antropic",
-        "Natural" = "Natural",
-        "Natural/Antrópico" = "Natural/Antropic",
-        "Não aplicado" = "Undefined"
-    )
-
-datafinal[is.na(datafinal)] <- 0
-
-################################################################################
-# 5. ADD MUNICIPAL AREA AND COMPUTE LAND USE SHARE (%)
+# 4. ADD MUNICIPAL AREA AND COMPUTE LAND USE SHARE (%)
 ################################################################################
 
 areas_mun <- readr::read_rds("./app_map_mapbiomas_cover/global/area_municipios.rds")
@@ -135,19 +79,73 @@ datafinal_area <- datafinal %>%
 cols_classes <- setdiff(names(datafinal_area),
                         c("time", "municipality_code", "group", "area_km2"))
 
-saveRDS(datafinal_area, "data/mapbiomas_cobertura_munic.rds")
+# --- Save English version (default) ---
+saveRDS(datafinal, "data/mapbiomas_cobertura_munic_en.rds")
+
+# --- Create Portuguese version ---
+translate_names <- c(
+    "Aquaculture" = "Aquicultura",
+    "Beach, Dune and Sand Spot" = "Praia e Dunas",
+    "Citrus" = "Cítricos",
+    "Coffee" = "Café",
+    "Cotton" = "Algodão",
+    "Floodable Forest" = "Floresta Inundável",
+    "Forest Formation" = "Formação de Floresta",
+    "Forest Plantation" = "Plantação de Floresta",
+    "Grassland" = "Pradaria",
+    "Herbaceous Sandbank Vegetation" = "Vegetação Herbácea de Restinga",
+    "Hypersaline Tidal Flat" = "Salar",
+    "Mangrove" = "Mangue",
+    "Mining" = "Mineiração",
+    "Mosaic of Uses" = "Mosaico de Uso da Terra",
+    "Not Observed" = "Não observado",
+    "Other non Vegetated Areas" = "Outras áreas não vegetadas",
+    "Other Perennial Crops" = "Outras Culturas Perenes",
+    "Other Temporary Crops" = "Outras Culturas Temporárias",
+    "Palm Oil" = "Dendê",
+    "Pasture" = "Pastagem",
+    "Rice" = "Arroz",
+    "River, Lake and Ocean" = "Rios, Lagos ou Oceanos",
+    "Rocky Outcrop" = "Afloramento rochoso",
+    "Savanna Formation" = "Formação de Savana",
+    "Soybean" = "Soja",
+    "Sugar cane" = "Cana-de-açúcar",
+    "Urban Area" = "Infraestrutura Urbana",
+    "Wetland" = "Pântano",
+    "Wooded Sandbank Vegetation" = "Restinga Arborizada",
+    "Perennial Crop" = "Culturas Perenes",
+    "Temporary Crop" = "Culturas Temporárias",
+    "Agriculture" = "Agricultura",
+    "Farming" = "Fazenda",
+    "Forest" = "Floresta",
+    "Non Forest Natural Formation" = "Formação Natural Não Florestal",
+    "Non vegetated area" = "Áreas não vegetadas",
+    "Water and Marine Environment" = "Água",
+    "Antropic" = "Antrópico",
+    "Natural" = "Natural",
+    "Natural/Antropic" = "Natural/Antrópico",
+    "Undefined" = "Não aplicado"
+)
+
+datafinal_pt <- datafinal
+names(datafinal_pt) <- ifelse(names(datafinal_pt) %in% names(translate_names),
+                              translate_names[names(datafinal_pt)],
+                              names(datafinal_pt))
+
+saveRDS(datafinal_pt, "data/mapbiomas_cobertura_munic_pt.rds")
 
 ################################################################################
-# 6. BUILD VARIABLE DICTIONARIES (PT / EN)
+# 5. BUILD VARIABLE DICTIONARIES (PT / EN)
 ################################################################################
 
+# remove municipality_code (chave técnica, não usada na visualização)
 data_dic <- datafinal %>%
     select(-municipality_code)
 
 columns <- colnames(data_dic)
 
-# gera o dicionário PT
-dic_pt <- tibble(
+# DICIONÁRIO EM INGLÊS (baseado no MapBiomas original)
+dic_en <- tibble(
     var = columns,
     x = TRUE,
     y = TRUE,
@@ -158,30 +156,46 @@ dic_pt <- tibble(
     desc = columns,
     var_group = "Mapbiomas",
     tipo = 1,
-    unidade = "m^2",
-    categoria = "Meio ambiente",
-    subcategoria = "Uso da terra"
+    unidade = "ha",
+    categoria = "Environment",
+    subcategoria = "Land use"
 )
 
-# metadados fixos
-dic_pt$label[1:2] <- c("Ano", "Município")
-dic_pt$desc[1:2]  <- c("Ano", "Município")
+# Corrige campos fixos
+dic_en$color[dic_en$var == "group"] <- TRUE
+dic_en$size[dic_en$var == "group"] <- TRUE
+dic_en$x[dic_en$var == "group"] <- FALSE
+dic_en$y[dic_en$var == "group"] <- FALSE
 
-# flags específicas (igual ao dicionário original)
-dic_pt$x[1:2] <- FALSE
-dic_pt$y[1:2] <- FALSE
-dic_pt$color <- c(FALSE, TRUE, rep(FALSE, length(columns) - 2))
-dic_pt$size  <- c(FALSE, TRUE, rep(FALSE, length(columns) - 2))
-dic_pt$slider[1:2] <- FALSE
+dic_en$x[dic_en$var == "time"] <- FALSE
+dic_en$y[dic_en$var == "time"] <- FALSE
+dic_en$slider[dic_en$var == "time"] <- FALSE
 
-write.csv(dic_pt, "data/mapbiomas_cobertura_munic_dic.csv", fileEncoding = "UTF-8", row.names = FALSE)
 
-# English version
-dic_en <- dic_pt
-dic_en$label[1:2] <- c("Year", "Municipality")
-dic_en$desc[1:2]  <- c("Year", "Municipality")
-dic_en$unidade <- "m^2"
-dic_en$categoria <- "Environment"
-dic_en$subcategoria <- "Land use"
+dic_en$label[dic_en$var == "time"] <- "Year"
+dic_en$label[dic_en$var == "group"] <- "Municipality"
+dic_en$desc[dic_en$var == "time"] <- "Year"
+dic_en$desc[dic_en$var == "group"] <- "Municipality"
 
-write.csv(dic_en, "data/mapbiomas_cobertura_munic_dic_en.csv", fileEncoding = "UTF-8", row.names = FALSE)
+write.csv(dic_en, "data/mapbiomas_cobertura_munic_dic_en.csv",
+          fileEncoding = "UTF-8", row.names = FALSE)
+
+
+# PORTUGUESE DICTIONARY (TRANSLATED FROM ENGLISH)
+
+dic_pt <- dic_en
+
+# traduz tanto var quanto label com o mesmo vetor central
+dic_pt$var   <- dplyr::recode(dic_pt$var, !!!translate_names)
+dic_pt$label <- dplyr::recode(dic_pt$label, !!!translate_names)
+
+# corrige metadados
+dic_pt$label[dic_pt$var == "time"] <- "Ano"
+dic_pt$label[dic_pt$var == "group"] <- "Município"
+dic_pt$desc[dic_pt$var == "time"] <- "Ano"
+dic_pt$desc[dic_pt$var == "group"] <- "Município"
+dic_pt$categoria <- "Meio ambiente"
+dic_pt$subcategoria <- "Uso da terra"
+
+write.csv(dic_pt, "data/mapbiomas_cobertura_munic_dic.csv",
+          fileEncoding = "UTF-8", row.names = FALSE)

@@ -11,7 +11,7 @@ files$server_script <- "scripts/rk_mapbiomas_cobertura_munic/server.R"
 files$param_script <- "scripts/rk_mapbiomas_cobertura_munic/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/mapbiomas_cobertura_munic_dic_en.csv"
-files$db_file <- "data/mapbiomas_cobertura_munic.rds"
+files$db_file <- "data/mapbiomas_cobertura_munic_en.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -20,7 +20,7 @@ source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "Floresta" # variável padrão do eixo x
+param$x_def <- "Forest" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
