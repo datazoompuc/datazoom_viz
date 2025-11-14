@@ -7,6 +7,10 @@ library(stringr)
 ###SH4
 dat <- readRDS(file = "data/comex_munic_raw.rds")
 
+aux <- dat %>%
+    distinct(cod_sh4, nome_sh4) %>%
+    mutate(cod_sh4 = sprintf("%04d", as.numeric(cod_sh4)))
+
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
 dat$kg_liquido <- NULL
@@ -19,19 +23,27 @@ data_val_pais <- aggregate(valor_fob ~ ano + cod_sh4, dat, sum)
 data_val_pais$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais$cod_sh4))
 
 data <- data_val_pais
-data <- data[data$ano=="2019",]
+#data <- data[data$ano=="2019",]
 data <- data[data$cod_sh4<="2100",]
 data <- data[data$valor_fob>=1000000,]
 
 #this data from world trade was generated in data-raw/baci.R
-world_trade <- readRDS("data/auxiliar_exportacoes_totais_produtos_sh4_selecionados_baci19.rds")
+world_trade <- readRDS("data/auxiliar_exportacoes_totais_produtos_sh4_selecionados_baci.rds")
 
 data$valor_fob <- data$valor_fob/1000
-data$valor_fob <- data$valor_fob/world_trade$valor_total
 
-aux <- readRDS("data/auxiliar_cod_sh4.rds")
-aux$CO_SH4 <- sprintf("%04d", as.numeric(aux$CO_SH4))
-data$cod_sh4 <- str_replace_all(data$cod_sh4, setNames(aux$NO_SH4_POR, aux$CO_SH4))
+# junta por ano + sh4, garantindo alinhamento correto
+data <- data %>%
+    left_join(world_trade, by = c("ano", "cod_sh4")) %>%
+    mutate(
+        valor_fob = ifelse(valor_total > 0, valor_fob / valor_total, NA_real_)  
+    )
+
+
+data$cod_sh4 <- str_replace_all(
+    data$cod_sh4,
+    setNames(aux$nome_sh4, aux$cod_sh4)
+    )
 
 data <- data %>% 
   mutate(floresta = ifelse(cod_sh4 %in% c("Peixes vivos",
@@ -53,7 +65,13 @@ data <- data %>%
                            TRUE, FALSE))
 
 
-colnames(data) <- c("time", "group", "value", "floresta")
+data <- data %>%
+    select(
+        time = ano,
+        group = cod_sh4,
+        value = valor_fob,   
+        floresta
+    )
 
 data= data%>%
   mutate(group= case_when(group == "Peixes vivos" ~ "Peixes vivos",
