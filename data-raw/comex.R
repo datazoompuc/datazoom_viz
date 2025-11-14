@@ -7,7 +7,7 @@ library(magrittr)
 library(tidyverse)
 library(stringr)
 
-dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2021, raw_data = FALSE)
+dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2023, raw_data = FALSE)
 
 tipos <- c("RO", "AM", "PA", "RR", "MT", "MA", "AC", "AP", "TO")
 `%notin%` <- Negate(`%in%`)
