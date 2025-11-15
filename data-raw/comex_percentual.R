@@ -11,6 +11,26 @@ aux <- dat %>%
     distinct(cod_sh4, nome_sh4) %>%
     mutate(cod_sh4 = sprintf("%04d", as.numeric(cod_sh4)))
 
+sh4_floresta <- c(
+    "0301", # Peixes vivos
+    "0302", # Peixes frescos/refrigerados, exceto filés
+    "0303", # Peixes congelados, exceto filés
+    "0304", # Filés de peixe e outras carnes
+    "0305", # Peixes secos, salgados, em salmoura ou defumados
+    "0306", # Crustáceos vivos, frescos, congelados, etc.
+    "0801", # Cocos, castanha do Brasil e castanha de caju
+    "0811", # Frutas, não cozidas ou cozidas em água/vapor, congeladas
+    "0904", # Pimenta (Piper) e pimentos secos/triturados (Capsicum/Pimenta)
+    "1207", # Outras sementes e frutos oleaginosos
+    "1301", # Goma-laca, gomas, resinas, gomas-resinas, oleorresinas
+    "1511", # Óleo de palma e respectivas fracções
+    "1515", # Outras gorduras e óleos vegetais não modificados
+    "1801", # Cacau em bruto ou torrado
+    "2008", # Frutas e outras partes comestíveis de plantas, preparadas/conservadas
+    "2009"  # Sumos de frutas e hortícolas
+)
+
+
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
 dat$kg_liquido <- NULL
@@ -22,56 +42,35 @@ data_val_pais <- aggregate(valor_fob ~ ano + cod_sh4, dat, sum)
 
 data_val_pais$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais$cod_sh4))
 
-data <- data_val_pais
-#data <- data[data$ano=="2019",]
-data <- data[data$cod_sh4<="2100",]
-data <- data[data$valor_fob>=1000000,]
 
 #this data from world trade was generated in data-raw/baci.R
 world_trade <- readRDS("data/auxiliar_exportacoes_totais_produtos_sh4_selecionados_baci.rds")
 
-data$valor_fob <- data$valor_fob/1000
 
 # junta por ano + sh4, garantindo alinhamento correto
-data <- data %>%
-    left_join(world_trade, by = c("ano", "cod_sh4")) %>%
-    mutate(
-        valor_fob = ifelse(valor_total > 0, valor_fob / valor_total, NA_real_)  
-    )
-
-
-data$cod_sh4 <- str_replace_all(
-    data$cod_sh4,
-    setNames(aux$nome_sh4, aux$cod_sh4)
-    )
-
-data <- data %>% 
-  mutate(floresta = ifelse(cod_sh4 %in% c("Peixes vivos",
-                                          "Peixes frescos ou refrigerados, exceto os filés de peixes e outra carne de peixes da posição 03.04",
-                                          "Peixes congelados, exceto os filés de peixes e outra carne de peixes da posição 03.04",
-                                          "Filés de peixes e outra carne de peixes (mesmo picada), frescos, refrigerados ou congelados",
-                                          "Peixes secos, salgados ou em salmoura; peixes defumados, mesmo cozidos antes ou durante a defumação; farinhas, pós e pellets, de peixe, próprios para alimentação humana",
-                                          "Crustáceos, mesmo sem casca, vivos, frescos, refrigerados, congelados, secos, salgados ou em salmoura; crustáceos com casca, cozidos em água ou vapor, mesmo refrigerados, congelados, secos, salgados ou em salmoura; farinhas, pó e pellets de crustáceos, pr",
-                                          "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
-                                          "Frutas, não cozidas ou cozidas em água ou vapor, congeladas, mesmo adicionadas de açúcar ou de outros edulcorantes",
-                                          'Pimenta (do género Piper); pimentos dos géneros Capsicum ou Pimenta, secos ou triturados ou em pó',
-                                          "Outras sementes e frutos oleaginosos, mesmo triturados",
-                                          "Goma-laca; gomas, resinas, gomas-resinas e oleorresinas (bálsamos por exemplo), naturais",
-                                          "Óleo de palma e respectivas fracções, mesmo refinados, mas não quimicamente modificados",
-                                          "Outras gorduras e óleos vegetais (incluído o óleo de jojoba) e respectivas fracções, fixos, mesmo refinados, mas não quimicamente modificados",
-                                          "Cacau inteiro ou partido, em bruto ou torrado",
-                                          "Frutas e outras partes comestíveis de plantas, preparadas ou conservadas de outro modo, com ou sem adição de açúcar ou de outros edulcorantes ou de álcool, não especificadas nem compreendidas noutras posições",
-                                          "Sumos de frutas (incluídos os mostos de uvas) ou de produtos hortícolas, não fermentados, sem adição de álcool, com ou sem adição de açúcar ou de outros edulcorantes"),
-                           TRUE, FALSE))
-
-
-data <- data %>%
-    select(
-        time = ano,
-        group = cod_sh4,
-        value = valor_fob,   
+data <- data_val_pais %>%
+    dplyr::filter(
+        cod_sh4 <= "2100",        
+        valor_fob >= 1000000      
+    ) %>%
+    dplyr::mutate(
+        valor_fob = valor_fob / 1000  # COMEX em mil USD para casar com BACI
+    ) %>%
+    dplyr::left_join(world_trade, by = c("ano", "cod_sh4")) %>%
+    dplyr::mutate(
+        valor_fob = ifelse(valor_total > 0, valor_fob / valor_total, NA_real_), # share
+        floresta  = cod_sh4 %in% sh4_floresta
+    ) %>%
+    dplyr::left_join(aux, by = "cod_sh4") %>%   
+    dplyr::rename(group = nome_sh4) %>%
+    dplyr::select(
+        time    = ano,
+        group,
+        value   = valor_fob,
         floresta
     )
+
+
 
 data= data%>%
   mutate(group= case_when(group == "Peixes vivos" ~ "Peixes vivos",
