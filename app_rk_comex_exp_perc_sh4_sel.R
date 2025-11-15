@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -18,7 +19,7 @@ source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
-# Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
+# Parâmetros da visualização (define as variáveis/colunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "value" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
@@ -32,20 +33,20 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX) em rela\u00e7\u00e3o ao comércio internacional (BACI): Propor\u00e7\u00e3o do valor da exporta\u00e7\u00e3o de produtos"
 
 # Outros parâmetros e configurações
-param$filter_choices <- c("Produtos Compat\u00edveis com a Floresta", "Todos os Produtos")
-param$filter_def <- c("Produtos Compat\u00edveis com a Floresta")
+param$filter_choices <- c("Todos os Produtos", "Produtos Compat\u00edveis com a Floresta")
+param$filter_def <- c("Todos os Produtos")
 
 # Parâmetros específicos do UI
 param$ui1 <- "VARI\u00C1VEIS:"
 param$ui2 <- "Tipos de Produto:"
 param$ui3 <- "https://datazoom.shinyapps.io/app_rk_comex_exp_perc_sh4_sel/"
+param$ui4 <- "Ano: "
 
 # Parâmetros específicos do server
 param$server1 <- "Vari\u00e1vel n\u00e3o selecionada"
-param$server2 <- "Ranking da Propor\u00e7\u00e3o das Exporta\u00e7\u00f5es Mundiais Vindas da Amaz\u00f4nia (2019)"
+param$server2 <- "Ranking da Propor\u00e7\u00e3o das Exporta\u00e7\u00f5es Mundiais Vindas da Amaz\u00f4nia"
 param$server3 <- "Amaz\u00f4nia Legal"
 param$server4 <- "Unidade de medida: <b>"
-param$server5 <- "Ano: "
 param$lang <- FALSE
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

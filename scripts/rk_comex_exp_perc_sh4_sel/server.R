@@ -14,6 +14,7 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file)
   
+  
   if(param$lang){
       
       df <- df %>% mutate(group = case_when( #######
@@ -237,62 +238,38 @@ get_server <- function(files, param) {
                             group),
              value = value * 100)
   
+  # ---- Fixar eixo X global ----
+  min_x <- min(df$value, na.rm = TRUE)
+  max_x <- max(df$value, na.rm = TRUE)
+  
+  # Garantir que zero sempre apareça
+  min_x <- min(0, min_x)
+  max_x <- max(0, max_x)
+  
   server <- function(input, output, session) {
     
     df_reactived <- reactive({
     
-      # filtrar para produtos da floresta
-      if(input$filter == param$filter_def) {
-        w <- df %>% filter(floresta)
-      } else {
         w <- df
-      }
-      
-      return(w)
+        
+        # filtro floresta
+        if (input$forest_filter == param$filter_choices[2]) {
+            w <- w %>% filter(floresta)
+        }
+
+        # filtro ano
+        w <- w %>% filter(time == input$year_filter)
+
+        return(w)
     })
     
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      # se input está vazio preenche com valor aleatório da lista de colunas
-      if (input$filter == "") {
-        updateSelectInput(session, "filter",
-          choices = param$filter_choices,
-          selected = sample(param$filter_choices, 1)
-        )
-      }
-    }
-
-    # Função para atualizar url do app com parâmetros dos inputs
-    update_my_queryString <- function() {
-      q_string <- paste0(
-        "?", "filter=", input$filter
-      )
-      updateQueryString(q_string, mode = "replace")
-    }
-
-    # Função para atualizar inputs a partir da URL
-    update_my_inputs <- function() {
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-
-      if (!is.null(query[["filter"]])) {
-        updateSelectInput(session, "filter",
-          choices = param$filter_choices,
-          selected = query[["filter"]]
-        )
-      }
-    }
 
 
     # Output título do gráfico
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$filter) || input$filter == "") {
+      if (is.null(input$forest_filter) || input$forest_filter == "") {
         text <- param$server1
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
@@ -305,7 +282,7 @@ get_server <- function(files, param) {
       text <- " "
 
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$filter) || input$filter == "") {
+      if (is.null(input$forest_filter) || input$forest_filter == "") {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
@@ -318,8 +295,6 @@ get_server <- function(files, param) {
     # Output gráfico
     output$plot <- renderPlotly({
 
-      # random_inputs() #preenche inputs se estiverem vazios
-      update_my_queryString() # atualiza url com parametros dos inputs
 
       fig <- plotly_empty() # inicia figura com gráfico em branco
 
@@ -327,88 +302,88 @@ get_server <- function(files, param) {
         {
 
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$filter) || input$filter == "") {
+            if (is.null(input$forest_filter) || input$forest_filter == "") {
             fig <- plotly_empty()
             stop()
           }
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == "value"), ]
-          color_col <- param$table[which(param$table$var == "group"), ]
-          slider_col <- param$table[which(param$table$var == "NA"), ]
-          text_col <- param$table[which(param$table$var == "group"), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
+            x_col <- param$table[which(param$table$var == "value"), ] 
+            color_col <- param$table[which(param$table$var == "group"), ] 
+            # slider_col <- param$table[which(param$table$var == "NA"), ] 
+            # text_col <- param$table[which(param$table$var == "group"), ] 
+            id_col <- param$table[which(param$table$var == param$id_def), ]
 
           # Cria coluna vazia para o ranking
-          y_col <- list()
-          y_col$var <- "rank"
-          y_col$label <- "Ranking"
+          y_col <- list(var = "rank", label = "Ranking")
 
           df <- df_reactived()
           
-          df_p <- data.frame(
-            df[x_col$var],
-            NA,
-            df[color_col$var],
-            df["group"],
-            df["group"],
-            df[id_col$var],
-            df["lab"]
-          )
+          df_p <- df %>%
+              dplyr::mutate(
+                  x     = .data[[x_col$var]],      
+                  color = .data[[color_col$var]],  
+                  text  = group,
+                  id    = .data[[id_col$var]],
+                  lab   = lab,
+                  y     = NA_real_
+              ) %>%
+              dplyr::select(x, y, color, text, group, id, lab)
+          
+          
+          # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma) 
+          df_p <- df_p[!is.na(df_p$x) & !is.na(df_p$color), , drop = FALSE]
 
-          colnames(df_p) <- c("x", "y", "color", "text", "group", "id", "lab")
-
-          # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
-
-          # Se dataset estiver vazio, não monta o gráfico, retorna em branco
-          if (nrow(df_p) < 1) {
-            fig <- plotly_empty()
-            stop()
+          # Se dataset estiver vazio, não monta o gráfico, retorna em branco 
+          if (nrow(df_p) < 1) { 
+              fig <- plotly_empty() 
+              stop() 
           }
-
-          # Filtra sem grupo
+          
+          # Filtra sem grupo 
           df_p <- df_p[which(df_p$group != " - "), ]
-
-          # Ordena base por variável de ranking e preenche y
+         
+          # monta base do gráfico com coluna de frame = ano
           df_p <- df_p %>%
-            mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
-            arrange(y, .by_group = TRUE) # ordena por rank e ano
-
-          # Se o rank for NA coloca para o final do ranking e zera x
-          df_p$y[is.na(df_p$y)] <- max(df_p$y) + 1
+              mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
+              arrange(y) # ordena por rank e ano
+          
+          # Se o rank for NA coloca para o final do ranking e zera x 
+          df_p$y[is.na(df_p$y)] <- max(df_p$y, na.rm = TRUE) + 1
           df_p$x[is.na(df_p$x)] <- 0
-
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
-
-          # Deixa somente grupos que tem rank <n em algum momento
+          
+          
+          # Se a coluna de cor for toda NA, preenche com strings em branco 
+          if (all(is.na(df_p$color))) { 
+              df_p$color <- " " 
+              }
+          
+          
+          # top_n global 
           top_n <- 10
-          top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
-          df_p <- df_p %>% filter(group %in% top_groups)
+          top_groups <- unique(df_p$group[df_p$y <= top_n])
+          df_p <- df_p[df_p$group %in% top_groups, , drop = FALSE]
 
-          # Monta html do tooltip
+
+         
+          ## tooltip
           df_p$tooltip <- paste0(
-            "<b>", df_p$lab, "</b><br>",
-            x_col$label, ": ", format(df_p$x, scientific = FALSE,
-                                      digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            param$server4, x_col$unidade, "</b>"
+              "<b>", df_p$lab, "</b><br>",
+              "(", input$year_filter, ")", "<br><br>",
+              x_col$label, ": ",
+              format(df_p$x, scientific = FALSE,
+                     digits = 2,
+                     decimal.mark = ",",
+                     big.mark = "."), " %", "<br>",
+              y_col$label, ": ", df_p$y, "<br>",
+              param$server4, x_col$unidade, "</b>"
           )
-
-          # Define paleta de cores
-          pallete <- pallete_continuous
-          if (!is.numeric(df_p$color)) {
-            pallete <- pallete_discrete
-          }
-
-          # Calcula menor e maior valor de x
-          min_x <- min(0, min(df_p$x))
-          max_x <- max(0, max(df_p$x))
+          
+          # paleta
+          pallete <- pallete_continuous 
+          if (!is.numeric(df_p$color)) { 
+              pallete <- pallete_discrete 
+              }
 
           # Monta gráfico
 
@@ -421,12 +396,8 @@ get_server <- function(files, param) {
             text = ~tooltip,
             textposition = "middle right",
             showlegend = FALSE,
-            # marker = list(
-            #  opacity = 0.5,
-            #  line = list(width = 1, color = 'white')
-            # ),
             hoverinfo = "text"
-          )
+          ) 
 
           # adiciona barras
           fig_p <- fig_p %>% add_segments(
@@ -451,69 +422,6 @@ get_server <- function(files, param) {
           )
 
 
-          # Parâmetros animação e slider (se tiver mais de um frame)
-          if (length(unique(df_p$slider)) > 1) {
-            # Edita slider
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = param$server5, font = f1))
-
-            # Botões da animação
-            #  edita botão padrão (editar move ele para o updatemenus)
-            fig_p <- fig_p %>% animation_button(label = "Play")
-
-            #  sobrescreve updatemenus, adicionando play e pause
-            fig_p$x$layout$updatemenus <- list(
-              list(
-                type = "buttons",
-                direction = "right",
-                showactive = FALSE,
-                x = 0,
-                y = 0,
-                xanchor = "top",
-                yanchor = "right",
-                pad = list(t = 60, r = 5),
-                buttons = list(
-                  list(
-                    method = "animate",
-                    label = "\u25B6",
-                    args = list(
-                      NA, # primeiro arg vazio para play
-                      list(
-                        mode = "immediate",
-                        transition = list(duration = 1500, easing = "linear", redraw = TRUE),
-                        fromcurrent = TRUE,
-                        frame = list(redraw = TRUE, duration = 1500)
-                      )
-                    )
-                  ),
-                  list(
-                    method = "animate",
-                    # label = "<U+25FC>",
-                    label = "I I",
-                    args = list(
-                      list(), # primeiro arg lista vazia para pause
-                      list(
-                        mode = "immediate",
-                        transition = list(duration = 0),
-                        frame = list(redraw = FALSE, duration = 0)
-                      )
-                    )
-                  )
-                )
-              )
-            )
-
-            # Pula animação para último frame (custom JS)
-            first_frame <- min(df_p$slider)
-            last_frame <- max(df_p$slider)
-            fig_p <- fig_p %>% onRender("
-            function(el,x,data){
-              Plotly.animate(el, data, {frame: [{duration: 0}]})
-            }",
-              data = c(first_frame, last_frame)
-            )
-          }
-
-
           # Layout eixos
           x_axis_layout <- list(
             title = x_col$label,
@@ -521,7 +429,7 @@ get_server <- function(files, param) {
             tickfont = f2,
             automargin = FALSE,
             autorange = FALSE,
-            range = c(min_x, max_x), # fixa range do x
+            range = c(min_x, max_x),
             showgrid = FALSE,
             zeroline = FALSE
           )
@@ -538,11 +446,9 @@ get_server <- function(files, param) {
             range = c(top_n + 0.5, 0.5), # fixa range do y somente para top 10
             type = "numeric"
           )
+          
 
-          # Tipo de eixo (se log selecionado)
-          # if (input$xlog & is.numeric(df_p$x)) {
-          #  x_axis_layout$type <- "log"
-          # }
+         
 
           # Layout hover/tooltip
           tooltip <- list(
@@ -553,49 +459,33 @@ get_server <- function(files, param) {
 
           # Aplica layout
           fig_p <- fig_p %>%
-            layout(
-              font = f1,
-              xaxis = x_axis_layout,
-              yaxis = y_axis_layout,
-              hoverlabel = tooltip
-            ) 
-
-          fig <- fig %>% animation_opts(
-            1500,
-            easing = "linear", redraw = FALSE
-          )
-
-          #  Configura botões do plotly
-          fig_p <- fig_p %>%
-            config(
-              # toImageButtonOptions = list(format = "svg"),
-              displaylogo = FALSE,
-              modeBarButtonsToRemove = c(
-                "lasso2d",
-                "select2d",
-                "hoverCompareCartesian"
+              layout(
+                  font = f1,
+                  xaxis = x_axis_layout,
+                  yaxis = y_axis_layout,
+                  showlegend = TRUE,
+                  legend = list(title = list(text = color_col$label)),
+                  hoverlabel = tooltip
+              ) %>%
+              config(
+                  displaylogo = FALSE,
+                  modeBarButtonsToRemove = c(
+                      "lasso2d",
+                      "select2d",
+                      "hoverCompareCartesian"
+                  )
               )
-            )
-
-          fig <- fig_p # retorna a figura do gráfico
-        },
-        error = function(cond) {
-          # se encontrar erro retorna fig em branco
-          print("plot error")
-          fig <- plotly_empty()
-        }
-      )
+          
+          fig <- fig_p
+          },
+          error = function(cond) {
+              # se encontrar erro retorna fig em branco
+              print("plot error")
+              fig <- plotly_empty()
+          }
+        )
       fig
-    }) 
-
-    # Observa eventos
-    observe({
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-      update_my_inputs()
     })
   }
-
-  # Retorna objeto server
   server
 }
