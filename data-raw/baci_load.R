@@ -12,7 +12,14 @@ processa_ano <- function(arq) {
   mensagem <- paste("Processando:", basename(arq))
   message(mensagem)
   
-  df <- read.csv(arq)
+  df <- read.csv(arq, colClasses = c(
+      "t" = "integer",
+      "i" = "character",
+      "j" = "character",
+      "k" = "character",   # ler SH6 como texto!
+      "v" = "numeric",
+      "q" = "numeric"
+  ))
   
   # renomeia colunas para manter compatibilidade 
   df <- df %>%
@@ -25,8 +32,8 @@ processa_ano <- function(arq) {
       quantidade = q
     ) %>%
     mutate(
-      cod_sh4 = substr(co_sh6, 1, 4),
-      valor = as.numeric(valor)
+        cod_sh4 = substr(co_sh6, 1, 4),
+        valor = as.numeric(valor)
     ) %>%
     group_by(ano, cod_sh4) %>%
     summarise(valor_total = sum(valor, na.rm = TRUE), .groups = "drop")
