@@ -234,7 +234,7 @@ get_server <- function(files, param) {
   df <- df %>%
       mutate(lab = group,
              group = ifelse(nchar(group) >= 40,
-                            paste0(substr(group, 1, 40), "..."),
+                            paste0(substr(group, 1, 60), "..."),
                             group),
              value = value * 100)
   
@@ -245,6 +245,8 @@ get_server <- function(files, param) {
   # Garantir que zero sempre apareça
   min_x <- min(0, min_x)
   max_x <- max(0, max_x)
+  
+  
   
   server <- function(input, output, session) {
     
@@ -259,6 +261,20 @@ get_server <- function(files, param) {
 
         # filtro ano
         w <- w %>% filter(time == input$year_filter)
+        
+        
+        # filtro UF
+        if (!is.null(input$uf_filter) && input$uf_filter != "Todos" && input$uf_filter != "All") {
+            w <- w %>% dplyr::filter(uf == input$uf_filter)
+        } else {
+            
+            w <- w %>%
+                dplyr::group_by(time, group, floresta, lab) %>%
+                dplyr::summarise(
+                    value = sum(value, na.rm = TRUE),
+                    .groups = "drop"
+                )
+        }
 
         return(w)
     })
@@ -286,7 +302,7 @@ get_server <- function(files, param) {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        text <- paste0(param$server3)
+        text <- paste0(param$server3, " (", input$year_filter, ")")
       }
 
       text

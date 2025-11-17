@@ -41,6 +41,7 @@ param$ui1 <- "VARI\u00C1VEIS:"
 param$ui2 <- "Tipos de Produto:"
 param$ui3 <- "https://datazoom.shinyapps.io/app_rk_comex_exp_perc_sh4_sel/"
 param$ui4 <- "Ano: "
+param$ui5 <- "Estado (UF)"
 
 # Parâmetros específicos do server
 param$server1 <- "Vari\u00e1vel n\u00e3o selecionada"
