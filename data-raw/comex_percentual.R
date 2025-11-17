@@ -34,11 +34,11 @@ sh4_floresta <- c(
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
 dat$kg_liquido <- NULL
-dat$uf <- NULL
+#dat$uf <- NULL
 dat$cod_municipio <- NULL
 dat$cod_pais <- NULL
 
-data_val_pais <- aggregate(valor_fob ~ ano + cod_sh4, dat, sum)
+data_val_pais <- aggregate(valor_fob ~ ano + uf + cod_sh4, dat, sum)
 
 data_val_pais$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais$cod_sh4))
 
@@ -67,6 +67,7 @@ data <- data_val_pais %>%
         time    = ano,
         group,
         value   = valor_fob,
+        uf,
         floresta
     )
 
@@ -148,8 +149,8 @@ temp_param_table$size[temp_param_table$var == "value"] <- TRUE
 temp_param_table$size[temp_param_table$var == "floresta"] <- FALSE
 
 temp_param_table$slider[temp_param_table$var == "group"] <- FALSE
-temp_param_table$slider[temp_param_table$var == "time"] <- FALSE
-temp_param_table$slider[temp_param_table$var == "value"] <- TRUE
+temp_param_table$slider[temp_param_table$var == "time"] <- TRUE
+temp_param_table$slider[temp_param_table$var == "value"] <- FALSE
 temp_param_table$slider[temp_param_table$var == "floresta"] <- FALSE
 
 # save csv in utf-8 encoding
