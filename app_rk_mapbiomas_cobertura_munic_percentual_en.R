@@ -10,8 +10,8 @@ files$ui_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/ui.R"
 files$server_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/server.R"
 files$param_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/mapbiomas_cobertura_munic_percentual_dic_en.csv"
-files$db_file <- "data/mapbiomas_cobertura_munic_percentual.rds"
+files$param_file <- "data/mapbiomas_cobertura_munic_dic_en.csv"
+files$db_file <- "data/mapbiomas_cobertura_munic_en.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -20,7 +20,7 @@ source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "Soja" # variável padrão do eixo x
+param$x_def <- "Soybean" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
@@ -33,6 +33,7 @@ param$ui1 <- "VARIABLES:"
 param$ui2 <- "Ranking - horizontal axis (x):"
 param$ui3 <- "Bar colors:"
 param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura_munic_percentual_en/'
+param$prop_button_label <- "Proportional land use relative to municipal area"
 
 # Parâmetros específicos do server
 param$server0 <- "No variable selected"

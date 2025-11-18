@@ -20,8 +20,6 @@ suppressPackageStartupMessages({
 dat <- load_mapbiomas(dataset = "mapbiomas_cover", 
                       geo_level = "municipality")
 
-saveRDS(dat, file = "data/mapbiomas_cobertura_munic_raw.rds")
-
 ################################################################################
 # 3. BUILD AND AGGREGATE CLASS LEVELS (0–4)
 ################################################################################
@@ -80,7 +78,7 @@ cols_classes <- setdiff(names(datafinal_area),
                         c("time", "municipality_code", "group", "area_km2"))
 
 # --- Save English version (default) ---
-saveRDS(datafinal, "data/mapbiomas_cobertura_munic_en.rds")
+saveRDS(datafinal_area, "data/mapbiomas_cobertura_munic_en.rds")
 
 # --- Create Portuguese version ---
 translate_names <- c(
@@ -127,7 +125,7 @@ translate_names <- c(
     "Undefined" = "Não aplicado"
 )
 
-datafinal_pt <- datafinal
+datafinal_pt <- datafinal_area
 names(datafinal_pt) <- ifelse(names(datafinal_pt) %in% names(translate_names),
                               translate_names[names(datafinal_pt)],
                               names(datafinal_pt))
@@ -139,7 +137,7 @@ saveRDS(datafinal_pt, "data/mapbiomas_cobertura_munic_pt.rds")
 ################################################################################
 
 # remove municipality_code (chave técnica, não usada na visualização)
-data_dic <- datafinal %>%
+data_dic <- datafinal_area %>%
     select(-municipality_code)
 
 columns <- colnames(data_dic)
@@ -177,9 +175,16 @@ dic_en$label[dic_en$var == "group"] <- "Municipality"
 dic_en$desc[dic_en$var == "time"] <- "Year"
 dic_en$desc[dic_en$var == "group"] <- "Municipality"
 
+dic_en$x[dic_en$var == "area_km2"] <- FALSE
+dic_en$y[dic_en$var == "area_km2"] <- FALSE
+dic_en$color[dic_en$var == "area_km2"] <- FALSE
+dic_en$size[dic_en$var == "area_km2"] <- FALSE
+dic_en$slider[dic_en$var == "area_km2"] <- FALSE
+dic_en$label[dic_en$var == "area_km2"] <- "Área do município (km²)"
+dic_en$desc[dic_en$var == "area_km2"] <- "Área territorial do município em quilômetros quadrados"
+
 write.csv(dic_en, "data/mapbiomas_cobertura_munic_dic_en.csv",
           fileEncoding = "UTF-8", row.names = FALSE)
-
 
 # PORTUGUESE DICTIONARY (TRANSLATED FROM ENGLISH)
 

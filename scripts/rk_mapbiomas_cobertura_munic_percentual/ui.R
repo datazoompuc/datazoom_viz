@@ -36,8 +36,26 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
-        # espaço vazio
-        div(class = "fakecheckbox", ),
+        
+        # botão proporção
+        div(
+            class = "switch_div",
+            tags$label(
+                class = "switch_label",
+                param$prop_button_label,   # <-- AGORA É DINÂMICO
+                tags$div(
+                    class = "switch_toggle",
+                    tags$input(
+                        id = "Ypr",
+                        type = "checkbox",
+                        class = "switch_input",
+                        checked = "checked"
+                    ),
+                    tags$span(class = "switch_slider")
+                )
+            )
+        ),
+        
         div(
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
