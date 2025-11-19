@@ -26,7 +26,7 @@ get_server <- function(files, param) {
                                                              "Sumos de frutas, com ou sem aditivos" ~ "Fruit juices, with or without additives", group == 
                                                              "Minerios de estanho e seus concentrados" ~ "Tin ores and concentrates", group == 
                                                              "Café torrado, cascas e sucedâneos" ~ "Roasted coffee, husks and substitutes", group == 
-                                                             "Produtos vegetais nao especificados" ~ "Unspecified vegetable products", group == 
+                                                             "Produtos vegetais não especificados" ~ "Unspecified vegetable products", group == 
                                                              "Arroz" ~ "Rice", group == 
                                                              "Soja, mesmo triturada" ~ "Soybeans, even crushed", group == 
                                                              "Outros veículos aéreos" ~ "Other aerial vehicles", group == 
@@ -42,7 +42,7 @@ get_server <- function(files, param) {
                                                              "Madeira perfilada, mesmo aplainada" ~ "Profiled wood, even planed", group == 
                                                              "Minérios de manganês e seus concentrados" ~ "Manganese ores and concentrates", group == 
                                                              "Açúcares no estado sólido" ~ "Solid sugars", group == 
-                                                             "Óleo de soja e respectivas fracções, mesmo refinados, mas não quimicamente modificados" ~ "Soybean oil and its fractions, even refined, but not chemically modified", group == 
+                                                             "Óleo de soja não modificado" ~ "Soybean oil and its fractions, even refined, but not chemically modified", group == 
                                                              "Carnes e comestíveis de aves domésticas" ~ "Meat and edible offal of domestic poultry", group == 
                                                              "Cocos e castanhas do Brasil e de caju" ~ "Brazil nuts and cashew nuts", group == 
                                                              "Frutas e outros comestíveis de planta" ~ "Fruits and other plant edibles", group == 
@@ -51,7 +51,7 @@ get_server <- function(files, param) {
                                                              "Carnes de animais da espécie bovina, congeladas" ~ "Frozen beef", group == 
                                                              "Madeira contraplacada ou compensada" ~ "Plywood or veneered wood", group == 
                                                              "Folhas de madeira para folheados" ~ "Wood veneer sheets", group == 
-                                                             "Outras gorduras e óleos vegetais" ~ "Other vegetable fats and oils", group == 
+                                                             "Outras gorduras e óleos vegetais (incluido o óleo de jojoba)" ~ "Other vegetable fats and oils", group == 
                                                              "Minerios de zinco e seus concentrados" ~ "Zinc ores and concentrates", group == 
                                                              "Minerios de chumbo e seus concentrados" ~ "Lead ores and concentrates", group == 
                                                              "Outros moveis e suas partes" ~ "Other furniture and its parts", group == 
@@ -61,7 +61,7 @@ get_server <- function(files, param) {
                                                              "Outras sementes e oleaginosos" ~ "Other seeds and oleaginous fruits", group == 
                                                              "Partes para veículos de sh4 8711 a 8713" ~ "Parts for vehicles of HS 8711 to 8713", group == 
                                                              "Partes para motores de sh4 8407 e 8408" ~ "Parts for engines of HS 8407 and 8408", group == 
-                                                             "Miudezas comestíveis de animais das espécies bovina, suína, ovina, caprina, cavalar, asinina e muar, frescas, refrigeradas ou congeladas" ~ "Edible offal of animals of the bovine, swine, ovine, caprine, equine, asinine, and mule species, fresh, chilled, or frozen", group == 
+                                                             "Miudezas comestíveis de animais das espécies bovina, suína, ovina, caprina, cavalar, asinina e muar" ~ "Edible offal of animals of the bovine, swine, ovine, caprine, equine, asinine, and mule species, fresh, chilled, or frozen", group == 
                                                              "Obras de carpintaria para construção" ~ "Carpentry works for construction", group == 
                                                              "Minérios de nióbio, tântalo, vanádio, zircônio" ~ "Niobium, tantalum, vanadium, zirconium ores", group == 
                                                              "Minerios de titanio e seus concentrados" ~ "Titanium ores and concentrates", group == 
@@ -153,7 +153,7 @@ get_server <- function(files, param) {
                                                              "Carvão vegetal" ~ "Charcoal", group == 
                                                              "Minérios de alumínio e seus concentrados" ~ "Aluminum ores and their concentrates", group == 
                                                              "Ferro fundido e outras formas primárias" ~ "Cast iron and other primary forms", group == 
-                                                             "Outras frutas de casca rija" ~ "Other nuts", group == 
+                                                             "Frutas secas ou de casca rija" ~ "Dried fruits or hard-shell nuts", group == 
                                                              "Instrumentos automáticos para regulação" ~ "Automatic regulating instruments", group == 
                                                              "Níquel em formas brutas" ~ "Nickel in raw forms", group == 
                                                              "Queijos e requeijão" ~ "Cheese and curd", group == 
@@ -200,7 +200,7 @@ get_server <- function(files, param) {
                                                              "Outros calçados" ~ "Other footwear", group == 
                                                              "Roupas íntimas e pijamas femininos" ~ "Women's underwear and pajamas", group == 
                                                              "Enzimas e enzimas preparadas" ~ "Enzymes and prepared enzymes", group == 
-                                                             "Carnes suínas refrigeradas ou congeladas" ~ "Chilled or frozen pork", group == 
+                                                             "Carnes suínas, frescas, refrigeradas ou congeladas" ~ "Chilled or frozen pork", group == 
                                                              "Âncoras e fateixas de ferro ou aço" ~ "Iron or steel anchors and grapnels", group == 
                                                              "Águas minerais sem aditivos" ~ "Mineral waters without additives", group == 
                                                              "Vestimentas de uso masculino" ~ "Men's clothing", group == 
@@ -211,7 +211,8 @@ get_server <- function(files, param) {
                                                              "Aparelhos para selecionar pedras" ~ "Stone sorting apparatus", group == 
                                                              "Gelatina e colas de origem animal" ~ "Gelatin and animal glues", group == 
                                                              "Dispositivo para tratamento de materiais" ~ "Materials treatment devices", group == 
-                                                             "Outras preparações de carne e miudezas" ~ "Other meat and offal preparations", group == 
+                                                             "Outras preparações de carne e miudezas" ~ "Other meats and offal preparations", group == 
+                                                             "Outras carnes e miudezas" ~ "Other meats and offal", group ==
                                                              "Cervejas de malte" ~ "Malt beers", group == 
                                                              "Aparelhos de iluminação e suas partes" ~ "Lighting fixtures and their parts", group == 
                                                              "Dormentes de madeira para vias férreas" ~ "Wooden sleepers for railway tracks", group == 
@@ -225,8 +226,23 @@ get_server <- function(files, param) {
                                                              "Outros couros e peles em bruto" ~ "Other raw hides and skins", group == 
                                                              "Couros e peles de animais sem pelos" ~ "Hairless animal hides and skins", group == 
                                                              "Melaços da extração e refino do açúcar" ~ "Molasses from sugar extraction and refining", group == 
-                                                             "Âmbar-cinzento, castóreo, algália e almíscar; bílis, mesmo seca; glândulas e outras substâncias de origem animal utilizadas na preparação de produtos farmacêuticos, frescas, refrigeradas, congeladas ou provisoriamente conservadas de outro modo" ~ "Ambergris, castoreum, musk, and civet; bile, whether or not dried; glands and other animal substances used in the preparation of pharmaceutical products, fresh, chilled, frozen, or provisionally preserved in other ways" ,
-                                                         TRUE ~ group
+                                                             "Âmbar, castóreo e outras substâncias de origem animal utilizadas na preparação de produtos farmacêuticos" ~ "Ambergris, castoreum and other animal substances used in the preparation of pharmaceutical products", group ==
+                                                             "Gorduras de animais das espécies bovina, ovina ou caprina, exceto as da posição 1503" ~ "Animal fats of bovine, ovine or caprine origin, excluding those classified under heading 150", group ==
+                                                             "Chocolate e outras preparações alimentícias contendo cacau" ~ "Chocolate and other cocoa preparations", group ==
+                                                             "Cravo-da-índia" ~ "Clove", group ==
+                                                             "Farinhas de cereais, exceto de trigo ou de mistura de trigo com centeio" ~ "Cereal flours, except those made from wheat or from a wheat–rye mixture", group ==
+                                                             "Farinhas de trigo ou de mistura de trigo com centeio" ~ "Wheat flour or flour from a wheat–rye mixture", group ==
+                                                             "Leite e nata" ~ "Milk and cream", group == 
+                                                             "Massas alimentícias" ~ "Pasta", group ==
+                                                             "Sorgo de grão" ~ "Grain sorghum", group ==
+                                                             "Ovos de aves" ~ "Bird eggs", group ==
+                                                             "Produtos de confeitaria sem cacau" ~ "Confectionery products without cocoa", group ==
+                                                             "Óleos de girassol, de cártamo ou de algodão" ~ "Sunflower, safflower or cottonseed oils", group ==
+                                                             "Produtos de padaria, pastelaria ou da industria de bolachas e biscoitos" ~ "Bakery, pastry, or biscuit-making industry products", group ==
+                                                             "Produtos hortícolas conservados transitoriamente" ~ "Vegetable products temporarily preserved", group ==
+                                                             "Soro de leite" ~ "Milk serum (Whey)", group ==
+                                                             "Trigo e mistura de trigo com centeio" ~ "Wheat and wheat–rye mixture",
+                                                TRUE ~ group
                                                          #######
       ))
   }
