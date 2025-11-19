@@ -70,9 +70,9 @@ get_ui <- function(files, param) {
             class = "var_selec_group",
             selectInput(
                 inputId = "uf_filter",
-                label = "Estado (UF)",          # se quiser, cria param$ui5 em pt/en
+                label = param$ui5,      
                 choices = param$uf_choices,
-                selected = param$uf_choices[1], # "Todos" ou "All"
+                selected = param$uf_choices[1],
                 width = "100%"
         )),
           
