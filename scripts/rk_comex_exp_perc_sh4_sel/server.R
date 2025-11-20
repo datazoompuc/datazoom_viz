@@ -254,9 +254,16 @@ get_server <- function(files, param) {
                             group),
              value = value * 100)
   
-  # ---- Fixar eixo X global ----
-  min_x <- min(df$value, na.rm = TRUE)
-  max_x <- max(df$value, na.rm = TRUE)
+  # ---- Fixar eixo X global (somando UFs por ano e produto) ----
+  df_x_range <- df %>%
+      dplyr::group_by(time, group, floresta, lab) %>%
+      dplyr::summarise(
+          value = sum(value, na.rm = TRUE),
+          .groups = "drop"
+      )
+  
+  min_x <- min(df_x_range$value, na.rm = TRUE)
+  max_x <- max(df_x_range$value, na.rm = TRUE)
   
   # Garantir que zero sempre apareça
   min_x <- min(0, min_x)
