@@ -12,7 +12,7 @@ files$param_script <- "scripts/ts_comex_exp_tot_pais/db_params.R"
 
 files$CSS_script <- "scripts/dza_lumen.css"
 
-files$param_file <- "data/comex_exp_tot_pais_en_dic.csv"
+files$param_file <- "data/comex_exp_tot_pais_dic_en.csv"
 files$db_file <- "data/comex_exp_tot_pais.rds"
 
 # Carrega scripts
@@ -34,6 +34,7 @@ param$lang <- TRUE
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "External trade in the Amazon (COMEX): Total products export value of Amazonia Legal per destination country"
+param$plot_title <- "Total products export value of Amazonia Legal per destination country"
 
 
 param$label_var_name <- "VARIABLES:"
