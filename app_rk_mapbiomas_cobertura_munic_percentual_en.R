@@ -33,7 +33,7 @@ param$ui1 <- "VARIABLES:"
 param$ui2 <- "Ranking - horizontal axis (x):"
 param$ui3 <- "Bar colors:"
 param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura_munic_percentual_en/'
-param$prop_button_label <- "Proportional land use relative to municipal area"
+param$prop_button_label <- "Proportion of municipality area"
 
 # Parâmetros específicos do server
 param$server0 <- "No variable selected"

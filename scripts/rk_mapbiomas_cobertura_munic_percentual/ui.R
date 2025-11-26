@@ -12,13 +12,13 @@ get_ui <- function(files, param) {
         
         # muda cor do background
         tags$style('.menucol {
-                        background-color: #3E688B;
-              }',),
+        background-color: #50A486;
+                   }'),
         
         # muda cor do botao 
         tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
-                        background-color: #3E5688 !important;
-                        border-color: #3E5688 !important;
+                        background-color: #48968B !important;
+                        border-color: #48968B !important;
               }',),
         
         h2(class = "plot_name", param$plot_name),
@@ -38,21 +38,20 @@ get_ui <- function(files, param) {
         ),
         
         # botão proporção
+        
+        tags$style(HTML("
+        .switch-label {
+        color: white;
+        }
+                        
+                        ")),
         div(
-            class = "switch_div",
-            tags$label(
-                class = "switch_label",
-                param$prop_button_label,   # <-- AGORA É DINÂMICO
-                tags$div(
-                    class = "switch_toggle",
-                    tags$input(
-                        id = "Ypr",
-                        type = "checkbox",
-                        class = "switch_input",
-                        checked = "checked"
-                    ),
-                    tags$span(class = "switch_slider")
-                )
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "yprop",
+                label = tags$span(param$prop_button_label, class = "switch-label"),
+                value = TRUE,
+                status = "info"   # ← mesma cor usada no outro app
             )
         ),
         

@@ -136,7 +136,7 @@ get_server <- function(files, param) {
           colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
           
           # ----  BLOCO PARA PROPORÇÃO ----
-          if (input$Ypr) {
+          if (input$yprop) {
               
               df_area <- df %>% 
                   dplyr::select(group, area_km2) %>% 
@@ -382,7 +382,7 @@ get_server <- function(files, param) {
       )
       fig
     }) %>%
-        bindCache(input$x, input$Ypr, param$color_def)
+        bindCache(input$x, input$yprop, param$color_def)
 
     # Observa eventos
     observe({
