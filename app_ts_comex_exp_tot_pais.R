@@ -34,10 +34,9 @@ param$lang <- FALSE
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos total da Amaz\u00f4nia Legal por país de destino"
-
+param$plot_title <- "Valor total da exporta\u00e7\u00e3o de produtos da Amaz\u00f4nia Legal por país de destino"
 
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "Valor (única opção)"
 param$label_scale_name <- "escala log"
 param$label_axis_name <- "proporcional ao ano inicial (*)"
 param$label_mun_filter <- "Países de destino"

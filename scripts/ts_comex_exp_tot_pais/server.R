@@ -338,12 +338,7 @@ get_server <- function(files, param) {
 
     # Output titulo do gráfico
     output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == param$y_def), ]
-
-        text <- paste0("", y_col$label)
+      text <- param$plot_title
       
       text
     })
