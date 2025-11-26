@@ -57,17 +57,24 @@ get_ui <- function(files, param) {
         ),
       ),
       column(9,
-        class = "plotcol h-100",
-        textOutput("plot_title"),
-        textOutput("plot_subtitle"),
-        div( # row do grÃ¡fico
-          class = "plotrow row justify-content-center flex-grow-1 w-100",
-          div(
-            class = "plotdiv w-100 h-100",
-            # GrÃ¡fico
-            plotlyOutput("plot", width = "100%", height = "100%")
-          )
-        )
+             class = "plotcol h-100",
+             textOutput("plot_title"),
+             textOutput("plot_subtitle"),
+             div( # row do gráfico
+                 class = "plotrow row justify-content-center flex-grow-1 w-100",
+                 div(
+                     class = "plotdiv w-100 h-100",
+                     style = "position: relative; display: flex; flex-direction: column;",
+                     div(
+                         style = "flex-grow: 1; position: relative;", 
+                         withSpinner(
+                             plotlyOutput("plot", width = "100%", height = "calc(100vh - 150px)"),
+                             type = 4,
+                             color = "#41878C"
+                         )
+                     )
+                 )
+             )
       )
     ),
   )
