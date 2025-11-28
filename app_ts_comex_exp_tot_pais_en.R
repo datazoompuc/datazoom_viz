@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -33,8 +34,8 @@ param$lang <- TRUE
 
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "External trade in the Amazon (COMEX): Total products export value of Amazonia Legal per destination country"
-param$plot_title <- "Total products export value of Amazonia Legal per destination country"
+param$plot_desc <- "External trade in the Brazilian Legal Amazon (COMEX): Total export value of products by destination country"
+param$plot_title <- "Total export value of products from the Brazilian Legal Amazon by destination country"
 
 
 param$label_var_name <- "VARIABLES:"
