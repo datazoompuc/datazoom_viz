@@ -180,6 +180,10 @@ get_server <- function(files, param) {
           df_p <- df_p %>% filter(group %in% top_groups)
 
           # Monta html do tooltip
+          if (input$yprop) {
+            x_col$unidade <- "%"
+          }
+          
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
