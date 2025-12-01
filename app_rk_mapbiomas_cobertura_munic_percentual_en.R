@@ -1,7 +1,9 @@
 # Carrega bibliotecas
+library(dplyr)
 library(shiny)
 library(ggplot2)
 library(plotly)
+library(shinyWidgets)
 library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
