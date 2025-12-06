@@ -1,342 +1,218 @@
-############################################################
-#### Generate rds data in the folder ./data/ 
-############################################################
+################################################################################
+#  1. SETUP AND PACKAGE LOADING
+################################################################################
 
-library(datazoom.amazonia)
-library(tidyverse)
-library(tibble)
-library(zoo)
-library(readxl)
+devtools::install_github("datazoompuc/datazoom.amazonia")
 
-# load data ------------------------------------------------------------------------
-# carrega por municipio, pois filtraremos os municipios que participam da amazonia legal
-# antes de agregar por UF
+suppressPackageStartupMessages({
+    library(datazoom.amazonia)
+    library(dplyr)
+    library(tidyr)
+    library(readr)
+    library(purrr)
+    library(tibble)
+})
 
-dat <- load_mapbiomas(dataset = "mapbiomas_cover", geo_level = "municipality", 
-                      cover_level = "none")
+################################################################################
+# 2. LOAD DATA
+################################################################################
 
+dat <- load_mapbiomas(
+    dataset   = "mapbiomas_cover",
+    geo_level = "municipality"
+)
 
+# municipios da Amazônia Legal
+municipios_amazonia <- datazoom.amazonia::municipalities %>%
+    filter(legal_amazon == 1) %>%
+    transmute(municipality_code = code_muni, uf = name_state)
 
-saveRDS(dat, file = "data/mapbiomas_cobertura_est_raw.rds")
+################################################################################
+# 3. BUILD AND AGGREGATE CLASS LEVELS (0–4)
+################################################################################
 
-# Data for level_4
-data1 <- dat
-data1$territory_id <- NULL
-data1$level_0 <- NULL
-data1$level_1 <- NULL
-data1$level_2 <- NULL
-data1$level_3 <- NULL
-data1$color <- NULL
-data1$class_id <- NULL
-data1$municipality <- NULL
+make_level <- function(dat, drop_levels) {
+    # remaining levels (class_level_0..4) minus those a dropar
+    remaining <- setdiff(paste0("class_level_", 0:4), drop_levels)
+    last_level <- tail(remaining, 1)
+    
+    dat %>%
+        # seleciona colunas relevantes, renomeia para padrão interno
+        select(
+            time = year,
+            municipality_code,
+            municipality,
+            state,
+            value,
+            aggregation = all_of(last_level)
+        ) %>%
+        
+        inner_join(municipios_amazonia, by = "municipality_code") %>%
+        mutate(area = as.numeric(value)) %>%
+        select(time, municipality_code, state, aggregation, area)
+}
 
-# filtra os municipios que participam da Amazonia Legal
+# cria os dataframes por nível (mesma lógica que seu original)
+data1 <- make_level(dat, c("class_level_0", "class_level_1", "class_level_2", "class_level_3"))
+data2 <- make_level(dat, c("class_level_0", "class_level_1", "class_level_2", "class_level_4"))
+data3 <- make_level(dat, c("class_level_0", "class_level_1", "class_level_3", "class_level_4"))
+data4 <- make_level(dat, c("class_level_0", "class_level_2", "class_level_3", "class_level_4"))
+data5 <- make_level(dat, c("class_level_1", "class_level_2", "class_level_3", "class_level_4"))
 
-municipios_amazonia<- datazoom.amazonia::municipalities
-municipios_amazonia <- municipios_amazonia%>%
-    filter(legal_amazon == 1)%>%
-    select(municipality_code=code_muni)
+# AGREGA ÁREA POR time + state + aggregation (soma por todos os municípios da Amazônia Legal)
+agg_fun <- function(df) {
+    df %>%
+        group_by(time, state, aggregation) %>%
+        summarise(area = sum(area, na.rm = TRUE), .groups = "drop")
+}
 
-data1 <- data1%>%
-    inner_join(municipios_amazonia)
+data_all <- list(data1, data2, data3, data4, data5) %>%
+    map_df(agg_fun) %>%
+    distinct()
 
-data1$municipality_code <- NULL
-
-#agrega por UF
-colnames(data1) <- c("time","state", "group","area" )
-data1 <- aggregate(area ~ time + state + group, data1, sum)
-
-
-# Data for level_3
-data2 <- dat
-data2$territory_id <- NULL
-data2$level_0 <- NULL
-data2$level_1 <- NULL
-data2$level_2 <- NULL
-data2$level_4 <- NULL
-data2$color <- NULL
-data2$class_id <- NULL
-data2$municipality <- NULL
-
-# filtra os municipios que participam da Amazonia Legal
-
-municipios_amazonia<- datazoom.amazonia::municipalities
-municipios_amazonia <- municipios_amazonia%>%
-    filter(legal_amazon == 1)%>%
-    select(municipality_code=code_muni)
-
-data2 <- data2%>%
-    inner_join(municipios_amazonia)
-
-data2$municipality_code <- NULL
-
-#agrega por UF
-colnames(data2) <- c("time","state", "group","area" )
-data2 <- aggregate(area ~ time + state + group, data2, sum)
-
-
-# Data for level_2
-data3 <- dat
-data3$territory_id <- NULL
-data3$level_0 <- NULL
-data3$level_1 <- NULL
-data3$level_3 <- NULL
-data3$level_4 <- NULL
-data3$color <- NULL
-data3$class_id <- NULL
-data3$municipality <- NULL
-
-# filtra os municipios que participam da Amazonia Legal
-
-municipios_amazonia<- datazoom.amazonia::municipalities
-municipios_amazonia <- municipios_amazonia%>%
-    filter(legal_amazon == 1)%>%
-    select(municipality_code=code_muni)
-
-data3 <- data3%>%
-    inner_join(municipios_amazonia)
-
-data3$municipality_code <- NULL
-
-#agrega por UF
-colnames(data3) <- c("time","state", "group","area" )
-data3 <- aggregate(area ~ time + state + group, data3, sum)
-
-
-
-# Data for level_1
-data4 <- dat
-data4$territory_id <- NULL
-data4$level_0 <- NULL
-data4$level_2 <- NULL
-data4$level_3 <- NULL
-data4$level_4 <- NULL
-data4$color <- NULL
-data4$class_id <- NULL
-data4$municipality <- NULL
-
-# filtra os municipios que participam da Amazonia Legal
-
-municipios_amazonia<- datazoom.amazonia::municipalities
-municipios_amazonia <- municipios_amazonia%>%
-    filter(legal_amazon == 1)%>%
-    select(municipality_code=code_muni)
-
-data4 <- data4%>%
-    inner_join(municipios_amazonia)
-
-data4$municipality_code <- NULL
-
-#agrega por UF
-colnames(data4) <- c("time","state", "group","area" )
-data4 <- aggregate(area ~ time + state + group, data4, sum)
-
-
-
-# Data for level_0
-data5 <- dat
-data5$territory_id <- NULL
-data5$level_1 <- NULL
-data5$level_2 <- NULL
-data5$level_3 <- NULL
-data5$level_4 <- NULL
-data5$color <- NULL
-data5$class_id <- NULL
-data5$municipality <- NULL
-
-# filtra os municipios que participam da Amazonia Legal
-
-municipios_amazonia<- datazoom.amazonia::municipalities
-municipios_amazonia <- municipios_amazonia%>%
-    filter(legal_amazon == 1)%>%
-    select(municipality_code=code_muni)
-
-data5 <- data5%>%
-    inner_join(municipios_amazonia)
-
-data5$municipality_code <- NULL
-
-#agrega por UF
-colnames(data5) <- c("time","state", "group","area" )
-data5 <- aggregate(area ~ time + state + group, data5, sum)
-
-
-# juntando as bases e criando o df final
-data <- rbind(data1, data2, data3, data4, data5)
-
-datafinal <- pivot_wider(unique(data), names_from = group, values_from = area,
-                         values_fill = 0)
-
-#desfaz as atribuições que eu havia feito acima e coloca na ordem correta
-datafinal <-datafinal %>%
-    select(group = state, everything())
-
-labl <- colnames(datafinal)
-labl <- labl[-c(1,2)]
-labl <- substr(labl, 6, 100)
-sublabl <- labl[22:26]
-sublabl <- substr(sublabl, 5, 100)
-#para evitar que a ordem esteja descasada, renomeei as colunas uma por uma:
-# removi a categoria "Nao aplicado" pois os resultados eram análogos ao "Não observado"
-datafinal <- datafinal %>%
-    select(  group,  time,                       
-            "Praia e Dunas"="Beach and Dune" ,  
-            "Algodão" = "Cotton",
-            "Formação de Floresta" = "Forest Formation",
-            " Plantação de Floresta" = "Forest Plantation"     ,            
-            "Pradaria" = "Grassland"  ,                     
-            "Mineiração"= "Mining" ,
-            "Mosaico de Uso da Terra"="Land Use Mosaic",
-            "Cana-de-açúcar" = "Sugar Cane" ,
-            "Mangue"= "Magrove"  ,
-            "Salar" = "Salt flat",                        
-            "Não observado"="Non Observed" ,                    
-            "Outras áreas não vegetadas"= "Other Non Vegetated Area" ,        
-            "Outras Culturas Perenes" =  "Other Perennial Crops" ,           
-            "Outras Culturas Temporárias"=  "Other Temporary Crops"  ,           
-            "Arroz" =  "Rice"    ,                     
-            "Rios, Lagos ou Oceanos" =  "River, Lake and Ocean"  ,           
-            "Afloramento rochoso" =  "Rocky outcrop"  ,                   
-            "Formação de Savana" =  "Savanna Formation"    ,           
-            "Soja" =  "Soy Beans",
-            "Pastagem" =  "Pasture" , 
-            "Infraestrutura Urbana" =  "Urban Infrastructure",
-            "Formação de Floresta"=  "Forest Formation" ,                     
-            "Pântano"=  "Wetland" ,                          
-            "Culturas Perenes"=  "Perennial Crops",                 
-            "Culturas Temporárias" =  "Temporary Crops" ,                
-            "Agricultura" =  "Agriculture"  ,                    
-            "Floresta" =  "1. Forest"   ,                     
-            "Formação Natural Não Florestal" =  "2. Non Forest Natural Formation"   ,
-            "Fazenda" =  "3. Farming" ,                       
-            "Áreas não vegetadas" =  "4. Non Vegetated Area" ,           
-            "Água" = "5. Water" ,                 
-            "Antrópico" = "Anthropic" ,                  
-            "Natural"=  "Natural"   )               
+# transforma em wide
+datafinal <- data_all %>%
+    pivot_wider(
+        id_cols = c(time, state),
+        names_from = aggregation,
+        values_from = area,
+        values_fill = 0
+    ) %>%
+    # mantém a mesma ordem que você espera: group = state, time em seguida
+    relocate(state, .before = time) %>%
+    rename(group = state)
 
 datafinal[is.na(datafinal)] <- 0
 
+################################################################################
+# 4. ADD MUNICIPAL AREA AND COMPUTE LAND USE SHARE (%)
+################################################################################
 
+areas_mun <- readr::read_rds("./app_map_mapbiomas_cover/global/area_municipios.rds")
 
-saveRDS(datafinal, "data/mapbiomas_cobertura_est.rds")
+areas_state <- areas_mun %>%
+    inner_join(municipios_amazonia, by = "municipality_code") %>%
+    group_by(uf) %>%
+    summarise(area_km2 = sum(area_km2, na.rm = TRUE), .groups = "drop")
 
-datafinal <- readRDS("data/mapbiomas_cobertura_est.rds")
+datafinal_area <- datafinal %>%
+    left_join(areas_state, by = c("group" = "uf"))
 
+saveRDS(datafinal_area, "data/mapbiomas_cobertura_est.rds")
 
+################################################################################
+# 5. BUILD VARIABLE DICTIONARIES (PT / EN)
+################################################################################
 
-####################
-# Build Dictionary 
-#####################
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Mapbiomas",
-  tipo = 1,
-  unidade = "m^2",
-  categoria= "Meio ambiente", 
-  subcategoria = "Uso da terra"
+# helper: vetor de traduções (EN -> PT) (comuns entre seus mapeamentos)
+translate_en_to_pt <- c(
+    "Aquaculture" = "Aquicultura",
+    "Beach, Dune and Sand Spot" = "Praia e Dunas",
+    "Citrus" = "Cítricos",
+    "Coffee" = "Café",
+    "Cotton" = "Algodão",
+    "Forest Formation" = "Formação de Floresta",
+    "Forest Plantation" = "Plantação de Floresta",
+    "Floodable Forest" = "Floresta Inundável",
+    "Grassland" = "Pradaria",
+    "Hypersaline Tidal Flat" = "Salar",
+    "Herbaceous Sandbank Vegetation" = "Restinga Herbácea",
+    "Mangrove" = "Mangue",
+    "Mining" = "Mineração",
+    "Mosaic of Uses" = "Mosaico de Uso da Terra",
+    "Not Observed" = "Não observado",
+    "Other Non Forest Natural Formation" = "Outras formações naturais não florestais",
+    "Other non Vegetated Areas" = "Outras áreas não vegetadas",
+    "Other Perennial Crops" = "Outras Culturas Perenes",
+    "Other Temporary Crops" = "Outras Culturas Temporárias",
+    "Rice" = "Arroz",
+    "River, Lake and Ocean" = "Rios, Lagos ou Oceanos",
+    "Rocky Outcrop" = "Afloramento rochoso",
+    "Savanna Formation" = "Formação de Savana",
+    "Soybean" = "Soja",
+    "Sugar cane" = "Cana-de-açúcar",
+    "Urban Area" = "Infraestrutura Urbana",
+    "Wetland" = "Pântano",
+    "Wooded Sandbank Vegetation" = "Restinga Arborizada",
+    "Perennial Crop" = "Culturas Perenes",
+    "Temporary Crop" = "Culturas Temporárias",
+    "Agriculture" = "Agricultura",
+    "Farming" = "Fazenda",
+    "Forest" = "Floresta",
+    "Non Forest Natural Formation" = "Formação Natural Não Florestal",
+    "Non vegetated area" = "Áreas não vegetadas",
+    "Water and Marine Environment" = "Água",
+    "Antropic" = "Antrópico",
+    "Natural" = "Natural",
+    "Undefined" = "Não aplicado"
 )
 
-temp_param_table$label[1] <- "UF"
-temp_param_table$label[2] <- "Ano"
-temp_param_table$desc[1] <- "UF"
-temp_param_table$desc[2] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 32))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 32))
-temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 33))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 32))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 32))
+# colunas para dicionário (remove municipality_code se existir)
+cols_dic <- colnames(datafinal_area)
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/mapbiomas_cobertura_est_dic.csv", fileEncoding = "UTF-8")
-
-
-##############################
-# Build Dictionary in English
-#############################
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
+# DICIONÁRIO EN
+dic_en <- tibble(
+    var = cols_dic,
     x = TRUE,
     y = TRUE,
     color = FALSE,
     size = FALSE,
     slider = FALSE,
-    label = columns,
-    desc = columns,
+    label = cols_dic,
+    desc = cols_dic,
     var_group = "Mapbiomas",
     tipo = 1,
-    unidade = "m^2",
-    categoria= "Meio ambiente", 
-    subcategoria = "Uso da terra"
+    unidade = "ha",
+    categoria = "Environment",
+    subcategoria = "Land use"
 )
 
-temp_param_table$label[1] <- "State"
-temp_param_table$label[2] <- "Year"
-temp_param_table$desc[1] <- "State"
-temp_param_table$desc[2] <- "Year"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 32))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 32))
-temp_param_table$color <- c(rep(TRUE, 1), rep(FALSE, 33))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 32))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 32))
+# ajusta campos fixos
+dic_en <- dic_en %>%
+    mutate(
+        x = if_else(var %in% c("group", "area_km2", "time"), FALSE, x),
+        y = if_else(var %in% c("group", "area_km2", "time"), FALSE, y),
+        color = if_else(var == "group", TRUE, color),
+        size = if_else(var == "group", TRUE, size),
+        slider = if_else(var == "time", TRUE, slider),
+        label = if_else(var == "time", "Year", label),
+        label = if_else(var == "group", "State", label),
+        desc  = if_else(var == "time", "Year", desc),
+        desc  = if_else(var == "group", "State", desc)
+    )
 
+# ajuste area_km2 metadata (legenda em inglês)
+dic_en <- dic_en %>%
+    mutate(
+        slider = if_else(var == "area_km2", FALSE, slider),
+        label = if_else(var == "area_km2", "Municipality area (km²)", label),
+        desc  = if_else(var == "area_km2", "Territorial area of municipality in square kilometers (aggregated by state)", desc),
+        unidade = if_else(var == "area_km2", "km^2", unidade)
+    )
 
-temp_param_table$label[temp_param_table$var==	"Praia e Dunas"]="Beach and Dune"
-temp_param_table$label[temp_param_table$var==	            "Algodão"]= "Cotton"
- temp_param_table$label[temp_param_table$var==	            "Formação de Floresta"]= "Forest Formation"
-temp_param_table$label[temp_param_table$var==	            " Plantação de Floresta"]= "Forest Plantation"               
-temp_param_table$label[temp_param_table$var==	            "Pradaria"]= "Grassland"                    
-temp_param_table$label[temp_param_table$var==	            "Mineiração"]= "Mining" 
-temp_param_table$label[temp_param_table$var==	            "Mosaico de Uso da Terra"]="Land Use Mosaic"
-temp_param_table$label[temp_param_table$var==	            "Cana-de-açúcar"]= "Sugar Cane" 
-temp_param_table$label[temp_param_table$var==	            "Mangue"]= "Magrove"  
-temp_param_table$label[temp_param_table$var==	            "Salar"]= "Salt flat"                       
-temp_param_table$label[temp_param_table$var==	            "Não observado"]="Non Observed"                  
-temp_param_table$label[temp_param_table$var==	            "Outras áreas não vegetadas"]= "Other Non Vegetated Area"      
-temp_param_table$label[temp_param_table$var==	            "Outras Culturas Perenes"]=  "Other Perennial Crops"         
-temp_param_table$label[temp_param_table$var==	            "Outras Culturas Temporárias"]=  "Other Temporary Crops"          
-temp_param_table$label[temp_param_table$var==	            "Arroz"]=  "Rice"                      
-temp_param_table$label[temp_param_table$var==	            "Rios, Lagos ou Oceanos"]=  "River, Lake and Ocean"          
-temp_param_table$label[temp_param_table$var==	            "Afloramento rochoso"]=  "Rocky outcrop"                  
-temp_param_table$label[temp_param_table$var==	            "Formação de Savana"]=  "Savanna Formation"            
- temp_param_table$label[temp_param_table$var==	            "Soja"]=  "Soy Beans"
-temp_param_table$label[temp_param_table$var==	            "Pastagem"]=  "Pasture"  
-temp_param_table$label[temp_param_table$var==	            "Infraestrutura Urbana"]=  "Urban Infrastructure"
-temp_param_table$label[temp_param_table$var==	            "Formação de Floresta"]=  "Forest Formation"                   
-temp_param_table$label[temp_param_table$var==	            "Pântano"]=  "Wetland"                        
-temp_param_table$label[temp_param_table$var==	            "Culturas Perenes"]=  "Perennial Crops"                 
-temp_param_table$label[temp_param_table$var==	            "Culturas Temporárias"]=  "Temporary Crops"              
-temp_param_table$label[temp_param_table$var==	            "Agricultura"]=  "Agriculture"                   
-temp_param_table$label[temp_param_table$var==	            "Floresta"]=  " Forest"                     
-temp_param_table$label[temp_param_table$var==	            "Formação Natural Não Florestal"]=  " Non Forest Natural Formation"  
-temp_param_table$label[temp_param_table$var==	            "Fazenda"]=  " Farming"                     
-temp_param_table$label[temp_param_table$var==	            "Áreas não vegetadas"]=  " Non Vegetated Area"         
-temp_param_table$label[temp_param_table$var==	            "Água"]= " Water"                  
-temp_param_table$label[temp_param_table$var==	            "Antrópico"]= "Anthropic"                     
-temp_param_table$label[temp_param_table$var==	            "Natural"]=  "Natural" 
-                               
+write.csv(dic_en, "data/mapbiomas_cobertura_est_dic_en.csv", fileEncoding = "UTF-8", row.names = FALSE)
 
-                       
-                       
+# DICIONÁRIO PT (a partir de EN + traduções)
+dic_pt <- dic_en
 
-View(temp_param_table)
+# traduz var/label/desc quando houver mapeamento
+dic_pt$label <- ifelse(dic_pt$label %in% names(translate_en_to_pt),
+                       translate_en_to_pt[dic_pt$label],
+                       dic_pt$label)
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/mapbiomas_cobertura_est_dic_en.csv", fileEncoding = "UTF-8")
+dic_pt$var <- ifelse(dic_pt$var %in% names(translate_en_to_pt),
+                     translate_en_to_pt[dic_pt$var],
+                     dic_pt$var)
 
+# corrige campos fixos PT
+dic_pt <- dic_pt %>%
+    mutate(
+        label = if_else(var == "time", "Ano", label),
+        label = if_else(var == "group", "UF", label),
+        desc  = if_else(var == "time", "Ano", desc),
+        desc  = if_else(var == "group", "UF", desc),
+        categoria = "Meio ambiente",
+        subcategoria = "Uso da terra"
+    )
+
+write.csv(dic_pt, "data/mapbiomas_cobertura_est_dic.csv", fileEncoding = "UTF-8", row.names = FALSE)
