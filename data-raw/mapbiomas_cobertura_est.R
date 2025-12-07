@@ -52,7 +52,7 @@ make_level <- function(dat, drop_levels) {
         select(time, municipality_code, state, aggregation, area)
 }
 
-# cria os dataframes por nível (mesma lógica que seu original)
+# cria os dataframes por nível 
 data1 <- make_level(dat, c("class_level_0", "class_level_1", "class_level_2", "class_level_3"))
 data2 <- make_level(dat, c("class_level_0", "class_level_1", "class_level_2", "class_level_4"))
 data3 <- make_level(dat, c("class_level_0", "class_level_1", "class_level_3", "class_level_4"))
@@ -147,55 +147,67 @@ translate_en_to_pt <- c(
     "Undefined" = "Não aplicado"
 )
 
-# colunas para dicionário (remove municipality_code se existir)
-cols_dic <- colnames(datafinal_area)
+# colunas para dicionário
+columns <- colnames(datafinal)
+special_vars <- c("group", "time")
 
-# DICIONÁRIO EN
+
 dic_en <- tibble(
-    var = cols_dic,
-    x = TRUE,
-    y = TRUE,
-    color = FALSE,
-    size = FALSE,
-    slider = FALSE,
-    label = cols_dic,
-    desc = cols_dic,
-    var_group = "Mapbiomas",
-    tipo = 1,
-    unidade = "ha",
-    categoria = "Environment",
+    var         = columns,
+    x           = columns != "group" & columns != "time",
+    y           = columns != "group" & columns != "time",
+    color       = columns == "group",
+    size        = !(columns %in% c("group", "time")),   # TRUE para quase tudo, FALSE para group/time
+    slider      = !(columns %in% c("group", "time")),   # TRUE para quase tudo, FALSE para group/time
+    label       = columns,
+    desc        = columns,
+    var_group   = "Mapbiomas",
+    tipo        = 1,
+    unidade     = "ha",
+    categoria   = "Environment",
     subcategoria = "Land use"
 )
 
-# ajusta campos fixos
+# Ajustes fixos
 dic_en <- dic_en %>%
     mutate(
-        x = if_else(var %in% c("group", "area_km2", "time"), FALSE, x),
-        y = if_else(var %in% c("group", "area_km2", "time"), FALSE, y),
-        color = if_else(var == "group", TRUE, color),
-        size = if_else(var == "group", TRUE, size),
-        slider = if_else(var == "time", TRUE, slider),
+        # garantir explicitamente que group e time têm size = FALSE e slider = FALSE
+        size   = if_else(var %in% c("group", "time"), FALSE, size),
+        slider = if_else(var %in% c("group", "time"), FALSE, slider),
+        
+        # color permanece TRUE só para group
+        color  = if_else(var == "group", TRUE, FALSE),
+        
+        # x/y para group/time = FALSE (já definido acima, mas reforço explicitamente)
+        x = if_else(var %in% c("group", "time"), FALSE, x),
+        y = if_else(var %in% c("group", "time"), FALSE, y),
+        
+        # labels/descriptions fixos para group/time
         label = if_else(var == "time", "Year", label),
         label = if_else(var == "group", "State", label),
         desc  = if_else(var == "time", "Year", desc),
         desc  = if_else(var == "group", "State", desc)
     )
 
-# ajuste area_km2 metadata (legenda em inglês)
+# Ajuste área_km2
 dic_en <- dic_en %>%
     mutate(
-        slider = if_else(var == "area_km2", FALSE, slider),
-        label = if_else(var == "area_km2", "Municipality area (km²)", label),
-        desc  = if_else(var == "area_km2", "Territorial area of municipality in square kilometers (aggregated by state)", desc),
-        unidade = if_else(var == "area_km2", "km^2", unidade)
+        slider  = if_else(var == "area_km2", FALSE, slider),
+        label   = if_else(var == "area_km2", "Municipality area (ha)", label),
+        desc    = if_else(var == "area_km2",
+                          "Territorial area of municipality in hectares (aggregated by state)",
+                          desc),
+        unidade = if_else(var == "area_km2", "ha", unidade)
     )
 
-write.csv(dic_en, "data/mapbiomas_cobertura_est_dic_en.csv", fileEncoding = "UTF-8", row.names = FALSE)
+write.csv(dic_en, "data/mapbiomas_cobertura_est_dic_en.csv",
+          fileEncoding = "UTF-8", row.names = FALSE)
 
-# DICIONÁRIO PT (a partir de EN + traduções)
+
+# dicionario em português
+
 dic_pt <- dic_en
 
-# traduz var/label/desc quando houver mapeamento
 dic_pt$label <- ifelse(dic_pt$label %in% names(translate_en_to_pt),
                        translate_en_to_pt[dic_pt$label],
                        dic_pt$label)
@@ -204,7 +216,7 @@ dic_pt$var <- ifelse(dic_pt$var %in% names(translate_en_to_pt),
                      translate_en_to_pt[dic_pt$var],
                      dic_pt$var)
 
-# corrige campos fixos PT
+# Ajustes fixos PT
 dic_pt <- dic_pt %>%
     mutate(
         label = if_else(var == "time", "Ano", label),
@@ -215,4 +227,5 @@ dic_pt <- dic_pt %>%
         subcategoria = "Uso da terra"
     )
 
-write.csv(dic_pt, "data/mapbiomas_cobertura_est_dic.csv", fileEncoding = "UTF-8", row.names = FALSE)
+write.csv(dic_pt, "data/mapbiomas_cobertura_est_dic.csv",
+          fileEncoding = "UTF-8", row.names = FALSE)
