@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -41,6 +42,7 @@ param$label_log_name <- "log scale"
 param$label_prop_name <-  "proportional to the initial year (*)"
 param$label_geo_name <- "State"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_est_en/"
+param$label_prop_muni <- "Proportion of municipality area"
 
 ### Parametros especificos no server
 param$subtitle_init <- "per hectare " # expressão titulo

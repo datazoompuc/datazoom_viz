@@ -96,7 +96,11 @@ areas_state <- areas_mun %>%
     summarise(area_km2 = sum(area_km2, na.rm = TRUE), .groups = "drop")
 
 datafinal_area <- datafinal %>%
-    left_join(areas_state, by = c("group" = "uf"))
+    mutate(group = tolower(group)) %>%
+    left_join(
+        areas_state %>% mutate(uf = tolower(uf)),
+        by = c("group" = "uf")
+    )
 
 saveRDS(datafinal_area, "data/mapbiomas_cobertura_est.rds")
 
@@ -152,13 +156,13 @@ translate_en_to_pt <- c(
 
 #  DICIONÁRIO EM PORTUGUÊS (var = nomes exatamente como em datafinal) 
 dic_pt <- tibble::tibble(
-    var         = columns,                        # <-- nomes exatos do datafinal
+    var         = columns,                        
     x           = !(columns %in% c("group", "time")),
     y           = !(columns %in% c("group", "time")),
     color       = ifelse(columns == "group", TRUE, FALSE),
     size        = !(columns %in% c("group", "time")),  # TRUE para quase tudo exceto group/time
     slider      = !(columns %in% c("group", "time")),  # TRUE para quase tudo exceto group/time
-    label       = columns,  # será substituído abaixo por PT quando houver mapeamento
+    label       = columns,  
     desc        = columns,  
     var_group   = "Mapbiomas",
     tipo        = 1,

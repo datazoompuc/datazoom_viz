@@ -174,20 +174,37 @@ get_server <- function(files, param) {
                    y_option = (y/aux1)*100)
           df_p$y <- df_p$y_option
         }
+        
+        # Bloco para proporção
+        if (input$yprop) {
+            df_area <- df %>%
+                dplyr::select(group, area_km2) %>%
+                dplyr::distinct()
+            
+            df_p <- df_p %>%
+                dplyr::left_join(df_area, by = "group") %>%
+                dplyr::mutate(
+                    x = x,            # mantém x intacto
+                    y = y / area_km2  # aplica proporção só em y
+                )
+        }
 
         # Se a coluna de cor for toda NA, preenche com strings em branco
         if (all(is.na(df_p$color))) {
           df_p$color <- " "
         }
         
+        # Define unidade dinâmica
+        unidade_y <- if (input$yprop) "%" else "ha"
+        
         # Monta html do tooltip
         df_p$tooltip <- paste0(
-          "<b>",df_p$text,"</b><br>",
-          x_col$label,": ",df_p$x,"<br>",
-          y_col$label,": ",format(df_p$y, scientific = FALSE,
-                                  digits = 2,
-                                  decimal.mark = ",", 
-                                  big.mark = "."), " ", "(ha)"
+            "<b>",df_p$text,"</b><br>",
+            x_col$label,": ",df_p$x,"<br>",
+            y_col$label,": ",format(df_p$y, scientific = FALSE,
+                                    digits = 2,
+                                    decimal.mark = ",", 
+                                    big.mark = "."), " ", "(", unidade_y, ")"
         )
         
         # Define paleta de cores
