@@ -104,7 +104,9 @@ saveRDS(datafinal_area, "data/mapbiomas_cobertura_est.rds")
 # 5. BUILD VARIABLE DICTIONARIES (PT / EN)
 ################################################################################
 
-# helper: vetor de traduções (EN -> PT) (comuns entre seus mapeamentos)
+columns <- colnames(datafinal)
+
+# seu vetor de tradução EN -> PT (o que você já tem)
 translate_en_to_pt <- c(
     "Aquaculture" = "Aquicultura",
     "Beach, Dune and Sand Spot" = "Praia e Dunas",
@@ -144,88 +146,69 @@ translate_en_to_pt <- c(
     "Water and Marine Environment" = "Água",
     "Antropic" = "Antrópico",
     "Natural" = "Natural",
+    "Natural/Antropic" = "Natural/Antropico",
     "Undefined" = "Não aplicado"
 )
 
-# colunas para dicionário
-columns <- colnames(datafinal)
-special_vars <- c("group", "time")
-
-
-dic_en <- tibble(
-    var         = columns,
-    x           = columns != "group" & columns != "time",
-    y           = columns != "group" & columns != "time",
-    color       = columns == "group",
-    size        = !(columns %in% c("group", "time")),   # TRUE para quase tudo, FALSE para group/time
-    slider      = !(columns %in% c("group", "time")),   # TRUE para quase tudo, FALSE para group/time
-    label       = columns,
-    desc        = columns,
+#  DICIONÁRIO EM PORTUGUÊS (var = nomes exatamente como em datafinal) 
+dic_pt <- tibble::tibble(
+    var         = columns,                        # <-- nomes exatos do datafinal
+    x           = !(columns %in% c("group", "time")),
+    y           = !(columns %in% c("group", "time")),
+    color       = ifelse(columns == "group", TRUE, FALSE),
+    size        = !(columns %in% c("group", "time")),  # TRUE para quase tudo exceto group/time
+    slider      = !(columns %in% c("group", "time")),  # TRUE para quase tudo exceto group/time
+    label       = columns,  # será substituído abaixo por PT quando houver mapeamento
+    desc        = columns,  
     var_group   = "Mapbiomas",
     tipo        = 1,
     unidade     = "ha",
-    categoria   = "Environment",
-    subcategoria = "Land use"
+    categoria   = "Meio ambiente",
+    subcategoria= "Uso da terra"
 )
 
-# Ajustes fixos
-dic_en <- dic_en %>%
-    mutate(
-        # garantir explicitamente que group e time têm size = FALSE e slider = FALSE
-        size   = if_else(var %in% c("group", "time"), FALSE, size),
-        slider = if_else(var %in% c("group", "time"), FALSE, slider),
-        
-        # color permanece TRUE só para group
-        color  = if_else(var == "group", TRUE, FALSE),
-        
-        # x/y para group/time = FALSE (já definido acima, mas reforço explicitamente)
-        x = if_else(var %in% c("group", "time"), FALSE, x),
-        y = if_else(var %in% c("group", "time"), FALSE, y),
-        
-        # labels/descriptions fixos para group/time
-        label = if_else(var == "time", "Year", label),
-        label = if_else(var == "group", "State", label),
-        desc  = if_else(var == "time", "Year", desc),
-        desc  = if_else(var == "group", "State", desc)
-    )
-
-# Ajuste área_km2
-dic_en <- dic_en %>%
-    mutate(
-        slider  = if_else(var == "area_km2", FALSE, slider),
-        label   = if_else(var == "area_km2", "Municipality area (ha)", label),
-        desc    = if_else(var == "area_km2",
-                          "Territorial area of municipality in hectares (aggregated by state)",
-                          desc),
-        unidade = if_else(var == "area_km2", "ha", unidade)
-    )
-
-write.csv(dic_en, "data/mapbiomas_cobertura_est_dic_en.csv",
-          fileEncoding = "UTF-8", row.names = FALSE)
-
-
-# dicionario em português
-
-dic_pt <- dic_en
-
-dic_pt$label <- ifelse(dic_pt$label %in% names(translate_en_to_pt),
-                       translate_en_to_pt[dic_pt$label],
-                       dic_pt$label)
-
-dic_pt$var <- ifelse(dic_pt$var %in% names(translate_en_to_pt),
-                     translate_en_to_pt[dic_pt$var],
-                     dic_pt$var)
-
-# Ajustes fixos PT
+# garantir explicitamente group/time falsos
 dic_pt <- dic_pt %>%
-    mutate(
-        label = if_else(var == "time", "Ano", label),
-        label = if_else(var == "group", "UF", label),
-        desc  = if_else(var == "time", "Ano", desc),
-        desc  = if_else(var == "group", "UF", desc),
-        categoria = "Meio ambiente",
-        subcategoria = "Uso da terra"
+    dplyr::mutate(
+        size   = ifelse(var %in% c("group", "time"), FALSE, size),
+        slider = ifelse(var %in% c("group", "time"), FALSE, slider)
     )
 
-write.csv(dic_pt, "data/mapbiomas_cobertura_est_dic.csv",
-          fileEncoding = "UTF-8", row.names = FALSE)
+# ajustar área (se sua coluna se chamar 'area_km2' mantenha, senão adapte)
+if ("area_km2" %in% dic_pt$var) {
+    dic_pt <- dic_pt %>%
+        dplyr::mutate(
+            slider  = ifelse(var == "area_km2", FALSE, slider),
+            label   = ifelse(var == "area_km2", "Área do município (ha)", label),
+            desc    = ifelse(var == "area_km2", "Área territorial do município em hectares (agregada por estado)", desc),
+            unidade = ifelse(var == "area_km2", "ha", unidade)
+        )
+}
+
+# aplicar traduções: se a coluna do datafinal é um nome em inglês presente no vetor, usar tradução
+# caso as colunas já estejam em PT, isso não muda
+dic_pt <- dic_pt %>%
+    dplyr::mutate(
+        # se var corresponde exatamente a uma chave EN do vetor, substitui label por tradução PT
+        label = ifelse(var %in% names(translate_en_to_pt),
+                       translate_en_to_pt[var],
+                       label),
+        # desc em PT (pode colocar a mesma coisa que label)
+        desc  = label
+    )
+
+readr::write_csv(dic_pt, "data/mapbiomas_cobertura_est_dic.csv")
+
+# DICIONÁRIO EM INGLÊS 
+dic_en <- dic_pt %>%
+    dplyr::mutate(
+        # se var originalmente estava em EN (chave do vetor), label deve ser o EN
+        label = ifelse(var %in% names(translate_en_to_pt),
+                       var,
+                       label),
+        desc = label,
+        categoria = "Environment",
+        subcategoria = "Land use"
+    )
+
+readr::write_csv(dic_en, "data/mapbiomas_cobertura_est_dic_en.csv")
