@@ -53,7 +53,6 @@ param$label_amazon<- paste0("Amazônia Legal")
 
 param$label_variable<- "VARI\u00C1VEIS:"
 param$label_x_choice_rk<- "Ranking - eixo horizontal (x):"
-param$color_bar<- "Cor das barras:"
 param$link<-"https://datazoom.shinyapps.io/app_rk_comex_exp_munic_produtosamz/"
 
 
