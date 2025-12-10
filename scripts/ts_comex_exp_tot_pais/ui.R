@@ -28,15 +28,19 @@ get_ui <- function(files, param) {
 
         
         # Seleciona eixo log
-        checkboxInput(
-          inputId = "ylog",
-          param$label_scale_name,
-          value = FALSE,
-          width = "100%"
+        tags$style(HTML(".switch-label { color: white; }")),
+        div(
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "ylog",
+                label = tags$span(param$label_scale_name, class = "switch-label"),
+                value = FALSE, 
+                status = "info"
+            )
         ),
      
 
-        # Seleciona filtro de municÃ­pios
+        # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
           param$label_mun_filter,
