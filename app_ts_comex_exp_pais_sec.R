@@ -44,8 +44,8 @@ param$label_scale_name <- "escala log"
 param$label_axis_name <- "proporcional ao ano inicial (*)"
 param$label_mun_filter <- "Países de destino"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_pais_sec/"
-param$currency <- "Em US$"
-param$measurement <- "US$ "
+param$currency <- "Por R$"
+param$measurement <- "R$ "
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
