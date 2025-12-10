@@ -42,8 +42,8 @@ param$label_scale_name <- "Escala log"
 param$label_axis_name <- "proporcional ao ano inicial (*)"
 param$label_mun_filter <- "Países de destino"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_pais/"
-param$currency <- "Por R$"
-param$measurement <- "R$ "
+param$currency <- "Em US$"
+param$measurement <- "US$ "
 
 # Outros parâmetros e configurações
 
