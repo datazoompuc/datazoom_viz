@@ -272,7 +272,7 @@ get_server <- function(files, param) {
       updateSelectInput(session,
         "filter1",
         choices = param$filter_choices,
-        selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        selected = sample(param$filter_choices, 3) # numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
 
     }
