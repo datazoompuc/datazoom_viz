@@ -52,7 +52,7 @@ param$label_amazon<- paste0("Amazônia Legal")
 #Mudanças específicas no UI
 
 param$label_variable<- "VARI\u00C1VEIS:"
-param$label_x_choice_rk<- "Ranking - eixo horizontal (x):"
+param$label_x_choice_rk<- "Categoria de produtos:"
 param$link<-"https://datazoom.shinyapps.io/app_rk_comex_exp_munic_produtosamz/"
 
 
