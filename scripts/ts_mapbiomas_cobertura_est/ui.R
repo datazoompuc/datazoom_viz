@@ -26,7 +26,10 @@ get_ui <- function(files, param) {
                      hr(),
                      p(class="vars",  param$label_var_name),
                      
-                     div(class="var_selec_group",
+                     div(
+                         style = "display: flex; flex-direction: column; gap: 5px;", # espaçamento dos botões
+                         
+                         class="var_selec_group",
                          # Seleciona variável do eixo y
                          selectInput(
                            inputId = "y",
@@ -57,8 +60,8 @@ get_ui <- function(files, param) {
               tags$style(HTML(".switch-label { color: white; }")),
               
               div(
-                  style = "display: flex; flex-direction: column; gap: 10px;",  # deixa um embaixo do outro com espaçamento bonito
-                  
+                  style = "display: flex; flex-direction: column; gap: 10px;",  # espaçamento dos botões
+                  o com 
               # Variação do ano inicial 
               materialSwitch(
                   inputId = "y_option",
