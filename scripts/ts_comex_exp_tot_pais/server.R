@@ -352,11 +352,17 @@ get_server <- function(files, param) {
       text
     })
     output$plot_subtitle <- renderText({
-        if (is.null(param$y_def) || param$y_def == "") {
+        if (is.null(param$y_def) || param$y_def == "") 
             return("")
-        }
         
-        if (isTRUE(input$ydefl)) {
+        
+        if (isTRUE(input$y_option) && isTRUE(input$ydefl)) {
+            paste0(param$ylabel_deflator, " ", param$label_prop)
+            
+        } else if (isTRUE(input$y_option)) {
+            paste0(param$currency, " ", param$label_prop)
+        
+        } else if (isTRUE(input$ydefl)) {
             paste0(param$currency, param$subtitle_deflator)
         } else {
             param$currency
@@ -419,12 +425,23 @@ get_server <- function(files, param) {
           colnames(df_p) <- c("x", "y", "color")
           df_p$group <- df_filtered$group
           df_p$text <- df_p$group
+          
+          if (isTRUE(input$y_option)) {
+              # garante ordem por país e ano
+              df_p <- df_p[order(df_p$group, df_p$x), ]
+              
+              # Proporcional ao ano inicial (índice 100)
+              df_p <- df_p %>%
+                  group_by(group) %>%
+                  mutate(
+                      y = 100 * y / first(na.omit(y))
+                  ) %>%
+                  ungroup()
+          }
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
           
-          # Garante ordem cronológica dentro de cada país
-          df_p <- df_p[order(df_p$group, df_p$x), ]
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
@@ -438,11 +455,12 @@ get_server <- function(files, param) {
             df_p$color <- " "
           }
           
-          measurement_label <- if (isTRUE(input$ydefl)) {
-              param$ylabel_deflator
-          } else {
-              param$measurement
-          }
+          measurement_label <- case_when(
+          isTRUE(input$y_option) ~ param$label_prop,  # índice, sem unidade monetária
+          isTRUE(input$ydefl)    ~ param$ylabel_deflator,
+          TRUE                   ~ param$measurement
+          )
+          
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
@@ -497,7 +515,10 @@ get_server <- function(files, param) {
           
           label_defl_suffix <- if (isTRUE(input$ydefl)) paste0(" (", param$ylabel_deflator, ")") else ""
           
-          y_axis_layout$title <- paste0(y_col$label, label_defl_suffix, "*")
+          label_prop_suffix <- if (isTRUE(input$y_option)) param$label_prop else ""
+          
+          
+          y_axis_layout$title <- paste0(y_col$label, label_defl_suffix, label_prop_suffix, "*")
           
           # Layout hover/tooltip
           tooltip <- list(

@@ -25,6 +25,21 @@ get_ui <- function(files, param) {
         p(class = "plot_desc", param$plot_desc),
         hr(),
         p(class = "vars", param$label_var_name),
+        
+        
+        
+        # Seleciona filtro de países
+        selectizeInput(
+            "filter1",
+            param$label_country_filter,
+            choices = NULL,
+            multiple = TRUE,
+            options = list(maxItems = 20),
+            width = "100%"
+        ),
+        
+        # espaço vazio
+        div(class = "fakecheckbox", ),
 
         
         # Seleciona eixo log
@@ -34,6 +49,17 @@ get_ui <- function(files, param) {
             materialSwitch(
                 inputId = "ylog",
                 label = tags$span(param$label_scale_name, class = "switch-label"),
+                value = FALSE, 
+                status = "info"
+            )
+        ),
+        
+        # Seleciona proporcional
+        div(
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "y_option",
+                label = tags$span(param$label_axis_name, class = "switch-label"),
                 value = FALSE, 
                 status = "info"
             )
@@ -51,16 +77,6 @@ get_ui <- function(files, param) {
         ),
      
 
-        # Seleciona filtro de municípios
-        selectizeInput(
-          "filter1",
-          param$label_mun_filter,
-          choices = NULL,
-          multiple = TRUE,
-          options = list(maxItems = 20),
-          width = "100%"
-        ),
-        
         # espaço vazio
         div(class = "fakecheckbox", ),
         
