@@ -50,6 +50,8 @@ get_ui <- function(files, param) {
                              width = "100%"
                          ),
                          
+                         div(style = "margin-top: 5px;"),  # espaço em branco
+                         
                          # BLOCO DOS BOTÕES
                          
                          # Variação do ano inicial 
