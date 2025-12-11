@@ -26,7 +26,6 @@ dat <- load_mapbiomas(
 # municipios da Amazônia Legal
 municipios_amazonia <- datazoom.amazonia::municipalities %>%
     filter(legal_amazon == 1) %>%
-    transmute(municipality_code = code_muni, uf = name_state)
     transmute(municipality_code = code_muni, uf = name_state) 
 
 ################################################################################
