@@ -26,8 +26,9 @@ get_ui <- function(files, param) {
                      hr(),
                      p(class="vars",  param$label_var_name),
                      
+                     tags$style(HTML(".switch-label { color: white; }")),
                      div(
-                         style = "display: flex; flex-direction: column; gap: 5px;", # espaçamento dos botões
+                         style = "display: flex; flex-direction: column; gap: 10px;", # espaçamento dos botões
                          
                          class="var_selec_group",
                          # Seleciona variável do eixo y
@@ -47,37 +48,26 @@ get_ui <- function(files, param) {
                              multiple = TRUE, 
                              options = list(maxItems = 20),
                              width = "100%"
+                         ),
+                         
+                         # BLOCO DOS BOTÕES
+                         
+                         # Variação do ano inicial 
+                         materialSwitch(
+                             inputId = "y_option",
+                             label = tags$span(param$label_prop_name, class = "switch-label"),
+                             value = FALSE,
+                             status = "info"
+                         ),
+                         
+                         # Porporção do estado 
+                         materialSwitch(
+                             inputId = "yprop",
+                             label = tags$span(param$label_prop_muni, class = "switch-label"),
+                             value = FALSE,   
+                             status = "info"
                          )
                      ),
-                     
-                     
-            
-              # espaço vazio
-              div(class = "fakecheckbox", ),
-              
-              # BLOCO DOS BOTÕES
-              
-              tags$style(HTML(".switch-label { color: white; }")),
-              
-              div(
-                  style = "display: flex; flex-direction: column; gap: 10px;",  # espaçamento dos botões
-                  o com 
-              # Variação do ano inicial 
-              materialSwitch(
-                  inputId = "y_option",
-                  label = tags$span(param$label_prop_name, class = "switch-label"),
-                  value = FALSE,
-                  status = "info"
-                  ),
-              
-              # Porporção do estado 
-              materialSwitch(
-                  inputId = "yprop",
-                  label = tags$span(param$label_prop_muni, class = "switch-label"),
-                  value = FALSE,   
-                  status = "info"
-                  )
-              ),
 
               # espaço vazio
               div(class = "fakecheckbox", ),
