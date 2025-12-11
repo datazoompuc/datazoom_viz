@@ -11,6 +11,7 @@ suppressPackageStartupMessages({
     library(readr)
     library(purrr)
     library(tibble)
+    library(stringr)
 })
 
 ################################################################################
@@ -26,6 +27,7 @@ dat <- load_mapbiomas(
 municipios_amazonia <- datazoom.amazonia::municipalities %>%
     filter(legal_amazon == 1) %>%
     transmute(municipality_code = code_muni, uf = name_state)
+    transmute(municipality_code = code_muni, uf = name_state) 
 
 ################################################################################
 # 3. BUILD AND AGGREGATE CLASS LEVELS (0–4)
@@ -96,11 +98,12 @@ areas_state <- areas_mun %>%
     summarise(area_km2 = sum(area_km2, na.rm = TRUE), .groups = "drop")
 
 datafinal_area <- datafinal %>%
-    mutate(group = tolower(group)) %>%
+    mutate(group = tolower(group)) %>%     
     left_join(
         areas_state %>% mutate(uf = tolower(uf)),
         by = c("group" = "uf")
-    )
+    ) %>%
+    mutate(group = stringr::str_to_title(group))   
 
 saveRDS(datafinal_area, "data/mapbiomas_cobertura_est.rds")
 

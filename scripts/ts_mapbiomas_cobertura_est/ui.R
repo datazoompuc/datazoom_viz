@@ -34,39 +34,48 @@ get_ui <- function(files, param) {
                            choices = param$y_choices,
                            selected = param$y_def,
                            width = "100%"
+                         ),
+                         
+                         # Seleciona filtro de municípios
+                         selectizeInput(
+                             'filter1', 
+                             param$label_geo_name, 
+                             choices = NULL,
+                             multiple = TRUE, 
+                             options = list(maxItems = 20),
+                             width = "100%"
                          )
                      ),
                      
                      
-                    # Seleciona eixo 
-                      checkboxInput(
-                      inputId = "y_option",
-                      param$label_prop_name,
-                      value = FALSE,
-                      width = "100%"
-                      ),
-                     
-                     # Seleciona filtro de municípios
-                     selectizeInput(
-                       'filter1', 
-                       param$label_geo_name, 
-                       choices = NULL,
-                       multiple = TRUE, 
-                       options = list(maxItems = 20),
-                       width = "100%"
-                     ),
+            
+              # espaço vazio
+              div(class = "fakecheckbox", ),
               
-              # Botão da proporção
+              # BLOCO DOS BOTÕES
+              
               tags$style(HTML(".switch-label { color: white; }")),
+              
               div(
-                  style = "margin-top: 10px;",
-                  materialSwitch(
-                      inputId = "yprop",
-                      label = tags$span(param$label_prop_muni, class = "switch-label"),
-                      value = FALSE,   
-                      status = "info"
+                  style = "display: flex; flex-direction: column; gap: 10px;",  # deixa um embaixo do outro com espaçamento bonito
+                  
+              # Variação do ano inicial 
+              materialSwitch(
+                  inputId = "y_option",
+                  label = tags$span(param$label_prop_name, class = "switch-label"),
+                  value = FALSE,
+                  status = "info"
+                  ),
+              
+              # Porporção do estado 
+              materialSwitch(
+                  inputId = "yprop",
+                  label = tags$span(param$label_prop_muni, class = "switch-label"),
+                  value = FALSE,   
+                  status = "info"
                   )
               ),
+
               # espaço vazio
               div(class = "fakecheckbox", ),
               

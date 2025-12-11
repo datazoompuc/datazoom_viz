@@ -166,27 +166,39 @@ get_server <- function(files, param) {
           stop()
         }
         
-        # Alternativa de medida para y
-        if (input$y_option & is.numeric(df_p$y)) {
-          df_p <- df_p %>%
-            group_by(df_p$group) %>%
-            mutate(aux1 = first(y),
-                   y_option = (y/aux1)*100)
-          df_p$y <- df_p$y_option
-        }
+        # ===============================
+        #   BOTÕES DE TRANSFORMAÇÃO
+        # ===============================
         
-        # Bloco para proporção
-        if (input$yprop) {
-            df_area <- df %>%
-                dplyr::select(group, area_km2) %>%
-                dplyr::distinct()
+        if (is.numeric(df_p$y)) {
             
-            df_p <- df_p %>%
-                dplyr::left_join(df_area, by = "group") %>%
-                dplyr::mutate(
-                    x = x,            # mantém x intacto
-                    y = y / area_km2  # aplica proporção só em y
-                )
+            # Guarda o valor bruto original (antes de qualquer transformação)
+            df_p$y_raw <- df_p$y
+            
+            # 1) PROPORÇÃO DA ÁREA
+            # Se o usuário ativou yprop, primeiro normalizamos pela área
+            if (input$yprop) {
+                df_area <- df %>%
+                    dplyr::select(group, area_km2) %>%
+                    dplyr::distinct()
+                
+                df_p <- df_p %>%
+                    dplyr::left_join(df_area, by = "group") %>%
+                    dplyr::mutate(
+                        y = y_raw / area_km2
+                    )
+            }
+            
+            # 2) PROPORCIONAL AO ANO INICIAL
+            # Se o usuário ativou y_option, agora zeramos o valor inicial
+            if (input$y_option) {
+                df_p <- df_p %>%
+                    dplyr::group_by(group) %>%
+                    dplyr::mutate(
+                        y = y - first(y)  # crescimento absoluto
+                    ) %>%
+                    dplyr::ungroup()
+            }
         }
 
         # Se a coluna de cor for toda NA, preenche com strings em branco
