@@ -38,6 +38,17 @@ get_ui <- function(files, param) {
                 status = "info"
             )
         ),
+        
+        # Seleciona deflação
+        div(
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "ydefl",
+                label = tags$span(param$label_deflator, class = "switch-label"),
+                value = FALSE,  # começa desligado
+                status = "info"
+            )
+        ),
      
 
         # Seleciona filtro de municípios

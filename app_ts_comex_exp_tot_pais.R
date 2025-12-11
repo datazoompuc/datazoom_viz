@@ -43,9 +43,10 @@ param$label_axis_name <- "proporcional ao ano inicial (*)"
 param$label_mun_filter <- "Países de destino"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_pais/"
 param$currency <- "Em US$"
-param$measurement <- "US$ "
-
-# Outros parâmetros e configurações
+param$measurement <- "US$"
+param$label_deflator <- "Deflacionar (US$ de 1998)"
+param$ylabel_deflator <-  "US$ de 1998"
+param$subtitle_deflator <- " (deflacionados, base 1998 = 100)"
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

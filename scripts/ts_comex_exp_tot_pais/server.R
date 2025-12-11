@@ -15,6 +15,15 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
     
+    # Carrega índice de preços anual
+    indice <- read.csv("data/indice_precos_anual.csv",
+                       stringsAsFactors = FALSE)
+    
+    # Garante tipos e nomes compatíveis com o df principal
+    indice$time <- as.integer(indice$CO_ANO)
+    indice$indice_anual_base1998 <- as.numeric(indice$indice_anual_base1998)
+    indice <- indice[, c("time", "indice_anual_base1998")]
+    
     #######
     #Translating country names
     if(param$lang){
@@ -343,14 +352,15 @@ get_server <- function(files, param) {
       text
     })
     output$plot_subtitle <- renderText({
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(param$y_def) || param$y_def == "") {
-        text <- ""
-      } else {
-        text <- paste0("",param$currency,"")
-      }
-
-      text
+        if (is.null(param$y_def) || param$y_def == "") {
+            return("")
+        }
+        
+        if (isTRUE(input$ydefl)) {
+            paste0(param$currency, param$subtitle_deflator)
+        } else {
+            param$currency
+        }
     })
 
     # Output gráfico
@@ -376,10 +386,34 @@ get_server <- function(files, param) {
 
           # Filtra dataframe com grupos selecionados
           df_filtered <- df[which(df$group %in% input$filter1), ]
+          
+          # Decide qual variável vai para o eixo Y:
+          #   - nominal (original) quando ydefl == FALSE
+          #   - deflacionada quando ydefl == TRUE
+          y_var <- y_col$var  # padrão: coluna original
+          
+          if (isTRUE(input$ydefl)) {
+              # Remove anos sem índice (ex.: 1997)
+              df_filtered <- df_filtered[df_filtered$time >= 1998, ]
+              
+              # Anexa o índice via match, sem mudar ordem nem número de linhas
+              df_filtered$indice_anual_base1998 <- indice$indice_anual_base1998[
+                  match(df_filtered$time, indice$time)
+              ]
+              
+              # Se por algum motivo faltar índice para algum ano, joga fora
+              df_filtered <- df_filtered[!is.na(df_filtered$indice_anual_base1998), ]
+              
+              # Cria uma coluna nova deflacionada (US$ de 1998)
+              df_filtered$y_defl <- df_filtered[[y_col$var]] *
+                  (100 / df_filtered$indice_anual_base1998)
+              
+              y_var <- "y_defl"
+          }
 
           df_p <- data.frame(
             df_filtered[x_col$var],
-            df_filtered[y_col$var],
+            df_filtered[[y_var]],
             df_filtered[color_col$var]
           )
           colnames(df_p) <- c("x", "y", "color")
@@ -388,6 +422,9 @@ get_server <- function(files, param) {
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
+          
+          # Garante ordem cronológica dentro de cada país
+          df_p <- df_p[order(df_p$group, df_p$x), ]
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
@@ -400,15 +437,24 @@ get_server <- function(files, param) {
           if (all(is.na(df_p$color))) {
             df_p$color <- " "
           }
+          
+          measurement_label <- if (isTRUE(input$ydefl)) {
+              param$ylabel_deflator
+          } else {
+              param$measurement
+          }
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
-            "<b>", df_p$text, "</b><br>",
-            x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", param$measurement, format(df_p$y, scientific = FALSE,
-                                         digits = 2,
-                                         decimal.mark = ",", 
-                                         big.mark = "."), "<br>"
+              "<b>", df_p$text, "</b><br>",
+              x_col$label, ": ", df_p$x, "<br>",
+              y_col$label, " (", measurement_label, "): ",
+              format(df_p$y,
+                     scientific   = FALSE,
+                     digits       = 2,
+                     decimal.mark = ",",
+                     big.mark     = "."),
+              "<br>"
           )
 
           # Define paleta de cores
@@ -446,12 +492,12 @@ get_server <- function(files, param) {
           )
 
           if (input$ylog & is.numeric(df_p$y)) {
-            y_axis_layout$type <- "log"
+              y_axis_layout$type <- "log"
           }
-
-
-              y_axis_layout$title <- paste0(y_col$label, "*")
-        
+          
+          label_defl_suffix <- if (isTRUE(input$ydefl)) paste0(" (", param$ylabel_deflator, ")") else ""
+          
+          y_axis_layout$title <- paste0(y_col$label, label_defl_suffix, "*")
           
           # Layout hover/tooltip
           tooltip <- list(
