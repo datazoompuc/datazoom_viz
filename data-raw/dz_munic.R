@@ -11,6 +11,8 @@ library(sp)
 library(scales) # to use label_percent()
 library(here)
 library(data.table)
+library(purrr)
+library(glue)
 ####################
 # 1) Call and clean data
 ###################
@@ -28,21 +30,21 @@ lgl_amazon <- readRDS(here("global", "legal_amazon_boundary.rds"))
 #st_crs(lgl_amazon)
 
 
-# 1) Mesma projeção e tirar Z/M se houver
+# 1) Mesma projecao e tirar Z/M se houver
 munic      <- st_zm(munic, drop = TRUE, what = "ZM")
 lgl_amazon <- st_zm(lgl_amazon, drop = TRUE, what = "ZM")
 munic      <- st_transform(munic, st_crs(lgl_amazon))
 
-# 2) Corrigir geometrias inválidas
+# 2) Corrigir geometrias invalidas
 munic_fix      <- st_make_valid(munic)
 lgl_amazon_fix <- lgl_amazon %>% 
     st_make_valid() %>% 
-    st_union()              # vira 1 polígono contínuo
+    st_union()              # vira 1 poligono continuo
 
 # se ainda der erro com S2, desligar temporariamente
 sf_use_s2(FALSE)
 
-# Interseção / filtro espacial
+# Intersecao / filtro espacial
 munic_amazon <- st_intersection(munic_fix, lgl_amazon_fix)
 
 # alternativa (costuma ser mais leve):
@@ -275,9 +277,22 @@ ips_2018 <- readxl::read_xlsx(here("data", "IPS_amazonia_2023.xlsx"),
            estado,
            ips_amazonia_2018)
 
-ips_2021 <- readRDS(here("data", "ips_2021_atualizado.rds")) %>% select(ips_2021 = ips_amazonia_2021)
-ips_2023 <- readRDS(here("data", "ips_2023.rds")) %>% select(ips_2023 = ips_amazonia_2023)
+ips_2021 <- readRDS(here("data", "ips_2021_atualizado.rds")) %>% select(cod_ibge, ips_2021 = ips_amazonia_2021) %>% 
+    st_drop_geometry() %>% 
+    mutate(cod_ibge = cod_ibge %>% as.character() %>% as.numeric())
+ips_2023 <- readRDS(here("data", "ips_2023.rds")) %>% select(cod_ibge, ips_2023 = ips_amazonia_2023) %>% 
+    st_drop_geometry() %>% 
+    mutate(cod_ibge = cod_ibge %>% as.character() %>% as.numeric())
  
+ips <- ips_2021 %>% 
+    left_join(ips_2023, by = c("cod_ibge")) %>% 
+    left_join(ips_2018, by = c("cod_ibge")) %>% 
+    left_join(ips_2014, by = c("cod_ibge")) %>% 
+    select(-ends_with("y")) %>% 
+    rename(municipio = municipio.x,
+           estado = estado.x,
+           ips_2018 = ips_amazonia_2018,
+           ips_2014 = ips_amazonia_2014)
 
 ###################
 # IBGE - CEMPRE
@@ -300,7 +315,9 @@ ppm_livestock <- readRDS(file = "./data/ppm_municipality_livestock_inventory.rds
 # dplyr::select("Código Município Completo", "Nome_Município")
 #ppm_livestock$group <- plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município, to = munics$`Código Município Completo`)
 
-ppm_livestock= ppm_livestock%>%
+ppm_livestock= ppm_livestock %>%
+    rename(ano = time,
+           geo_id = group) %>% 
     dplyr::filter(ano >= 2000)%>%
     dplyr::select(geo_id, ano, num_v2670, num_v32794, num_v32796)
 
@@ -330,9 +347,24 @@ ppm_livestock= ppm_livestock%>%
 # 
 # saveRDS(pam_municipality_all_crops_2000_19, "./data/pam_municipality_all_crops_2000_19.rds")
 
-pam_municipality_all_crops= readRDS('./data/pam_municipality_all_crops.rds') %>%
-    filter(ano >= 2000)
-pam_municipality_all_crops[is.na(pam_municipality_all_crops)] <- 0  
+ # pam_municipality_all_crops= readRDS('./data/pam_municipality_all_crops.rds') %>%
+ #    filter(ano >= 2000)
+cols_pam <- c("area_plantada_dest_colheita_v40124",
+              "quant_v40124",
+              "area_plantada_dest_colheita_v40102",
+              "quant_v40102",
+              "area_plantada_dest_colheita_v40122",
+              "quant_v40122",
+              "area_plantada_dest_colheita_v40119",
+              "quant_v40119")
+pam_municipality_all_crops <- map(2000:2024, ~ readRDS(glue::glue("./data/pam_municipality_all_crops{.x}.rds")) %>% 
+                                      select(geo_id, ano, cols_pam))
+
+pam_municipality_all_crops <- pam_municipality_all_crops %>% 
+    bind_rows() %>% 
+    mutate(across(area_plantada_dest_colheita_v40124:quant_v40119, ~ .x %>% as.numeric())) %>% 
+    mutate(across(area_plantada_dest_colheita_v40124:quant_v40119, ~ if_else(is.na(.x), 0, .x)))
+
 
 ###########################
 # edit data to merge
@@ -344,7 +376,7 @@ class(prodes$cod_munic_ibge) <-  'character'
 #class(deter$cod_ibge) <-  'character'
 class(gdp$cod_ibge) <-  'character'
 #class(degrad$cod_ibge) <-  'character'
-class(ips$cod_municipio) <-  'character'
+class(ips$cod_ibge) <-  'character'
 class(income$cod_ibge) <-  'character'
 #class(ppm_livestock$group) <-  'character'
 
@@ -355,7 +387,7 @@ class(prodes$ano) <-  'numeric'
 class(gdp$ano) <-  'numeric'
 #class(degrad$ano) <-  'numeric'
 #class(income$ano) <-  'numeric'
-class(ips$cod_municipio) <-  'character'
+class(ips$cod_ibge) <-  'character'
 class(pam_municipality_all_crops$ano) <- 'numeric'
 
 ###########################
@@ -365,7 +397,7 @@ dz_munic <- income %>%
     full_join(prodes, by = c("cod_ibge" = "cod_munic_ibge")) %>%
     full_join(gdp, by = c("cod_ibge", "ano")) %>%
     full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
-    full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
+    full_join(ips, by = c("cod_ibge" = "cod_ibge")) %>%
     full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
     full_join(pam_municipality_all_crops, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
     arrange(cod_ibge, ano) %>%
