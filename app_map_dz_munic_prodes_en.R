@@ -52,7 +52,7 @@ param$link<-"window.open('https://datazoom.shinyapps.io/app_map_dz_munic_prodes_
 
 # Outros parâmetros e configurações
 param$x_choices <- param$x_choices[param$app]
-
+param$label_prop_name <- "Proportion of the area of the municipality"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
