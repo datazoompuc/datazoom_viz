@@ -39,7 +39,7 @@ param$plot_title <- "Valor total da exporta\u00e7\u00e3o de produtos da Amaz\u00
 
 param$label_var_name <- "VARIÁVEIS:"
 param$label_scale_name <- "Escala log"
-param$label_axis_name <- "Proporcional ao ano inicial (*)"
+param$label_axis_name <- "Proporcional ao ano inicial"
 param$label_prop <- "% do ano inicial"
 param$label_country_filter <- "Países de destino"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_pais/"

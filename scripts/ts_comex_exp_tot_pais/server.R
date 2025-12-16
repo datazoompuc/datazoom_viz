@@ -515,10 +515,10 @@ get_server <- function(files, param) {
           
           label_defl_suffix <- if (isTRUE(input$ydefl)) paste0(" (", param$ylabel_deflator, ")") else ""
           
-          label_prop_suffix <- if (isTRUE(input$y_option)) param$label_prop else ""
+          label_prop_suffix <- if (isTRUE(input$y_option)) paste0(" (", param$label_prop, ")") else ""
           
           
-          y_axis_layout$title <- paste0(y_col$label, label_defl_suffix, label_prop_suffix, "*")
+          y_axis_layout$title <- paste0(y_col$label, label_defl_suffix, label_prop_suffix)
           
           # Layout hover/tooltip
           tooltip <- list(
