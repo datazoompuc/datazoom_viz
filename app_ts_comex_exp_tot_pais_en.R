@@ -39,13 +39,18 @@ param$plot_title <- "Total export value of products from the Brazilian Legal Ama
 
 
 param$label_var_name <- "VARIABLES:"
-param$label_y_name <- "Value (only option)"
-param$label_scale_name <- "log scale"
-param$label_axis_name <- "proportional to starting year (*)"
-param$label_mun_filter <- "Destination Countries"
+param$label_scales <- "SCALE OPTIONS:"
+param$label_scale_name <- "Log scale"
+param$label_axis_name <- "Proportional to starting year"
+param$label_prop <- "% of starting year"
+param$label_country_filter <- "Destination Countries"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_pais_en/"
-param$currency <- "Per R$"
-param$measurement <- "R$ "
+param$currency <- "In US$"
+param$measurement <- "US$"
+param$label_deflator   <- "Deflate (1998 US$)"
+param$ylabel_deflator  <- "1998 US$"
+param$subtitle_deflator <- " (deflated, base 1998 = 100)"
+
 
 # Outros parâmetros e configurações
 
