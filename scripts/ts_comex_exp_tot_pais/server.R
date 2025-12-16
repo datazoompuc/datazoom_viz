@@ -344,6 +344,20 @@ get_server <- function(files, param) {
         random_inputs() # preenche inputs se estiverem vazios
       }
     }
+    
+    # Se marcar LOG, desmarca PROPORCIONAL
+    observeEvent(input$ylog, ignoreInit = TRUE, {
+        if (isTRUE(input$ylog) && isTRUE(input$y_option)) {
+            updateCheckboxInput(session, "y_option", value = FALSE)
+        }
+    })
+    
+    # Se marcar PROPORCIONAL, desmarca LOG
+    observeEvent(input$y_option, ignoreInit = TRUE, {
+        if (isTRUE(input$y_option) && isTRUE(input$ylog)) {
+            updateCheckboxInput(session, "ylog", value = FALSE)
+        }
+    })
 
     # Output titulo do gráfico
     output$plot_title <- renderText({
@@ -460,6 +474,7 @@ get_server <- function(files, param) {
           isTRUE(input$ydefl)    ~ param$ylabel_deflator,
           TRUE                   ~ param$measurement
           )
+          
           
 
           # Monta html do tooltip

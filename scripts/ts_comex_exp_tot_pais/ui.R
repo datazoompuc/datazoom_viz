@@ -40,6 +40,22 @@ get_ui <- function(files, param) {
         
         # espaço vazio
         div(class = "fakecheckbox", ),
+        
+        # Seleciona deflação
+        div(
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "ydefl",
+                label = tags$span(param$label_deflator, class = "switch-label"),
+                value = FALSE,  # começa desligado
+                status = "info"
+            )
+        ),
+        
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        
+        p(class = "vars", param$label_scales),
 
         
         # Seleciona eixo log
@@ -54,6 +70,7 @@ get_ui <- function(files, param) {
             )
         ),
         
+        
         # Seleciona proporcional
         div(
             style = "margin-top: 10px;",
@@ -65,16 +82,7 @@ get_ui <- function(files, param) {
             )
         ),
         
-        # Seleciona deflação
-        div(
-            style = "margin-top: 10px;",
-            materialSwitch(
-                inputId = "ydefl",
-                label = tags$span(param$label_deflator, class = "switch-label"),
-                value = FALSE,  # começa desligado
-                status = "info"
-            )
-        ),
+        
      
 
         # espaço vazio

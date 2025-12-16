@@ -38,6 +38,7 @@ param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da ex
 param$plot_title <- "Valor total da exporta\u00e7\u00e3o de produtos da Amaz\u00f4nia Legal por país de destino"
 
 param$label_var_name <- "VARIÁVEIS:"
+param$label_scales <- "OPÇÕES DE ESCALA:"
 param$label_scale_name <- "Escala log"
 param$label_axis_name <- "Proporcional ao ano inicial"
 param$label_prop <- "% do ano inicial"
