@@ -11,9 +11,13 @@ library(jsonlite)
 
 dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2024, raw_data = FALSE)
 
-tipos <- c("RO", "AM", "PA", "RR", "MT", "MA", "AC", "AP", "TO")
-`%notin%` <- Negate(`%in%`)
-dat <- dat[!(dat$uf %notin% tipos),]
+dat <- inner_join(
+    dat,
+    datazoom.amazonia::municipalities[, c("code_muni", "legal_amazon")],
+    by = c("cod_municipio" = "code_muni")
+) %>% filter(legal_amazon == 1) %>%
+    select(-legal_amazon)
+
 
 saveRDS(dat, file = "data/comex_munic_raw.rds")
 dat <- readRDS(file = "data/comex_munic_raw.rds")
@@ -788,7 +792,7 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Comex",
     tipo = 1,
-    unidade = "R$",
+    unidade = "US$",
     categoria= "Economy", 
     subcategoria = "Trade"
 )
