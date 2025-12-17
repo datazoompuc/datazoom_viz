@@ -41,7 +41,7 @@ param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil (Font
 param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "Variável selecionada"
 param$label_log_name <- "Escala log"
-param$label_prop_name <-  "Proporcional ao ano inicial"
+param$label_prop_name <-  "Proporcional ao ano inicial*"
 param$label_prop_muni <- "Proporção da área dos estados"
 param$label_geo_name <- "Estados"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_est/"

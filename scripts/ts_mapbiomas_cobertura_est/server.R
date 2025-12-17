@@ -207,7 +207,7 @@ get_server <- function(files, param) {
         }
         
         # Define unidade dinâmica
-        unidade_y <- if (input$yprop) "%" else "ha"
+        unidade_y <- if (isTRUE(input$yprop) || isTRUE(input$y_option)) "%" else "ha"
         
         # Monta html do tooltip
         df_p$tooltip <- paste0(

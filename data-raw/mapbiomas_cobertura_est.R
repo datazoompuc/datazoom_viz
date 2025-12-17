@@ -104,6 +104,25 @@ datafinal_area <- datafinal %>%
     ) %>%
     mutate(group = stringr::str_to_title(group))   
 
+estados_legal <- c(
+    "Acre" = "Acre",
+    "Amapa" = "Amapá",
+    "Amazonas" = "Amazonas",
+    "Maranhao" = "Maranhão",
+    "Mato Grosso" = "Mato Grosso",
+    "Para" = "Pará",
+    "Rondonia" = "Rondônia",
+    "Roraima" = "Roraima",
+    "Tocantis" = "Tocantis"
+)
+
+datafinal_area <- datafinal_area %>%
+    dplyr::mutate(
+        group = ifelse(group %in% names(estados_legal),
+                       estados_legal[group],
+                       group)
+        )
+
 saveRDS(datafinal_area, "data/mapbiomas_cobertura_est.rds")
 
 ################################################################################
@@ -153,8 +172,10 @@ translate_en_to_pt <- c(
     "Antropic" = "Antrópico",
     "Natural" = "Natural",
     "Natural/Antropic" = "Natural/Antropico",
-    "Undefined" = "Não aplicado"
-)
+    "Undefined" = "Não aplicado",
+    "Palm Oil" = "Óleo de Palma",
+    "Pasture" = "Pastagem"
+    )
 
 #  DICIONÁRIO EM PORTUGUÊS (var = nomes exatamente como em datafinal) 
 dic_pt <- tibble::tibble(

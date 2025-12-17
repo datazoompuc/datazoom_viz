@@ -7,7 +7,7 @@ Grassland,TRUE,TRUE,FALSE,TRUE,TRUE,Pradaria,Pradaria,Mapbiomas,1,ha,Meio ambien
 Not Observed,TRUE,TRUE,FALSE,TRUE,TRUE,Não observado,Não observado,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Other Temporary Crops,TRUE,TRUE,FALSE,TRUE,TRUE,Outras Culturas Temporárias,Outras Culturas Temporárias,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Other non Vegetated Areas,TRUE,TRUE,FALSE,TRUE,TRUE,Outras áreas não vegetadas,Outras áreas não vegetadas,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Pasture,TRUE,TRUE,FALSE,TRUE,TRUE,Pasture,Pasture,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Pasture,TRUE,TRUE,FALSE,TRUE,TRUE,Pastagem,Pastagem,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 "River, Lake and Ocean",TRUE,TRUE,FALSE,TRUE,TRUE,"Rios, Lagos ou Oceanos","Rios, Lagos ou Oceanos",Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Savanna Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Formação de Savana,Formação de Savana,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Urban Area,TRUE,TRUE,FALSE,TRUE,TRUE,Infraestrutura Urbana,Infraestrutura Urbana,Mapbiomas,1,ha,Meio ambiente,Uso da terra
@@ -23,7 +23,7 @@ Sugar cane,TRUE,TRUE,FALSE,TRUE,TRUE,Cana-de-açúcar,Cana-de-açúcar,Mapbiomas
 Cotton,TRUE,TRUE,FALSE,TRUE,TRUE,Algodão,Algodão,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Hypersaline Tidal Flat,TRUE,TRUE,FALSE,TRUE,TRUE,Salar,Salar,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Mosaic of Uses,TRUE,TRUE,FALSE,TRUE,TRUE,Mosaico de Uso da Terra,Mosaico de Uso da Terra,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Palm Oil,TRUE,TRUE,FALSE,TRUE,TRUE,Palm Oil,Palm Oil,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Palm Oil,TRUE,TRUE,FALSE,TRUE,TRUE,Óleo de Palma,Óleo de Palma,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Rice,TRUE,TRUE,FALSE,TRUE,TRUE,Arroz,Arroz,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Temporary Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Culturas Temporárias,Culturas Temporárias,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Perennial Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Culturas Perenes,Culturas Perenes,Mapbiomas,1,ha,Meio ambiente,Uso da terra
