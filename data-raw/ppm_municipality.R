@@ -80,8 +80,8 @@ ppm_municipality_livestock_inventory <- as.data.frame(do.call(cbind,ppm_municipa
 municipios = datazoom.amazonia::municipalities_biomes
 municipios%>%
     dplyr::select('municipality_mapbiomas', 'code_muni')
-ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
-ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , time=.data$ano, group=.data$geo_id)
+ppm_municipality_livestock_inventory$municipio= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
+ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , time=.data$ano, group=.data$municipio)
 
 
 ##saving f

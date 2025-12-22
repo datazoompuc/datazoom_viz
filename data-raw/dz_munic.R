@@ -13,6 +13,7 @@ library(here)
 library(data.table)
 library(purrr)
 library(glue)
+library(plyr)
 ####################
 # 1) Call and clean data
 ###################
@@ -339,9 +340,7 @@ ppm_livestock= ppm_livestock %>%
     rename(ano = time,
            municipio = group) %>% 
     dplyr::filter(ano >= 2000)%>%
-    dplyr::select(municipio, ano, num_v2670, num_v32794, num_v32796) %>% 
-    mutate(municipio = str_to_lower(municipio)) %>% 
-    left_join(cod_ibge_mun, by = "municipio")
+    dplyr::select(geo_id, municipio, ano, num_v2670, num_v32794, num_v32796) 
 
 ###################
 #PAM - IBGE
@@ -421,12 +420,14 @@ dz_munic <- income %>%
     full_join(gdp, by = c("cod_ibge", "ano")) %>%
     full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
     full_join(ips %>% select(-municipio), by = c("cod_ibge" = "cod_ibge")) %>%
-    full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
+    full_join(ppm_livestock %>% select(-municipio), by = c('cod_ibge' = 'geo_id', 'ano')) %>%
     full_join(pam_municipality_all_crops, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
     arrange(cod_ibge, ano) %>%
     relocate(cod_ibge, ano)
 
+dz_munic$municipio <- plyr::mapvalues(dz_munic$cod_ibge, from = datazoom.amazonia::municipalities$code_muni, to = datazoom.amazonia::municipalities$municipality_mapbiomas)
 
+dz_munic$uf <- plyr::mapvalues(dz_munic$cod_ibge, from = datazoom.amazonia::municipalities$code_muni, to = datazoom.amazonia::municipalities$abbrev_state)
 # colnames(dz_munic)
 #dz_munic$name_munic <- dz_munic$name_munic.x
 #dz_munic <- dz_munic %>% transform(estado = ifelse(!is.na(estado.x), estado.x, estado.y))
@@ -445,14 +446,14 @@ dz_munic <- dz_munic %>%
 ######################################################
 # merge data with amazon municipalities shapefile
 ######################################################
-map_dz_munic <- sp::merge(shapefile, dz_munic, by.x = "cod_ibge", by.y = "cod_ibge")
+map_dz_munic <- sp::merge(shapefile, dz_munic, by.x = "municipality_code", by.y = "cod_ibge")
 
 # convert time data to date
 map_dz_munic$ano <- as.Date(as.yearqtr(map_dz_munic$ano), format = "%Y")
 
 # colnames(map_dz_munic)
-dz_munic <- map_dz_munic %>% select(cod_ibge,
-                                    nm_municip,
+dz_munic <- map_dz_munic %>% select(cod_ibge = municipality_code,
+                                    nm_municip = municipio,
                                     uf,
                                     ano,
                                     employed_census2000,
