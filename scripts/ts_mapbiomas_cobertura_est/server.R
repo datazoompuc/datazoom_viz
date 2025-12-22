@@ -172,12 +172,11 @@ get_server <- function(files, param) {
         
         if (is.numeric(df_p$y)) {
             
-            # Guarda o valor bruto original (antes de qualquer transformação)
+            # Guarda valor bruto original
             df_p$y_raw <- df_p$y
             
-            # 1) PROPORÇÃO DA ÁREA
-            # Se o usuário ativou yprop, primeiro normalizamos pela área
-            if (input$yprop) {
+            # 1) NORMALIZAÇÃO POR ÁREA (opcional)
+            if (isTRUE(input$yprop)) {
                 df_area <- df %>%
                     dplyr::select(group, area_km2) %>%
                     dplyr::distinct()
@@ -187,15 +186,16 @@ get_server <- function(files, param) {
                     dplyr::mutate(
                         y = y_raw / area_km2
                     )
+            } else {
+                df_p$y <- df_p$y_raw
             }
             
-            # 2) PROPORCIONAL AO ANO INICIAL
-            # Se o usuário ativou y_option, agora zeramos o valor inicial
-            if (input$y_option) {
+            # 2) ÍNDICE BASE 100 (CORRETO)
+            if (isTRUE(input$y_option)) {
                 df_p <- df_p %>%
                     dplyr::group_by(group) %>%
                     dplyr::mutate(
-                        y = y - first(y)  # crescimento absoluto
+                        y = (y / first(y)) * 100
                     ) %>%
                     dplyr::ungroup()
             }
