@@ -4,6 +4,16 @@
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Incluí script CSS
+    tags$style(HTML("
+                      .switch-group { margin-top: 10px; }
+                      .switch-title {
+                        display: block;
+                        color: white;
+                        font-weight: 500;
+                        letter-spacing: 0.5px;
+                        margin-bottom: 6px;
+                      }
+                    ")),
     tags$style(type = "text/css", 
       # remove o ultimo ano no slider (2018 e 2019 estavam um em cima do outro)
       # remove tracos intermediarios do slider
@@ -56,7 +66,8 @@ get_ui <- function(files, param) {
                 value   = FALSE,
                 status  = "info"
             )
-        ),
+        )
+        ,
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
