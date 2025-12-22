@@ -21,7 +21,7 @@ library(glue)
 # TERRABRASILIS
 ###################
 # read shapefile
-shapefile <- st_read("./data/shapefiles/municipalities_legal_amazon.shp")
+#shapefile <- st_read("./data/shapefiles/municipalities_legal_amazon.shp")
 
 munic <- readRDS(here("global", "munic_shapefile.rds"))
 lgl_amazon <- readRDS(here("global", "legal_amazon_boundary.rds"))
@@ -53,6 +53,8 @@ munic_amazon <- st_intersection(munic_fix, lgl_amazon_fix)
 # reativar S2 depois
 sf_use_s2(TRUE)
 
+shapefile <- munic_amazon
+
 #plot(st_geometry(munic_amazon))
 
 # data too heavy (over 100mb)
@@ -80,6 +82,23 @@ income <- income %>%
 #     select(cod_ibge, name_munic, ano, employed, mean_income, median_income)
 income$ano <- 2010
 class(income$ano) <- "numeric"
+
+income <- income %>% 
+    mutate(id = cod_ibge) %>% 
+    select(-Ano)
+
+cod_ibge_mun <- datazoom.amazonia::municipalities %>% 
+    select(cod_ibge = code_muni, municipio = name_muni, code_state) %>% 
+    mutate(id = cod_ibge %>% str_sub(end = -2))
+
+income <- income %>% 
+    left_join(cod_ibge_mun, by = "id") %>% 
+    mutate(municipio = municipio.y) %>% 
+    select(municipio,
+           cod_ibge = cod_ibge.y,
+           ano,
+           renda_media_dom_per_capita) %>% 
+    mutate(cod_ibge = cod_ibge %>% as.character())
 
 # Reshaping data.frame from long  to wide format
 # income <- income %>%
@@ -317,9 +336,11 @@ ppm_livestock <- readRDS(file = "./data/ppm_municipality_livestock_inventory.rds
 
 ppm_livestock= ppm_livestock %>%
     rename(ano = time,
-           geo_id = group) %>% 
+           municipio = group) %>% 
     dplyr::filter(ano >= 2000)%>%
-    dplyr::select(geo_id, ano, num_v2670, num_v32794, num_v32796)
+    dplyr::select(municipio, ano, num_v2670, num_v32794, num_v32796) %>% 
+    mutate(municipio = str_to_lower(municipio)) %>% 
+    left_join(cod_ibge_mun, by = "municipio")
 
 ###################
 #PAM - IBGE
@@ -363,7 +384,7 @@ pam_municipality_all_crops <- map(2000:2024, ~ readRDS(glue::glue("./data/pam_mu
 pam_municipality_all_crops <- pam_municipality_all_crops %>% 
     bind_rows() %>% 
     mutate(across(area_plantada_dest_colheita_v40124:quant_v40119, ~ .x %>% as.numeric())) %>% 
-    mutate(across(area_plantada_dest_colheita_v40124:quant_v40119, ~ if_else(is.na(.x), 0, .x)))
+    mutate(across(area_plantada_dest_colheita_v40124:quant_v40119, ~ if_else(is.na(.x), 0, .x))) 
 
 
 ###########################
@@ -390,14 +411,15 @@ class(gdp$ano) <-  'numeric'
 class(ips$cod_ibge) <-  'character'
 class(pam_municipality_all_crops$ano) <- 'numeric'
 
+
 ###########################
 # merge all data
 ###########################
-dz_munic <- income %>%
-    full_join(prodes, by = c("cod_ibge" = "cod_munic_ibge")) %>%
+dz_munic <- income %>% 
+    full_join(prodes, by = c("cod_ibge" = "cod_munic_ibge","ano")) %>%
     full_join(gdp, by = c("cod_ibge", "ano")) %>%
     full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
-    full_join(ips, by = c("cod_ibge" = "cod_ibge")) %>%
+    full_join(ips %>% select(-municipio), by = c("cod_ibge" = "cod_ibge")) %>%
     full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
     full_join(pam_municipality_all_crops, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
     arrange(cod_ibge, ano) %>%
