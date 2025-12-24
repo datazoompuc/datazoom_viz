@@ -6,6 +6,8 @@ library(datazoom.amazonia)
 library(magrittr)
 library(tidyverse)
 library(stringr)
+library(httr)
+library(jsonlite)
 
 dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2024, raw_data = FALSE)
 
@@ -16,10 +18,33 @@ dat <- inner_join(
 ) %>% filter(legal_amazon == 1) %>%
     select(-legal_amazon)
 
+
 saveRDS(dat, file = "data/comex_munic_raw.rds")
 dat <- readRDS(file = "data/comex_munic_raw.rds")
 
+# gera auxiliar de código de país
+url <- "https://api-comexstat.mdic.gov.br/general/filters/country?language=pt"
+resp <- GET(url)
+stop_for_status(resp)
+
+txt <- content(resp, as = "text", encoding = "UTF-8")
+obj <- fromJSON(txt, simplifyDataFrame = TRUE)
+
+d <- obj$data
+# a doc mostra que às vezes vem aninhado; isso deixa robusto:
+if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
+
+aux1 <- as_tibble(d) %>%
+    transmute(
+        SISCOMEX  = str_pad(id, 3, pad = "0"),
+        NO_POR_MIN = text
+    ) %>%
+    distinct(SISCOMEX, .keep_all = TRUE)
+
+saveRDS(aux1, "data/auxiliar_cod_pais.rds")
 aux1 <- readRDS("data/auxiliar_cod_pais.rds")
+
+
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
 aux3 <- readRDS("data/auxiliar_cod_municipais.rds")
 
@@ -239,17 +264,20 @@ data_val_pais <- aggregate(valor_fob ~ ano + cod_pais, dat, sum)
 data_val_pais_sec <- aggregate(valor_fob ~ ano + cod_pais + cod_sh4, dat, sum)
 
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
+
 data_val_pais$cod_pais <- sprintf("%03d", as.numeric(data_val_pais$cod_pais))
 aux1$SISCOMEX <- sprintf("%03d", as.numeric(aux1$SISCOMEX))
-data_val_pais$cod_pais <- str_replace_all(data_val_pais$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
+
 
 data_val_pais_sec$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais_sec$cod_sh4))
 data_val_pais_sec$cod_sh4 <- str_replace_all(data_val_pais_sec$cod_sh4, setNames(aux2$NO_SEC_POR, aux2$CO_SH4))
 data_val_pais_sec$cod_pais <- sprintf("%03d", as.numeric(data_val_pais_sec$cod_pais))
 data_val_pais_sec$cod_pais <- str_replace_all(data_val_pais_sec$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
 
-data_val_pais <- data_val_pais[!(data_val_pais$cod_pais %in% c("015", "042", "150", "388", "489", "693", "790", "990")),]
+data_val_pais <- data_val_pais[!(data_val_pais$cod_pais %in% c("042", "105", "388", "790", "990", "998", "994", "995", "100")),]
 data_val_pais_sec <- data_val_pais_sec[!(data_val_pais_sec$cod_pais %in% c("015", "042", "150", "388", "489", "693", "790", "990")),]
+
+data_val_pais$cod_pais <- str_replace_all(data_val_pais$cod_pais, setNames(aux1$NO_POR_MIN, aux1$SISCOMEX))
 
 colnames(data_val_pais) <- c("time", "group", "value")
 colnames(data_val_pais_sec) <- c("time", "group", "type", "value")
@@ -764,7 +792,7 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Comex",
     tipo = 1,
-    unidade = "R$",
+    unidade = "US$",
     categoria= "Economy", 
     subcategoria = "Trade"
 )
