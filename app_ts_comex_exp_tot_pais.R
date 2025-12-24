@@ -3,6 +3,8 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinycssloaders)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -33,18 +35,20 @@ param$lang <- FALSE
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos total da Amaz\u00f4nia Legal por país de destino"
-
+param$plot_title <- "Valor total da exporta\u00e7\u00e3o de produtos da Amaz\u00f4nia Legal por país de destino"
 
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "Valor (única opção)"
-param$label_scale_name <- "escala log"
-param$label_axis_name <- "proporcional ao ano inicial (*)"
-param$label_mun_filter <- "Países de destino"
+param$label_scales <- "OPÇÕES DE ESCALA:"
+param$label_scale_name <- "Escala log"
+param$label_axis_name <- "Proporcional ao ano inicial"
+param$label_prop <- "% do ano inicial"
+param$label_country_filter <- "Países de destino"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_tot_pais/"
-param$currency <- "Por R$"
-param$measurement <- "R$ "
-
-# Outros parâmetros e configurações
+param$currency <- "Em US$"
+param$measurement <- "US$"
+param$label_deflator <- "Deflacionar (US$ de 1998)"
+param$ylabel_deflator <-  "US$ de 1998"
+param$subtitle_deflator <- " (deflacionados, base 1998 = 100)"
 
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
