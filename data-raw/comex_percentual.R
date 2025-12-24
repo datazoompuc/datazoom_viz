@@ -58,9 +58,10 @@ data <- data_val_pais %>%
     ) %>%
     dplyr::left_join(world_trade, by = c("ano", "cod_sh4")) %>%
     dplyr::mutate(
-        valor_fob = ifelse(valor_total > 0, valor_fob / valor_total, NA_real_), # share
+        valor_fob = valor_fob / valor_total,   # share
         floresta  = cod_sh4 %in% sh4_floresta
     ) %>%
+    dplyr::filter(!is.na(valor_total), valor_total > 0) %>%
     dplyr::left_join(aux, by = "cod_sh4") %>%   
     dplyr::rename(group = nome_sh4) %>%
     dplyr::select(
