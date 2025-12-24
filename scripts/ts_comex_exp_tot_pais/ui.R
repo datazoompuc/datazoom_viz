@@ -25,27 +25,66 @@ get_ui <- function(files, param) {
         p(class = "plot_desc", param$plot_desc),
         hr(),
         p(class = "vars", param$label_var_name),
+        
+        
+        
+        # Seleciona filtro de países
+        selectizeInput(
+            "filter1",
+            param$label_country_filter,
+            choices = NULL,
+            multiple = TRUE,
+            options = list(maxItems = 20),
+            width = "100%"
+        ),
+        
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        
+        # Seleciona deflação
+        div(
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "ydefl",
+                label = tags$span(param$label_deflator, class = "switch-label"),
+                value = FALSE,  # começa desligado
+                status = "info"
+            )
+        ),
+        
+        # espaço vazio
+        div(class = "fakecheckbox", ),
+        
+        p(class = "vars", param$label_scales),
 
         
         # Seleciona eixo log
-        checkboxInput(
-          inputId = "ylog",
-          param$label_scale_name,
-          value = FALSE,
-          width = "100%"
-        ),
-     
-
-        # Seleciona filtro de municÃ­pios
-        selectizeInput(
-          "filter1",
-          param$label_mun_filter,
-          choices = NULL,
-          multiple = TRUE,
-          options = list(maxItems = 20),
-          width = "100%"
+        tags$style(HTML(".switch-label { color: white; }")),
+        div(
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "ylog",
+                label = tags$span(param$label_scale_name, class = "switch-label"),
+                value = FALSE, 
+                status = "info"
+            )
         ),
         
+        
+        # Seleciona proporcional
+        div(
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "y_option",
+                label = tags$span(param$label_axis_name, class = "switch-label"),
+                value = FALSE, 
+                status = "info"
+            )
+        ),
+        
+        
+     
+
         # espaço vazio
         div(class = "fakecheckbox", ),
         
@@ -57,17 +96,24 @@ get_ui <- function(files, param) {
         ),
       ),
       column(9,
-        class = "plotcol h-100",
-        textOutput("plot_title"),
-        textOutput("plot_subtitle"),
-        div( # row do grÃ¡fico
-          class = "plotrow row justify-content-center flex-grow-1 w-100",
-          div(
-            class = "plotdiv w-100 h-100",
-            # GrÃ¡fico
-            plotlyOutput("plot", width = "100%", height = "100%")
-          )
-        )
+             class = "plotcol h-100",
+             textOutput("plot_title"),
+             textOutput("plot_subtitle"),
+             div( # row do gráfico
+                 class = "plotrow row justify-content-center flex-grow-1 w-100",
+                 div(
+                     class = "plotdiv w-100 h-100",
+                     style = "position: relative; display: flex; flex-direction: column;",
+                     div(
+                         style = "flex-grow: 1; position: relative;", 
+                         withSpinner(
+                             plotlyOutput("plot", width = "100%", height = "calc(100vh - 150px)"),
+                             type = 4,
+                             color = "#41878C"
+                         )
+                     )
+                 )
+             )
       )
     ),
   )
