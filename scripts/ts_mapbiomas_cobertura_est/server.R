@@ -13,6 +13,28 @@ get_server <- function(files, param) {
    
   server <- function(input, output, session) {
       
+      # botões mutuamente exclusivos:
+      
+      observeEvent(input$y_option, {
+          if (isTRUE(input$y_option)) {
+              updateMaterialSwitch(
+                  session,
+                  inputId = "yprop",
+                  value = FALSE
+              )
+          }
+      }, ignoreInit = TRUE)
+      
+      observeEvent(input$yprop, {
+          if (isTRUE(input$yprop)) {
+              updateMaterialSwitch(
+                  session,
+                  inputId = "y_option",
+                  value = FALSE
+              )
+          }
+      }, ignoreInit = TRUE)
+      
     # Carrega dados
     df <- readRDS(files$db_file)
 
@@ -75,7 +97,7 @@ get_server <- function(files, param) {
       
 
       if (!is.null(query[['y_option']])) {
-        updateCheckboxInput(session, "y_option",
+          updateMaterialSwitch(session, "y_option",
                             value = (query[['y_option']] == "TRUE"))
       }
       
@@ -114,14 +136,20 @@ get_server <- function(files, param) {
       text
     })
     output$plot_subtitle <- renderText({
-      # Se algum campo estiver vazio retorna texto vazio
-      if(is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        text <-  paste0(param$subtitle_init)
-      }
-      
-      text
+        
+        if (is.null(input$y) || input$y == "") return(" ")
+        
+        y_col <- param$table[param$table$var == input$y, ]
+        
+        sufixo <- ""
+        
+        if (isTRUE(input$y_option)) {
+            sufixo <- " (índice base 100)"
+        } else if (isTRUE(input$yprop)) {
+            sufixo <- " (por área)"
+        }
+        
+        paste0(y_col$subtitle, sufixo)
     })
     
     # Output gráfico
