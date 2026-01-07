@@ -49,7 +49,7 @@ get_server <- function(files, param) {
       q_string <- paste0(
         "?", "y=", input$y,
         "&", "ylog=", input$ylog,
-        "&", "y_option=", input$y_option
+        "&", "y_index_base=", input$y_index_base
       )
 
       for (i in input$uf) {
@@ -89,9 +89,9 @@ get_server <- function(files, param) {
         )
       }
 
-      if (!is.null(query[["y_option"]])) {
-        updateCheckboxInput(session, "y_option",
-          value = (query[["y_option"]] == "TRUE")
+      if (!is.null(query[["y_index_base"]])) {
+        updateCheckboxInput(session, "y_index_base",
+          value = (query[["y_index_base"]] == "TRUE")
         )
       }
 
@@ -131,7 +131,7 @@ get_server <- function(files, param) {
         y_col <- param$table[which(param$table$var == input$y), ]
 
         text <- paste0("", y_col$label)
-        if (input$y_option) {
+        if (input$y_index_base) {
           text <- paste0("", y_col$label, "*")
         }
       }
@@ -204,14 +204,14 @@ get_server <- function(files, param) {
           }
 
           # Alternativa de medida para y
-          if (input$y_option & is.numeric(df_p$y)) {
+          if (input$y_index_base & is.numeric(df_p$y)) {
             df_p <- df_p %>%
               group_by(df_p$municipio) %>%
               mutate(
                 aux1 = first(y),
-                y_option = (y / aux1) * 100
+                y_index_base = (y / aux1) * 100
               )
-            df_p$y <- df_p$y_option
+            df_p$y <- df_p$y_index_base
           }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
@@ -267,7 +267,7 @@ get_server <- function(files, param) {
             y_axis_layout$type <- "log"
           }
 
-          if (input$y_option) {
+          if (input$y_index_base) {
             y_axis_layout$title <- paste0(y_col$label, "*")
           }
 

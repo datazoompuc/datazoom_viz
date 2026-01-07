@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -35,9 +36,9 @@ param$plot_desc <- "Dados de Saúde ao nível municipal"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "eixo vertical (y)"
+param$label_y_name <- "Variável selecionada"
 param$label_log_name <- "escala log"
-param$label_prop_name <-  "proporcional ao ano inicial (*)"
+param$label_prop_name <-  "Proporcional ao ano inicial"
 param$label_uf_name <-  "UF"
 param$label_geo_name <- "Municípios"
 param$link <- "https://datazoom.shinyapps.io/app_ts_saude_municipality/"

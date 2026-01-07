@@ -25,7 +25,11 @@ get_ui <- function(files, param) {
         p(class = "plot_desc", param$plot_desc),
         hr(),
         p(class = "vars",  param$label_var_name),
+        
+        tags$style(HTML(".switch-label { color: white; }")),
         div(
+            style = "display: flex; flex-direction: column; gap: 10px;", # espaçamento dos botões
+            
           class = "var_selec_group",
           # Seleciona variável do eixo y
           selectInput(
@@ -34,44 +38,51 @@ get_ui <- function(files, param) {
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
-          )
+          ),
+          
+          div(style = "margin-top: 5px;"),  # espaço em branco
+          
+          
+          # BLOCO DOS BOTÕES
+          
+          # Seleciona eixo log
+          materialSwitch(
+              inputId = "ylog",
+              label = tags$span(param$label_log_name, class = "switch-label"),
+              value = FALSE,
+              status = "info"
+          ),
+          
+          # Variação do ano inicial 
+          materialSwitch(
+              inputId = "y_index_base",
+              label = tags$span(param$label_prop_name, class = "switch-label"),
+              value = FALSE,
+              status = "info"
+          ),
+          
+          # Seleciona filtro
+          selectizeInput(
+              "uf",
+              param$label_uf_name,
+              choices = sort(param$uf_choices),
+              selected = param$uf_def,
+              multiple = TRUE,
+              options = list(maxItems = 20, plugins = list('remove_button')),
+              width = "100%"
+          ),
+          # Seleciona filtro
+          selectizeInput(
+              "filter1",
+              param$label_geo_name,
+              choices = param$munic_def,
+              selected = param$munic_def,
+              multiple = TRUE,
+              options = list(maxItems = 20, plugins = list('remove_button')),
+              width = "100%"
+          ),
         ),
 
-        # Seleciona eixo log
-        checkboxInput(
-          inputId = "ylog",
-          param$label_log_name,
-          value = FALSE,
-          width = "100%"
-        ),
-        # Seleciona eixo
-        checkboxInput(
-          inputId = "y_option",
-          param$label_prop_name,
-          value = FALSE,
-          width = "100%"
-        ),
-
-        # Seleciona filtro
-        selectizeInput(
-          "uf",
-          param$label_uf_name,
-          choices = sort(param$uf_choices),
-          selected = param$uf_def,
-          multiple = TRUE,
-          options = list(maxItems = 20, plugins = list('remove_button')),
-          width = "100%"
-        ),
-        # Seleciona filtro
-        selectizeInput(
-          "filter1",
-          param$label_geo_name,
-          choices = param$munic_def,
-          selected = param$munic_def,
-          multiple = TRUE,
-          options = list(maxItems = 20, plugins = list('remove_button')),
-          width = "100%"
-        ),
         # espaço vazio
         div(class = "fakecheckbox", ),
         
