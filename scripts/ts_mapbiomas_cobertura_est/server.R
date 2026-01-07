@@ -19,14 +19,14 @@ get_server <- function(files, param) {
           if (isTRUE(input$y_option)) {
               updateMaterialSwitch(
                   session,
-                  inputId = "yprop",
+                  inputId = "y_index_base",
                   value = FALSE
               )
           }
       }, ignoreInit = TRUE)
       
-      observeEvent(input$yprop, {
-          if (isTRUE(input$yprop)) {
+      observeEvent(input$y_index_base, {
+          if (isTRUE(input$y_index_base)) {
               updateMaterialSwitch(
                   session,
                   inputId = "y_option",
@@ -145,7 +145,7 @@ get_server <- function(files, param) {
         
         if (isTRUE(input$y_option)) {
             sufixo <- " (índice base 100)"
-        } else if (isTRUE(input$yprop)) {
+        } else if (isTRUE(input$y_index_base)) {
             sufixo <- " (por área)"
         }
         
@@ -204,7 +204,7 @@ get_server <- function(files, param) {
             df_p$y_raw <- df_p$y
             
             # 1) NORMALIZAÇÃO POR ÁREA (opcional)
-            if (isTRUE(input$yprop)) {
+            if (isTRUE(input$y_index_base)) {
                 df_area <- df %>%
                     dplyr::select(group, area_km2) %>%
                     dplyr::distinct()
@@ -235,7 +235,7 @@ get_server <- function(files, param) {
         }
         
         # Define unidade dinâmica
-        unidade_y <- if (isTRUE(input$yprop) || isTRUE(input$y_option)) "%" else "ha"
+        unidade_y <- if (isTRUE(input$y_index_base) || isTRUE(input$y_option)) "%" else "ha"
         
         # Monta html do tooltip
         df_p$tooltip <- paste0(

@@ -64,7 +64,7 @@ get_ui <- function(files, param) {
                          
                          # Porporção do estado 
                          materialSwitch(
-                             inputId = "yprop",
+                             inputId = "y_index_base",
                              label = tags$span(param$label_prop_muni, class = "switch-label"),
                              value = FALSE,   
                              status = "info"
