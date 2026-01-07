@@ -56,7 +56,7 @@ get_ui <- function(files, param) {
                          
                          # Variação do ano inicial 
                          materialSwitch(
-                             inputId = "y_option",
+                             inputId = "y_index_base",
                              label = tags$span(param$label_prop_name, class = "switch-label"),
                              value = FALSE,
                              status = "info"
@@ -64,7 +64,7 @@ get_ui <- function(files, param) {
                          
                          # Porporção do estado 
                          materialSwitch(
-                             inputId = "y_index_base",
+                             inputId = "yprop",
                              label = tags$span(param$label_prop_muni, class = "switch-label"),
                              value = FALSE,   
                              status = "info"

@@ -15,21 +15,21 @@ get_server <- function(files, param) {
       
       # botões mutuamente exclusivos:
       
-      observeEvent(input$y_option, {
-          if (isTRUE(input$y_option)) {
+      observeEvent(input$y_index_base, {
+          if (isTRUE(input$y_index_base)) {
               updateMaterialSwitch(
                   session,
-                  inputId = "y_index_base",
+                  inputId = "yprop",
                   value = FALSE
               )
           }
       }, ignoreInit = TRUE)
       
-      observeEvent(input$y_index_base, {
-          if (isTRUE(input$y_index_base)) {
+      observeEvent(input$yprop, {
+          if (isTRUE(input$yprop)) {
               updateMaterialSwitch(
                   session,
-                  inputId = "y_option",
+                  inputId = "y_index_base",
                   value = FALSE
               )
           }
@@ -63,7 +63,7 @@ get_server <- function(files, param) {
       q_string <- paste0(
         "?","y=",input$y,
 
-        "&","y_option=",input$y_option
+        "&","y_index_base=",input$y_index_base
       )
       
       for (i in input$filter1) {
@@ -96,9 +96,9 @@ get_server <- function(files, param) {
       } 
       
 
-      if (!is.null(query[['y_option']])) {
-          updateMaterialSwitch(session, "y_option",
-                            value = (query[['y_option']] == "TRUE"))
+      if (!is.null(query[['y_index_base']])) {
+          updateMaterialSwitch(session, "y_index_base",
+                            value = (query[['y_index_base']] == "TRUE"))
       }
       
       selected <- unlist(query[names(query) == "filter"], use.names=FALSE)
@@ -128,7 +128,7 @@ get_server <- function(files, param) {
         y_col <- param$table[which(param$table$var == input$y), ]
         
         text <-  paste0("", y_col$label)
-        if(input$y_option)  {
+        if(input$y_index_base)  {
           text <-  paste0("", y_col$label, "*")
         }
       }
@@ -143,9 +143,9 @@ get_server <- function(files, param) {
         
         sufixo <- ""
         
-        if (isTRUE(input$y_option)) {
+        if (isTRUE(input$y_index_base)) {
             sufixo <- " (índice base 100)"
-        } else if (isTRUE(input$y_index_base)) {
+        } else if (isTRUE(input$yprop)) {
             sufixo <- " (por área)"
         }
         
@@ -204,7 +204,7 @@ get_server <- function(files, param) {
             df_p$y_raw <- df_p$y
             
             # 1) NORMALIZAÇÃO POR ÁREA (opcional)
-            if (isTRUE(input$y_index_base)) {
+            if (isTRUE(input$yprop)) {
                 df_area <- df %>%
                     dplyr::select(group, area_km2) %>%
                     dplyr::distinct()
@@ -219,7 +219,7 @@ get_server <- function(files, param) {
             }
             
             # 2) ÍNDICE BASE 100 (CORRETO)
-            if (isTRUE(input$y_option)) {
+            if (isTRUE(input$y_index_base)) {
                 df_p <- df_p %>%
                     dplyr::group_by(group) %>%
                     dplyr::mutate(
@@ -235,7 +235,7 @@ get_server <- function(files, param) {
         }
         
         # Define unidade dinâmica
-        unidade_y <- if (isTRUE(input$y_index_base) || isTRUE(input$y_option)) "%" else "ha"
+        unidade_y <- if (isTRUE(input$yprop) || isTRUE(input$y_index_base)) "%" else "ha"
         
         # Monta html do tooltip
         df_p$tooltip <- paste0(
@@ -289,7 +289,7 @@ get_server <- function(files, param) {
         
         
 
-        if (input$y_option) {
+        if (input$y_index_base) {
           y_axis_layout$title <- paste0(y_col$label, "*")
         }
         
