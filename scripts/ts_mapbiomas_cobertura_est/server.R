@@ -119,37 +119,35 @@ get_server <- function(files, param) {
     
     # Output titulo do gráfico
     output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-      if(is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
+        if (is.null(input$y) || input$y == "") return(" ")
         
-        text <-  paste0("", y_col$label)
-        if(input$y_index_base)  {
-          text <-  paste0("", y_col$label, "*")
-        }
-      }
-      
-      text
+        y_col <- param$table[param$table$var == input$y, ]
+        y_col$label
     })
+    
     output$plot_subtitle <- renderText({
         
         if (is.null(input$y) || input$y == "") return(" ")
         
-        y_col <- param$table[param$table$var == input$y, ]
-        
-        sufixo <- ""
-        
+        # Prioridade para transformações
         if (isTRUE(input$y_index_base)) {
-            sufixo <- " (índice base 100)"
-        } else if (isTRUE(input$yprop)) {
-            sufixo <- " (por área)"
+            return(param$label_prop_name)
         }
         
-        paste0(y_col$subtitle, sufixo)
+        if (isTRUE(input$yprop)) {
+            return(param$label_prop_muni)
+        }
+        
+        # Caso padrão: subtítulo da variável
+        y_col <- param$table[param$table$var == input$y, ]
+        
+        # Se existir subtitle específico da variável, usa ele
+        if (!is.null(y_col$subtitle) && y_col$subtitle != "") {
+            return(y_col$subtitle)
+        }
+        
+        # Fallback geral (ex: "por hectare")
+        param$subtitle_init
     })
     
     # Output gráfico
