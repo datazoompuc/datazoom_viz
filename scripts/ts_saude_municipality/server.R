@@ -156,7 +156,7 @@ get_server <- function(files, param) {
         
         # Se algum botão estiver ativo, junta os labels
         if (length(subtitles) > 0) {
-            return(paste(subtitles, collapse = " e "))
+            return(paste(subtitles, collapse = param$label_and))
         }
         
         # Caso padrão: subtítulo da variável ou fallback

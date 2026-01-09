@@ -45,6 +45,7 @@ param$link <- "https://datazoom.shinyapps.io/app_ts_saude_municipality_en/"
 
 ### Parametros especificos no server
 param$stitle_init <- "by Municipality " # expressão titulo
+param$label_and <- " and "
 
 
 # Outros parâmetros e configurações
