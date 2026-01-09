@@ -37,7 +37,7 @@ param$plot_desc <- "Health data at the municipal level"
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Selected variable"
-param$label_log_name <-  "log scale"
+param$label_log_name <-  "Log scale"
 param$label_prop_name <-  "Proportional to the initial year"
 param$label_uf_name <-  "State"
 param$label_geo_name <- "Municipalities"

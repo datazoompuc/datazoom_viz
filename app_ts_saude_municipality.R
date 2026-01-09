@@ -37,7 +37,7 @@ param$plot_desc <- "Dados de Saúde ao nível municipal"
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "Variável selecionada"
-param$label_log_name <- "escala log"
+param$label_log_name <- "Escala log"
 param$label_prop_name <-  "Proporcional ao ano inicial"
 param$label_uf_name <-  "UF"
 param$label_geo_name <- "Municípios"

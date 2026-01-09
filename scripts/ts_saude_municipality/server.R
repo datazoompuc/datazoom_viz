@@ -138,20 +138,37 @@ get_server <- function(files, param) {
 
       text
     })
+    
     output$plot_subtitle <- renderText({
-      
-      
-      
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        text <- paste0(param$title_init)
-      }
-
-      text
+        
+        if (is.null(input$y) || input$y == "") return(" ")
+        
+        subtitles <- c()
+        
+        # Botões ativos (podem coexistir)
+        if (isTRUE(input$y_index_base)) {
+            subtitles <- c(subtitles, param$label_prop_name)
+        }
+        
+        if (isTRUE(input$ylog)) {
+            subtitles <- c(subtitles, param$label_log_name)
+        }
+        
+        # Se algum botão estiver ativo, junta os labels
+        if (length(subtitles) > 0) {
+            return(paste(subtitles, collapse = " e "))
+        }
+        
+        # Caso padrão: subtítulo da variável ou fallback
+        y_col <- param$table[param$table$var == input$y, ]
+        
+        if (!is.null(y_col$subtitle) && y_col$subtitle != "") {
+            return(y_col$subtitle)
+        }
+        
+        param$stitle_init
     })
-
+    
     observe({
       selected_filter <- input$filter1
       updateSelectInput(session,
