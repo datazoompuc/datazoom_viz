@@ -48,6 +48,63 @@ param$subtitle_init <- "by economic activities" # expressão subtitulo
 # Outros parâmetros e configurações
 param$y_choices[[1]] <- NULL
 
+param$filter_choices <- list(
+    "Brasil" = list("Brasil", ""),
+    "Amaz\u00f4nia Legal" = list("Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal"),
+    "Regi\u00e3o" = list("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"),
+    "UF" = list(
+        "RO", "AC", "AM", "RO", "PA", "AP", "TO",
+        "MA", "PI", "CE", "RN", "PB", "PE", "AL",
+        "SE", "BA", "MG", "ES", "RJ", "SP", "PR",
+        "SC", "RS", "MS", "MT", "GO", "DF"
+    )
+)
+
+param$ocupation_choices <- list(
+    "Todos",
+    "Administração pública, defesa e seguridade social",     
+    "Alimentos, bebidas e fumo",                          
+    "Artes, cultura, esportes e recreação",                  
+    "Atividades profissionais, científicas e técnicas",      
+    "Automóveis e equipamentos de transporte",               
+    "Comércio",                                              
+    "Construção",                                            
+    "Educação",                                              
+    "Eletrônicos, máquinas e equipamentos",                  
+    "Estadia e turismo",                                     
+    "Madeira, celulose e papel",                             
+    "Móveis",                                                
+    "Organizações religiosas, sindicais e patronais",        
+    "Outros",                                                
+    "Pecuária e criação de animais",                         
+    "Pesca, caça e aquicultura",                             
+    "Produtos de metal, minerais não-metálicos e metalurgia",
+    "Químicos, farmacêuticos, borracha e plástico",          
+    "Saúde e assistência social",                            
+    "Segurança e edifícios",                                 
+    "Serviços de alimentação",                              
+    "Serviços de informação e comunicação",                  
+    "Serviços domésticos",                                   
+    "Serviços financeiros e de seguros",                     
+    "Serviços jurídicos",                                   
+    "Serviços pessoais (cabelereiros, lavanderias, etc.)",  
+    "Terceirização de mão-de-obra",                         
+    "Transporte e correio",                                  
+    "Têxtil, vestuário, couro e calçados"
+)
+
+param$ocupation_def <- list("Todos") 
+
+param$sector_choices <- list(
+    "Todos" = "todos",
+    "Formal" = "formal",
+    "Informal" = "informal",
+    "Público" = "publico",
+    "Privado" = "privado"
+)
+
+param$sector_def <- "formal"
+
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
