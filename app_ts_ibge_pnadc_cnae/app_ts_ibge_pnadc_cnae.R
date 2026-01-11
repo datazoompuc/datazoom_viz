@@ -9,8 +9,8 @@ library(shinycssloaders)
 files <- list()
 files$ui_script <- "ui.R"
 files$server_script <- "server.R"
-files$param_script <- "../../scripts/ts_ibge_pnadc_cnae/db_params.R"
-files$CSS_script <- "../../scripts/dza_lumen.css"
+files$param_script <- "global/db_params.R"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/ibge_pnadc_cnae_dic.csv"
 files$db_file <- "data/ibge_pnadc_cnae.rds"
 
