@@ -104,6 +104,7 @@ datafinal_area <- datafinal %>%
     ) %>%
     mutate(group = stringr::str_to_title(group))   
 
+# adiciona os acentos
 estados_legal <- c(
     "Acre" = "Acre",
     "Amapa" = "Amapá",
