@@ -117,6 +117,7 @@ write_csv(dict_pt, "data/saude_municipality_dic.csv")
 #   DICIONÁRIO EN
 ################################################################################
 
+# Crie um vetor com TODAS as traduções correspondentes
 labels_en <- c(
     "Year",
     "Municipality code",
@@ -125,15 +126,93 @@ labels_en <- c(
     "Real GDP per capita (R$ 2021)",
     "Municipality's name",
     "Region",
-    "State's name"
+    "State's name",
+    "State abbreviation",
+    "Belongs to Legal Amazon (Yes/No)",
+    "Municipalities with operating hydroelectric plants (Yes/No)",
+    "Municipalities with illegal mining (Yes/No)",
+    "Crude mortality rate per 100,000 inhabitants",
+    "Age-adjusted mortality rate per 100,000 inhabitants",
+    "Mortality from non-communicable diseases per 100,000 inhabitants",
+    "Age-adjusted mortality from communicable diseases per 100,000 inhabitants",
+    "Mortality from external causes per 100,000 inhabitants",
+    "Age-adjusted mortality from external causes per 100,000 inhabitants",
+    "Mortality from communicable diseases per 100,000 inhabitants",
+    "Age-adjusted mortality from non-communicable diseases per 100,000 inhabitants",
+    "Mortality from ill-defined causes per 100,000 inhabitants",
+    "Age-adjusted mortality from cardiovascular diseases per 100,000 inhabitants",
+    "Age-adjusted mortality from diabetes per 100,000 inhabitants",
+    "Age-adjusted mortality from neoplasms per 100,000 inhabitants",
+    "Age-adjusted mortality from violence per 100,000 inhabitants",
+    "Age-adjusted mortality from traffic accidents per 100,000 inhabitants",
+    "Age-adjusted mortality from unintentional accidents per 100,000 inhabitants",
+    "Age-adjusted mortality from motorcycle accidents per 100,000 inhabitants",
+    "Age-adjusted mortality from non-motorcycle accidents per 100,000 inhabitants",
+    "Age-adjusted mortality from malaria per 100,000 inhabitants",
+    "Age-adjusted mortality from AIDS per 100,000 inhabitants",
+    "Age-adjusted mortality from waterborne diseases per 100,000 inhabitants",
+    "Age-adjusted mortality from respiratory diseases per 100,000 inhabitants",
+    "Breast cancer mortality per 100,000 women",
+    "Cervical cancer mortality per 100,000 women",
+    "Violence-related mortality per 100,000 women",
+    "Percentage of low birth weight newborns",
+    "Percentage of pregnancies among 10-19 year olds",
+    "Indigenous crude mortality rate per 100,000 inhabitants",
+    "Indigenous mortality from communicable diseases per 100,000 inhabitants",
+    "Indigenous mortality from non-communicable diseases per 100,000 inhabitants",
+    "Indigenous mortality from external causes per 100,000 inhabitants",
+    "Indigenous mortality from ill-defined causes per 100,000 inhabitants",
+    "Indigenous infant mortality per 1,000 live births",
+    "Family Health Strategy coverage percentage",
+    "Primary Health Care coverage percentage (AB Teams + FHS Teams)",
+    "Community Health Agents coverage percentage",
+    "FHS teams per 1,000 km²",
+    "Primary Health Care teams per 1,000 km²",
+    "Community Health Agents per 1,000 km²",
+    "Riverine and Fluvial Family Health Units",
+    "Riverine and Fluvial Family Health Teams",
+    "Total hospital beds",
+    "SUS hospital beds",
+    "Total ICU beds",
+    "SUS ICU beds",
+    "Distance to nearest emergency service",
+    "Distance to nearest medium complexity service",
+    "Distance to nearest high complexity service",
+    "Distance to nearest ICU",
+    "Distance to nearest dialysis service",
+    "Distance to nearest chemotherapy service",
+    "Physicians per 1,000 inhabitants",
+    "Nursing professionals per 1,000 inhabitants",
+    "Cardiologists per 1,000 inhabitants",
+    "Gynecologists per 1,000 inhabitants",
+    "Endocrinologists per 1,000 inhabitants",
+    "Oncologists per 1,000 inhabitants",
+    "Physicians from More Doctors Program",
+    "Proportion of physicians from More Doctors Program",
+    "Proportion of private health plan beneficiaries",
+    "Proportion of hospitals not affiliated with SUS",
+    "Private beds per 100,000 inhabitants",
+    "Private ICU beds per 100,000 inhabitants",
+    "Private hospitals affiliated with SUS per 100,000 inhabitants",
+    "Private hospitals not affiliated with SUS per 100,000 inhabitants",
+    "Total health expenditure per capita",
+    "Health expenditure from own resources per capita",
+    "Health expenditure proportion per capita"
 )
+
+# Verifique se o número de labels corresponde ao número de colunas
+if (length(labels_en) != ncol(data)) {
+    warning(paste("Número de labels EN (", length(labels_en), 
+                  ") não corresponde ao número de colunas (", ncol(data), ")"))
+}
 
 dict_en <- build_dictionary_base(data) |>
     apply_variable_flags() |>
     mutate(
-        label = case_when(
-            row_number() <= length(labels_en) ~ labels_en[row_number()],
-            TRUE ~ label
+        label = if_else(
+            row_number() <= length(labels_en),
+            labels_en[row_number()],
+            label  # fallback: mantém nome da variável se faltar tradução
         )
     )
 

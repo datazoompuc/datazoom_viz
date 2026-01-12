@@ -39,7 +39,7 @@ param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "Variável selecionada"
 param$label_log_name <- "Escala log"
 param$label_prop_name <-  "Proporcional ao ano inicial"
-param$label_uf_name <-  "UF"
+param$label_uf_name <-  "Estados"
 param$label_geo_name <- "Municípios"
 param$link <- "https://datazoom.shinyapps.io/app_ts_saude_municipality/"
 
