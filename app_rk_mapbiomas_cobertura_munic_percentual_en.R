@@ -5,6 +5,7 @@ library(ggplot2)
 library(plotly)
 library(shinyWidgets)
 library(htmlwidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
