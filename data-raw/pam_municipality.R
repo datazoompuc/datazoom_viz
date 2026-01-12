@@ -10,6 +10,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 library(tidyverse)
 library(datazoom.amazonia)
 library(labelled)
+library(here)
 
 ##########################################
 ##   update-and-download-pam function   ##
@@ -69,7 +70,7 @@ update_download_pam <- function(geo_level, dataset, time_period){
                 #saves all the years that are not downloaded
                 if((!file.exists("./data/pam_", geo_level, "_", dataset, year_h, ".rds"))[1]){
                     year_vector <- c(year_vector, year_h)
-                    
+                   
                 } else {
                     
                     #saves all the years that are already downloaded
@@ -85,7 +86,7 @@ update_download_pam <- function(geo_level, dataset, time_period){
             pam_yearly = load_pam(dataset = dataset, raw_data = FALSE, geo_level = geo_level, time_period = year_i, language = "pt")
             
             #save the file for that year
-            saveRDS(pam_yearly, file = paste0("./data/pam_", geo_level,"_", dataset, year_i, ".rds"))
+            saveRDS(pam_yearly, file = paste0(file.path("data"),"/pam_", geo_level,"_", dataset, year_i, ".rds"))
             
         }
         
@@ -134,7 +135,7 @@ update_download_pam <- function(geo_level, dataset, time_period){
 ##########################
 
 #dataset all_crops
-update_download_pam(dataset = "all_crops", geo_level = "municipality", time_period = 1974:2021)
+update_download_pam(dataset = "all_crops", geo_level = "municipality", time_period = 1974:2024)
 
 #dataset permanent_crops
 update_download_pam(dataset = "permanent_crops", geo_level = "municipality", time_period = 1974:2021)

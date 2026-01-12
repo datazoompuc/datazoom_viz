@@ -13,34 +13,40 @@ library(datazoom.amazonia)
 ##municipality 
 ## Provided time period that is supporter, otherwise there is error
 ### split the data base 
-ppm_municipality_livestock_inventory1= load_ppm(dataset = 'ppm_livestock_inventory', 
+ppm_municipality_livestock_inventory1 = load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
                                                 1974:1980, 
                                                 language = "pt")
 
-ppm_municipality_livestock_inventory2= load_ppm(dataset = 'ppm_livestock_inventory', 
+ppm_municipality_livestock_inventory2 = load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
                                                 1981:1990, 
                                                 language = "pt")
 
-ppm_municipality_livestock_inventory3= load_ppm(dataset = 'ppm_livestock_inventory', 
+ppm_municipality_livestock_inventory3 = load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
                                                 1991:2000, 
                                                 language = "pt")
 
-ppm_municipality_livestock_inventory4= load_ppm(dataset = 'ppm_livestock_inventory', 
+ppm_municipality_livestock_inventory4 = load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
                                                 2001:2010, 
                                                 language = "pt")
 
-ppm_municipality_livestock_inventory5= load_ppm(dataset = 'ppm_livestock_inventory', 
+ppm_municipality_livestock_inventory5 = load_ppm(dataset = 'ppm_livestock_inventory', 
                                                 raw_data = FALSE, 
                                                 'municipality', 
                                                 2011:2021, 
+                                                language = "pt")
+
+ppm_municipality_livestock_inventory6 = load_ppm(dataset = 'ppm_livestock_inventory', 
+                                                raw_data = FALSE, 
+                                                'municipality', 
+                                                2022:2024, 
                                                 language = "pt")
 
 
@@ -57,7 +63,11 @@ xxx <- bind_rows(ppm_municipality_livestock_inventory1,
 zzz <- ppm_municipality_livestock_inventory5 %>% 
   select(colnames(xxx)) 
 
-ppm_municipality_livestock_inventory <- bind_rows(zzz, xxx)
+zzz2 <- ppm_municipality_livestock_inventory6 %>% 
+    select(colnames(xxx)) 
+
+ppm_municipality_livestock_inventory <- bind_rows(zzz, xxx) %>% 
+    bind_rows(zzz2)
 
 ##making data usable for datazoom viz
 ##convert dataframe to list
@@ -70,8 +80,8 @@ ppm_municipality_livestock_inventory <- as.data.frame(do.call(cbind,ppm_municipa
 municipios = datazoom.amazonia::municipalities_biomes
 municipios%>%
     dplyr::select('municipality_mapbiomas', 'code_muni')
-ppm_municipality_livestock_inventory$geo_id= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
-ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , time=.data$ano, group=.data$geo_id)
+ppm_municipality_livestock_inventory$municipio= plyr::mapvalues(ppm_municipality_livestock_inventory$geo_id, from = municipios$code_muni, to = municipios$municipality_mapbiomas)
+ppm_municipality_livestock_inventory= dplyr::rename(ppm_municipality_livestock_inventory , time=.data$ano, group=.data$municipio)
 
 
 ##saving f

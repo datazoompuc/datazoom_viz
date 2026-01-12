@@ -9,7 +9,11 @@ library(zoo)
 library(sf)
 library(sp)
 library(scales) # to use label_percent()
-
+library(here)
+library(data.table)
+library(purrr)
+library(glue)
+library(plyr)
 ####################
 # 1) Call and clean data
 ###################
@@ -18,11 +22,45 @@ library(scales) # to use label_percent()
 # TERRABRASILIS
 ###################
 # read shapefile
-shapefile <- st_read("./data/shapefiles/municipalities_legal_amazon.shp")
+#shapefile <- st_read("./data/shapefiles/municipalities_legal_amazon.shp")
+
+munic <- readRDS(here("global", "munic_shapefile.rds"))
+lgl_amazon <- readRDS(here("global", "legal_amazon_boundary.rds"))
+
+#st_crs(munic)
+#st_crs(lgl_amazon)
+
+
+# 1) Mesma projecao e tirar Z/M se houver
+munic      <- st_zm(munic, drop = TRUE, what = "ZM")
+lgl_amazon <- st_zm(lgl_amazon, drop = TRUE, what = "ZM")
+munic      <- st_transform(munic, st_crs(lgl_amazon))
+
+# 2) Corrigir geometrias invalidas
+munic_fix      <- st_make_valid(munic)
+lgl_amazon_fix <- lgl_amazon %>% 
+    st_make_valid() %>% 
+    st_union()              # vira 1 poligono continuo
+
+# se ainda der erro com S2, desligar temporariamente
+sf_use_s2(FALSE)
+
+# Intersecao / filtro espacial
+munic_amazon <- st_intersection(munic_fix, lgl_amazon_fix)
+
+# alternativa (costuma ser mais leve):
+# munic_amazon <- st_filter(munic_fix, lgl_amazon_fix, .predicate = st_intersects)
+
+# reativar S2 depois
+sf_use_s2(TRUE)
+
+shapefile <- munic_amazon
+
+#plot(st_geometry(munic_amazon))
 
 # data too heavy (over 100mb)
 # solution: simplify geometry
-shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
+#shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
 
 # plot(shapefile)
 # shapefile$cod_ibge
@@ -30,28 +68,54 @@ shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
 ###################
 # CENSUS
 ###################
-income <- readRDS(file = "./data/income.rds")
-income$Ano <- income$Year
-income <- income %>%
-    separate(Municipality, c("name_munic", "Estado"), " - ") %>%
-    janitor::clean_names() %>%
-    select(cod_ibge, name_munic, ano, employed, mean_income, median_income)
+income <- fread(here("data", "income.csv"), encoding = "Latin-1")
+
+colnames(income) <- c("municipio", "renda_media_dom_per_capita")
+
+income <- income %>% 
+    mutate(cod_ibge = str_sub(municipio, end = 6),
+           municipio = str_sub(municipio, start = 7) %>% str_squish(),
+           Ano = 2010)
+
+# income <- income %>%
+#     separate(Municipality, c("name_munic", "Estado"), " - ") %>%
+#     janitor::clean_names() %>%
+#     select(cod_ibge, name_munic, ano, employed, mean_income, median_income)
+income$ano <- 2010
 class(income$ano) <- "numeric"
+
+income <- income %>% 
+    mutate(id = cod_ibge) %>% 
+    select(-Ano)
+
+cod_ibge_mun <- datazoom.amazonia::municipalities %>% 
+    select(cod_ibge = code_muni, municipio = name_muni, code_state) %>% 
+    mutate(id = cod_ibge %>% str_sub(end = -2))
+
+income <- income %>% 
+    left_join(cod_ibge_mun, by = "id") %>% 
+    mutate(municipio = municipio.y) %>% 
+    select(municipio,
+           cod_ibge = cod_ibge.y,
+           ano,
+           renda_media_dom_per_capita) %>% 
+    mutate(cod_ibge = cod_ibge %>% as.character())
+
 # Reshaping data.frame from long  to wide format
-income <- income %>%
-    tidyr::pivot_wider(
-        id_cols = c(cod_ibge),
-        names_from = ano,
-        names_prefix = "census",
-        values_from = c(employed, mean_income, median_income)
-    )
+# income <- income %>%
+#     tidyr::pivot_wider(
+#         id_cols = c(cod_ibge),
+#         names_from = ano,
+#         names_prefix = "census",
+#         values_from = c(employed, mean_income, median_income)
+#     )
 # Identify and remove duplicate data
-income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
+# income <- income %>% distinct(cod_ibge, .keep_all = TRUE)
 
 ###################
 # INPE - PRODES
 ###################
-prodes <- readRDS(file = "./data/prodes.rds")
+prodes <- readRDS(here("data", "prodes.rds"))
 prodes <- prodes %>%
     janitor::clean_names()
 
@@ -207,17 +271,48 @@ gdp$gdp_deflacionado[gdp$ano == 2021] <- gdp$gdp_deflacionado[gdp$ano == 2021] *
 ###################
 # IMAZON - IPS
 ###################
-ips <- readRDS(file = "./data/ips.rds")
-ips <- ips %>%
-    janitor::clean_names()
-# Reshaping data.frame from long  to wide format
-ips <- ips %>%
-    tidyr::pivot_wider(
-        id_cols = c(cod_municipio),
-        names_from = ano,
-        names_prefix = "ips",
-        values_from = ips
-    )
+# ips <- readRDS(file = "./data/ips.rds")
+# ips <- ips %>%
+#     janitor::clean_names()
+# # Reshaping data.frame from long  to wide format
+# ips <- ips %>%
+#     tidyr::pivot_wider(
+#         id_cols = c(cod_municipio),
+#         names_from = ano,
+#         names_prefix = "ips",
+#         values_from = ips
+#     )
+ips_2014 <- readxl::read_xlsx(here("data", "IPS_amazonia_2023.xlsx"),
+                              sheet = 4) %>%
+    janitor::clean_names() %>% 
+    select(cod_ibge = codigo_ibge, 
+           municipio,
+           estado,
+           ips_amazonia_2014)
+ips_2018 <- readxl::read_xlsx(here("data", "IPS_amazonia_2023.xlsx"),
+                              sheet = 3) %>%
+    janitor::clean_names() %>% 
+    select(cod_ibge = codigo_ibge, 
+           municipio,
+           estado,
+           ips_amazonia_2018)
+
+ips_2021 <- readRDS(here("data", "ips_2021_atualizado.rds")) %>% select(cod_ibge, ips_2021 = ips_amazonia_2021) %>% 
+    st_drop_geometry() %>% 
+    mutate(cod_ibge = cod_ibge %>% as.character() %>% as.numeric())
+ips_2023 <- readRDS(here("data", "ips_2023.rds")) %>% select(cod_ibge, ips_2023 = ips_amazonia_2023) %>% 
+    st_drop_geometry() %>% 
+    mutate(cod_ibge = cod_ibge %>% as.character() %>% as.numeric())
+ 
+ips <- ips_2021 %>% 
+    left_join(ips_2023, by = c("cod_ibge")) %>% 
+    left_join(ips_2018, by = c("cod_ibge")) %>% 
+    left_join(ips_2014, by = c("cod_ibge")) %>% 
+    select(-ends_with("y")) %>% 
+    rename(municipio = municipio.x,
+           estado = estado.x,
+           ips_2018 = ips_amazonia_2018,
+           ips_2014 = ips_amazonia_2014)
 
 ###################
 # IBGE - CEMPRE
@@ -240,9 +335,12 @@ ppm_livestock <- readRDS(file = "./data/ppm_municipality_livestock_inventory.rds
 # dplyr::select("Código Município Completo", "Nome_Município")
 #ppm_livestock$group <- plyr::mapvalues(ppm_livestock$group, from = munics$Nome_Município, to = munics$`Código Município Completo`)
 
-ppm_livestock= ppm_livestock%>%
+#UNFINISHED
+ppm_livestock= ppm_livestock %>%
+    rename(ano = time,
+           municipio = group) %>% 
     dplyr::filter(ano >= 2000)%>%
-    dplyr::select(geo_id, ano, num_v2670, num_v32794, num_v32796)
+    dplyr::select(geo_id, municipio, ano, num_v2670, num_v32794, num_v32796) 
 
 ###################
 #PAM - IBGE
@@ -270,9 +368,24 @@ ppm_livestock= ppm_livestock%>%
 # 
 # saveRDS(pam_municipality_all_crops_2000_19, "./data/pam_municipality_all_crops_2000_19.rds")
 
-pam_municipality_all_crops= readRDS('./data/pam_municipality_all_crops.rds') %>%
-    filter(ano >= 2000)
-pam_municipality_all_crops[is.na(pam_municipality_all_crops)] <- 0  
+ # pam_municipality_all_crops= readRDS('./data/pam_municipality_all_crops.rds') %>%
+ #    filter(ano >= 2000)
+cols_pam <- c("area_plantada_dest_colheita_v40124",
+              "quant_v40124",
+              "area_plantada_dest_colheita_v40102",
+              "quant_v40102",
+              "area_plantada_dest_colheita_v40122",
+              "quant_v40122",
+              "area_plantada_dest_colheita_v40119",
+              "quant_v40119")
+pam_municipality_all_crops <- map(2000:2024, ~ readRDS(glue::glue("./data/pam_municipality_all_crops{.x}.rds")) %>% 
+                                      select(geo_id, ano, cols_pam))
+
+pam_municipality_all_crops <- pam_municipality_all_crops %>% 
+    bind_rows() %>% 
+    mutate(across(area_plantada_dest_colheita_v40124:quant_v40119, ~ .x %>% as.numeric())) %>% 
+    mutate(across(area_plantada_dest_colheita_v40124:quant_v40119, ~ if_else(is.na(.x), 0, .x))) 
+
 
 ###########################
 # edit data to merge
@@ -284,7 +397,7 @@ class(prodes$cod_munic_ibge) <-  'character'
 #class(deter$cod_ibge) <-  'character'
 class(gdp$cod_ibge) <-  'character'
 #class(degrad$cod_ibge) <-  'character'
-class(ips$cod_municipio) <-  'character'
+class(ips$cod_ibge) <-  'character'
 class(income$cod_ibge) <-  'character'
 #class(ppm_livestock$group) <-  'character'
 
@@ -295,23 +408,26 @@ class(prodes$ano) <-  'numeric'
 class(gdp$ano) <-  'numeric'
 #class(degrad$ano) <-  'numeric'
 #class(income$ano) <-  'numeric'
-class(ips$cod_municipio) <-  'character'
+class(ips$cod_ibge) <-  'character'
 class(pam_municipality_all_crops$ano) <- 'numeric'
+
 
 ###########################
 # merge all data
 ###########################
-dz_munic <- income %>%
-    full_join(prodes, by = c("cod_ibge" = "cod_munic_ibge")) %>%
+dz_munic <- income %>% 
+    full_join(prodes, by = c("cod_ibge" = "cod_munic_ibge","ano")) %>%
     full_join(gdp, by = c("cod_ibge", "ano")) %>%
     full_join(cempre_municipality, by = c("cod_ibge", "ano")) %>%
-    full_join(ips, by = c("cod_ibge" = "cod_municipio")) %>%
-    full_join(ppm_livestock, by = c('cod_ibge' = 'geo_id', 'ano')) %>%
+    full_join(ips %>% select(-municipio), by = c("cod_ibge" = "cod_ibge")) %>%
+    full_join(ppm_livestock %>% select(-municipio), by = c('cod_ibge' = 'geo_id', 'ano')) %>%
     full_join(pam_municipality_all_crops, by = c('cod_ibge' = 'geo_id', 'ano' = 'ano')) %>%
     arrange(cod_ibge, ano) %>%
     relocate(cod_ibge, ano)
 
+dz_munic$municipio <- plyr::mapvalues(dz_munic$cod_ibge, from = datazoom.amazonia::municipalities$code_muni, to = datazoom.amazonia::municipalities$municipality_mapbiomas)
 
+dz_munic$uf <- plyr::mapvalues(dz_munic$cod_ibge, from = datazoom.amazonia::municipalities$code_muni, to = datazoom.amazonia::municipalities$abbrev_state)
 # colnames(dz_munic)
 #dz_munic$name_munic <- dz_munic$name_munic.x
 #dz_munic <- dz_munic %>% transform(estado = ifelse(!is.na(estado.x), estado.x, estado.y))
@@ -330,14 +446,14 @@ dz_munic <- dz_munic %>%
 ######################################################
 # merge data with amazon municipalities shapefile
 ######################################################
-map_dz_munic <- sp::merge(shapefile, dz_munic, by.x = "cod_ibge", by.y = "cod_ibge")
+map_dz_munic <- sp::merge(shapefile, dz_munic, by.x = "municipality_code", by.y = "cod_ibge")
 
 # convert time data to date
 map_dz_munic$ano <- as.Date(as.yearqtr(map_dz_munic$ano), format = "%Y")
 
 # colnames(map_dz_munic)
-dz_munic <- map_dz_munic %>% select(cod_ibge,
-                                    nm_municip,
+dz_munic <- map_dz_munic %>% select(cod_ibge = municipality_code,
+                                    nm_municip = municipio,
                                     uf,
                                     ano,
                                     employed_census2000,

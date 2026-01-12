@@ -11,27 +11,54 @@ library(sp)
 library(scales) # to use label_percent()
 library(datazoom.amazonia)
 library(rmapshaper)
+library(here)
 
 ####################
 # 1) Call and clean data
 ###################
-ips_2021 <- readxl::read_xlsx("C:\\Users\\DELL\\Desktop\\IPS_Amazonia_2021.xlsx") %>%
+ips_2021 <- readxl::read_xlsx(here("data", "IPS_amazonia_2023.xlsx"),
+                              sheet = 2) %>%
     janitor::clean_names()
 
-# colnames(ips_2021)
-
 ips_2021 <- ips_2021 %>%
-  mutate(cod_ibge = codigo_ibge )
+  mutate(cod_ibge = codigo_ibge,
+         ano = 2021)
+
+ips_2023 <- readxl::read_xlsx(here("data", "IPS_amazonia_2023.xlsx"),
+                              sheet = 1) %>%
+    janitor::clean_names() %>% 
+    mutate(cod_ibge = codigo_ibge,
+           ano = 2023)
+
 
 ###################
 # TERRABRASILIS
 ###################
 # read shapefile
-shapefile <- st_read("data/shapefiles/municipalities_legal_amazon.shp")
+munic <- readRDS(here("global", "munic_shapefile.rds"))
+lgl_amazon <- readRDS(here("global", "legal_amazon_boundary.rds"))
+
+# Mesma projeção e tirar Z/M se houver
+munic      <- st_zm(munic, drop = TRUE, what = "ZM")
+lgl_amazon <- st_zm(lgl_amazon, drop = TRUE, what = "ZM")
+munic      <- st_transform(munic, st_crs(lgl_amazon))
+
+# Corrigir geometrias inválidas
+munic_fix      <- st_make_valid(munic)
+lgl_amazon_fix <- lgl_amazon %>% 
+    st_make_valid() %>% 
+    st_union()              # vira 1 polígono contínuo
+
+# se ainda der erro com S2, desligar temporariamente
+sf_use_s2(FALSE)
+
+# Interseção / filtro espacial
+shapefile <- st_intersection(munic_fix, lgl_amazon_fix) %>% 
+    mutate(cod_ibge = municipality_code)
 
 # data too heavy (over 100mb)
 # solution: simplify geometry
-shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
+#shapefile <- sf::st_simplify(munic_amazon, dTolerance = 400)
 
 # plot(shapefile)
 # shapefile$cod_ibge
@@ -39,35 +66,48 @@ shapefile <- sf::st_simplify(shapefile, dTolerance = 400)
 ######################################################
 # merge data with amazon municipalities shapefile
 ######################################################
-temporary_data <- sp::merge(shapefile, ips_2021, by.x = "cod_ibge", by.y = "cod_ibge")
-
-temporary_data$estado <- temporary_data$uf
+temporary_data_2021 <- sp::merge(shapefile, ips_2021, by.x = "cod_ibge", by.y = "cod_ibge")
+temporary_data_2023 <- sp::merge(shapefile, ips_2023, by.x = "cod_ibge", by.y = "cod_ibge")
+#temporary_data$estado <- temporary_data$uf
 
 # unique(temporary_data$uf)
 # temporary_data <- temporary_data %>% dplyr::filter(estado == "AC" | estado == "AP" | estado == "AM" | estado == "PA" | estado == "MA" | estado == "RR" | estado == "RO" | estado == "MT" | estado == "TO")
-class(temporary_data$cod_ibge)
-temporary_data$cod_ibge <- as.factor(temporary_data$cod_ibge)
-temporary_data$estado <- as.factor(temporary_data$estado)
+class(temporary_data_2021$cod_ibge)
+temporary_data_2021$cod_ibge <- as.factor(temporary_data_2021$cod_ibge)
+temporary_data_2021$estado <- as.factor(temporary_data_2021$estado)
+
+temporary_data_2023$cod_ibge <- as.factor(temporary_data_2023$cod_ibge)
+temporary_data_2023$estado <- as.factor(temporary_data_2023$estado)
 
 # groups at the level: municipio
-temporary_data$group <- temporary_data$nm_municip
+temporary_data_2021$group <- temporary_data_2021$municipio
 
+temporary_data_2023$group <- temporary_data_2023$municipio
 # unique rows
 # temporary_data <- unique(temporary_data, by = c(cod_ibge, estado))
-temporary_data <- temporary_data %>% group_by(cod_ibge, ano)
+temporary_data_2021 <- temporary_data_2021 %>% group_by(cod_ibge, ano)
+
+temporary_data_2023 <- temporary_data_2023 %>% group_by(cod_ibge, ano)
 
 # arrange data by
-temporary_data <- temporary_data %>%
+temporary_data_2021 <- temporary_data_2021 %>%
   arrange(cod_ibge)
+
+temporary_data_2023 <- temporary_data_2023 %>%
+    arrange(cod_ibge)
 
 # Identify and remove duplicate data
 # xxx <- temporary_data %>% distinct(cod_ibge, ano, .keep_all = TRUE)
 
 # drop municipalities with empty geometry
-temporary_data <- temporary_data[!st_is_empty(temporary_data), , drop = FALSE]
+temporary_data_2021 <- temporary_data_2021[!st_is_empty(temporary_data_2021), , drop = FALSE]
+ips_2021 <- temporary_data_2021
 
-ips_2021 <- temporary_data
-remove(temporary_data)
+temporary_data_2023 <- temporary_data_2023[!st_is_empty(temporary_data_2023), , drop = FALSE]
+ips_2023 <- temporary_data_2023
+
+remove(temporary_data_2021)
+remove(temporary_data_2023)
 remove(shapefile)
 
 # save simplified sf for faster maps
@@ -75,83 +115,238 @@ ips_2021 <- rmapshaper::ms_simplify(ips_2021,
                                          keep_shapes = TRUE, 
                                          keep = 0.01)
 
+ips_2023 <- rmapshaper::ms_simplify(ips_2023, 
+                                    keep_shapes = TRUE, 
+                                    keep = 0.01)
+
+
 # select only relevant variables
+# ips_2021 <- ips_2021 %>%
+#   select(cod_ibge, 
+#          nm_municip = municipio, 
+#          uf = estado, 
+#          ips_amazonia_2021, 
+#          necessidades_humanas_basicas,
+#          fundamentos_para_o_bem_estar,
+#          oportunidades,
+#          nutricao_e_cuidados_medicos_basicos,
+#          agua_e_saneamento,
+#          moradia,
+#          seguranca_pessoal,
+#          acesso_ao_conhecimento_basico,
+#          acesso_a_informacao_e_comunicacao,
+#          saude_e_bem_estar,
+#          qualidade_do_meio_ambiente,
+#          direitos_individuais,
+#          liberdade_individual_e_de_escolha,
+#          inclusao_social,
+#          acesso_a_educacao_superior,
+#          mortalidade_infantil_ate_5_anos_2019_obitos_1_000_nasc_vivos,
+#          mortalidade_materna_2019_obitos_maternos_100_000_nascidos_vivos,
+#          mortalidade_por_doencas_infecciosas_2019_obitos_100_000_habitantes,
+#          mortalidade_por_desnutricao_2019_obitos_100_000_habitantes,
+#          subnutricao_2020_percent_da_populacao,
+#          abastecimento_de_agua_adequado_2020_percent_da_populacao,
+#          esgotamento_sanitario_adequado_2020_percent_da_populacao,
+#          indice_atendimento_de_agua_2019_percent_da_populacao,
+#          coleta_de_lixo_2020_percent_de_domicilios,
+#          domicilios_com_iluminacao_eletrica_adequadas_2020_percent_de_domicilios,
+#          domicilios_com_paredes_adequadas_2020_percent_de_domicilios,
+#          domicilios_com_pisos_adequados_2020_percent_de_domicilios,
+#          assassinatos_de_jovens_2019_obitos_100_000_habitantes_de_15_a_29_anos,
+#          assassinatos_de_jovens_2019_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
+#          homicidios_2019_obitos_100_000_habitantes,
+#          homicidios_categorico_2019_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
+#          mortes_por_acidente_no_transito_obitos_100_000_habitantes,
+#          distorcao_idade_serie_ensino_fundamental_2019_percent_de_alunos,
+#          distorcao_idade_serie_ensino_medio_2019_percent_de_alunos,
+#          taxa_de_abandono_escolar_ensino_fundamental_2019_percent_de_alunos,
+#          taxa_de_reprovacao_escolar_ensino_fundamental_2019_percent_de_alunos,
+#          qualidade_da_educacao_ideb_2019,
+#          densidade_internet_banda_larga_fixa_2020_no_de_acessos_100_domicilios,
+#          densidade_telefonia_fixa_2020_no_de_acessos_100_domicilios,
+#          densidade_telefonia_movel_2020_no_de_acessos_100_habitantes,
+#          densidade_tv_por_assinatura_2020_no_de_acessos_100_domicilios,
+#          mortalidade_por_doencas_circulatorias_2019_obitos_100_000_habitantes,
+#          mortalidade_por_doencas_respiratorias_2019_obitos_100_000_habitantes,
+#          mortalidade_por_diabetes_mellitus_2019_obitos_100_000_habitantes,
+#          mortalidade_por_neoplasias_cancer_2019_obitos_100_000_habitantes,
+#          taxa_de_suicidios_2019_obitos_100_000_habitantes,
+#          areas_protegidas_2020_percent_area_total_do_municipio,
+#          desmatamento_acumulado_2020_percent_area_total_do_municipio,
+#          desmatamento_recente_2018_2019_2020_percent_do_desmatamento_total,
+#          emissoes_co2_2018_ton_co2eq_gwp_ar5_habitante,
+#          focos_de_calor_2020_na_de_focos_1_000_habitantes,
+#          diversidade_partidaria_2020_percent_de_vereadores_eleitos_de_partidos_diferentes,
+#          mobilidade_urbana_transporte_publico_2020_no_de_onibus_e_micro_onibus_1_000_habitantes,
+#          acesso_a_cultura_e_lazer_2018_categorica_1_10,
+#          maes_adolescentes_ou_criancas_2019_percent_de_filhos_de_maes_adolescentes_ou_criancas,
+#          trabalho_infantil_2019_no_de_familias_com_ao_menos_1_membro_em_trabalho_infantil_1_000_familias,
+#          vulnerabilidade_familiar_2019_percent_de_filhos_de_maes_solteiras,
+#          violencia_contra_indigenas_2014_no_de_casos_1_000_indigenas,
+#          violencia_contra_indigenas_2014_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_0_1_2_7_3_2_7_8_8_4_8_8_20_8_5_20_8,
+#          violencia_contra_mulheres_2019_no_de_casos_100_000_mulheres,
+#          violencia_infantil_2019_no_de_casos_100_000_pessoas_de_0_14_anos,
+#          violencia_infantil_2019_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_1_1_40_1_3_40_1_133_1_4_133_1_496_0_5_496_0,
+#          empregos_ensino_superior_2019_no_de_empregos_por_100_mil_habitantes,
+#          mulheres_com_empregos_ensino_superior_2019_no_de_empregos_por_100_mil_habitantes,
+#          group,
+#          geometry
+#          )
+
 ips_2021 <- ips_2021 %>%
-  select(cod_ibge, 
-         nm_municip, 
-         uf, 
-         ips_amazonia_2021, 
-         necessidades_humanas_basicas,
-         fundamentos_para_o_bem_estar,
-         oportunidades,
-         nutricao_e_cuidados_medicos_basicos,
-         agua_e_saneamento,
-         moradia,
-         seguranca_pessoal,
-         acesso_ao_conhecimento_basico,
-         acesso_a_informacao_e_comunicacao,
-         saude_e_bem_estar,
-         qualidade_do_meio_ambiente,
-         direitos_individuais,
-         liberdade_individual_e_de_escolha,
-         inclusao_social,
-         acesso_a_educacao_superior,
-         mortalidade_infantil_ate_5_anos_2019_obitos_1_000_nasc_vivos,
-         mortalidade_materna_2019_obitos_maternos_100_000_nascidos_vivos,
-         mortalidade_por_doencas_infecciosas_2019_obitos_100_000_habitantes,
-         mortalidade_por_desnutricao_2019_obitos_100_000_habitantes,
-         subnutricao_2020_percent_da_populacao,
-         abastecimento_de_agua_adequado_2020_percent_da_populacao,
-         esgotamento_sanitario_adequado_2020_percent_da_populacao,
-         indice_atendimento_de_agua_2019_percent_da_populacao,
-         coleta_de_lixo_2020_percent_de_domicilios,
-         domicilios_com_iluminacao_eletrica_adequadas_2020_percent_de_domicilios,
-         domicilios_com_paredes_adequadas_2020_percent_de_domicilios,
-         domicilios_com_pisos_adequados_2020_percent_de_domicilios,
-         assassinatos_de_jovens_2019_obitos_100_000_habitantes_de_15_a_29_anos,
-         assassinatos_de_jovens_2019_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
-         homicidios_2019_obitos_100_000_habitantes,
-         homicidios_categorico_2019_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
-         mortes_por_acidente_no_transito_obitos_100_000_habitantes,
-         distorcao_idade_serie_ensino_fundamental_2019_percent_de_alunos,
-         distorcao_idade_serie_ensino_medio_2019_percent_de_alunos,
-         taxa_de_abandono_escolar_ensino_fundamental_2019_percent_de_alunos,
-         taxa_de_reprovacao_escolar_ensino_fundamental_2019_percent_de_alunos,
-         qualidade_da_educacao_ideb_2019,
-         densidade_internet_banda_larga_fixa_2020_no_de_acessos_100_domicilios,
-         densidade_telefonia_fixa_2020_no_de_acessos_100_domicilios,
-         densidade_telefonia_movel_2020_no_de_acessos_100_habitantes,
-         densidade_tv_por_assinatura_2020_no_de_acessos_100_domicilios,
-         mortalidade_por_doencas_circulatorias_2019_obitos_100_000_habitantes,
-         mortalidade_por_doencas_respiratorias_2019_obitos_100_000_habitantes,
-         mortalidade_por_diabetes_mellitus_2019_obitos_100_000_habitantes,
-         mortalidade_por_neoplasias_cancer_2019_obitos_100_000_habitantes,
-         taxa_de_suicidios_2019_obitos_100_000_habitantes,
-         areas_protegidas_2020_percent_area_total_do_municipio,
-         desmatamento_acumulado_2020_percent_area_total_do_municipio,
-         desmatamento_recente_2018_2019_2020_percent_do_desmatamento_total,
-         emissoes_co2_2018_ton_co2eq_gwp_ar5_habitante,
-         focos_de_calor_2020_na_de_focos_1_000_habitantes,
-         diversidade_partidaria_2020_percent_de_vereadores_eleitos_de_partidos_diferentes,
-         mobilidade_urbana_transporte_publico_2020_no_de_onibus_e_micro_onibus_1_000_habitantes,
-         acesso_a_cultura_e_lazer_2018_categorica_1_10,
-         maes_adolescentes_ou_criancas_2019_percent_de_filhos_de_maes_adolescentes_ou_criancas,
-         trabalho_infantil_2019_no_de_familias_com_ao_menos_1_membro_em_trabalho_infantil_1_000_familias,
-         vulnerabilidade_familiar_2019_percent_de_filhos_de_maes_solteiras,
-         violencia_contra_indigenas_2014_no_de_casos_1_000_indigenas,
-         violencia_contra_indigenas_2014_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_0_1_2_7_3_2_7_8_8_4_8_8_20_8_5_20_8,
-         violencia_contra_mulheres_2019_no_de_casos_100_000_mulheres,
-         violencia_infantil_2019_no_de_casos_100_000_pessoas_de_0_14_anos,
-         violencia_infantil_2019_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_1_1_40_1_3_40_1_133_1_4_133_1_496_0_5_496_0,
-         empregos_ensino_superior_2019_no_de_empregos_por_100_mil_habitantes,
-         mulheres_com_empregos_ensino_superior_2019_no_de_empregos_por_100_mil_habitantes,
-         group,
-         geometry
-         )
+    select(cod_ibge, 
+           nm_municip = municipio, 
+           uf = estado, 
+           ips_amazonia_2021, 
+           necessidades_humanas_basicas,
+           fundamentos_para_o_bem_estar,
+           oportunidades,
+           nutricao_e_cuidados_medicos_basicos,
+           agua_e_saneamento,
+           moradia,
+           seguranca_pessoal,
+           acesso_ao_conhecimento_basico,
+           acesso_a_informacao_e_comunicacao,
+           saude_e_bem_estar,
+           qualidade_do_meio_ambiente,
+           direitos_individuais,
+           liberdade_individual_e_de_escolha,
+           tolerancia_e_inclusao,
+           acesso_a_educacao_superior,
+           esgoto_adequado_2020_percent_da_populacao,
+           mortalidade_infantil_ate_5_anos_2019_obitos_1_000_nasc_vivos,
+           mortalidade_materna_2019_obitos_maternos_100_000_nascidos_vivos,
+           mortalidade_por_doencas_infecciosas_2019_obitos_100_000_habitantes,
+           mortalidade_por_desnutricao_2019_obitos_100_000_habitantes,
+           subnutricao_2020_percent_da_populacao,
+           abastecimento_de_agua_adequado_2020_percent_da_populacao,
+           indice_atendimento_de_agua_2019_percent_da_populacao,
+           coleta_de_lixo_adequada_2020_percent_de_domicilios,
+           moradias_com_iluminacao_adequada_2020_percent_de_domicilios,
+           moradias_com_parede_adequada_2020_percent_de_domicilios,
+           moradias_com_piso_adequado_2020_percent_de_domicilios,
+           assassinatos_de_jovens_2019_obitos_100_000_habitantes_de_15_a_29_anos,
+           assassinatos_de_jovens_2019_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
+           homicidios_2019_obitos_100_000_habitantes,
+           homicidios_categorico_2019_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
+           mortes_por_acidente_no_transito_obitos_100_000_habitantes,
+           distorcao_idade_serie_ensino_fundamental_2019_percent_de_alunos,
+           distorcao_idade_serie_ensino_medio_2019_percent_de_alunos,
+           abandono_escolar_ensino_fundamental_2019_percent_de_alunos,
+           reprovacao_escolar_ensino_fundamental_2019_percent_de_alunos,
+           qualidade_da_educacao_ideb_ensino_fundamental_2019,
+           densidade_internet_banda_larga_2020_no_de_acessos_100_domicilios,
+           densidade_telefonia_fixa_2020_no_de_acessos_100_domicilios,
+           densidade_telefonia_movel_2020_no_de_acessos_100_habitantes,
+           densidade_tv_por_assinatura_2020_no_de_acessos_100_domicilios,
+           mortalidade_por_doencas_circulatorias_2019_obitos_100_000_habitantes,
+           mortalidade_por_doencas_respiratorias_2019_obitos_100_000_habitantes,
+           mortalidade_por_diabetes_mellitus_2019_obitos_100_000_habitantes,
+           mortalidade_por_cancer_2019_obitos_100_000_habitantes,
+           mortalidade_por_suicidios_2019_obitos_100_000_habitantes,
+           areas_protegidas_2020_percent_area_total_do_municipio,
+           desmatamento_acumulado_2020_percent_area_total_do_municipio,
+           desmatamento_recente_2019_2019_2020_percent_area_total_do_municipio,
+           emissoes_co2_2018_ton_co2_habitante,
+           focos_de_calor_2020_na_de_focos_1_000_habitantes,
+           diversidade_partidaria_2020_percent_vereadores_eleitos_partidos_diferentes,
+           transporte_publico_2020_no_de_onibus_e_micro_onibus_1_000_habitantes,
+           acesso_a_cultura_esporte_e_lazer_2018_categorica_1_10,
+           gravidez_na_infancia_e_adolescencia_2019_percent_de_filhos_de_maes_com_ate_19_anos,
+           trabalho_infantil_2019_no_de_familias_com_ao_menos_1_membro_em_trabalho_infantil_1_000_familias,
+           vulnerabilidade_familiar_2019_percent_de_filhos_de_maes_solteiras,
+           violencia_contra_indigenas_2014_no_de_casos_1_000_indigenas,
+           violencia_contra_indigenas_2014_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_0_1_2_7_3_2_7_8_8_4_8_8_20_8_5_20_8,
+           violencia_contra_mulheres_2014_no_de_casos_100_000_mulheres,
+           violencia_infantil_2014_no_de_casos_100_000_pessoas_de_0_14_anos,
+           violencia_infantil_2014_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_1_1_40_1_3_40_1_133_1_4_133_1_496_0_5_496_0,
+           empregos_ensino_superior_2019_percent_de_empregos_em_relacao_ao_total,
+           mulheres_com_empregos_ensino_superior_2019_percent_de_empregos_em_relacao_ao_total,
+           group,
+           geometry = geom
+    )
+
+ips_2023 <- ips_2023 %>%
+    select(cod_ibge, 
+           nm_municip = municipio, 
+           uf = estado, 
+           ips_amazonia_2023, 
+           necessidades_humanas_basicas,
+           fundamentos_para_o_bem_estar,
+           oportunidades,
+           nutricao_e_cuidados_medicos_basicos,
+           agua_e_saneamento,
+           moradia,
+           seguranca_pessoal,
+           acesso_ao_conhecimento_basico,
+           acesso_a_informacao_e_comunicacao,
+           saude_e_bem_estar,
+           qualidade_do_meio_ambiente,
+           direitos_individuais,
+           liberdade_individual_e_de_escolha,
+           tolerancia_e_inclusao,
+           acesso_a_educacao_superior,
+           esgoto_adequado_2021_percent_da_populacao,
+           mortalidade_infantil_ate_5_anos_2020_obitos_1_000_nasc_vivos,
+           mortalidade_materna_2020_obitos_maternos_100_000_nascidos_vivos,
+           mortalidade_por_doencas_infecciosas_2020_obitos_100_000_habitantes,
+           mortalidade_por_desnutricao_2020_obitos_100_000_habitantes,
+           subnutricao_2020_percent_da_populacao,
+           abastecimento_de_agua_adequado_2021_percent_da_populacao,
+           indice_atendimento_de_agua_2021_percent_da_populacao,
+           coleta_de_lixo_adequada_2021_percent_de_domicilios,
+           moradias_com_iluminacao_adequada_2021_percent_de_domicilios,
+           moradias_com_parede_adequada_2021_percent_de_domicilios,
+           moradias_com_piso_adequado_2021_percent_de_domicilios,
+           assassinatos_de_jovens_2020_obitos_100_000_habitantes_de_15_a_29_anos,
+           assassinatos_de_jovens_2020_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
+           homicidios_2020_obitos_100_000_habitantes,
+           homicidios_categorico_2020_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
+           mortes_por_acidente_no_transito_2020_obitos_100_000_habitantes,
+           distorcao_idade_serie_ensino_fundamental_2022_percent_de_alunos,
+           distorcao_idade_serie_ensino_medio_2022_percent_de_alunos,
+           abandono_escolar_ensino_fundamental_2021_percent_de_alunos,
+           reprovacao_escolar_ensino_fundamental_2021_percent_de_alunos,
+           qualidade_da_educacao_ideb_ensino_fundamental_2021,
+           densidade_internet_banda_larga_2022_no_de_acessos_100_domicilios,
+           densidade_telefonia_fixa_2022_no_de_acessos_100_domicilios,
+           densidade_telefonia_movel_2022_no_de_acessos_100_habitantes,
+           densidade_tv_por_assinatura_2022_no_de_acessos_100_domicilios,
+           mortalidade_por_doencas_circulatorias_2020_obitos_100_000_habitantes,
+           mortalidade_por_doencas_respiratorias_2020_obitos_100_000_habitantes,
+           mortalidade_por_diabetes_mellitus_2020_obitos_100_000_habitantes,
+           mortalidade_por_cancer_2020_obitos_100_000_habitantes,
+           mortalidade_por_suicidios_2020_obitos_100_000_habitantes,
+           areas_protegidas_2020_percent_area_total_do_municipio,
+           desmatamento_acumulado_2022_percent_area_total_do_municipio,
+           desmatamento_recente_2020_2021_2022_percent_area_total_do_municipio,
+           emissoes_co2_2012_ton_co2e_habitante,
+           focos_de_calor_2022_na_de_focos_1_000_habitantes,
+           diversidade_partidaria_2020_percent_vereadores_eleitos_partidos_diferentes,
+           transporte_publico_2022_no_de_onibus_e_micro_onibus_1_000_habitantes,
+           acesso_a_cultura_esporte_e_lazer_2021_categorica_1_10,
+           gravidez_na_infancia_e_adolescencia_2020_percent_de_filhos_de_maes_com_ate_19_anos,
+           trabalho_infantil_2021_no_de_familias_com_ao_menos_1_membro_em_trabalho_infantil_1_000_familias,
+           vulnerabilidade_familiar_2020_percent_de_filhos_de_maes_solteiras,
+           violencia_contra_indigenas_2014_no_de_casos_1_000_indigenas,
+           violencia_contra_indigenas_2014_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_0_1_2_7_3_2_7_8_8_4_8_8_20_8_5_20_8,
+           violencia_contra_mulheres_2014_no_de_casos_100_000_mulheres,
+           violencia_infantil_2014_no_de_casos_100_000_pessoas_de_0_14_anos,
+           violencia_infantil_2014_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_1_1_40_1_3_40_1_133_1_4_133_1_496_0_5_496_0,
+           empregos_ensino_superior_2019_percent_de_empregos_em_relacao_ao_total,
+           mulheres_com_empregos_ensino_superior_2019_percent_de_empregos_em_relacao_ao_total,
+           group,
+           geometry = geom
+    )
 
 # save data
 saveRDS(ips_2021,
-        file = "./data/ips_2021.rds"
+        file = here("data", "ips_2021_atualizado.rds")
+)
+
+saveRDS(ips_2023,
+        file = here("data", "ips_2023.rds")
 )
 
 #####################

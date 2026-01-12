@@ -15,7 +15,7 @@ year_max <- max(gdp_antigo$ano)
 
 #Loading a more recent year of gdp data
 gdp <- load_pibmunic(raw_data = F, 
-                     time_period = year_max + 1, 
+                     time_period = 2002:2021, 
                      language = "pt",
                      geo_level = "municipality")
 

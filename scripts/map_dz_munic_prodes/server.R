@@ -21,6 +21,16 @@ get_server <- function(files, param) {
 
       return(w)
     })
+    
+    x_var <- reactive({
+        if (isTRUE(input$x_prop)) {
+            nm <- paste0("prop_", input$x)
+            # se por algum motivo a coluna não existir, cai para a base
+            if (nm %in% names(df)) nm else input$x
+        } else {
+            input$x
+        }
+    })
 
     # Cria opções para seleção de datas
     param$filter_choices <- sort(unique(year(df$ano)))
@@ -95,7 +105,7 @@ get_server <- function(files, param) {
         text <- param$variavel_none
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
+        x_col <- param$table[which(param$table$var == x_var()), ]
         text <- paste0(param$label_var_name, x_col$label)
       }
 
@@ -114,12 +124,42 @@ get_server <- function(files, param) {
 
       # Define paleta de cores
       pal1 <- pallete_continuous
-      if (!is.numeric(df_reactived()[[input$x]])) {
+      if (!is.numeric(df_reactived()[[x_var()]])) {
         pal1 <- pallete_discrete
       }
 
-      # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
+      # # Determina a paleta para as legendas
+      # pal <- colorBin(palette = pal1, 9, domain = df[[x_var()]])
+      
+      # Paleta com bins condicionais para desmatamento ---
+      xv <- x_var()
+      x_col <- param$table[which(param$table$var == xv), ]
+      
+      is_numeric <- is.numeric(df[[xv]])
+      is_desmat  <- grepl("desmat", tolower(xv)) || grepl("desmat", tolower(x_col$label))
+      is_prop    <- startsWith(xv, "prop_") || grepl("propor", tolower(x_col$label))
+      
+      # bins especiais para desmatamento
+      bins <- NULL
+      if (is_numeric && is_desmat && !is_prop) {
+          # incremento absoluto (hectares)
+          bins <- c(0, 10, 25, 50, 100, 200, 400, 800, 1600, Inf)
+      } else if (is_numeric && is_desmat && is_prop) {
+          # proporção do município (percentual)
+          bins <- c(0, 1, 2, 3, 5, 10, 20, 40, 80, 100)
+      }
+      
+      if (is_numeric) {
+          if (!is.null(bins)) {
+              pal <- colorBin(palette = pal1, bins = bins, domain = df[[xv]], right = FALSE)
+          } else {
+              # fallback padrão (9 classes)
+              pal <- colorBin(palette = pal1, bins = 9, domain = df[[xv]])
+          }
+      } else {
+          # categóricas continuam indo pela paleta discreta (mantendo compatibilidade)
+          pal <- colorFactor(palette = pal1, domain = df[[xv]])
+      }
 
       tryCatch(
         {
@@ -127,12 +167,12 @@ get_server <- function(files, param) {
           # Monta mapa
 
           # Monta html do tooltip
-          x_col <- param$table[which(param$table$var == input$x), ]
+          x_col <- param$table[which(param$table$var == x_var()), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
             param$label_munic, df_reactived()$nm_municip, "</b> <br>",
             param$label_state, df_reactived()$estado, "</b> <br>",
-            x_col$label, ": <b>", df_reactived()[[input$x]], "</b> <br>",
+            x_col$label, ": <b>", df_reactived()[[x_var()]], "</b> <br>",
             param$label_measurement_unit, x_col$unidade, "</b>"
           ) %>%
             lapply(htmltools::HTML)
@@ -146,7 +186,7 @@ get_server <- function(files, param) {
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = 0.7,
-              fillColor = ~ pal(df_reactived()[[input$x]]),
+              fillColor = ~ pal(df_reactived()[[xv]]),
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -157,7 +197,7 @@ get_server <- function(files, param) {
             ) %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df_reactived()[[input$x]],
+              values = ~ df_reactived()[[xv]],
               title = title_legend,
               opacity = 0.7
             )
