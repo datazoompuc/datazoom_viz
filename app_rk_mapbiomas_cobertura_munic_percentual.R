@@ -1,8 +1,11 @@
 # Carrega bibliotecas
+library(dplyr)
 library(shiny)
 library(ggplot2)
 library(plotly)
+library(shinyWidgets)
 library(htmlwidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -10,8 +13,8 @@ files$ui_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/ui.R"
 files$server_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/server.R"
 files$param_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/mapbiomas_cobertura_munic_percentual_dic.csv"
-files$db_file <- "data/mapbiomas_cobertura_munic_percentual.rds"
+files$param_file <- "data/mapbiomas_cobertura_munic_dic.csv"
+files$db_file <- "data/mapbiomas_cobertura_munic_pt.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -33,6 +36,7 @@ param$ui1 <- "VARI\u00C1VEIS:"
 param$ui2 <- "Ranking - eixo horizontal (x):"
 param$ui3 <- "Cor das barras:"
 param$link <- 'https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura_munic_percentual/'
+param$prop_button_label <- "Proporção da área dos municípios"
 
 # Parâmetros específicos do server
 param$server0 <- "Variável não selecionada"

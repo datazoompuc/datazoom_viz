@@ -124,16 +124,28 @@ get_server <- function(files, param) {
           y_col$label <- "Ranking"
 
           df_p <- data.frame(
-            df[x_col$var],
-            NA,
-            df[color_col$var],
-            df[slider_col$var],
-            df["group"],
-            df["group"],
-            df[id_col$var]
+              df[x_col$var],
+              NA,
+              df[color_col$var],
+              df[slider_col$var],
+              df["group"],
+              df["group"],
+              df[id_col$var]
           )
-
+          
           colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
+          
+          # ----  BLOCO PARA PROPORÇÃO ----
+          if (input$yprop) {
+              
+              df_area <- df %>% 
+                  dplyr::select(group, area_km2) %>% 
+                  dplyr::distinct()
+              
+              df_p <- df_p %>%
+                  dplyr::left_join(df_area, by = "group") %>%
+                  dplyr::mutate(x = x / area_km2)
+          }
 
           # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
@@ -168,6 +180,10 @@ get_server <- function(files, param) {
           df_p <- df_p %>% filter(group %in% top_groups)
 
           # Monta html do tooltip
+          if (input$yprop) {
+            x_col$unidade <- "%"
+          }
+          
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
@@ -370,7 +386,7 @@ get_server <- function(files, param) {
       )
       fig
     }) %>%
-        bindCache(input$x, param$color_def)
+        bindCache(input$x, input$yprop, param$color_def)
 
     # Observa eventos
     observe({

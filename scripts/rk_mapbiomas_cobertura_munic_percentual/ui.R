@@ -12,13 +12,13 @@ get_ui <- function(files, param) {
         
         # muda cor do background
         tags$style('.menucol {
-                        background-color: #3E688B;
-              }',),
+        background-color: #50A486;
+                   }'),
         
         # muda cor do botao 
         tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
-                        background-color: #3E5688 !important;
-                        border-color: #3E5688 !important;
+                        background-color: #48968B !important;
+                        border-color: #48968B !important;
               }',),
         
         h2(class = "plot_name", param$plot_name),
@@ -36,8 +36,25 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
-        # espaço vazio
-        div(class = "fakecheckbox", ),
+        
+        # botão proporção
+        
+        tags$style(HTML("
+        .switch-label {
+        color: white;
+        }
+                        
+                        ")),
+        div(
+            style = "margin-top: 10px;",
+            materialSwitch(
+                inputId = "yprop",
+                label = tags$span(param$prop_button_label, class = "switch-label"),
+                value = TRUE,
+                status = "info"   # ← mesma cor usada no outro app
+            )
+        ),
+        
         div(
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
@@ -52,9 +69,12 @@ get_ui <- function(files, param) {
         div( # row do gráfico
           class = "plotrow row justify-content-center flex-grow-1 w-100",
           div(
-            class = "plotdiv w-100 h-100",
-            # Gráfico
-            plotlyOutput("plot", width = "100%", height = "100%") # %>% withSpinner()
+              style = "flex-grow: 1; position: relative;", 
+              withSpinner(
+                  plotlyOutput("plot", width = "100%", height = "calc(100vh - 150px)"),
+                  type = 4,
+                  color = "#41878C"
+            )
           )
         )
       )
