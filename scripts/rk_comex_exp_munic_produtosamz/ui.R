@@ -36,17 +36,7 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
-        div(
-          class = "var_selec_group",
-          # Seleciona variável de cor
-          selectInput(
-            inputId = "color",
-            label = param$color_bar,
-            choices = param$color_choices,
-            selected = param$color_def,
-            width = "100%"
-          )
-        ),
+        
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
@@ -63,9 +53,16 @@ get_ui <- function(files, param) {
         div( # row do gráfico
           class = "plotrow row justify-content-center flex-grow-1 w-100",
           div(
-            class = "plotdiv w-100 h-100",
-            # Gráfico
-            plotlyOutput("plot", width = "100%", height = "100%") # %>% withSpinner()
+              class = "plotdiv w-100 h-100",
+              style = "position: relative; display: flex; flex-direction: column;",
+              div(
+                  style = "flex-grow: 1; position: relative;", 
+                  withSpinner(
+                      plotlyOutput("plot", width = "100%", height = "calc(100vh - 150px)"),
+                      type = 4,
+                      color = "#41878C"
+                  )
+              )
           )
         )
       )

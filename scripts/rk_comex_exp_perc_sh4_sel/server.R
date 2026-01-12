@@ -14,6 +14,7 @@ get_server <- function(files, param) {
   # Carrega dados
   df <- readRDS(files$db_file)
   
+  
   if(param$lang){
       
       df <- df %>% mutate(group = case_when( #######
@@ -25,7 +26,7 @@ get_server <- function(files, param) {
                                                              "Sumos de frutas, com ou sem aditivos" ~ "Fruit juices, with or without additives", group == 
                                                              "Minerios de estanho e seus concentrados" ~ "Tin ores and concentrates", group == 
                                                              "Café torrado, cascas e sucedâneos" ~ "Roasted coffee, husks and substitutes", group == 
-                                                             "Produtos vegetais nao especificados" ~ "Unspecified vegetable products", group == 
+                                                             "Produtos vegetais não especificados" ~ "Unspecified vegetable products", group == 
                                                              "Arroz" ~ "Rice", group == 
                                                              "Soja, mesmo triturada" ~ "Soybeans, even crushed", group == 
                                                              "Outros veículos aéreos" ~ "Other aerial vehicles", group == 
@@ -41,7 +42,7 @@ get_server <- function(files, param) {
                                                              "Madeira perfilada, mesmo aplainada" ~ "Profiled wood, even planed", group == 
                                                              "Minérios de manganês e seus concentrados" ~ "Manganese ores and concentrates", group == 
                                                              "Açúcares no estado sólido" ~ "Solid sugars", group == 
-                                                             "Óleo de soja e respectivas fracções, mesmo refinados, mas não quimicamente modificados" ~ "Soybean oil and its fractions, even refined, but not chemically modified", group == 
+                                                             "Óleo de soja não modificado" ~ "Soybean oil and its fractions, even refined, but not chemically modified", group == 
                                                              "Carnes e comestíveis de aves domésticas" ~ "Meat and edible offal of domestic poultry", group == 
                                                              "Cocos e castanhas do Brasil e de caju" ~ "Brazil nuts and cashew nuts", group == 
                                                              "Frutas e outros comestíveis de planta" ~ "Fruits and other plant edibles", group == 
@@ -50,7 +51,7 @@ get_server <- function(files, param) {
                                                              "Carnes de animais da espécie bovina, congeladas" ~ "Frozen beef", group == 
                                                              "Madeira contraplacada ou compensada" ~ "Plywood or veneered wood", group == 
                                                              "Folhas de madeira para folheados" ~ "Wood veneer sheets", group == 
-                                                             "Outras gorduras e óleos vegetais" ~ "Other vegetable fats and oils", group == 
+                                                             "Outras gorduras e óleos vegetais (incluido o óleo de jojoba)" ~ "Other vegetable fats and oils", group == 
                                                              "Minerios de zinco e seus concentrados" ~ "Zinc ores and concentrates", group == 
                                                              "Minerios de chumbo e seus concentrados" ~ "Lead ores and concentrates", group == 
                                                              "Outros moveis e suas partes" ~ "Other furniture and its parts", group == 
@@ -60,7 +61,7 @@ get_server <- function(files, param) {
                                                              "Outras sementes e oleaginosos" ~ "Other seeds and oleaginous fruits", group == 
                                                              "Partes para veículos de sh4 8711 a 8713" ~ "Parts for vehicles of HS 8711 to 8713", group == 
                                                              "Partes para motores de sh4 8407 e 8408" ~ "Parts for engines of HS 8407 and 8408", group == 
-                                                             "Miudezas comestíveis de animais das espécies bovina, suína, ovina, caprina, cavalar, asinina e muar, frescas, refrigeradas ou congeladas" ~ "Edible offal of animals of the bovine, swine, ovine, caprine, equine, asinine, and mule species, fresh, chilled, or frozen", group == 
+                                                             "Miudezas comestíveis de animais das espécies bovina, suína, ovina, caprina, cavalar, asinina e muar" ~ "Edible offal of animals of the bovine, swine, ovine, caprine, equine, asinine, and mule species, fresh, chilled, or frozen", group == 
                                                              "Obras de carpintaria para construção" ~ "Carpentry works for construction", group == 
                                                              "Minérios de nióbio, tântalo, vanádio, zircônio" ~ "Niobium, tantalum, vanadium, zirconium ores", group == 
                                                              "Minerios de titanio e seus concentrados" ~ "Titanium ores and concentrates", group == 
@@ -152,7 +153,7 @@ get_server <- function(files, param) {
                                                              "Carvão vegetal" ~ "Charcoal", group == 
                                                              "Minérios de alumínio e seus concentrados" ~ "Aluminum ores and their concentrates", group == 
                                                              "Ferro fundido e outras formas primárias" ~ "Cast iron and other primary forms", group == 
-                                                             "Outras frutas de casca rija" ~ "Other nuts", group == 
+                                                             "Frutas secas ou de casca rija" ~ "Dried fruits or hard-shell nuts", group == 
                                                              "Instrumentos automáticos para regulação" ~ "Automatic regulating instruments", group == 
                                                              "Níquel em formas brutas" ~ "Nickel in raw forms", group == 
                                                              "Queijos e requeijão" ~ "Cheese and curd", group == 
@@ -199,7 +200,7 @@ get_server <- function(files, param) {
                                                              "Outros calçados" ~ "Other footwear", group == 
                                                              "Roupas íntimas e pijamas femininos" ~ "Women's underwear and pajamas", group == 
                                                              "Enzimas e enzimas preparadas" ~ "Enzymes and prepared enzymes", group == 
-                                                             "Carnes suínas refrigeradas ou congeladas" ~ "Chilled or frozen pork", group == 
+                                                             "Carnes suínas, frescas, refrigeradas ou congeladas" ~ "Chilled or frozen pork", group == 
                                                              "Âncoras e fateixas de ferro ou aço" ~ "Iron or steel anchors and grapnels", group == 
                                                              "Águas minerais sem aditivos" ~ "Mineral waters without additives", group == 
                                                              "Vestimentas de uso masculino" ~ "Men's clothing", group == 
@@ -210,7 +211,8 @@ get_server <- function(files, param) {
                                                              "Aparelhos para selecionar pedras" ~ "Stone sorting apparatus", group == 
                                                              "Gelatina e colas de origem animal" ~ "Gelatin and animal glues", group == 
                                                              "Dispositivo para tratamento de materiais" ~ "Materials treatment devices", group == 
-                                                             "Outras preparações de carne e miudezas" ~ "Other meat and offal preparations", group == 
+                                                             "Outras preparações de carne e miudezas" ~ "Other meats and offal preparations", group == 
+                                                             "Outras carnes e miudezas" ~ "Other meats and offal", group ==
                                                              "Cervejas de malte" ~ "Malt beers", group == 
                                                              "Aparelhos de iluminação e suas partes" ~ "Lighting fixtures and their parts", group == 
                                                              "Dormentes de madeira para vias férreas" ~ "Wooden sleepers for railway tracks", group == 
@@ -224,8 +226,23 @@ get_server <- function(files, param) {
                                                              "Outros couros e peles em bruto" ~ "Other raw hides and skins", group == 
                                                              "Couros e peles de animais sem pelos" ~ "Hairless animal hides and skins", group == 
                                                              "Melaços da extração e refino do açúcar" ~ "Molasses from sugar extraction and refining", group == 
-                                                             "Âmbar-cinzento, castóreo, algália e almíscar; bílis, mesmo seca; glândulas e outras substâncias de origem animal utilizadas na preparação de produtos farmacêuticos, frescas, refrigeradas, congeladas ou provisoriamente conservadas de outro modo" ~ "Ambergris, castoreum, musk, and civet; bile, whether or not dried; glands and other animal substances used in the preparation of pharmaceutical products, fresh, chilled, frozen, or provisionally preserved in other ways" ,
-                                                         TRUE ~ group
+                                                             "Âmbar, castóreo e outras substâncias de origem animal utilizadas na preparação de produtos farmacêuticos" ~ "Ambergris, castoreum and other animal substances used in the preparation of pharmaceutical products", group ==
+                                                             "Gorduras de animais das espécies bovina, ovina ou caprina, exceto as da posição 1503" ~ "Animal fats of bovine, ovine or caprine origin, excluding those classified under heading 150", group ==
+                                                             "Chocolate e outras preparações alimentícias contendo cacau" ~ "Chocolate and other cocoa preparations", group ==
+                                                             "Cravo-da-índia" ~ "Clove", group ==
+                                                             "Farinhas de cereais, exceto de trigo ou de mistura de trigo com centeio" ~ "Cereal flours, except those made from wheat or from a wheat–rye mixture", group ==
+                                                             "Farinhas de trigo ou de mistura de trigo com centeio" ~ "Wheat flour or flour from a wheat–rye mixture", group ==
+                                                             "Leite e nata" ~ "Milk and cream", group == 
+                                                             "Massas alimentícias" ~ "Pasta", group ==
+                                                             "Sorgo de grão" ~ "Grain sorghum", group ==
+                                                             "Ovos de aves" ~ "Bird eggs", group ==
+                                                             "Produtos de confeitaria sem cacau" ~ "Confectionery products without cocoa", group ==
+                                                             "Óleos de girassol, de cártamo ou de algodão" ~ "Sunflower, safflower or cottonseed oils", group ==
+                                                             "Produtos de padaria, pastelaria ou da industria de bolachas e biscoitos" ~ "Bakery, pastry, or biscuit-making industry products", group ==
+                                                             "Produtos hortícolas conservados transitoriamente" ~ "Vegetable products temporarily preserved", group ==
+                                                             "Soro de leite" ~ "Milk serum (Whey)", group ==
+                                                             "Trigo e mistura de trigo com centeio" ~ "Wheat and wheat–rye mixture",
+                                                TRUE ~ group
                                                          #######
       ))
   }
@@ -233,66 +250,65 @@ get_server <- function(files, param) {
   df <- df %>%
       mutate(lab = group,
              group = ifelse(nchar(group) >= 40,
-                            paste0(substr(group, 1, 40), "..."),
+                            paste0(substr(group, 1, 60), "..."),
                             group),
              value = value * 100)
+  
+  # ---- Fixar eixo X global (somando UFs por ano e produto) ----
+  df_x_range <- df %>%
+      dplyr::group_by(time, group, floresta, lab) %>%
+      dplyr::summarise(
+          value = sum(value, na.rm = TRUE),
+          .groups = "drop"
+      )
+  
+  min_x <- min(df_x_range$value, na.rm = TRUE)
+  max_x <- max(df_x_range$value, na.rm = TRUE)
+  
+  # Garantir que zero sempre apareça
+  min_x <- min(0, min_x)
+  max_x <- max(0, max_x)
+  
+  
   
   server <- function(input, output, session) {
     
     df_reactived <- reactive({
     
-      # filtrar para produtos da floresta
-      if(input$filter == param$filter_def) {
-        w <- df %>% filter(floresta)
-      } else {
         w <- df
-      }
-      
-      return(w)
+        
+        # filtro floresta
+        if (input$forest_filter == param$filter_choices[2]) {
+            w <- w %>% filter(floresta)
+        }
+
+        # filtro ano
+        w <- w %>% filter(time == input$year_filter)
+        
+        
+        # filtro UF
+        if (!is.null(input$uf_filter) && input$uf_filter != "Todos" && input$uf_filter != "All") {
+            w <- w %>% dplyr::filter(uf == input$uf_filter)
+        } else {
+            
+            w <- w %>%
+                dplyr::group_by(time, group, floresta, lab) %>%
+                dplyr::summarise(
+                    value = sum(value, na.rm = TRUE),
+                    .groups = "drop"
+                )
+        }
+
+        return(w)
     })
     
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      # se input está vazio preenche com valor aleatório da lista de colunas
-      if (input$filter == "") {
-        updateSelectInput(session, "filter",
-          choices = param$filter_choices,
-          selected = sample(param$filter_choices, 1)
-        )
-      }
-    }
-
-    # Função para atualizar url do app com parâmetros dos inputs
-    update_my_queryString <- function() {
-      q_string <- paste0(
-        "?", "filter=", input$filter
-      )
-      updateQueryString(q_string, mode = "replace")
-    }
-
-    # Função para atualizar inputs a partir da URL
-    update_my_inputs <- function() {
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-
-      if (!is.null(query[["filter"]])) {
-        updateSelectInput(session, "filter",
-          choices = param$filter_choices,
-          selected = query[["filter"]]
-        )
-      }
-    }
 
 
     # Output título do gráfico
     output$plot_title <- renderText({
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$filter) || input$filter == "") {
+      if (is.null(input$forest_filter) || input$forest_filter == "") {
         text <- param$server1
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
@@ -305,11 +321,11 @@ get_server <- function(files, param) {
       text <- " "
 
       # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$filter) || input$filter == "") {
+      if (is.null(input$forest_filter) || input$forest_filter == "") {
         text <- " "
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        text <- paste0(param$server3)
+        text <- paste0(param$server3, " (", input$year_filter, ")")
       }
 
       text
@@ -318,8 +334,6 @@ get_server <- function(files, param) {
     # Output gráfico
     output$plot <- renderPlotly({
 
-      # random_inputs() #preenche inputs se estiverem vazios
-      update_my_queryString() # atualiza url com parametros dos inputs
 
       fig <- plotly_empty() # inicia figura com gráfico em branco
 
@@ -327,88 +341,88 @@ get_server <- function(files, param) {
         {
 
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$filter) || input$filter == "") {
+            if (is.null(input$forest_filter) || input$forest_filter == "") {
             fig <- plotly_empty()
             stop()
           }
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == "value"), ]
-          color_col <- param$table[which(param$table$var == "group"), ]
-          slider_col <- param$table[which(param$table$var == "NA"), ]
-          text_col <- param$table[which(param$table$var == "group"), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
+            x_col <- param$table[which(param$table$var == "value"), ] 
+            color_col <- param$table[which(param$table$var == "group"), ] 
+            # slider_col <- param$table[which(param$table$var == "NA"), ] 
+            # text_col <- param$table[which(param$table$var == "group"), ] 
+            id_col <- param$table[which(param$table$var == param$id_def), ]
 
           # Cria coluna vazia para o ranking
-          y_col <- list()
-          y_col$var <- "rank"
-          y_col$label <- "Ranking"
+          y_col <- list(var = "rank", label = "Ranking")
 
           df <- df_reactived()
           
-          df_p <- data.frame(
-            df[x_col$var],
-            NA,
-            df[color_col$var],
-            df["group"],
-            df["group"],
-            df[id_col$var],
-            df["lab"]
-          )
+          df_p <- df %>%
+              dplyr::mutate(
+                  x     = .data[[x_col$var]],      
+                  color = .data[[color_col$var]],  
+                  text  = group,
+                  id    = .data[[id_col$var]],
+                  lab   = lab,
+                  y     = NA_real_
+              ) %>%
+              dplyr::select(x, y, color, text, group, id, lab)
+          
+          
+          # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma) 
+          df_p <- df_p[!is.na(df_p$x) & !is.na(df_p$color), , drop = FALSE]
 
-          colnames(df_p) <- c("x", "y", "color", "text", "group", "id", "lab")
-
-          # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
-
-          # Se dataset estiver vazio, não monta o gráfico, retorna em branco
-          if (nrow(df_p) < 1) {
-            fig <- plotly_empty()
-            stop()
+          # Se dataset estiver vazio, não monta o gráfico, retorna em branco 
+          if (nrow(df_p) < 1) { 
+              fig <- plotly_empty() 
+              stop() 
           }
-
-          # Filtra sem grupo
+          
+          # Filtra sem grupo 
           df_p <- df_p[which(df_p$group != " - "), ]
-
-          # Ordena base por variável de ranking e preenche y
+         
+          # monta base do gráfico com coluna de frame = ano
           df_p <- df_p %>%
-            mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
-            arrange(y, .by_group = TRUE) # ordena por rank e ano
-
-          # Se o rank for NA coloca para o final do ranking e zera x
-          df_p$y[is.na(df_p$y)] <- max(df_p$y) + 1
+              mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
+              arrange(y) # ordena por rank e ano
+          
+          # Se o rank for NA coloca para o final do ranking e zera x 
+          df_p$y[is.na(df_p$y)] <- max(df_p$y, na.rm = TRUE) + 1
           df_p$x[is.na(df_p$x)] <- 0
-
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
-
-          # Deixa somente grupos que tem rank <n em algum momento
+          
+          
+          # Se a coluna de cor for toda NA, preenche com strings em branco 
+          if (all(is.na(df_p$color))) { 
+              df_p$color <- " " 
+              }
+          
+          
+          # top_n global 
           top_n <- 10
-          top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
-          df_p <- df_p %>% filter(group %in% top_groups)
+          top_groups <- unique(df_p$group[df_p$y <= top_n])
+          df_p <- df_p[df_p$group %in% top_groups, , drop = FALSE]
 
-          # Monta html do tooltip
+
+         
+          ## tooltip
           df_p$tooltip <- paste0(
-            "<b>", df_p$lab, "</b><br>",
-            x_col$label, ": ", format(df_p$x, scientific = FALSE,
-                                      digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            param$server4, x_col$unidade, "</b>"
+              "<b>", df_p$lab, "</b><br>",
+              "(", input$year_filter, ")", "<br><br>",
+              x_col$label, ": ",
+              format(df_p$x, scientific = FALSE,
+                     digits = 2,
+                     decimal.mark = ",",
+                     big.mark = "."), " %", "<br>",
+              y_col$label, ": ", df_p$y, "<br>",
+              param$server4, x_col$unidade, "</b>"
           )
-
-          # Define paleta de cores
-          pallete <- pallete_continuous
-          if (!is.numeric(df_p$color)) {
-            pallete <- pallete_discrete
-          }
-
-          # Calcula menor e maior valor de x
-          min_x <- min(0, min(df_p$x))
-          max_x <- max(0, max(df_p$x))
+          
+          # paleta
+          pallete <- pallete_continuous 
+          if (!is.numeric(df_p$color)) { 
+              pallete <- pallete_discrete 
+              }
 
           # Monta gráfico
 
@@ -421,12 +435,8 @@ get_server <- function(files, param) {
             text = ~tooltip,
             textposition = "middle right",
             showlegend = FALSE,
-            # marker = list(
-            #  opacity = 0.5,
-            #  line = list(width = 1, color = 'white')
-            # ),
             hoverinfo = "text"
-          )
+          ) 
 
           # adiciona barras
           fig_p <- fig_p %>% add_segments(
@@ -451,69 +461,6 @@ get_server <- function(files, param) {
           )
 
 
-          # Parâmetros animação e slider (se tiver mais de um frame)
-          if (length(unique(df_p$slider)) > 1) {
-            # Edita slider
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = param$server5, font = f1))
-
-            # Botões da animação
-            #  edita botão padrão (editar move ele para o updatemenus)
-            fig_p <- fig_p %>% animation_button(label = "Play")
-
-            #  sobrescreve updatemenus, adicionando play e pause
-            fig_p$x$layout$updatemenus <- list(
-              list(
-                type = "buttons",
-                direction = "right",
-                showactive = FALSE,
-                x = 0,
-                y = 0,
-                xanchor = "top",
-                yanchor = "right",
-                pad = list(t = 60, r = 5),
-                buttons = list(
-                  list(
-                    method = "animate",
-                    label = "\u25B6",
-                    args = list(
-                      NA, # primeiro arg vazio para play
-                      list(
-                        mode = "immediate",
-                        transition = list(duration = 1500, easing = "linear", redraw = TRUE),
-                        fromcurrent = TRUE,
-                        frame = list(redraw = TRUE, duration = 1500)
-                      )
-                    )
-                  ),
-                  list(
-                    method = "animate",
-                    # label = "<U+25FC>",
-                    label = "I I",
-                    args = list(
-                      list(), # primeiro arg lista vazia para pause
-                      list(
-                        mode = "immediate",
-                        transition = list(duration = 0),
-                        frame = list(redraw = FALSE, duration = 0)
-                      )
-                    )
-                  )
-                )
-              )
-            )
-
-            # Pula animação para último frame (custom JS)
-            first_frame <- min(df_p$slider)
-            last_frame <- max(df_p$slider)
-            fig_p <- fig_p %>% onRender("
-            function(el,x,data){
-              Plotly.animate(el, data, {frame: [{duration: 0}]})
-            }",
-              data = c(first_frame, last_frame)
-            )
-          }
-
-
           # Layout eixos
           x_axis_layout <- list(
             title = x_col$label,
@@ -521,7 +468,7 @@ get_server <- function(files, param) {
             tickfont = f2,
             automargin = FALSE,
             autorange = FALSE,
-            range = c(min_x, max_x), # fixa range do x
+            range = c(min_x, max_x),
             showgrid = FALSE,
             zeroline = FALSE
           )
@@ -538,11 +485,9 @@ get_server <- function(files, param) {
             range = c(top_n + 0.5, 0.5), # fixa range do y somente para top 10
             type = "numeric"
           )
+          
 
-          # Tipo de eixo (se log selecionado)
-          # if (input$xlog & is.numeric(df_p$x)) {
-          #  x_axis_layout$type <- "log"
-          # }
+         
 
           # Layout hover/tooltip
           tooltip <- list(
@@ -553,49 +498,33 @@ get_server <- function(files, param) {
 
           # Aplica layout
           fig_p <- fig_p %>%
-            layout(
-              font = f1,
-              xaxis = x_axis_layout,
-              yaxis = y_axis_layout,
-              hoverlabel = tooltip
-            ) 
-
-          fig <- fig %>% animation_opts(
-            1500,
-            easing = "linear", redraw = FALSE
-          )
-
-          #  Configura botões do plotly
-          fig_p <- fig_p %>%
-            config(
-              # toImageButtonOptions = list(format = "svg"),
-              displaylogo = FALSE,
-              modeBarButtonsToRemove = c(
-                "lasso2d",
-                "select2d",
-                "hoverCompareCartesian"
+              layout(
+                  font = f1,
+                  xaxis = x_axis_layout,
+                  yaxis = y_axis_layout,
+                  showlegend = TRUE,
+                  legend = list(title = list(text = color_col$label)),
+                  hoverlabel = tooltip
+              ) %>%
+              config(
+                  displaylogo = FALSE,
+                  modeBarButtonsToRemove = c(
+                      "lasso2d",
+                      "select2d",
+                      "hoverCompareCartesian"
+                  )
               )
-            )
-
-          fig <- fig_p # retorna a figura do gráfico
-        },
-        error = function(cond) {
-          # se encontrar erro retorna fig em branco
-          print("plot error")
-          fig <- plotly_empty()
-        }
-      )
+          
+          fig <- fig_p
+          },
+          error = function(cond) {
+              # se encontrar erro retorna fig em branco
+              print("plot error")
+              fig <- plotly_empty()
+          }
+        )
       fig
-    }) 
-
-    # Observa eventos
-    observe({
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-      update_my_inputs()
     })
   }
-
-  # Retorna objeto server
   server
 }

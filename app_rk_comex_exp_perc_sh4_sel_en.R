@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -32,20 +33,23 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Foreign trade (COMEX) in the Amazon compared to international commerce (BACI): Proportion of products' export values"
 
 # Outros parâmetros e configurações
-param$filter_choices <- c("Products Compatible with the Forest", "All products")
-param$filter_def <- c("Products Compatible with the Forest")
+param$filter_choices <- c("All products", "Products Compatible with the Forest")
+param$filter_def <- c("All")
 
 # Parâmetros específicos do UI
 param$ui1 <- "VARIABLES:"
 param$ui2 <- "Product types:"
 param$ui3 <- "https://datazoom.shinyapps.io/app_rk_comex_exp_perc_sh4_sel_en/"
+param$ui4 <- "Year: "
+param$ui5 <- "State"
 
 # Parâmetros específicos do server
 param$server1 <- "No variable selected"
-param$server2 <- "Proportions of world exports coming from the Amazon Ranking (2019)"
+param$server2 <- "Proportions of world exports coming from the Amazon Ranking"
 param$server3 <- "Legal Amazon"
 param$server4 <- "Measurement Unit: <b>"
-param$server5 <- "Year: "
+
+
 param$lang <- TRUE
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
