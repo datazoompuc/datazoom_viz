@@ -16,8 +16,7 @@ df_saude <- read_csv(
     rename(cod_ibge = cod_mun) |>
     distinct() |>
     mutate(
-        estado = paste0(nome_uf, " (", sigla_uf, ")"),
-        sigla_uf = sigla_uf,  # Mantém a sigla separada
+        sigla_uf = paste0(nome_uf, " (", sigla_uf, ")"),
         across(
             c(d_am_legal, d_hidro_oper, d_min_ilegal),
             ~ factor(.x, levels = c(0, 1), labels = c("Não", "Sim"))
