@@ -26,7 +26,11 @@ get_ui <- function(files, param) {
                      hr(),
                      p(class="vars",  param$label_var_name),
                      
-                     div(class="var_selec_group",
+                     tags$style(HTML(".switch-label { color: white; }")),
+                     div(
+                         style = "display: flex; flex-direction: column; gap: 10px;", # espaçamento dos botões
+                         
+                         class="var_selec_group",
                          # Seleciona variável do eixo y
                          selectInput(
                            inputId = "y",
@@ -34,27 +38,39 @@ get_ui <- function(files, param) {
                            choices = param$y_choices,
                            selected = param$y_def,
                            width = "100%"
+                         ),
+                         
+                         # Seleciona filtro de municípios
+                         selectizeInput(
+                             'filter1', 
+                             param$label_geo_name, 
+                             choices = NULL,
+                             multiple = TRUE, 
+                             options = list(maxItems = 20),
+                             width = "100%"
+                         ),
+                         
+                         div(style = "margin-top: 5px;"),  # espaço em branco
+                         
+                         # BLOCO DOS BOTÕES
+                         
+                         # Variação do ano inicial 
+                         materialSwitch(
+                             inputId = "y_index_base",
+                             label = tags$span(param$label_prop_name, class = "switch-label"),
+                             value = FALSE,
+                             status = "info"
+                         ),
+                         
+                         # Porporção do estado 
+                         materialSwitch(
+                             inputId = "yprop",
+                             label = tags$span(param$label_prop_muni, class = "switch-label"),
+                             value = FALSE,   
+                             status = "info"
                          )
                      ),
-                     
-                     
-                    # Seleciona eixo 
-                      checkboxInput(
-                      inputId = "y_option",
-                      param$label_prop_name,
-                      value = FALSE,
-                      width = "100%"
-                      ),
-                     
-                     # Seleciona filtro de municípios
-                     selectizeInput(
-                       'filter1', 
-                       param$label_geo_name, 
-                       choices = NULL,
-                       multiple = TRUE, 
-                       options = list(maxItems = 20),
-                       width = "100%"
-                     ),
+
               # espaço vazio
               div(class = "fakecheckbox", ),
               

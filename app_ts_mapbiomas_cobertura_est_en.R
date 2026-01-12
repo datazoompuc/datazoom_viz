@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -24,6 +25,7 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "time" # variável padrão do eixo x
+param$x_label <- "Year"  # título do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
@@ -36,10 +38,10 @@ param$plot_desc <- "Annual Mapping of Land Use and Coverage in Brazil (Data Sour
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"
-param$label_y_name <- "vertical axis (y)"
-param$label_log_name <- "log scale"
-param$label_prop_name <-  "proportional to the initial year (*)"
-param$label_geo_name <- "State"
+param$label_y_name <- "Select variable"
+param$label_prop_name <-  "Proportional to starting year"
+param$label_prop_muni <- "Proportional to states' areas"
+param$label_geo_name <- "States"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_est_en/"
 
 ### Parametros especificos no server

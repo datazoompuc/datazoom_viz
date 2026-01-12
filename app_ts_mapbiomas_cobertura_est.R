@@ -3,6 +3,7 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -24,6 +25,7 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "time" # variável padrão do eixo x
+param$x_label <- "Ano"  # título do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
@@ -34,12 +36,13 @@ param$group <- "group" # variável de agrupamento
 param$plot_name <- "Data Zoom Amazonia"
 param$plot_desc <- "Mapeamento Anual do Uso e Cobertura da Terra no Brasil (Fonte: MAPBIOMAS)"
 
+
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "eixo vertical (y)"
-param$label_log_name <- "escala log"
-param$label_prop_name <-  "proporcional ao ano inicial (*)"
-param$label_geo_name <- "Subdivisão geográfica"
+param$label_y_name <- "Variável selecionada"
+param$label_prop_name <-  "Proporcional ao ano inicial"
+param$label_prop_muni <- "Proporção da área dos estados"
+param$label_geo_name <- "Estados"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_est/"
 
 ### Parametros especificos no server

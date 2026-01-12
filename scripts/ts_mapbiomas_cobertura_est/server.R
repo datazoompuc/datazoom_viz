@@ -13,6 +13,28 @@ get_server <- function(files, param) {
    
   server <- function(input, output, session) {
       
+      # botões mutuamente exclusivos:
+      
+      observeEvent(input$y_index_base, {
+          if (isTRUE(input$y_index_base)) {
+              updateMaterialSwitch(
+                  session,
+                  inputId = "yprop",
+                  value = FALSE
+              )
+          }
+      }, ignoreInit = TRUE)
+      
+      observeEvent(input$yprop, {
+          if (isTRUE(input$yprop)) {
+              updateMaterialSwitch(
+                  session,
+                  inputId = "y_index_base",
+                  value = FALSE
+              )
+          }
+      }, ignoreInit = TRUE)
+      
     # Carrega dados
     df <- readRDS(files$db_file)
 
@@ -41,7 +63,7 @@ get_server <- function(files, param) {
       q_string <- paste0(
         "?","y=",input$y,
 
-        "&","y_option=",input$y_option
+        "&","y_index_base=",input$y_index_base
       )
       
       for (i in input$filter1) {
@@ -74,9 +96,9 @@ get_server <- function(files, param) {
       } 
       
 
-      if (!is.null(query[['y_option']])) {
-        updateCheckboxInput(session, "y_option",
-                            value = (query[['y_option']] == "TRUE"))
+      if (!is.null(query[['y_index_base']])) {
+          updateMaterialSwitch(session, "y_index_base",
+                            value = (query[['y_index_base']] == "TRUE"))
       }
       
       selected <- unlist(query[names(query) == "filter"], use.names=FALSE)
@@ -97,31 +119,35 @@ get_server <- function(files, param) {
     
     # Output titulo do gráfico
     output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-      if(is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
+        if (is.null(input$y) || input$y == "") return(" ")
         
-        text <-  paste0("", y_col$label)
-        if(input$y_option)  {
-          text <-  paste0("", y_col$label, "*")
-        }
-      }
-      
-      text
+        y_col <- param$table[param$table$var == input$y, ]
+        y_col$label
     })
+    
     output$plot_subtitle <- renderText({
-      # Se algum campo estiver vazio retorna texto vazio
-      if(is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        text <-  paste0(param$subtitle_init)
-      }
-      
-      text
+        
+        if (is.null(input$y) || input$y == "") return(" ")
+        
+        # Prioridade para transformações
+        if (isTRUE(input$y_index_base)) {
+            return(param$label_prop_name)
+        }
+        
+        if (isTRUE(input$yprop)) {
+            return(param$label_prop_muni)
+        }
+        
+        # Caso padrão: subtítulo da variável
+        y_col <- param$table[param$table$var == input$y, ]
+        
+        # Se existir subtitle específico da variável, usa ele
+        if (!is.null(y_col$subtitle) && y_col$subtitle != "") {
+            return(y_col$subtitle)
+        }
+        
+        # Fallback geral (ex: "por hectare")
+        param$subtitle_init
     })
     
     # Output gráfico
@@ -166,13 +192,39 @@ get_server <- function(files, param) {
           stop()
         }
         
-        # Alternativa de medida para y
-        if (input$y_option & is.numeric(df_p$y)) {
-          df_p <- df_p %>%
-            group_by(df_p$group) %>%
-            mutate(aux1 = first(y),
-                   y_option = (y/aux1)*100)
-          df_p$y <- df_p$y_option
+        # ===============================
+        #   BOTÕES DE TRANSFORMAÇÃO
+        # ===============================
+        
+        if (is.numeric(df_p$y)) {
+            
+            # Guarda valor bruto original
+            df_p$y_raw <- df_p$y
+            
+            # 1) NORMALIZAÇÃO POR ÁREA (opcional)
+            if (isTRUE(input$yprop)) {
+                df_area <- df %>%
+                    dplyr::select(group, area_km2) %>%
+                    dplyr::distinct()
+                
+                df_p <- df_p %>%
+                    dplyr::left_join(df_area, by = "group") %>%
+                    dplyr::mutate(
+                        y = y_raw / area_km2
+                    )
+            } else {
+                df_p$y <- df_p$y_raw
+            }
+            
+            # 2) ÍNDICE BASE 100 (CORRETO)
+            if (isTRUE(input$y_index_base)) {
+                df_p <- df_p %>%
+                    dplyr::group_by(group) %>%
+                    dplyr::mutate(
+                        y = (y / first(y)) * 100
+                    ) %>%
+                    dplyr::ungroup()
+            }
         }
 
         # Se a coluna de cor for toda NA, preenche com strings em branco
@@ -180,14 +232,17 @@ get_server <- function(files, param) {
           df_p$color <- " "
         }
         
+        # Define unidade dinâmica
+        unidade_y <- if (isTRUE(input$yprop) || isTRUE(input$y_index_base)) "%" else "ha"
+        
         # Monta html do tooltip
         df_p$tooltip <- paste0(
-          "<b>",df_p$text,"</b><br>",
-          x_col$label,": ",df_p$x,"<br>",
-          y_col$label,": ",format(df_p$y, scientific = FALSE,
-                                  digits = 2,
-                                  decimal.mark = ",", 
-                                  big.mark = "."), " ", "(ha)"
+            "<b>",df_p$text,"</b><br>",
+            x_col$label,": ",df_p$x,"<br>",
+            y_col$label,": ",format(df_p$y, scientific = FALSE,
+                                    digits = 2,
+                                    decimal.mark = ",", 
+                                    big.mark = "."), " ", "(", unidade_y, ")"
         )
         
         # Define paleta de cores
@@ -212,7 +267,7 @@ get_server <- function(files, param) {
         
         # Layout eixos
         x_axis_layout <- list(
-          title = x_col$label,
+          title = param$x_label,
           titlefont = f1,
           tickfont = f2,
           automargin = TRUE,
@@ -232,7 +287,7 @@ get_server <- function(files, param) {
         
         
 
-        if (input$y_option) {
+        if (input$y_index_base) {
           y_axis_layout$title <- paste0(y_col$label, "*")
         }
         
