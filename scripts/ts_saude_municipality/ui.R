@@ -83,15 +83,27 @@ get_ui <- function(files, param) {
               options = list(maxItems = 20, plugins = list('remove_button')),
               width = "100%"
           ),
-          # Seleciona filtro
-          selectizeInput(
-              "filter1",
-              param$label_geo_name,
-              choices = param$munic_def,
-              selected = param$munic_def,
-              multiple = TRUE,
-              options = list(maxItems = 20, plugins = list('remove_button')),
-              width = "100%"
+          
+          # Filtro de municípios (só aparece quando NÃO está agregado por estado)
+          conditionalPanel(
+              condition = "input.aggregate_state == false",
+              selectizeInput(
+                  "filter1",
+                  param$label_geo_name,
+                  choices = param$munic_def,
+                  selected = param$munic_def,
+                  multiple = TRUE,
+                  options = list(maxItems = 20, plugins = list('remove_button')),
+                  width = "100%"
+              )
+          ),
+          
+          #alterar a visualização municipal e estadual
+          materialSwitch(
+              inputId = "aggregate_state",
+              label = tags$span(param$label_aggregate_name, class = "switch-label"),
+              value = FALSE,
+              status = "info"
           ),
         ),
 

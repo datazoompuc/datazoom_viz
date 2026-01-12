@@ -145,6 +145,15 @@ get_server <- function(files, param) {
         
         subtitles <- c()
         
+        # Nível geográfico (municipal ou estadual)
+        level_text <- if (input$aggregate_state) {
+            param$label_state  # "estadual" ou "state"
+        } else {
+            param$label_municipal  # "municipal"
+        }
+        
+        subtitles <- c(subtitles, level_text)
+        
         # Botões ativos (podem coexistir)
         if (isTRUE(input$y_index_base)) {
             subtitles <- c(subtitles, param$label_prop_name)
@@ -159,13 +168,7 @@ get_server <- function(files, param) {
             return(paste(subtitles, collapse = param$label_and))
         }
         
-        # Caso padrão: subtítulo da variável ou fallback
-        y_col <- param$table[param$table$var == input$y, ]
-        
-        if (!is.null(y_col$subtitle) && y_col$subtitle != "") {
-            return(y_col$subtitle)
-        }
-        
+        # Caso padrão
         param$stitle_init
     })
     
@@ -200,15 +203,34 @@ get_server <- function(files, param) {
           color_col <- param$table[which(param$table$var == param$color_def), ]
 
           # Filtra dataframe com grupos selecionados
-          df_filtered <- df[which(df$municipio %in% input$filter1), ]
+          df_filtered <- reactive({
+              if (input$aggregate_state) {
+                  # Modo agregado por estado: filtra por UF e agrega
+                  df_uf <- df[which(df$sigla_uf %in% input$uf), ]
+                  
+                  # Agrega por estado e ano
+                  df_uf %>%
+                      group_by(ano, sigla_uf) %>%
+                      summarise(
+                          across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),
+                          municipio = first(sigla_uf),  # Para manter compatibilidade com o código existente
+                          nome_uf = first(nome_uf),     # Mantém o nome do estado
+                          regiao = first(regiao),       # Mantém a região
+                          .groups = "drop"
+                      )
+              } else {
+                  # Modo normal: filtra por municípios selecionados
+                  df[which(df$municipio %in% input$filter1), ]
+              }
+          })
 
           df_p <- data.frame(
-            df_filtered[x_col$var],
-            df_filtered[y_col$var],
-            df_filtered[color_col$var]
+              df_filtered()[x_col$var],     
+              df_filtered()[y_col$var],
+              df_filtered()[color_col$var]
           )
           colnames(df_p) <- c("x", "y", "color")
-          df_p$municipio <- df_filtered$municipio
+          df_p$municipio <- df_filtered()$municipio  
           df_p$text <- df_p$municipio
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)

@@ -42,6 +42,10 @@ param$label_prop_name <-  "Proportional to the initial year"
 param$label_uf_name <-  "States"
 param$label_geo_name <- "Municipalities"
 param$link <- "https://datazoom.shinyapps.io/app_ts_saude_municipality_en/"
+param$label_aggregate_name <- "Aggregate by state"
+param$label_municipal <- "municipal"
+param$label_state <- "state"
+param$stitle_init <- "by Municipality "
 
 ### Parametros especificos no server
 param$stitle_init <- "by Municipality " # expressão titulo
