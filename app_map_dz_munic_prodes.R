@@ -23,7 +23,7 @@ source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
-# Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
+# Parâmetros da visualização (define as variáveis/colunas padrões para os eixos do gráfico)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "desmatado" # variável padrão do eixo x
@@ -55,7 +55,7 @@ param$ref_year<- "Ano Referente"
 param$link<-"window.open('https://datazoom.shinyapps.io/app_map_dz_munic_prodes/"
 
 # Outros parâmetros e configurações
-param$x_choices <- param$x_choices[param$app][[1]][1:5]
+param$x_choices <- param$x_choices[param$app][[1]][1:5] # gambiarra p tirar opcoes de prop
 param$label_prop_name <- "Proporção da área do município"
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
