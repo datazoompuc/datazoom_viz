@@ -39,9 +39,8 @@ param$plot_desc <- "Annual Mapping of Land Use and Coverage in Brazil (Data Sour
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Select variable"
-param$label_log_name <- "Log scale"
-param$label_prop_name <-  "Proportional to the initial year"
-param$label_prop_muni <- "Proportion of the area of the states"
+param$label_prop_name <-  "Proportional to starting year"
+param$label_prop_muni <- "Proportional to states' areas"
 param$label_geo_name <- "States"
 param$link <- "https://datazoom.shinyapps.io/app_ts_mapbiomas_cobertura_est_en/"
 
