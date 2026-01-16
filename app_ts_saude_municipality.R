@@ -43,8 +43,8 @@ param$label_uf_name <-  "Estados"
 param$label_geo_name <- "Municípios"
 param$link <- "https://datazoom.shinyapps.io/app_ts_saude_municipality/"
 param$label_aggregate_name <- "Agregar por estado"
-param$label_municipal <- "municipal"
-param$label_state <- "estadual"
+param$label_municipal <- "Por municipio"
+param$label_state <- "Agregado por estado"
 param$stitle_init <- "por Município "
 
 ### Parametros especificos no server
