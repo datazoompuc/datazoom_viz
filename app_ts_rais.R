@@ -4,6 +4,7 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 library(shinycssloaders)
+library(shinyWidgets)
 
 
 # Define nome de arquivos a serem carregados
