@@ -18,10 +18,10 @@ get_ui <- function(files, param) {
           }'
                    ),
                    
-                   h2(class = "plot_name", param$plot_name),
-                   p(class = "plot_desc", param$plot_desc),
+                   uiOutput("plot_name_ui"),
+                   uiOutput("plot_desc_ui"),
                    hr(),
-                   p(class = "vars", param$label_var_name),
+                   uiOutput("label_var_ui"),
                    
                    # Controles de visualização
                    div(
@@ -76,6 +76,13 @@ get_ui <- function(files, param) {
                            options = list(placeholder = param$label_group),
                            width = "100%"
                        )
+                   ),
+                   
+                   actionButton(
+                       'toggle_lang',
+                       label = "English",
+                       icon = icon("globe"),
+                       class = "btn-primary"
                    ),
                    
                    actionButton(
