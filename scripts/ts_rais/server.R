@@ -72,12 +72,23 @@ get_server <- function(files, param) {
             updateCheckboxInput(session, "ylog", label = txt()$label_scale_name)
             updateCheckboxInput(session, "y_option", label = txt()$label_prop_name)
             
+            # Mantém seleção atual (valores continuam PT)
+            sel_geo <- isolate(input$filter_geo)
+            sel_group <- isolate(input$filter_group)
+            
+            if (is.null(sel_geo) || length(sel_geo) == 0) sel_geo <- default_geo
+            if (is.null(sel_group) || !nzchar(sel_group)) sel_group <- default_group
+            
             updateSelectizeInput(session, "filter_geo", label = txt()$label_geo,
+                                 choices = geo_choices_i18n(),
+                                 selected = sel_geo,
                                  options = list(placeholder = txt()$label_geo, maxItems = 20))
-            
+
             updateSelectizeInput(session, "filter_group", label = txt()$label_group,
+                                 choices = group_choices_i18n(),
+                                 selected = sel_group,
                                  options = list(placeholder = txt()$label_group))
-            
+
             # Botões
             updateActionButton(session, "toggle_lang", label = txt()$btn_lang)
             updateActionButton(session, "ab1", label = txt()$btn_fullscreen)
@@ -90,7 +101,7 @@ get_server <- function(files, param) {
                 choices = setNames(tbl$var[tbl$y], tbl$label[tbl$y]),
                 selected = if (!is.null(isolate(input$y))) isolate(input$y) else param$y_def
             )
-        })
+        }, ignoreInit = FALSE)
         
         # Função para geo choices traduzidas
         geo_choices_i18n <- function() {
@@ -129,7 +140,7 @@ get_server <- function(files, param) {
                     c("Feminino", "Masculino"),
                     c("Female", "Male")
                 ),
-                "Age Group" = list(
+                "Age Group" = c(
                     "Under 18 years old" = "Menor de 18 anos",
                     "Between 18 and 24 years old" = "Entre 18 e 24 anos",
                     "Between 25 and 29 years old" = "Entre 25 e 29 anos",
@@ -142,7 +153,7 @@ get_server <- function(files, param) {
                     c("Branca", "Preta", "Parda", "Amarela", "Indígena"),
                     c("White", "Black", "Brown", "Yellow", "Indigenous")
                 ),
-                "Occupation" = list(
+                "Occupation" = c(
                     "Administrative support workers" =
                         "Trabalhadores de serviços administrativos",
                     "Agricultural, forestry, and fishery workers" =
@@ -163,7 +174,7 @@ get_server <- function(files, param) {
                         "Técnicos de nível médio"
                 ),
                 
-                "Economic Sector" = list(
+                "Economic Sector" = c(
                     "Accommodation and food services" = "Alojamento e Alimentação",
                     "Administrative and support service activities" =
                         "Atividades administrativas e serviços complementares",
@@ -237,31 +248,6 @@ get_server <- function(files, param) {
             setNames(names(leaves), unname(leaves))
         })
 
-        
-        # Atualiza seletores
-        
-        observe({
-            df <- dados()
-            
-            # manter seleções atuais, se existirem
-            sel_geo <- isolate(input$filter_geo)
-            sel_group <- isolate(input$filter_group)
-            
-            updateSelectizeInput(
-                session,
-                "filter_geo",
-                choices = geo_choices_i18n(),
-                selected = if (!is.null(sel_geo)) sel_geo else default_geo
-            )
-            
-            updateSelectizeInput(
-                session,
-                "filter_group",
-                choices = group_choices_i18n(),
-                selected = if (!is.null(sel_group)) sel_group else default_group,
-                options = list(placeholder = txt()$label_group)
-            )
-        })
         
         
         
