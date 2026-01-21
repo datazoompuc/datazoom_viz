@@ -220,6 +220,22 @@ get_server <- function(files, param) {
             # inverte: names = PT, values = EN
             setNames(names(leaves), unname(leaves))
         })
+        
+        geo_map_pt_to_en <- reactive({
+            if (lang() != "en") return(NULL)
+            
+            ch <- geo_choices_i18n()
+            
+            leaves <- c(
+                ch[["Brazil"]],       
+                ch[["Legal Amazon"]],  
+                ch[["Regions"]]         
+                # States fica sem tradução
+            )
+            
+            # inverte: names = PT, values = EN
+            setNames(names(leaves), unname(leaves))
+        })
 
         
         # Atualiza seletores
@@ -336,6 +352,12 @@ get_server <- function(files, param) {
             
             if(!(default_geo %in% input$filter_geo)) {
                 df_agg$combinacao <- df_agg$geo_group
+                if (lang() == "en") {
+                    m <- geo_map_pt_to_en()
+                    geo_en <- unname(m[df_agg$combinacao])
+                    df_agg$combinacao <- ifelse(is.na(geo_en), df_agg$combinacao, geo_en)
+                }
+                
             } else {
                 df_agg$combinacao <- if (lang() == "en") "Brazil" else "Brasil"
             }
