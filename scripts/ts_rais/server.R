@@ -94,23 +94,23 @@ get_server <- function(files, param) {
         
         # Função para geo choices traduzidas
         geo_choices_i18n <- function() {
-            # base em PT (valores)
             base <- param$geo_choices
-            
             if (lang() == "pt") return(base)
             
-            # rótulos em EN (valores continuam PT)
             list(
-                "Brazil" = list("Brasil"),
-                "Legal Amazon" = setNames(
-                    c("Amazônia Legal", "Fora da Amazônia Legal"),
-                    c("Legal Amazon", "Outside Legal Amazon")
+                "Brazil" = c("Brazil" = "Brasil"),
+                "Legal Amazon" = c(
+                    "Legal Amazon" = "Amazônia Legal",
+                    "Outside Legal Amazon" = "Fora da Amazônia Legal"
                 ),
-                "Regions" = setNames(
-                    c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"),
-                    c("North", "Northeast", "Southeast", "South", "Central-West")
+                "Regions" = c(
+                    "North" = "Norte",
+                    "Northeast" = "Nordeste",
+                    "Southeast" = "Sudeste",
+                    "South" = "Sul",
+                    "Central-West" = "Centro-Oeste"
                 ),
-                "States" = base[["Estados"]]  # mantém nomes dos estados
+                "States" = base[["Estados"]]  # pode ficar como está
             )
         }
         
