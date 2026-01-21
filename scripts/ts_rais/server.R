@@ -129,13 +129,74 @@ get_server <- function(files, param) {
                     c("Feminino", "Masculino"),
                     c("Female", "Male")
                 ),
-                "Age group" = base[["Faixa Etária"]],     # mantém PT por enquanto
+                "Age Group" = list(
+                    "Under 18 years old" = "Menor de 18 anos",
+                    "Between 18 and 24 years old" = "Entre 18 e 24 anos",
+                    "Between 25 and 29 years old" = "Entre 25 e 29 anos",
+                    "Between 30 and 39 years old" = "Entre 30 e 39 anos",
+                    "Between 40 and 49 years old" = "Entre 40 e 49 anos",
+                    "Between 50 and 59 years old" = "Entre 50 e 59 anos",
+                    "Between 60 years and over" = "60 anos ou mais"
+                ),
                 "Race/color" = setNames(
                     c("Branca", "Preta", "Parda", "Amarela", "Indígena"),
                     c("White", "Black", "Brown", "Yellow", "Indigenous")
                 ),
-                "Occupation" = base[["Ocupação"]],        # mantém PT
-                "Economic sector" = base[["Setor Econômico"]] # mantém PT
+                "Occupation" = list(
+                    "Administrative support workers" =
+                        "Trabalhadores de serviços administrativos",
+                    "Agricultural, forestry, and fishery workers" =
+                        "Trabalhadores agropecuários, florestais e da pesca",
+                    "Members of the armed forces, police, and military firefighters" =
+                        "Membros das forças armadas, Policiais e bombeiros militares",
+                    "Production workers in industry and related services" =
+                        "Trabalhadores da produção de bens e serviços industriais",
+                    "Professionals in science and the arts" =
+                        "Profissionais das ciências e das artes",
+                    "Repair and maintenance workers" =
+                        "Trabalhadores em serviços de reparação e manutenção",
+                    "Senior public officials, executives, and managers" =
+                        "Membros superiores do poder público, Dirigentes de organizações de interesse público e de empresas, Gerentes",
+                    "Service and sales workers in shops and markets" =
+                        "Trabalhadores dos serviços, vendedores do comércio em lojas e mercados",
+                    "Technicians and associate professionals" =
+                        "Técnicos de nível médio"
+                ),
+                
+                "Economic Sector" = list(
+                    "Accommodation and food services" = "Alojamento e Alimentação",
+                    "Administrative and support service activities" =
+                        "Atividades administrativas e serviços complementares",
+                    "Agriculture, livestock, forestry, fishing, and aquaculture" =
+                        "Agricultura, Pecuária, Produção Florestal, Pesca e Aquicultura",
+                    "Arts, culture, sports, and recreation" =
+                        "Artes, Cultura, Esporte e Recreação",
+                    "Construction" = "Construção",
+                    "Domestic services" = "Serviços domésticos",
+                    "Education" = "Educação",
+                    "Electricity and gas supply" = "Eletricidade e Gás",
+                    "Financial and insurance activities" =
+                        "Atividades financeiras, de seguros e serviços relacionados",
+                    "Human health and social work activities" =
+                        "Saúde humana e Serviços sociais",
+                    "Information and communication" = "Informação e Comunicação",
+                    "International organizations and other extraterritorial institutions" =
+                        "Organismos internacionais e outras instituições extraterritoriais",
+                    "Manufacturing" = "Indústrias de transformação",
+                    "Mining and quarrying" = "Indústrias extrativas",
+                    "Other service activities" = "Outras atividades de serviços",
+                    "Professional, scientific, and technical activities" =
+                        "Atividades Profissionais, Científicas e Técnicas",
+                    "Public administration, defense, and social security" =
+                        "Administração pública, Defesa e Seguridade social",
+                    "Real estate activities" = "Atividades imobiliárias",
+                    "Transportation, storage, and postal services" =
+                        "Transporte, Armazenagem e Correio",
+                    "Water supply, sewage, waste management, and remediation" =
+                        "Água, Esgoto, Atividades de Gestão de resíduos e Descontaminação",
+                    "Wholesale and retail trade; repair of motor vehicles and motorcycles" =
+                        "Comércio; Reparação de veículos automotores e motocicletas"
+                )
             )
         }
 
@@ -249,7 +310,7 @@ get_server <- function(files, param) {
             if(!(default_geo %in% input$filter_geo)) {
                 df_agg$combinacao <- df_agg$geo_group
             } else {
-                df_agg$combinacao <- default_geo
+                df_agg$combinacao <- if (lang() == "en") "Brazil" else "Brasil"
             }
             
             # Mantém o grupo completo para o tooltip
