@@ -199,6 +199,27 @@ get_server <- function(files, param) {
                 )
             )
         }
+        
+        # “mapa achatado” PT → EN
+        group_map_pt_to_en <- reactive({
+            if (lang() != "en") return(NULL)
+            
+            ch <- group_choices_i18n()  # lista hierárquica
+            
+            # pega apenas os itens "folha" (cada um é named vector ou lista nomeada)
+            leaves <- c(
+                ch[["Education"]],
+                ch[["Gender"]],
+                unlist(ch[["Age Group"]]),
+                ch[["Race/color"]],
+                unlist(ch[["Occupation"]]),
+                unlist(ch[["Economic Sector"]])
+            )
+            
+            # leaves: names = EN, values = PT
+            # inverte: names = PT, values = EN
+            setNames(names(leaves), unname(leaves))
+        })
 
         
         # Atualiza seletores
@@ -243,10 +264,16 @@ get_server <- function(files, param) {
             req(input$filter_group)
             
             if (input$filter_group != default_group) {
-                paste(txt()$subtitle_init, "-", input$filter_group)
+                if (lang() == "en") {
+                    m <- group_map_pt_to_en()
+                    grp_en <- unname(m[input$filter_group])
+                    if (is.na(grp_en)) grp_en <- input$filter_group
+                    paste(txt()$subtitle_init, "-", grp_en)
+                } else {
+                    paste(txt()$subtitle_init, "-", input$filter_group)
+                }
             }
         })
-        
         
         # Gera o gráfico principal
         output$plot <- renderPlotly({
@@ -315,7 +342,16 @@ get_server <- function(files, param) {
             
             # Mantém o grupo completo para o tooltip
             df_agg$combinacao_completa <- if(input$filter_group != default_group && "group" %in% names(df_agg)) {
-                paste(df_agg$combinacao, "-", df_agg$group)
+                grp_disp <- df_agg$group
+                
+                if (lang() == "en") {
+                    m <- group_map_pt_to_en()
+                    grp_en <- unname(m[grp_disp])
+                    grp_disp <- ifelse(is.na(grp_en), grp_disp, grp_en)
+                }
+                
+                paste(df_agg$combinacao, "-", grp_disp)
+                
             } else {
                 df_agg$combinacao
             }
