@@ -103,151 +103,86 @@ get_server <- function(files, param) {
             )
         }, ignoreInit = FALSE)
         
+       
+        
+        # Helper lê geo choices
+        
+        read_geo_choices <- function(groups_path, levels_path, lang = c("pt","en")) {
+            lang <- match.arg(lang)
+            groups <- read.csv(groups_path, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+            levels <- read.csv(levels_path, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+            
+            groups <- groups[order(groups$ord), ]
+            levels <- levels[order(levels$group_id, levels$ord), ]
+            
+            out <- list()
+            for (i in seq_len(nrow(groups))) {
+                gid <- groups$id[i]
+                g_label <- if (lang == "pt") groups$label_pt[i] else groups$label_en[i]
+                lv <- levels[levels$group_id == gid, ]
+                
+                if (lang == "pt") {
+                    # PT: display=value
+                    out[[g_label]] <- as.list(lv$value_pt)
+                } else {
+                    # EN: names=label_en, values=value_pt
+                    out[[g_label]] <- stats::setNames(lv$value_pt, lv$label_en)
+                }
+            }
+            out
+        }
+        
         # Função para geo choices traduzidas
         geo_choices_i18n <- function() {
-            base <- param$geo_choices
-            if (lang() == "pt") return(base)
-            
-            list(
-                "Brazil" = c("Brazil" = "Brasil"),
-                "Legal Amazon" = c(
-                    "Legal Amazon" = "Amazônia Legal",
-                    "Outside Legal Amazon" = "Fora da Amazônia Legal"
-                ),
-                "Regions" = c(
-                    "North" = "Norte",
-                    "Northeast" = "Nordeste",
-                    "Southeast" = "Sudeste",
-                    "South" = "Sul",
-                    "Central-West" = "Centro-Oeste"
-                ),
-                "States" = base[["Estados"]]  # pode ficar como está
-            )
+            read_geo_choices(files$geo_groups, files$geo_levels, lang = lang())
         }
         
-        # Função para grupos traduzidos
-        group_choices_i18n <- function() {
-            base <- param$group_categories
-            if (lang() == "pt") return(base)
+        # Helper lê group choices
+        read_group_choices <- function(groups_path, levels_path, lang = c("pt","en")) {
+            lang <- match.arg(lang)
+            groups <- read.csv(groups_path, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+            levels <- read.csv(levels_path, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
             
-            list(
-                "All" = "Todos",
-                "Education" = setNames(
-                    c("Sem fundamental completo", "Médio completo", "Superior completo"),
-                    c("Less than primary", "High school", "College degree")
-                ),
-                "Gender" = setNames(
-                    c("Feminino", "Masculino"),
-                    c("Female", "Male")
-                ),
-                "Age Group" = c(
-                    "Under 18 years old" = "Menor de 18 anos",
-                    "Between 18 and 24 years old" = "Entre 18 e 24 anos",
-                    "Between 25 and 29 years old" = "Entre 25 e 29 anos",
-                    "Between 30 and 39 years old" = "Entre 30 e 39 anos",
-                    "Between 40 and 49 years old" = "Entre 40 e 49 anos",
-                    "Between 50 and 59 years old" = "Entre 50 e 59 anos",
-                    "Between 60 years and over" = "60 anos ou mais"
-                ),
-                "Race/color" = setNames(
-                    c("Branca", "Preta", "Parda", "Amarela", "Indígena"),
-                    c("White", "Black", "Brown", "Yellow", "Indigenous")
-                ),
-                "Occupation" = c(
-                    "Administrative support workers" =
-                        "Trabalhadores de serviços administrativos",
-                    "Agricultural, forestry, and fishery workers" =
-                        "Trabalhadores agropecuários, florestais e da pesca",
-                    "Members of the armed forces, police, and military firefighters" =
-                        "Membros das forças armadas, Policiais e bombeiros militares",
-                    "Production workers in industry and related services" =
-                        "Trabalhadores da produção de bens e serviços industriais",
-                    "Professionals in science and the arts" =
-                        "Profissionais das ciências e das artes",
-                    "Repair and maintenance workers" =
-                        "Trabalhadores em serviços de reparação e manutenção",
-                    "Senior public officials, executives, and managers" =
-                        "Membros superiores do poder público, Dirigentes de organizações de interesse público e de empresas, Gerentes",
-                    "Service and sales workers in shops and markets" =
-                        "Trabalhadores dos serviços, vendedores do comércio em lojas e mercados",
-                    "Technicians and associate professionals" =
-                        "Técnicos de nível médio"
-                ),
+            groups <- groups[order(groups$ord), ]
+            levels <- levels[order(levels$group_id, levels$ord), ]
+            
+            out <- list()
+            for (i in seq_len(nrow(groups))) {
+                gid <- groups$id[i]
+                g_label <- if (lang == "pt") groups$label_pt[i] else groups$label_en[i]
+                lv <- levels[levels$group_id == gid, ]
                 
-                "Economic Sector" = c(
-                    "Accommodation and food services" = "Alojamento e Alimentação",
-                    "Administrative and support service activities" =
-                        "Atividades administrativas e serviços complementares",
-                    "Agriculture, livestock, forestry, fishing, and aquaculture" =
-                        "Agricultura, Pecuária, Produção Florestal, Pesca e Aquicultura",
-                    "Arts, culture, sports, and recreation" =
-                        "Artes, Cultura, Esporte e Recreação",
-                    "Construction" = "Construção",
-                    "Domestic services" = "Serviços domésticos",
-                    "Education" = "Educação",
-                    "Electricity and gas supply" = "Eletricidade e Gás",
-                    "Financial and insurance activities" =
-                        "Atividades financeiras, de seguros e serviços relacionados",
-                    "Human health and social work activities" =
-                        "Saúde humana e Serviços sociais",
-                    "Information and communication" = "Informação e Comunicação",
-                    "International organizations and other extraterritorial institutions" =
-                        "Organismos internacionais e outras instituições extraterritoriais",
-                    "Manufacturing" = "Indústrias de transformação",
-                    "Mining and quarrying" = "Indústrias extrativas",
-                    "Other service activities" = "Outras atividades de serviços",
-                    "Professional, scientific, and technical activities" =
-                        "Atividades Profissionais, Científicas e Técnicas",
-                    "Public administration, defense, and social security" =
-                        "Administração pública, Defesa e Seguridade social",
-                    "Real estate activities" = "Atividades imobiliárias",
-                    "Transportation, storage, and postal services" =
-                        "Transporte, Armazenagem e Correio",
-                    "Water supply, sewage, waste management, and remediation" =
-                        "Água, Esgoto, Atividades de Gestão de resíduos e Descontaminação",
-                    "Wholesale and retail trade; repair of motor vehicles and motorcycles" =
-                        "Comércio; Reparação de veículos automotores e motocicletas"
-                )
-            )
+                if (lang == "pt") {
+                    out[[g_label]] <- if (gid == "all") lv$value_pt[1] else as.list(lv$value_pt)
+                } else {
+                    out[[g_label]] <- stats::setNames(lv$value_pt, lv$label_en)
+                }
+            }
+            out
         }
         
-        # “mapa achatado” PT → EN
-        group_map_pt_to_en <- reactive({
-            if (lang() != "en") return(NULL)
-            
-            ch <- group_choices_i18n()  # lista hierárquica
-            
-            # pega apenas os itens "folha" (cada um é named vector ou lista nomeada)
-            leaves <- c(
-                ch[["Education"]],
-                ch[["Gender"]],
-                unlist(ch[["Age Group"]]),
-                ch[["Race/color"]],
-                unlist(ch[["Occupation"]]),
-                unlist(ch[["Economic Sector"]])
-            )
-            
-            # leaves: names = EN, values = PT
-            # inverte: names = PT, values = EN
-            setNames(names(leaves), unname(leaves))
-        })
+        # Função para geo choices traduzidas
+        
+        group_choices_i18n <- function() {
+            read_group_choices(files$group_groups, files$group_levels, lang = lang())
+        }
+        
+        
+        # Mapa PT → EN
+        
+        geo_levels_df <- read.csv(files$geo_levels, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
         
         geo_map_pt_to_en <- reactive({
             if (lang() != "en") return(NULL)
-            
-            ch <- geo_choices_i18n()
-            
-            leaves <- c(
-                ch[["Brazil"]],       
-                ch[["Legal Amazon"]],  
-                ch[["Regions"]]         
-                # States fica sem tradução
-            )
-            
-            # inverte: names = PT, values = EN
-            setNames(names(leaves), unname(leaves))
+            setNames(geo_levels_df$label_en, geo_levels_df$value_pt)
         })
 
+        group_levels_df <- read.csv(files$group_levels, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+        
+        group_map_pt_to_en <- reactive({
+            if (lang() != "en") return(NULL)
+            setNames(group_levels_df$label_en, group_levels_df$value_pt)
+        })
         
         
         

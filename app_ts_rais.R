@@ -17,6 +17,11 @@ files$param_file_pt <- "data/rais_groups_dic.csv"
 files$param_file_en <- "data/rais_groups_dic_en.csv"
 files$db_file <- "data/rais_groups.rds"
 
+files$group_groups <- "data/group_groups.csv"
+files$group_levels <- "data/group_levels.csv"
+files$geo_groups <- "data/geo_groups.csv"
+files$geo_levels <- "data/geo_levels.csv"
+
 
 # Carrega scripts
 source(files$param_script)
