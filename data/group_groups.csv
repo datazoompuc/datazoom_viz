@@ -1,0 +1,8 @@
+id,label_pt,label_en,ord
+all,Todos,All,1
+education,Escolaridade,Education,2
+gender,Sexo,Gender,3
+age,Faixa Etária,Age Group,4
+race,Raça/Cor,Race/color,5
+occupation,Ocupação,Occupation,6
+sector,Setor Econômico,Economic Sector,7
