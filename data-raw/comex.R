@@ -71,6 +71,27 @@ saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
 
 
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
+
+# gera auxiliar de código de município
+url <- "https://api-comexstat.mdic.gov.br/cities/filters/city?language=pt"
+resp <- GET(url)
+stop_for_status(resp)
+
+txt <- content(resp, as = "text", encoding = "UTF-8")
+obj <- fromJSON(txt, simplifyDataFrame = TRUE)
+
+d <- obj$data
+if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
+
+aux3 <- as_tibble(d) %>%
+    transmute(
+        codigo = str_pad(as.character(id), 7, pad = "0"),  # município costuma ser 7 dígitos (IBGE)
+        nome   = text
+    ) %>%
+    distinct(codigo, .keep_all = TRUE)
+
+saveRDS(aux3, "data/auxiliar_cod_municipais.rds")
+
 aux3 <- readRDS("data/auxiliar_cod_municipais.rds")
 
 #dat$cod_pais <- as.numeric(dat$cod_pais)
@@ -125,9 +146,9 @@ dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio + uf, dat, sum)
 
 dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
-dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH4_POR, aux2$CO_SH4))
+dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_POR_MIN, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
-dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
+# dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
 dat$uf <- NULL
 
 data_val <- dat
