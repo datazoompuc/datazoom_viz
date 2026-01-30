@@ -11,39 +11,45 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
   
-  # Carrega dados
-  df <- readRDS(files$db_file) %>% 
-    select(time, group, starts_with("Cocos"), 
-           starts_with("Madeira"), starts_with("Cacau")) %>% 
-    right_join(tidyr::expand(., time, group))
-  
-  if(param$lang){
-      #translating the column names from the dataframe
-      df <- df %>%
-          rename("Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" = "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
-                 "Whole or broken cocoa, raw or roasted" = "Cacau inteiro ou partido, em bruto ou torrado",
-                 "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" = "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada")
-      
-      #translating the names from the param$table
-      param$table <- param$table %>% 
-          mutate(var = case_when(
-              var == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled",
-              var == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
-              var == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
-              TRUE ~ var
-              ),
-              label = case_when(
-                  label == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ,
-                  label == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
-                  label == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
-                  TRUE ~ label
-              )
-           )
-  }
-   
-  df[is.na(df)] <- 0
+  # Carrega dados (tudo)
+    df_all <- readRDS(files$db_file) %>%
+        dplyr::right_join(tidyr::expand(., time, group))
+    
+    # Calcula os 20 produtos mais exportados no total
+    top_products <- df_all %>%
+        dplyr::select(-time, -group) %>%
+        dplyr::summarise(dplyr::across(dplyr::everything(), ~sum(.x, na.rm = TRUE))) %>%
+        tidyr::pivot_longer(dplyr::everything(), names_to = "produto", values_to = "total") %>%
+        dplyr::arrange(dplyr::desc(total)) %>%
+        dplyr::slice_head(n = 20) %>%
+        dplyr::pull(produto)
+    
+    # Garante que só ficam produtos que existem nas choices do param
+    top_products <- top_products[top_products %in% names(param$x_choices$Comex)]
+    
+    # Choices finais (somente top 20, na ordem do ranking)
+    choices_top20 <- param$x_choices$Comex[top_products]
+    
+    # (opcional) reduz df para só as colunas top20 (mais leve)
+    df <- df_all %>%
+        dplyr::select(time, group, dplyr::all_of(top_products)) %>%
+        dplyr::right_join(tidyr::expand(., time, group))
+    
+    df[is.na(df)] <- 0
   
   server <- function(input, output, session) {
+      
+      observeEvent(TRUE, {
+          # respeita x vindo da URL, se existir e estiver no top20
+          query <- parseQueryString(session$clientData$url_search)
+          selected_x <- if (!is.null(query[["x"]]) && query[["x"]] %in% top_products) query[["x"]] else top_products[1]
+          
+          updateSelectInput(
+              session, "x",
+              choices = list(Comex = choices_top20),
+              selected = selected_x
+          )
+      }, once = TRUE)
     
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))

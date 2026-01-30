@@ -31,7 +31,7 @@ get_ui <- function(files, param) {
           selectInput(
             inputId = "x",
             label = param$label_x_choice_rk,
-            choices = param$x_choices,
+            choices = list(Comex = character(0)),  # começa vazio, server preenche
             selected = param$x_def,
             width = "100%"
           )
