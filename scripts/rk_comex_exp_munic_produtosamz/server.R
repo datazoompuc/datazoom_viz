@@ -15,22 +15,45 @@ get_server <- function(files, param) {
     df_all <- readRDS(files$db_file) %>%
         dplyr::right_join(tidyr::expand(., time, group))
     
-    # Calcula os 20 produtos mais exportados no total
+    # --- lê auxiliar (RDS) ---
+    aux_sh4 <- readRDS("data/auxiliar_cod_sh4.rds")
+    stopifnot(all(c("CO_SH4", "NO_POR_MIN") %in% names(aux_sh4)))
+    aux_sh4$CO_SH4 <- sprintf("%04d", as.numeric(aux_sh4$CO_SH4))
+    
+    # vetor: names = codigo, values = nome
+    map_sh4_nome <- stats::setNames(aux_sh4$NO_POR_MIN, aux_sh4$CO_SH4)
+    
+    # renomeia colunas do df: codigo -> nome
+    prod_cols <- setdiff(names(df_all), c("time", "group"))
+    new_names <- names(df_all)
+    
+    # aplica mapeamento só onde existe no auxiliar
+    has_map <- prod_cols %in% names(map_sh4_nome)
+    new_names[match(prod_cols, new_names)] <- ifelse(
+        has_map,
+        unname(map_sh4_nome[prod_cols]),
+        prod_cols
+    )
+    
+    names(df_all) <- new_names
+    
+    # garante nomes únicos (evita colunas duplicadas)
+    names(df_all) <- make.unique(names(df_all), sep = " __dup__ ")
+    
+    df_all[is.na(df_all)] <- 0
+    
+    # --- calcula TOP 20 produtos (por soma total) ---
+    prod_cols2 <- setdiff(names(df_all), c("time", "group"))
+    
     top_products <- df_all %>%
-        dplyr::select(-time, -group) %>%
+        dplyr::select(dplyr::all_of(prod_cols2)) %>%
         dplyr::summarise(dplyr::across(dplyr::everything(), ~sum(.x, na.rm = TRUE))) %>%
         tidyr::pivot_longer(dplyr::everything(), names_to = "produto", values_to = "total") %>%
         dplyr::arrange(dplyr::desc(total)) %>%
         dplyr::slice_head(n = 20) %>%
         dplyr::pull(produto)
     
-    # Garante que só ficam produtos que existem nas choices do param
-    top_products <- top_products[top_products %in% names(param$x_choices$Comex)]
-    
-    # Choices finais (somente top 20, na ordem do ranking)
-    choices_top20 <- param$x_choices$Comex[top_products]
-    
-    # (opcional) reduz df para só as colunas top20 (mais leve)
+    # --- opcional (recomendado): reduz df só com top 20 (mais leve) ---
     df <- df_all %>%
         dplyr::select(time, group, dplyr::all_of(top_products)) %>%
         dplyr::right_join(tidyr::expand(., time, group))
@@ -39,8 +62,9 @@ get_server <- function(files, param) {
   
   server <- function(input, output, session) {
       
+      choices_top20 <- stats::setNames(top_products, top_products)  # label=valor=nome
+      
       observeEvent(TRUE, {
-          # respeita x vindo da URL, se existir e estiver no top20
           query <- parseQueryString(session$clientData$url_search)
           selected_x <- if (!is.null(query[["x"]]) && query[["x"]] %in% top_products) query[["x"]] else top_products[1]
           
@@ -82,7 +106,7 @@ get_server <- function(files, param) {
       if (!is.null(query[["x"]])) {
         # se tem x na url atribui valor ao selecinput x
         updateSelectInput(session, "x",
-          choices = param$x_choices$Comex,
+          choices = list(Comex = choices_top20),
           selected = query[["x"]]
         )
       }
@@ -98,9 +122,7 @@ get_server <- function(files, param) {
         text <- param$label_no_variable
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
-
-        text <- paste0(param$ranking_intro, x_col$label)
+          text <- paste0(param$ranking_intro, input$x)
       }
 
       text
@@ -160,34 +182,30 @@ get_server <- function(files, param) {
             stop()
           }
 
-          # Filtra sem grupo
-          df_p <- df_p[which(df_p$group != " - "), ]
 
-          # Ordena base por variável de ranking e preenche y
+          # Mantém só top_n por ano (muito mais rápido que ranquear tudo)
+          top_n <- 5  # troque para 20 se quiser top 20 municípios
+          
           df_p <- df_p %>%
-            group_by(slider) %>% # para cada ano
-            mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
-            arrange(y, .by_group = TRUE) # ordena por rank e ano
-
-          # Se o rank for NA coloca para o final do ranking e zera x
-          df_p$y[is.na(df_p$y)] <- max(df_p$y) + 1
-          df_p$x[is.na(df_p$x)] <- 0
+              filter(group != " - ") %>%
+              mutate(x = dplyr::coalesce(x, 0)) %>%  # trata NA como 0
+              group_by(slider) %>%
+              slice_max(order_by = x, n = top_n, with_ties = FALSE) %>%  # filtra cedo
+              arrange(slider, dplyr::desc(x), .by_group = TRUE) %>%
+              mutate(y = dplyr::row_number()) %>%  # ranking 1..top_n
+              ungroup()
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
           if (all(is.na(df_p$color))) {
             df_p$color <- " "
           }
 
-          # Deixa somente grupos que tem rank <n em algum momento
-          top_n <- 5
-          top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
-          df_p <- df_p %>% filter(group %in% top_groups)
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            x_col$label, ": ", format(df_p$x, scientific = FALSE,
+            input$x, ": ", format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
