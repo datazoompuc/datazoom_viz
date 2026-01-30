@@ -39,11 +39,11 @@ param$plot_name <- "Data Zoom Amazônia"
 param$plot_desc <- "municípios que mais exportam produtos da Amazônia Legal"
 
 # Outros parâmetros e configurações
-# param$x_choices[[1]] <- NULL
-# param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados`, 
-#                               param$x_choices$Comex$`Cacau inteiro ou partido, em bruto ou torrado`,
-#                               param$x_choices$Comex$`Madeira em bruto, mesmo descascada, desalburnada ou esquadriada`
-#                               )
+param$x_choices[[1]] <- NULL
+param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados`, 
+                              param$x_choices$Comex$`Cacau inteiro ou partido, em bruto ou torrado`,
+                              param$x_choices$Comex$`Madeira em bruto, mesmo descascada, desalburnada ou esquadriada`
+                              )
 #Mudanças específicas no server
 param$label_no_variable<- paste0("Variável não selecionada")
 param$x_label<- "Valor"
