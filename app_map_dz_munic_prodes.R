@@ -11,12 +11,12 @@ library(classInt)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/map_dz_munic_prodes/ui.R"
-files$server_script <- "scripts/map_dz_munic_prodes/server.R"
-files$param_script <- "scripts/map_dz_munic_prodes/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/dz_munic_dic.csv"
-files$db_file <- "data/dz_munic_simplified.rds"
+files$ui_script <- "map_dz_munic_prodes/ui.R"
+files$server_script <- "map_dz_munic_prodes/server.R"
+files$param_script <- "global/db_params.R"
+files$CSS_script <- "global/dza_lumen.css"
+files$param_file <- "map_dz_munic_prodes/data/dz_munic_dic.csv"
+files$db_file <- "map_dz_munic_prodes/data/dz_munic_simplified.rds"
 
 # Carrega scripts
 source(files$param_script)
