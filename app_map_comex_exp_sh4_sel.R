@@ -6,6 +6,8 @@ library(sf)
 library(htmlwidgets)
 
 
+
+
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/map_comex_exp_sh4_sel/ui.R"
@@ -32,6 +34,7 @@ param$text_def <- "group" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 param$lang <- FALSE
 param$forest <- "Produtos Compativeis com a Floresta"
+param$razao <- "Razão: Floresta / Outros produtos"
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos"
@@ -58,7 +61,8 @@ param$tooltip7 <- "% das exportações do produto vindas da Amazônia no ano"
 param$legend <- "Categoria do Principal Produto"
 
 # Outros parâmetros e configurações
-param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos")
+
+param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos", "Razão: Floresta / Outros produtos")
 param$year_inicio <- 1997
 param$year_final <- 2021
 
@@ -72,3 +76,5 @@ ui <- get_ui(files, param)
 server <- get_server(files, param)
 
 shinyApp(ui = ui, server = server)
+
+
