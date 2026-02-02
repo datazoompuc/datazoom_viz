@@ -512,20 +512,62 @@ get_server <- function(files, param) {
                           )
   }
   
+  df_resto <- df %>%
+    filter(!floresta) %>%
+    select(
+      cod_ibge, time, nm_municip, uf, geometry,
+      produto_principal_resto = produto_principal,
+      nome_sh2_resto = nome_sh2,
+      maximo_resto = maximo_produto
+    )
+  
+  df_forest <- df %>%
+    filter(floresta) %>%
+    st_drop_geometry() %>%
+    select(
+      cod_ibge, time,
+      produto_principal_forest = produto_principal,
+      nome_sh2_forest = nome_sh2,
+      maximo_forest = maximo_produto
+    )
+  
+  df_ratio <- df_resto %>%
+    left_join(df_forest, by = c("cod_ibge", "time")) %>%
+    mutate(
+      same_prod = !is.na(produto_principal_forest) &
+        (produto_principal_forest == produto_principal_resto),
+      
+      ratio_compat = dplyr::if_else(
+        is.na(maximo_resto) | maximo_resto <= 0 | is.na(maximo_forest),
+        NA_real_,
+        maximo_forest / maximo_resto
+      ),
+      
+      ratio_compat = if_else(same_prod, 1, ratio_compat),
+      
+      # reaproveitar o pipeline do mapa (cor/legend)
+      nome_sh2 = ratio_compat
+    ) %>%
+    st_as_sf()
+  
+  
   server <- function(input, output, session) {
     df_reactived <- reactive({
-      w <- df %>%
-        filter(time == input$filter1)
-
-      if (input$x == param$forest) {
-          w <- w %>% 
-            filter(floresta)
-      } else {
-        w <- w %>% 
-          filter(!floresta)
+      # caso 1: razão
+      if (input$x == param$razao) {
+        return(df_ratio %>% filter(time == input$filter1))
       }
       
-      return(w)
+      # caso 2: mapa “normal” (floresta vs outros)
+      w <- df %>% filter(time == input$filter1)
+      
+      if (input$x == param$forest) {
+        w <- w %>% filter(floresta)
+      } else {
+        w <- w %>% filter(!floresta)
+      }
+      
+      w
     })
 
     # Cria opções para seleção de datas
