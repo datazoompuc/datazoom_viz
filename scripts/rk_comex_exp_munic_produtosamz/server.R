@@ -29,56 +29,74 @@ get_server <- function(files, param) {
   # mantém só os códigos que existem no auxiliar
   prod_codes <- prod_codes[prod_codes %in% names(map_nome)]
   
-  starter_codes <- c(
-      # Agro / alimentos básicos
-      "1201", # soja
-      "1005", # milho
-      "1006", # arroz
-      "0901", # café
-      "0904", # pimenta/pimentões secos
-      "1701", # açúcar
-      "2304", # farelo/tortas de soja (resíduos da extração do óleo)
+  starter_choices <- list(
+      "Agro e alimentos" = c(
+          "Soja, mesmo triturada" = "1201",
+          "Milho" = "1005",
+          "Legumes de vagem, secos, em grão" = "0713",
+          "Produtos hortícolas congelados" = "0710",
+          "Tomates, frescos ou refrigerados" = "0702",
+          "Pepinos e pepininhos, frescos ou refrigerados" = "0707",
+          "Grãos de cereais trabalhados (flocos/partidos etc.)" = "1104",
+          "Produtos à base de cereais (expandidos/torrados)" = "1904",
+          "Produtos hortícolas preparados/conservados (exceto vinagre)" = "2005",
+          "Frutas e partes comestíveis, preparadas ou conservadas" = "2008",
+          "Águas (minerais/gaseificadas) sem açúcar" = "2201",
+          "Extratos e preparações de café/chá/mate" = "2101"
+      ),
       
-      # Óleos vegetais
-      "1507", # óleo de soja
+      "Carnes e produtos de origem animal" = c(
+          "Carnes bovinas, congeladas" = "0202",
+          "Carnes bovinas, frescas ou refrigeradas" = "0201",
+          "Miudezas comestíveis (bov./suín./ovín. etc.)" = "0206",
+          "Tripas, bexigas e estômagos de animais (exceto peixes)" = "0504",
+          "Gorduras de bovinos/ovinos/caprinos (exceto 1503)" = "1502",
+          "Farinhas/pó/pellets de carnes/miudezas/peixes (impróprios p/ alimentação humana)" = "2301"
+      ),
       
-      # Carnes / proteína animal
-      "0201", # carne bovina fresca/refrigerada
-      "0202", # carne bovina congelada
-      "0207", # carne de aves
+      "Óleos e derivados" = c(
+          "Óleo de soja e frações (mesmo refinado)" = "1507"
+      ),
       
-      # Mineração / metais
-      "2601", # minérios de ferro
-      "2602", # minérios de manganês
-      "2603", # minérios de cobre
-      "2606", # minérios de alumínio (bauxita)
-      "2610", # minérios de cromo
-      "7108", # ouro (formas brutas/semi)
+      "Florestais e madeira" = c(
+          "Madeira serrada/endireitada longitudinalmente (> 6mm)" = "4407",
+          "Madeira perfilada (tacos/frisos para soalhos etc.)" = "4409",
+          "Cocos/castanha do Brasil/castanha de caju (frescos ou secos)" = "0801"  # se preferir, pode mover pra Agro
+      ),
       
-      # Metais / siderurgia
-      "7201", # ferro fundido bruto / spiegel
-      "7202", # ferro-ligas
-      "7601", # alumínio em formas brutas
+      "Metais e minerais" = c(
+          "Ouro (bruto/semimanufaturado ou em pó)" = "7108",
+          "Algodão, não cardado nem penteado" = "5201"
+      ),
       
-      # Madeira / florestal
-      "4403", # madeira em bruto
-      "4407", # madeira serrada
-      "4703", # pastas químicas de madeira (celulose)
-      
-      # Energia / combustíveis (bem comum em COMEX)
-      "2710"  # óleos de petróleo (exceto brutos) / preparações
+      "Indústria e manufaturados" = c(
+          "Parafusos, porcas, anilhas, rebites e afins" = "7318",
+          "Rolamentos (esferas/roletes/agulhas)" = "8482",
+          "Papel/pasta para higiene e toucador" = "4818",
+          "Vestuário feminino (conjuntos/vestidos/saias/calças etc.)" = "6204",
+          "Malas, maletas, estojos e bolsas" = "4202",
+          "Preparações e artigos farmacêuticos" = "3006"
+      )
   )
   
+  # ordena alfabeticamente dentro de cada categoria
+  starter_choices <- lapply(starter_choices, function(x) x[order(tolower(names(x)))])
+  
+  # pega os códigos usados nas escolhas (valores do vetor)
+  starter_codes <- unique(unname(unlist(starter_choices)))
+  
+  # garante formato "0000"
   starter_codes <- sprintf("%04d", as.integer(starter_codes))
+                           
+  # filtra para só códigos que existem no df e no auxiliar
+  starter_codes <- intersect(starter_codes, prod_codes)
   
-  prod_codes <- intersect(prod_codes, starter_codes)
-  
-  # choices: names = label mostrado; values = código usado internamente
-  choices_prod <- stats::setNames(prod_codes, unname(map_nome[prod_codes]))
-  choices_prod <- choices_prod[order(tolower(names(choices_prod)))] # ordem alfabética pelo label
+  # remove dos choices qualquer item cujo código não exista
+  starter_choices <- lapply(starter_choices, function(x) x[x %in% starter_codes])
+  starter_choices <- starter_choices[lengths(starter_choices) > 0]
   
   
-  df <- df[, c("time", "group", prod_codes), drop = FALSE]
+  df <- df %>% select(time, group, all_of(starter_codes))
   df[is.na(df)] <- 0
   
   # if(param$lang){
@@ -112,11 +130,11 @@ get_server <- function(files, param) {
       observeEvent(TRUE, {
           query <- parseQueryString(session$clientData$url_search)
           
-          selected_x <- if (!is.null(query[["x"]]) && query[["x"]] %in% prod_codes) query[["x"]] else prod_codes[1]
+          selected_x <- if (!is.null(query[["x"]]) && query[["x"]] %in% starter_codes) query[["x"]] else starter_codes[1]
           
           updateSelectInput(
               session, "x",
-              choices = list(Comex = choices_prod),
+              choices = starter_choices,
               selected = selected_x
           )
       }, once = TRUE)
