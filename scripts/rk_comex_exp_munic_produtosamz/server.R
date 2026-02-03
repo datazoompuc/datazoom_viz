@@ -181,17 +181,21 @@ get_server <- function(files, param) {
 
     # Output título do gráfico
     output$plot_title <- renderText({
-        if (is.null(input$x) || input$x == "") return(param$label_no_variable)
-        
-        nome_prod <- unname(map_nome[input$x])
-        if (is.na(nome_prod) || nome_prod == "") nome_prod <- input$x
-        
-        paste0(param$ranking_intro, nome_prod)
+        param$plot_title
     })
     
     
     output$plot_subtitle <- renderText({
-      param$label_amazon
+        if (is.null(input$x) || input$x == "") return("")
+        
+        cod <- sprintf("%04d", as.integer(input$x))
+        nome <- unname(map_nome[cod])
+        
+        if (is.na(nome) || nome == "") {
+            paste0("SH4 ", cod)
+        } else {
+            paste0(nome, " (SH4 ", cod, ")")
+        }
     })
 
     # Output gráfico
