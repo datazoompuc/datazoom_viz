@@ -245,13 +245,19 @@ get_server <- function(files, param) {
           
           
           df_p <- df_p %>%
-              mutate(x = dplyr::coalesce(x, 0)) %>%
               filter(group != " - ") %>%
+              mutate(x = dplyr::coalesce(x, 0)) %>%
               group_by(slider) %>%
+              mutate(
+                  total_ano = sum(x, na.rm = TRUE),
+                  pct_ano   = if_else(total_ano > 0, 100 * x / total_ano, 0)
+              ) %>%
               slice_max(order_by = x, n = top_n, with_ties = FALSE) %>%
-              arrange(slider, desc(x), .by_group = TRUE) %>%
+              arrange(desc(x), .by_group = TRUE) %>%
               mutate(y = row_number()) %>%
               ungroup()
+          
+
 
 
 
@@ -259,12 +265,12 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            x_label, ": ", format(df_p$x, scientific = FALSE,
+            param$x_label, " : ", "<b>",format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            param$table$label[param$table$var == param$color_def], ": ", df_p$color
+                                      big.mark = "."), "</b><br>",
+            param$pct_anual, "<b>", format(round(df_p$pct_ano, 2), nsmall = 2, decimal.mark = ","), "%</b><br>",
+            y_col$label, ": ", df_p$y, "<br>"
           )
 
           # Define paleta de cores
@@ -421,7 +427,8 @@ get_server <- function(files, param) {
           tooltip <- list(
             bordercolor = "rgba(255, 255, 255, 1)",
             bgopacity = "0.5",
-            font = f1
+            font = f1,
+            align = "left"
           )
 
           # Aplica layout

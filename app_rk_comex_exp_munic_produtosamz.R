@@ -44,8 +44,9 @@ param$x_choices[[1]] <- NULL
 
 #Mudanças específicas no server
 param$label_no_variable<- paste0("Variável não selecionada")
-param$x_label<- "Valor"
+param$x_label<- "Valor (US$ FOB)"
 param$plot_title<- "Ranking de exportação por município"
+param$pct_anual <- "Participação no ano: "
 # param$label_amazon<- paste0("Amazônia Legal")
 
 #Mudanças específicas no UI
