@@ -4,9 +4,10 @@ library(haven)
 library(tibble)
 library(zoo)
 library(tidyr)
+library(magrittr)
 
-library(datazoom.social)
 # make sure it is updated and from github
+library(datazoom.social)
 
 #################################################
 ## Mercado de Trabalho na Amazônia Legal
@@ -325,9 +326,56 @@ dat <- dat %>%
 dat <- dat %>%
     mutate(prop_informal = taxa_informalidade)
 
+# UTF-8 encoding
+
+dat %<>% mutate(across(where(is.character), enc2utf8))
+
 # saving data file
 
 readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
+
+## Data in English
+
+# 1. Dicionário de tradução com os caracteres exatamente como aparecem na sua base
+traducao <- c(
+    # Geografia e Grupos
+    "Brasil" = "Brazil",
+    "Amaz\u00f4nia Legal" = "Legal Amazon",
+    "Fora da Amaz\u00f4nia Legal" = "Outside Legal Amazon",
+    "Norte" = "North",
+    "Nordeste" = "Northeast",
+    "Sudeste" = "Southeast",
+    "Sul" = "South",
+    "Centro-Oeste" = "Central-West",
+    
+    # Demografia Geral
+    "Todos" = "All",
+    "Homem" = "Male",
+    "Mulher" = "Female",
+    
+    # Faixas Etárias
+    "Entre 14 e 17 anos" = "Between 14 and 17",
+    "Entre 18 e 24 anos" = "Between 18 and 24",
+    "Entre 25 e 29 anos" = "Between 25 and 29",
+    "Entre 30 e 39 anos" = "Between 30 and 39",
+    "Entre 40 e 49 anos" = "Between 40 and 49",
+    "Entre 50 e 59 anos" = "Between 50 and 59",
+    "60 anos ou mais" = "60 or older",
+    
+    # Escolaridade
+    "Sem instru\u00e7\u00e3o" = "No formal education",
+    "1 a 7 anos de estudo" = "1-7 years of schooling",
+    "8 a 11 anos de estudo" = "8-11 years of schooling",
+    "9 a 14 anos de estudo" = "9-14 years of schooling",
+    "15 ou mais anos de estudo" = "15 or more years of schooling"
+)
+
+# 2. Tradução dos valores na base dat
+dat_traduzido <- dat %>%
+    mutate(across(c(group, composicao_demografica, sexo, faixa_idade, faixa_educ, regiao, legal_amazon),
+                  ~ recode(., !!!traducao)))
+
+readr::write_rds(dat_traduzido, "data/ibge_pnadc_trabalho_en.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##

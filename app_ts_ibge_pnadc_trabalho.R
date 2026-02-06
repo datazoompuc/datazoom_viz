@@ -36,6 +36,7 @@ param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "Eixo vertical (y)"
 param$label_geo_name <-  "Selecione recorte regional"
 param$label_comp_name <-  "Selecione grupos"
+
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_trabalho/"
 
 ### Parametros especificos no server
