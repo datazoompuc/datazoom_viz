@@ -4,6 +4,7 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 library(shinycssloaders)
+library(shinyWidgets)
 
 
 # Define nome de arquivos a serem carregados
@@ -12,8 +13,15 @@ files$ui_script <- "scripts/ts_rais/ui.R"
 files$server_script <- "scripts/ts_rais/server.R"
 files$param_script <- "scripts/ts_rais/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/rais_groups_dic.csv"
+files$param_file_pt <- "data/rais_groups_dic.csv"
+files$param_file_en <- "data/rais_groups_dic_en.csv"
 files$db_file <- "data/rais_groups.rds"
+
+files$group_groups <- "data/group_groups.csv"
+files$group_levels <- "data/group_levels.csv"
+files$geo_groups <- "data/geo_groups.csv"
+files$geo_levels <- "data/geo_levels.csv"
+
 
 # Carrega scripts
 source(files$param_script)
@@ -21,35 +29,72 @@ source(files$ui_script)
 source(files$server_script)
 
 # Parâmetros 
-param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
+param_pt <- get_db_param(files$param_file_pt, files$db_file)
+param_en <- get_db_param(files$param_file_en, files$db_file) 
+
+param <- param_pt # usa PT como padrão inicial
+
+# guarda as duas tabelas para alternar no server
+param$tables <- list(
+    pt = param_pt$table,
+    en = param_en$table
+)
+
+param$i18n <- list(
+    pt = list(
+        plot_name = "Data Zoom RAIS",
+        plot_desc = "Dados compilados sobre o mercado de trabalho brasileiro gerados a partir da RAIS",
+        label_var_name = "VARIÁVEIS:",
+        label_y_name = "Eixo vertical (y)",
+        label_scale_name = "Escala log",
+        label_prop_name = "Proporcional ao ano inicial",
+        label_geo = "Selecione recorte geográfico",
+        label_group = "Selecione agrupamento",
+        title_init = "Evolução anual do",
+        subtitle_init = "por grupo selecionado",
+        no_data_msg = "Nenhum dado encontrado com os filtros selecionados",
+        axis_x_title = "Ano",
+        axis_y_title = "Valor",
+        btn_fullscreen = "Fullscreen",
+        btn_lang = "English",          # mostra o “alvo” quando estiver em PT
+        y_rel_suffix = "(% do ano base)",
+        locale = "pt-BR",
+        dec_mark = ",",
+        big_mark = "."
+    ),
+    en = list(
+        plot_name = "Data Zoom RAIS",
+        plot_desc = "Compiled data on the Brazilian labor market based on RAIS microdata.",
+        label_var_name = "VARIABLES:",
+        label_y_name = "Vertical axis (y)",
+        label_scale_name = "Log scale",
+        label_prop_name = "Relative to base year",
+        label_geo = "Select region",
+        label_group = "Select group",
+        title_init = "Annual evolution of",
+        subtitle_init = "by selected group",
+        no_data_msg = "No data found for the selected filters",
+        axis_x_title = "Year",
+        axis_y_title = "Value",
+        btn_fullscreen = "Fullscreen",
+        btn_lang = "Português",        # mostra o “alvo” quando estiver em EN
+        y_rel_suffix = "(% of base year)",
+        locale = "en-US",
+        dec_mark = ".",
+        big_mark = ","
+    )
+)
+
+
 param$x_def <- "year" # variável padrão do eixo x
 param$y_def <- "real_avg_w" # variável padrão do eixo y
 param$slider_def <- "year"
 param$color_def <- "setor" # variável padrão de cor
 param$text_def <- "ocupacao" # variável padrão de texto sobre o gráfico (quando passa o mouse em cima)
 param$group <- "uf" # variável de agrupamento
-
-
-param$plot_name <- "Data Zoom RAIS"
-param$plot_desc <- "Dados compilados sobre o mercado de trabalho brasileiro gerados a partir da RAIS"
-
-
-param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "Eixo vertical (y)"
-param$label_scale_name <- "escala log"
-param$label_prop_name <- "proporcional ao ano inicial (*)"
-param$label_geo <- "Selecione recorte geográfico"
-param$label_group <- "Selecione agrupamento"
 param$link <- "https://datazoom.shinyapps.io/app_ts_rais/"
 
-param$title_init <- "Evolução anual do" # expressão titulo
-param$subtitle_init <- "por grupo selecionado" # expressão subtitulo
-param$no_data_msg <- "Nenhum dado encontrado com os filtros selecionados"
-param$axis_x_title <- "Ano"
-param$axis_y_title <- "Valor"
-param$tooltip_year <- "Ano"
 
-param$y_choices[[1]] <- NULL
 
 param$geo_choices <- list(
     "Brasil" = list("Brasil"),
