@@ -25,8 +25,8 @@ pevs_municipality_forest_crops <- as.data.frame(pevs_municipality_forest_crops)
 pevs_municipality_forest_crops[is.na(pevs_municipality_forest_crops)] <- 0
 
 munics= readxl::read_xls("data\\RELATORIO_DTB_BRASIL_MUNICIPIO.xls")%>%
-  dplyr::select('Código Município Completo', 'Nome_Município')
-pevs_municipality_forest_crops$geo_id= plyr::mapvalues(pevs_municipality_forest_crops$geo_id, from = munics$`Código Município Completo`, to = munics$Nome_Município)
+  dplyr::select('C?digo Munic?pio Completo', 'Nome_Munic?pio')
+pevs_municipality_forest_crops$geo_id= plyr::mapvalues(pevs_municipality_forest_crops$geo_id, from = munics$`C?digo Munic?pio Completo`, to = munics$Nome_Munic?pio)
 pevs_municipality_forest_crops= dplyr::rename(pevs_municipality_forest_crops , time=.data$ano, group=.data$geo_id)
 
 ##saving f
