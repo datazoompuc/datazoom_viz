@@ -1,0 +1,14 @@
+name: app_tss_ibge_pnadc_cod
+title: app_tss_ibge_pnadc_cod
+username:
+account: datazoom
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4296562
+bundleId: 4740446
+url: https://datazoom.shinyapps.io/app_tss_ibge_pnadc_cod/
+when: 1624301252.502
+lastSyncTime: 1624301252.502
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|app_ts_ibge_pnadc_cnae.R|app_ts_ibge_pnadc_trabalho.R|data-raw/datazoom_amazonia.R|data-raw/ibge_pnadc.R|LICENSE|README.md
