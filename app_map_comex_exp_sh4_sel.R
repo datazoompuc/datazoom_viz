@@ -59,7 +59,7 @@ param$tooltip7 <- "% das exportações do produto vindas da Amazônia no ano"
 param$legend <- "Categoria do Principal Produto"
 
 # Outros parâmetros e configurações
-param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos", "Razão: Compativeis com a floresta / Outros produtos")
+param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos", "Razão: Floresta / Outros produtos")
 param$year_inicio <- 1997
 param$year_final <- 2021
 

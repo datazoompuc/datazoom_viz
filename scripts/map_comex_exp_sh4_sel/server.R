@@ -554,9 +554,13 @@ get_server <- function(files, param) {
   
   server <- function(input, output, session) {
     df_reactived <- reactive({
-      w <- df %>%
-        filter(time == input$filter1)
-
+      
+      if (input$x == param$razao) {
+        return(df_ratio %>% filter(time == input$filter1))
+      }
+      
+      w <- df %>% filter(time == input$filter1)
+      
       if (input$x == param$forest) {
           w <- w %>% 
             filter(floresta)
