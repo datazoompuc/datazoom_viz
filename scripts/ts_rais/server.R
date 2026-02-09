@@ -32,43 +32,167 @@ get_server <- function(files, param) {
                 )
         
         dados <- reactive({df})
-
         
-        # Atualiza seletores
+        default_geo   <- unname(unlist(param$geo_choices[[1]]))[1]          # "Brasil"
+        default_group <- unname(unlist(param$group_categories[[1]]))[1]     # "Todos"
         
-        default_geo <- unname(unlist(param$geo_choices[[1]]))[1]
-        default_group <- unname(unlist(param$group_categories[1]))[1]
+        # Reativo de língua
+        lang <- reactiveVal("pt")
         
-        observe({
-            df <- dados()
-            
-            # Atualiza filtro geográfico
-        
-            
-            updateSelectizeInput(
-                session, 
-                "filter_geo",
-                choices = param$geo_choices,
-                selected = default_geo
-            )
-            
-            # Atualiza filtro de agrupamento
-            updateSelectizeInput(
-                session, 
-                "filter_group",
-                choices = param$group_categories,
-                selected = default_group,
-                options = list(placeholder = param$label_group)
-            )
+        observeEvent(input$toggle_lang, {
+            lang(ifelse(lang() == "pt", "en", "pt"))
         })
+        
+        # Helper para pegar textos e a tabela correta
+        txt <- reactive({
+            param$i18n[[lang()]]
+        })
+        
+        param_tbl <- reactive({
+            param$tables[[lang()]]
+        })
+        
+        # Renderizar os textos do topo do menu
+        output$plot_name_ui <- renderUI({
+            h2(class = "plot_name", txt()$plot_name)
+        })
+        
+        output$plot_desc_ui <- renderUI({
+            p(class = "plot_desc", txt()$plot_desc)
+        })
+        
+        output$label_var_ui <- renderUI({
+            p(class = "vars", txt()$label_var_name)
+        })
+        
+        # Atualizar labels dos inputs + choices do Y quando mudar idioma
+        observeEvent(lang(), {
+            # Atualiza labels
+            updateSelectInput(session, "y", label = txt()$label_y_name)
+            updateCheckboxInput(session, "ylog", label = txt()$label_scale_name)
+            updateCheckboxInput(session, "y_option", label = txt()$label_prop_name)
+            
+            # Mantém seleção atual (valores continuam PT)
+            sel_geo <- isolate(input$filter_geo)
+            sel_group <- isolate(input$filter_group)
+            
+            if (is.null(sel_geo) || length(sel_geo) == 0) sel_geo <- default_geo
+            if (is.null(sel_group) || !nzchar(sel_group)) sel_group <- default_group
+            
+            updateSelectizeInput(session, "filter_geo", label = txt()$label_geo,
+                                 choices = geo_choices_i18n(),
+                                 selected = sel_geo,
+                                 options = list(placeholder = txt()$label_geo, maxItems = 20))
+
+            updateSelectizeInput(session, "filter_group", label = txt()$label_group,
+                                 choices = group_choices_i18n(),
+                                 selected = sel_group,
+                                 options = list(placeholder = txt()$label_group))
+
+            # Botões
+            updateActionButton(session, "toggle_lang", label = txt()$btn_lang)
+            updateActionButton(session, "ab1", label = txt()$btn_fullscreen)
+            
+            # Atualiza choices do Y com a tabela traduzida
+            tbl <- param_tbl()
+            updateSelectInput(
+                session,
+                "y",
+                choices = setNames(tbl$var[tbl$y], tbl$label[tbl$y]),
+                selected = if (!is.null(isolate(input$y))) isolate(input$y) else param$y_def
+            )
+        }, ignoreInit = FALSE)
+        
+       
+        
+        # Helper lê geo choices
+        
+        read_geo_choices <- function(groups_path, levels_path, lang = c("pt","en")) {
+            lang <- match.arg(lang)
+            groups <- read.csv(groups_path, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+            levels <- read.csv(levels_path, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+            
+            groups <- groups[order(groups$ord), ]
+            levels <- levels[order(levels$group_id, levels$ord), ]
+            
+            out <- list()
+            for (i in seq_len(nrow(groups))) {
+                gid <- groups$id[i]
+                g_label <- if (lang == "pt") groups$label_pt[i] else groups$label_en[i]
+                lv <- levels[levels$group_id == gid, ]
+                
+                if (lang == "pt") {
+                    # PT: display=value
+                    out[[g_label]] <- as.list(lv$value_pt)
+                } else {
+                    # EN: names=label_en, values=value_pt
+                    out[[g_label]] <- stats::setNames(lv$value_pt, lv$label_en)
+                }
+            }
+            out
+        }
+        
+        # Função para geo choices traduzidas
+        geo_choices_i18n <- function() {
+            read_geo_choices(files$geo_groups, files$geo_levels, lang = lang())
+        }
+        
+        # Helper lê group choices
+        read_group_choices <- function(groups_path, levels_path, lang = c("pt","en")) {
+            lang <- match.arg(lang)
+            groups <- read.csv(groups_path, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+            levels <- read.csv(levels_path, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+            
+            groups <- groups[order(groups$ord), ]
+            levels <- levels[order(levels$group_id, levels$ord), ]
+            
+            out <- list()
+            for (i in seq_len(nrow(groups))) {
+                gid <- groups$id[i]
+                g_label <- if (lang == "pt") groups$label_pt[i] else groups$label_en[i]
+                lv <- levels[levels$group_id == gid, ]
+                
+                if (lang == "pt") {
+                    out[[g_label]] <- if (gid == "all") lv$value_pt[1] else as.list(lv$value_pt)
+                } else {
+                    out[[g_label]] <- stats::setNames(lv$value_pt, lv$label_en)
+                }
+            }
+            out
+        }
+        
+        # Função para geo choices traduzidas
+        
+        group_choices_i18n <- function() {
+            read_group_choices(files$group_groups, files$group_levels, lang = lang())
+        }
+        
+        
+        # Mapa PT → EN
+        
+        geo_levels_df <- read.csv(files$geo_levels, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+        
+        geo_map_pt_to_en <- reactive({
+            if (lang() != "en") return(NULL)
+            setNames(geo_levels_df$label_en, geo_levels_df$value_pt)
+        })
+
+        group_levels_df <- read.csv(files$group_levels, stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+        
+        group_map_pt_to_en <- reactive({
+            if (lang() != "en") return(NULL)
+            setNames(group_levels_df$label_en, group_levels_df$value_pt)
+        })
+        
         
         
         # Gera título dinâmico
         output$plot_title <- renderText({
             req(input$y)  
             
-            y_label <- param$table$label[param$table$var == input$y]
-            paste(param$title_init, y_label)
+            tbl <- param_tbl()
+            y_label <- tbl$label[tbl$var == input$y]
+            paste(txt()$title_init, y_label)
         })
         
         # Gera subtítulo
@@ -76,12 +200,17 @@ get_server <- function(files, param) {
             
             req(input$filter_group)
             
-            first_choice <- names(param$group_categories)[1]
-            if (input$filter_group != first_choice) {
-                paste(param$subtitle_init, "-", input$filter_group)
+            if (input$filter_group != default_group) {
+                if (lang() == "en") {
+                    m <- group_map_pt_to_en()
+                    grp_en <- unname(m[input$filter_group])
+                    if (is.na(grp_en)) grp_en <- input$filter_group
+                    paste(txt()$subtitle_init, "-", grp_en)
+                } else {
+                    paste(txt()$subtitle_init, "-", input$filter_group)
+                }
             }
         })
-        
         
         # Gera o gráfico principal
         output$plot <- renderPlotly({
@@ -144,13 +273,28 @@ get_server <- function(files, param) {
             
             if(!(default_geo %in% input$filter_geo)) {
                 df_agg$combinacao <- df_agg$geo_group
+                if (lang() == "en") {
+                    m <- geo_map_pt_to_en()
+                    geo_en <- unname(m[df_agg$combinacao])
+                    df_agg$combinacao <- ifelse(is.na(geo_en), df_agg$combinacao, geo_en)
+                }
+                
             } else {
-                df_agg$combinacao <- default_geo
+                df_agg$combinacao <- if (lang() == "en") "Brazil" else "Brasil"
             }
             
             # Mantém o grupo completo para o tooltip
             df_agg$combinacao_completa <- if(input$filter_group != default_group && "group" %in% names(df_agg)) {
-                paste(df_agg$combinacao, "-", df_agg$group)
+                grp_disp <- df_agg$group
+                
+                if (lang() == "en") {
+                    m <- group_map_pt_to_en()
+                    grp_en <- unname(m[grp_disp])
+                    grp_disp <- ifelse(is.na(grp_en), grp_disp, grp_en)
+                }
+                
+                paste(df_agg$combinacao, "-", grp_disp)
+                
             } else {
                 df_agg$combinacao
             }
@@ -159,7 +303,7 @@ get_server <- function(files, param) {
             # Verifica se há dados
             if(nrow(df_agg) == 0) {
                 return(plotly_empty() %>% 
-                           layout(title = list(text = param$no_data_msg)))
+                           layout(title = list(text = txt()$no_data_msg)))
             }
             
             # Calcula evolução relativa se necessário
@@ -173,14 +317,18 @@ get_server <- function(files, param) {
             }
             
             # Prepara tooltip
+            tbl <- param_tbl()
+            
             df_agg$tooltip <- paste0(
                 "<b>", df_agg$combinacao_completa, "</b><br>",
-                param$axis_x_title, ": ", df_agg$year, "<br>",
-                param$table$label[param$table$var == input$y], ": ",
-                format(round(df_agg$y_value, 2),
-                       scientific = FALSE,
-                       decimal.mark = ifelse(grepl("en", files$param_file), ".", ","),
-                       big.mark = ifelse(grepl("en", files$param_file), ",", "."))
+                txt()$axis_x_title, ": ", df_agg$year, "<br>",
+                tbl$label[tbl$var == input$y], ": ",
+                format(
+                    round(df_agg$y_value, 2),
+                    scientific = FALSE,
+                    decimal.mark = txt()$dec_mark,
+                    big.mark = txt()$big_mark
+                )
             )
             
             # Layout hover/tooltip
@@ -192,18 +340,19 @@ get_server <- function(files, param) {
             
             
             # Título eixo y
-            y_label <- param$table$label[param$table$var == input$y]
-            if (input$y_option) {
-                y_title <- paste0(y_label, " (% of base year)")
-                if (!grepl("en", files$param_file)) y_title <- paste0(y_label, " (% do ano base)")
+            tbl <- param_tbl()
+            y_label <- tbl$label[tbl$var == input$y]
+            
+            y_title <- if (input$y_option) {
+                paste0(y_label, " ", txt()$y_rel_suffix)
             } else {
-                y_title <- y_label
+                y_label
             }
             
             
             # Layout eixos
                 x_axis_layout <- list(
-                    title = param$axis_x_title,
+                    title = txt()$axis_x_title,
                     titlefont = f1, 
                     tickfont = f2, 
                     showgrid = FALSE,
@@ -242,7 +391,7 @@ get_server <- function(files, param) {
             p %>% config(
                 displayModeBar = TRUE,
                 modeBarButtonsToRemove = c("select2d", "lasso2d", "autoScale2d"),
-                locale = ifelse(grepl("en", files$param_file), "en-US", "pt-BR")
+                locale = txt()$locale
             )
         })
     }

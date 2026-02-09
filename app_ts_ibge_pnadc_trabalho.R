@@ -6,12 +6,12 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_ibge_pnadc_trabalho/ui.R"
-files$server_script <- "scripts/ts_ibge_pnadc_trabalho/server.R"
-files$param_script <- "scripts/ts_ibge_pnadc_trabalho/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/ibge_pnadc_trabalho_dic.csv"
-files$db_file <- "data/ibge_pnadc_trabalho.rds"
+files$ui_script <- "ts_ibge_pnadc_trabalho/ui.R"
+files$server_script <- "ts_ibge_pnadc_trabalho/server.R"
+files$param_script <- "ts_ibge_pnadc_trabalho/db_params.R"
+files$CSS_script <- "global/dza_lumen.css"
+files$param_file <- "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_dic.csv"
+files$db_file <- "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -36,6 +36,7 @@ param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "Eixo vertical (y)"
 param$label_geo_name <-  "Selecione recorte regional"
 param$label_comp_name <-  "Selecione grupos"
+
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_trabalho/"
 
 ### Parametros especificos no server

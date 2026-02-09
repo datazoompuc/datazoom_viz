@@ -1,0 +1,36 @@
+group_id,ord,value_pt,label_pt,label_en
+br,1,Brasil,Brasil,Brazil
+amazonia,1,Amazônia Legal,Amazônia Legal,Legal Amazon
+amazonia,2,Fora da Amazônia Legal,Fora da Amazônia Legal,Outside Legal Amazon
+regions,1,Norte,Norte,North
+regions,2,Nordeste,Nordeste,Northeast
+regions,3,Sudeste,Sudeste,Southeast
+regions,4,Sul,Sul,South
+regions,5,Centro-Oeste,Centro-Oeste,Central-West
+states,1,Acre,Acre,Acre
+states,2,Alagoas,Alagoas,Alagoas
+states,3,Amapá,Amapá,Amapá
+states,4,Amazonas,Amazonas,Amazonas
+states,5,Bahia,Bahia,Bahia
+states,6,Ceará,Ceará,Ceará
+states,7,Distrito Federal,Distrito Federal,Federal District
+states,8,Espírito Santo,Espírito Santo,Espirito Santo
+states,9,Goiás,Goiás,Goias
+states,10,Maranhão,Maranhão,Maranhao
+states,11,Mato Grosso,Mato Grosso,Mato Grosso
+states,12,Mato Grosso do Sul,Mato Grosso do Sul,Mato Grosso do Sul
+states,13,Minas Gerais,Minas Gerais,Minas Gerais
+states,14,Pará,Pará,Para
+states,15,Paraíba,Paraíba,Paraiba
+states,16,Paraná,Paraná,Parana
+states,17,Pernambuco,Pernambuco,Pernambuco
+states,18,Piauí,Piauí,Piaui
+states,19,Rio de Janeiro,Rio de Janeiro,Rio de Janeiro
+states,20,Rio Grande do Norte,Rio Grande do Norte,Rio Grande do Norte
+states,21,Rio Grande do Sul,Rio Grande do Sul,Rio Grande do Sul
+states,22,Rondônia,Rondônia,Rondonia
+states,23,Roraima,Roraima,Roraima
+states,24,Santa Catarina,Santa Catarina,Santa Catarina
+states,25,São Paulo,São Paulo,Sao Paulo
+states,26,Sergipe,Sergipe,Sergipe
+states,27,Tocantins,Tocantins,Tocantins

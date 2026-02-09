@@ -18,10 +18,10 @@ get_ui <- function(files, param) {
           }'
                    ),
                    
-                   h2(class = "plot_name", param$plot_name),
-                   p(class = "plot_desc", param$plot_desc),
+                   uiOutput("plot_name_ui"),
+                   uiOutput("plot_desc_ui"),
                    hr(),
-                   p(class = "vars", param$label_var_name),
+                   uiOutput("label_var_ui"),
                    
                    # Controles de visualização
                    div(
@@ -36,20 +36,33 @@ get_ui <- function(files, param) {
                        )
                    ),
                    
-                   checkboxInput(
-                       inputId = "ylog",
-                       label = param$label_scale_name,
-                       value = FALSE,
-                       width = "100%"
-                   ),
+                   # espaço vazio
+                   div(style = "height: 12px;"),
                    
-                   checkboxInput(
-                       inputId = "y_option",
-                       label = param$label_prop_name,
-                       value = FALSE,
-                       width = "100%"
-                   ),
+                   # Seleciona eixo log
+                   tags$style(HTML(".switch-label { color: white; }")),
+                   div(
+                       style = "margin-top: 10px;",
+                       materialSwitch(
+                           inputId = "ylog",
+                           label = tags$span(param$label_scale_name, class = "switch-label"),
+                           value = FALSE,
+                           status = "info"
+                       )
+                    ),
                    
+                   # Seleciona proporcional
+                   div(
+                       style = "margin-top: 10px;",
+                       materialSwitch(
+                           inputId = "y_option",
+                           label = tags$span(param$label_prop_name, class = "switch-label"),
+                           value = FALSE, 
+                           status = "info"
+                       )
+                   ),
+                      
+                   hr(),
                    
                    
                    # Filtro geográfico
@@ -65,6 +78,9 @@ get_ui <- function(files, param) {
                        )
                    ),
                    
+                   # espaço vazio
+                   div(style = "height: 6px;"),
+                   
                    # Filtro de grupos
                    div(
                        class = "var_selec_group",
@@ -77,6 +93,19 @@ get_ui <- function(files, param) {
                            width = "100%"
                        )
                    ),
+                   
+                   # espaço vazio
+                   div(class = "fakecheckbox", ),
+                   
+                   actionButton(
+                       'toggle_lang',
+                       label = "English",
+                       icon = icon("globe"),
+                       class = "btn-primary"
+                   ),
+                   
+                   # espaço vazio
+                   div(style = "height: 6px;"),
                    
                    actionButton(
                        'ab1', 
