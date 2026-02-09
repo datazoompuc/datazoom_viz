@@ -165,7 +165,7 @@ get_server <- function(files, param) {
                                        "Microfones, alto-falantes, amplificadores, etc" ~ "Microphones, loudspeakers, amplifiers, etc.", produto_principal ==
                                        "Fornos elétricos industriais" ~ "Industrial electric furnaces", produto_principal ==
                                        "Fluidos para sistemas hidráulicos" ~ "Fluids for hydraulic systems", produto_principal ==
-                                       "Minérios de cromo e seus concentrados" ~ "Chromium ores and their concentrates", produto_principal ==
+                                       "Minérios de cromo e seus concentrados" ~ "Chromium ores and concentrates", produto_principal ==
                                        "Areias naturais de qualquer espécie" ~ "Natural sands of any kind", produto_principal ==
                                        "Lenha em qualquer estado" ~ "Firewood in any condition", produto_principal ==
                                        "Arcos e estacas de madeira" ~ "Wooden arches and stakes", produto_principal ==
@@ -546,25 +546,22 @@ get_server <- function(files, param) {
       
       ratio_compat = if_else(same_prod, 1, ratio_compat),
       
-
       classe_ratio = case_when(
         is.na(ratio_compat) ~ NA_character_,
-        same_prod           ~ "Mesmo produto (ratio=1)",
-        ratio_compat < 1    ~ "Principal NÃO compatível (ratio<1)",
-        ratio_compat >= 1   ~ "Principal compatível (ratio>=1)"
+        same_prod ~ "Mesmo produto",
+        ratio_compat < 1 ~ "Principal produto não compatível",
+        ratio_compat >= 1 ~ "Principal produto compatível"
       ),
       
-
       produto_principal = produto_principal_resto,
       maximo_produto    = ratio_compat,
       
-
       nome_sh2 = factor(
         classe_ratio,
         levels = c(
-          "Mesmo produto (ratio=1)",
-          "Principal NÃO compatível (ratio<1)",
-          "Principal compatível (ratio>=1)"
+          "Mesmo produto",
+          "Principal produto não compatível",
+          "Principal produto compatível"
         )
       )
     ) %>%
@@ -616,9 +613,7 @@ get_server <- function(files, param) {
     
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
-      # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
-      
       
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       updateSelectizeInput(session,
@@ -627,16 +622,13 @@ get_server <- function(files, param) {
                            selected = selected
       )
       
-
       query <- parseQueryString(session$clientData$url_search)
       
-
       if (is.null(query[["filter"]])) {
-        random_inputs() 
+        random_inputs()
       }
     }
     
-
     output$plot_title <- renderText({
       text <- " "
       if (is.null(input$filter1) || input$filter1 == "") {
@@ -657,22 +649,24 @@ get_server <- function(files, param) {
       text
     })
     
-    
     output$map <- renderLeaflet({
       
-
-      update_my_queryString() # atualiza url com parametros dos inputs
+      update_my_queryString()
       
       fig <- leaflet() %>%
         addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
-        setView(-58, -7, zoom = 5) 
+        setView(-58, -7, zoom = 5)
       
       vals <- df_reactived()[["nome_sh2"]]
       
       if (input$x == param$razao) {
         pal <- colorFactor(
           palette = pallete_discrete[1:3],
-          domain  = levels(vals),
+          domain  = c(
+            "Mesmo produto",
+            "Principal produto não compatível",
+            "Principal produto compatível"
+          ),
           na.color = "#cccccc"
         )
       } else {
@@ -686,8 +680,6 @@ get_server <- function(files, param) {
       tryCatch(
         {
           
-          # Monta mapa
-
           x_col <- param$table[which(param$table$var == "produto_principal"), ]
           title_legend <- paste0("", x_col$label)
           labels <- paste0(
@@ -730,7 +722,7 @@ get_server <- function(files, param) {
                       opacity = 0.7
             )
           
-          fig <- fig_p 
+          fig <- fig_p
         },
         error = function(cond) {
           print("Plot error in tryCatch environment")
@@ -740,12 +732,10 @@ get_server <- function(files, param) {
     })
     
     observe({
-
       query <- parseQueryString(session$clientData$url_search)
       update_my_inputs()
     })
   }
-  
   
   server
 }
