@@ -5,16 +5,18 @@ library(plotly)
 library(htmlwidgets)
 
 # Cache
-cache_folder <- "./cache/app_rk_comex_exp_munic_produtosamz_en/"
+cache_folder <- "rk_comex_exp_munic_produtosamz_en/cache/"
 shinyOptions(cache = cachem::cache_disk(cache_folder))
+
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk_comex_exp_munic_produtosamz/ui.R"
-files$server_script <- "scripts/rk_comex_exp_munic_produtosamz/server.R"
-files$param_script <- "scripts/rk_comex_exp_munic_produtosamz/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/comex_exp_sh4_munic_dic_en.csv"
-files$db_file <- "data/comex_exp_sh4_munic.rds"
+files$ui_script <- "rk_comex_exp_munic_produtosamz/ui.R"
+files$server_script <- "rk_comex_exp_munic_produtosamz/server.R"
+files$param_script <- "rk_comex_exp_munic_produtosamz/db_params.R"
+files$CSS_script <- "global/dza_lumen.css"
+files$param_file <- "rk_comex_exp_munic_produtosamz/comex_exp_sh4_munic_dic.csv"
+files$db_file <- "rk_comex_exp_munic_produtosamz/comex_exp_sh4_munic.rds"
+files$aux_file <- "rk_comex_exp_munic_produtosamz/auxiliar_cod_sh4.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -38,16 +40,58 @@ param$plot_desc <- "The municipalities who are the biggest product exporters of 
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
-param$x_choices$Comex <- list("Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled", 
-                              "Whole or broken cocoa, raw or roasted",
-                              "Raw wood, whether or not stripped of bark or sapwood, or roughly squared"
+
+param$starter_choices <- list(
+    "Agribusiness & food" = c(
+        "Soybeans" = "1201",
+        "Corn" = "1005",
+        "Dried leguminous vegetables" = "0713",
+        "Frozen vegetables" = "0710",
+        "Tomatoes (fresh/chilled)" = "0702",
+        "Cucumbers (fresh/chilled)" = "0707",
+        "Worked cereal grains" = "1104",
+        "Prepared cereals (expanded/roasted)" = "1904",
+        "Vegetables (prepared/preserved), execept vinegar" = "2005",
+        "Fruit (prepared/preserved)" = "2008",
+        "Waters (mineral/aerated), no sugar" = "2201",
+        "Coffee/tea/mate extracts & preparations" = "2101",
+        "Coconuts/Brazil nuts/cashews" = "0801"
+    ),
+    "Meat & animal products" = c(
+        "Frozen bovine meat" = "0202",
+        "Fresh/chilled bovine meat" = "0201",
+        "Edible offal" = "0206",
+        "Animal intestines/bladders/stomachs" = "0504",
+        "Bovine/ovine/caprine fats (except 1503)" = "1502",
+        "Meals/powders/pellets of meat/fish (non-food)" = "2301"
+    ),
+    "Oils" = c(
+        "Soybean oil & fractions" = "1507"
+    ),
+    "Wood & forest products" = c(
+        "Sawn wood (>6mm)" = "4407",
+        "Profiled wood" = "4409"
+    ),
+    "Metals & minerals" = c(
+        "Gold" = "7108",
+        "Raw cotton" = "5201"
+    ),
+    "Manufactured goods" = c(
+        "Screws/bolts/nuts/washers/rivets" = "7318",
+        "Ball/roller/needle bearings" = "8482",
+        "Tissue/toweling paper & cellulose wadding" = "4818",
+        "Women’s apparel (sets/dresses/trousers etc.)" = "6204",
+        "Bags/briefcases/cases" = "4202",
+        "Pharmaceutical preparations" = "3006"
+    )
 )
 
 #Mudanças específicas no server
 param$label_no_variable<- "No variable selected"
-param$x_label<- "Value"
-param$ranking_intro<- "Ranking of "
-param$label_amazon<- "Legal Amazon"
+param$plot_title <- "Exports ranking by municipality"
+param$pct_anual  <- "Share of the year: "
+param$x_label    <- "Export value (US$ FOB)"
+
 
 #Mudanças específicas no UI
 
