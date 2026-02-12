@@ -21,7 +21,9 @@ get_server <- function(files, param) {
   stopifnot(all(c("CO_SH4", "NO_POR_MIN") %in% names(aux_sh4)))
   
   aux_sh4$CO_SH4 <- sprintf("%04d", as.numeric(aux_sh4$CO_SH4))
-  map_nome <- stats::setNames(aux_sh4$NO_POR_MIN, aux_sh4$CO_SH4)
+  
+  label_col <- if (isTRUE(param$lang) && "NO_ENG_MIN" %in% names(aux_sh4)) "NO_ENG_MIN" else "NO_POR_MIN"
+  map_nome <- stats::setNames(aux_sh4[[label_col]], aux_sh4$CO_SH4)
   
   # colunas de produto
   prod_codes <- setdiff(names(df), c("time", "group"))
@@ -29,55 +31,10 @@ get_server <- function(files, param) {
   # mantém só os códigos que existem no auxiliar
   prod_codes <- prod_codes[prod_codes %in% names(map_nome)]
   
-  starter_choices <- list(
-      "Agro e alimentos" = c(
-          "Soja, mesmo triturada" = "1201",
-          "Milho" = "1005",
-          "Legumes de vagem, secos, em grão" = "0713",
-          "Produtos hortícolas congelados" = "0710",
-          "Tomates, frescos ou refrigerados" = "0702",
-          "Pepinos e pepininhos, frescos ou refrigerados" = "0707",
-          "Grãos de cereais trabalhados (flocos/partidos etc.)" = "1104",
-          "Produtos à base de cereais (expandidos/torrados)" = "1904",
-          "Produtos hortícolas preparados/conservados (exceto vinagre)" = "2005",
-          "Frutas e partes comestíveis, preparadas ou conservadas" = "2008",
-          "Águas (minerais/gaseificadas) sem açúcar" = "2201",
-          "Extratos e preparações de café/chá/mate" = "2101"
-      ),
-      
-      "Carnes e produtos de origem animal" = c(
-          "Carnes bovinas, congeladas" = "0202",
-          "Carnes bovinas, frescas ou refrigeradas" = "0201",
-          "Miudezas comestíveis (bov./suín./ovín. etc.)" = "0206",
-          "Tripas, bexigas e estômagos de animais (exceto peixes)" = "0504",
-          "Gorduras de bovinos/ovinos/caprinos (exceto 1503)" = "1502",
-          "Farinhas/pó/pellets de carnes/miudezas/peixes (impróprios p/ alimentação humana)" = "2301"
-      ),
-      
-      "Óleos e derivados" = c(
-          "Óleo de soja e frações (mesmo refinado)" = "1507"
-      ),
-      
-      "Florestais e madeira" = c(
-          "Madeira serrada/endireitada longitudinalmente (> 6mm)" = "4407",
-          "Madeira perfilada (tacos/frisos para soalhos etc.)" = "4409",
-          "Cocos/castanha do Brasil/castanha de caju (frescos ou secos)" = "0801"  # se preferir, pode mover pra Agro
-      ),
-      
-      "Metais e minerais" = c(
-          "Ouro (bruto/semimanufaturado ou em pó)" = "7108",
-          "Algodão, não cardado nem penteado" = "5201"
-      ),
-      
-      "Indústria e manufaturados" = c(
-          "Parafusos, porcas, anilhas, rebites e afins" = "7318",
-          "Rolamentos (esferas/roletes/agulhas)" = "8482",
-          "Papel/pasta para higiene e toucador" = "4818",
-          "Vestuário feminino (conjuntos/vestidos/saias/calças etc.)" = "6204",
-          "Malas, maletas, estojos e bolsas" = "4202",
-          "Preparações e artigos farmacêuticos" = "3006"
-      )
-  )
+  starter_choices <- param$starter_choices
+  if (is.null(starter_choices) || length(starter_choices) == 0) {
+      stop()
+  }
   
   # ordena alfabeticamente dentro de cada categoria
   starter_choices <- lapply(starter_choices, function(x) x[order(tolower(names(x)))])
