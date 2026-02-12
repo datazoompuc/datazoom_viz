@@ -22,6 +22,10 @@ dat <- inner_join(
 saveRDS(dat, file = "data/comex_munic_raw.rds")
 dat <- readRDS(file = "data/comex_munic_raw.rds")
 
+# -------------------------------
+# AUXILIARES
+# -------------------------------
+
 # gera auxiliar de código de país
 url <- "https://api-comexstat.mdic.gov.br/general/filters/country?language=pt"
 resp <- GET(url)
@@ -45,7 +49,49 @@ saveRDS(aux1, "data/auxiliar_cod_pais.rds")
 aux1 <- readRDS("data/auxiliar_cod_pais.rds")
 
 
+# gera auxiliar de cod sh4
+
+url <- "https://api-comexstat.mdic.gov.br/cities/filters/heading?language=pt"
+resp <- GET(url)
+stop_for_status(resp)
+
+txt <- content(resp, as = "text", encoding = "UTF-8")
+obj <- fromJSON(txt, simplifyDataFrame = TRUE)
+
+d <- obj$data
+if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
+
+aux2 <- as_tibble(d) %>%
+    transmute(
+        CO_SH4       = str_pad(id, 4, pad = "0"),
+        NO_POR_MIN = str_trim(str_remove(text, "^\\d{4}\\s*-\\s*"))
+    ) %>%
+    distinct(CO_SH4, .keep_all = TRUE)
+saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
+
+
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
+
+# gera auxiliar de código de município
+url <- "https://api-comexstat.mdic.gov.br/cities/filters/city?language=pt"
+resp <- GET(url)
+stop_for_status(resp)
+
+txt <- content(resp, as = "text", encoding = "UTF-8")
+obj <- fromJSON(txt, simplifyDataFrame = TRUE)
+
+d <- obj$data
+if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
+
+aux3 <- as_tibble(d) %>%
+    transmute(
+        codigo = str_pad(as.character(id), 7, pad = "0"),  # município costuma ser 7 dígitos (IBGE)
+        nome   = text
+    ) %>%
+    distinct(codigo, .keep_all = TRUE)
+
+saveRDS(aux3, "data/auxiliar_cod_municipais.rds")
+
 aux3 <- readRDS("data/auxiliar_cod_municipais.rds")
 
 #dat$cod_pais <- as.numeric(dat$cod_pais)
@@ -100,9 +146,9 @@ dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio + uf, dat, sum)
 
 dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
-dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH4_POR, aux2$CO_SH4))
+# dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_POR_MIN, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
-dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
+# dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
 dat$uf <- NULL
 
 data_val <- dat
@@ -114,12 +160,12 @@ datafinal_val_sh2 <- reshape(data_val, idvar = c("time", "group"), timevar = "ty
 
 labl <- colnames(datafinal_val_munic)
 labl <- labl[-c(1,2)]
-labl <- substr(labl, 7, 100)
+labl <- sub("^value\\.", "", labl)   # remove prefixo sem truncar
 colnames(datafinal_val_munic) <- c("time", "group", labl)
 
 labl <- colnames(datafinal_val_sh2)
 labl <- labl[-c(1,2)]
-labl <- substr(labl, 7, 100)
+labl <- sub("^value\\.", "", labl)   # remove prefixo sem truncar
 colnames(datafinal_val_sh2) <- c("time", "group", labl)
 
 datafinal_val_munic[is.na(datafinal_val_munic)] <- 0
@@ -127,6 +173,9 @@ datafinal_val_sh2[is.na(datafinal_val_sh2)] <- 0
 
 datafinal_val_munic <- datafinal_val_munic[order(datafinal_val_munic$group, datafinal_val_munic$time),]
 datafinal_val_sh2 <- datafinal_val_sh2[order(datafinal_val_sh2$group, datafinal_val_sh2$time),]
+
+stopifnot(!anyDuplicated(names(datafinal_val_sh2)))
+stopifnot(!anyDuplicated(names(datafinal_val_munic)))
 
 saveRDS(datafinal_val_munic, "data/comex_exp_munic_sh4.rds")
 saveRDS(datafinal_val_sh2, "data/comex_exp_sh4_munic.rds")

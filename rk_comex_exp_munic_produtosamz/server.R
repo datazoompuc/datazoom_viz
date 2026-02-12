@@ -12,39 +12,134 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
   
   # Carrega dados
-  df <- readRDS(files$db_file) %>% 
-    select(time, group, starts_with("Cocos"), 
-           starts_with("Madeira"), starts_with("Cacau")) %>% 
-    right_join(tidyr::expand(., time, group))
+  df <- readRDS(files$db_file)
   
-  if(param$lang){
-      #translating the column names from the dataframe
-      df <- df %>%
-          rename("Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" = "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
-                 "Whole or broken cocoa, raw or roasted" = "Cacau inteiro ou partido, em bruto ou torrado",
-                 "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" = "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada")
-      
-      #translating the names from the param$table
-      param$table <- param$table %>% 
-          mutate(var = case_when(
-              var == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled",
-              var == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
-              var == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
-              TRUE ~ var
-              ),
-              label = case_when(
-                  label == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ,
-                  label == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
-                  label == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
-                  TRUE ~ label
-              )
-           )
-  }
-   
   df[is.na(df)] <- 0
+  
+  # --- auxiliar: CO_SH4 -> label --
+  aux_sh4 <- readRDS(files$aux_file)
+  stopifnot(all(c("CO_SH4", "NO_POR_MIN") %in% names(aux_sh4)))
+  
+  aux_sh4$CO_SH4 <- sprintf("%04d", as.numeric(aux_sh4$CO_SH4))
+  map_nome <- stats::setNames(aux_sh4$NO_POR_MIN, aux_sh4$CO_SH4)
+  
+  # colunas de produto
+  prod_codes <- setdiff(names(df), c("time", "group"))
+  
+  # mantém só os códigos que existem no auxiliar
+  prod_codes <- prod_codes[prod_codes %in% names(map_nome)]
+  
+  starter_choices <- list(
+      "Agro e alimentos" = c(
+          "Soja, mesmo triturada" = "1201",
+          "Milho" = "1005",
+          "Legumes de vagem, secos, em grão" = "0713",
+          "Produtos hortícolas congelados" = "0710",
+          "Tomates, frescos ou refrigerados" = "0702",
+          "Pepinos e pepininhos, frescos ou refrigerados" = "0707",
+          "Grãos de cereais trabalhados (flocos/partidos etc.)" = "1104",
+          "Produtos à base de cereais (expandidos/torrados)" = "1904",
+          "Produtos hortícolas preparados/conservados (exceto vinagre)" = "2005",
+          "Frutas e partes comestíveis, preparadas ou conservadas" = "2008",
+          "Águas (minerais/gaseificadas) sem açúcar" = "2201",
+          "Extratos e preparações de café/chá/mate" = "2101"
+      ),
+      
+      "Carnes e produtos de origem animal" = c(
+          "Carnes bovinas, congeladas" = "0202",
+          "Carnes bovinas, frescas ou refrigeradas" = "0201",
+          "Miudezas comestíveis (bov./suín./ovín. etc.)" = "0206",
+          "Tripas, bexigas e estômagos de animais (exceto peixes)" = "0504",
+          "Gorduras de bovinos/ovinos/caprinos (exceto 1503)" = "1502",
+          "Farinhas/pó/pellets de carnes/miudezas/peixes (impróprios p/ alimentação humana)" = "2301"
+      ),
+      
+      "Óleos e derivados" = c(
+          "Óleo de soja e frações (mesmo refinado)" = "1507"
+      ),
+      
+      "Florestais e madeira" = c(
+          "Madeira serrada/endireitada longitudinalmente (> 6mm)" = "4407",
+          "Madeira perfilada (tacos/frisos para soalhos etc.)" = "4409",
+          "Cocos/castanha do Brasil/castanha de caju (frescos ou secos)" = "0801"  # se preferir, pode mover pra Agro
+      ),
+      
+      "Metais e minerais" = c(
+          "Ouro (bruto/semimanufaturado ou em pó)" = "7108",
+          "Algodão, não cardado nem penteado" = "5201"
+      ),
+      
+      "Indústria e manufaturados" = c(
+          "Parafusos, porcas, anilhas, rebites e afins" = "7318",
+          "Rolamentos (esferas/roletes/agulhas)" = "8482",
+          "Papel/pasta para higiene e toucador" = "4818",
+          "Vestuário feminino (conjuntos/vestidos/saias/calças etc.)" = "6204",
+          "Malas, maletas, estojos e bolsas" = "4202",
+          "Preparações e artigos farmacêuticos" = "3006"
+      )
+  )
+  
+  # ordena alfabeticamente dentro de cada categoria
+  starter_choices <- lapply(starter_choices, function(x) x[order(tolower(names(x)))])
+  
+  # pega os códigos usados nas escolhas (valores do vetor)
+  starter_codes <- unique(unname(unlist(starter_choices)))
+  
+  # garante formato "0000"
+  starter_codes <- sprintf("%04d", as.integer(starter_codes))
+                           
+  # filtra para só códigos que existem no df e no auxiliar
+  starter_codes <- intersect(starter_codes, prod_codes)
+  
+  # remove dos choices qualquer item cujo código não exista
+  starter_choices <- lapply(starter_choices, function(x) x[x %in% starter_codes])
+  starter_choices <- starter_choices[lengths(starter_choices) > 0]
+  
+  
+  df <- df %>% select(time, group, all_of(starter_codes))
+  df[is.na(df)] <- 0
+  
+  # if(param$lang){
+  #     #translating the column names from the dataframe
+  #     df <- df %>%
+  #         rename("Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" = "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados",
+  #                "Whole or broken cocoa, raw or roasted" = "Cacau inteiro ou partido, em bruto ou torrado",
+  #                "Raw wood, whether or not stripped of bark or sapwood, or roughly squared" = "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada")
+  #     
+  #     #translating the names from the param$table
+  #     param$table <- param$table %>% 
+  #         mutate(var = case_when(
+  #             var == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled",
+  #             var == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
+  #             var == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
+  #             TRUE ~ var
+  #             ),
+  #             label = case_when(
+  #                 label == "Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados" ~ "Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled" ,
+  #                 label == "Cacau inteiro ou partido, em bruto ou torrado" ~ "Whole or broken cocoa, raw or roasted",
+  #                 label == "Madeira em bruto, mesmo descascada, desalburnada ou esquadriada" ~ "Raw wood, whether or not stripped of bark or sapwood, or roughly squared",
+  #                 TRUE ~ label
+  #             )
+  #          )
+  # }
+   
+
   
   server <- function(input, output, session) {
     
+      observeEvent(TRUE, {
+          query <- parseQueryString(session$clientData$url_search)
+          
+          selected_x <- if (!is.null(query[["x"]]) && query[["x"]] %in% starter_codes) query[["x"]] else starter_codes[1]
+          
+          updateSelectInput(
+              session, "x",
+              choices = starter_choices,
+              selected = selected_x
+          )
+      }, once = TRUE)
+      
+      
     # Cria opções para seleção de grupos
     param$filter_choices <- sort(unique(df$group))
     param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
@@ -64,43 +159,43 @@ get_server <- function(files, param) {
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
-      q_string <- paste0("?", "x=", input$x)
+      q_string <- paste0("?", "x=", URLencode(input$x, reserved = TRUE))
       updateQueryString(q_string, mode = "replace")
     }
 
     # Função para atualizar inputs a partir da URL
-    update_my_inputs <- function() {
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-
-      if (!is.null(query[["x"]])) {
-        # se tem x na url atribui valor ao selecinput x
-        updateSelectInput(session, "x",
-          choices = param$x_choices$Comex,
-          selected = query[["x"]]
-        )
-      }
-
-    }
+    # update_my_inputs <- function() {
+    #   # Pega parametros da url e atribui aos selectinputs
+    #   query <- parseQueryString(session$clientData$url_search)
+    # 
+    #   if (!is.null(query[["x"]])) {
+    #     # se tem x na url atribui valor ao selecinput x
+    #     updateSelectInput(session, "x",
+    #       choices = param$x_choices$Comex,
+    #       selected = query[["x"]]
+    #     )
+    #   }
+    # 
+    # }
 
 
     # Output título do gráfico
     output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "") {
-        text <- param$label_no_variable
-      } else {
-        # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
-
-        text <- paste0(param$ranking_intro, x_col$label)
-      }
-
-      text
+        param$plot_title
     })
+    
+    
     output$plot_subtitle <- renderText({
-      param$label_amazon
+        if (is.null(input$x) || input$x == "") return("")
+        
+        cod <- sprintf("%04d", as.integer(input$x))
+        nome <- unname(map_nome[cod])
+        
+        if (is.na(nome) || nome == "") {
+            paste0("SH4 ", cod)
+        } else {
+            paste0(nome, " (SH4 ", cod, ")")
+        }
     })
 
     # Output gráfico
@@ -120,13 +215,11 @@ get_server <- function(files, param) {
             stop()
           }
             
-
-          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == input$x), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
-          slider_col <- param$table[which(param$table$var == param$slider_def), ]
-          text_col <- param$table[which(param$table$var == param$text_def), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
+          
+          x_label <- unname(map_nome[input$x])
+          if (is.na(x_label) || x_label == "") x_label <- input$x
+          
+          top_n <- 5
 
           # Cria coluna vazia para o ranking
           y_col <- list()
@@ -134,59 +227,50 @@ get_server <- function(files, param) {
           y_col$label <- "Ranking"
 
           df_p <- data.frame(
-            df[x_col$var],
-            NA,
-            df[color_col$var],
-            df[slider_col$var],
-            df["group"],
-            df["group"],
-            df[id_col$var]
+              x      = df[[input$x]],
+              slider = df[[param$slider_def]],
+              text   = df[["group"]],
+              group  = df[["group"]],
+              id     = df[[param$id_def]],
+              stringsAsFactors = FALSE
           )
 
-          colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
 
-          # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
-          if (nrow(df_p) < 1) {
-            fig <- plotly_empty()
-            stop()
-          }
+          if (nrow(df_p) < 1) return(plotly_empty())
 
-          # Filtra sem grupo
-          df_p <- df_p[which(df_p$group != " - "), ]
-
-          # Ordena base por variável de ranking e preenche y
+          df_p$color <- df_p$group
+          df_p$text  <- df_p$group
+          
+          
           df_p <- df_p %>%
-            group_by(slider) %>% # para cada ano
-            mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
-            arrange(y, .by_group = TRUE) # ordena por rank e ano
+              filter(group != " - ") %>%
+              mutate(x = dplyr::coalesce(x, 0)) %>%
+              group_by(slider) %>%
+              mutate(
+                  total_ano = sum(x, na.rm = TRUE),
+                  pct_ano   = if_else(total_ano > 0, 100 * x / total_ano, 0)
+              ) %>%
+              slice_max(order_by = x, n = top_n, with_ties = FALSE) %>%
+              arrange(desc(x), .by_group = TRUE) %>%
+              mutate(y = row_number()) %>%
+              ungroup()
+          
 
-          # Se o rank for NA coloca para o final do ranking e zera x
-          df_p$y[is.na(df_p$y)] <- max(df_p$y) + 1
-          df_p$x[is.na(df_p$x)] <- 0
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
 
-          # Deixa somente grupos que tem rank <n em algum momento
-          top_n <- 5
-          top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
-          df_p <- df_p %>% filter(group %in% top_groups)
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            x_col$label, ": ", format(df_p$x, scientific = FALSE,
+            param$x_label, " : ", "<b>",format(df_p$x, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            color_col$label, ": ", df_p$color
+                                      big.mark = "."), "</b><br>",
+            param$pct_anual, "<b>", format(round(df_p$pct_ano, 2), nsmall = 2, decimal.mark = ","), "%</b><br>",
+            y_col$label, ": ", df_p$y, "<br>"
           )
 
           # Define paleta de cores
@@ -343,7 +427,8 @@ get_server <- function(files, param) {
           tooltip <- list(
             bordercolor = "rgba(255, 255, 255, 1)",
             bgopacity = "0.5",
-            font = f1
+            font = f1,
+            align = "left"
           )
 
           # Aplica layout
@@ -353,7 +438,7 @@ get_server <- function(files, param) {
               xaxis = x_axis_layout,
               yaxis = y_axis_layout,
               showlegend = TRUE,
-              legend = list(title = list(text = color_col$label)),
+              legend = list(title = list(text = param$table$label[param$table$var == param$color_def])),
               hoverlabel = tooltip
             )
 
@@ -387,11 +472,11 @@ get_server <- function(files, param) {
       bindCache(input$x)
 
     # Observa eventos
-    observe({
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-      update_my_inputs()
-    })
+    # observe({
+    #   # Pega parametros da url e atribui aos selectinputs
+    #   query <- parseQueryString(session$clientData$url_search)
+    #   update_my_inputs()
+    # })
   }
 
   # Retorna objeto server

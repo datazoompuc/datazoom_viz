@@ -1,5 +1,5 @@
 # Cache
-cache_folder <- "./cache/app_rk_comex_exp_munic_produtosamz/"
+cache_folder <- "rk_comex_exp_munic_produtosamz/cache/"
 shinyOptions(cache = cachem::cache_disk(cache_folder))
 
 # Carrega bibliotecas
@@ -11,12 +11,13 @@ library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk_comex_exp_munic_produtosamz/ui.R"
-files$server_script <- "scripts/rk_comex_exp_munic_produtosamz/server.R"
-files$param_script <- "scripts/rk_comex_exp_munic_produtosamz/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/comex_exp_sh4_munic_dic.csv"
-files$db_file <- "data/comex_exp_sh4_munic.rds"
+files$ui_script <- "rk_comex_exp_munic_produtosamz/ui.R"
+files$server_script <- "rk_comex_exp_munic_produtosamz/server.R"
+files$param_script <- "rk_comex_exp_munic_produtosamz/db_params.R"
+files$CSS_script <- "global/dza_lumen.css"
+files$param_file <- "rk_comex_exp_munic_produtosamz/comex_exp_sh4_munic_dic.csv"
+files$db_file <- "rk_comex_exp_munic_produtosamz/comex_exp_sh4_munic.rds"
+files$aux_file <- "rk_comex_exp_munic_produtosamz/auxiliar_cod_sh4.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -40,15 +41,14 @@ param$plot_desc <- "municípios que mais exportam produtos da Amazônia Legal"
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
-param$x_choices$Comex <- list(param$x_choices$Comex$`Cocos, castanha do Brasil e castanha de caju, frescos ou secos, mesmo sem casca ou pelados`, 
-                              param$x_choices$Comex$`Cacau inteiro ou partido, em bruto ou torrado`,
-                              param$x_choices$Comex$`Madeira em bruto, mesmo descascada, desalburnada ou esquadriada`
-                              )
+
+
 #Mudanças específicas no server
 param$label_no_variable<- paste0("Variável não selecionada")
-param$x_label<- "Valor"
-param$ranking_intro<- "Ranking de "
-param$label_amazon<- paste0("Amazônia Legal")
+param$x_label<- "Valor (US$ FOB)"
+param$plot_title<- "Ranking de exportação por município"
+param$pct_anual <- "Participação no ano: "
+# param$label_amazon<- paste0("Amazônia Legal")
 
 #Mudanças específicas no UI
 
