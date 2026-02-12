@@ -506,7 +506,7 @@ get_server <- function(files, param) {
                   legend = list(title = list(text = color_col$label)),
                   hoverlabel = tooltip
               ) %>%
-              config(
+              plotly::config(
                   displaylogo = FALSE,
                   modeBarButtonsToRemove = c(
                       "lasso2d",
