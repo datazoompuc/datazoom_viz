@@ -51,25 +51,37 @@ aux1 <- readRDS("data/auxiliar_cod_pais.rds")
 
 # gera auxiliar de cod sh4
 
-url <- "https://api-comexstat.mdic.gov.br/cities/filters/heading?language=pt"
-resp <- GET(url)
-stop_for_status(resp)
+fetch_heading <- function(language = c("pt","en")) {
+    language <- match.arg(language)
+    url <- paste0("https://api-comexstat.mdic.gov.br/cities/filters/heading?language=", language)
+    
+    resp <- GET(url)
+    stop_for_status(resp)
+    
+    txt <- content(resp, as = "text", encoding = "UTF-8")
+    obj <- fromJSON(txt, simplifyDataFrame = TRUE)
+    
+    d <- obj$data
+    if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
+    
+    as_tibble(d) %>%
+        transmute(
+            CO_SH4 = str_pad(id, 4, pad = "0"),
+            label  = str_trim(str_remove(text, "^\\d{4}\\s*-\\s*"))
+        ) %>%
+        distinct(CO_SH4, .keep_all = TRUE)
+}
 
-txt <- content(resp, as = "text", encoding = "UTF-8")
-obj <- fromJSON(txt, simplifyDataFrame = TRUE)
+aux_pt <- fetch_heading("pt") %>% rename(NO_POR_MIN = label)
+aux_en <- fetch_heading("en") %>% rename(NO_ENG_MIN = label)
 
-d <- obj$data
-if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
-
-aux2 <- as_tibble(d) %>%
-    transmute(
-        CO_SH4       = str_pad(id, 4, pad = "0"),
-        NO_POR_MIN = str_trim(str_remove(text, "^\\d{4}\\s*-\\s*"))
-    ) %>%
-    distinct(CO_SH4, .keep_all = TRUE)
-saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
+aux_bi <- aux_pt %>%
+    left_join(aux_en, by = "CO_SH4") %>%
+    # fallback: se não vier inglês pra algum item, usa pt
+    mutate(NO_ENG_MIN = if_else(is.na(NO_ENG_MIN) | NO_ENG_MIN == "", NO_POR_MIN, NO_ENG_MIN))
 
 
+saveRDS(aux_bi, "data/auxiliar_cod_sh4.rds")
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
 
 # gera auxiliar de código de município
