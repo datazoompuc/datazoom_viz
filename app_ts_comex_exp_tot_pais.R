@@ -16,6 +16,7 @@ files$CSS_script <- "global/dza_lumen.css"
 
 files$param_file <- "ts_comex_exp_tot_pais/comex_exp_tot_pais_dic.csv"
 files$db_file <- "ts_comex_exp_tot_pais/comex_exp_tot_pais.rds"
+files$aux_file <- "ts_comex_exp_tot_pais/indice_precos_anual.csv"
 
 # Carrega scripts
 source(files$param_script)
