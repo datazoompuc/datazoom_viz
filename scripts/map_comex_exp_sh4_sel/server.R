@@ -1,8 +1,38 @@
 # -------------------------------- Define lógica do server --------------------------------
 
 # Paleta de cores
-pallete_discrete <- c("#fcff84", "#ffcf48", "#c3ff83", "#007e47", "#00596d", "#4fdf94", "#99b0c8", "#261c4e", "#000098", "#c368b1", "#60458c", "#757575")
-pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "#33638d", "#287d8e", "#238a8d", "#1f968b", "#20a387", "#29af7f", "#3cbb75", "#55c667", "#73d055", "#95d840", "#b8de29", "#dce319", "#fde725") # Viridis
+pallete_discrete <- c(
+  "#fcff84", 
+  "#ffcf48",
+  "#c3ff83", 
+  "#007e47",  
+  "#00596d",  
+  "#4fdf94",  
+  "#8b5a2b",  
+  "#261c4e",  
+  "#000098",
+  "#c368b1",
+  "#60458c",
+  "#f2e5c4")
+pallete_continuous <- c(
+  "#440154",
+  "#481567",
+  "#453781",
+  "#404788",
+  "#39568c",
+  "#33638d",
+  "#287d8e",
+  "#238a8d",
+  "#1f968b",
+  "#20a387",
+  "#29af7f",
+  "#3cbb75",
+  "#55c667",
+  "#73d055",
+  "#95d840",
+  "#b8de29",
+  "#dce319",
+  "#fde725") # Viridis
 pallete_discrete <- rev(pallete_discrete)
 pallete_continuous <- rev(pallete_continuous)
 
@@ -547,10 +577,9 @@ get_server <- function(files, param) {
       ratio_compat = if_else(same_prod, 1, ratio_compat),
       
       classe_ratio = case_when(
-        is.na(ratio_compat) ~ NA_character_,
-        same_prod ~ "Mesmo produto",
-        ratio_compat < 1 ~ "Principal produto não compatível",
-        ratio_compat >= 1 ~ "Principal produto compatível"
+        is.na(produto_principal_resto) ~ NA_character_,
+        !is.na(produto_principal_forest) ~ "Principal produto compatível",
+        TRUE ~ "Principal produto não compatível"
       ),
       
       produto_principal = produto_principal_resto,
@@ -559,7 +588,6 @@ get_server <- function(files, param) {
       nome_sh2 = factor(
         classe_ratio,
         levels = c(
-          "Mesmo produto",
           "Principal produto não compatível",
           "Principal produto compatível"
         )
@@ -663,9 +691,9 @@ get_server <- function(files, param) {
         pal <- colorFactor(
           palette = pallete_discrete[1:3],
           domain  = c(
-            "Mesmo produto",
             "Principal produto não compatível",
-            "Principal produto compatível"
+            "Principal produto compatível",
+            "NA"
           ),
           na.color = "#cccccc"
         )
