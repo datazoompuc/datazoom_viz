@@ -310,7 +310,7 @@ get_server <- function(files, param) {
         
         #  Configura botões do plotly
         fig_p <- fig_p %>%
-          config(
+          plotly::config(
             #toImageButtonOptions = list(format = "svg"),
             displaylogo = FALSE,
             modeBarButtonsToRemove = c(

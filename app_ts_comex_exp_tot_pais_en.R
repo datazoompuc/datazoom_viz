@@ -8,14 +8,15 @@ library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_comex_exp_tot_pais/ui.R"
-files$server_script <- "scripts/ts_comex_exp_tot_pais/server.R"
-files$param_script <- "scripts/ts_comex_exp_tot_pais/db_params.R"
+files$ui_script <- "ts_comex_exp_tot_pais/ui.R"
+files$server_script <- "ts_comex_exp_tot_pais/server.R"
+files$param_script <- "ts_comex_exp_tot_pais/db_params.R"
 
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 
-files$param_file <- "data/comex_exp_tot_pais_dic_en.csv"
-files$db_file <- "data/comex_exp_tot_pais.rds"
+files$param_file <- "ts_comex_exp_tot_pais/comex_exp_tot_pais_dic_en.csv"
+files$db_file <- "ts_comex_exp_tot_pais/comex_exp_tot_pais.rds"
+files$aux_file <- "ts_comex_exp_tot_pais/indice_precos_anual.csv"
 
 # Carrega scripts
 source(files$param_script)
@@ -32,7 +33,6 @@ param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$lang <- TRUE
-
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "External trade in the Brazilian Legal Amazon (COMEX): Total export value of products by destination country"

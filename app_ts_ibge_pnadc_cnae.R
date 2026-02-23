@@ -4,15 +4,16 @@ library(ggplot2)
 library(plotly)
 library(htmlwidgets)
 library(shinyWidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_ibge_pnadc_cnae/ui.R"
-files$server_script <- "scripts/ts_ibge_pnadc_cnae/server.R"
-files$param_script <- "scripts/ts_ibge_pnadc_cnae/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/ibge_pnadc_cnae_dic.csv"
-files$db_file <- "data/ibge_pnadc_cnae.rds"
+files$ui_script <- "ts_ibge_pnadc_cnae/ui.R"
+files$server_script <- "ts_ibge_pnadc_cnae/server.R"
+files$param_script <- "ts_ibge_pnadc_cnae/db_params.R"
+files$CSS_script <- "global/dza_lumen.css"
+files$param_file <- "ts_ibge_pnadc_cnae/ibge_pnadc_cnae_dic.csv"
+files$db_file <- "ts_ibge_pnadc_cnae/ibge_pnadc_cnae.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -35,9 +36,9 @@ param$plot_desc <- "Dados sobre atividades econ\u00f4micas gerados a partir da P
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "eixo vertical (y)"
-param$label_scale_name <- "escala log"
-param$label_prop_name <- "proporcional ao trimestre inicial (*)"
+param$label_y_name <- "Eixo vertical"
+param$label_scale_name <- "Escala log"
+param$label_prop_name <- "Proporcional ao trimestre inicial"
 param$label_region_name <- "Recorte regional"
 param$label_type_name <- "Atividade econômica"
 param$label_sector_name <- "Setor"

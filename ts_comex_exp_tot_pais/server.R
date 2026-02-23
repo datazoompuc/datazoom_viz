@@ -16,7 +16,7 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file)
     
     # Carrega índice de preços anual
-    indice <- read.csv("data/indice_precos_anual.csv",
+    indice <- read.csv(files$aux_file,
                        stringsAsFactors = FALSE)
     
     # Garante tipos e nomes compatíveis com o df principal
@@ -553,7 +553,7 @@ get_server <- function(files, param) {
 
           #  Configura botões do plotly
           fig_p <- fig_p %>%
-            config(
+              plotly::config(
               # toImageButtonOptions = list(format = "svg"),
               displaylogo = FALSE,
               modeBarButtonsToRemove = c(
