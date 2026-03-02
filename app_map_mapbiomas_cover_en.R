@@ -14,12 +14,12 @@ library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "map_mapbiomas_cover_en/ui.R"
-files$server_script <- "map_mapbiomas_cover_en/server.R"
-files$param_script <- "map_mapbiomas_cover_en/db_params.R"
+files$ui_script <- "map_mapbiomas_cover/ui.R"
+files$server_script <- "map_mapbiomas_cover/server.R"
+files$param_script <- "map_mapbiomas_cover/db_params.R"
 files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "map_mapbiomas_cover_en/dic_en.csv"
-files$db_file <- "map_mapbiomas_cover_en/mapbiomas_cobertura.parquet"
+files$param_file <- "map_mapbiomas_cover/dic_en.csv"
+files$db_file <- "map_mapbiomas_cover/mapbiomas_cobertura.parquet"
 files$shapefile <- "global/munic_shapefile.rds"
 files$legal_amazon <- "global/legal_amazon_boundary.rds"
 files$states_boundary <- "global/states_boundary.rds"
