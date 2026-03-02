@@ -3,17 +3,18 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_saude_municipality/ui.R"
-files$server_script <- "scripts/ts_saude_municipality/server.R"
-files$param_script <- "scripts/ts_saude_municipality/db_params.R"
+files$ui_script <- "ts_saude_municipality/ui.R"
+files$server_script <- "ts_saude_municipality/server.R"
+files$param_script <- "ts_saude_municipality/db_params.R"
 
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 
-files$param_file <- "data/saude_municipality_dic_en.csv"
-files$db_file <- "data/saude_municipality.rds"
+files$param_file <- "ts_saude_municipality/saude_municipality_dic_en.csv"
+files$db_file <- "ts_saude_municipality/saude_municipality.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -35,15 +36,20 @@ param$plot_desc <- "Health data at the municipal level"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"
-param$label_y_name <- "vertical axis (y)"
-param$label_log_name <-  "log scale"
-param$label_prop_name <-  "proportional to the initial year (*)"
-param$label_uf_name <-  "State"
+param$label_y_name <- "Selected variable"
+param$label_log_name <-  "Log scale"
+param$label_prop_name <-  "Proportional to the initial year"
+param$label_uf_name <-  "States"
 param$label_geo_name <- "Municipalities"
 param$link <- "https://datazoom.shinyapps.io/app_ts_saude_municipality_en/"
+param$label_aggregate_name <- "Aggregate by state"
+param$label_municipal <- "By municipality"
+param$label_state <- "Aggregated by state"
+param$stitle_init <- "by Municipality "
 
 ### Parametros especificos no server
 param$stitle_init <- "by Municipality " # expressão titulo
+param$label_and <- " and "
 
 
 # Outros parâmetros e configurações

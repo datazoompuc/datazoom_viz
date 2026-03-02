@@ -49,7 +49,7 @@ get_server <- function(files, param) {
       q_string <- paste0(
         "?", "y=", input$y,
         "&", "ylog=", input$ylog,
-        "&", "y_option=", input$y_option
+        "&", "y_index_base=", input$y_index_base
       )
 
       for (i in input$uf) {
@@ -89,9 +89,9 @@ get_server <- function(files, param) {
         )
       }
 
-      if (!is.null(query[["y_option"]])) {
-        updateCheckboxInput(session, "y_option",
-          value = (query[["y_option"]] == "TRUE")
+      if (!is.null(query[["y_index_base"]])) {
+        updateCheckboxInput(session, "y_index_base",
+          value = (query[["y_index_base"]] == "TRUE")
         )
       }
 
@@ -131,27 +131,47 @@ get_server <- function(files, param) {
         y_col <- param$table[which(param$table$var == input$y), ]
 
         text <- paste0("", y_col$label)
-        if (input$y_option) {
+        if (input$y_index_base) {
           text <- paste0("", y_col$label, "*")
         }
       }
 
       text
     })
+    
     output$plot_subtitle <- renderText({
-      
-      
-      
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        text <- paste0(param$title_init)
-      }
-
-      text
+        
+        if (is.null(input$y) || input$y == "") return(" ")
+        
+        subtitles <- c()
+        
+        # Nível geográfico (municipal ou estadual)
+        level_text <- if (input$aggregate_state) {
+            param$label_state  # "estadual" ou "state"
+        } else {
+            param$label_municipal  # "municipal"
+        }
+        
+        subtitles <- c(subtitles, level_text)
+        
+        # Botões ativos (podem coexistir)
+        if (isTRUE(input$y_index_base)) {
+            subtitles <- c(subtitles, param$label_prop_name)
+        }
+        
+        if (isTRUE(input$ylog)) {
+            subtitles <- c(subtitles, param$label_log_name)
+        }
+        
+        # Se algum botão estiver ativo, junta os labels
+        if (length(subtitles) > 0) {
+            return(paste(subtitles, collapse = param$label_and))
+        }
+        
+        # Caso padrão
+        param$stitle_init
     })
-
+    
     observe({
       selected_filter <- input$filter1
       updateSelectInput(session,
@@ -183,15 +203,34 @@ get_server <- function(files, param) {
           color_col <- param$table[which(param$table$var == param$color_def), ]
 
           # Filtra dataframe com grupos selecionados
-          df_filtered <- df[which(df$municipio %in% input$filter1), ]
+          df_filtered <- reactive({
+              if (input$aggregate_state) {
+                  # Modo agregado por estado: filtra por UF e agrega
+                  df_uf <- df[which(df$sigla_uf %in% input$uf), ]
+                  
+                  # Agrega por estado e ano
+                  df_uf %>%
+                      group_by(ano, sigla_uf) %>%
+                      summarise(
+                          across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),
+                          municipio = first(sigla_uf),  # Para manter compatibilidade com o código existente
+                          nome_uf = first(nome_uf),     # Mantém o nome do estado
+                          regiao = first(regiao),       # Mantém a região
+                          .groups = "drop"
+                      )
+              } else {
+                  # Modo normal: filtra por municípios selecionados
+                  df[which(df$municipio %in% input$filter1), ]
+              }
+          })
 
           df_p <- data.frame(
-            df_filtered[x_col$var],
-            df_filtered[y_col$var],
-            df_filtered[color_col$var]
+              df_filtered()[x_col$var],     
+              df_filtered()[y_col$var],
+              df_filtered()[color_col$var]
           )
           colnames(df_p) <- c("x", "y", "color")
-          df_p$municipio <- df_filtered$municipio
+          df_p$municipio <- df_filtered()$municipio  
           df_p$text <- df_p$municipio
 
           # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
@@ -204,14 +243,14 @@ get_server <- function(files, param) {
           }
 
           # Alternativa de medida para y
-          if (input$y_option & is.numeric(df_p$y)) {
+          if (input$y_index_base & is.numeric(df_p$y)) {
             df_p <- df_p %>%
               group_by(df_p$municipio) %>%
               mutate(
                 aux1 = first(y),
-                y_option = (y / aux1) * 100
+                y_index_base = (y / aux1) * 100
               )
-            df_p$y <- df_p$y_option
+            df_p$y <- df_p$y_index_base
           }
 
           # Se a coluna de cor for toda NA, preenche com strings em branco
@@ -267,7 +306,7 @@ get_server <- function(files, param) {
             y_axis_layout$type <- "log"
           }
 
-          if (input$y_option) {
+          if (input$y_index_base) {
             y_axis_layout$title <- paste0(y_col$label, "*")
           }
 
