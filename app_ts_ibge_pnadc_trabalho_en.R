@@ -6,12 +6,12 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "ts_ibge_pnadc_trabalho_en/ui.R"
-files$server_script <- "ts_ibge_pnadc_trabalho_en/server.R"
-files$param_script <- "ts_ibge_pnadc_trabalho_en/db_params.R"
+files$ui_script <- "ts_ibge_pnadc_trabalho/ui.R"
+files$server_script <- "ts_ibge_pnadc_trabalho/server.R"
+files$param_script <- "ts_ibge_pnadc_trabalho/db_params.R"
 files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "ts_ibge_pnadc_trabalho_en/ibge_pnadc_trabalho_dic_en.csv"
-files$db_file <- "ts_ibge_pnadc_trabalho_en/ibge_pnadc_trabalho_en.rds"
+files$param_file <- "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_dic_en.csv"
+files$db_file <- "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_en.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -50,19 +50,10 @@ param$x_choices[[1]] <- NULL
 param$y_choices[[1]] <- NULL
 param$color_choices[[1]] <- NULL
 
-##
-param$filter_choices <- list(
-    "Brazil" = list("Brazil", ""),
-    "Legal Amazon" = list("Legal Amazon", "Outside Legal Amazon"),
-    "Regions" = list("North", "Northeast", "Southeast", "South", "Central-West"),
-    "UF" = list("RO", "AC", "AM", "RO", "PA", "AP", "TO",
-                "MA", "PI", "CE", "RN", "PB", "PE", "AL",
-                "SE", "BA", "MG", "ES", "RJ", "SP", "PR",
-                "SC", "RS", "MS", "MT", "GO", "DF")
-)
+
 
 param$filter_composicao_demografica_choices <- list(
-    "All" = list("All", ""),
+    "All" = list("All"),
     "Sex" = list("Male", "Female"),
     "Age Group" = list("Between 14 and 17",
                                "Between 18 and 24",
@@ -78,7 +69,7 @@ param$filter_composicao_demografica_choices <- list(
                           "15 or more years of schooling")
 )
 
-param$filter_geo_def <- list("Legal Amazon", "Outside Legal Amazon")
+param$filter_geo_def <- c("Legal Amazon", "Outside Legal Amazon")
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)

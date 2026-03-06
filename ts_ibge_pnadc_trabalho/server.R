@@ -14,7 +14,40 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
     
+    get_uf_choices <- function(df) {
+        df %>%
+            dplyr::filter(grepl("^[A-Z]{2}$", group)) %>%
+            dplyr::distinct(group) %>%
+            dplyr::pull(group) %>%
+            sort()
+    }
+    
+    
+    get_filter_choices <- function(df, lang = FALSE) {
+        ufs <- get_uf_choices(df)
+        
+        if (isTRUE(lang)) {
+            list(
+                "Brazil" = c("Brazil"),
+                "Legal Amazon" = c("Legal Amazon", "Outside Legal Amazon"),
+                "Regions" = c("Central-West", "North", "Northeast", "South", "Southeast"),
+                "UF" = ufs
+            )
+        } else {
+            list(
+                "Brasil" = c("Brasil"),
+                "Amazônia Legal" = c("Amazônia Legal", "Fora da Amazônia Legal"),
+                "Região" = c("Centro-Oeste", "Norte", "Nordeste", "Sul", "Sudeste"),
+                "UF" = ufs
+            )
+        }
+    }
+    
+    filter_choices <- get_filter_choices(df, lang = param$lang)
+    
     server <- function(input, output, session) {
+        
+        
         
         # filtra dados de composicao demografica
         df_reactived <- reactive({
@@ -48,13 +81,13 @@ get_server <- function(files, param) {
             # Preenche filtro vazio
             updateSelectizeInput(session,
                                  "filter1",
-                                 choices = param$filter_choices,
+                                 choices = filter_choices,
                                  selected = param$filter_geo_def
             )
             updateSelectInput(session,
                               "filter_composicao_demografica",
                               choices = param$filter_composicao_demografica_choices,
-                              selected = "Todos"
+                              selected = names(param$filter_composicao_demografica_choices)[1]
             )
             
             # Pega parametros da url e atribui aos selectinputs
@@ -68,7 +101,7 @@ get_server <- function(files, param) {
             }
             
             if (!is.null(query[["filter_composicao"]])) {
-                updateSelectInput(session, "filter_composicao",
+                updateSelectInput(session, "filter_composicao_demografica",
                                   choices = param$filter_composicao_demografica_choices,
                                   selected = query[["filter_composicao"]]
                 )
@@ -78,7 +111,7 @@ get_server <- function(files, param) {
             if (!is.null(query[["filter"]])) {
                 updateSelectizeInput(session,
                                      "filter1",
-                                     choices = param$filter_choices,
+                                     choices = filter_choices,
                                      selected = selected
                 )
             }
