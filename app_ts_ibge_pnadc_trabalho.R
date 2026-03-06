@@ -51,24 +51,6 @@ param$y_choices[[1]] <- NULL
 param$color_choices[[1]] <- NULL
 
 
-
-param$filter_composicao_demografica_choices <- list(
-    "Todos" = list("Todos"),
-    "Sexo" = list("Homem", "Mulher"),
-    "Faixa Et\u00e1ria" = list("Entre 14 e 17 anos",
-                               "Entre 18 e 24 anos",
-                               "Entre 25 e 29 anos",
-                               "Entre 30 e 39 anos",
-                               "Entre 40 e 49 anos",
-                               "Entre 50 e 59 anos",
-                               "60 anos ou mais"),
-    "Escolaridade" = list("Sem instru\u00e7\u00e3o",
-                          "1 a 7 anos de estudo",
-                          "8 a 11 anos de estudo",
-                          "9 a 14 anos de estudo",
-                          "15 ou mais anos de estudo")
-)
-
 param$filter_geo_def <- c("Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal")
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
