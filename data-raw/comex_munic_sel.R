@@ -9,17 +9,22 @@ library(sp)
 dat <- readRDS("C:/Users/PUC/Documents/GitHub/datazoom_viz/data/comex_munic_raw.rds") %>% 
   mutate(cod_municipio = as.character(cod_municipio))
 aux <- readRDS("C:/Users/PUC/Documents/GitHub/datazoom_viz/data/auxiliar_cod_sh2.rds")
-shapefile <- readRDS("C:/Users/PUC/Documents/GitHub/datazoom_viz/global/munic_shapefile.rds")
-
+shapefile <- readRDS("C:/Users/PUC/Documents/GitHub/datazoom_viz/global/munic_shapefile.rds") %>% 
+  rename(geometry = geom)
+aux_munic <- readRDS("C:/Users/PUC/Documents/GitHub/datazoom_viz/data/auxiliar_munic_comex.rds") %>% 
+  mutate(cod_ibge = as.character(cod_ibge))
 
 
 shapefile <- shapefile %>%
-  st_as_sf(sf_column_name = "geom") %>%          
-  rename(cod_ibge = municipality_code) %>%       
-  mutate(cod_ibge = as.character(cod_ibge)) %>%  
-  filter(legal_amazon == 1) %>%                  
-  st_make_valid() %>%                            
-  st_simplify(dTolerance = 400)                  
+  st_as_sf(sf_column_name = "geometry") %>%
+  rename(cod_ibge = municipality_code) %>%
+  mutate(cod_ibge = as.character(cod_ibge)) %>%
+  filter(legal_amazon == 1) %>%          
+  select(cod_ibge, geometry) %>%             
+  st_make_valid() %>%
+  st_simplify(dTolerance = 400)
+
+              
 shapefile <- shapefile[!st_is_empty(shapefile), , drop=FALSE]
 
 
@@ -146,7 +151,11 @@ df_final <- df_final %>%
                                  change_to_relative_value(maximo_produto, time, lab),
                                  0))
 
-
+df_final <- df_final %>%
+  left_join(
+    aux_munic %>% select(cod_ibge, nm_municip, uf),
+    by = "cod_ibge"
+  )
 
 ###sh2 code and sh2 name columns
 df_final$cod_sh2 <- gsub('.{2}$', '', df_final$cod_sh4)
@@ -168,7 +177,22 @@ df_final <- df_final %>%
     aux %>% select(CO_SH2, NO_SH2_POR) %>% distinct(),
     by = c("cod_sh2" = "CO_SH2")
   ) %>%
-  rename(nome_sh2 = NO_SH2_POR)
+  rename(nome_sh2 = NO_SH2_POR) %>% 
+  
+  select(
+    cod_ibge,
+    nm_municip,
+    uf,
+    time,
+    maximo_produto,
+    produto_principal,
+    lab,
+    floresta,
+    cod_sh4,
+    cod_sh2,
+    nome_sh2
+  )
+
 
 # df_final$nome_sh2 <- ifelse(nchar(df_final$nome_sh2) >= 40,
 #                             paste0(substr(df_final$nome_sh2, 1, 40), "..."),
@@ -177,14 +201,17 @@ df_final <- df_final %>%
 
 
 # merge with shape --------------------------------------------------------
+
+
 data <- shapefile %>%
   left_join(df_final, by = "cod_ibge")
 
 
 
+
 # export ------------------------------------------------------------------
 # save simplified sf for faster maps
-cols <- colnames(data)
+
 data <- rmapshaper::ms_simplify(data, 
                                 keep_shapes = TRUE, 
                                 keep = 0.01)
@@ -409,7 +436,7 @@ data= data%>%
 }
 data$produto_principal = data$lab
 
-colnames(data) <- cols
+
 
 saveRDS(data, "C:/Users/PUC/Documents/GitHub/datazoom_viz/data/comex_exp_munic_sh4_sel.rds")
 
@@ -453,11 +480,11 @@ temp_param_table$label[temp_param_table$var == 'nome_sh2'] <- "Nome no sistema u
 temp_param_table$unidade[temp_param_table$var == 'maximo_produto'] <- "% das exporta\u00e7\u00f5es mundiais"
 
 
-temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
-temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
-temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE)
-temp_param_table$size <- c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
-temp_param_table$slider <- c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$x <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$y <- c(FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$color <- c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$size <- c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+temp_param_table$slider <- c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "C:/Users/PUC/Documents/GitHub/datazoom_viz/data/comex_exp_munic_sh4_sel_dic.csv", fileEncoding = "UTF-8")
@@ -475,5 +502,4 @@ temp_param_table$subcategoria <- "Foreign Trade"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "C:/Users/PUC/Documents/GitHub/datazoom_viz/data/comex_exp_munic_sh4_sel_dic_en.csv", fileEncoding = "UTF-8")
-
 
