@@ -227,7 +227,7 @@ describe_states <- function(df) {
                 11 ~ "RO",
                 12 ~ "AC",
                 13 ~ "AM",
-                14 ~ "RO",
+                14 ~ "RR",
                 15 ~ "PA",
                 16 ~ "AP",
                 17 ~ "TO",
@@ -332,9 +332,11 @@ dat %<>% mutate(across(where(is.character), enc2utf8))
 
 # saving data file
 
-readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
+readr::write_rds(dat, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds", compress = "gz")
 
 ## Data in English
+
+dat <- readr::read_rds("ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds")
 
 # 1. Dicionário de tradução com os caracteres exatamente como aparecem na sua base
 traducao <- c(
@@ -375,7 +377,7 @@ dat_traduzido <- dat %>%
     mutate(across(c(group, composicao_demografica, sexo, faixa_idade, faixa_educ, regiao, legal_amazon),
                   ~ recode(., !!!traducao)))
 
-readr::write_rds(dat_traduzido, "data/ibge_pnadc_trabalho_en.rds", compress = "gz")
+readr::write_rds(dat_traduzido, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_en.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##
@@ -475,7 +477,7 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
 
 ############################
 ## Dictionary -- Insercao ##
