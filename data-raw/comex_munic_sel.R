@@ -445,6 +445,21 @@ data= data%>%
 data$produto_principal = data$lab
 
 
+data <- data %>%
+  dplyr::select(
+    cod_ibge,
+    nm_municip,
+    uf,
+    time,
+    maximo_produto,
+    produto_principal,
+    lab,
+    floresta,
+    cod_sh4,
+    cod_sh2,
+    nome_sh2,
+    geometry
+  )
 
 saveRDS(data, "C:/Users/PUC/Documents/GitHub/datazoom_viz/data/comex_exp_munic_sh4_sel.rds")
 
