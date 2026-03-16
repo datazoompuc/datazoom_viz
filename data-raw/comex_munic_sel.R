@@ -123,7 +123,7 @@ agg_dat_all_selcolumns <- agg_dat_all %>%
 df_final <- rbind(agg_dat_selcolumns, agg_dat_all_selcolumns) %>% 
   data.frame() %>% 
   tibble()
-  
+
 
 #add sh4 code -------------------------------------------------------------
 df_final <- df_final %>%
@@ -204,7 +204,8 @@ df_final <- df_final %>%
 
 
 data <- shapefile %>%
-  left_join(df_final, by = "cod_ibge")
+  left_join(df_final, by = "cod_ibge") %>%
+  mutate(floresta = ifelse(floresta, "True", "False"))
 
 
 
@@ -215,6 +216,13 @@ data <- shapefile %>%
 data <- rmapshaper::ms_simplify(data, 
                                 keep_shapes = TRUE, 
                                 keep = 0.01)
+
+data <- data %>%
+  mutate(floresta = case_when(
+    floresta == "True" ~ TRUE,
+    floresta == "False" ~ FALSE,
+    TRUE ~ NA
+  ))
 
 #simplifying products' names to fit the map
 {
