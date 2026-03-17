@@ -7,14 +7,14 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk_energia_geracao_distribuida/ui.R"
-files$server_script <- "scripts/rk_energia_geracao_distribuida/server.R"
-files$param_script <- "scripts/rk_energia_geracao_distribuida/db_params.R"
+files$ui_script <- "rk_energia_geracao_distribuida/ui.R"
+files$server_script <- "rk_energia_geracao_distribuida/server.R"
+files$param_script <- "rk_energia_geracao_distribuida/db_params.R"
 
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 
-files$param_file <- "data/aneel_siga_geracao_distribuida_dic_en.csv"
-files$db_file <- "data/aneel_siga_geracao_distribuida.rds"
+files$param_file <- "rk_energia_geracao_distribuida/aneel_siga_geracao_distribuida_dic_en.csv"
+files$db_file <- "rk_energia_geracao_distribuida/aneel_siga_geracao_distribuida.rds"
 
 # Carrega scripts
 source(files$param_script)
