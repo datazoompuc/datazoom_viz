@@ -6,12 +6,12 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "ts_ibge_pnadc_trabalho_en/ui.R"
-files$server_script <- "ts_ibge_pnadc_trabalho_en/server.R"
-files$param_script <- "ts_ibge_pnadc_trabalho_en/db_params.R"
+files$ui_script <- "ts_ibge_pnadc_trabalho/ui.R"
+files$server_script <- "ts_ibge_pnadc_trabalho/server.R"
+files$param_script <- "ts_ibge_pnadc_trabalho/db_params.R"
 files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "ts_ibge_pnadc_trabalho_en/ibge_pnadc_trabalho_dic_en.csv"
-files$db_file <- "ts_ibge_pnadc_trabalho_en/ibge_pnadc_trabalho_en.rds"
+files$param_file <- "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_dic_en.csv"
+files$db_file <- "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_en.rds"
 
 # Carrega scripts
 source(files$param_script)
