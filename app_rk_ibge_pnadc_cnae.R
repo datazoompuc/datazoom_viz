@@ -10,12 +10,12 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk_ibge_pnadc_cnae/ui.R"
-files$server_script <- "scripts/rk_ibge_pnadc_cnae/server.R"
-files$param_script <- "scripts/ts_ibge_pnadc_cnae/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
-files$param_file <- "data/ibge_pnadc_cnae_rk_dic.csv"
-files$db_file <- "data/ibge_pnadc_cnae.rds"
+files$ui_script <- "rk_ibge_pnadc_cnae/ui.R"
+files$server_script <- "rk_ibge_pnadc_cnae/server.R"
+files$param_script <- "rk_ibge_pnadc_cnae/db_params.R"
+files$CSS_script <- "global/dza_lumen.css"
+files$param_file <- "rk_ibge_pnadc_cnae/ibge_pnadc_cnae_rk_dic.csv"
+files$db_file <- "rk_ibge_pnadc_cnae/ibge_pnadc_cnae.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -34,7 +34,7 @@ param$id_def <- "composicao_demografica" # variável padrão de id
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
-param$label_x_name <- "eixo horizontal (x)"
+param$label_x_name <- "Eixo horizontal (x)"
 
 param$label_region_name <- "Recorte regional"
 param$label_sector_name <- "Setor"
