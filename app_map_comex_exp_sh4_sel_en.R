@@ -32,6 +32,7 @@ param$text_def <- "group" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 param$lang <- TRUE
 param$forest <- "Forest Compatible Products"
+param$razao <- "Forest Compatible Products x Not Compatible"
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Foreign trade in the Amazon: Value of the product's export"
@@ -58,13 +59,14 @@ param$tooltip7 <- "% of the product's exports that came from the Amazon in the r
 param$legend <- "Main Product's Category"
 
 # Outros parâmetros e configurações
-param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos")
+param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos", "Produto Compatível com a Floresta x Produto Não Compatível")
 param$year_inicio <- 1997
-param$year_final <- 2021
+param$year_final <- 2024
 
 if(param$lang){
     param$x_choices[param$x_choices == "Produtos Compativeis com a Floresta"] <- "Forest Compatible Products"
     param$x_choices[param$x_choices == "Todos os Produtos"] <- "All Products"
+    param$x_choices[param$x_choices == "Produto Compatível com a Floresta x Produto Não Compatível"] <- "Forest Compatible Products x Not Compatible"
 }
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

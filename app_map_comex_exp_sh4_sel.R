@@ -32,7 +32,7 @@ param$text_def <- "group" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 param$lang <- FALSE
 param$forest <- "Produtos Compativeis com a Floresta"
-param$razao <- "Razão: Floresta / Outros produtos"
+param$razao <- "Produto Compatível com a Floresta x Produto Não Compatível"
 
 param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos"
@@ -59,13 +59,14 @@ param$tooltip7 <- "% das exportações do produto vindas da Amazônia no ano"
 param$legend <- "Categoria do Principal Produto"
 
 # Outros parâmetros e configurações
-param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos", "Razão: Floresta / Outros produtos")
+param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos", "Produto Compatível com a Floresta x Produto Não Compatível")
 param$year_inicio <- 1997
 param$year_final <- 2024
 
 if(param$lang){
     param$x_choices[param$x_choices == "Produtos Compativeis com a Floresta"] <- "Forest Compatible Products"
     param$x_choices[param$x_choices == "Todos os Produtos"] <- "All Products"
+    param$x_choices[param$x_choices == "Produto Compatível com a Floresta x Produto Não Compatível"] <- "Forest Compatible Products x Not Compatible"
 }
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------

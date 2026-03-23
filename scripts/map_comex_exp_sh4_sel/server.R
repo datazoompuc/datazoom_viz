@@ -690,7 +690,7 @@ get_server <- function(files, param) {
       
       if (input$x == param$razao) {
         pal <- colorFactor(
-          palette = pallete_discrete[1:3],
+          palette = pallete_discrete[c(1,3,5)],
           domain  = c(
             "Principal produto não compatível",
             "Principal produto compatível",
