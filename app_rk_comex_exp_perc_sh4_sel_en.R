@@ -7,12 +7,12 @@ library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "rk_comex_exp_perc_sh4_sel/ui.R"
-files$server_script <- "rk_comex_exp_perc_sh4_sel/server.R"
-files$param_script <- "rk_comex_exp_perc_sh4_sel/db_params.R"
+files$ui_script <- "scripts/rk_comex_exp_perc_sh4_sel/ui.R"
+files$server_script <- "scripts/rk_comex_exp_perc_sh4_sel/server.R"
+files$param_script <- "scripts/rk_comex_exp_perc_sh4_sel/db_params.R"
 files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "rk_comex_exp_perc_sh4_sel/comex_exp_perc_sh4_sel_dic_en.csv"
-files$db_file <- "rk_comex_exp_perc_sh4_sel/comex_exp_perc_sh4_sel.rds"
+files$param_file <- "data/comex_exp_perc_sh4_sel_dic_en.csv"
+files$db_file <- "data/comex_exp_perc_sh4_sel.rds"
 
 # Carrega scripts
 source(files$param_script)
