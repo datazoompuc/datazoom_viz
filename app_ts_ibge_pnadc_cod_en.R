@@ -6,14 +6,14 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "ts_ibge_pnadc_cod/ui.R"
-files$server_script <- "ts_ibge_pnadc_cod/server.R"
-files$param_script <- "ts_ibge_pnadc_cod/db_params.R"
+files$ui_script <- "scripts/ts_ibge_pnadc_cod/ui.R"
+files$server_script <- "scripts/ts_ibge_pnadc_cod/server.R"
+files$param_script <- "scripts/ts_ibge_pnadc_cod/db_params.R"
 
 files$CSS_script <- "global/dza_lumen.css"
 
-files$param_file <- "ts_ibge_pnadc_cod/ibge_pnadc_cod_dic_en.csv"
-files$db_file <- "ts_ibge_pnadc_cod/ibge_pnadc_cod.rds"
+files$param_file <- "data/ibge_pnadc_cod_dic_en.csv"
+files$db_file <- "data/ibge_pnadc_cod.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -38,9 +38,9 @@ param$plot_desc <- "Compiled data about type of work occupation generated from t
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"
-param$label_y_name <- "vertical axis (y)"
-param$label_scale_name <- "log scale"
-param$label_prop_name <- "proportional to the initial quarter (*)"
+param$label_y_name <- "Vertical axis (y)"
+param$label_scale_name <- "Log scale"
+param$label_prop_name <- "Proportional to the initial quarter"
 param$label_type_name <- "State - Type of occupation"
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cod_en/"
 
