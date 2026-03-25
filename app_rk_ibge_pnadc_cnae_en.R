@@ -10,17 +10,18 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "rk_ibge_pnadc_cnae/ui.R"
-files$server_script <- "rk_ibge_pnadc_cnae/server.R"
-files$param_script <- "rk_ibge_pnadc_cnae/db_params.R"
+files$ui_script <- "scripts/rk_ibge_pnadc_cnae/ui.R"
+files$server_script <- "scripts/rk_ibge_pnadc_cnae/server.R"
+files$param_script <- "scripts/ts_ibge_pnadc_cnae/db_params.R"
 files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "rk_ibge_pnadc_cnae/ibge_pnadc_cnae_rk_dic_en.csv"
-files$db_file <- "rk_ibge_pnadc_cnae/ibge_pnadc_cnae.rds"
+files$param_file <- "data/ibge_pnadc_cnae_rk_dic_en.csv"
+files$db_file <- "data/ibge_pnadc_cnae.rds"
 
 # Carrega scripts
 source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
+
 
 # Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
