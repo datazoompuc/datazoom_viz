@@ -44,7 +44,7 @@ get_ui <- function(files, param) {
                    selectizeInput(
                        "filter1",
                        param$label_geo_name,
-                       choices = param$filter_choices,
+                       choices = NULL,
                        multiple = TRUE,
                        options = list(maxItems = 20),
                        width = "100%",
