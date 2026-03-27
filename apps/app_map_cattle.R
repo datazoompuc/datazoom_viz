@@ -15,7 +15,7 @@ files <- list()
 files$ui_script <- "scripts/map_cattle/ui.R"
 files$server_script <- "scripts/map_cattle/server.R"
 files$param_script <- "scripts/map_cattle/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/censoagro_mapbiomas_gado_dic.csv"
 files$db_file <- "data/censoagro_mapbiomas_gado.rds"
 files$legal_amazon <- "data/legal_amazon_boundary.rds"

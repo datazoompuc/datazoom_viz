@@ -11,7 +11,7 @@ files$ui_script <- "scripts/ts_energia_amz_exporta/ui.R"
 files$server_script <- "scripts/ts_energia_amz_exporta/server.R"
 files$param_script <- "scripts/ts_energia_amz_exporta/db_params.R"
 
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 
 files$param_file <- "data/energia_amz_exporta_dic_en.csv"
 files$db_file <- "data/energia_amz_exporta.rds"

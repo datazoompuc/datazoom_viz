@@ -11,7 +11,7 @@ files$ui_script <- "scripts/ts_mapbiomas_transicao/ui.R"
 files$server_script <- "scripts/ts_mapbiomas_transicao/server.R"
 files$param_script <- "scripts/ts_mapbiomas_transicao/db_params.R"
 
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 
 files$param_file <- "data/mapbiomas_transicao_est_dic_en.csv"
 files$db_file <- "data/mapbiomas_transicao_est.rds"

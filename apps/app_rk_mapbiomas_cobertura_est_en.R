@@ -9,7 +9,7 @@ files <- list()
 files$ui_script <- "scripts/rk/ui.R"
 files$server_script <- "scripts/rk/server.R"
 files$param_script <- "scripts/rk/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/mapbiomas_cobertura_est_dic_en.csv"
 files$db_file <- "data/mapbiomas_cobertura_est.rds"
 

@@ -11,7 +11,7 @@ files <- list()
 files$ui_script <- "scripts/map_dz_munic_ppm/ui.R"
 files$server_script <- "scripts/map_dz_munic_ppm/server.R"
 files$param_script <- "scripts/map_dz_munic_ppm/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/dz_munic_dic_en.csv"
 files$db_file <- "data/dz_munic_simplified.rds"
 

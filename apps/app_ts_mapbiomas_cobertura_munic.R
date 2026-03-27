@@ -10,7 +10,7 @@ files$ui_script <- "scripts/ts_mapbiomas_cobertura_munic/ui.R"
 files$server_script <- "scripts/ts_mapbiomas_cobertura_munic/server.R"
 files$param_script <- "scripts/ts_mapbiomas_cobertura_munic/db_params.R"
 
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 
 files$param_file <- "data/mapbiomas_cobertura_munic_dic.csv"
 files$db_file <- "data/mapbiomas_cobertura_munic.rds"

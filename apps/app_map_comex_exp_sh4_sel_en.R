@@ -11,7 +11,7 @@ files <- list()
 files$ui_script <- "scripts/map_comex_exp_sh4_sel/ui.R"
 files$server_script <- "scripts/map_comex_exp_sh4_sel/server.R"
 files$param_script <- "scripts/map_comex_exp_sh4_sel/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/comex_exp_munic_sh4_sel_dic_en.csv"
 files$db_file <- "data/comex_exp_munic_sh4_sel.rds"
 

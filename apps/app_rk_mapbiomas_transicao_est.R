@@ -9,7 +9,7 @@ files <- list()
 files$ui_script <- "scripts/rk_mapbiomas_transition_est/ui.R"
 files$server_script <- "scripts/rk_mapbiomas_transition_est/server.R"
 files$param_script <- "scripts/rk_mapbiomas_transition_est/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/mapbiomas_transicao_est_dic.csv"
 files$db_file <- "data/mapbiomas_transicao_est.rds"
 

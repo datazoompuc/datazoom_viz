@@ -11,7 +11,7 @@ files <- list()
 files$ui_script <- "scripts/map_saude_mortalidade/ui.R"
 files$server_script <- "scripts/map_saude_mortalidade/server.R"
 files$param_script <- "scripts/map_saude_mortalidade/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/saude_mortalidade_dic_en.csv"
 files$db_file <- "data/saude_mortalidade.rds"
 

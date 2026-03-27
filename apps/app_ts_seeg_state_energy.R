@@ -10,7 +10,7 @@ files$ui_script <- "scripts/ts_seeg_state_energy/ui.R"
 files$server_script <- "scripts/ts_seeg_state_energy/server.R"
 files$param_script <- "scripts/ts_seeg_state_energy/db_params.R"
 
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 
 files$param_file <- "data/seeg_state_energy_dic.csv"
 files$db_file <- "data/seeg_state_energy.rds"

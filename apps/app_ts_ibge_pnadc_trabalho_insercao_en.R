@@ -9,7 +9,7 @@ files <- list()
 files$ui_script <- "scripts/ts_ibge_pnadc_trabalho_insercao/ui.R"
 files$server_script <- "scripts/ts_ibge_pnadc_trabalho_insercao/server.R"
 files$param_script <- "scripts/ts_ibge_pnadc_trabalho_insercao/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/ibge_pnadc_trabalho_insercao_dic_en.csv"
 files$db_file <- "data/ibge_pnadc_trabalho_insercao.rds"
 

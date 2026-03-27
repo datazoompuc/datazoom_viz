@@ -11,7 +11,7 @@ files <- list()
 files$ui_script <- "scripts/mapstatic_mapbiomas8_pastCattle/ui.R"
 files$server_script <- "scripts/mapstatic_mapbiomas8_pastCattle/server.R"
 files$param_script <- "scripts/mapstatic_mapbiomas8_pastCattle/db_params.R"
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 files$param_file <- "data/mapbiomas8_cover_pastCattle_dic.csv"
 files$db_file <- "data/mapbiomas8_cover_pastCattle.rds"
 

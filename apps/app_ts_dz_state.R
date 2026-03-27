@@ -10,7 +10,7 @@ files$ui_script <- "scripts/ts_dz_state/ui.R"
 files$server_script <- "scripts/ts_dz_state/server.R"
 files$param_script <- "scripts/ts_dz_state/db_params.R"
 
-files$CSS_script <- "scripts/dza_lumen.css"
+files$CSS_script <- "global/dza_lumen.css"
 
 files$param_file <- "data/dz_state_dic.csv"
 files$db_file <- "data/dz_state.rds"
