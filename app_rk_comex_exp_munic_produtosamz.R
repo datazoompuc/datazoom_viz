@@ -1,7 +1,3 @@
-# Cache
-cache_folder <- "rk_comex_exp_munic_produtosamz/cache/"
-shinyOptions(cache = cachem::cache_disk(cache_folder))
-
 # Carrega bibliotecas
 library(shiny)
 library(ggplot2)
@@ -11,13 +7,13 @@ library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "rk_comex_exp_munic_produtosamz/ui.R"
-files$server_script <- "rk_comex_exp_munic_produtosamz/server.R"
-files$param_script <- "rk_comex_exp_munic_produtosamz/db_params.R"
+files$ui_script <- "scripts/rk_comex_exp_munic_produtosamz/ui.R"
+files$server_script <- "scripts/rk_comex_exp_munic_produtosamz/server.R"
+files$param_script <- "scripts/rk_comex_exp_munic_produtosamz/db_params.R"
 files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "rk_comex_exp_munic_produtosamz/comex_exp_sh4_munic_dic.csv"
-files$db_file <- "rk_comex_exp_munic_produtosamz/comex_exp_sh4_munic.rds"
-files$aux_file <- "rk_comex_exp_munic_produtosamz/auxiliar_cod_sh4.rds"
+files$param_file <- "data/comex_exp_sh4_munic_dic.csv"
+files$db_file <- "data/comex_exp_sh4_munic.rds"
+files$aux_file <- "data/auxiliar_cod_sh4.rds"
 
 # Carrega scripts
 source(files$param_script)

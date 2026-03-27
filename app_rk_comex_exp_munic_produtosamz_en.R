@@ -3,10 +3,9 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinycssloaders)
 
-# Cache
-cache_folder <- "./cache/app_rk_comex_exp_munic_produtosamz_en/"
-shinyOptions(cache = cachem::cache_disk(cache_folder))
+
 # Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "scripts/rk_comex_exp_munic_produtosamz/ui.R"
@@ -15,6 +14,7 @@ files$param_script <- "scripts/rk_comex_exp_munic_produtosamz/db_params.R"
 files$CSS_script <- "scripts/dza_lumen.css"
 files$param_file <- "data/comex_exp_sh4_munic_dic_en.csv"
 files$db_file <- "data/comex_exp_sh4_munic.rds"
+files$aux_file <- "data/auxiliar_cod_sh4.rds"
 
 # Carrega scripts
 source(files$param_script)
@@ -38,22 +38,17 @@ param$plot_desc <- "The municipalities who are the biggest product exporters of 
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL
-param$x_choices$Comex <- list("Coconuts, Brazil nuts, and cashew nuts, fresh or dried, whether or not shelled or peeled", 
-                              "Whole or broken cocoa, raw or roasted",
-                              "Raw wood, whether or not stripped of bark or sapwood, or roughly squared"
-)
 
 #Mudanças específicas no server
 param$label_no_variable<- "No variable selected"
-param$x_label<- "Value"
-param$ranking_intro<- "Ranking of "
-param$label_amazon<- "Legal Amazon"
+param$x_label<- "Value (US$ FOB)"
+param$plot_title<- "Ranking of exportation by municipality"
+param$pct_anual <- "Share of total exports: "
 
 #Mudanças específicas no UI
 
 param$label_variable<- "VARIABLES"
-param$label_x_choice_rk<- "Ranking - horizontal axis (x):"
-param$color_bar<- "Bar Colors :"
+param$label_x_choice_rk<- "Product categories:"
 param$link<-"https://datazoom.shinyapps.io/app_rk_comex_exp_munic_produtosamz_en/"
 
 
