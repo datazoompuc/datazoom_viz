@@ -7,12 +7,12 @@ library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_rais/ui.R"
-files$server_script <- "scripts/ts_rais/server.R"
-files$param_script <- "scripts/ts_rais/db_params.R"
-files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "data/rais_groups_dic_en.csv"
-files$db_file <- "data/rais_groups.rds"
+files$ui_script <- "../scripts/ts_rais/ui.R"
+files$server_script <- "../scripts/ts_rais/server.R"
+files$param_script <- "../scripts/ts_rais/db_params.R"
+files$CSS_script <- "../global/dza_lumen.css"
+files$param_file <- "../data/rais_groups_dic_en.csv"
+files$db_file <- "../data/rais_groups.rds"
 
 # Carrega scripts
 source(files$param_script)

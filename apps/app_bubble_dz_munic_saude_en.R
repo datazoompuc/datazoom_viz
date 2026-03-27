@@ -7,14 +7,14 @@ library(lubridate)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/bubble_dz_munic_saude/ui.R"
-files$server_script <- "scripts/bubble_dz_munic_saude/server.R"
-files$param_script <- "scripts/bubble_dz_munic_saude/db_params.R"
+files$ui_script <- "../scripts/bubble_dz_munic_saude/ui.R"
+files$server_script <- "../scripts/bubble_dz_munic_saude/server.R"
+files$param_script <- "../scripts/bubble_dz_munic_saude/db_params.R"
 
-files$CSS_script <- "global/dza_lumen.css"
+files$CSS_script <- "../global/dza_lumen.css"
 
-files$param_file <- "data/dz_munic_saude_dic_en.csv"
-files$db_file <- "data/dz_munic_saude.rds"
+files$param_file <- "../data/dz_munic_saude_dic_en.csv"
+files$db_file <- "../data/dz_munic_saude.rds"
 
 # Carrega scripts
 source(files$param_script)

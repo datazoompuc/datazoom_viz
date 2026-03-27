@@ -9,12 +9,12 @@ library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/ui.R"
-files$server_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/server.R"
-files$param_script <- "scripts/rk_mapbiomas_cobertura_munic_percentual/db_params.R"
-files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "data/mapbiomas_cobertura_munic_dic_en.csv"
-files$db_file <- "data/mapbiomas_cobertura_munic_en.rds"
+files$ui_script <- "../scripts/rk_mapbiomas_cobertura_munic_percentual/ui.R"
+files$server_script <- "../scripts/rk_mapbiomas_cobertura_munic_percentual/server.R"
+files$param_script <- "../scripts/rk_mapbiomas_cobertura_munic_percentual/db_params.R"
+files$CSS_script <- "../global/dza_lumen.css"
+files$param_file <- "../data/mapbiomas_cobertura_munic_dic_en.csv"
+files$db_file <- "../data/mapbiomas_cobertura_munic_en.rds"
 
 # Carrega scripts
 source(files$param_script)

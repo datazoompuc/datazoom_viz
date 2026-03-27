@@ -6,14 +6,14 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_energia_sistemas_isolados/ui.R"
-files$server_script <- "scripts/ts_energia_sistemas_isolados/server.R"
-files$param_script <- "scripts/ts_energia_sistemas_isolados/db_params.R"
+files$ui_script <- "../scripts/ts_energia_sistemas_isolados/ui.R"
+files$server_script <- "../scripts/ts_energia_sistemas_isolados/server.R"
+files$param_script <- "../scripts/ts_energia_sistemas_isolados/db_params.R"
 
-files$CSS_script <- "global/dza_lumen.css"
+files$CSS_script <- "../global/dza_lumen.css"
 
-files$param_file <- "data/energia_sistemas_isolados_dic_en.csv"
-files$db_file <- "data/energia_sistemas_isolados.rds"
+files$param_file <- "../data/energia_sistemas_isolados_dic_en.csv"
+files$db_file <- "../data/energia_sistemas_isolados.rds"
 
 # Carrega scripts
 source(files$param_script)

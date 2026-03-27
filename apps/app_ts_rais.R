@@ -9,18 +9,18 @@ library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_rais/ui.R"
-files$server_script <- "scripts/ts_rais/server.R"
-files$param_script <- "scripts/ts_rais/db_params.R"
-files$CSS_script <- "global/dza_lumen.css"
-files$param_file_pt <- "data/rais_groups_dic.csv"
-files$param_file_en <- "data/rais_groups_dic_en.csv"
-files$db_file <- "data/rais_groups.rds"
+files$ui_script <- "../scripts/ts_rais/ui.R"
+files$server_script <- "../scripts/ts_rais/server.R"
+files$param_script <- "../scripts/ts_rais/db_params.R"
+files$CSS_script <- "../global/dza_lumen.css"
+files$param_file_pt <- "../data/rais_groups_dic.csv"
+files$param_file_en <- "../data/rais_groups_dic_en.csv"
+files$db_file <- "../data/rais_groups.rds"
 
-files$group_groups <- "data/group_groups.csv"
-files$group_levels <- "data/group_levels.csv"
-files$geo_groups <- "data/geo_groups.csv"
-files$geo_levels <- "data/geo_levels.csv"
+files$group_groups <- "../data/group_groups.csv"
+files$group_levels <- "../data/group_levels.csv"
+files$geo_groups <- "../data/geo_groups.csv"
+files$geo_levels <- "../data/geo_levels.csv"
 
 
 # Carrega scripts

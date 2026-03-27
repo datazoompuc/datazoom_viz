@@ -6,14 +6,14 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/tab/ui.R"
-files$server_script <- "scripts/tab/server.R"
-files$param_script <- "scripts/tab/db_params.R"
+files$ui_script <- "../scripts/tab/ui.R"
+files$server_script <- "../scripts/tab/server.R"
+files$param_script <- "../scripts/tab/db_params.R"
 
-files$CSS_script <- "global/dza_lumen.css"
+files$CSS_script <- "../global/dza_lumen.css"
 
-files$param_file <- "data/mapbiomas_transicao_est_tab_dic.csv"
-files$db_file <- "data/mapbiomas_transicao_est_tab.rds"
+files$param_file <- "../data/mapbiomas_transicao_est_tab_dic.csv"
+files$db_file <- "../data/mapbiomas_transicao_est_tab.rds"
 
 # Carrega scripts
 source(files$param_script)

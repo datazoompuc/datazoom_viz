@@ -6,14 +6,14 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/ts_comex_exp_sec_pais/ui.R"
-files$server_script <- "scripts/ts_comex_exp_sec_pais/server.R"
-files$param_script <- "scripts/ts_comex_exp_sec_pais/db_params.R"
+files$ui_script <- "../scripts/ts_comex_exp_sec_pais/ui.R"
+files$server_script <- "../scripts/ts_comex_exp_sec_pais/server.R"
+files$param_script <- "../scripts/ts_comex_exp_sec_pais/db_params.R"
 
-files$CSS_script <- "global/dza_lumen.css"
+files$CSS_script <- "../global/dza_lumen.css"
 
-files$param_file <- "data/comex_exp_sec_pais_en_dic.csv"
-files$db_file <- "data/comex_exp_sec_pais.rds"
+files$param_file <- "../data/comex_exp_sec_pais_en_dic.csv"
+files$db_file <- "../data/comex_exp_sec_pais.rds"
 
 # Carrega scripts
 source(files$param_script)

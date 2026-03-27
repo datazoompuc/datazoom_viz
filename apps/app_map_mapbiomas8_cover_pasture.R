@@ -8,12 +8,12 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/map_mapbiomas8_cover_pasture/ui.R"
-files$server_script <- "scripts/map_mapbiomas8_cover_pasture/server.R"
-files$param_script <- "scripts/map_mapbiomas8_cover_pasture/db_params.R"
-files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "data/mapbiomas8_cover_pasture_dic.csv"
-files$db_file <- "data/mapbiomas8_cover_pasture.rds"
+files$ui_script <- "../scripts/map_mapbiomas8_cover_pasture/ui.R"
+files$server_script <- "../scripts/map_mapbiomas8_cover_pasture/server.R"
+files$param_script <- "../scripts/map_mapbiomas8_cover_pasture/db_params.R"
+files$CSS_script <- "../global/dza_lumen.css"
+files$param_file <- "../data/mapbiomas8_cover_pasture_dic.csv"
+files$db_file <- "../data/mapbiomas8_cover_pasture.rds"
 
 # Carrega scripts
 source(files$param_script)

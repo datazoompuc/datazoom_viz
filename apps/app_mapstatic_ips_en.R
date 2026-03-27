@@ -8,12 +8,12 @@ library(htmlwidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/mapstatic_ips/ui.R"
-files$server_script <- "scripts/mapstatic_ips/server.R"
-files$param_script <- "scripts/mapstatic_ips/db_params.R"
-files$CSS_script <- "global/dza_lumen.css"
-files$param_file <- "data/ips_2021_dic_en.csv"
-files$db_file <- "data/ips_2021.rds"
+files$ui_script <- "../scripts/mapstatic_ips/ui.R"
+files$server_script <- "../scripts/mapstatic_ips/server.R"
+files$param_script <- "../scripts/mapstatic_ips/db_params.R"
+files$CSS_script <- "../global/dza_lumen.css"
+files$param_file <- "../data/ips_2021_dic_en.csv"
+files$db_file <- "../data/ips_2021.rds"
 
 # Carrega scripts
 source(files$param_script)

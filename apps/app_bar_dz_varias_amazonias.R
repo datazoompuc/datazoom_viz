@@ -7,14 +7,14 @@ library(lubridate)
 
 # Define nome de arquivos a serem carregados
 files <- list()
-files$ui_script <- "scripts/bar_dz_varias_amazonias/ui.R"
-files$server_script <- "scripts/bar_dz_varias_amazonias/server.R"
-files$param_script <- "scripts/bar_dz_varias_amazonias/db_params.R"
+files$ui_script <- "../scripts/bar_dz_varias_amazonias/ui.R"
+files$server_script <- "../scripts/bar_dz_varias_amazonias/server.R"
+files$param_script <- "../scripts/bar_dz_varias_amazonias/db_params.R"
 
-files$CSS_script <- "global/dza_lumen.css"
+files$CSS_script <- "../global/dza_lumen.css"
 
-files$param_file <- "data/dz_varias_amazonias_cross_section_dic.csv"
-files$db_file <- "data/dz_varias_amazonias_cross_section.rds"
+files$param_file <- "../data/dz_varias_amazonias_cross_section_dic.csv"
+files$db_file <- "../data/dz_varias_amazonias_cross_section.rds"
 
 # Carrega scripts
 source(files$param_script)
