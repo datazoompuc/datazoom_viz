@@ -1,80 +1,80 @@
-var,x,y,color,size,slider,geometry,label,desc,var_group,tipo,unidade,categoria,subcategoria
-ano,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,Year,ano,Saúde - DATASUS,1,,Social,Saúde
-cod_ibge,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Municipality code,cod_ibge,Saúde - DATASUS,1,,Social,Saúde
-pop,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Population,pop,IBGE,1,,Social,Saúde
-gdp_deflacionado,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Real GDP (R$ 2021),gdp_deflacionado,IBGE,1,,Social,Saúde
-gd_ppc_deflacionado,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Real GDP per capita (R$ 2021),gd_ppc_deflacionado,IBGE,1,,Social,Saúde
-municipio,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Municipality's name,municipio, ,1,,Social,Saúde
-regiao,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,Region,regiao, ,1,,Social,Saúde
-nome_uf,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,State's name,nome_uf, ,1,,Social,Saúde
-sigla_uf,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,State abbreviation,sigla_uf, ,1,,Social,Saúde
-d_am_legal,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Belongs to Legal Amazon (Yes/No),d_am_legal, ,1,,Social,Saúde
-d_hidro_oper,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,Municipalities with operating hydroelectric plants (Yes/No),d_hidro_oper, ,1,,Social,Saúde
-d_min_ilegal,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,Municipalities with illegal mining (Yes/No),d_min_ilegal, ,1,,Social,Saúde
-t_mortalidade,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Crude mortality rate per 100,000 inhabitants",t_mortalidade,Saúde - DATASUS,1,,Social,Saúde
-t_mortalidade_adj,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality rate per 100,000 inhabitants",t_mortalidade_adj,Saúde - DATASUS,1,,Social,Saúde
-t_ncommunicable,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Mortality from non-communicable diseases per 100,000 inhabitants",t_ncommunicable,Saúde - DATASUS,1,,Social,Saúde
-t_communicable_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from communicable diseases per 100,000 inhabitants",t_communicable_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_injuries,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Mortality from external causes per 100,000 inhabitants",t_injuries,Saúde - DATASUS,1,,Social,Saúde
-t_injuries_adj,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from external causes per 100,000 inhabitants",t_injuries_adj,Saúde - DATASUS,1,,Social,Saúde
-t_communicable,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Mortality from communicable diseases per 100,000 inhabitants",t_communicable,Saúde - DATASUS,1,,Social,Saúde
-t_ncommunicable_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from non-communicable diseases per 100,000 inhabitants",t_ncommunicable_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_ndef,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Mortality from ill-defined causes per 100,000 inhabitants",t_ndef,Saúde - DATASUS,1,,Social,Saúde
-t_cardio_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from cardiovascular diseases per 100,000 inhabitants",t_cardio_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_diabetes_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from diabetes per 100,000 inhabitants",t_diabetes_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_neoplasm_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from neoplasms per 100,000 inhabitants",t_neoplasm_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_violencia_adj,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from violence per 100,000 inhabitants",t_violencia_adj,Saúde - DATASUS,1,,Social,Saúde
-t_road_inj_adj,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from traffic accidents per 100,000 inhabitants",t_road_inj_adj,Saúde - DATASUS,1,,Social,Saúde
-t_unintentional_inj0_adj,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from unintentional accidents per 100,000 inhabitants",t_unintentional_inj0_adj,Saúde - DATASUS,1,,Social,Saúde
-t_moto_env_adj,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from motorcycle accidents per 100,000 inhabitants",t_moto_env_adj,Saúde - DATASUS,1,,Social,Saúde
-t_nmoto_env_adj,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from non-motorcycle accidents per 100,000 inhabitants",t_nmoto_env_adj,Saúde - DATASUS,1,,Social,Saúde
-t_malaria_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from malaria per 100,000 inhabitants",t_malaria_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_hiv_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from AIDS per 100,000 inhabitants",t_hiv_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_wash_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from waterborne diseases per 100,000 inhabitants",t_wash_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_respiratory_inf_adj.N,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from respiratory diseases per 100,000 inhabitants",t_respiratory_inf_adj.N,Saúde - DATASUS,1,,Social,Saúde
-t_mama,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Breast cancer mortality per 100,000 women",t_mama,Saúde - DATASUS,1,,Social,Saúde
-t_utero,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Cervical cancer mortality per 100,000 women",t_utero,Saúde - DATASUS,1,,Social,Saúde
-t_violencia_female,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Violence-related mortality per 100,000 women",t_violencia_female,Saúde - DATASUS,1,,Social,Saúde
-t_nascidos_b_peso,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentage of low birth weight newborns,t_nascidos_b_peso,Saúde - DATASUS,1,,Social,Saúde
-t_gravidez_10to19,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentage of pregnancies among 10-19 year olds,t_gravidez_10to19,Saúde - DATASUS,1,,Social,Saúde
-t_mortalidade_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous crude mortality rate per 100,000 inhabitants",t_mortalidade_ind,Saúde - DATASUS,1,,Social,Saúde
-t_communicable_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous mortality from communicable diseases per 100,000 inhabitants",t_communicable_ind,Saúde - DATASUS,1,,Social,Saúde
-t_ncommunicable_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous mortality from non-communicable diseases per 100,000 inhabitants",t_ncommunicable_ind,Saúde - DATASUS,1,,Social,Saúde
-t_injuries_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous mortality from external causes per 100,000 inhabitants",t_injuries_ind,Saúde - DATASUS,1,,Social,Saúde
-t_ndef_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous mortality from ill-defined causes per 100,000 inhabitants",t_ndef_ind,Saúde - DATASUS,1,,Social,Saúde
-t_mortalidade_inf_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous infant mortality per 1,000 live births",t_mortalidade_inf_ind,Saúde - DATASUS,1,,Social,Saúde
-pc_cobertura_sf,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Family Health Strategy coverage percentage,pc_cobertura_sf,Saúde - DATASUS,1,,Social,Saúde
-pc_cobertura_sf_ab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Primary Health Care coverage percentage (AB Teams + FHS Teams),pc_cobertura_sf_ab,Saúde - DATASUS,1,,Social,Saúde
-pc_cobertura_acs,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Community Health Agents coverage percentage,pc_cobertura_acs,Saúde - DATASUS,1,,Social,Saúde
-sf_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"FHS teams per 1,000 km²",sf_km,Saúde - DATASUS,1,,Social,Saúde
-sf_ab_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Primary Health Care teams per 1,000 km²",sf_ab_km,Saúde - DATASUS,1,,Social,Saúde
-acs_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Community Health Agents per 1,000 km²",acs_km,Saúde - DATASUS,1,,Social,Saúde
-ubsf_estab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Riverine and Fluvial Family Health Units,ubsf_estab,Saúde - DATASUS,1,,Social,Saúde
-ubsf_equip,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Riverine and Fluvial Family Health Teams,ubsf_equip,Saúde - DATASUS,1,,Social,Saúde
-bed_total_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Total hospital beds,bed_total_hab,Saúde - DATASUS,1,,Social,Saúde
-bed_sus_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,SUS hospital beds,bed_sus_hab,Saúde - DATASUS,1,,Social,Saúde
-uti_total_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Total ICU beds,uti_total_hab,Saúde - DATASUS,1,,Social,Saúde
-uti_sus_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,SUS ICU beds,uti_sus_hab,Saúde - DATASUS,1,,Social,Saúde
-dist_emg,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distance to nearest emergency service,dist_emg,Saúde - DATASUS,1,,Social,Saúde
-dist_mc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distance to nearest medium complexity service,dist_mc,Saúde - DATASUS,1,,Social,Saúde
-dist_hc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distance to nearest high complexity service,dist_hc,Saúde - DATASUS,1,,Social,Saúde
-dist_uti,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distance to nearest ICU,dist_uti,Saúde - DATASUS,1,,Social,Saúde
-dist_dialise,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distance to nearest dialysis service,dist_dialise,Saúde - DATASUS,1,,Social,Saúde
-dist_quimio,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distance to nearest chemotherapy service,dist_quimio,Saúde - DATASUS,1,,Social,Saúde
-phys_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Physicians per 1,000 inhabitants",phys_hab,Saúde - DATASUS,1,,Social,Saúde
-enf_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Nursing professionals per 1,000 inhabitants",enf_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_cardio_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Cardiologists per 1,000 inhabitants",phys_cardio_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_gineco_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Gynecologists per 1,000 inhabitants",phys_gineco_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_endo_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Endocrinologists per 1,000 inhabitants",phys_endo_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_onco_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Oncologists per 1,000 inhabitants",phys_onco_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_pmm,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Physicians from More Doctors Program,phys_pmm,Saúde - DATASUS,1,,Social,Saúde
-prop_pmm,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proportion of physicians from More Doctors Program,prop_pmm,Saúde - DATASUS,1,,Social,Saúde
-prop_benef,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proportion of private health plan beneficiaries,prop_benef,Saúde - DATASUS,1,,Social,Saúde
-prop_hosp_nsus,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proportion of hospitals not affiliated with SUS,prop_hosp_nsus,Saúde - DATASUS,1,,Social,Saúde
-bed_priv_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Private beds per 100,000 inhabitants",bed_priv_hab,Saúde - DATASUS,1,,Social,Saúde
-uti_priv_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Private ICU beds per 100,000 inhabitants",uti_priv_hab,Saúde - DATASUS,1,,Social,Saúde
-hosp_sus_priv_pc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Private hospitals affiliated with SUS per 100,000 inhabitants",hosp_sus_priv_pc,Saúde - DATASUS,1,,Social,Saúde
-hosp_nsus_priv_pc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Private hospitals not affiliated with SUS per 100,000 inhabitants",hosp_nsus_priv_pc,Saúde - DATASUS,1,,Social,Saúde
-siops_despsaude_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Total health expenditure per capita,siops_despsaude_def_pc,Saúde - DATASUS,1,,Social,Saúde
-siops_despexrecproprio_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Health expenditure from own resources per capita,siops_despexrecproprio_def_pc,Saúde - DATASUS,1,,Social,Saúde
-siops_desprecpropsaude_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Health expenditure proportion per capita,siops_desprecpropsaude_def_pc,Saúde - DATASUS,1,,Social,Saúde
+"","var","x","y","color","size","slider","geometry","label","desc","var_group","tipo","unidade","categoria","subcategoria"
+"1","ano",FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,"Year","ano","Saúde - DATASUS",1,NA,"Social","Saúde"
+"2","cod_ibge",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"Municipality code","cod_ibge","Saúde - DATASUS",1,NA,"Social","Saúde"
+"3","pop",TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,"Population","pop","IBGE",1,NA,"Social","Saúde"
+"4","gdp_deflacionado",TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,"Real GDP (R$ 2021)","gdp_deflacionado","IBGE",1,NA,"Social","Saúde"
+"5","gd_ppc_deflacionado",TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,"Real GDP per capita (R$ 2021)","gd_ppc_deflacionado","IBGE",1,NA,"Social","Saúde"
+"6","municipio",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"Municipality's name","municipio",NA,1,NA,"Social","Saúde"
+"7","regiao",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Region","regiao",NA,1,NA,"Social","Saúde"
+"8","nome_uf",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"State's name","nome_uf",NA,1,NA,"Social","Saúde"
+"9","sigla_uf",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"State abbreviation","sigla_uf",NA,1,NA,"Social","Saúde"
+"10","d_am_legal",FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,"Belongs to Legal Amazon (Yes/No)","d_am_legal",NA,1,NA,"Social","Saúde"
+"11","d_hidro_oper",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Municipalities with operating hydroelectric plants (Yes/No)","d_hidro_oper",NA,1,NA,"Social","Saúde"
+"12","d_min_ilegal",FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,"Municipalities with illegal mining (Yes/No)","d_min_ilegal",NA,1,NA,"Social","Saúde"
+"13","t_mortalidade",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Gross mortality rate per 100,000 inhabitants","t_mortalidade","Saúde - DATASUS",1,NA,"Social","Saúde"
+"14","t_mortalidade_adj",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality rate per 100,000 inhabitants","t_mortalidade_adj","Saúde - DATASUS",1,NA,"Social","Saúde"
+"15","t_ncommunicable",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Mortality from non-communicable diseases per 100,000 inhabitants","t_ncommunicable","Saúde - DATASUS",1,NA,"Social","Saúde"
+"16","t_communicable_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from communicable diseases per 100,000 inhabitants","t_communicable_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"17","t_injuries",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Mortality from external causes per 100,000 inhabitants","t_injuries","Saúde - DATASUS",1,NA,"Social","Saúde"
+"18","t_injuries_adj",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from external causes per 100,000 inhabitants","t_injuries_adj","Saúde - DATASUS",1,NA,"Social","Saúde"
+"19","t_communicable",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Mortality from communicable diseases per 100,000 inhabitants","t_communicable","Saúde - DATASUS",1,NA,"Social","Saúde"
+"20","t_ncommunicable_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from non-communicable diseases per 100,000 inhabitants","t_ncommunicable_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"21","t_ndef",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Mortality from ill-defined causes per 100,000 inhabitants","t_ndef","Saúde - DATASUS",1,NA,"Social","Saúde"
+"22","t_cardio_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from cardiovascular diseases per 100,000 inhabitants","t_cardio_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"23","t_diabetes_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from diabetes per 100,000 inhabitants","t_diabetes_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"24","t_neoplasm_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from neoplasms per 100,000 inhabitants","t_neoplasm_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"25","t_violencia_adj",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from violence per 100,000 inhabitants","t_violencia_adj","Saúde - DATASUS",1,NA,"Social","Saúde"
+"26","t_road_inj_adj",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from traffic accidents per 100,000 inhabitants","t_road_inj_adj","Saúde - DATASUS",1,NA,"Social","Saúde"
+"27","t_unintentional_inj0_adj",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from unintentional accidents per 100,000 inhabitants","t_unintentional_inj0_adj","Saúde - DATASUS",1,NA,"Social","Saúde"
+"28","t_moto_env_adj",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from motorcycle accidents per 100,000 inhabitants","t_moto_env_adj","Saúde - DATASUS",1,NA,"Social","Saúde"
+"29","t_nmoto_env_adj",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from non-motorcycle accidents per 100,000 inhabitants","t_nmoto_env_adj","Saúde - DATASUS",1,NA,"Social","Saúde"
+"30","t_malaria_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from malaria per 100,000 inhabitants","t_malaria_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"31","t_hiv_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from AIDS per 100,000 inhabitants","t_hiv_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"32","t_wash_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from waterborne diseases per 100,000 inhabitants","t_wash_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"33","t_respiratory_inf_adj.N",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Age-adjusted mortality from respiratory diseases per 100,000 inhabitants","t_respiratory_inf_adj.N","Saúde - DATASUS",1,NA,"Social","Saúde"
+"34","t_mama",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Breast cancer mortality per 100,000 women","t_mama","Saúde - DATASUS",1,NA,"Social","Saúde"
+"35","t_utero",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Cervical cancer mortality per 100,000 women","t_utero","Saúde - DATASUS",1,NA,"Social","Saúde"
+"36","t_violencia_female",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Violence-related mortality per 100,000 women","t_violencia_female","Saúde - DATASUS",1,NA,"Social","Saúde"
+"37","t_nascidos_b_peso",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Percentage of low birth weight newborns","t_nascidos_b_peso","Saúde - DATASUS",1,NA,"Social","Saúde"
+"38","t_gravidez_10to19",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Percentage of pregnancies among 10-19 year olds","t_gravidez_10to19","Saúde - DATASUS",1,NA,"Social","Saúde"
+"39","t_mortalidade_ind",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous crude mortality rate per 100,000 inhabitants","t_mortalidade_ind","Saúde - DATASUS",1,NA,"Social","Saúde"
+"40","t_communicable_ind",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous mortality from communicable diseases per 100,000 inhabitants","t_communicable_ind","Saúde - DATASUS",1,NA,"Social","Saúde"
+"41","t_ncommunicable_ind",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous mortality from non-communicable diseases per 100,000 inhabitants","t_ncommunicable_ind","Saúde - DATASUS",1,NA,"Social","Saúde"
+"42","t_injuries_ind",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous mortality from external causes per 100,000 inhabitants","t_injuries_ind","Saúde - DATASUS",1,NA,"Social","Saúde"
+"43","t_ndef_ind",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous mortality from ill-defined causes per 100,000 inhabitants","t_ndef_ind","Saúde - DATASUS",1,NA,"Social","Saúde"
+"44","t_mortalidade_inf_ind",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Indigenous infant mortality per 1,000 live births","t_mortalidade_inf_ind","Saúde - DATASUS",1,NA,"Social","Saúde"
+"45","pc_cobertura_sf",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Family Health Strategy coverage percentage","pc_cobertura_sf","Saúde - DATASUS",1,NA,"Social","Saúde"
+"46","pc_cobertura_sf_ab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Primary Health Care coverage percentage (AB Teams + FHS Teams)","pc_cobertura_sf_ab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"47","pc_cobertura_acs",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Community Health Agents coverage percentage","pc_cobertura_acs","Saúde - DATASUS",1,NA,"Social","Saúde"
+"48","sf_km",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"FHS teams per 1,000 km²","sf_km","Saúde - DATASUS",1,NA,"Social","Saúde"
+"49","sf_ab_km",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Primary Health Care teams per 1,000 km²","sf_ab_km","Saúde - DATASUS",1,NA,"Social","Saúde"
+"50","acs_km",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Community Health Agents per 1,000 km²","acs_km","Saúde - DATASUS",1,NA,"Social","Saúde"
+"51","ubsf_estab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Riverine and Fluvial Family Health Units","ubsf_estab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"52","ubsf_equip",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Riverine and Fluvial Family Health Teams","ubsf_equip","Saúde - DATASUS",1,NA,"Social","Saúde"
+"53","bed_total_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Total hospital beds","bed_total_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"54","bed_sus_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"SUS hospital beds","bed_sus_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"55","uti_total_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Total ICU beds","uti_total_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"56","uti_sus_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"SUS ICU beds","uti_sus_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"57","dist_emg",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Distance to nearest emergency service","dist_emg","Saúde - DATASUS",1,NA,"Social","Saúde"
+"58","dist_mc",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Distance to nearest medium complexity service","dist_mc","Saúde - DATASUS",1,NA,"Social","Saúde"
+"59","dist_hc",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Distance to nearest high complexity service","dist_hc","Saúde - DATASUS",1,NA,"Social","Saúde"
+"60","dist_uti",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Distance to nearest ICU","dist_uti","Saúde - DATASUS",1,NA,"Social","Saúde"
+"61","dist_dialise",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Distance to nearest dialysis service","dist_dialise","Saúde - DATASUS",1,NA,"Social","Saúde"
+"62","dist_quimio",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Distance to nearest chemotherapy service","dist_quimio","Saúde - DATASUS",1,NA,"Social","Saúde"
+"63","phys_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Physicians per 1,000 inhabitants","phys_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"64","enf_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Nursing professionals per 1,000 inhabitants","enf_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"65","phys_cardio_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Cardiologists per 1,000 inhabitants","phys_cardio_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"66","phys_gineco_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Gynecologists per 1,000 inhabitants","phys_gineco_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"67","phys_endo_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Endocrinologists per 1,000 inhabitants","phys_endo_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"68","phys_onco_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Oncologists per 1,000 inhabitants","phys_onco_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"69","phys_pmm",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Physicians from More Doctors Program","phys_pmm","Saúde - DATASUS",1,NA,"Social","Saúde"
+"70","prop_pmm",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Proportion of physicians from More Doctors Program","prop_pmm","Saúde - DATASUS",1,NA,"Social","Saúde"
+"71","prop_benef",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Proportion of private health plan beneficiaries","prop_benef","Saúde - DATASUS",1,NA,"Social","Saúde"
+"72","prop_hosp_nsus",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Proportion of hospitals not affiliated with SUS","prop_hosp_nsus","Saúde - DATASUS",1,NA,"Social","Saúde"
+"73","bed_priv_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Private beds per 100,000 inhabitants","bed_priv_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"74","uti_priv_hab",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Private ICU beds per 100,000 inhabitants","uti_priv_hab","Saúde - DATASUS",1,NA,"Social","Saúde"
+"75","hosp_sus_priv_pc",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Private hospitals affiliated with SUS per 100,000 inhabitants","hosp_sus_priv_pc","Saúde - DATASUS",1,NA,"Social","Saúde"
+"76","hosp_nsus_priv_pc",TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,"Private hospitals not affiliated with SUS per 100,000 inhabitants","hosp_nsus_priv_pc","Saúde - DATASUS",1,NA,"Social","Saúde"
+"77","siops_despsaude_def_pc",TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,"Total health expenditure per capita","siops_despsaude_def_pc","Saúde - DATASUS",1,NA,"Social","Saúde"
+"78","siops_despexrecproprio_def_pc",TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,"Health expenditure from own resources per capita","siops_despexrecproprio_def_pc","Saúde - DATASUS",1,NA,"Social","Saúde"
+"79","siops_desprecpropsaude_def_pc",TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,"Health expenditure proportion per capita","siops_desprecpropsaude_def_pc","Saúde - DATASUS",1,NA,"Social","Saúde"
