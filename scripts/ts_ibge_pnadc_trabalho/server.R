@@ -14,7 +14,91 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
     
+    get_uf_choices <- function(df) {
+        df %>%
+            dplyr::filter(grepl("^[A-Z]{2}$", group)) %>%
+            dplyr::distinct(group) %>%
+            dplyr::pull(group) %>%
+            sort()
+    }
+    
+    
+    get_filter_choices <- function(df, lang = FALSE) {
+        ufs <- get_uf_choices(df)
+        
+        if (isTRUE(lang)) {
+            list(
+                "Brazil" = c("Brazil"),
+                "Legal Amazon" = c("Legal Amazon", "Outside Legal Amazon"),
+                "Regions" = c("Central-West", "North", "Northeast", "South", "Southeast"),
+                "UF" = ufs
+            )
+        } else {
+            list(
+                "Brasil" = c("Brasil"),
+                "Amazônia Legal" = c("Amazônia Legal", "Fora da Amazônia Legal"),
+                "Região" = c("Centro-Oeste", "Norte", "Nordeste", "Sul", "Sudeste"),
+                "UF" = ufs
+            )
+        }
+    }
+    
+    get_filter_comp_choices <- function(lang = FALSE) {
+        
+        if (isTRUE(lang)) {
+            list(
+                "All" = c("All"),
+                "Sex" = c("Male", "Female"),
+                "Age Group" = c(
+                    "Between 14 and 17",
+                    "Between 18 and 24",
+                    "Between 25 and 29",
+                    "Between 30 and 39",
+                    "Between 40 and 49",
+                    "Between 50 and 59",
+                    "60 or older"
+                ),
+                "Schooling" = c(
+                    "No formal education",
+                    "1-7 years of schooling",
+                    "8-11 years of schooling",
+                    "9-14 years of schooling",
+                    "15 or more years of schooling"
+                )
+            )
+            
+        } else {
+            
+            list(
+                "Todos" = c("Todos"),
+                "Sexo" = c("Homem", "Mulher"),
+                "Faixa Etária" = c(
+                    "Entre 14 e 17 anos",
+                    "Entre 18 e 24 anos",
+                    "Entre 25 e 29 anos",
+                    "Entre 30 e 39 anos",
+                    "Entre 40 e 49 anos",
+                    "Entre 50 e 59 anos",
+                    "60 anos ou mais"
+                ),
+                "Escolaridade" = c(
+                    "Sem instrução",
+                    "1 a 7 anos de estudo",
+                    "8 a 11 anos de estudo",
+                    "9 a 14 anos de estudo",
+                    "15 ou mais anos de estudo"
+                )
+            )
+        }
+    }
+    
+    filter_choices <- get_filter_choices(df, lang = param$lang)
+    filter_comp_choices <- get_filter_comp_choices(lang = param$lang)
+    
+    
     server <- function(input, output, session) {
+        
+        
         
         # filtra dados de composicao demografica
         df_reactived <- reactive({
@@ -48,13 +132,13 @@ get_server <- function(files, param) {
             # Preenche filtro vazio
             updateSelectizeInput(session,
                                  "filter1",
-                                 choices = param$filter_choices,
+                                 choices = filter_choices,
                                  selected = param$filter_geo_def
             )
             updateSelectInput(session,
                               "filter_composicao_demografica",
-                              choices = param$filter_composicao_demografica_choices,
-                              selected = "Todos"
+                              choices = filter_comp_choices,
+                              selected = names(filter_comp_choices)[1]
             )
             
             # Pega parametros da url e atribui aos selectinputs
@@ -68,8 +152,8 @@ get_server <- function(files, param) {
             }
             
             if (!is.null(query[["filter_composicao"]])) {
-                updateSelectInput(session, "filter_composicao",
-                                  choices = param$filter_composicao_demografica_choices,
+                updateSelectInput(session, "filter_composicao_demografica",
+                                  choices = filter_comp_choices,
                                   selected = query[["filter_composicao"]]
                 )
             }
@@ -78,7 +162,7 @@ get_server <- function(files, param) {
             if (!is.null(query[["filter"]])) {
                 updateSelectizeInput(session,
                                      "filter1",
-                                     choices = param$filter_choices,
+                                     choices = filter_choices,
                                      selected = selected
                 )
             }
