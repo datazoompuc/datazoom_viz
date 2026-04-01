@@ -1,0 +1,75 @@
+name: Check PNADC updates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * 1'   # segunda-feira 12:00 UTC = 09:00 em Brasília (BRT)
+
+jobs:
+  check-pnadc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::readr
+            any::dplyr
+            any::purrr
+            any::stringr
+            any::httr
+            any::tibble
+            any::tidyr
+
+      - name: Run PNADC update check
+        run: Rscript scripts/check_pnadc_updates.R
+
+      - name: Build summary and fail if outdated
+        shell: bash
+        run: |
+          Rscript -e "
+          library(readr)
+          library(dplyr)
+
+          df <- read_csv('reports/pnadc_update_status.csv', show_col_types = FALSE)
+
+          n_outdated <- sum(df\$update_status == 'OUTDATED', na.rm = TRUE)
+          n_errors <- sum(df\$update_status %in% c('RDS_MISSING','READ_ERROR','MISSING_TIME_COLUMNS','REMOTE_NOT_FOUND'), na.rm = TRUE)
+
+          remote_vals <- unique(df\$remote_yq)
+          remote_vals <- remote_vals[!is.na(remote_vals) & remote_vals != '']
+          remote_yq <- if (length(remote_vals) > 0) remote_vals[1] else 'N/A'
+
+          lines <- c(
+            '# PNADC update check',
+            '',
+            paste0('- Remote latest: ', remote_yq),
+            paste0('- Outdated datasets: ', n_outdated),
+            paste0('- Technical errors: ', n_errors),
+            '',
+            '## Datasets',
+            ''
+          )
+
+          detail <- apply(df[, c('dataset_id','local_yq','remote_yq','update_status')], 1, function(x) {
+            paste0('- ', x[1], ': local=', x[2], ' | remote=', x[3], ' | status=', x[4])
+          })
+
+          writeLines(c(lines, detail), Sys.getenv('GITHUB_STEP_SUMMARY'))
+
+          if (n_outdated > 0 || n_errors > 0) {
+            quit(status = 1)
+          }
+          "
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pnadc-update-report
+          path: reports/pnadc_update_status.csv
