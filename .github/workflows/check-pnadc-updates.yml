@@ -25,8 +25,7 @@ jobs:
         run: |
           Rscript -e "install.packages(
             c('readr','dplyr','purrr','stringr','httr','tibble','tidyr'),
-            repos = 'https://cloud.r-project.org',
-            type = 'both'
+            repos = 'https://cloud.r-project.org'
           )"
 
       - name: Run PNADC update check
