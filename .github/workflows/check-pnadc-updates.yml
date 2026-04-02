@@ -1,9 +1,9 @@
-name: Check PNADC updates TEST
+name: Check PNADC updates
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 12 * * 1'   # segunda-feira 12:00 UTC = 09:00 em Brasília (BRT)
+    - cron: '0 12 * * 1' # 09:00 horário de Brasília toda segunda-feira
 
 jobs:
   check-pnadc:
@@ -16,16 +16,23 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
 
-      - name: Install packages and run script
+      - name: Install system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Install required packages
         shell: bash
         run: |
           Rscript -e "install.packages(
-            c('readr','dplyr','purrr','stringr','httr','tibble','tidyr'),
+            c('curl','httr','readr','dplyr','purrr','stringr','tibble','tidyr'),
             repos = 'https://cloud.r-project.org',
-            dependencies = TRUE
+            dependencies = c('Depends', 'Imports')
           )"
           Rscript -e "library(httr); packageVersion('httr')"
-          Rscript scripts/check_pnadc_updates.R
+
+      - name: Run PNADC update check
+        run: Rscript scripts/check_pnadc_updates.R
 
       - name: Upload report
         uses: actions/upload-artifact@v4
