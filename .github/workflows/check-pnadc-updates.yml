@@ -31,6 +31,35 @@ jobs:
       - name: Run PNADC update check
         run: Rscript scripts/check_pnadc_updates.R
 
+      - name: Check for outdated datasets
+        id: check_outdated
+        run: |
+          # Extrai os nomes dos datasets desatualizados
+          OUTDATED_LIST=$(awk -F',' 'NR>1 && $5=="OUTDATED" {print "• " $1}' reports/pnadc_update_status.csv)
+
+          if [ -n "$OUTDATED_LIST" ]; then
+            echo "has_outdated=true" >> $GITHUB_OUTPUT
+            # Salva a lista em variável multiline
+            {
+              echo 'outdated_list<<EOF'
+              echo "$OUTDATED_LIST"
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+          else
+            echo "has_outdated=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notify Slack if outdated
+        if: steps.check_outdated.outputs.has_outdated == 'true'
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":warning: *PNADC desatualizada — ação necessária*\n\nOs seguintes datasets estão desatualizados em relação ao IBGE:\n${{ steps.check_outdated.outputs.outdated_list }}\n\nAtualize as bases e faça o redeploy dos apps Shiny correspondentes.\n\n_Verificação automática via GitHub Actions — <https://github.com/datazoompuc/datazoom_viz/actions|Ver workflow>_"
+            }
+
       - name: Upload report
         uses: actions/upload-artifact@v4
         with:
