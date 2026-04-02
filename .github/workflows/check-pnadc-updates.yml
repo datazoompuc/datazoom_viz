@@ -3,7 +3,7 @@ name: Check PNADC updates
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 12 * * 1'   # segunda-feira 12:00 UTC = 09:00 em Brasília (BRT)
+    - cron: '0 12 * * 1' # 09:00 horário de Brasília toda segunda-feira
 
 jobs:
   check-pnadc:
@@ -16,6 +16,11 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev libcurl4-openssl-dev libxml2-dev
+
       - name: Install required packages
         run: |
           Rscript -e "install.packages(
@@ -23,47 +28,38 @@ jobs:
             repos = 'https://cloud.r-project.org'
           )"
 
-
       - name: Run PNADC update check
         run: Rscript scripts/check_pnadc_updates.R
 
-      - name: Build summary and fail if outdated
-        shell: bash
+      - name: Check for outdated datasets
+        id: check_outdated
         run: |
-          Rscript -e "
-          library(readr)
-          library(dplyr)
+          # Extrai os nomes dos datasets desatualizados
+          OUTDATED_LIST=$(awk -F',' 'NR>1 && $5=="OUTDATED" {print "• " $1}' reports/pnadc_update_status.csv)
 
-          df <- read_csv('reports/pnadc_update_status.csv', show_col_types = FALSE)
+          if [ -n "$OUTDATED_LIST" ]; then
+            echo "has_outdated=true" >> $GITHUB_OUTPUT
+            # Salva a lista em variável multiline
+            {
+              echo 'outdated_list<<EOF'
+              echo "$OUTDATED_LIST"
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+          else
+            echo "has_outdated=false" >> $GITHUB_OUTPUT
+          fi
 
-          n_outdated <- sum(df\$update_status == 'OUTDATED', na.rm = TRUE)
-          n_errors <- sum(df\$update_status %in% c('RDS_MISSING','READ_ERROR','MISSING_TIME_COLUMNS','REMOTE_NOT_FOUND'), na.rm = TRUE)
+      - name: Notify Slack if outdated
+        if: steps.check_outdated.outputs.has_outdated == 'true'
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":warning: *PNADC desatualizada — ação necessária*\n\nOs seguintes datasets estão desatualizados em relação ao IBGE:\n${{ steps.check_outdated.outputs.outdated_list }}\n\nAtualize as bases e faça o redeploy dos apps Shiny correspondentes.\n\n_Verificação automática via GitHub Actions — <https://github.com/datazoompuc/datazoom_viz/actions|Ver workflow>_"
+            }
 
-          remote_vals <- unique(df\$remote_yq)
-          remote_vals <- remote_vals[!is.na(remote_vals) & remote_vals != '']
-          remote_yq <- if (length(remote_vals) > 0) remote_vals[1] else 'N/A'
-
-          lines <- c(
-            '# PNADC update check',
-            '',
-            paste0('- Remote latest: ', remote_yq),
-            paste0('- Outdated datasets: ', n_outdated),
-            paste0('- Technical errors: ', n_errors),
-            '',
-            '## Datasets',
-            ''
-          )
-
-          detail <- apply(df[, c('dataset_id','local_yq','remote_yq','update_status')], 1, function(x) {
-            paste0('- ', x[1], ': local=', x[2], ' | remote=', x[3], ' | status=', x[4])
-          })
-
-          writeLines(c(lines, detail), Sys.getenv('GITHUB_STEP_SUMMARY'))
-
-          if (n_outdated > 0 || n_errors > 0) {
-            quit(status = 1)
-          }
-          "
       - name: Upload report
         uses: actions/upload-artifact@v4
         with:
