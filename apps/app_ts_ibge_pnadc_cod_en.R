@@ -26,13 +26,13 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "time" # variável padrão do eixo x
-param$y_def <- "" # variável padrão do eixo y
 param$y_def <- "rendimento_medio" # variável padrão do eixo y
 param$slider_def <- "time"
 param$color_def <- "group" # variável padrão de cor
 param$text_def <- "group" # variável padrão de texto (quando mouse em cima)
 param$group <- "group" # variável de agrupamento
 param$lang <- TRUE
+
 
 
 # Descrição da visualização no eixo de opções
@@ -44,7 +44,9 @@ param$label_var_name <- "VARIABLES:"
 param$label_y_name <- "Vertical axis (y)"
 param$label_scale_name <- "Log scale"
 param$label_prop_name <- "Proportional to the initial quarter"
-param$label_type_name <- "State - Type of occupation"
+param$label_region_name <- "Region"
+param$label_type_name <- "Ocupation"
+param$label_sector_name <- "Sector"
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cod_en/"
 
 ### Parametros especificos no server
