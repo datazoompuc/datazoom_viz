@@ -57,10 +57,10 @@ param$filter_choices <- list(
     "Amaz\u00f4nia Legal" = list("Amaz\u00f4nia Legal", "Fora da Amaz\u00f4nia Legal"),
     "Regi\u00e3o" = list("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"),
     "UF" = list(
-        "RO", "AC", "AM", "RO", "PA", "AP", "TO",
-        "MA", "PI", "CE", "RN", "PB", "PE", "AL",
-        "SE", "BA", "MG", "ES", "RJ", "SP", "PR",
-        "SC", "RS", "MS", "MT", "GO", "DF"
+        "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", 
+        "MA", "MG", "MS", "MT", "PA", "PB", "PE",
+        "PI", "PR", "RJ", "RN", "RO", "RR", "RS", 
+        "SC", "SE", "SP", "TO"
     )
 )
 
