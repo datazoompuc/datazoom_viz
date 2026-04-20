@@ -87,7 +87,7 @@ deploy_shiny_script <- function(
 }
 
 
-deploy_shiny_script("app_id") # ex. "rk_comex_exp_munic_produtosamz"
+#deploy_shiny_script("app_id") # ex. "rk_comex_exp_munic_produtosamz"
 
 
 # ver log de erro
