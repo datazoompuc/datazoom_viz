@@ -19,7 +19,7 @@ library(datazoom.social)
 #github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # PNAD files must be downloaded to the computer
-source <- "F:/Dados/PNADC/R"
+source <- "F:/PNADC/load_pnadc DZ"
 
 # only run this if not already downloaded: takes a long time
 # não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
@@ -769,6 +769,8 @@ dat <- purrr::map_dfr(
 dat <- dat %>%
     mutate(Mes = 3*Trimestre - 2) %>%
     mutate(time = lubridate::make_date(Ano, Mes))
+
+readr::write_rds(dat, "data/ibge_pnadc_atividades_ocupacoes.rds", compress = "gz")
 
 # saving data files
 
