@@ -192,7 +192,7 @@ get_server <- function(files, param) {
                 df_p$group <- df_filtered$group
                 df_p$composicao_demografica <- df_filtered$composicao_demografica
                 df_p$id <- df_filtered$id
-                df_p$text <- df_p$group
+                df_p$text <- paste(df_p$group, "-", df_p$composicao_demografica)
 
                 # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
                 df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
@@ -213,8 +213,8 @@ get_server <- function(files, param) {
 
                 df_p$combined <- ifelse(
                     df_p$id != "All" & df_p$composicao_demografica %in% ambiguous,
-                    paste0(df_p$group, " - ", df_p$composicao_demografica, " (", df_p$id, ")"),
-                    paste(df_p$group, "-", df_p$composicao_demografica)
+                    paste0(df_p$text, " (", df_p$id, ")"),
+                    df_p$text
                 )
                 
                 # Alternativa de medida para y
@@ -235,7 +235,7 @@ get_server <- function(files, param) {
                 
                 # Monta html do tooltip
                 df_p$tooltip <- paste0(
-                    "<b>",df_p$text,"</b><br>",
+                    "<b>",df_p$combined,"</b><br>",
                     x_col$label,": ",paste0('T', quarter(df_p$x), '-', year(df_p$x)),"<br>",
                     y_col$label,": ",format(df_p$y, scientific = FALSE,
                                             digits = 2,
