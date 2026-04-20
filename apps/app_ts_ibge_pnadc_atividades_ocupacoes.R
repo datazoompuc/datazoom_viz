@@ -41,7 +41,7 @@ param$label_y_name <- "Eixo vertical"
 param$label_scale_name <- "Escala log"
 param$label_prop_name <- "Proporcional ao trimestre inicial"
 param$label_region_name <- "Recorte regional"
-param$label_type_name <- "Atividade econômica"
+param$label_type_name <- "Atividade / Ocupa\u00e7\u00e3o"
 param$label_sector_name <- "Setor"
 param$link <- "https://datazoom.shinyapps.io/app_ts_ibge_pnadc_cnae/"
 
@@ -63,13 +63,6 @@ param$filter_choices <- list(
         "SC", "SE", "SP", "TO"
     )
 )
-
-param$id_choices <- c(
-    "Atividade econômica" = "CNAE",
-    "Ocupação" = "COD"
-)
-
-param$id_def <- "CNAE"
 
 param$cnae_choices <- list(
     "Todos",
@@ -133,6 +126,20 @@ param$cod_choices <- list(
     "Técnicos de eletricidade e eletrônica",
     "Vendedores"
 )
+
+param$ocupation_choices <- list(
+    "Geral" = list("Todos" = "All::Todos"),
+    "Atividade Econ\u00f4mica" = setNames(
+        as.list(paste0("CNAE::", unlist(param$cnae_choices[-1]))),
+        unlist(param$cnae_choices[-1])
+    ),
+    "Ocupa\u00e7\u00e3o" = setNames(
+        as.list(paste0("COD::", unlist(param$cod_choices[-1]))),
+        unlist(param$cod_choices[-1])
+    )
+)
+
+param$ocupation_def <- "All::Todos"
 
 param$sector_choices <- list(
     "Todos" = "todos",

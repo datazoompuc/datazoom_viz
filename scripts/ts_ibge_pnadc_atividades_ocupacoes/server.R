@@ -20,8 +20,7 @@ get_server <- function(files, param) {
             q_string <- paste0(
                 "?","y=",input$y,
                 "&","ylog=",input$ylog,
-                "&","y_option=",input$y_option,
-                "&","filter_id=",input$filter_id
+                "&","y_option=",input$y_option
             )
             
             for (i in input$filter1) {
@@ -59,10 +58,10 @@ get_server <- function(files, param) {
                               selected = c("Amazônia Legal", "Brasil")
             )
             
-            updateSelectInput(session, 
-                              "filter2", 
-                              choices = param$ocupation_choices, 
-                              selected = param$ocupation_def
+            updateSelectizeInput(session,
+                                 "filter2",
+                                 choices = param$ocupation_choices,
+                                 selected = param$ocupation_def
             )
             
             updateSelectInput(session, 
@@ -88,15 +87,6 @@ get_server <- function(files, param) {
             if (!is.null(query[['y_option']])) {
                 updateCheckboxInput(session, "y_option",
                                     value = (query[['y_option']] == "TRUE"))
-            }
-            
-            if (!is.null(query[['filter_id']])) {
-                updateSelectizeInput(
-                    session,
-                    "filter_id",
-                    choices = param$id_choices,
-                    selected = query[['filter_id']]
-                )
             }
             
             selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
@@ -127,44 +117,6 @@ get_server <- function(files, param) {
             }
         }
         
-        observeEvent(input$filter_id, {
-            if (is.null(input$filter_id)) return()
-            
-            if (input$filter_id == "CNAE") {
-                updateSelectizeInput(
-                    session,
-                    "filter2",
-                    choices = param$cnae_choices,
-                    selected = "Todos",
-                    server = TRUE
-                )
-            }
-            
-            if (input$filter_id == "COD") {
-                updateSelectizeInput(
-                    session,
-                    "filter2",
-                    choices = param$cod_choices,
-                    selected = "Todos",
-                    server = TRUE
-                )
-            }
-        }, ignoreInit = FALSE)
-        
-        observe({
-            label_tipo <- if (is.null(input$filter_id) || input$filter_id == "CNAE") {
-                "Atividade econômica"
-            } else {
-                "Ocupação"
-            }
-            
-            updateSelectizeInput(
-                session,
-                "filter2",
-                label = label_tipo
-            )
-        })
-        
         # Output título do gráfico
         output$plot_title <- renderText({
             text <- " "
@@ -184,13 +136,15 @@ get_server <- function(files, param) {
             text
         })
         output$plot_subtitle <- renderText({
-            if (is.null(input$y) || input$y == "") {
-                " "
-            } else if (is.null(input$filter_id) || input$filter_id == "CNAE") {
-                "por atividade econômica"
-            } else {
-                "por ocupação"
-            }
+            if (is.null(input$y) || input$y == "") return(" ")
+
+            has_cnae <- any(startsWith(input$filter2, "CNAE::"))
+            has_cod  <- any(startsWith(input$filter2, "COD::"))
+
+            if (has_cnae && has_cod) "por atividade econ\u00f4mica / ocupa\u00e7\u00e3o"
+            else if (has_cnae)       "por atividade econ\u00f4mica"
+            else if (has_cod)        "por ocupa\u00e7\u00e3o"
+            else                     "por atividade econ\u00f4mica / ocupa\u00e7\u00e3o"
         })
         
         # Output gráfico
@@ -210,15 +164,25 @@ get_server <- function(files, param) {
                 # Cria dataframe do gráfico
                 x_col <- param$table[which(param$table$var == param$x_def),]
                 y_col <- param$table[which(param$table$var == input$y),]
-                id_col <- param$table[which(param$table$var == param$id_def), ]
                 color_col <- param$table[which(param$table$var == param$color_def), ]
-                
+
+                # Parseia valores prefixados do filter2
+                sel <- input$filter2
+                is_todos  <- "All::Todos" %in% sel
+                cnae_sel  <- sub("^CNAE::", "", sel[startsWith(sel, "CNAE::")])
+                cod_sel   <- sub("^COD::",  "", sel[startsWith(sel, "COD::")])
+
                 # Filtra dataframe com grupos selecionados
-                df_filtered <- df %>% 
-                    dplyr::filter((id %in% c("All", input$filter_id) &
-                                   group %in% input$filter1) &
-                                   (composicao_demografica %in% input$filter2) &
-                                   (setor %in% input$filter3))
+                df_filtered <- df %>%
+                    dplyr::filter(
+                        group %in% input$filter1 &
+                        setor %in% input$filter3 &
+                        (
+                            (is_todos & id == "All") |
+                            (id == "CNAE" & composicao_demografica %in% cnae_sel) |
+                            (id == "COD"  & composicao_demografica %in% cod_sel)
+                        )
+                    )
                 
                 df_p <- data.frame(df_filtered[x_col$var],
                                    df_filtered[y_col$var],
@@ -227,19 +191,31 @@ get_server <- function(files, param) {
                 colnames(df_p) <- c("x", "y", "color")
                 df_p$group <- df_filtered$group
                 df_p$composicao_demografica <- df_filtered$composicao_demografica
+                df_p$id <- df_filtered$id
                 df_p$text <- df_p$group
-                
+
                 # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
                 df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
-                
+
                 # Se dataset estiver vazio, não monta o gráfico, retorna em branco
                 if (nrow(df_p) < 1) {
                     fig <- plotly_empty()
                     stop()
                 }
-                
-                #Define variável de cor
-                df_p$combined <- paste(df_p$group, "-", df_p$composicao_demografica)
+
+                # Labels com ambiguidade (mesmo composicao_demografica em CNAE e COD) recebem sufixo
+                ambiguous <- df_p %>%
+                    dplyr::filter(id != "All") %>%
+                    dplyr::group_by(composicao_demografica) %>%
+                    dplyr::summarize(n_ids = dplyr::n_distinct(id), .groups = "drop") %>%
+                    dplyr::filter(n_ids > 1) %>%
+                    dplyr::pull(composicao_demografica)
+
+                df_p$combined <- ifelse(
+                    df_p$id != "All" & df_p$composicao_demografica %in% ambiguous,
+                    paste0(df_p$group, " - ", df_p$composicao_demografica, " (", df_p$id, ")"),
+                    paste(df_p$group, "-", df_p$composicao_demografica)
+                )
                 
                 # Alternativa de medida para y
                 if (input$y_option & is.numeric(df_p$y)) {

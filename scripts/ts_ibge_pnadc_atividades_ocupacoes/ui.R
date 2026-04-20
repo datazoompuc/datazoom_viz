@@ -82,18 +82,6 @@ get_ui <- function(files, param) {
                        width = "100%"
                    ),
                     
-                  # Seleciona tipo de classificação
-                  selectizeInput(
-                      "filter_id",
-                      "Classificação",
-                      choices = param$id_choices,
-                      multiple = FALSE,
-                      options = list(maxItems = 1),
-                      width = "100%",
-                      selected = param$id_def
-                  ),
-              
-                   
                    #Seleciona filtro de ocupação
                    selectizeInput(
                        "filter2",
