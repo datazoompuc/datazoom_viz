@@ -19,42 +19,35 @@ get_server <- function(files, param) {
             stringsAsFactors = FALSE, fileEncoding = "UTF-8"
         )
 
-        # Helper: constrói choices a partir de pnadc_categories.csv
+        # Helper: constrói choices a partir de pnadc_categories.csv 
         read_pnadc_choices <- function(filter_id, lang_val = "pt") {
-            cats <- categories_df[
-                categories_df$filter_id == filter_id & nzchar(categories_df$value),
-            ]
+            cats <- categories_df[categories_df$filter_id == filter_id & nzchar(categories_df$value), ]
             cats <- cats[order(cats$ord_group, cats$ord_item), ]
-            group_keys <- unique(cats$group_pt)
-            out <- list()
-            for (g_pt in group_keys) {
-                items <- cats[cats$group_pt == g_pt, ]
-                g_label <- if (lang_val == "pt") items$group_pt[1] else items$group_en[1]
-                labels  <- if (lang_val == "pt") items$label_pt   else items$label_en
+            out  <- list()
+            for (g_pt in unique(cats$group_pt)) {
+                items  <- cats[cats$group_pt == g_pt, ]
+                if (g_pt == "UF") items <- items[order(items$value), ]
+                g_label        <- if (lang_val == "pt") items$group_pt[1] else items$group_en[1]
+                labels         <- if (g_pt == "UF") items$value else if (lang_val == "pt") items$label_pt else items$label_en
                 out[[g_label]] <- as.list(setNames(items$value, labels))
             }
             out
         }
 
-        # Helper: constrói choices de filter2 (CNAE + COD agrupados, com prefixos)
+        # Helper: constrói choices de filter2
         build_ocupation_choices <- function(lang_val = "pt") {
-            t <- param$i18n[[lang_val]]
-
-            cnae_cats <- categories_df[categories_df$filter_id == "cnae" & nzchar(categories_df$value), ]
-            cnae_cats <- cnae_cats[order(cnae_cats$ord_item), ]
-            cnae_rest <- cnae_cats[cnae_cats$value != "Todos", ]
-
-            cod_cats <- categories_df[categories_df$filter_id == "cod" & nzchar(categories_df$value), ]
-            cod_cats  <- cod_cats[order(cod_cats$ord_item), ]
-
-            todos_label      <- if (lang_val == "pt") "Todos" else "All"
-            cnae_rest_labels <- if (lang_val == "pt") cnae_rest$label_pt else cnae_rest$label_en
-            cod_labels       <- if (lang_val == "pt") cod_cats$label_pt  else cod_cats$label_en
-
+            t    <- param$i18n[[lang_val]]
+            lbl  <- function(x) if (lang_val == "pt") x$label_pt else x$label_en
+            get_sorted <- function(fid) {
+                x <- categories_df[categories_df$filter_id == fid & nzchar(categories_df$value) & categories_df$value != "Todos", ]
+                x[order(x$label_pt), ]
+            }
+            cnae <- get_sorted("cnae")
+            cod  <- get_sorted("cod")
             choices <- list()
-            choices[[t$label_all]]  <- setNames(list("All::Todos"), todos_label)
-            choices[[t$label_cnae]] <- as.list(setNames(paste0("CNAE::", cnae_rest$value), cnae_rest_labels))
-            choices[[t$label_cod]]  <- as.list(setNames(paste0("COD::",  cod_cats$value),  cod_labels))
+            choices[[t$label_all]]  <- setNames(list("All::Todos"), if (lang_val == "pt") "Todos" else "All")
+            choices[[t$label_cnae]] <- as.list(setNames(paste0("CNAE::", cnae$value), lbl(cnae)))
+            choices[[t$label_cod]]  <- as.list(setNames(paste0("COD::",  cod$value),  lbl(cod)))
             choices
         }
 
@@ -75,7 +68,7 @@ get_server <- function(files, param) {
         output$label_scale_ui <- renderUI({ tags$span(txt()$label_scale_name, class = "switch-title") })
         output$label_prop_ui  <- renderUI({ tags$span(txt()$label_prop_name,  class = "switch-title") })
 
-        # Atualiza todos os inputs quando a língua muda (também roda no init)
+        # Atualiza todos os inputs quando a língua muda
         observeEvent(lang(), {
             t   <- txt()
             tbl <- param_tbl()
