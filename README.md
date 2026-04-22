@@ -16,6 +16,30 @@ Main Directories:
  
  - "./scripts": contains .R scripts that generate the visualizations using the Shiny Apps technology.
 
+## App Deployment
+
+To deploy a Shiny application, first load the deploy script:
+
+```r
+source("scripts/deploy_shiny_script.R")
+```
+
+Then call the deploy function with the desired `app_id`:
+
+```r
+deploy_shiny_script("app_id")
+```
+For example:
+
+```r
+deploy_shiny_script("ts_ibge_pnadc_cnae")
+```
+
+If an error occurs, check the console log to identify missing dependencies or configuration issues.
+
+```r
+rsconnect::showLogs(appName = "app_app_id", account = "datazoom")
+```
 
 ## Glossary
 
