@@ -40,7 +40,7 @@ get_server <- function(files, param) {
             lbl  <- function(x) if (lang_val == "pt") x$label_pt else x$label_en
             get_sorted <- function(fid) {
                 x <- categories_df[categories_df$filter_id == fid & nzchar(categories_df$value) & categories_df$value != "Todos", ]
-                x[order(x$label_pt), ]
+                x[order(lbl(x)), ]
             }
             cnae <- get_sorted("cnae")
             cod  <- get_sorted("cod")
