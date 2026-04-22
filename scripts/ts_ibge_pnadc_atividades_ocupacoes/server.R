@@ -173,7 +173,7 @@ get_server <- function(files, param) {
                 if (is.null(input$y) || input$y == "" ||
                     is.null(input$filter1) || length(input$filter1) < 1) stop()
 
-                x_col     <- param$table[param$table$var == param$x_def, ]
+                x_col     <- param_tbl()[param_tbl()$var == param$x_def, ]
                 y_col     <- param_tbl()[param_tbl()$var == input$y, ]
                 color_col <- param$table[param$table$var == param$color_def, ]
 
@@ -203,7 +203,20 @@ get_server <- function(files, param) {
                 df_p$group               <- df_filtered$group
                 df_p$composicao_demografica <- df_filtered$composicao_demografica
                 df_p$id                  <- df_filtered$id
-                df_p$text                <- paste(df_p$group, "-", df_p$composicao_demografica)
+
+                # Traduz labels de legenda/tooltip quando em inglês
+                group_disp <- df_p$group
+                cd_disp    <- df_p$composicao_demografica
+                if (lang() == "en") {
+                    region_rows <- categories_df[categories_df$filter_id == "region" & nzchar(categories_df$value), ]
+                    region_lkp  <- setNames(region_rows$label_en, region_rows$value)
+                    group_disp  <- ifelse(group_disp %in% names(region_lkp), region_lkp[group_disp], group_disp)
+
+                    act_rows <- categories_df[categories_df$filter_id %in% c("cnae", "cod") & nzchar(categories_df$value), ]
+                    act_lkp  <- setNames(act_rows$label_en, act_rows$value)
+                    cd_disp  <- ifelse(cd_disp %in% names(act_lkp), act_lkp[cd_disp], cd_disp)
+                }
+                df_p$text <- paste(group_disp, "-", cd_disp)
 
                 df_p <- df_p[!is.na(df_p$x) & !is.na(df_p$y), ]
                 if (nrow(df_p) < 1) stop()
