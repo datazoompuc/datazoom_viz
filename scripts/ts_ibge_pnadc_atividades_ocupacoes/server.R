@@ -2,19 +2,118 @@
 
 # Paleta de cores
 pallete_discrete <- c("#fcff84","#ffcf48" ,"#c3ff83","#007e47","#00596d","#4fdf94","#99b0c8","#261c4e","#000098","#c368b1","#60458c","#757575")
-pallete_continuous <- c("#440154","#481567" ,"#453781","#404788","#39568c","#33638d","#287d8e","#238a8d","#1f968b","#20a387","#29af7f","#3cbb75","#55c667","#73d055","#95d840","#b8de29","#dce319","#fde725") # Viridis
+pallete_continuous <- c("#440154","#481567" ,"#453781","#404788","#39568c","#33638d","#287d8e","#238a8d","#1f968b","#20a387","#29af7f","#3cbb75","#55c667","#73d055","#95d840","#b8de29","#dce319","#fde725")
 
 # Fontes
 f1 <- list(family = "Roboto", size = 14, color = "rgb(0, 0, 0)")
 f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
-# Funcão para retornar objeto server
 get_server <- function(files, param) {
     server <- function(input, output, session) {
-        
-        # Carrega dados
+
         df <- readRDS(files$db_file)
-        
+
+        # Lê categories uma vez ao iniciar
+        categories_df <- read.csv(
+            files$categories_file, sep = ";",
+            stringsAsFactors = FALSE, fileEncoding = "UTF-8"
+        )
+
+        # Helper: constrói choices a partir de pnadc_categories.csv
+        read_pnadc_choices <- function(filter_id, lang_val = "pt") {
+            cats <- categories_df[
+                categories_df$filter_id == filter_id & nzchar(categories_df$value),
+            ]
+            cats <- cats[order(cats$ord_group, cats$ord_item), ]
+            group_keys <- unique(cats$group_pt)
+            out <- list()
+            for (g_pt in group_keys) {
+                items <- cats[cats$group_pt == g_pt, ]
+                g_label <- if (lang_val == "pt") items$group_pt[1] else items$group_en[1]
+                labels  <- if (lang_val == "pt") items$label_pt   else items$label_en
+                out[[g_label]] <- as.list(setNames(items$value, labels))
+            }
+            out
+        }
+
+        # Helper: constrói choices de filter2 (CNAE + COD agrupados, com prefixos)
+        build_ocupation_choices <- function(lang_val = "pt") {
+            t <- param$i18n[[lang_val]]
+
+            cnae_cats <- categories_df[categories_df$filter_id == "cnae" & nzchar(categories_df$value), ]
+            cnae_cats <- cnae_cats[order(cnae_cats$ord_item), ]
+            cnae_rest <- cnae_cats[cnae_cats$value != "Todos", ]
+
+            cod_cats <- categories_df[categories_df$filter_id == "cod" & nzchar(categories_df$value), ]
+            cod_cats  <- cod_cats[order(cod_cats$ord_item), ]
+
+            todos_label      <- if (lang_val == "pt") "Todos" else "All"
+            cnae_rest_labels <- if (lang_val == "pt") cnae_rest$label_pt else cnae_rest$label_en
+            cod_labels       <- if (lang_val == "pt") cod_cats$label_pt  else cod_cats$label_en
+
+            choices <- list()
+            choices[[t$label_all]]  <- setNames(list("All::Todos"), todos_label)
+            choices[[t$label_cnae]] <- as.list(setNames(paste0("CNAE::", cnae_rest$value), cnae_rest_labels))
+            choices[[t$label_cod]]  <- as.list(setNames(paste0("COD::",  cod_cats$value),  cod_labels))
+            choices
+        }
+
+        # Reativo de língua
+        lang <- reactiveVal("pt")
+
+        observeEvent(input$toggle_lang, {
+            lang(ifelse(lang() == "pt", "en", "pt"))
+        })
+
+        txt       <- reactive({ param$i18n[[lang()]] })
+        param_tbl <- reactive({ param$tables[[lang()]] })
+
+        # Textos dinâmicos do menu
+        output$plot_name_ui  <- renderUI({ h2(class = "plot_name", txt()$plot_name) })
+        output$plot_desc_ui  <- renderUI({ p(class  = "plot_desc", txt()$plot_desc) })
+        output$label_var_ui  <- renderUI({ p(class  = "vars",      txt()$label_var_name) })
+        output$label_scale_ui <- renderUI({ tags$span(txt()$label_scale_name, class = "switch-title") })
+        output$label_prop_ui  <- renderUI({ tags$span(txt()$label_prop_name,  class = "switch-title") })
+
+        # Atualiza todos os inputs quando a língua muda (também roda no init)
+        observeEvent(lang(), {
+            t   <- txt()
+            tbl <- param_tbl()
+
+            updateSelectInput(session, "y",
+                              label   = t$label_y_name,
+                              choices = setNames(tbl$var[tbl$y], tbl$label[tbl$y]),
+                              selected = isolate(if (!is.null(input$y)) input$y else param$y_def))
+
+            sel1 <- isolate(input$filter1)
+            sel2 <- isolate(input$filter2)
+            sel3 <- isolate(input$filter3)
+            if (is.null(sel1) || length(sel1) == 0) sel1 <- c("Amaz\u00f4nia Legal", "Brasil")
+            if (is.null(sel2) || length(sel2) == 0) sel2 <- param$ocupation_def
+            if (is.null(sel3) || length(sel3) == 0) sel3 <- param$sector_def
+
+            updateSelectizeInput(session, "filter1",
+                                 label    = t$label_region_name,
+                                 choices  = read_pnadc_choices("region", lang()),
+                                 selected = sel1,
+                                 options  = list(maxItems = 20))
+
+            updateSelectizeInput(session, "filter2",
+                                 label    = t$label_type_name,
+                                 choices  = build_ocupation_choices(lang()),
+                                 selected = sel2,
+                                 options  = list(maxItems = 20))
+
+            updateSelectizeInput(session, "filter3",
+                                 label    = t$label_sector_name,
+                                 choices  = read_pnadc_choices("sector", lang()),
+                                 selected = sel3,
+                                 options  = list(maxItems = 1))
+
+            updateActionButton(session, "toggle_lang", label = t$btn_lang)
+
+        }, ignoreInit = FALSE)
+
         # Função para atualizar url do app com parâmetros dos inputs
         update_my_queryString <- function() {
             q_string <- paste0(
@@ -22,157 +121,68 @@ get_server <- function(files, param) {
                 "&","ylog=",input$ylog,
                 "&","y_option=",input$y_option
             )
-            
-            for (i in input$filter1) {
-                q_string <- paste0(
-                    q_string,
-                    "&","filter=",i
-                )
-            }
-            
-            for (j in input$filter2) {
-                q_string <- paste0(
-                    q_string,
-                    "&","filter2=",j
-                )
-                
-            }
-            
-            for (k in input$filter3) {
-                q_string <- paste0(
-                    q_string,
-                    "&","filter3=",k
-                )
-                
-            }
-            
+            for (i in input$filter1)  q_string <- paste0(q_string, "&filter=",  i)
+            for (j in input$filter2)  q_string <- paste0(q_string, "&filter2=", j)
+            for (k in input$filter3)  q_string <- paste0(q_string, "&filter3=", k)
             updateQueryString(q_string, mode = "replace")
         }
-        
+
         # Função para atualizar inputs a partir da URL
         update_my_inputs <- function() {
-            # Preenche filtro vazio
-            updateSelectInput(session,
-                              "filter1",
-                              choices = param$filter_choices,
-                              selected = c("Amazônia Legal", "Brasil")
-            )
-            
-            updateSelectizeInput(session,
-                                 "filter2",
-                                 choices = param$ocupation_choices,
-                                 selected = param$ocupation_def
-            )
-            
-            updateSelectInput(session, 
-                              "filter3", 
-                              choices = param$sector_choices, 
-                              selected = param$sector_def
-            )
-            
-            #Pega parametros da url e atribui aos selectinputs
             query <- parseQueryString(session$clientData$url_search)
-            
+
             if (!is.null(query[['y']])) {
-                updateSelectInput(session,  "y",
-                                  choices = param$y_choices,
-                                  selected = query[['y']])
-            } 
-            
+                updateSelectInput(session, "y", selected = query[['y']])
+            }
             if (!is.null(query[['ylog']])) {
-                updateCheckboxInput(session, "ylog",
-                                    value = (query[['ylog']] == "TRUE"))
+                updateCheckboxInput(session, "ylog", value = (query[['ylog']] == "TRUE"))
             }
-            
             if (!is.null(query[['y_option']])) {
-                updateCheckboxInput(session, "y_option",
-                                    value = (query[['y_option']] == "TRUE"))
+                updateCheckboxInput(session, "y_option", value = (query[['y_option']] == "TRUE"))
             }
-            
-            selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-            if (!is.null(query[["filter"]])) {
-                updateSelectInput(session,
-                                  "filter1",
-                                  choices = param$filter_choices,
-                                  selected = selected
-                )
-            }
-            
-            selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-            if (!is.null(query[["filter"]])) {
-                updateSelectInput(session,
-                                  "filter2",
-                                  choices = param$ocupation_choices,
-                                  selected = selected
-                )
-            }
-            
-            selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-            if (!is.null(query[["filter"]])) {
-                updateSelectInput(session,
-                                  "filter3",
-                                  choices = param$sector_choices,
-                                  selected = selected
-                )
-            }
+            selected1 <- unlist(query[names(query) == "filter"],  use.names = FALSE)
+            if (length(selected1) > 0) updateSelectizeInput(session, "filter1", selected = selected1)
+
+            selected2 <- unlist(query[names(query) == "filter2"], use.names = FALSE)
+            if (length(selected2) > 0) updateSelectizeInput(session, "filter2", selected = selected2)
+
+            selected3 <- unlist(query[names(query) == "filter3"], use.names = FALSE)
+            if (length(selected3) > 0) updateSelectizeInput(session, "filter3", selected = selected3)
         }
-        
-        # Output título do gráfico
+
+        # Título do gráfico
         output$plot_title <- renderText({
-            text <- " "
-            # Se algum campo estiver vazio retorna texto vazio
-            if(is.null(input$y) || input$y == "") {
-                text <- "Vari\u00e1vel n\u00e3o selecionada"
-            } else {
-                # Monta título a partir de variáveis selecionadas nos inputs
-                y_col <- param$table[which(param$table$var == input$y), ]
-                
-                text <-  paste0(param$title_init, " ", y_col$label)
-                if(input$y_option)  {
-                    text <-  paste0(param$title_init, " ", y_col$label, "*")
-                }
-            }
-            
-            text
+            req(input$y)
+            tbl <- param_tbl()
+            y_label <- tbl$label[tbl$var == input$y]
+            title <- paste(txt()$title_init, y_label)
+            if (isTRUE(input$y_option)) paste0(title, "*") else title
         })
+
         output$plot_subtitle <- renderText({
-            if (is.null(input$y) || input$y == "") return(" ")
-
-            has_cnae <- any(startsWith(input$filter2, "CNAE::"))
-            has_cod  <- any(startsWith(input$filter2, "COD::"))
-
-            if (has_cnae && has_cod) "por atividade econ\u00f4mica / ocupa\u00e7\u00e3o"
-            else if (has_cnae)       "por atividade econ\u00f4mica"
-            else if (has_cod)        "por ocupa\u00e7\u00e3o"
-            else                     "por atividade econ\u00f4mica / ocupa\u00e7\u00e3o"
+            req(input$y)
+            txt()$subtitle
         })
-        
-        # Output gráfico
+
+        # Gráfico principal
         output$plot <- renderPlotly({
-            update_my_queryString()  #atualiza url com parametros dos inputs
-            
-            fig <- plotly_empty() #inicia figura com gráfico em branco
+            update_my_queryString()
+
+            fig <- plotly_empty()
             tryCatch({
-                # Se algum campo estiver vazio retorna gráfico vazio
-                if(is.null(input$y) || input$y == "" || 
-                   is.null(input$filter1) || length(input$filter1) < 1) {
-                    fig <- plotly_empty()
-                    stop()
-                }
-                
-                #Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-                # Cria dataframe do gráfico
-                x_col <- param$table[which(param$table$var == param$x_def),]
-                y_col <- param$table[which(param$table$var == input$y),]
-                color_col <- param$table[which(param$table$var == param$color_def), ]
+                if (is.null(input$y) || input$y == "" ||
+                    is.null(input$filter1) || length(input$filter1) < 1) stop()
+
+                x_col     <- param$table[param$table$var == param$x_def, ]
+                y_col     <- param_tbl()[param_tbl()$var == input$y, ]
+                color_col <- param$table[param$table$var == param$color_def, ]
 
                 # Parseia valores prefixados do filter2
-                sel <- input$filter2
-                is_todos  <- "All::Todos" %in% sel
-                cnae_sel  <- sub("^CNAE::", "", sel[startsWith(sel, "CNAE::")])
-                cod_sel   <- sub("^COD::",  "", sel[startsWith(sel, "COD::")])
+                sel      <- input$filter2
+                is_todos <- "All::Todos" %in% sel
+                cnae_sel <- sub("^CNAE::", "", sel[startsWith(sel, "CNAE::")])
+                cod_sel  <- sub("^COD::",  "", sel[startsWith(sel, "COD::")])
 
-                # Filtra dataframe com grupos selecionados
                 df_filtered <- df %>%
                     dplyr::filter(
                         group %in% input$filter1 &
@@ -183,27 +193,22 @@ get_server <- function(files, param) {
                             (id == "COD"  & composicao_demografica %in% cod_sel)
                         )
                     )
-                
-                df_p <- data.frame(df_filtered[x_col$var],
-                                   df_filtered[y_col$var],
-                                   df_filtered[color_col$var]
+
+                df_p <- data.frame(
+                    df_filtered[x_col$var],
+                    df_filtered[y_col$var],
+                    df_filtered[color_col$var]
                 )
                 colnames(df_p) <- c("x", "y", "color")
-                df_p$group <- df_filtered$group
+                df_p$group               <- df_filtered$group
                 df_p$composicao_demografica <- df_filtered$composicao_demografica
-                df_p$id <- df_filtered$id
-                df_p$text <- paste(df_p$group, "-", df_p$composicao_demografica)
+                df_p$id                  <- df_filtered$id
+                df_p$text                <- paste(df_p$group, "-", df_p$composicao_demografica)
 
-                # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-                df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
+                df_p <- df_p[!is.na(df_p$x) & !is.na(df_p$y), ]
+                if (nrow(df_p) < 1) stop()
 
-                # Se dataset estiver vazio, não monta o gráfico, retorna em branco
-                if (nrow(df_p) < 1) {
-                    fig <- plotly_empty()
-                    stop()
-                }
-
-                # Labels com ambiguidade (mesmo composicao_demografica em CNAE e COD) recebem sufixo
+                # Labels com ambiguidade (mesmo nome em CNAE e COD) recebem sufixo
                 ambiguous <- df_p %>%
                     dplyr::filter(id != "All") %>%
                     dplyr::group_by(composicao_demografica) %>%
@@ -216,123 +221,65 @@ get_server <- function(files, param) {
                     paste0(df_p$text, " (", df_p$id, ")"),
                     df_p$text
                 )
-                
-                # Alternativa de medida para y
-                if (input$y_option & is.numeric(df_p$y)) {
+
+                if (isTRUE(input$y_option) && is.numeric(df_p$y)) {
                     df_p <- df_p %>%
-                        ungroup() %>%
-                        arrange(x) %>%
-                        mutate(
-                            y = 100 * y/first(y),
-                            .by = combined
-                        )
+                        dplyr::ungroup() %>%
+                        dplyr::arrange(x) %>%
+                        dplyr::mutate(y = 100 * y / dplyr::first(y), .by = combined)
                 }
-                
-                # Se a coluna de cor for toda NA, preenche com strings em branco
-                if (all(is.na(df_p$color))) {
-                    df_p$color <- " "
-                }
-                
-                # Monta html do tooltip
+
+                if (all(is.na(df_p$color))) df_p$color <- " "
+
+                t <- txt()
                 df_p$tooltip <- paste0(
-                    "<b>",df_p$combined,"</b><br>",
-                    x_col$label,": ",paste0('T', quarter(df_p$x), '-', year(df_p$x)),"<br>",
-                    y_col$label,": ",format(df_p$y, scientific = FALSE,
-                                            digits = 2,
-                                            decimal.mark = ",", 
-                                            big.mark = "."),"<br>"
+                    "<b>", df_p$combined, "</b><br>",
+                    x_col$label, ": ", paste0("T", quarter(df_p$x), "-", year(df_p$x)), "<br>",
+                    y_col$label, ": ", format(df_p$y,
+                                              scientific  = FALSE,
+                                              digits      = 2,
+                                              decimal.mark = t$dec_mark,
+                                              big.mark     = t$big_mark), "<br>"
                 )
-                
-                # Define paleta de cores
-                pallete <- pallete_discrete
-                
-                # Monta gráfico
-                fig_p <- plot_ly(df_p, 
-                                 x = ~x,
-                                 y = ~y,
-                                 color = ~combined,
-                                 type = "scatter", 
-                                 mode = "lines",
-                                 text = ~tooltip,
-                                 hoverinfo = "text"
-                )
-                
-                # Layout eixos
+
+                y_title <- if (isTRUE(input$y_option)) paste0(y_col$label, "*") else y_col$label
+                if (isTRUE(input$ylog) && is.numeric(df_p$y)) y_title <- paste0(y_title, " (log)")
+
                 x_axis_layout <- list(
-                    title = x_col$label,
-                    titlefont = f1,
-                    tickfont = f2,
-                    automargin = FALSE,
-                    autorange = TRUE,
-                    showgrid = FALSE,
-                    zeroline = FALSE
+                    title = x_col$label, titlefont = f1, tickfont = f2,
+                    automargin = FALSE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE
                 )
                 y_axis_layout <- list(
-                    title = y_col$label,
-                    titlefont = f1,
-                    tickfont = f2,
-                    automargin = FALSE,
-                    autorange = TRUE,
-                    showgrid = FALSE,
-                    zeroline = FALSE
+                    title = y_title, titlefont = f1, tickfont = f2,
+                    automargin = FALSE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE
                 )
-                
-                if (input$ylog & is.numeric(df_p$y)) {
-                    y_axis_layout$type <- "log"
-                    y_axis_layout$title <- paste0(y_axis_layout$title, " (log)")
-                }
-                
-                if (input$y_option) {
-                    y_axis_layout$title <- paste0(y_col$label, "*")
-                }
-                
-                # Layout hover/tooltip
-                tooltip <- list(
-                    bordercolor = "rgba(255, 255, 255, 1)",
-                    bgopacity = "0.5",
-                    font = f1
-                )
-                
-                # Aplica layout
-                fig_p <- fig_p %>% 
-                    layout(
-                        font = f1,
-                        xaxis = x_axis_layout,
-                        yaxis = y_axis_layout,
-                        showlegend = TRUE,
-                        hoverlabel = tooltip
-                    )
-                
-                #  Configura botões do plotly
-                fig_p <- fig_p %>%
-                    config(
-                        #toImageButtonOptions = list(format = "svg"),
-                        displaylogo = FALSE,
-                        modeBarButtonsToRemove = c(
-                            "lasso2d",
-                            "select2d",
-                            "hoverCompareCartesian"
-                        )
-                    )
-                
-                fig <- fig_p # retorna a figura do gráfico
+                if (isTRUE(input$ylog) && is.numeric(df_p$y)) y_axis_layout$type <- "log"
+
+                tooltip_style <- list(bordercolor = "rgba(255,255,255,1)", bgopacity = "0.5", font = f1)
+
+                fig_p <- plot_ly(df_p,
+                                 x = ~x, y = ~y, color = ~combined,
+                                 type = "scatter", mode = "lines",
+                                 text = ~tooltip, hoverinfo = "text") %>%
+                    layout(font = f1, xaxis = x_axis_layout, yaxis = y_axis_layout,
+                           showlegend = TRUE, hoverlabel = tooltip_style) %>%
+                    config(displaylogo = FALSE,
+                           modeBarButtonsToRemove = c("lasso2d", "select2d", "hoverCompareCartesian"))
+
+                fig <- fig_p
             },
             error = function(cond) {
-                # se encontrar erro retorna fig em branco
                 print("plot error")
-                fig <- plotly_empty()
+                fig <<- plotly_empty()
             })
             fig
         })
-        
-        # Observa eventos
+
         observe({
-            #Pega parametros da url e atribui aos selectinputs
             query <- parseQueryString(session$clientData$url_search)
             update_my_inputs()
         })
     }
-    
-    # Retorna objeto server
+
     server
 }

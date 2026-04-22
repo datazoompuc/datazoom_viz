@@ -1,131 +1,131 @@
-# library(shinyWidgets)
-# library(bslib)
-
 #  -------------------------------- Define UI --------------------------------
 
-# Funcão para retornar objeto server
 get_ui <- function(files, param) {
-    div( # div geral
-        includeCSS(files$CSS_script), # Incluí script CSS
+    div(
+        includeCSS(files$CSS_script),
         class = "container-fluid h-100 d-flex flex-column apppanel",
         fluidRow(
             class = "mainrow h-100",
-            column(3, # dimensão da coluna do bootstrap
+            column(3,
                    class = "menucol",
-                   
-                   # muda cor do background
-                   tags$style('.menucol {
-                             background-color: #41878C;
-              }',),
-                   
-                   # muda cor do botao 
-                   tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
-                          background-color: #40768B !important;
-                          border-color: #40768B !important;
-              }',),
-                   
-                   h2(class = "plot_name", param$plot_name),
-                   p(class = "plot_desc", param$plot_desc),
+
+                   tags$style('
+                     .menucol { background-color: #41878C; }
+                     .btn-primary, .btn-primary:hover,
+                     .btn-primary:active, .btn-primary:visited {
+                       background-color: #40768B !important;
+                       border-color: #40768B !important;
+                     }
+                     .switch-label { color: white; }
+                   '),
+
+                   uiOutput("plot_name_ui"),
+                   uiOutput("plot_desc_ui"),
                    hr(),
-                   p(class = "vars",  param$label_var_name),
+                   uiOutput("label_var_ui"),
+
                    div(
                        class = "var_selec_group",
-                       # Seleciona variável do eixo y
                        selectInput(
                            inputId = "y",
-                           label = param$label_y_name,
-                           choices = param$y_choices,
+                           label = param$i18n$pt$label_y_name,
+                           choices = setNames(param$table$var[param$table$y],
+                                              param$table$label[param$table$y]),
                            selected = param$y_def,
                            width = "100%"
                        )
                    ),
-              # labels e switches com texto em cima, switch embaixo
-              tags$style(HTML("
-                      .switch-group { margin-top: 10px; }
-                      .switch-title {
-                        display: block;
-                        color: white;
-                        font-weight: 500;
-                        letter-spacing: 0.5px;
-                        margin-bottom: 6px;
-                      }
-                    ")),
-                    
-                    # Escala log
-                    div(class = "switch-group",
-                        tags$span(param$label_scale_name, class = "switch-title"),
-                        materialSwitch(
-                            inputId = "ylog",
-                            label   = NULL,     # << texto fica acima, não ao lado
-                            value   = FALSE,
-                            status  = "info"
-                        )
-                    ),
-                    
-                    # Proporcional ao trimestre inicial (*)
-                    div(class = "switch-group",
-                        tags$span(param$label_prop_name, class = "switch-title"),
-                        materialSwitch(
-                            inputId = "y_option",
-                            label   = NULL,
-                            value   = FALSE,
-                            status  = "info"
-                        )
-                    ),
-                   # Seleciona filtro de municípios
+
+                   tags$style(HTML("
+                     .switch-group { margin-top: 10px; }
+                     .switch-title {
+                       display: block;
+                       color: white;
+                       font-weight: 500;
+                       letter-spacing: 0.5px;
+                       margin-bottom: 6px;
+                     }
+                   ")),
+
+                   div(class = "switch-group",
+                       uiOutput("label_scale_ui"),
+                       materialSwitch(
+                           inputId = "ylog",
+                           label   = NULL,
+                           value   = FALSE,
+                           status  = "info"
+                       )
+                   ),
+
+                   div(class = "switch-group",
+                       uiOutput("label_prop_ui"),
+                       materialSwitch(
+                           inputId = "y_option",
+                           label   = NULL,
+                           value   = FALSE,
+                           status  = "info"
+                       )
+                   ),
+
                    selectizeInput(
                        "filter1",
-                       param$label_region_name,
-                       choices = param$filter_choices,
-                       multiple = T,
+                       param$i18n$pt$label_region_name,
+                       choices = NULL,
+                       multiple = TRUE,
                        options = list(maxItems = 20),
                        width = "100%"
                    ),
-                    
-                   #Seleciona filtro de ocupação
+
                    selectizeInput(
                        "filter2",
-                       param$label_type_name,
-                       choices = param$ocupation_choices,
+                       param$i18n$pt$label_type_name,
+                       choices = NULL,
                        multiple = TRUE,
                        options = list(maxItems = 20),
                        width = "100%",
                        selected = param$ocupation_def
                    ),
-                   
-                   
-                   #seleciona filtro de setor
+
                    selectizeInput(
                        "filter3",
-                       param$label_sector_name,
-                       choices = param$sector_choices,
-                       multiple = T,
+                       param$i18n$pt$label_sector_name,
+                       choices = NULL,
+                       multiple = TRUE,
                        options = list(maxItems = 1),
                        width = "100%",
                        selected = param$sector_def
                    ),
-                   
-                   # espaço vazio
-                   div(class = "fakecheckbox", ),
-                   
-                   div(
-                       shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                                           icon = icon("expand"), 
-                                           class = "btn-primary",
-                                           onclick = paste0("window.open('", param$link, "', '_blank')"))
+
+                   div(class = "fakecheckbox"),
+
+                   actionButton(
+                       'toggle_lang',
+                       label = "English",
+                       icon = icon("globe"),
+                       class = "btn-primary"
                    ),
+
+                   div(style = "height: 6px;"),
+
+                   actionButton(
+                       inputId = 'ab1',
+                       label = "Fullscreen",
+                       icon = icon("expand"),
+                       class = "btn-primary",
+                       onclick = paste0("window.open('", param$link, "', '_blank')")
+                   )
             ),
             column(9,
                    class = "plotcol h-100",
                    textOutput("plot_title"),
                    textOutput("plot_subtitle"),
-                   div( # row do gráfico
+                   div(
                        class = "plotrow row justify-content-center flex-grow-1 w-100",
                        div(
                            class = "plotdiv w-100 h-100",
                            style = "position: relative; display: flex; flex-direction: column;",
                            div(
-                               style = "flex-grow: 1; position: relative;", 
+                               style = "flex-grow: 1; position: relative;",
                                withSpinner(
                                    plotlyOutput("plot", width = "100%", height = "calc(100vh - 150px)"),
                                    type = 4,
@@ -135,6 +135,6 @@ get_ui <- function(files, param) {
                        )
                    )
             )
-        ),
+        )
     )
 }
