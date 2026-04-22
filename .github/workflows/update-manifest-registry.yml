@@ -1,0 +1,67 @@
+name: Update Manifest & Registry
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * 1' # 09:00 horário de Brasília toda segunda-feira
+
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev libcurl4-openssl-dev libxml2-dev
+
+      - name: Install R packages
+        run: |
+          Rscript -e "install.packages(
+            c('readr','dplyr','purrr','stringr','tibble','tidyr'),
+            repos = 'https://cloud.r-project.org'
+          )"
+
+      - name: Generate app manifest
+        run: Rscript scripts/generate_app_manifest.R
+
+      - name: Build dataset registry
+        run: Rscript scripts/build_dataset_registry.R
+
+      - name: Detect config changes
+        id: detect_changes
+        run: |
+          CHANGED=$(git status --porcelain config/app_manifest.csv config/dataset_registry.csv | awk '{print $NF}')
+          if [ -n "$CHANGED" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            SLACK_LIST=$(echo "$CHANGED" | awk '{printf "• %s\\n", $0}')
+            echo "slack_list=$SLACK_LIST" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit updated config files
+        if: steps.detect_changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add config/app_manifest.csv config/dataset_registry.csv
+          git commit -m "chore: update app manifest and dataset registry [skip ci]"
+          git push
+
+      - name: Notify Slack
+        if: steps.detect_changes.outputs.has_changes == 'true'
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":white_check_mark: *Aquivos config atualizados*\n\nOs seguintes arquivos foram atualizados em `config/`:\n${{ steps.detect_changes.outputs.slack_list }}\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>_"
+            }
