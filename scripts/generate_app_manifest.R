@@ -118,11 +118,5 @@ generate_app_manifest <- function(
   message("Manifesto salvo em: ", normalizePath(output_csv))
   manifest
 }
-----------------
-  
   
 generate_app_manifest()
-
-app_manifest <- read.csv("./config/app_manifest.csv")
-
-View(app_manifest)
