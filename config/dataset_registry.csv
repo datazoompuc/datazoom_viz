@@ -13,7 +13,7 @@ comex_exp_sh2_munic,data/comex_exp_sh2_munic.rds,data-raw/comex.R,load_br_trade(
 comex_exp_sh4_munic,data/comex_exp_sh4_munic.rds,data-raw/comex.R,load_br_trade(),datazoom.amazonia,
 comex_exp_tot_pais,data/comex_exp_tot_pais.rds,data-raw/comex.R,load_br_trade(),datazoom.amazonia,
 comex_exp_tot_sh2,data/comex_exp_tot_sh2.rds,data-raw/comex.R,load_br_trade(),datazoom.amazonia,
-dz_munic,data/dz_munic.rds,data-raw/dz_munic.R;data-raw/dz_munic_saude.R;data-raw/map_dz_munic.R;data-raw/map_dz_munic_prodes_data.R;data-raw/saude_municipality.R,load_prodes(),datazoom.amazonia,MULTIPLE_MATCHES
+dz_munic,data/dz_munic.rds,data-raw/dz_munic_saude.R;data-raw/dz_munic.R;data-raw/map_dz_munic_prodes_data.R;data-raw/map_dz_munic.R;data-raw/saude_municipality.R,load_prodes(),datazoom.amazonia,MULTIPLE_MATCHES
 dz_munic_ppm_mapbiomas,data/dz_munic_ppm_mapbiomas.rds,data-raw/dz_munic_ppm_mapbiomas.R,load_mapbiomas(),datazoom.amazonia,
 dz_munic_ppm_mapbiomas_en,data/dz_munic_ppm_mapbiomas_en.rds,data-raw/dz_munic_ppm_mapbiomas.R,load_mapbiomas(),datazoom.amazonia,
 dz_munic_saude,data/dz_munic_saude.rds,data-raw/dz_munic_saude.R;data-raw/map_saude_mortalidade.R,,datazoom.amazonia,MULTIPLE_MATCHES
@@ -27,6 +27,7 @@ ibge_pnadc_cnae,data/ibge_pnadc_cnae.rds,data-raw/ibge_pnadc.R,load_pnadc(),data
 ibge_pnadc_cod,data/ibge_pnadc_cod.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
 ibge_pnadc_trabalho,data/ibge_pnadc_trabalho.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
 ibge_pnadc_trabalho_en,data/ibge_pnadc_trabalho_en.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
+ibge_pnadc_trabalho_insercao,data/ibge_pnadc_trabalho_insercao.rds,,,,NOT_FOUND_IN_DATA_RAW
 ips_2021,data/ips_2021.rds,data-raw/dz_varias_amazonias_cross_section.R;data-raw/ips.R,,,MULTIPLE_MATCHES
 mapbiomas8_cover_pastCattle,data/mapbiomas8_cover_pastCattle.rds,data-raw/mapbiomas8_cover_pasture.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas8_cover_pasture,data/mapbiomas8_cover_pasture.rds,data-raw/mapbiomas8_cover_pasture.R,load_mapbiomas(),datazoom.amazonia,
