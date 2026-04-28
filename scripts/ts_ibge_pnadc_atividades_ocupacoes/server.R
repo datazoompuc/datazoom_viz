@@ -52,7 +52,10 @@ get_server <- function(files, param) {
         }
 
         # Reativo de língua
-        lang <- reactiveVal("pt")
+        lang <- reactiveVal({
+            query <- parseQueryString(isolate(session$clientData$url_search))
+            if (identical(query[["lang"]], "en")) "en" else "pt"
+        })
 
         observeEvent(input$toggle_lang, {
             lang(ifelse(lang() == "pt", "en", "pt"))
@@ -114,6 +117,7 @@ get_server <- function(files, param) {
                 "&","ylog=",input$ylog,
                 "&","y_option=",input$y_option
             )
+            if (lang() == "en") q_string <- paste0(q_string, "&lang=en")
             for (i in input$filter1)  q_string <- paste0(q_string, "&filter=",  i)
             for (j in input$filter2)  q_string <- paste0(q_string, "&filter2=", j)
             for (k in input$filter3)  q_string <- paste0(q_string, "&filter3=", k)
