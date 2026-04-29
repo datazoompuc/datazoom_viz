@@ -1,0 +1,101 @@
+filter_id;group_pt;group_en;value;label_pt;label_en;ord_group;ord_item
+region;Brasil;Brazil;Brasil;Brasil;Brazil;1;1
+region;Brasil;Brazil;;;;1;2
+region;Amazônia Legal;Legal Amazon;Amazônia Legal;Amazônia Legal;Legal Amazon;2;1
+region;Amazônia Legal;Legal Amazon;Fora da Amazônia Legal;Fora da Amazônia Legal;Outside Legal Amazon;2;2
+region;Região;Region;Norte;Norte;North;3;1
+region;Região;Region;Nordeste;Nordeste;Northeast;3;2
+region;Região;Region;Sudeste;Sudeste;Southeast;3;3
+region;Região;Region;Sul;Sul;South;3;4
+region;Região;Region;Centro-Oeste;Centro-Oeste;Central-West;3;5
+region;UF;State;RO;RO;RO;4;1
+region;UF;State;AC;AC;AC;4;2
+region;UF;State;AM;AM;AM;4;3
+region;UF;State;PA;PA;PA;4;4
+region;UF;State;AP;AP;AP;4;5
+region;UF;State;TO;TO;TO;4;6
+region;UF;State;MA;MA;MA;4;7
+region;UF;State;PI;PI;PI;4;8
+region;UF;State;CE;CE;CE;4;9
+region;UF;State;RN;RN;RN;4;10
+region;UF;State;PB;PB;PB;4;11
+region;UF;State;PE;PE;PE;4;12
+region;UF;State;AL;AL;AL;4;13
+region;UF;State;SE;SE;SE;4;14
+region;UF;State;BA;BA;BA;4;15
+region;UF;State;MG;MG;MG;4;16
+region;UF;State;ES;ES;ES;4;17
+region;UF;State;RJ;RJ;RJ;4;18
+region;UF;State;SP;SP;SP;4;19
+region;UF;State;PR;PR;PR;4;20
+region;UF;State;SC;SC;SC;4;21
+region;UF;State;RS;RS;RS;4;22
+region;UF;State;MS;MS;MS;4;23
+region;UF;State;MT;MT;MT;4;24
+region;UF;State;GO;GO;GO;4;25
+region;UF;State;DF;DF;DF;4;26
+
+sector;Setor;Sector;todos;Todos;All;1;1
+sector;Setor;Sector;formal;Formal;Formal;1;2
+sector;Setor;Sector;informal;Informal;Informal;1;3
+sector;Setor;Sector;publico;Público;Public;1;4
+sector;Setor;Sector;privado;Privado;Private;1;5
+
+cod;Ocupação;Ocupation;Todos;Todos;All;1;1
+cod;Ocupação;Ocupation;Administradores e especialista em gestão;Administradores e especialista em gestão;Administrators and management specialists;1;2
+cod;Ocupação;Ocupation;Ambulantes;Ambulantes;Street vendors;1;3
+cod;Ocupação;Ocupation;Apoio administrativo;Apoio administrativo;Administrative support;1;4
+cod;Ocupação;Ocupation;Artesões e artes gráficas;Artesões e artes gráficas;Craftsmen and graphic arts;1;5
+cod;Ocupação;Ocupation;Atendimento direto ao público;Atendimento direto ao público;Customer service;1;6
+cod;Ocupação;Ocupation;Cientistas e engenheiros;Cientistas e engenheiros;Scientists and engineers;1;7
+cod;Ocupação;Ocupation;Coletores de lixo;Coletores de lixo;Garbage collectors;1;8
+cod;Ocupação;Ocupation;Dirigentes e gerentes;Dirigentes e gerentes;Directors and managers;1;9
+cod;Ocupação;Ocupation;Domésticos;Domésticos;Domestic workers;1;10
+cod;Ocupação;Ocupation;Escriturários;Escriturários;Clerks;1;11
+cod;Ocupação;Ocupation;Extrativistas florestais;Extrativistas florestais;Forest extractors;1;12
+cod;Ocupação;Ocupation;Montadores e condutores de veículos;Montadores e condutores de veículos;Assemblers and vehicle drivers;1;13
+cod;Ocupação;Ocupation;Operários da construção, metalurgia e indústria;Operários da construção, metalurgia e indústria;Construction metallurgy and industry workers;1;14
+cod;Ocupação;Ocupation;Operários de processamento e instalações;Operários de processamento e instalações;Processing and installation workers;1;15
+cod;Ocupação;Ocupation;Pecuaristas e criadores de animais;Pecuaristas e criadores de animais;Livestock farmers and animal breeders;1;16
+cod;Ocupação;Ocupation;Profissionais da saúde;Profissionais da saúde;Healthcare professionals;1;17
+cod;Ocupação;Ocupation;Profissionais de segurança;Profissionais de segurança;Security professionals;1;18
+cod;Ocupação;Ocupation;Profissionais do ensino;Profissionais do ensino;Education professionals;1;19
+cod;Ocupação;Ocupation;Profissionais em alimentação;Profissionais em alimentação;Food professionals;1;20
+cod;Ocupação;Ocupation;Serviços de TI e comunicação;Serviços de TI e comunicação;IT and communication services;1;21
+cod;Ocupação;Ocupation;Serviços e cuidados pessoais;Serviços e cuidados pessoais;Personal care services;1;22
+cod;Ocupação;Ocupation;Serviços financeiros e administrativos;Serviços financeiros e administrativos;Financial and administrative services;1;23
+cod;Ocupação;Ocupation;Serviços jurídicos;Serviços jurídicos;Legal services;1;24
+cod;Ocupação;Ocupation;Técnicos de eletricidade e eletrônica;Técnicos de eletricidade e eletrônica;Electrical and electronics technicians;1;25
+cod;Ocupação;Ocupation;Trabalhadores no governo;Trabalhadores no governo;Government workers;1;26
+cod;Ocupação;Ocupation;Vendedores;Vendedores;Salespeople;1;27
+
+cnae;Atividade Econômica;Economic Activity;Todos;Todos;All;1;1
+cnae;Atividade Econômica;Economic Activity;Administração pública, defesa e seguridade social;Administração pública, defesa e seguridade social;Public administration, defense and social security;1;2
+cnae;Atividade Econômica;Economic Activity;Alimentos, bebidas e fumo;Alimentos, bebidas e fumo;Food, beverages and tobacco;1;3
+cnae;Atividade Econômica;Economic Activity;Artes, cultura, esportes e recreação;Artes, cultura, esportes e recreação;Arts, culture, sports and recreation;1;4
+cnae;Atividade Econômica;Economic Activity;Atividades profissionais, científicas e técnicas;Atividades profissionais, científicas e técnicas;Professional, scientific and technical activities;1;5
+cnae;Atividade Econômica;Economic Activity;Automóveis e equipamentos de transporte;Automóveis e equipamentos de transporte;Automobiles and transport equipment;1;6
+cnae;Atividade Econômica;Economic Activity;Comércio;Comércio;Trade;1;7
+cnae;Atividade Econômica;Economic Activity;Construção;Construção;Construction;1;8
+cnae;Atividade Econômica;Economic Activity;Educação;Educação;Education;1;9
+cnae;Atividade Econômica;Economic Activity;Eletrônicos, máquinas e equipamentos;Eletrônicos, máquinas e equipamentos;Electronics, machinery and equipment;1;10
+cnae;Atividade Econômica;Economic Activity;Estadia e turismo;Estadia e turismo;Lodging and tourism;1;11
+cnae;Atividade Econômica;Economic Activity;Madeira, celulose e papel;Madeira, celulose e papel;Wood, pulp and paper;1;12
+cnae;Atividade Econômica;Economic Activity;Móveis;Móveis;Furniture;1;13
+cnae;Atividade Econômica;Economic Activity;Organizações religiosas, sindicais e patronais;Organizações religiosas, sindicais e patronais;Religious, union and employer organizations;1;14
+cnae;Atividade Econômica;Economic Activity;Outros;Outros;Other;1;15
+cnae;Atividade Econômica;Economic Activity;Pecuária e criação de animais;Pecuária e criação de animais;Livestock and animal husbandry;1;16
+cnae;Atividade Econômica;Economic Activity;Pesca, caça e aquicultura;Pesca, caça e aquicultura;Fishing, hunting and aquaculture;1;17
+cnae;Atividade Econômica;Economic Activity;Produtos de metal, minerais não-metálicos e metalurgia;Produtos de metal, minerais não-metálicos e metalurgia;Metal products, non-metallic minerals and metallurgy;1;18
+cnae;Atividade Econômica;Economic Activity;Químicos, farmacêuticos, borracha e plástico;Químicos, farmacêuticos, borracha e plástico;Chemicals, pharmaceuticals, rubber and plastics;1;19
+cnae;Atividade Econômica;Economic Activity;Saúde e assistência social;Saúde e assistência social;Health and social care;1;20
+cnae;Atividade Econômica;Economic Activity;Segurança e edifícios;Segurança e edifícios;Security and buildings;1;21
+cnae;Atividade Econômica;Economic Activity;Serviços de alimentação;Serviços de alimentação;Food services;1;22
+cnae;Atividade Econômica;Economic Activity;Serviços de informação e comunicação;Serviços de informação e comunicação;Information and communication services;1;23
+cnae;Atividade Econômica;Economic Activity;Serviços domésticos;Serviços domésticos;Domestic services;1;24
+cnae;Atividade Econômica;Economic Activity;Serviços financeiros e de seguros;Serviços financeiros e de seguros;Financial and insurance services;1;25
+cnae;Atividade Econômica;Economic Activity;Serviços jurídicos;Serviços jurídicos;Legal services;1;26
+cnae;Atividade Econômica;Economic Activity;Serviços pessoais (cabelereiros, lavanderias, etc.);Serviços pessoais (cabelereiros, lavanderias, etc.);Personal services (hairdressers, laundries, etc.);1;27
+cnae;Atividade Econômica;Economic Activity;Terceirização de mão-de-obra;Terceirização de mão-de-obra;Labor outsourcing;1;28
+cnae;Atividade Econômica;Economic Activity;Têxtil, vestuário, couro e calçados;Têxtil, vestuário, couro e calçados;Textiles, clothing, leather and footwear;1;29
+cnae;Atividade Econômica;Economic Activity;Transporte e correio;Transporte e correio;Transport and mail;1;30
