@@ -4,6 +4,7 @@ library(tidyverse)
 library(plotly)
 library(htmlwidgets)
 library(owdbr)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -36,9 +37,9 @@ param$plot_desc <- "Energy Data from EPE on proportion of energy production, con
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIABLES:"
-param$label_y_name <- "vertical axis (y)"
-param$label_scale_name <- "log scale"
-param$label_prop_name <- "proportional to the initial year (*)"
+param$label_y_name <- "Vertical axis (y)"
+param$label_scale_name <- "Log scale"
+param$label_prop_name <- "Proportional to the initial year"
 param$label_geo_name <- "Geographical subdivision"
 
 param$link <- "https://datazoom.shinyapps.io/app_ts_energia_amz_exporta_en/"

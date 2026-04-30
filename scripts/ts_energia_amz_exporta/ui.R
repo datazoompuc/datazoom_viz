@@ -37,6 +37,9 @@ get_ui <- function(files, param) {
                  multiple = TRUE,
                  width = "100%"),
                
+               # espaço vazio
+               div(style = "height: 12px;"),
+               
                # Seleciona variável do eixo y
                selectInput(
                  inputId = "y",
@@ -48,19 +51,30 @@ get_ui <- function(files, param) {
                )
              ),
              
+             # espaço vazio
+             div(style = "height: 12px;"),
+             
              # Seleciona eixo log
-             checkboxInput(
-               inputId = "ylog",
-               param$label_scale_name,
-               value = FALSE,
-               width = "100%"
+             tags$style(HTML(".switch-label { color: white; }")),
+             div(
+               style = "margin-top: 10px;",
+               materialSwitch(
+                 inputId = "ylog",
+                 label = tags$span(param$label_scale_name, class = "switch-label"),
+                 value = FALSE, 
+                 status = "info"
+               )
              ),
+             
              # Seleciona eixo
-             checkboxInput(
-               inputId = "y_option",
-               param$label_prop_name,
-               value = FALSE,
-               width = "100%"
+             div(
+               style = "margin-top: 10px;",
+               materialSwitch(
+                 inputId = "y_option",
+                 label = tags$span(param$label_prop_name, class = "switch-label"),
+                 value = FALSE, 
+                 status = "info"
+               )
              ),
              
              
