@@ -36,7 +36,10 @@ get_server <- function(files, param) {
         dsc_fonte_geracao == "Potencial hidráulico"             ~ "Hydropower",
         dsc_fonte_geracao == "Radiação solar"                   ~ "Solar Radiation",
         dsc_fonte_geracao == "Resíduos Florestais"              ~ "Forest Waste",
-        dsc_fonte_geracao == "Resíduos Sólidos Urbanos - RU"    ~ "Urban Solid Waste - RU"),
+        dsc_fonte_geracao == "Resíduos Sólidos Urbanos - RU"    ~ "Urban Solid Waste - RU",
+        dsc_fonte_geracao == "Etanol"                            ~ "Ethanol",
+        dsc_fonte_geracao == "Lenha"                             ~ "Firewood",
+        dsc_fonte_geracao == "Óleo Diesel"                       ~ "Diesel Oil"),
 
         sig_modalidade_empreendimento = case_when(
         sig_modalidade_empreendimento == "Indefinido"                                ~ "Undefined",
