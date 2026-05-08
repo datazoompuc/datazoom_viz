@@ -70,6 +70,10 @@ db_geracao_distribuida <- db_geracao_distribuida %>%
 
 db_geracao_distribuida$ano_cadastral <- as.numeric(db_geracao_distribuida$ano_cadastral)
 
+# remove registros com data malformada
+db_geracao_distribuida <- db_geracao_distribuida %>%
+  filter(ano_cadastral >= 2009)
+
 # convert long data to wide data
 
 ## ## ## ## ## ## ## ## ## ## ## ## 
