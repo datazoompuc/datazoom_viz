@@ -41,6 +41,9 @@ db_geracao_distribuida <- left_join(db_geracao_distribuida, amz_cities, by = c("
 #db_geracao_distribuida <- db_geracao_distribuida %>%
 #  filter(legal_amazon ==1)
 
+# trim whitespace em dsc_classe_consumo para evitar duplicatas como "REBR" vs "REBR "
+db_geracao_distribuida$dsc_classe_consumo <- trimws(db_geracao_distribuida$dsc_classe_consumo)
+
 # replace character "," to "."
 db_geracao_distribuida$mda_potencia_instalada_kw <- gsub(",", ".", db_geracao_distribuida$mda_potencia_instalada_kw)
 db_geracao_distribuida$qtd_uc_recebe_credito <- gsub(",", ".", db_geracao_distribuida$qtd_uc_recebe_credito)
@@ -159,34 +162,10 @@ append_data <- append_data %>%
   arrange(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte, ano_cadastral) %>%
   group_by(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte) %>%
   dplyr::mutate(
-    mda_potencia_instalada_kw_comercial = cumsum(mda_potencia_instalada_kw_comercial),
-    mda_potencia_instalada_kw_residencial = cumsum(mda_potencia_instalada_kw_residencial),
-    mda_potencia_instalada_kw_industrial = cumsum(mda_potencia_instalada_kw_industrial),
-    mda_potencia_instalada_kw_rural = cumsum(mda_potencia_instalada_kw_rural),
-    mda_potencia_instalada_kw_poder_publico = cumsum(mda_potencia_instalada_kw_poder_publico),
-    mda_potencia_instalada_kw_servico_publico = cumsum(mda_potencia_instalada_kw_servico_publico),
-    mda_potencia_instalada_kw_iluminacao_publica = cumsum(mda_potencia_instalada_kw_iluminacao_publica),
-    mda_potencia_instalada_kw_total = mda_potencia_instalada_kw_comercial +
-      mda_potencia_instalada_kw_residencial + 
-      mda_potencia_instalada_kw_industrial + 
-      mda_potencia_instalada_kw_rural + 
-      mda_potencia_instalada_kw_poder_publico + 
-      mda_potencia_instalada_kw_servico_publico + 
-      mda_potencia_instalada_kw_iluminacao_publica,
-    qtd_uc_recebe_credito_comercial = cumsum(qtd_uc_recebe_credito_comercial),
-    qtd_uc_recebe_credito_residencial = cumsum(qtd_uc_recebe_credito_residencial),
-    qtd_uc_recebe_credito_industrial = cumsum(qtd_uc_recebe_credito_industrial),
-    qtd_uc_recebe_credito_rural = cumsum(qtd_uc_recebe_credito_rural),
-    qtd_uc_recebe_credito_poder_publico = cumsum(qtd_uc_recebe_credito_poder_publico),
-    qtd_uc_recebe_credito_servico_publico = cumsum(qtd_uc_recebe_credito_servico_publico),
-    qtd_uc_recebe_credito_iluminacao_publica = cumsum(qtd_uc_recebe_credito_iluminacao_publica),
-    qtd_uc_recebe_credito_total = qtd_uc_recebe_credito_comercial +
-      qtd_uc_recebe_credito_residencial + 
-      qtd_uc_recebe_credito_industrial + 
-      qtd_uc_recebe_credito_rural + 
-      qtd_uc_recebe_credito_poder_publico + 
-      qtd_uc_recebe_credito_servico_publico + 
-      qtd_uc_recebe_credito_iluminacao_publica
+    across(starts_with("mda_potencia_instalada_kw_"), cumsum),
+    across(starts_with("qtd_uc_recebe_credito_"), cumsum),
+    mda_potencia_instalada_kw_total = rowSums(across(starts_with("mda_potencia_instalada_kw_")), na.rm = TRUE),
+    qtd_uc_recebe_credito_total     = rowSums(across(starts_with("qtd_uc_recebe_credito_")),     na.rm = TRUE)
   ) 
 
 # filter years above 2013
