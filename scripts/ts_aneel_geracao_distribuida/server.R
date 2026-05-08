@@ -46,7 +46,8 @@ get_server <- function(files, param) {
         sig_modalidade_empreendimento == "Geração compartilhada"                    ~ "Shared Generation",
         sig_modalidade_empreendimento == "Múltiplas unidades consumidoras"           ~ "Multiple Consumer Units",
         sig_modalidade_empreendimento == "Microgeração ou Minigeração distribuída"   ~ "Microgeneration or Distributed Minigeneration",
-        sig_modalidade_empreendimento == "Autoconsumo remoto"                        ~ "Remote Self-consumption"),
+        sig_modalidade_empreendimento == "Autoconsumo remoto"                        ~ "Remote Self-consumption",
+        sig_modalidade_empreendimento == "Condomínio"                                ~ "Condominium"),
 
         dsc_porte = case_when(
         dsc_porte == "Microgeração"    ~ "Microgeneration",

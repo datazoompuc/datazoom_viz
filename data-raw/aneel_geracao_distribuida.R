@@ -23,10 +23,10 @@ library(stringi)
 url_aneel <- "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv"
 
 temp_aneel <- tempfile(fileext = ".csv")
-download.file(url_aneel, destfile = temp_aneel, mode = "wb", quiet = FALSE)
+curl::curl_download(url_aneel, destfile = temp_aneel, quiet = FALSE)
 
 db_geracao_distribuida <- data.table::fread(
-  file = temp_aneel,
+  temp_aneel,
   encoding = "Latin-1"
 ) %>%
   janitor::clean_names()
@@ -44,6 +44,17 @@ db_geracao_distribuida <- left_join(db_geracao_distribuida, amz_cities, by = c("
 # trim whitespace em dsc_classe_consumo para evitar duplicatas como "REBR" vs "REBR "
 db_geracao_distribuida$dsc_classe_consumo <- trimws(db_geracao_distribuida$dsc_classe_consumo)
 
+# sig_modalidade_empreendimento passou a ser vazio no novo dataset da ANEEL;
+# usar dsc_modalidade_habilitado como fonte
+db_geracao_distribuida <- db_geracao_distribuida %>%
+  mutate(sig_modalidade_empreendimento = case_when(
+    dsc_modalidade_habilitado == "Geracao na propria UC" ~ "Microgeração ou Minigeração distribuída",
+    dsc_modalidade_habilitado == "Auto consumo remoto"   ~ "Autoconsumo remoto",
+    dsc_modalidade_habilitado == "Compartilhada"         ~ "Geração compartilhada",
+    dsc_modalidade_habilitado == "Condomínio"            ~ "Condomínio",
+    TRUE                                                 ~ "Indefinido"
+  ))
+
 # replace character "," to "."
 db_geracao_distribuida$mda_potencia_instalada_kw <- gsub(",", ".", db_geracao_distribuida$mda_potencia_instalada_kw)
 db_geracao_distribuida$qtd_uc_recebe_credito <- gsub(",", ".", db_geracao_distribuida$qtd_uc_recebe_credito)
@@ -53,16 +64,9 @@ db_geracao_distribuida$mda_potencia_instalada_kw <- as.numeric(db_geracao_distri
 db_geracao_distribuida$qtd_uc_recebe_credito <- as.numeric(db_geracao_distribuida$qtd_uc_recebe_credito)
 
 # generate variable of year
-# usa AnmPeriodoReferencia ("MM/YYYY") quando disponível; fallback: DthAtualizaCadastralEmpreend
 db_geracao_distribuida <- db_geracao_distribuida %>%
-  mutate(
-    ano_cadastral = as.integer(substr(anm_periodo_referencia, 4, 7)),
-    ano_cadastral = if_else(
-      is.na(ano_cadastral),
-      year(as.Date(dth_atualiza_cadastral_empreend, "%d/%m/%Y")),
-      ano_cadastral
-    )
-  )
+  mutate(ano_cadastral = as.Date(dth_atualiza_cadastral_empreend, "%d/%m/%Y")) %>%
+  mutate(ano_cadastral = year(ano_cadastral))
 
 db_geracao_distribuida$ano_cadastral <- as.numeric(db_geracao_distribuida$ano_cadastral)
 
@@ -183,11 +187,6 @@ append_data$sig_modalidade_empreendimento %>% unique() %>% sort()
 append_data$dsc_fonte_geracao %>% unique() %>% sort()
 append_data$dsc_porte %>% unique() %>% sort()
 
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "P"] <- "Microgera\u00e7\u00e3o ou Minigera\u00e7\u00e3o distribuída"
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "R"] <- "Autoconsumo remoto"
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "C"] <- "Geração compartilhada"
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "M"] <- "Múltiplas unidades consumidoras"
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == ""] <- "Indefinido"
 
 append_data$dsc_porte[append_data$dsc_porte == "Microgeracao"] <- "Microgera\u00e7\u00e3o"
 append_data$dsc_porte[append_data$dsc_porte == "Minigeracao"] <- "Minigera\u00e7\u00e3o"
