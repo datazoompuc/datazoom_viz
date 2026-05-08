@@ -46,15 +46,15 @@ db_geracao_distribuida$mda_potencia_instalada_kw <- gsub(",", ".", db_geracao_di
 db_geracao_distribuida$qtd_uc_recebe_credito <- gsub(",", ".", db_geracao_distribuida$qtd_uc_recebe_credito)
 
 # ensure variables are numeric
-class(db_geracao_distribuida$mda_potencia_instalada_kw) <- "numeric"
-class(db_geracao_distribuida$qtd_uc_recebe_credito) <- "numeric"
+db_geracao_distribuida$mda_potencia_instalada_kw <- as.numeric(db_geracao_distribuida$mda_potencia_instalada_kw)
+db_geracao_distribuida$qtd_uc_recebe_credito <- as.numeric(db_geracao_distribuida$qtd_uc_recebe_credito)
 
 # generate variable of year
 db_geracao_distribuida <- db_geracao_distribuida %>%
   mutate(ano_cadastral = as.Date(dth_atualiza_cadastral_empreend, "%d/%m/%Y")) %>%
   mutate(ano_cadastral = year(ano_cadastral))
 
-class(db_geracao_distribuida$ano_cadastral) <- "numeric"
+db_geracao_distribuida$ano_cadastral <- as.numeric(db_geracao_distribuida$ano_cadastral)
 
 # convert long data to wide data
 
