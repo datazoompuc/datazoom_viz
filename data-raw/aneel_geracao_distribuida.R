@@ -239,6 +239,8 @@ temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_poder_
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_servico_publico"] <- "Potência Instalada - Serviço Público"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_iluminacao_publica"] <- "Potência Instalada - Iluminação pública"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_total"] <- "Total de Potência Instalada"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_consumo_proprio"] <- "Potência Instalada - Consumo Próprio"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_rebr"] <- "Potência Instalada - REBR"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_comercial"] <- "Qtd. de  Unidades - Comercial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_residencial"] <- "Qtd. de  Unidades - Residencial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_industrial"] <- "Qtd. de  Unidades - Industrial"
@@ -247,6 +249,8 @@ temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_poder_publ
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_servico_publico"] <- "Qtd. de  Unidades - Serviço Público"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica"] <- "Qtd. de  Unidades - Iluminação pública"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_total"] <- "Total de Qtd. de  Unidades"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_consumo_proprio"] <- "Qtd. de  Unidades - Consumo Próprio"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_rebr"] <- "Qtd. de  Unidades - REBR"
 temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Ano"
 
 
@@ -284,6 +288,8 @@ temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_poder_
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_servico_publico"] <- "Installed Capacity - Public Service"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_iluminacao_publica"] <- "Installed Capacity - Public Lighting"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_total"] <- "Total Installed Capacity"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_consumo_proprio"] <- "Installed Capacity - Own Consumption"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_rebr"] <- "Installed Capacity - REBR"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_comercial"] <- "Number of Units - Commercial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_residencial"] <- "Number of Units - Residential"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_industrial"] <- "Number of Units - Industrial"
@@ -292,6 +298,8 @@ temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_poder_publ
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_servico_publico"] <- "Number of Units - Public Service"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica"] <- "Number of Units - Public Lighting"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_total"] <- "Total Number of Units"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_consumo_proprio"] <- "Number of Units - Own Consumption"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_rebr"] <- "Number of Units - REBR"
 temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Year"
 
 
