@@ -140,40 +140,36 @@ get_server <- function(files, param) {
     param$filter_dsc_fonte_geracao_choices <- sort(unique(df$dsc_fonte_geracao))
     param$filter_dsc_porte_choices <- sort(unique(df$dsc_porte))
 
-    # Funcão para preencher inputs com coluna/variável aleatória
+    # Funcão para preencher inputs com valores padrão
     random_inputs <- function() {
       updateSelectizeInput(session,
         "filter1",
         choices = param$filter_choices,
-        selected = sample(param$filter_choices, 1) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        selected = param$filter_def
       )
-      
-      selected_sig_modalidade_empreendimento <- sample(param$filter_sig_modalidade_empreendimento_choices, 1)
+
       updateSelectInput(session,
                         "filter_sig_modalidade_empreendimento",
                         choices = param$filter_sig_modalidade_empreendimento_choices,
-                        selected = selected_sig_modalidade_empreendimento
+                        selected = param$filter_sig_modalidade_empreendimento_def
       )
-      
-      selected_dsc_fonte_geracao <- sample(param$filter_dsc_fonte_geracao_choices, 1)
+
       updateSelectInput(session,
                         "filter_dsc_fonte_geracao",
                         choices = param$filter_dsc_fonte_geracao_choices,
-                        selected = selected_dsc_fonte_geracao
+                        selected = param$filter_dsc_fonte_geracao_def
       )
-      
-      selected_dsc_porte <- sample(param$filter_dsc_porte_choices, 1)
+
       updateSelectInput(session,
                         "filter_dsc_porte",
                         choices = param$filter_dsc_porte_choices,
-                        selected = selected_dsc_porte
+                        selected = param$filter_dsc_porte_def
       )
 
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
       updateSelectInput(session,
         "y",
         choices = param$y_choices,
-        selected = selected
+        selected = param$y_def
       )
     }
 

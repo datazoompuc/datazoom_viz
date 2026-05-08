@@ -25,9 +25,11 @@ source(files$server_script)
 
 param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
 param$x_def <- "ano_cadastral" # variável padrão do eixo x
-param$filter_sig_modalidade_empreendimento_def <- "Autoconsumo" # variável padrão do filtro
-param$filter_dsc_fonte_geracao_def <- "" # variável padrão do filtro
-param$y_def <- "mda_potencia_instalada_kw_residencial" # variável padrão do eixo y
+param$filter_def <- c("Amazônia Legal", "Fora da Amazônia Legal")
+param$filter_sig_modalidade_empreendimento_def <- "Microgeração ou Minigeração distribuída"
+param$filter_dsc_fonte_geracao_def <- "Radiação solar"
+param$filter_dsc_porte_def <- "Microgeração"
+param$y_def <- "mda_potencia_instalada_kw_total" # variável padrão do eixo y
 param$color_def <- "id" # variável padrão de cor
 param$size_def <- "" # variável padrão de tamanho
 param$slider_def <- "ano_cadastral" # variável padrão do slider
