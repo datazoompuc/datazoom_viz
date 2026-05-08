@@ -19,9 +19,14 @@ library(stringi)
 
 # load data -------------------------------------------------------------------------
 # Original raw data can be downloaded at: https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida
-# Also can be downloaded at Data Zoom drive:
+# URL do arquivo no portal de dados abertos da ANEEL (atualizado diariamente):
+url_aneel <- "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv"
+
+temp_aneel <- tempfile(fileext = ".csv")
+download.file(url_aneel, destfile = temp_aneel, mode = "wb", quiet = FALSE)
+
 db_geracao_distribuida <- data.table::fread(
-  file = "C:/Users/DELL/Desktop/empreendimento-geracao-distribuida.csv",
+  file = temp_aneel,
   encoding = "Latin-1"
 ) %>%
   janitor::clean_names()
