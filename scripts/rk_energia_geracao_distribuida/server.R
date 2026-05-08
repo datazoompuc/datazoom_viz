@@ -361,20 +361,7 @@ get_server <- function(files, param) {
             textposition = "middle right"
           )
 
-          if (!is.numeric(df_p$color)) {
-            # adiciona barra sem split para a legenda
-            fig_p <- fig_p %>% add_segments(
-              hoverinfo = "none",
-              showlegend = TRUE,
-              x = 0,
-              xend = 0,
-              y = ~y,
-              yend = ~y,
-              color = ~color,
-              line = list(width = 30),
-              opacity = 0.7
-            )
-          } else {
+          if (is.numeric(df_p$color)) {
             fig_p <- fig_p %>% colorbar(title = color_col$label)
           }
 
@@ -486,8 +473,7 @@ get_server <- function(files, param) {
               font = f1,
               xaxis = x_axis_layout,
               yaxis = y_axis_layout,
-              showlegend = TRUE,
-              legend = list(title = list(text = color_col$label)),
+              showlegend = FALSE,
               hoverlabel = tooltip
             )
 
