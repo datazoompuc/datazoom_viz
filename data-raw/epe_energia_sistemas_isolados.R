@@ -98,26 +98,26 @@ db_consumidores <- bind_rows(
 #     2. Em "Tipos de Despesas", selecione apenas "CCC"
 #     3. Passe o mouse sobre a tabela "Despesas no Orçamento da CDE"
 #     4. Clique em "..." (canto superior direito) > "Exportar dados" > "Dados resumidos"
-#     5. Salve como: data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde.csv
+#     5. Salve como: data/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde.csv
 #     Colunas esperadas: Ano, Valor
 #
 #   Arquivo 2 — participação da CCC no orçamento total:
 #     (mesmo painel, coluna "Participação" já exportada junto)
-#     Salve como: data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde_particip.csv
+#     Salve como: data/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde_particip.csv
 #     Colunas esperadas: Ano, Participação (formato "28,63%")
 #
 #   Arquivo 3 — orçamento total da CDE (todas as despesas):
 #     1. No mesmo portal, remova o filtro de "Tipos de Despesas"
 #     2. Exporte da mesma forma
-#     3. Salve como: data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orçamento_da_CDE.csv
+#     3. Salve como: data/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orçamento_da_cde_total.csv
 #     Colunas esperadas: Ano, Valor
 #
 # Se algum arquivo não existir, o script roda normalmente sem as variáveis CDE.
 # ============================================================
 
-path_cde      <- "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde.csv"
-path_particip <- "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde_particip.csv"
-path_total    <- "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orçamento_da_CDE.csv"
+path_cde      <- "data/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde.csv"
+path_particip <- "data/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde_particip.csv"
+path_total    <- "data/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orçamento_da_cde_total.csv"
 
 db_orcamento_cde        <- NULL
 db_orcamento_cde_particip <- NULL
@@ -134,7 +134,7 @@ if (file.exists(path_cde)) {
 
 if (file.exists(path_particip)) {
   db_orcamento_cde_particip <- read_csv(path_particip, show_col_types = FALSE) %>%
-    select(Ano, participacao = `Participação`) %>%
+    select(Ano, participacao = `Participação_desp`) %>%
     filter(Ano < ano_atual) %>%
     mutate(participacao = participacao %>%
              str_remove_all("%") %>%
