@@ -1,97 +1,88 @@
 #######################
-##Sistemas Isolados
+## Sistemas Isolados
 
 ############
-#libraries
+# libraries
 library(readr)
 library(tidyverse)
 library(readxl)
 library(deflateBR)
+library(jsonlite)
 ############
 
-#######################
+# ============================================================
+# EPE - Consumo Mensal de Energia Elétrica por Classe
+# Fonte: Empresa de Pesquisa Energética
+# https://www.epe.gov.br/pt/publicacoes-dados-abertos/publicacoes/consumo-de-energia-eletrica
+# ============================================================
 
-#Consumo Mensal de Energia Elétrica por Classe (regiões e subsistemas)
-#fonte: Empresa de Pesquisa Energética
-#https://www.epe.gov.br/pt/publicacoes-dados-abertos/publicacoes/consumo-de-energia-eletrica
+# download do arquivo XLSX da EPE -----------------------------------------
+# O arquivo é atualizado mensalmente pela EPE com dados a partir de 2004.
+# Anos com dados preliminares são marcados com "*" e excluídos automaticamente.
 
-# dados de consumo -------------------------------------------------------------
-# funcao para limpar dados de consumo -----------------------------------------------
-limpa_consumo <- function(sheet_name) {
-  
-  # le dados de consumo
-  raw_df <- readxl::read_xls(path = "data-raw/bases viz energia CPI/sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls",
-                             sheet = sheet_name)
-  
-  # troca nome das colunas
-  colnames(raw_df) <- c("Sistema", 1:12, "Total")
-  
-  # limpa
-  clean_df <- raw_df %>%
-    filter(Sistema == "Sistemas Isolados") %>%  
-    drop_na() %>%
-    slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
-    mutate(Ano = 2021:2004) %>%  mutate(Ano = as.numeric(Ano)) %>%
-    select(Ano, Total) %>%
-    mutate(tipo = paste0("CONSUMO ", sheet_name)) %>% # adiciona coluna para tipo de consumo
-    rename("valor" = "Total") %>%
-    mutate(valor = as.numeric(valor) / 1e6)
-  
-  return(clean_df)
-  
+url_epe <- paste0(
+  "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/",
+  "Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%C3%89TRICA%20POR%20CLASSE.xlsx"
+)
+epe_file <- tempfile(fileext = ".xlsx")
+download.file(url_epe, destfile = epe_file, mode = "wb", quiet = TRUE)
+
+# Estrutura do XLSX:
+#   Cada ano ocupa um bloco de ~16 linhas.
+#   Dentro de cada bloco, "Sistemas isolados" está sempre 10 linhas abaixo
+#   do cabeçalho do ano (que contém o ano em col 2, ex: "2025" ou "2026*").
+#   Abas de consumo (14 colunas): col 2-13 = JAN-DEZ, col 14 = ANO (total anual).
+#   Abas de consumidores (13 colunas): col 2-13 = JAN-DEZ (sem total anual;
+#   usamos dezembro como referência de fim de ano).
+
+# extrai total anual dos Sistemas Isolados (abas de consumo) ------------------
+parse_consumo <- function(file, sheet) {
+  df <- read_xlsx(file, sheet = sheet, col_names = FALSE)
+  iso_rows <- which(df[[1]] == "Sistemas isolados")
+
+  map_dfr(iso_rows, function(i) {
+    year_raw <- as.character(df[[2]][i - 10])
+    # ignora anos com dados preliminares (marcados com "*")
+    if (is.na(year_raw) || grepl("\\*", year_raw)) return(NULL)
+    tibble(
+      Ano   = as.integer(year_raw),
+      valor = as.numeric(df[[14]][i])   # col 14 = ANO (total anual em MWh)
+    )
+  })
 }
 
+# extrai valor de dezembro dos Sistemas Isolados (abas de consumidores) -------
+# Número de consumidores é medida de estoque: usamos dezembro como referência anual.
+parse_consumidores <- function(file, sheet) {
+  df <- read_xlsx(file, sheet = sheet, col_names = FALSE)
+  iso_rows <- which(df[[1]] == "Sistemas isolados")
 
-# roda funcao -----------------------------------------------------------------------
-# consumo total
-db_consumo_total <- limpa_consumo("TOTAL")
-
-# consumo por residencial, industrial, comercial e outros
-db_consumo_residencial <- limpa_consumo("RESIDENCIAL")
-db_consumo_industrial <- limpa_consumo("INDUSTRIAL")
-db_consumo_comercial <- limpa_consumo("COMERCIAL")
-db_consumo_outros <- limpa_consumo("OUTROS")
-
-# bind all
-db_consumo <- bind_rows(list(db_consumo_total, db_consumo_residencial, 
-                             db_consumo_industrial, db_consumo_comercial, 
-                             db_consumo_outros))
-
-# dados de consumidores -------------------------------------------------------------
-# funcao para limpar dados de consumo -----------------------------------------------
-limpa_consumidores <- function(sheet_name) {
-  
-  # le dados de consumidores
-  raw_df <- readxl::read_xls(path = "data-raw/bases viz energia CPI/sistemas_isolados_consumo_mensal_de_energia_eletrica_por_classe.xls",
-                             sheet = sheet_name)
-  
-  # troca nome das colunas
-  colnames(raw_df) <- c("Sistema", 1:12)
-  
-  # limpa
-  clean_df <- raw_df %>%
-    filter(Sistema == "Sistemas Isolados") %>%
-    slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
-    mutate(Ano = 2021:2004)  %>%
-    pivot_longer(cols = c(2:13), names_to = "Mes", values_to = "valor") %>%
-    filter(Mes == 12) %>%
-    select(Ano, valor) %>% #tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
-    mutate(Ano = as.numeric(Ano), valor = as.numeric(valor), valor = valor / 1e6) %>%
-    mutate(tipo = sheet_name) # adiciona coluna para tipo de consumidor
-  
-  return(clean_df)
-  
+  map_dfr(iso_rows, function(i) {
+    year_raw <- as.character(df[[2]][i - 10])
+    if (is.na(year_raw) || grepl("\\*", year_raw)) return(NULL)
+    tibble(
+      Ano   = as.integer(year_raw),
+      valor = as.numeric(df[[13]][i])   # col 13 = DEZ
+    )
+  })
 }
 
-# roda funcao -----------------------------------------------------------------------
-# consumidores total
-db_consumidores_total <- limpa_consumidores("CONSUMIDORES TOTAIS")
+# dados de consumo (MWh → milhões de MWh) ------------------------------------
+db_consumo <- bind_rows(
+  parse_consumo(epe_file, "TOTAL")       %>% mutate(tipo = "CONSUMO TOTAL"),
+  parse_consumo(epe_file, "RESIDENCIAL") %>% mutate(tipo = "CONSUMO RESIDENCIAL"),
+  parse_consumo(epe_file, "INDUSTRIAL")  %>% mutate(tipo = "CONSUMO INDUSTRIAL"),
+  parse_consumo(epe_file, "COMERCIAL")   %>% mutate(tipo = "CONSUMO COMERCIAL"),
+  parse_consumo(epe_file, "OUTROS")      %>% mutate(tipo = "CONSUMO OUTROS")
+) %>%
+  mutate(valor = valor / 1e6)
 
-# consumidores por residencial, industrial, comercial e outros
-db_consumidores_residencial <- limpa_consumidores("CONSUMIDORES RESIDENCIAIS")
-
-# bind all
-db_consumidores <- bind_rows(list(db_consumidores_total, db_consumidores_residencial))
+# dados de consumidores (unidades → milhões de consumidores) ------------------
+db_consumidores <- bind_rows(
+  parse_consumidores(epe_file, "CONSUMIDORES TOTAIS")       %>% mutate(tipo = "CONSUMIDORES TOTAIS"),
+  parse_consumidores(epe_file, "CONSUMIDORES RESIDENCIAIS") %>% mutate(tipo = "CONSUMIDORES RESIDENCIAIS")
+) %>%
+  mutate(valor = valor / 1e6)
 
 
 #######################
