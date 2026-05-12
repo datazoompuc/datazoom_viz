@@ -85,41 +85,66 @@ db_consumidores <- bind_rows(
   mutate(valor = valor / 1e6)
 
 
-#######################
+# ============================================================
+# ANEEL - Despesas na Conta de Desenvolvimento Energético (CDE)
+# Fonte: Agência Nacional de Energia Elétrica
+# https://portalrelatorios.aneel.gov.br/luznatarifa/contadesenvolvimento
+#
+# ATUALIZAÇÃO MANUAL — os dados da ANEEL não têm download direto.
+# O portal usa um dashboard interativo (Power BI). Para exportar:
+#
+#   Arquivo 1 — despesas da CCC:
+#     1. Acesse https://portalrelatorios.aneel.gov.br/luznatarifa/contadesenvolvimento
+#     2. Em "Tipos de Despesas", selecione apenas "CCC"
+#     3. Passe o mouse sobre a tabela "Despesas no Orçamento da CDE"
+#     4. Clique em "..." (canto superior direito) > "Exportar dados" > "Dados resumidos"
+#     5. Salve como: data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde.csv
+#     Colunas esperadas: Ano, Valor
+#
+#   Arquivo 2 — participação da CCC no orçamento total:
+#     (mesmo painel, coluna "Participação" já exportada junto)
+#     Salve como: data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde_particip.csv
+#     Colunas esperadas: Ano, Participação (formato "28,63%")
+#
+#   Arquivo 3 — orçamento total da CDE (todas as despesas):
+#     1. No mesmo portal, remova o filtro de "Tipos de Despesas"
+#     2. Exporte da mesma forma
+#     3. Salve como: data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orçamento_da_CDE.csv
+#     Colunas esperadas: Ano, Valor
+#
+# Se algum arquivo não existir, o script roda normalmente sem as variáveis CDE.
+# ============================================================
 
-#Despesas na Conta de Desenvolvimento Estratégico (CDE)
-#fonte: Agencia Nacional de Energia Elétrica
-#https://portalrelatorios.aneel.gov.br/luznatarifa/contadesenvolvimento
+path_cde      <- "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde.csv"
+path_particip <- "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde_particip.csv"
+path_total    <- "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orçamento_da_CDE.csv"
 
-db_orcamento_cde <- read_csv(file = "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde.csv", skip = 0) %>%
-  select(c("Ano", "Valor")) %>%
-  rename("valor" = "Valor") %>%
-  filter(Ano != 2022) %>%
-  mutate(valor = valor / 1e9,
-         tipo = "DESPESAS ESTIMADAS CCC (Nominal)",
-         nominal_dates = as.Date(paste0(Ano, "-01-01")),
-         `DESPESAS ESTIMADAS CCC (Real, R$ 2021)` = ipca(valor, nominal_dates, "01/2021")) %>%
-  select(Ano, `DESPESAS ESTIMADAS CCC (Nominal)` = valor, 
-         `DESPESAS ESTIMADAS CCC (Real, R$ 2021)`)
+db_orcamento_cde        <- NULL
+db_orcamento_cde_particip <- NULL
+db_orcamento_total      <- NULL
 
-db_orcamento_cde_particip <- read_csv(file = "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orcamento_da_cde_particip.csv", skip = 0) %>%
-  select(c("Ano", participacao = "Participação")) %>%
-  filter(Ano != 2022) %>%
-  mutate(participacao = str_remove_all(participacao, "[%]"),
-         participacao = str_replace_all(participacao, "[,]", "."),
-         participacao = as.numeric(participacao))
-  
-db_orcamento_total = read_csv(file = "data-raw/bases viz energia CPI/sistemas_isolados_despesas_estimadas_no_orçamento_da_CDE.csv") %>%
-  select("Ano", "Valor") %>%
-  rename("valor" = "Valor") %>%
-  filter(Ano != 2022) %>%
-  mutate(valor = valor/1e9) %>%
-  group_by(Ano) %>%
-  summarise("DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)" = sum(`valor`)) %>%
-  mutate(nominal_dates = as.Date(paste0(Ano, "-01-01")),
-         `DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Real, R$ 2021)` = ipca(`DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)`, nominal_dates, "01/2021")) %>%
-  select(Ano, `DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)`, 
-         `DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Real, R$ 2021)`)
+if (file.exists(path_cde)) {
+  db_orcamento_cde <- read_csv(path_cde, show_col_types = FALSE) %>%
+    select(Ano, valor = Valor) %>%
+    mutate(valor = valor / 1e9)   # R$ → bilhões de R$
+}
+
+if (file.exists(path_particip)) {
+  db_orcamento_cde_particip <- read_csv(path_particip, show_col_types = FALSE) %>%
+    select(Ano, participacao = `Participação`) %>%
+    mutate(participacao = participacao %>%
+             str_remove_all("%") %>%
+             str_replace_all(",", ".") %>%
+             as.numeric())
+}
+
+if (file.exists(path_total)) {
+  db_orcamento_total <- read_csv(path_total, show_col_types = FALSE) %>%
+    select(Ano, valor = Valor) %>%
+    mutate(valor = valor / 1e9) %>%  # R$ → bilhões de R$
+    group_by(Ano) %>%
+    summarise(`DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)` = sum(valor))
+}
   
 #tudo junto ---------------------------------------------------------------
 db_completa = full_join(db_consumo, db_consumidores)
