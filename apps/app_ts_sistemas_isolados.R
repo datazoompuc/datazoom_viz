@@ -4,6 +4,7 @@ library(tidyverse)
 library(plotly)
 library(htmlwidgets)
 library(shinyWidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
