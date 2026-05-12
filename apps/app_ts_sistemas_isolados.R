@@ -3,6 +3,7 @@ library(shiny)
 library(tidyverse)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -35,9 +36,9 @@ param$plot_desc <- "Dados dos Sistemas Isolados de Energia"
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "eixo vertical (y)"
-param$label_scale_name <- "escala log"
-param$label_prop_name <- "proporcional ao ano inicial (*)"
+param$label_y_name <- "Eixo vertical (y)"
+param$label_scale_name <- "Escala log"
+param$label_prop_name <- "Proporcional ao ano inicial"
 
 param$link <- "https://datazoom.shinyapps.io/app_ts_sistemas_isolados/"
 
