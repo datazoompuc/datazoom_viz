@@ -123,15 +123,19 @@ db_orcamento_cde        <- NULL
 db_orcamento_cde_particip <- NULL
 db_orcamento_total      <- NULL
 
+ano_atual <- as.integer(format(Sys.Date(), "%Y"))
+
 if (file.exists(path_cde)) {
   db_orcamento_cde <- read_csv(path_cde, show_col_types = FALSE) %>%
     select(Ano, valor = Valor) %>%
+    filter(Ano < ano_atual) %>%
     mutate(valor = valor / 1e9)   # R$ → bilhões de R$
 }
 
 if (file.exists(path_particip)) {
   db_orcamento_cde_particip <- read_csv(path_particip, show_col_types = FALSE) %>%
     select(Ano, participacao = `Participação`) %>%
+    filter(Ano < ano_atual) %>%
     mutate(participacao = participacao %>%
              str_remove_all("%") %>%
              str_replace_all(",", ".") %>%
@@ -141,6 +145,7 @@ if (file.exists(path_particip)) {
 if (file.exists(path_total)) {
   db_orcamento_total <- read_csv(path_total, show_col_types = FALSE) %>%
     select(Ano, valor = Valor) %>%
+    filter(Ano < ano_atual) %>%
     mutate(valor = valor / 1e9) %>%  # R$ → bilhões de R$
     group_by(Ano) %>%
     summarise(`DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)` = sum(valor))
