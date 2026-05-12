@@ -16,48 +16,56 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file) %>%
       mutate(`total produzido`= as.numeric(`total produzido`))
     
-    if(param$translate_names) {
-      df <- df %>% 
-        mutate(uf = case_when(
-          uf == "Amazônia Legal" ~ "Legal Amazon",
-          uf == "Fora da Amazônia Legal" ~ "Outside Legal Amazon"
-        ))
-    }
-    
-    # Cria opções para seleção de grupos
-    #param$filter_choices <- sort(unique(df$group))
-    #param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-    
-    # Funcão para preencher inputs com coluna/variável aleatória
-    
-    if(param$translate_names == FALSE) {
-      random_inputs <- function() {
-        updateSelectInput(session,
-                          "y",
-                          choices = param$y_choices,
-                          selected = c("total produzido", "consumo total") 
-        )
-        
-        updateSelectInput(session,
-                          "filter1",
-                          choices = param$filter_choices,
-                          selected = c("Amazônia Legal", "Fora da Amazônia Legal")
-        )
-      }
-    } else {
-      random_inputs <- function() {
-        updateSelectInput(session,
-                          "y",
-                          choices = param$y_choices,
-                          selected = c("total produzido", "consumo total") 
-        )
-        
-        updateSelectInput(session,
-                          "filter1",
-                          choices = param$filter_choices,
-                          selected = c("Legal Amazon", "Outside Legal Amazon")
-        )
-      }
+    # Reativo de língua
+    lang <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["lang"]], "en")) "en" else "pt"
+    })
+
+    observeEvent(input$toggle_lang, {
+      lang(ifelse(lang() == "pt", "en", "pt"))
+    })
+
+    # i18n reativo
+    i18n <- reactive({ param$i18n[[lang()]] })
+
+    # Outputs de texto da sidebar
+    output$plot_desc        <- renderText({ i18n()$plot_desc })
+    output$label_var_name   <- renderText({ i18n()$label_var_name })
+    output$label_geo_name   <- renderText({ i18n()$label_geo_name })
+    output$label_scale_name <- renderText({ i18n()$label_scale_name })
+    output$label_prop_name  <- renderText({ i18n()$label_prop_name })
+
+    # Atualiza choices e labels dos selectInputs quando língua muda
+    observeEvent(lang(), {
+      table <- param$tables[[lang()]]
+      choices <- grouped_list(table[which(table$y), ])
+      updateSelectInput(session, "y",
+                        label = i18n()$label_y_name,
+                        choices = choices,
+                        selected = input$y
+      )
+      updateSelectizeInput(session, "filter1",
+                           label = i18n()$label_geo_name,
+                           choices = i18n()$filter_choices,
+                           selected = input$filter1
+      )
+    })
+
+    # Funcão para preencher inputs com valores padrão
+    random_inputs <- function() {
+      table <- param$tables[[lang()]]
+      updateSelectInput(session,
+                        "y",
+                        choices = grouped_list(table[which(table$y), ]),
+                        selected = c("total produzido", "consumo total")
+      )
+
+      updateSelectizeInput(session,
+                           "filter1",
+                           choices = i18n()$filter_choices,
+                           selected = c("Amazônia Legal", "Fora da Amazônia Legal")
+      )
     }
     
     
@@ -66,7 +74,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "ylog=", input$ylog,
+        "?", "lang=", lang(),
+        "&", "ylog=", input$ylog,
         "&", "y_option=", input$y_option
       )
       
@@ -90,20 +99,21 @@ get_server <- function(files, param) {
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       # Preenche filtro vazio
-      updateSelectInput(session,
-                        "filter1",
-                        choices = param$filter_choices,
-                        selected = NULL
+      updateSelectizeInput(session,
+                           "filter1",
+                           choices = i18n()$filter_choices,
+                           selected = NULL
       )
-      
+
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
-      
+
       selected <- unlist(query[names(query) == "y"], use.names = FALSE)
       if (!is.null(query[["y"]])) {
+        table <- param$tables[[lang()]]
         updateSelectInput(session,
                           "y",
-                          choices = param$y_choices,
+                          choices = grouped_list(table[which(table$y), ]),
                           selected = selected
         )
       }
@@ -122,10 +132,10 @@ get_server <- function(files, param) {
       
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       if (!is.null(query[["filter"]])) {
-        updateSelectInput(session,
-                          "filter1",
-                          choices = param$filter_choices,
-                          selected = selected
+        updateSelectizeInput(session,
+                             "filter1",
+                             choices = i18n()$filter_choices,
+                             selected = selected
         )
       }
       
@@ -144,9 +154,9 @@ get_server <- function(files, param) {
         text <- " "
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table %>%
+        y_col <- param$tables[[lang()]] %>%
           filter(var %in% input$y)
-        filt <- paste(sapply(input$filter1, paste, collapse = ", "), 
+        filt <- paste(unname(i18n()$uf_map[input$filter1]),
                       collapse = ", ")
         text <- paste0("", paste(y_col$label, collapse = ", "))
 
@@ -161,7 +171,7 @@ get_server <- function(files, param) {
       if ((is.null(input$y)) | (is.null(input$filter1))) {
         text <- " "
       } else {
-        text <- ifelse(input$y_option, "Proporcional ao ano inicial", " ")
+        text <- ifelse(input$y_option, i18n()$label_prop_name, " ")
       }
       
       text
