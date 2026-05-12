@@ -247,26 +247,32 @@ temp_param_table <- tibble(
   var_group = "Energia - EPE", #ATENCAO colunas de despesas tem fonte ANEEL
   tipo = 1,
   unidade = "",
-  categoria= "Economia", 
+  categoria= "Economia",
   subcategoria = "Energia"
 )
 
 temp_param_table$label <- temp_param_table$var
 
-temp_param_table$var_group[2:6] <- "Orçamento CDE (Conta de Desenvolvimento Energético) - ANEEL"
-temp_param_table$var_group[7:11] <- "Consumo de Eletricidade - EPE"
-temp_param_table$var_group[12:13] <- "Média de Consumidores - EPE"
+cols_aneel_budget <- c(
+  "Despesas Estimadas CCC (Nominal)",
+  paste0("Despesas Estimadas CCC (Real, R$ ", ano_ref_ipca, ")"),
+  "Participação da CCC no Orçamento Total da CDE",
+  "Despesas Estimadas no Orçamento da CDE (Nominal)",
+  paste0("Despesas Estimadas no Orçamento da CDE (Real, R$ ", ano_ref_ipca, ")")
+)
 
-temp_param_table$unidade[2:3] <- "Bilhões de R$"
-temp_param_table$unidade[4] <- "% do Orçamento da CDE"
-temp_param_table$unidade[5:6] <- "Bilhões de R$"
-temp_param_table$unidade[7:11] <- "Milhões de MWh"
-temp_param_table$unidade[12:13] <- "Milhões de Consumidores"
+temp_param_table$var_group[temp_param_table$var %in% cols_aneel_budget]                                  <- "Orçamento CDE (Conta de Desenvolvimento Energético) - ANEEL"
+temp_param_table$var_group[temp_param_table$var %in% c("Consumo Total", "Consumo Residencial", "Consumo Industrial", "Consumo Comercial", "Consumo Outros")] <- "Consumo de Eletricidade - EPE"
+temp_param_table$var_group[temp_param_table$var %in% c("Consumidores Totais", "Consumidores Residenciais")]  <- "Média de Consumidores - EPE"
 
+temp_param_table$unidade[temp_param_table$var %in% cols_aneel_budget[c(1, 2)]] <- "Bilhões de R$"
+temp_param_table$unidade[temp_param_table$var == cols_aneel_budget[3]]          <- "% do Orçamento da CDE"
+temp_param_table$unidade[temp_param_table$var %in% cols_aneel_budget[c(4, 5)]] <- "Bilhões de R$"
+temp_param_table$unidade[temp_param_table$var %in% c("Consumo Total", "Consumo Residencial", "Consumo Industrial", "Consumo Comercial", "Consumo Outros")] <- "Milhões de MWh"
+temp_param_table$unidade[temp_param_table$var %in% c("Consumidores Totais", "Consumidores Residenciais")]  <- "Milhões de Consumidores"
 
-temp_param_table$x <- c(TRUE, rep(FALSE, 12))
-temp_param_table$y <- c(FALSE, rep(TRUE, 12))
-
+temp_param_table$x <- temp_param_table$var == "Ano"
+temp_param_table$y <- temp_param_table$var != "Ano"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_sistemas_isolados_dic.csv", fileEncoding = "UTF-8")
@@ -275,10 +281,10 @@ write.csv(temp_param_table, file = "data/energia_sistemas_isolados_dic.csv", fil
 # translate to english --------------------------------------------------------------
 temp_param_table$label[temp_param_table$var == "Ano"] <- "Year"
 temp_param_table$label[temp_param_table$var == "Despesas Estimadas CCC (Nominal)"] <- "Estimated Expenses CCC (Nominal)"
-temp_param_table$label[temp_param_table$var == "Despesas Estimadas CCC (Real, R$ 2021)"] <- "Estimated Expenses CCC (Real, R$ 2021)"
+temp_param_table$label[temp_param_table$var == cols_aneel_budget[2]] <- paste0("Estimated Expenses CCC (Real, R$ ", ano_ref_ipca, ")")
 temp_param_table$label[temp_param_table$var == "Participação da CCC no Orçamento Total da CDE"] <- "CCC Participation in the Total Energy Development Account Budget"
 temp_param_table$label[temp_param_table$var == "Despesas Estimadas no Orçamento da CDE (Nominal)"] <- "Estimated Expenses in the Energy Development Account Budget (Nominal)"
-temp_param_table$label[temp_param_table$var == "Despesas Estimadas no Orçamento da CDE (Real, R$ 2021)"] <- "Estimated Expenses in the Energy Development Account Budget (Real, R$ 2021)"
+temp_param_table$label[temp_param_table$var == cols_aneel_budget[5]] <- paste0("Estimated Expenses in the Energy Development Account Budget (Real, R$ ", ano_ref_ipca, ")")
 temp_param_table$label[temp_param_table$var == "Consumo Total"] <- "Total Consumption"
 temp_param_table$label[temp_param_table$var == "Consumo Residencial"] <- "Residential Consumption"
 temp_param_table$label[temp_param_table$var == "Consumo Industrial"] <- "Industrial Consumption"
@@ -287,16 +293,15 @@ temp_param_table$label[temp_param_table$var == "Consumo Outros"] <- "Other Consu
 temp_param_table$label[temp_param_table$var == "Consumidores Totais"] <- "Total Consumers"
 temp_param_table$label[temp_param_table$var == "Consumidores Residenciais"] <- "Residential Consumers"
 
-temp_param_table$var_group[2:6] <- "CDE Budget - ANEEL"
-temp_param_table$var_group[7:11] <- "Eletricity Consumption - EPE"
-temp_param_table$var_group[12:13] <- "Average of Consumers - EPE"
+temp_param_table$var_group[temp_param_table$var %in% cols_aneel_budget]                                  <- "CDE Budget - ANEEL"
+temp_param_table$var_group[temp_param_table$var %in% c("Consumo Total", "Consumo Residencial", "Consumo Industrial", "Consumo Comercial", "Consumo Outros")] <- "Electricity Consumption - EPE"
+temp_param_table$var_group[temp_param_table$var %in% c("Consumidores Totais", "Consumidores Residenciais")]  <- "Average of Consumers - EPE"
 
-temp_param_table$unidade[2:3] <- "R$ Billions"
-temp_param_table$unidade[4] <- "% of the Energy Development Account Budget"
-temp_param_table$unidade[5:6] <- "R$ Billions"
-temp_param_table$unidade[7:11] <- "MWh Millions"
-temp_param_table$unidade[12:13] <- "Millions of Consumers"
-
+temp_param_table$unidade[temp_param_table$var %in% cols_aneel_budget[c(1, 2)]] <- "R$ Billions"
+temp_param_table$unidade[temp_param_table$var == cols_aneel_budget[3]]          <- "% of the Energy Development Account Budget"
+temp_param_table$unidade[temp_param_table$var %in% cols_aneel_budget[c(4, 5)]] <- "R$ Billions"
+temp_param_table$unidade[temp_param_table$var %in% c("Consumo Total", "Consumo Residencial", "Consumo Industrial", "Consumo Comercial", "Consumo Outros")] <- "MWh Millions"
+temp_param_table$unidade[temp_param_table$var %in% c("Consumidores Totais", "Consumidores Residenciais")]  <- "Millions of Consumers"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/energia_sistemas_isolados_dic_en.csv", fileEncoding = "UTF-8")
