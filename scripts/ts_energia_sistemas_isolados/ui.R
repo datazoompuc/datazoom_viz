@@ -22,9 +22,9 @@ get_ui <- function(files, param) {
               }',),
         
         h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        p(class = "plot_desc", textOutput("plot_desc", inline = TRUE)),
         hr(),
-        p(class = "vars", param$label_var_name),
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo y
@@ -47,18 +47,18 @@ get_ui <- function(files, param) {
           style = "margin-top: 10px;",
           materialSwitch(
             inputId = "ylog",
-            label = tags$span(param$label_scale_name, class = "switch-label"),
+            label = tags$span(textOutput("label_scale_name", inline = TRUE), class = "switch-label"),
             value = FALSE,
             status = "info"
           )
         ),
-        
+
         # Seleciona proporcional
         div(
           style = "margin-top: 10px;",
           materialSwitch(
             inputId = "y_option",
-            label = tags$span(param$label_prop_name, class = "switch-label"),
+            label = tags$span(textOutput("label_prop_name", inline = TRUE), class = "switch-label"),
             value = FALSE, 
             status = "info"
           )
@@ -67,6 +67,16 @@ get_ui <- function(files, param) {
         
         # espaço vazio
         div(class = "fakecheckbox", ),
+        
+        actionButton(
+          'toggle_lang',
+          label = "English",
+          icon = icon("globe"),
+          class = "btn-primary"
+        ),
+        
+        
+        div(style = "height: 6px;"),
         
         div(
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
