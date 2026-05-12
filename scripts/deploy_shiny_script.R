@@ -3,7 +3,7 @@ deploy_shiny_script <- function(
         manifest = "config/app_manifest.csv",
         account = "datazoom",
         server = "shinyapps.io",
-        extra = c("global", "www"),
+        extra = c("global", "apps/www"),
         forceUpdate = TRUE
 ) {
     man <- read.csv(manifest, stringsAsFactors = FALSE)
@@ -49,8 +49,8 @@ deploy_shiny_script <- function(
     dir.create(td, recursive = TRUE, showWarnings = FALSE)
     
     copy_one <- function(src) {
-        dest <- file.path(td, src)
-        
+        dest <- file.path(td, if (dir.exists(src)) basename(src) else src)
+
         if (dir.exists(src)) {
             dir.create(dest, recursive = TRUE, showWarnings = FALSE)
             files <- list.files(src, all.files = TRUE, full.names = TRUE, recursive = TRUE)
