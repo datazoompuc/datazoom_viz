@@ -142,39 +142,19 @@ get_server <- function(files, param) {
           table_lang <- param$tables[[lang()]]
           x_col <- table_lang[which(table_lang$var == param$x_def), ]
           y_col <- table_lang %>% filter(var %in% input$y)
-       
-           df_filtered <- df %>%
-             select("Ano", input$y) %>%
-             pivot_longer(cols = input$y) %>%
-             filter(!is.na(value)) %>%
-             mutate(unidade = case_when(str_detect(name, "Consumo") ~ "Milhões de MWh",
-                                        str_detect(name, "Despesas") ~ "Bilhões de R$",
-                                        str_detect(name, "Consumidores") ~ "Milhões de Consumidores",
-                                        str_detect(name, "Participação") ~ "% do Orçamento da Conta de Desenvolvimento Energético"),
-                    group = name)
-              
-           if (i18n()$translate_names) {
-               df_filtered <- df_filtered %>%
-                   mutate(unidade = case_when(str_detect(name, "Consumo") ~ "MWh Millions",
-                                              str_detect(name, "Despesas") ~ "R$ Billions",
-                                              str_detect(name, "Consumidores") ~ "Millions of Consumers",
-                                              str_detect(name, "Participação") ~ "% of the Energy Development Account Budget"))
-               
-               df_filtered$name[df_filtered$name == "Ano"] <- "Year"
-               df_filtered$name[df_filtered$name == "Despesas Estimadas CCC (Nominal)"] <- "Estimated Expenses CCC (Nominal)"
-               df_filtered$name[df_filtered$name == "Despesas Estimadas CCC (Real, R$ 2021)"] <- "Estimated Expenses CCC (Real, R$ 2021)"
-               df_filtered$name[df_filtered$name == "Participação da CCC no Orçamento Total da CDE"] <- "CCC Participation in the Total Energy Development Account Budget"
-               df_filtered$name[df_filtered$name == "Despesas Estimadas no Orçamento da CDE (Nominal)"] <- "Estimated Expenses in the Energy Development Account Budget (Nominal)"
-               df_filtered$name[df_filtered$name == "Despesas Estimadas no Orçamento da CDE (Real, R$ 2021)"] <- "Estimated Expenses in the Energy Development Account Budget (Real, R$ 2021)"
-               df_filtered$name[df_filtered$name == "Consumo Total"] <- "Total Consumption"
-               df_filtered$name[df_filtered$name == "Consumo Residencial"] <- "Residential Consumption"
-               df_filtered$name[df_filtered$name == "Consumo Industrial"] <- "Industrial Consumption"
-               df_filtered$name[df_filtered$name == "Consumo Comercial"] <- "Comercial Consumption"
-               df_filtered$name[df_filtered$name == "Consumo Outros"] <- "Other Consumption"
-               df_filtered$name[df_filtered$name == "Consumidores Totais"] <- "Total Consumers"
-               df_filtered$name[df_filtered$name == "Consumidores Residenciais"] <- "Residential Consumers"
-               
-           }
+
+          name_map    <- setNames(table_lang$label,   table_lang$var)
+          unidade_map <- setNames(table_lang$unidade, table_lang$var)
+
+          df_filtered <- df %>%
+            select("Ano", input$y) %>%
+            pivot_longer(cols = input$y) %>%
+            filter(!is.na(value)) %>%
+            mutate(
+              group   = name,
+              unidade = unname(unidade_map[name]),
+              name    = unname(name_map[name])
+            )
            
        # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
@@ -204,27 +184,17 @@ get_server <- function(files, param) {
             df_p$y <- df_p$y_option
           }
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
-
           # Adicionar coluna de color
           df_p <- df_p %>%
-            mutate(color = case_when(str_detect(group, "Consumo") ~ "Consumo",
-                                     str_detect(group, "Despesas") ~ "Despesas",
-                                     str_detect(group, "Consumidores") ~ "Consumidores",
-                                     str_detect(group, "Participação") ~ "Despesas"),
-                   group = text)
-          
-          if (i18n()$translate_names) {
-
-              df_p <- df_p %>%
-                  mutate(color = case_when(color == "Consumo" ~ "Consumption",
-                                           color == "Despesas" ~ "Expenses",
-                                           color == "Consumidores" ~ "Consumers",
-                                           color == "Participação" ~ "Expenses"))
-          }
+            mutate(
+              color = case_when(
+                str_detect(group, "Consumo")      ~ ifelse(i18n()$translate_names, "Consumption",  "Consumo"),
+                str_detect(group, "Despesas")     ~ ifelse(i18n()$translate_names, "Expenses",     "Despesas"),
+                str_detect(group, "Consumidores") ~ ifelse(i18n()$translate_names, "Consumers",    "Consumidores"),
+                str_detect(group, "Participação") ~ ifelse(i18n()$translate_names, "Expenses",     "Despesas")
+              ),
+              group = text
+            )
           
           # Monta html do tooltip
           df_p$tooltip <- paste0(
