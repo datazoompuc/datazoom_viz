@@ -159,6 +159,28 @@ db_sistemas_isolados_p3 = full_join(db_sistemas_isolados_p2, db_orcamento_total)
 
 # pivot table -----------------------------------------------------------------------
 db_sistemas_isolados <- db_sistemas_isolados_p3 %>%
+# ============================================================
+# Referência para deflação IPCA
+# Consulta automaticamente o mês mais recente disponível via API do IBGE.
+# ============================================================
+
+get_ref_ipca <- function() {
+  url <- paste0(
+    "https://servicodados.ibge.gov.br/api/v3/agregados/1737/",
+    "periodos/last%201/variaveis/2266?localidades=N1[all]"
+  )
+  resp <- tryCatch(fromJSON(url), error = function(e) NULL)
+  if (!is.null(resp)) {
+    periodo <- names(resp$resultados[[1]]$series[[1]]$serie)  # formato "YYYYMM"
+    return(format(as.Date(paste0(periodo, "01"), "%Y%m%d"), "%m/%Y"))
+  }
+  # fallback: dois meses atrás (garante que o IPCA já foi divulgado)
+  format(floor_date(Sys.Date() - months(2), "month"), "%m/%Y")
+}
+
+ref_ipca     <- get_ref_ipca()                     # ex: "04/2026"
+ano_ref_ipca <- str_extract(ref_ipca, "\\d{4}")   # ex: "2026"
+
   pivot_wider(names_from = tipo, values_from = valor)
 
 colnames(db_sistemas_isolados) <- str_to_title(colnames(db_sistemas_isolados))
