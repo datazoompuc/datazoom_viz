@@ -198,82 +198,42 @@ get_server <- function(files, param) {
           }
           
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table %>% filter(var %in% input$y)
-         
+          table_lang <- param$tables[[lang()]]
+          x_col <- table_lang[which(table_lang$var == param$x_def), ]
+          y_col <- table_lang %>% filter(var %in% input$y)
+
+          name_map    <- setNames(table_lang$label,   table_lang$var)
+          unidade_map <- setNames(table_lang$unidade, table_lang$var)
+
           df_filtered <- df %>%
             select("ano", "uf", input$y) %>%
             pivot_longer(cols = input$y) %>%
-            filter(!is.na(value))
-          
-          if (param$translate_names) {
-              df_filtered <- df_filtered %>%
-                  mutate(name = case_when(name == "total produzido" ~ "Total energy produced",
-                                          name == "hidro" ~ "Energy produced by hydro",
-                                          name == "eolica" ~ "Energy produced by wind",
-                                          name == "solar" ~ "Energy produced by solar",
-                                          name == "nuclear" ~ "Energy produced by nuclear",
-                                          name == "termo" ~ "Energy produced by thermo",
-                                          name == "cana" ~ "Energy produced by sugar cane",
-                                          name == "lenha" ~ "Energy produced by wood",
-                                          name == "lixivia" ~ "Energy produced by black liquor",
-                                          name == "outras fontes renovaveis" ~ "Energy produced by other renewable sources",
-                                          name == "carvao vapor" ~ "Energy produced by steam coal",
-                                          name == "gas natural" ~ "Energy produced by natural gas",
-                                          name == "gas de coqueira" ~ "Energy produced by coke oven gas",
-                                          name == "combustivel" ~ "Energy produced by fuel",
-                                          name == "diesel" ~ "Energy produced by diesel",
-                                          name == "outras fontes nao renovaveis" ~ "Energy produced by other non-renewable sources",
-                                          name == "consumo cativo" ~ "Captive consumption",
-                                          name == "consumo livre" ~ "Free consumption",
-                                          name == "consumo residencial" ~ "Residential consumption",
-                                          name == "consumo industrial" ~ "Industrial consumption",
-                                          name == "consumo comercial" ~ "Comercial consumption",
-                                          name == "consumo rural" ~ "Rural consumption",
-                                          name == "consumo poder publico" ~ "Public authority consumption",
-                                          name == "consumo iluminacao publica" ~ "Public lighting consumption",
-                                          name == "consumo servico publica" ~ "Public service consumption",
-                                          name == "consumo proprio" ~ "Personal consumption",
-                                          name == "consumidores cativo" ~ "Captive consumers",
-                                          name == "consumidores livre" ~ "Free consumers",
-                                          name == "consumidores residencial" ~ "Residential consumers",
-                                          name == "consumidores industrial" ~ "Industrial consumers",
-                                          name == "consumidores comercial" ~ "Comercial consumers",
-                                          name == "consumidores rural" ~ "Rural consumers",
-                                          name == "consumidores poder publico" ~ "Public authority consumers",
-                                          name == "consumidores iluminacao publica" ~ "Public lighting consumers",
-                                          name == "consumidores servico publica" ~ "Public service consumers",
-                                          name == "consumidores proprio" ~ "Personal consumers",
-                                          name == "consumo total" ~ "Total consumption",
-                                          name == "consumidores" ~ "Total consumers",
-                                          ))
-          }
-          
-          df_filtered <- df_filtered[which(df_filtered$uf %in% input$filter1), ]
-          df_filtered <- df_filtered %>%
-            mutate(group = paste(uf, name, sep = " - "))
-          
+            filter(!is.na(value)) %>%
+            filter(uf %in% input$filter1) %>%
+            mutate(
+              unidade    = unname(unidade_map[name]),
+              name       = unname(name_map[name]),
+              uf_display = unname(i18n()$uf_map[uf]),
+              group      = paste(uf_display, name, sep = " - ")
+            )
+
           # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
             df_filtered[x_col$var],
             df_filtered["value"],
             df_filtered["group"],
-            df_filtered["uf"],
-            df_filtered["name"]
+            df_filtered["uf_display"],
+            df_filtered["name"],
+            df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "group", "color", "text")
-          
-          unidade_df <- y_col %>%
-            select(text = var, unidade)
-          
-          df_p <- left_join(df_p, unidade_df)
-          
+          colnames(df_p) <- c("x", "y", "group", "color", "text", "unidade")
+
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
             stop()
           }
-          
+
           # Alternativa de medida para y
           if (input$y_option & is.numeric(df_p$y)) {
             df_p <- df_p %>%
@@ -285,35 +245,17 @@ get_server <- function(files, param) {
               )
             df_p$y <- df_p$y_option
           }
-          
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
-          
-          if(param$translate_names == FALSE){
-            # Monta html do tooltip
-            df_p$tooltip <- paste0(
-              "<b>", df_p$color, "</b><br>",
-              x_col$label, ": ", df_p$x, "<br>",
-              df_p$text, ": ", format(df_p$y, scientific = FALSE,
-                                      digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-              "Unidade de medida: <b>", df_p$unidade, "</b>"
-            )
-          } else {
-            # Monta html do tooltip
-            df_p$tooltip <- paste0(
-              "<b>", df_p$color, "</b><br>",
-              x_col$label, ": ", df_p$x, "<br>",
-              df_p$text, ": ", format(df_p$y, scientific = FALSE,
-                                      digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-              "Measurment Unit: <b> % of Brazil's total </b>"
-            )
-          }
+
+          # Monta html do tooltip
+          df_p$tooltip <- paste0(
+            "<b>", df_p$color, "</b><br>",
+            x_col$label, ": ", df_p$x, "<br>",
+            df_p$text, ": ", format(df_p$y, scientific = FALSE,
+                                    digits = 2,
+                                    decimal.mark = ",",
+                                    big.mark = "."), "<br>",
+            i18n()$label_unit_name, ": <b>", df_p$unidade, "</b>"
+          )
        
          
           
