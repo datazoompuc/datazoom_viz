@@ -151,14 +151,6 @@ if (file.exists(path_total)) {
     summarise(`DESPESAS ESTIMADAS NO ORÇAMENTO DA CDE (Nominal)` = sum(valor))
 }
   
-#tudo junto ---------------------------------------------------------------
-db_completa = full_join(db_consumo, db_consumidores)
-db_sistemas_isolados_p1 = full_join(db_completa, db_orcamento_cde)
-db_sistemas_isolados_p2 = full_join(db_sistemas_isolados_p1, db_orcamento_cde_particip)
-db_sistemas_isolados_p3 = full_join(db_sistemas_isolados_p2, db_orcamento_total)
-
-# pivot table -----------------------------------------------------------------------
-db_sistemas_isolados <- db_sistemas_isolados_p3 %>%
 # ============================================================
 # Referência para deflação IPCA
 # Consulta automaticamente o mês mais recente disponível via API do IBGE.
@@ -181,24 +173,57 @@ get_ref_ipca <- function() {
 ref_ipca     <- get_ref_ipca()                     # ex: "04/2026"
 ano_ref_ipca <- str_extract(ref_ipca, "\\d{4}")   # ex: "2026"
 
+# tudo junto ---------------------------------------------------------------
+# pivot da EPE para formato wide, depois une com dados da ANEEL disponíveis
+db_sistemas_isolados <- bind_rows(db_consumo, db_consumidores) %>%
   pivot_wider(names_from = tipo, values_from = valor)
 
+for (df_aneel in list(db_orcamento_cde, db_orcamento_cde_particip, db_orcamento_total)) {
+  if (!is.null(df_aneel)) {
+    db_sistemas_isolados <- full_join(db_sistemas_isolados, df_aneel, by = "Ano")
+  }
+}
+
+# padroniza nomes de colunas -----------------------------------------------
 colnames(db_sistemas_isolados) <- str_to_title(colnames(db_sistemas_isolados))
 
+# corrige siglas distorcidas pelo str_to_title (ex: "Ccc" → "CCC")
+# cada rename só roda se a coluna existir, pois os dados da ANEEL são opcionais
+if ("Despesas Estimadas Ccc (Nominal)" %in% colnames(db_sistemas_isolados))
+  db_sistemas_isolados <- db_sistemas_isolados %>%
+    rename(`Despesas Estimadas CCC (Nominal)` = `Despesas Estimadas Ccc (Nominal)`)
+
+if ("Participacao" %in% colnames(db_sistemas_isolados))
+  db_sistemas_isolados <- db_sistemas_isolados %>%
+    rename(`Participação da CCC no Orçamento Total da CDE` = Participacao)
+
+if ("Despesas Estimadas No Orçamento Da Cde (Nominal)" %in% colnames(db_sistemas_isolados))
+  db_sistemas_isolados <- db_sistemas_isolados %>%
+    rename(`Despesas Estimadas no Orçamento da CDE (Nominal)` = `Despesas Estimadas No Orçamento Da Cde (Nominal)`)
+
+# deflação: cria colunas reais com referência dinâmica ---------------------
+nominal_dates <- as.Date(paste0(db_sistemas_isolados$Ano, "-01-01"))
+
+if ("Despesas Estimadas CCC (Nominal)" %in% colnames(db_sistemas_isolados)) {
+  col_real_ccc <- paste0("Despesas Estimadas CCC (Real, R$ ", ano_ref_ipca, ")")
+  db_sistemas_isolados[[col_real_ccc]] <- ipca(
+    db_sistemas_isolados$`Despesas Estimadas CCC (Nominal)`, nominal_dates, ref_ipca
+  )
+}
+
+if ("Despesas Estimadas no Orçamento da CDE (Nominal)" %in% colnames(db_sistemas_isolados)) {
+  col_real_cde <- paste0("Despesas Estimadas no Orçamento da CDE (Real, R$ ", ano_ref_ipca, ")")
+  db_sistemas_isolados[[col_real_cde]] <- ipca(
+    db_sistemas_isolados$`Despesas Estimadas no Orçamento da CDE (Nominal)`, nominal_dates, ref_ipca
+  )
+}
+
+# remove anos anteriores a 2013 e ordena -----------------------------------
 db_sistemas_isolados <- db_sistemas_isolados %>%
-  rename(`Despesas Estimadas CCC (Nominal)` = `Despesas Estimadas Ccc (Nominal)`,
-         `Despesas Estimadas CCC (Real, R$ 2021)` = `Despesas Estimadas Ccc (Real, R$ 2021)`,
-         `Participação da CCC no Orçamento Total da CDE` = Participacao,
-         `Despesas Estimadas no Orçamento da CDE (Nominal)` = `Despesas Estimadas No Orçamento Da Cde (Nominal)`,
-         `Despesas Estimadas no Orçamento da CDE (Real, R$ 2021)` = `Despesas Estimadas No Orçamento Da Cde (Real, R$ 2021)`)
-        
+  filter(Ano >= 2013) %>%
+  arrange(Ano)
 
-# remove years before 2013 ----------------------------------------------------------
-db_sistemas_isolados <- db_sistemas_isolados %>%
-  filter(Ano >= 2013)
-
-
-# export ------------------------------------------------------------------
+# export -------------------------------------------------------------------
 saveRDS(db_sistemas_isolados, "data/energia_sistemas_isolados.rds")
 
 
