@@ -13,26 +13,50 @@ get_server <- function(files, param) {
   
   # Carrega dados
   df <- readRDS(files$db_file)
-  
-  #Traduz dados para inglês
-  if(param$lang){
-      
-      df$fonte <- df$fonte %>%
-          str_replace_all(c("Termoelétrica" = "Thermal Power" , 
+
+  server <- function(input, output, session) {
+
+    # Língua inicial (lida da URL)
+    lang <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["lang"]], "en")) "en" else "pt"
+    })
+
+    # Alterna língua ao clicar no botão
+    observeEvent(input$toggle_lang, {
+      new_lang <- ifelse(lang() == "pt", "en", "pt")
+      lang(new_lang)
+      updateActionButton(session, "toggle_lang",
+                         label = ifelse(new_lang == "pt", "English", "Português"))
+    })
+
+    # Atalho para os textos da língua ativa
+    i18n <- reactive({ param$i18n[[lang()]] })
+
+    # Outputs de texto da sidebar
+    output$plot_desc <- renderText({ i18n()$plot_desc })
+    output$ui1       <- renderText({ i18n()$ui1 })
+
+    # Tradução reativa das colunas de filtro
+    df_translated <- reactive({
+      d <- df
+      if (lang() == "en") {
+        d$fonte <- d$fonte %>%
+          str_replace_all(c("Termoelétrica" = "Thermal Power",
                             "Eólica" = "Wind Power",
                             "Solar" = "Solar Power",
                             "Pequena Central Hidrelétrica" = "Small Hydroelectric Center",
                             "Central Geradora Hidrelétrica" = "Hydroelectric Generating Center",
                             "Usina Hidrelétrica" = "Hydroelectric Power Plant",
                             "Energia Termonuclear" = "Thermonuclear Power"))
-      
-      df$origem <- df$origem %>%
+
+        d$origem <- d$origem %>%
           str_replace_all(c("Fóssil" = "Fossil",
                             "Biomassa" = "Biomass",
                             "Eólica" = "Wind",
                             "Hídrica" = "Hydric"))
-      
-      df$tipo <- df$tipo %>%
+
+        d$tipo <- d$tipo %>%
           str_replace_all(c("Carvão Mineral" = "Mineral Coal",
                             "Petróleo" = "Oil",
                             "Radiação Solar" = "Solar Radiation",
@@ -46,8 +70,8 @@ get_server <- function(files, param) {
                             "Outros Fósseis" = "Other Fossil",
                             "Resíduos Solidos Urbanos" = "Solid Urban Residue",
                             "Urânio" = "Uranium"))
-      
-      df$combustivel_final <- df$combustivel_final %>%
+
+        d$combustivel_final <- d$combustivel_final %>%
           str_replace_all(c("Carvão Mineral" = "Mineral Coal",
                             "Óleo Diesel" = "Diesel",
                             "Gás De Alto Forno - Biomassa" = "Blast Furnace Gas - Biomass",
@@ -77,82 +101,49 @@ get_server <- function(files, param) {
                             "Gás De Refinaria" = "Refinery Gas",
                             "Calor De Processo - CM" = "Process Heat - CM",
                             "Biogas - Floresta" = "Biogas - Forest",
-                            "Gás De Alto Forno - PE" = "Blast Funace Gas - PE", 
+                            "Gás De Alto Forno - PE" = "Blast Funace Gas - PE",
                             "Etanol" = "Ethanol"
           ))
-  }
-  
-  server <- function(input, output, session) {
-    
+      }
+      d
+    })
+
     df_reactived <- reactive({
-        
-      df <- df %>% filter(ano != as.numeric(str_extract(Sys.Date(), "^.{4}")))
-      if (input$tipo != param$server7) df <- df %>% filter(tipo == input$tipo)
-      if (input$fonte != param$server7) df <- df %>% filter(fonte == input$fonte)
-      if (input$origem != param$server7) df <- df %>% filter(origem == input$origem)
-      if (input$combustivel != param$server7) df <- df %>% filter(combustivel_final == input$combustivel)
-      
-      w <- df %>%
+
+      d <- df_translated() %>% filter(ano != as.numeric(str_extract(Sys.Date(), "^.{4}")))
+      if (input$tipo != i18n()$server7) d <- d %>% filter(tipo == input$tipo)
+      if (input$fonte != i18n()$server7) d <- d %>% filter(fonte == input$fonte)
+      if (input$origem != i18n()$server7) d <- d %>% filter(origem == input$origem)
+      if (input$combustivel != i18n()$server7) d <- d %>% filter(combustivel_final == input$combustivel)
+
+      d %>%
         group_by(ano, estado) %>%
         summarise(potencia_outorgada_kw = sum(potencia_outorgada_kw))
-      
-      return(w)
     })
-    
-    # Cria opções para seleção de grupos
-    param$fonte_choices <- c(param$server7, sort(unique(df$fonte)))
-    param$origem_choices <- c(param$server7, sort(unique(df$origem)))
-    param$tipo_choices <- c(param$server7, sort(unique(df$tipo)))
-    param$combustivel_choices <- c(param$server7, sort(unique(df$combustivel_final)))
-    
-    # Adicionar opcoes no ui
-    updateSelectInput(session, "fonte",
-                      choices = param$fonte_choices)
-    
-    updateSelectInput(session, "origem",
-                      choices = param$origem_choices)
-    
-    updateSelectInput(session, "tipo",
-                      choices = param$tipo_choices)
-    
-    updateSelectInput(session, "combustivel",
-                      choices = param$combustivel_choices)
-    
 
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      # se input está vazio preenche com valor aleatório da lista de colunas
-      if (input$fonte == "") {
-        updateSelectInput(session, "fonte",
-          choices = param$fonte_choices,
-          selected = sample(param$fonte_choices, 1)
-        )
-      }
-      if (input$origem == "") {
-        updateSelectInput(session, "origem",
-          choices = param$origem_choices,
-          selected = sample(param$origem_choices, 1)
-        )
-      }
-      if (input$tipo == "") {
-        updateSelectInput(session, "tipo",
-          choices = param$tipo_choices,
-          selected = sample(param$tipo_choices, 1)
-        )
-      }
-      if (input$combustivel == "") {
-        updateSelectInput(session, "fonte",
-          choices = param$combustivel_choices,
-          selected = sample(param$combustivel_choices, 1)
-        )
-      }
+    # Atualiza opções dos selects ao trocar língua
+    observeEvent(lang(), {
+      d <- df_translated()
+      fonte_choices       <- c(i18n()$server7, sort(unique(d$fonte)))
+      origem_choices      <- c(i18n()$server7, sort(unique(d$origem)))
+      tipo_choices        <- c(i18n()$server7, sort(unique(d$tipo)))
+      combustivel_choices <- c(i18n()$server7, sort(unique(d$combustivel_final)))
 
-    }
+      updateSelectInput(session, "fonte",
+                        label = i18n()$ui2, choices = fonte_choices, selected = i18n()$server7)
+      updateSelectInput(session, "origem",
+                        label = i18n()$ui3, choices = origem_choices, selected = i18n()$server7)
+      updateSelectInput(session, "tipo",
+                        label = i18n()$ui4, choices = tipo_choices, selected = i18n()$server7)
+      updateSelectInput(session, "combustivel",
+                        label = i18n()$ui5, choices = combustivel_choices, selected = i18n()$server7)
+    })
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "fonte=", input$fonte,
+        "?", "lang=", lang(),
+        "&", "fonte=", input$fonte,
         "&", "origem=", input$origem,
         "&", "tipo=", input$tipo,
         "&", "combustivel=", input$combustivel
@@ -164,28 +155,33 @@ get_server <- function(files, param) {
     update_my_inputs <- function() {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
+      d <- df_translated()
+      fonte_choices       <- c(i18n()$server7, sort(unique(d$fonte)))
+      origem_choices      <- c(i18n()$server7, sort(unique(d$origem)))
+      tipo_choices        <- c(i18n()$server7, sort(unique(d$tipo)))
+      combustivel_choices <- c(i18n()$server7, sort(unique(d$combustivel_final)))
 
       if (!is.null(query[["fonte"]])) {
         updateSelectInput(session, "fonte",
-          choices = param$fonte_choices,
+          choices = fonte_choices,
           selected = query[["fonte"]]
         )
       }
       if (!is.null(query[["origem"]])) {
         updateSelectInput(session, "origem",
-          choices = param$origem_choices,
+          choices = origem_choices,
           selected = query[["origem"]]
         )
       }
       if (!is.null(query[["tipo"]])) {
         updateSelectInput(session, "tipo",
-          choices = param$tipo_choices,
+          choices = tipo_choices,
           selected = query[["tipo"]]
         )
       }
       if (!is.null(query[["combustivel"]])) {
         updateSelectInput(session, "combustivel",
-          choices = param$combustivel_choices,
+          choices = combustivel_choices,
           selected = query[["combustivel"]]
         )
       }
@@ -198,19 +194,19 @@ get_server <- function(files, param) {
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$tipo) || is.null(input$origem) || 
           is.null(input$fonte) || is.null(input$combustivel)) {
-        text <- param$server1
+        text <- i18n()$server1
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == param$x_def), ]
+        x_col <- param$tables[[lang()]][which(param$tables[[lang()]]$var == param$x_def), ]
 
-        text <- paste0(param$server2, x_col$label)
+        text <- paste0(i18n()$server2, x_col$label)
       }
 
       text
     })
     output$plot_subtitle <- renderText({
-      text <- paste0(param$server3, input$fonte, param$server4, input$origem,
-                     param$server5, input$tipo, param$server6, input$combustivel)
+      text <- paste0(i18n()$server3, input$fonte, i18n()$server4, input$origem,
+                     i18n()$server5, input$tipo, i18n()$server6, input$combustivel)
 
       text
     })
@@ -235,13 +231,14 @@ get_server <- function(files, param) {
           
           
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
-          slider_col <- param$table[which(param$table$var == param$slider_def), ]
-          group_col <- param$table[which(param$table$var == param$group), ]
-          text_col <- param$table[which(param$table$var == param$text_def), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
-  
+          table_lang <- param$tables[[lang()]]
+          x_col <- table_lang[which(table_lang$var == param$x_def), ]
+          color_col <- table_lang[which(table_lang$var == param$color_def), ]
+          slider_col <- table_lang[which(table_lang$var == param$slider_def), ]
+          group_col <- table_lang[which(table_lang$var == param$group), ]
+          text_col <- table_lang[which(table_lang$var == param$text_def), ]
+          id_col <- table_lang[which(table_lang$var == param$id_def), ]
+
           # Cria coluna vazia para o ranking
           y_col <- list()
           y_col$var <- "rank"
