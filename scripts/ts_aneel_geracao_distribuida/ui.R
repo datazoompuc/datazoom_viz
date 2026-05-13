@@ -22,14 +22,14 @@ get_ui <- function(files, param) {
               }',),
         
         h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        p(class = "plot_desc", textOutput("plot_desc", inline = TRUE)),
         hr(),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo y
           selectInput(
             inputId = "y",
-            label = param$label_y_name,
+            label = param$i18n$pt$label_y_name,
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -42,7 +42,7 @@ get_ui <- function(files, param) {
         # Seleciona filtro de municípios
         selectizeInput(
           "filter1",
-          param$label_region_name,
+          param$i18n$pt$label_region_name,
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
@@ -51,29 +51,29 @@ get_ui <- function(files, param) {
         
         # espaço vazio
         div(class = "fakecheckbox", ),
-          p(class = "vars", param$label_var_name),      
+          p(class = "vars", textOutput("label_var_name", inline = TRUE)),
         # Seleciona filtro de modalidade empreendimento
         selectInput(
           "filter_sig_modalidade_empreendimento",
-          param$label_type_name,
+          param$i18n$pt$label_type_name,
           choices = NULL,
-          selected = param$filter_sig_modalidade_empreendimento_def,
+          selected = param$i18n$pt$filter_modalidade_def,
           width = "100%"
         ),
         # Seleciona filtro de tipo geracao
         selectInput(
           "filter_dsc_fonte_geracao",
-          param$label_source_name,
+          param$i18n$pt$label_source_name,
           choices = NULL,
-          selected = param$filter_dsc_fonte_geracao_def,
+          selected = param$i18n$pt$filter_fonte_def,
           width = "100%"
         ),
         # Seleciona filtro de tipo porte
         selectInput(
           "filter_dsc_porte",
-          param$label_size_name,
+          param$i18n$pt$label_size_name,
           choices = NULL,
-          selected = param$filter_dsc_porte_def,
+          selected = param$i18n$pt$filter_porte_def,
           width = "100%"
         ),
         
@@ -81,10 +81,13 @@ get_ui <- function(files, param) {
         div(class = "fakecheckbox", ),
         
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen",
+                              icon = icon("expand"),
                               class = "btn-primary",
-                              onclick = paste0("window.open('", param$link, "', '_blank')"))
+                              onclick = paste0("window.open('", param$link, "', '_blank')")),
+          shiny::actionButton("toggle_lang", label = "English",
+                              icon = icon("globe"),
+                              class = "btn-primary")
         ),
       ),
       column(9,
