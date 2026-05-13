@@ -225,7 +225,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "y=", input$y,
+        "?", "lang=", lang(),
+        "&", "y=", input$y,
         "&", "filter_sig_modalidade_empreendimento=", input$filter_sig_modalidade_empreendimento,
         "&", "filter_dsc_fonte_geracao=", input$filter_dsc_fonte_geracao,
         "&", "filter_dsc_porte=", input$filter_dsc_porte
@@ -323,10 +324,10 @@ get_server <- function(files, param) {
       text <- " "
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$y) || input$y == "") {
-        text <- "Variável no eixo Y não selecionada"
+        text <- i18n()$server_empty
       } else {
         # Monta título a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
+        y_col <- param$tables[[lang()]][which(param$tables[[lang()]]$var == input$y), ]
 
         text <- paste0(y_col$label)
       }
@@ -339,8 +340,8 @@ get_server <- function(files, param) {
         text <- " "
       } else {
 
-        text <- paste0(param$subtitle_init, input$filter_sig_modalidade_empreendimento,
-          ", ", input$filter_dsc_fonte_geracao, " ", param$subtitle_sep, " ",
+        text <- paste0(i18n()$subtitle_init, input$filter_sig_modalidade_empreendimento,
+          ", ", input$filter_dsc_fonte_geracao, " ", i18n()$subtitle_sep, " ",
           input$filter_dsc_porte)
       }
 
@@ -369,10 +370,11 @@ get_server <- function(files, param) {
 
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           # Cria dataframe do gráfico
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
+          table_lang <- param$tables[[lang()]]
+          x_col <- table_lang[which(table_lang$var == param$x_def), ]
+          y_col <- table_lang[which(table_lang$var == input$y), ]
+          id_col <- table_lang[which(table_lang$var == param$id_def), ]
+          color_col <- table_lang[which(table_lang$var == param$color_def), ]
 
           # Filtra dataframe com grupos selecionados
           df_filtered <- df_reactived()[which(df_reactived()$group %in% input$filter1), ]
@@ -403,11 +405,11 @@ get_server <- function(files, param) {
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
-            "Ano : ", "<b>", paste0(df_p$x), "</b><br>",
-            "Modalidade de empreendimento: ", "<b>", paste0(input$filter_sig_modalidade_empreendimento),"</b><br>",
-            "Fonte de geracao: ",  "<b>", paste0(input$filter_dsc_fonte_geracao),"</b><br>",
-            "Porte: ",  "<b>", paste0(input$filter_dsc_porte),"</b><br>",
-            "Unidade de medida: ", "<b>", y_col$unidade,"</b><br>",
+            i18n()$tooltip_year, ": ", "<b>", paste0(df_p$x), "</b><br>",
+            i18n()$tooltip_modalidade, ": ", "<b>", paste0(input$filter_sig_modalidade_empreendimento),"</b><br>",
+            i18n()$tooltip_fonte, ": ", "<b>", paste0(input$filter_dsc_fonte_geracao),"</b><br>",
+            i18n()$tooltip_porte, ": ", "<b>", paste0(input$filter_dsc_porte),"</b><br>",
+            i18n()$tooltip_unit, ": ", "<b>", y_col$unidade,"</b><br>",
             y_col$label, ": ", "<b>", format(df_p$y, scientific = FALSE,
                                       digits = 2,
                                       decimal.mark = ",",
