@@ -10,162 +10,211 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
-  
+
   # Carrega dados
-  df <- readRDS(files$db_file) %>% 
+  df <- readRDS(files$db_file) %>%
     ungroup
-  
+
   df <- df %>%
       mutate(dsc_fonte_geracao = case_when(
           dsc_fonte_geracao == "Biogás-AGR" ~ "Biogás - AGR",
           TRUE                              ~ dsc_fonte_geracao))
-  
-  if(param$lang) {
 
-    df <- df %>%
-      mutate(dsc_fonte_geracao = case_when(
-        dsc_fonte_geracao == "Bagaço de Cana de Açúcar"         ~ "Sugarcane Bagasse",
-        dsc_fonte_geracao == "Biogás - AGR"                       ~ "Biogas - AGR",
-        dsc_fonte_geracao == "Biogás - Floresta"                ~ "Biogas - Forest",
-        dsc_fonte_geracao == "Biogás - RA"                      ~ "Biogas - RA",
-        dsc_fonte_geracao == "Biogás - RU"                      ~ "Biogas - RU",
-        dsc_fonte_geracao == "Casca de Arroz"                   ~ "Rice Husk",
-        dsc_fonte_geracao == "Cinética do vento"                ~ "Wind Kinetics",
-        dsc_fonte_geracao == "Gás de Alto Forno - Biomassa"     ~ "Blast Furnace Gas - Biomass",
-        dsc_fonte_geracao == "Gás Natural"                      ~ "Natural Gas",
-        dsc_fonte_geracao == "Potencial hidráulico"             ~ "Hydropower",
-        dsc_fonte_geracao == "Radiação solar"                   ~ "Solar Radiation",
-        dsc_fonte_geracao == "Resíduos Florestais"              ~ "Forest Waste",
-        dsc_fonte_geracao == "Resíduos Sólidos Urbanos - RU"    ~ "Urban Solid Waste - RU",
-        dsc_fonte_geracao == "Etanol"                            ~ "Ethanol",
-        dsc_fonte_geracao == "Lenha"                             ~ "Firewood",
-        dsc_fonte_geracao == "Óleo Diesel"                       ~ "Diesel Oil"),
-
-        sig_modalidade_empreendimento = case_when(
-        sig_modalidade_empreendimento == "Indefinido"                                ~ "Undefined",
-        sig_modalidade_empreendimento == "Geração compartilhada"                    ~ "Shared Generation",
-        sig_modalidade_empreendimento == "Múltiplas unidades consumidoras"           ~ "Multiple Consumer Units",
-        sig_modalidade_empreendimento == "Microgeração ou Minigeração distribuída"   ~ "Microgeneration or Distributed Minigeneration",
-        sig_modalidade_empreendimento == "Autoconsumo remoto"                        ~ "Remote Self-consumption",
-        sig_modalidade_empreendimento == "Condomínio"                                ~ "Condominium"),
-
-        dsc_porte = case_when(
-        dsc_porte == "Microgeração"    ~ "Microgeneration",
-        dsc_porte == "Minigeração"     ~ "Minigeneration"
-      ),
-      id = case_when(
-        id == "Amazônia Legal"            ~ "Legal Amazon",
-        id == "Fora da Amazônia Legal"    ~ "Outside Legal Amazon",
-        id == "R. Centro-Oeste: DF"       ~ "Central-West Region: DF",
-        id == "R. Centro-Oeste: GO"       ~ "Central-West Region: GO",
-        id == "R. Centro-Oeste: MS"       ~ "Central-West Region: MS",
-        id == "R. Centro-Oeste: MT"       ~ "Central-West Region: MT",
-        id == "R. Nordeste: AL"          ~ "Northeast Region: AL",
-        id == "R. Nordeste: BA"          ~ "Northeast Region: BA",
-        id == "R. Nordeste: CE"          ~ "Northeast Region: CE",
-        id == "R. Nordeste: MA"          ~ "Northeast Region: MA",
-        id == "R. Nordeste: PB"          ~ "Northeast Region: PB",
-        id == "R. Nordeste: PE"          ~ "Northeast Region: PE",
-        id == "R. Nordeste: RN"          ~ "Northeast Region: RN",
-        id == "R. Nordeste: SE"          ~ "Northeast Region: SE",
-        id == "R. Norte: AC"             ~ "North Region: AC",
-        id == "R. Norte: AM"             ~ "North Region: AM",
-        id == "R. Norte: AP"             ~ "North Region: AP",
-        id == "R. Norte: PA"             ~ "North Region: PA",
-        id == "R. Norte: RO"             ~ "North Region: RO",
-        id == "R. Norte: RR"             ~ "North Region: RR",
-        id == "R. Norte: TO"             ~ "North Region: TO",
-        id == "R. Sudeste: ES"           ~ "Southeast Region: ES",
-        id == "R. Sudeste: MG"           ~ "Southeast Region: MG",
-        id == "R. Sudeste: RJ"           ~ "Southeast Region: RJ",
-        id == "R. Sudeste: SP"           ~ "Southeast Region: SP",
-        id == "R. Sul: PR"               ~ "South Region: PR",
-        id == "R. Sul: RS"               ~ "South Region: RS",
-        id == "R. Sul: SC"               ~ "South Region: SC",
-        TRUE                            ~ id  # Else condition (keep the original value)
-      ),
-      group = case_when(
-        group == "Amazônia Legal"            ~ "Legal Amazon",
-        group == "Fora da Amazônia Legal"    ~ "Outside Legal Amazon",
-        group == "R. Centro-Oeste: DF"       ~ "Central-West Region: DF",
-        group == "R. Centro-Oeste: GO"       ~ "Central-West Region: GO",
-        group == "R. Centro-Oeste: MS"       ~ "Central-West Region: MS",
-        group == "R. Centro-Oeste: MT"       ~ "Central-West Region: MT",
-        group == "R. Nordeste: AL"          ~ "Northeast Region: AL",
-        group == "R. Nordeste: BA"          ~ "Northeast Region: BA",
-        group == "R. Nordeste: CE"          ~ "Northeast Region: CE",
-        group == "R. Nordeste: MA"          ~ "Northeast Region: MA",
-        group == "R. Nordeste: PB"          ~ "Northeast Region: PB",
-        group == "R. Nordeste: PE"          ~ "Northeast Region: PE",
-        group == "R. Nordeste: RN"          ~ "Northeast Region: RN",
-        group == "R. Nordeste: SE"          ~ "Northeast Region: SE",
-        group == "R. Norte: AC"             ~ "North Region: AC",
-        group == "R. Norte: AM"             ~ "North Region: AM",
-        group == "R. Norte: AP"             ~ "North Region: AP",
-        group == "R. Norte: PA"             ~ "North Region: PA",
-        group == "R. Norte: RO"             ~ "North Region: RO",
-        group == "R. Norte: RR"             ~ "North Region: RR",
-        group == "R. Norte: TO"             ~ "North Region: TO",
-        group == "R. Sudeste: ES"           ~ "Southeast Region: ES",
-        group == "R. Sudeste: MG"           ~ "Southeast Region: MG",
-        group == "R. Sudeste: RJ"           ~ "Southeast Region: RJ",
-        group == "R. Sudeste: SP"           ~ "Southeast Region: SP",
-        group == "R. Sul: PR"               ~ "South Region: PR",
-        group == "R. Sul: RS"               ~ "South Region: RS",
-        group == "R. Sul: SC"               ~ "South Region: SC",
-        TRUE                            ~ group  # Else condition (keep the original value)
-      ))
-
-
-
-  }
-  
-  
-  
   server <- function(input, output, session) {
-    
+
+    # Língua inicial (lida da URL)
+    lang <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["lang"]], "en")) "en" else "pt"
+    })
+
+    # Alterna língua ao clicar no botão
+    observeEvent(input$toggle_lang, {
+      new_lang <- ifelse(lang() == "pt", "en", "pt")
+      lang(new_lang)
+      updateActionButton(session, "toggle_lang",
+                         label = ifelse(new_lang == "pt", "English", "Português"))
+    })
+
+    # Atalho para os textos da língua ativa
+    i18n <- reactive({ param$i18n[[lang()]] })
+
+    # Outputs de texto da sidebar
+    output$plot_desc      <- renderText({ i18n()$plot_desc })
+    output$label_var_name <- renderText({ i18n()$label_var_name })
+
+    # Tradução reativa das colunas categóricas
+    df_translated <- reactive({
+      d <- df
+      if (lang() == "en") {
+        d <- d %>%
+          mutate(
+            dsc_fonte_geracao = case_when(
+              dsc_fonte_geracao == "Bagaço de Cana de Açúcar"      ~ "Sugarcane Bagasse",
+              dsc_fonte_geracao == "Biogás - AGR"                  ~ "Biogas - AGR",
+              dsc_fonte_geracao == "Biogás - Floresta"             ~ "Biogas - Forest",
+              dsc_fonte_geracao == "Biogás - RA"                   ~ "Biogas - RA",
+              dsc_fonte_geracao == "Biogás - RU"                   ~ "Biogas - RU",
+              dsc_fonte_geracao == "Casca de Arroz"                ~ "Rice Husk",
+              dsc_fonte_geracao == "Cinética do vento"             ~ "Wind Kinetics",
+              dsc_fonte_geracao == "Gás de Alto Forno - Biomassa"  ~ "Blast Furnace Gas - Biomass",
+              dsc_fonte_geracao == "Gás Natural"                   ~ "Natural Gas",
+              dsc_fonte_geracao == "Potencial hidráulico"          ~ "Hydropower",
+              dsc_fonte_geracao == "Radiação solar"                ~ "Solar Radiation",
+              dsc_fonte_geracao == "Resíduos Florestais"           ~ "Forest Waste",
+              dsc_fonte_geracao == "Resíduos Sólidos Urbanos - RU" ~ "Urban Solid Waste - RU",
+              dsc_fonte_geracao == "Etanol"                        ~ "Ethanol",
+              dsc_fonte_geracao == "Lenha"                         ~ "Firewood",
+              dsc_fonte_geracao == "Óleo Diesel"                   ~ "Diesel Oil",
+              TRUE                                                 ~ dsc_fonte_geracao
+            ),
+            sig_modalidade_empreendimento = case_when(
+              sig_modalidade_empreendimento == "Indefinido"                               ~ "Undefined",
+              sig_modalidade_empreendimento == "Geração compartilhada"                   ~ "Shared Generation",
+              sig_modalidade_empreendimento == "Múltiplas unidades consumidoras"         ~ "Multiple Consumer Units",
+              sig_modalidade_empreendimento == "Microgeração ou Minigeração distribuída" ~ "Microgeneration or Distributed Minigeneration",
+              sig_modalidade_empreendimento == "Autoconsumo remoto"                      ~ "Remote Self-consumption",
+              sig_modalidade_empreendimento == "Condomínio"                              ~ "Condominium",
+              TRUE                                                                       ~ sig_modalidade_empreendimento
+            ),
+            dsc_porte = case_when(
+              dsc_porte == "Microgeração" ~ "Microgeneration",
+              dsc_porte == "Minigeração"  ~ "Minigeneration",
+              TRUE                        ~ dsc_porte
+            ),
+            id = case_when(
+              id == "Amazônia Legal"            ~ "Legal Amazon",
+              id == "Fora da Amazônia Legal"    ~ "Outside Legal Amazon",
+              id == "R. Centro-Oeste: DF"       ~ "Central-West Region: DF",
+              id == "R. Centro-Oeste: GO"       ~ "Central-West Region: GO",
+              id == "R. Centro-Oeste: MS"       ~ "Central-West Region: MS",
+              id == "R. Centro-Oeste: MT"       ~ "Central-West Region: MT",
+              id == "R. Nordeste: AL"           ~ "Northeast Region: AL",
+              id == "R. Nordeste: BA"           ~ "Northeast Region: BA",
+              id == "R. Nordeste: CE"           ~ "Northeast Region: CE",
+              id == "R. Nordeste: MA"           ~ "Northeast Region: MA",
+              id == "R. Nordeste: PB"           ~ "Northeast Region: PB",
+              id == "R. Nordeste: PE"           ~ "Northeast Region: PE",
+              id == "R. Nordeste: RN"           ~ "Northeast Region: RN",
+              id == "R. Nordeste: SE"           ~ "Northeast Region: SE",
+              id == "R. Norte: AC"              ~ "North Region: AC",
+              id == "R. Norte: AM"              ~ "North Region: AM",
+              id == "R. Norte: AP"              ~ "North Region: AP",
+              id == "R. Norte: PA"              ~ "North Region: PA",
+              id == "R. Norte: RO"              ~ "North Region: RO",
+              id == "R. Norte: RR"              ~ "North Region: RR",
+              id == "R. Norte: TO"              ~ "North Region: TO",
+              id == "R. Sudeste: ES"            ~ "Southeast Region: ES",
+              id == "R. Sudeste: MG"            ~ "Southeast Region: MG",
+              id == "R. Sudeste: RJ"            ~ "Southeast Region: RJ",
+              id == "R. Sudeste: SP"            ~ "Southeast Region: SP",
+              id == "R. Sul: PR"                ~ "South Region: PR",
+              id == "R. Sul: RS"                ~ "South Region: RS",
+              id == "R. Sul: SC"                ~ "South Region: SC",
+              TRUE                              ~ id
+            ),
+            group = case_when(
+              group == "Amazônia Legal"            ~ "Legal Amazon",
+              group == "Fora da Amazônia Legal"    ~ "Outside Legal Amazon",
+              group == "R. Centro-Oeste: DF"       ~ "Central-West Region: DF",
+              group == "R. Centro-Oeste: GO"       ~ "Central-West Region: GO",
+              group == "R. Centro-Oeste: MS"       ~ "Central-West Region: MS",
+              group == "R. Centro-Oeste: MT"       ~ "Central-West Region: MT",
+              group == "R. Nordeste: AL"           ~ "Northeast Region: AL",
+              group == "R. Nordeste: BA"           ~ "Northeast Region: BA",
+              group == "R. Nordeste: CE"           ~ "Northeast Region: CE",
+              group == "R. Nordeste: MA"           ~ "Northeast Region: MA",
+              group == "R. Nordeste: PB"           ~ "Northeast Region: PB",
+              group == "R. Nordeste: PE"           ~ "Northeast Region: PE",
+              group == "R. Nordeste: RN"           ~ "Northeast Region: RN",
+              group == "R. Nordeste: SE"           ~ "Northeast Region: SE",
+              group == "R. Norte: AC"              ~ "North Region: AC",
+              group == "R. Norte: AM"              ~ "North Region: AM",
+              group == "R. Norte: AP"              ~ "North Region: AP",
+              group == "R. Norte: PA"              ~ "North Region: PA",
+              group == "R. Norte: RO"              ~ "North Region: RO",
+              group == "R. Norte: RR"              ~ "North Region: RR",
+              group == "R. Norte: TO"              ~ "North Region: TO",
+              group == "R. Sudeste: ES"            ~ "Southeast Region: ES",
+              group == "R. Sudeste: MG"            ~ "Southeast Region: MG",
+              group == "R. Sudeste: RJ"            ~ "Southeast Region: RJ",
+              group == "R. Sudeste: SP"            ~ "Southeast Region: SP",
+              group == "R. Sul: PR"                ~ "South Region: PR",
+              group == "R. Sul: RS"                ~ "South Region: RS",
+              group == "R. Sul: SC"                ~ "South Region: SC",
+              TRUE                                 ~ group
+            )
+          )
+      }
+      d
+    })
+
     # filtra dados de composicao demografica
     df_reactived <- reactive({
-      
-      w <- df %>%
-        filter(sig_modalidade_empreendimento == input$filter_sig_modalidade_empreendimento & dsc_fonte_geracao == input$filter_dsc_fonte_geracao & dsc_porte == input$filter_dsc_porte)
-      
+
+      w <- df_translated() %>%
+        filter(sig_modalidade_empreendimento == input$filter_sig_modalidade_empreendimento &
+               dsc_fonte_geracao == input$filter_dsc_fonte_geracao &
+               dsc_porte == input$filter_dsc_porte)
+
       return(w)
     })
 
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$id))
+    # Atualiza opções dos selects ao trocar língua
+    observeEvent(lang(), {
+      d <- df_translated()
+      filter_choices     <- sort(unique(d$id))
+      modalidade_choices <- sort(unique(d$sig_modalidade_empreendimento))
+      fonte_choices      <- sort(unique(d$dsc_fonte_geracao))
+      porte_choices      <- sort(unique(d$dsc_porte))
+      table_lang         <- param$tables[[lang()]]
+      y_choices          <- grouped_list(table_lang[which(table_lang$y), ])
 
-    param$filter_sig_modalidade_empreendimento_choices <- sort(unique(df$sig_modalidade_empreendimento))
-    param$filter_dsc_fonte_geracao_choices <- sort(unique(df$dsc_fonte_geracao))
-    param$filter_dsc_porte_choices <- sort(unique(df$dsc_porte))
+      updateSelectizeInput(session, "filter1",
+                           label = i18n()$label_region_name,
+                           choices = filter_choices,
+                           selected = i18n()$filter_def)
+      updateSelectInput(session, "filter_sig_modalidade_empreendimento",
+                        label = i18n()$label_type_name,
+                        choices = modalidade_choices,
+                        selected = i18n()$filter_modalidade_def)
+      updateSelectInput(session, "filter_dsc_fonte_geracao",
+                        label = i18n()$label_source_name,
+                        choices = fonte_choices,
+                        selected = i18n()$filter_fonte_def)
+      updateSelectInput(session, "filter_dsc_porte",
+                        label = i18n()$label_size_name,
+                        choices = porte_choices,
+                        selected = i18n()$filter_porte_def)
+      updateSelectInput(session, "y",
+                        label = i18n()$label_y_name,
+                        choices = y_choices,
+                        selected = input$y)
+    })
 
     # Funcão para preencher inputs com valores padrão
     random_inputs <- function() {
+      d <- df_translated()
       updateSelectizeInput(session,
         "filter1",
-        choices = param$filter_choices,
-        selected = param$filter_def
+        choices = sort(unique(d$id)),
+        selected = i18n()$filter_def
       )
-
       updateSelectInput(session,
                         "filter_sig_modalidade_empreendimento",
-                        choices = param$filter_sig_modalidade_empreendimento_choices,
-                        selected = param$filter_sig_modalidade_empreendimento_def
+                        choices = sort(unique(d$sig_modalidade_empreendimento)),
+                        selected = i18n()$filter_modalidade_def
       )
-
       updateSelectInput(session,
                         "filter_dsc_fonte_geracao",
-                        choices = param$filter_dsc_fonte_geracao_choices,
-                        selected = param$filter_dsc_fonte_geracao_def
+                        choices = sort(unique(d$dsc_fonte_geracao)),
+                        selected = i18n()$filter_fonte_def
       )
-
       updateSelectInput(session,
                         "filter_dsc_porte",
-                        choices = param$filter_dsc_porte_choices,
-                        selected = param$filter_dsc_porte_def
+                        choices = sort(unique(d$dsc_porte)),
+                        selected = i18n()$filter_porte_def
       )
-
       updateSelectInput(session,
         "y",
         choices = param$y_choices,
@@ -195,28 +244,34 @@ get_server <- function(files, param) {
 
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
+      d <- df_translated()
+      filter_choices     <- sort(unique(d$id))
+      modalidade_choices <- sort(unique(d$sig_modalidade_empreendimento))
+      fonte_choices      <- sort(unique(d$dsc_fonte_geracao))
+      porte_choices      <- sort(unique(d$dsc_porte))
+
       # Preenche filtro vazio
       updateSelectizeInput(session,
         "filter1",
-        choices = param$filter_choices,
+        choices = filter_choices,
         selected = NULL
       )
       updateSelectInput(session,
         "filter_sig_modalidade_empreendimento",
-        choices = param$filter_sig_modalidade_empreendimento_choices,
+        choices = modalidade_choices,
         selected = NULL
       )
       updateSelectInput(session,
                         "filter_dsc_fonte_geracao",
-                        choices = param$filter_dsc_fonte_geracao_choices,
+                        choices = fonte_choices,
                         selected = NULL
       )
       updateSelectInput(session,
                         "filter_dsc_porte",
-                        choices = param$filter_dsc_porte_choices,
+                        choices = porte_choices,
                         selected = NULL
       )
-      
+
 
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
@@ -230,19 +285,19 @@ get_server <- function(files, param) {
 
       if (!is.null(query[["filter_sig_modalidade_empreendimento"]])) {
         updateSelectInput(session, "filter_sig_modalidade_empreendimento",
-          choices = param$filter_sig_modalidade_empreendimento_choices,
+          choices = modalidade_choices,
           selected = query[["filter_sig_modalidade_empreendimento"]]
         )
       }
       if (!is.null(query[["filter_dsc_fonte_geracao"]])) {
         updateSelectInput(session, "filter_dsc_fonte_geracao",
-                          choices = param$filter_dsc_fonte_geracao_choices,
+                          choices = fonte_choices,
                           selected = query[["filter_dsc_fonte_geracao"]]
         )
       }
       if (!is.null(query[["filter_dsc_porte"]])) {
         updateSelectInput(session, "filter_dsc_porte",
-                          choices = param$filter_dsc_porte_choices,
+                          choices = porte_choices,
                           selected = query[["filter_dsc_porte"]]
         )
       }
@@ -251,7 +306,7 @@ get_server <- function(files, param) {
       if (!is.null(query[["filter"]])) {
         updateSelectizeInput(session,
           "filter1",
-          choices = param$filter_choices,
+          choices = filter_choices,
           selected = selected
         )
       }
@@ -285,7 +340,7 @@ get_server <- function(files, param) {
       } else {
 
         text <- paste0(param$subtitle_init, input$filter_sig_modalidade_empreendimento,
-          ", ", input$filter_dsc_fonte_geracao, " ", param$subtitle_sep, " ", 
+          ", ", input$filter_dsc_fonte_geracao, " ", param$subtitle_sep, " ",
           input$filter_dsc_porte)
       }
 
@@ -301,11 +356,11 @@ get_server <- function(files, param) {
         {
           # Se algum campo estiver vazio retorna gráfico vazio
           if (is.null(input$y) || input$y == "" ||
-              is.null(input$filter_sig_modalidade_empreendimento) || 
+              is.null(input$filter_sig_modalidade_empreendimento) ||
               input$filter_sig_modalidade_empreendimento == "" ||
-              is.null(input$filter_dsc_fonte_geracao) || 
+              is.null(input$filter_dsc_fonte_geracao) ||
               input$filter_dsc_fonte_geracao == "" ||
-              is.null(input$filter_dsc_porte) || 
+              is.null(input$filter_dsc_porte) ||
               input$filter_dsc_porte == "" ||
             is.null(input$filter1) || length(input$filter1) < 1) {
             fig <- plotly_empty()
@@ -355,7 +410,7 @@ get_server <- function(files, param) {
             "Unidade de medida: ", "<b>", y_col$unidade,"</b><br>",
             y_col$label, ": ", "<b>", format(df_p$y, scientific = FALSE,
                                       digits = 2,
-                                      decimal.mark = ",", 
+                                      decimal.mark = ",",
                                       big.mark = "."), "</b><br>"
           )
 
