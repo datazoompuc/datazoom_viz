@@ -205,8 +205,8 @@ get_server <- function(files, param) {
       text
     })
     output$plot_subtitle <- renderText({
-      text <- paste0(i18n()$server3, input$fonte, i18n()$server4, input$origem,
-                     i18n()$server5, input$tipo, i18n()$server6, input$combustivel)
+      text <- paste0(i18n()$server3, input$fonte, " | ", i18n()$server4, input$origem, " | ",
+                     i18n()$server5, input$tipo,  " | ", i18n()$server6, input$combustivel)
 
       text
     })
