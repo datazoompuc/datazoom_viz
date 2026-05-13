@@ -22,38 +22,38 @@ get_ui <- function(files, param) {
               }',),
         
         h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        p(class = "plot_desc", textOutput("plot_desc", inline = TRUE)),
         hr(),
-        p(class = "vars", param$ui1),
+        p(class = "vars", textOutput("ui1", inline = TRUE)),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "fonte",
-            label = param$ui2,
-            choices = c(param$server7, param$x_choices),
-            selected = param$server7,
+            label = param$i18n$pt$ui2,
+            choices = c(param$i18n$pt$server7, param$x_choices),
+            selected = param$i18n$pt$server7,
             width = "100%"
           ),
           selectInput(
             inputId = "origem",
-            label = param$ui3,
-            choices = c(param$server7, param$x_choices),
-            selected = param$server7,
+            label = param$i18n$pt$ui3,
+            choices = c(param$i18n$pt$server7, param$x_choices),
+            selected = param$i18n$pt$server7,
             width = "100%"
           ),
           selectInput(
             inputId = "tipo",
-            label = param$ui4,
-            choices = c(param$server7, param$x_choices),
-            selected = param$server7,
+            label = param$i18n$pt$ui4,
+            choices = c(param$i18n$pt$server7, param$x_choices),
+            selected = param$i18n$pt$server7,
             width = "100%"
           ),
           selectInput(
             inputId = "combustivel",
-            label = param$ui5,
-            choices = c(param$server7, param$x_choices),
-            selected = param$server7,
+            label = param$i18n$pt$ui5,
+            choices = c(param$i18n$pt$server7, param$x_choices),
+            selected = param$i18n$pt$server7,
             width = "100%"
           )
         ),
@@ -61,10 +61,13 @@ get_ui <- function(files, param) {
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen",
+                              icon = icon("expand"),
                               class = "btn-primary",
-                              onclick = paste0("window.open('", param$ui6, "', '_blank')"))
+                              onclick = paste0("window.open('", param$link, "', '_blank')")),
+          shiny::actionButton("toggle_lang", label = "English",
+                              icon = icon("globe"),
+                              class = "btn-primary")
         ),
       ),
       column(9,
