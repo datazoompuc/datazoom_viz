@@ -9,7 +9,11 @@ The datazoom_viz repository is used for developing visualizations in shiny R cod
 
 All the apps are listed in this sheet. (https://docs.google.com/spreadsheets/d/1oSR_vybaRs9JEy8NC7MuBFfOlE6mA2Mxf_Ugm4E_HgA/edit?usp=sharing). It shows if there are any issues related to the app, if it is updated, translated, published and working well. 
 
-Main Directories:
+## Documentation
+
+- [Tutorial: Novo UI — Material Switch, Spinner e Lang Toggle](tutorial_novo_ui.md)
+
+## Main Directories
 
  - "./apps": contains one entry-point `.R` file per app (`app_app_id.R`). Each file loads the libraries, defines file paths, sources the scripts from `./scripts/app_id/`, sets visualization parameters and launches the Shiny app.
 
