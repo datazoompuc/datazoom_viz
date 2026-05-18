@@ -16,48 +16,56 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file) %>%
       mutate(`total produzido`= as.numeric(`total produzido`))
     
-    if(param$translate_names) {
-      df <- df %>% 
-        mutate(uf = case_when(
-          uf == "Amazônia Legal" ~ "Legal Amazon",
-          uf == "Fora da Amazônia Legal" ~ "Outside Legal Amazon"
-        ))
-    }
-    
-    # Cria opções para seleção de grupos
-    #param$filter_choices <- sort(unique(df$group))
-    #param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
-    
-    # Funcão para preencher inputs com coluna/variável aleatória
-    
-    if(param$translate_names == FALSE) {
-      random_inputs <- function() {
-        updateSelectInput(session,
-                          "y",
-                          choices = param$y_choices,
-                          selected = c("total produzido", "consumo total") 
-        )
-        
-        updateSelectInput(session,
-                          "filter1",
-                          choices = param$filter_choices,
-                          selected = c("Amazônia Legal", "Fora da Amazônia Legal")
-        )
-      }
-    } else {
-      random_inputs <- function() {
-        updateSelectInput(session,
-                          "y",
-                          choices = param$y_choices,
-                          selected = c("total produzido", "consumo total") 
-        )
-        
-        updateSelectInput(session,
-                          "filter1",
-                          choices = param$filter_choices,
-                          selected = c("Legal Amazon", "Outside Legal Amazon")
-        )
-      }
+    # Reativo de língua
+    lang <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["lang"]], "en")) "en" else "pt"
+    })
+
+    observeEvent(input$toggle_lang, {
+      lang(ifelse(lang() == "pt", "en", "pt"))
+    })
+
+    # i18n reativo
+    i18n <- reactive({ param$i18n[[lang()]] })
+
+    # Outputs de texto da sidebar
+    output$plot_desc        <- renderText({ i18n()$plot_desc })
+    output$label_var_name   <- renderText({ i18n()$label_var_name })
+    output$label_geo_name   <- renderText({ i18n()$label_geo_name })
+    output$label_scale_name <- renderText({ i18n()$label_scale_name })
+    output$label_prop_name  <- renderText({ i18n()$label_prop_name })
+
+    # Atualiza choices e labels dos selectInputs quando língua muda
+    observeEvent(lang(), {
+      table <- param$tables[[lang()]]
+      choices <- grouped_list(table[which(table$y), ])
+      updateSelectInput(session, "y",
+                        label = i18n()$label_y_name,
+                        choices = choices,
+                        selected = input$y
+      )
+      updateSelectizeInput(session, "filter1",
+                           label = i18n()$label_geo_name,
+                           choices = i18n()$filter_choices,
+                           selected = input$filter1
+      )
+    })
+
+    # Funcão para preencher inputs com valores padrão
+    random_inputs <- function() {
+      table <- param$tables[[lang()]]
+      updateSelectInput(session,
+                        "y",
+                        choices = grouped_list(table[which(table$y), ]),
+                        selected = c("total produzido", "consumo total")
+      )
+
+      updateSelectizeInput(session,
+                           "filter1",
+                           choices = i18n()$filter_choices,
+                           selected = c("Amazônia Legal", "Fora da Amazônia Legal")
+      )
     }
     
     
@@ -66,7 +74,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "ylog=", input$ylog,
+        "?", "lang=", lang(),
+        "&", "ylog=", input$ylog,
         "&", "y_option=", input$y_option
       )
       
@@ -90,20 +99,21 @@ get_server <- function(files, param) {
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       # Preenche filtro vazio
-      updateSelectInput(session,
-                        "filter1",
-                        choices = param$filter_choices,
-                        selected = NULL
+      updateSelectizeInput(session,
+                           "filter1",
+                           choices = i18n()$filter_choices,
+                           selected = NULL
       )
-      
+
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
-      
+
       selected <- unlist(query[names(query) == "y"], use.names = FALSE)
       if (!is.null(query[["y"]])) {
+        table <- param$tables[[lang()]]
         updateSelectInput(session,
                           "y",
-                          choices = param$y_choices,
+                          choices = grouped_list(table[which(table$y), ]),
                           selected = selected
         )
       }
@@ -122,10 +132,10 @@ get_server <- function(files, param) {
       
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       if (!is.null(query[["filter"]])) {
-        updateSelectInput(session,
-                          "filter1",
-                          choices = param$filter_choices,
-                          selected = selected
+        updateSelectizeInput(session,
+                             "filter1",
+                             choices = i18n()$filter_choices,
+                             selected = selected
         )
       }
       
@@ -144,9 +154,9 @@ get_server <- function(files, param) {
         text <- " "
       } else {
         # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table %>%
+        y_col <- param$tables[[lang()]] %>%
           filter(var %in% input$y)
-        filt <- paste(sapply(input$filter1, paste, collapse = ", "), 
+        filt <- paste(unname(i18n()$uf_map[input$filter1]),
                       collapse = ", ")
         text <- paste0("", paste(y_col$label, collapse = ", "))
 
@@ -161,7 +171,7 @@ get_server <- function(files, param) {
       if ((is.null(input$y)) | (is.null(input$filter1))) {
         text <- " "
       } else {
-        text <- ifelse(input$y_option, "Proporcional ao ano inicial", " ")
+        text <- ifelse(input$y_option, i18n()$label_prop_name, " ")
       }
       
       text
@@ -188,82 +198,42 @@ get_server <- function(files, param) {
           }
           
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table %>% filter(var %in% input$y)
-         
+          table_lang <- param$tables[[lang()]]
+          x_col <- table_lang[which(table_lang$var == param$x_def), ]
+          y_col <- table_lang %>% filter(var %in% input$y)
+
+          name_map    <- setNames(table_lang$label,   table_lang$var)
+          unidade_map <- setNames(table_lang$unidade, table_lang$var)
+
           df_filtered <- df %>%
             select("ano", "uf", input$y) %>%
             pivot_longer(cols = input$y) %>%
-            filter(!is.na(value))
-          
-          if (param$translate_names) {
-              df_filtered <- df_filtered %>%
-                  mutate(name = case_when(name == "total produzido" ~ "Total energy produced",
-                                          name == "hidro" ~ "Energy produced by hydro",
-                                          name == "eolica" ~ "Energy produced by wind",
-                                          name == "solar" ~ "Energy produced by solar",
-                                          name == "nuclear" ~ "Energy produced by nuclear",
-                                          name == "termo" ~ "Energy produced by thermo",
-                                          name == "cana" ~ "Energy produced by sugar cane",
-                                          name == "lenha" ~ "Energy produced by wood",
-                                          name == "lixivia" ~ "Energy produced by black liquor",
-                                          name == "outras fontes renovaveis" ~ "Energy produced by other renewable sources",
-                                          name == "carvao vapor" ~ "Energy produced by steam coal",
-                                          name == "gas natural" ~ "Energy produced by natural gas",
-                                          name == "gas de coqueira" ~ "Energy produced by coke oven gas",
-                                          name == "combustivel" ~ "Energy produced by fuel",
-                                          name == "diesel" ~ "Energy produced by diesel",
-                                          name == "outras fontes nao renovaveis" ~ "Energy produced by other non-renewable sources",
-                                          name == "consumo cativo" ~ "Captive consumption",
-                                          name == "consumo livre" ~ "Free consumption",
-                                          name == "consumo residencial" ~ "Residential consumption",
-                                          name == "consumo industrial" ~ "Industrial consumption",
-                                          name == "consumo comercial" ~ "Comercial consumption",
-                                          name == "consumo rural" ~ "Rural consumption",
-                                          name == "consumo poder publico" ~ "Public authority consumption",
-                                          name == "consumo iluminacao publica" ~ "Public lighting consumption",
-                                          name == "consumo servico publica" ~ "Public service consumption",
-                                          name == "consumo proprio" ~ "Personal consumption",
-                                          name == "consumidores cativo" ~ "Captive consumers",
-                                          name == "consumidores livre" ~ "Free consumers",
-                                          name == "consumidores residencial" ~ "Residential consumers",
-                                          name == "consumidores industrial" ~ "Industrial consumers",
-                                          name == "consumidores comercial" ~ "Comercial consumers",
-                                          name == "consumidores rural" ~ "Rural consumers",
-                                          name == "consumidores poder publico" ~ "Public authority consumers",
-                                          name == "consumidores iluminacao publica" ~ "Public lighting consumers",
-                                          name == "consumidores servico publica" ~ "Public service consumers",
-                                          name == "consumidores proprio" ~ "Personal consumers",
-                                          name == "consumo total" ~ "Total consumption",
-                                          name == "consumidores" ~ "Total consumers",
-                                          ))
-          }
-          
-          df_filtered <- df_filtered[which(df_filtered$uf %in% input$filter1), ]
-          df_filtered <- df_filtered %>%
-            mutate(group = paste(uf, name, sep = " - "))
-          
+            filter(!is.na(value)) %>%
+            filter(uf %in% input$filter1) %>%
+            mutate(
+              unidade    = unname(unidade_map[name]),
+              name       = unname(name_map[name]),
+              uf_display = unname(i18n()$uf_map[uf]),
+              group      = paste(uf_display, name, sep = " - ")
+            )
+
           # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
             df_filtered[x_col$var],
             df_filtered["value"],
             df_filtered["group"],
-            df_filtered["uf"],
-            df_filtered["name"]
+            df_filtered["uf_display"],
+            df_filtered["name"],
+            df_filtered["unidade"]
           )
-          colnames(df_p) <- c("x", "y", "group", "color", "text")
-          
-          unidade_df <- y_col %>%
-            select(text = var, unidade)
-          
-          df_p <- left_join(df_p, unidade_df)
-          
+          colnames(df_p) <- c("x", "y", "group", "color", "text", "unidade")
+
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
             stop()
           }
-          
+
           # Alternativa de medida para y
           if (input$y_option & is.numeric(df_p$y)) {
             df_p <- df_p %>%
@@ -275,35 +245,17 @@ get_server <- function(files, param) {
               )
             df_p$y <- df_p$y_option
           }
-          
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
-          
-          if(param$translate_names == FALSE){
-            # Monta html do tooltip
-            df_p$tooltip <- paste0(
-              "<b>", df_p$color, "</b><br>",
-              x_col$label, ": ", df_p$x, "<br>",
-              df_p$text, ": ", format(df_p$y, scientific = FALSE,
-                                      digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-              "Unidade de medida: <b>", df_p$unidade, "</b>"
-            )
-          } else {
-            # Monta html do tooltip
-            df_p$tooltip <- paste0(
-              "<b>", df_p$color, "</b><br>",
-              x_col$label, ": ", df_p$x, "<br>",
-              df_p$text, ": ", format(df_p$y, scientific = FALSE,
-                                      digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-              "Measurment Unit: <b> % of Brazil's total </b>"
-            )
-          }
+
+          # Monta html do tooltip
+          df_p$tooltip <- paste0(
+            "<b>", df_p$color, "</b><br>",
+            x_col$label, ": ", df_p$x, "<br>",
+            df_p$text, ": ", format(df_p$y, scientific = FALSE,
+                                    digits = 2,
+                                    decimal.mark = ",",
+                                    big.mark = "."), "<br>",
+            i18n()$label_unit_name, ": <b>", df_p$unidade, "</b>"
+          )
        
          
           

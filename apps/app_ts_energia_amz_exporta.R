@@ -4,6 +4,8 @@ library(tidyverse)
 library(plotly)
 library(htmlwidgets)
 library(owdbr)
+library(shinyWidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -13,7 +15,8 @@ files$param_script <- "../scripts/ts_energia_amz_exporta/db_params.R"
 
 files$CSS_script <- "../global/dza_lumen.css"
 
-files$param_file <- "../data/energia_amz_exporta_dic.csv"
+files$param_file_pt <- "../data/energia_amz_exporta_dic.csv"
+files$param_file_en <- "../data/energia_amz_exporta_dic_en.csv"
 files$db_file <- "../data/energia_amz_exporta.rds"
 
 # Carrega scripts
@@ -21,34 +24,65 @@ source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
-# Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
+# Parâmetros da visualização
+param_pt <- get_db_param(files$param_file_pt, files$db_file)
+param_en <- get_db_param(files$param_file_en, files$db_file)
 
-param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "ano" # variável padrão do eixo x
-param$y_def <- "" # variável padrão do eixo y
-param$color_def <- "" # variável padrão de cor
-param$slider_def <- "" # variável padrão do slider
-param$text_def <- "" # variável padrão de texto
-param$id_def <- "" # variável padrão de id
+param <- param_pt
+param$tables <- list(
+  pt = param_pt$table,
+  en = param_en$table
+)
 
-param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Dados de Energia do EPE sobre propor\u00e7\u00e3o de produ\u00e7\u00e3o, consumo e consumidores de energia"
+param$x_def      <- "ano"
+param$y_def      <- ""
+param$color_def  <- ""
+param$slider_def <- ""
+param$text_def   <- ""
+param$id_def     <- ""
 
-### Parametros especificos no UI
-param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "eixo vertical (y)"
-param$label_scale_name <- "escala log"
-param$label_prop_name <- "proporcional ao ano inicial (*)"
-param$label_geo_name <- "Subdivisão geográfica"
+param$plot_name <- "Data Zoom Amazônia"
+param$link      <- "https://datazoom.shinyapps.io/app_ts_energia_amz_exporta/"
 
-param$link <- "https://datazoom.shinyapps.io/app_ts_energia_amz_exporta/"
-
-### Parametros especificos no server
-param$translate_names <- FALSE
+param$i18n <- list(
+  pt = list(
+    plot_desc        = "Dados de Energia do EPE sobre proporção de produção, consumo e consumidores de energia",
+    label_var_name   = "VARIÁVEIS:",
+    label_y_name     = "Eixo vertical (y)",
+    label_scale_name = "Escala log",
+    label_prop_name  = "Proporcional ao ano inicial",
+    label_geo_name   = "Subdivisão geográfica",
+    label_unit_name  = "Unidade de medida",
+    translate_names  = FALSE,
+    filter_choices   = list(
+      "Amazônia Legal" = list("Amazônia Legal"       = "Amazônia Legal",
+                                   "Fora da Amazônia Legal" = "Fora da Amazônia Legal"),
+      "UF" = owdbr::uflist()$UF
+    ),
+    uf_map = c("Amazônia Legal"       = "Amazônia Legal",
+               "Fora da Amazônia Legal" = "Fora da Amazônia Legal")
+  ),
+  en = list(
+    plot_desc        = "Energy data from EPE on the proportion of energy production, consumption and consumers",
+    label_var_name   = "VARIABLES:",
+    label_y_name     = "Vertical axis (y)",
+    label_scale_name = "Log scale",
+    label_prop_name  = "Proportional to the initial year",
+    label_geo_name   = "Geographic subdivision",
+    label_unit_name  = "Measurement unit",
+    translate_names  = TRUE,
+    filter_choices   = list(
+      "Legal Amazon" = list("Legal Amazon"        = "Amazônia Legal",
+                            "Outside Legal Amazon" = "Fora da Amazônia Legal"),
+      "UF" = owdbr::uflist()$UF
+    ),
+    uf_map = c("Amazônia Legal"       = "Legal Amazon",
+               "Fora da Amazônia Legal" = "Outside Legal Amazon")
+  )
+)
 
 # Outros parâmetros e configurações
-param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal"),
-                             "UF" = owdbr::uflist()$UF)
+param$filter_choices <- param$i18n$pt$filter_choices
 param$y_choices$`Fonte de dados` <- NULL
 param$y_choices[[1]] <- NULL
 

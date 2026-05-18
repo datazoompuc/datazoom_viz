@@ -15,7 +15,7 @@
 "14","gas de coqueira",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por gás de coqueria","gas de coqueira","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "15","combustivel",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por combustível","combustivel","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "16","diesel",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por diesel","diesel","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
-"17","outras fontes nao renovaveis",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida outras fontes não renováveis","outras fontes nao renovaveis","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
+"17","outras fontes nao renovaveis",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Energia produzida por outras fontes não renováveis","outras fontes nao renovaveis","ENERGIA PRODUZIDA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "18","consumo cativo",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Consumo cativo","consumo cativo","CONSUMO DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "19","consumo livre",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Consumo livre","consumo livre","CONSUMO DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"
 "20","consumo residencial",FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,"Consumo residencial","consumo residencial","CONSUMO DE ENERGIA - PROPORÇÃO EM RELAÇÃO AO BRASIL",1,"% do total do Brasil","Economia","Energia"

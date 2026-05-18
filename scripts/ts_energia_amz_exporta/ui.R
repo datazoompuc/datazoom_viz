@@ -22,20 +22,23 @@ get_ui <- function(files, param) {
               }',),
              
              h2(class = "plot_name", param$plot_name),
-             p(class = "plot_desc", param$plot_desc),
+             p(class = "plot_desc", textOutput("plot_desc", inline = TRUE)),
              hr(),
-             p(class = "vars", param$label_var_name),
+             p(class = "vars", textOutput("label_var_name", inline = TRUE)),
              div(
                class = "var_selec_group",
                
                # Seleciona filtro
                selectizeInput(
                  "filter1",
-                 param$label_geo_name,
+                 textOutput("label_geo_name", inline = TRUE),
                  selected = c("Amazônia Legal", "Fora da Amazônia Legal"), 
                  choices = param$filter_choices,
                  multiple = TRUE,
                  width = "100%"),
+               
+               # espaço vazio
+               div(style = "height: 12px;"),
                
                # Seleciona variável do eixo y
                selectInput(
@@ -48,25 +51,45 @@ get_ui <- function(files, param) {
                )
              ),
              
+             # espaço vazio
+             div(style = "height: 12px;"),
+             
              # Seleciona eixo log
-             checkboxInput(
-               inputId = "ylog",
-               param$label_scale_name,
-               value = FALSE,
-               width = "100%"
+             tags$style(HTML(".switch-label { color: white; }")),
+             div(
+               style = "margin-top: 10px;",
+               materialSwitch(
+                 inputId = "ylog",
+                 label = tags$span(textOutput("label_scale_name", inline = TRUE), class = "switch-label"),
+                 value = FALSE,
+                 status = "info"
+               )
              ),
+
              # Seleciona eixo
-             checkboxInput(
-               inputId = "y_option",
-               param$label_prop_name,
-               value = FALSE,
-               width = "100%"
+             div(
+               style = "margin-top: 10px;",
+               materialSwitch(
+                 inputId = "y_option",
+                 label = tags$span(textOutput("label_prop_name", inline = TRUE), class = "switch-label"),
+                 value = FALSE, 
+                 status = "info"
+               )
              ),
              
              
              # espaço vazio
              div(class = "fakecheckbox", ),
-             
+
+             actionButton(
+               "toggle_lang",
+               label = "English",
+               icon = icon("globe"),
+               class = "btn-primary"
+             ),
+
+             div(style = "height: 6px;"),
+
              div(
                shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                                    icon = icon("expand"), 
@@ -82,8 +105,15 @@ get_ui <- function(files, param) {
                class = "plotrow row justify-content-center flex-grow-1 w-100",
                div(
                  class = "plotdiv w-100 h-100",
-                 # Gráfico
-                 plotlyOutput("plot", width = "100%", height = "100%")
+                 style = "position: relative; display: flex; flex-direction: column;",
+                 div(
+                   style = "flex-grow: 1; position: relative;", 
+                   withSpinner(
+                     plotlyOutput("plot", width = "100%", height = "calc(100vh - 150px)"),
+                     type = 4,
+                     color = "#41878C"
+                   )
+                 )
                )
              )
       )

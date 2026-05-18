@@ -49,15 +49,10 @@ deploy_shiny_script <- function(
     dir.create(td, recursive = TRUE, showWarnings = FALSE)
     
     copy_one <- function(src) {
-        dest <- file.path(td, if (dir.exists(src)) basename(src) else src)
-
         if (dir.exists(src)) {
-            dir.create(dest, recursive = TRUE, showWarnings = FALSE)
-            files <- list.files(src, all.files = TRUE, full.names = TRUE, recursive = TRUE)
-            if (length(files) > 0) {
-                file.copy(files, file.path(td, src), overwrite = TRUE, recursive = TRUE)
-            }
+            file.copy(src, td, recursive = TRUE, overwrite = TRUE)
         } else {
+            dest <- file.path(td, src)
             dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
             ok <- file.copy(src, dest, overwrite = TRUE)
             if (!ok) stop("Falha ao copiar: ", src)

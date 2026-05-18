@@ -19,6 +19,36 @@ get_server <- function(files, param) {
     #param$filter_choices <- sort(unique(df$group))
     #param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
 
+    # Reativo de língua
+    lang <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["lang"]], "en")) "en" else "pt"
+    })
+    
+    observeEvent(input$toggle_lang, {
+      lang(ifelse(lang() == "pt", "en", "pt"))
+    })
+
+    # i18n reativo
+    i18n <- reactive({ param$i18n[[lang()]] })
+
+    # Outputs de texto da sidebar
+    output$plot_desc        <- renderText({ i18n()$plot_desc })
+    output$label_var_name   <- renderText({ i18n()$label_var_name })
+    output$label_scale_name <- renderText({ i18n()$label_scale_name })
+    output$label_prop_name  <- renderText({ i18n()$label_prop_name })
+
+    # Atualiza choices e label do selectInput quando língua muda
+    observeEvent(lang(), {
+      table <- param$tables[[lang()]]
+      choices <- grouped_list(table[which(table$y), ])
+      updateSelectInput(session, "y",
+        label    = i18n()$label_y_name,
+        choices  = choices,
+        selected = input$y
+      )
+    })
+
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       updateSelectInput(session,
@@ -31,7 +61,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "ylog=", input$ylog,
+        "?", "lang=", lang(),
+        "&", "ylog=", input$ylog,
         "&", "y_option=", input$y_option
       )
       
@@ -80,34 +111,17 @@ get_server <- function(files, param) {
 
     # Output titulo do gráfico
     output$plot_title <- renderText({
-      
       text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y)) {
-        text <- " "
-      } else {
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table %>%
-          filter(var %in% input$y)
-
-        text <- paste0("", paste(y_col$label, collapse = ", "))
-        if (input$y_option) {
-          text <- paste0("", y_col$label, "*")
-        }
+      if (!is.null(input$y)) {
+        y_col <- param$tables[[lang()]] %>% filter(var %in% input$y)
+        text <- paste(y_col$label, collapse = ", ")
+        if (input$y_option) text <- paste0(text, "*")
       }
-
       text
     })
     output$plot_subtitle <- renderText({
-      
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y)) {
-        text <- " "
-      } else {
-        text <- ifelse(input$y_option, "Proporcional ao ano inicial", " ")
-      }
-
-      text
+      if (is.null(input$y)) " "
+      else ifelse(input$y_option, i18n()$label_prop_name, " ")
     })
 
     # Output gráfico
@@ -125,41 +139,22 @@ get_server <- function(files, param) {
           }
           
           # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table %>% filter(var %in% input$y)
-       
-           df_filtered <- df %>%
-             select("Ano", input$y) %>%
-             pivot_longer(cols = input$y) %>%
-             filter(!is.na(value)) %>%
-             mutate(unidade = case_when(str_detect(name, "Consumo") ~ "Milhões de MWh",
-                                        str_detect(name, "Despesas") ~ "Bilhões de R$",
-                                        str_detect(name, "Consumidores") ~ "Milhões de Consumidores",
-                                        str_detect(name, "Participação") ~ "% do Orçamento da Conta de Desenvolvimento Energético"),
-                    group = name)
-              
-           if (param$translate_names) {
-               df_filtered <- df_filtered %>%
-                   mutate(unidade = case_when(str_detect(name, "Consumo") ~ "MWh Millions",
-                                              str_detect(name, "Despesas") ~ "R$ Billions",
-                                              str_detect(name, "Consumidores") ~ "Millions of Consumers",
-                                              str_detect(name, "Participação") ~ "% of the Energy Development Account Budget"))
-               
-               df_filtered$name[df_filtered$name == "Ano"] <- "Year"
-               df_filtered$name[df_filtered$name == "Despesas Estimadas CCC (Nominal)"] <- "Estimated Expenses CCC (Nominal)"
-               df_filtered$name[df_filtered$name == "Despesas Estimadas CCC (Real, R$ 2021)"] <- "Estimated Expenses CCC (Real, R$ 2021)"
-               df_filtered$name[df_filtered$name == "Participação da CCC no Orçamento Total da CDE"] <- "CCC Participation in the Total Energy Development Account Budget"
-               df_filtered$name[df_filtered$name == "Despesas Estimadas no Orçamento da CDE (Nominal)"] <- "Estimated Expenses in the Energy Development Account Budget (Nominal)"
-               df_filtered$name[df_filtered$name == "Despesas Estimadas no Orçamento da CDE (Real, R$ 2021)"] <- "Estimated Expenses in the Energy Development Account Budget (Real, R$ 2021)"
-               df_filtered$name[df_filtered$name == "Consumo Total"] <- "Total Consumption"
-               df_filtered$name[df_filtered$name == "Consumo Residencial"] <- "Residential Consumption"
-               df_filtered$name[df_filtered$name == "Consumo Industrial"] <- "Industrial Consumption"
-               df_filtered$name[df_filtered$name == "Consumo Comercial"] <- "Comercial Consumption"
-               df_filtered$name[df_filtered$name == "Consumo Outros"] <- "Other Consumption"
-               df_filtered$name[df_filtered$name == "Consumidores Totais"] <- "Total Consumers"
-               df_filtered$name[df_filtered$name == "Consumidores Residenciais"] <- "Residential Consumers"
-               
-           }
+          table_lang <- param$tables[[lang()]]
+          x_col <- table_lang[which(table_lang$var == param$x_def), ]
+          y_col <- table_lang %>% filter(var %in% input$y)
+
+          name_map    <- setNames(table_lang$label,   table_lang$var)
+          unidade_map <- setNames(table_lang$unidade, table_lang$var)
+
+          df_filtered <- df %>%
+            select("Ano", input$y) %>%
+            pivot_longer(cols = input$y) %>%
+            filter(!is.na(value)) %>%
+            mutate(
+              group   = name,
+              unidade = unname(unidade_map[name]),
+              name    = unname(name_map[name])
+            )
            
        # Filtra dataframe com grupos selecionados
           df_p <- data.frame(
@@ -189,27 +184,17 @@ get_server <- function(files, param) {
             df_p$y <- df_p$y_option
           }
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
-
           # Adicionar coluna de color
           df_p <- df_p %>%
-            mutate(color = case_when(str_detect(group, "Consumo") ~ "Consumo",
-                                     str_detect(group, "Despesas") ~ "Despesas",
-                                     str_detect(group, "Consumidores") ~ "Consumidores",
-                                     str_detect(group, "Participação") ~ "Despesas"),
-                   group = text)
-          
-          if (param$translate_names) {
-              
-              df_p <- df_p %>%
-                  mutate(color = case_when(color == "Consumo" ~ "Consumption",
-                                           color == "Despesas" ~ "Expenses",
-                                           color == "Consumidores" ~ "Consumers",
-                                           color == "Participação" ~ "Expenses"))
-          }
+            mutate(
+              color = case_when(
+                str_detect(group, "Consumo")      ~ ifelse(i18n()$translate_names, "Consumption",  "Consumo"),
+                str_detect(group, "Despesas")     ~ ifelse(i18n()$translate_names, "Expenses",     "Despesas"),
+                str_detect(group, "Consumidores") ~ ifelse(i18n()$translate_names, "Consumers",    "Consumidores"),
+                str_detect(group, "Participação") ~ ifelse(i18n()$translate_names, "Expenses",     "Despesas")
+              ),
+              group = text
+            )
           
           # Monta html do tooltip
           df_p$tooltip <- paste0(
@@ -219,7 +204,7 @@ get_server <- function(files, param) {
                                       digits = 2,
                                       decimal.mark = ",", 
                                       big.mark = "."), "<br>",
-            param$label_unit_name, ": <b>", df_p$unidade, "</b>"
+            i18n()$label_unit_name, ": <b>", df_p$unidade, "</b>"
           )
 
           # Define paleta de cores
