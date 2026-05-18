@@ -4,6 +4,7 @@ library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -13,7 +14,8 @@ files$param_script <- "../scripts/rk_energia_geracao_distribuida/db_params.R"
 
 files$CSS_script <- "../global/dza_lumen.css"
 
-files$param_file <- "../data/aneel_siga_geracao_distribuida_dic.csv"
+files$param_file_pt <- "../data/aneel_siga_geracao_distribuida_dic.csv"
+files$param_file_en <- "../data/aneel_siga_geracao_distribuida_dic_en.csv"
 files$db_file <- "../data/aneel_siga_geracao_distribuida.rds"
 
 # Carrega scripts
@@ -22,7 +24,14 @@ source(files$ui_script)
 source(files$server_script)
 
 # Parâmetros da visualização (define as variáveis/colunas padrões para os eixos do gráfico)
-param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
+param_pt <- get_db_param(files$param_file_pt, files$db_file)
+param_en <- get_db_param(files$param_file_en, files$db_file)
+
+param <- param_pt
+param$tables <- list(
+  pt = param_pt$table,
+  en = param_en$table
+)
 param$x_def <- "potencia_outorgada_kw" # variável padrão do eixo x
 param$y_def <- "" # variável padrão do eixo y
 param$slider_def <- "ano"
@@ -33,25 +42,40 @@ param$id_def <- "estado" # variável padrão de id
 
 # Descrição da visualização no eixo de opções
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Estados com maior capacidade instalada de energia na Amazônia Legal"
+param$link <- "https://datazoom.shinyapps.io/app_rk_energia_geracao_distribuida/"
 
-# Parâmetros específicos do UI
-param$ui1 <- "VARI\u00C1VEIS:"
-param$ui2 <- "Fonte:"
-param$ui3 <- "Origem:"
-param$ui4 <- "Tipo:"
-param$ui5 <- "Combustível final:"
-param$ui6 <- "https://datazoom.shinyapps.io/app_rk_energia_geracao_distribuida/"
-
-# Parâmetros específicos do server
-param$lang <- FALSE
-param$server1 <- "Variável não selecionada"
-param$server2 <- "Ranking de "
-param$server3 <- "Fonte: "
-param$server4 <- ", Origem: "
-param$server5 <- ", Tipo: "
-param$server6 <- ", Combustível Final: "
-param$server7 <- "Todos"
+param$i18n <- list(
+  pt = list(
+    plot_desc = "Estados com maior capacidade instalada de energia na Amazônia Legal",
+    ui1       = "VARIÁVEIS:",
+    ui2       = "Fonte:",
+    ui3       = "Origem:",
+    ui4       = "Tipo:",
+    ui5       = "Combustível final:",
+    server1   = "Variável não selecionada",
+    server2   = "Ranking de ",
+    server3   = "Fonte: ",
+    server4   = "Origem: ",
+    server5   = "Tipo: ",
+    server6   = "Combustível Final: ",
+    server7   = "Todos"
+  ),
+  en = list(
+    plot_desc = "States with the greatest installed energy power in the Legal Amazon",
+    ui1       = "VARIABLES:",
+    ui2       = "Source:",
+    ui3       = "Origin:",
+    ui4       = "Type:",
+    ui5       = "Final fuel:",
+    server1   = "No variable selected",
+    server2   = "Ranking of ",
+    server3   = "Source: ",
+    server4   = "Origin: ",
+    server5   = "Type: ",
+    server6   = "Final Fuel: ",
+    server7   = "All"
+  )
+)
 
 # Outros parâmetros e configurações
 param$x_choices[[1]] <- NULL

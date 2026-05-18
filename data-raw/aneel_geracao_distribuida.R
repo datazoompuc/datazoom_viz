@@ -19,9 +19,14 @@ library(stringi)
 
 # load data -------------------------------------------------------------------------
 # Original raw data can be downloaded at: https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida
-# Also can be downloaded at Data Zoom drive:
+# URL do arquivo no portal de dados abertos da ANEEL (atualizado diariamente):
+url_aneel <- "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv"
+
+temp_aneel <- tempfile(fileext = ".csv")
+curl::curl_download(url_aneel, destfile = temp_aneel, quiet = FALSE)
+
 db_geracao_distribuida <- data.table::fread(
-  file = "C:/Users/DELL/Desktop/empreendimento-geracao-distribuida.csv",
+  temp_aneel,
   encoding = "Latin-1"
 ) %>%
   janitor::clean_names()
@@ -36,20 +41,38 @@ db_geracao_distribuida <- left_join(db_geracao_distribuida, amz_cities, by = c("
 #db_geracao_distribuida <- db_geracao_distribuida %>%
 #  filter(legal_amazon ==1)
 
+# trim whitespace em dsc_classe_consumo para evitar duplicatas como "REBR" vs "REBR "
+db_geracao_distribuida$dsc_classe_consumo <- trimws(db_geracao_distribuida$dsc_classe_consumo)
+
+# sig_modalidade_empreendimento passou a ser vazio no novo dataset da ANEEL;
+# usar dsc_modalidade_habilitado como fonte
+db_geracao_distribuida <- db_geracao_distribuida %>%
+  mutate(sig_modalidade_empreendimento = case_when(
+    dsc_modalidade_habilitado == "Geracao na propria UC" ~ "Microgeração ou Minigeração distribuída",
+    dsc_modalidade_habilitado == "Auto consumo remoto"   ~ "Autoconsumo remoto",
+    dsc_modalidade_habilitado == "Compartilhada"         ~ "Geração compartilhada",
+    dsc_modalidade_habilitado == "Condomínio"            ~ "Condomínio",
+    TRUE                                                 ~ "Indefinido"
+  ))
+
 # replace character "," to "."
 db_geracao_distribuida$mda_potencia_instalada_kw <- gsub(",", ".", db_geracao_distribuida$mda_potencia_instalada_kw)
 db_geracao_distribuida$qtd_uc_recebe_credito <- gsub(",", ".", db_geracao_distribuida$qtd_uc_recebe_credito)
 
 # ensure variables are numeric
-class(db_geracao_distribuida$mda_potencia_instalada_kw) <- "numeric"
-class(db_geracao_distribuida$qtd_uc_recebe_credito) <- "numeric"
+db_geracao_distribuida$mda_potencia_instalada_kw <- as.numeric(db_geracao_distribuida$mda_potencia_instalada_kw)
+db_geracao_distribuida$qtd_uc_recebe_credito <- as.numeric(db_geracao_distribuida$qtd_uc_recebe_credito)
 
 # generate variable of year
 db_geracao_distribuida <- db_geracao_distribuida %>%
   mutate(ano_cadastral = as.Date(dth_atualiza_cadastral_empreend, "%d/%m/%Y")) %>%
   mutate(ano_cadastral = year(ano_cadastral))
 
-class(db_geracao_distribuida$ano_cadastral) <- "numeric"
+db_geracao_distribuida$ano_cadastral <- as.numeric(db_geracao_distribuida$ano_cadastral)
+
+# remove registros com data malformada
+db_geracao_distribuida <- db_geracao_distribuida %>%
+  filter(ano_cadastral >= 2009)
 
 # convert long data to wide data
 
@@ -147,34 +170,10 @@ append_data <- append_data %>%
   arrange(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte, ano_cadastral) %>%
   group_by(id, dsc_fonte_geracao, sig_modalidade_empreendimento, dsc_porte) %>%
   dplyr::mutate(
-    mda_potencia_instalada_kw_comercial = cumsum(mda_potencia_instalada_kw_comercial),
-    mda_potencia_instalada_kw_residencial = cumsum(mda_potencia_instalada_kw_residencial),
-    mda_potencia_instalada_kw_industrial = cumsum(mda_potencia_instalada_kw_industrial),
-    mda_potencia_instalada_kw_rural = cumsum(mda_potencia_instalada_kw_rural),
-    mda_potencia_instalada_kw_poder_publico = cumsum(mda_potencia_instalada_kw_poder_publico),
-    mda_potencia_instalada_kw_servico_publico = cumsum(mda_potencia_instalada_kw_servico_publico),
-    mda_potencia_instalada_kw_iluminacao_publica = cumsum(mda_potencia_instalada_kw_iluminacao_publica),
-    mda_potencia_instalada_kw_total = mda_potencia_instalada_kw_comercial +
-      mda_potencia_instalada_kw_residencial + 
-      mda_potencia_instalada_kw_industrial + 
-      mda_potencia_instalada_kw_rural + 
-      mda_potencia_instalada_kw_poder_publico + 
-      mda_potencia_instalada_kw_servico_publico + 
-      mda_potencia_instalada_kw_iluminacao_publica,
-    qtd_uc_recebe_credito_comercial = cumsum(qtd_uc_recebe_credito_comercial),
-    qtd_uc_recebe_credito_residencial = cumsum(qtd_uc_recebe_credito_residencial),
-    qtd_uc_recebe_credito_industrial = cumsum(qtd_uc_recebe_credito_industrial),
-    qtd_uc_recebe_credito_rural = cumsum(qtd_uc_recebe_credito_rural),
-    qtd_uc_recebe_credito_poder_publico = cumsum(qtd_uc_recebe_credito_poder_publico),
-    qtd_uc_recebe_credito_servico_publico = cumsum(qtd_uc_recebe_credito_servico_publico),
-    qtd_uc_recebe_credito_iluminacao_publica = cumsum(qtd_uc_recebe_credito_iluminacao_publica),
-    qtd_uc_recebe_credito_total = qtd_uc_recebe_credito_comercial +
-      qtd_uc_recebe_credito_residencial + 
-      qtd_uc_recebe_credito_industrial + 
-      qtd_uc_recebe_credito_rural + 
-      qtd_uc_recebe_credito_poder_publico + 
-      qtd_uc_recebe_credito_servico_publico + 
-      qtd_uc_recebe_credito_iluminacao_publica
+    across(starts_with("mda_potencia_instalada_kw_"), cumsum),
+    across(starts_with("qtd_uc_recebe_credito_"), cumsum),
+    mda_potencia_instalada_kw_total = rowSums(across(starts_with("mda_potencia_instalada_kw_")), na.rm = TRUE),
+    qtd_uc_recebe_credito_total     = rowSums(across(starts_with("qtd_uc_recebe_credito_")),     na.rm = TRUE)
   ) 
 
 # filter years above 2013
@@ -192,11 +191,6 @@ append_data$sig_modalidade_empreendimento %>% unique() %>% sort()
 append_data$dsc_fonte_geracao %>% unique() %>% sort()
 append_data$dsc_porte %>% unique() %>% sort()
 
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "P"] <- "Microgera\u00e7\u00e3o ou Minigera\u00e7\u00e3o distribuída"
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "R"] <- "Autoconsumo remoto"
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "C"] <- "Geração compartilhada"
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == "M"] <- "Múltiplas unidades consumidoras"
-append_data$sig_modalidade_empreendimento[append_data$sig_modalidade_empreendimento == ""] <- "Indefinido"
 
 append_data$dsc_porte[append_data$dsc_porte == "Microgeracao"] <- "Microgera\u00e7\u00e3o"
 append_data$dsc_porte[append_data$dsc_porte == "Minigeracao"] <- "Minigera\u00e7\u00e3o"
@@ -248,6 +242,8 @@ temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_poder_
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_servico_publico"] <- "Potência Instalada - Serviço Público"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_iluminacao_publica"] <- "Potência Instalada - Iluminação pública"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_total"] <- "Total de Potência Instalada"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_consumo_proprio"] <- "Potência Instalada - Consumo Próprio"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_rebr"] <- "Potência Instalada - REBR"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_comercial"] <- "Qtd. de  Unidades - Comercial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_residencial"] <- "Qtd. de  Unidades - Residencial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_industrial"] <- "Qtd. de  Unidades - Industrial"
@@ -256,6 +252,8 @@ temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_poder_publ
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_servico_publico"] <- "Qtd. de  Unidades - Serviço Público"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica"] <- "Qtd. de  Unidades - Iluminação pública"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_total"] <- "Total de Qtd. de  Unidades"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_consumo_proprio"] <- "Qtd. de  Unidades - Consumo Próprio"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_rebr"] <- "Qtd. de  Unidades - REBR"
 temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Ano"
 
 
@@ -293,6 +291,8 @@ temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_poder_
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_servico_publico"] <- "Installed Capacity - Public Service"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_iluminacao_publica"] <- "Installed Capacity - Public Lighting"
 temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_total"] <- "Total Installed Capacity"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_consumo_proprio"] <- "Installed Capacity - Own Consumption"
+temp_param_table$label[temp_param_table$var == "mda_potencia_instalada_kw_rebr"] <- "Installed Capacity - REBR"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_comercial"] <- "Number of Units - Commercial"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_residencial"] <- "Number of Units - Residential"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_industrial"] <- "Number of Units - Industrial"
@@ -301,6 +301,8 @@ temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_poder_publ
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_servico_publico"] <- "Number of Units - Public Service"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_iluminacao_publica"] <- "Number of Units - Public Lighting"
 temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_total"] <- "Total Number of Units"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_consumo_proprio"] <- "Number of Units - Own Consumption"
+temp_param_table$label[temp_param_table$var == "qtd_uc_recebe_credito_rebr"] <- "Number of Units - REBR"
 temp_param_table$label[temp_param_table$var == "ano_cadastral"] <- "Year"
 
 

@@ -105,7 +105,7 @@ df$combustivel_final <- df$combustivel_final %>%
                       ))
 
 # create panel ----------------------------------------------------------------------
-df_panel <- db_siga %>% 
+df_panel <- df %>%
     mutate(entrada_em_operacao = as.Date(entrada_em_operacao, "%d/%m/%Y")) %>%
     select(entrada_em_operacao, municipio, estado, 
            fonte, origem, tipo, combustivel_final, 
@@ -146,22 +146,22 @@ base <- rbind(df_panel_state_level_before_2002, df_panel_state_level_after_2002)
 
 # create panel function
 
-create_panel <- function(df_row) {
-    
-    years_op <- (df_row$entrada_em_operacao):2022
+create_panel <- function(df_row, max_year) {
+
+    years_op <- (df_row$entrada_em_operacao):max_year
     panel <- cbind(tibble(ano = years_op), df_row)
-    
+
 }
 
 
 
 ### run function
+current_year <- year(Sys.Date())
 df_list <- list()
 for(row in 1:nrow(base)) {
-    
-    df_list[[row]] <- create_panel(base[row, ])
 
-    
+    df_list[[row]] <- create_panel(base[row, ], max_year = current_year)
+
 }
 
 df_final <- bind_rows(df_list) %>%
