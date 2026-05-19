@@ -18,6 +18,7 @@ files$param_file_pt = "../data/comex_exp_tot_pais_dic.csv"
 files$param_file_en = "../data/comex_exp_tot_pais_dic_en.csv"
 files$db_file = "../data/comex_exp_tot_pais.rds"
 files$aux_file = "../data/indice_precos_anual.csv"
+files$country_map_file <- "../data/paises_traducao.csv"
 
 # Carrega scripts
 source(files$param_script)
