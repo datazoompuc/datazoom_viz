@@ -16,6 +16,12 @@ get_server <- function(files, param) {
       right_join(tidyr::expand(., time, group)) %>%
       mutate(value = ifelse(is.na(value), 0, value))
 
+  # Carrega índice de preços anual
+  indice <- read.csv(files$aux_file, stringsAsFactors = FALSE)
+  indice$time <- as.integer(indice$CO_ANO)
+  indice$indice_anual_base1998 <- as.numeric(indice$indice_anual_base1998)
+  indice <- indice[, c("time", "indice_anual_base1998")]
+
   # Tabela de tradução de países
   paises <- read.csv(files$country_map_file, stringsAsFactors = FALSE)
   country_map <- setNames(paises$en, paises$pt)
@@ -42,8 +48,9 @@ get_server <- function(files, param) {
     })
 
     # Renderiza textos dinâmicos da sidebar
-    output$plot_name_ui <- renderUI({ h2(class = "plot_name", i18n()$plot_name) })
-    output$plot_desc_ui <- renderUI({ p(class = "plot_desc", i18n()$plot_desc) })
+    output$plot_name_ui  <- renderUI({ h2(class = "plot_name", i18n()$plot_name) })
+    output$plot_desc_ui  <- renderUI({ p(class = "plot_desc", i18n()$plot_desc) })
+    output$label_deflator <- renderText({ i18n()$label_deflator })
 
     # Atualiza botão quando idioma muda
     observeEvent(lang(), {
@@ -101,6 +108,16 @@ get_server <- function(files, param) {
           # Filtra colunas onde variáveis são NA
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
 
+          # Aplica deflação ao valor antes de calcular o ranking
+          if (isTRUE(input$ydefl)) {
+            df_p <- df_p[df_p$slider >= 1998, ]
+            df_p$indice_anual_base1998 <- indice$indice_anual_base1998[
+              match(df_p$slider, indice$time)
+            ]
+            df_p <- df_p[!is.na(df_p$indice_anual_base1998), ]
+            df_p$x <- df_p$x * (100 / df_p$indice_anual_base1998)
+          }
+
           # Se dataset estiver vazio, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
@@ -128,16 +145,18 @@ get_server <- function(files, param) {
           top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
           df_p <- df_p %>% filter(group %in% top_groups)
 
+          x_label_full <- if (isTRUE(input$ydefl)) paste0(i18n()$x_label, " (", i18n()$ylabel_deflator, ")") else i18n()$x_label
+
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            i18n()$x_label, ": ", format(df_p$x, scientific = FALSE,
+            x_label_full, ": ", format(df_p$x, scientific = FALSE,
                                           digits = 2,
                                           decimal.mark = ",",
                                           big.mark = "."), "<br>",
             i18n()$y_label, ": ", df_p$y, "<br>",
-            i18n()$unit_text, ": ", param$unit, "<br>",
+            if (isTRUE(input$ydefl)) i18n()$ylabel_deflator else paste0(i18n()$unit_text, ": ", param$unit), "<br>",
             i18n()$color_label, ": ", df_p$color
           )
 
@@ -244,7 +263,7 @@ get_server <- function(files, param) {
 
           # Layout eixos
           x_axis_layout <- list(
-            title = i18n()$x_label,
+            title = x_label_full,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,

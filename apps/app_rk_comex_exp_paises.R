@@ -3,6 +3,8 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -14,6 +16,7 @@ files$param_file_pt <- "../data/comex_exp_tot_pais_dic.csv"
 files$param_file_en <- "../data/comex_exp_tot_pais_dic_en.csv"
 files$db_file <- "../data/comex_exp_tot_pais.rds"
 files$country_map_file <- "../data/paises_traducao.csv"
+files$aux_file <- "../data/indice_precos_anual.csv"
 
 # Carrega scripts
 source(files$param_script)
@@ -46,20 +49,24 @@ param$i18n <- list(
     y_label     = "Ranking",
     color_label = "País",
     unit_text   = "Unidade de Medida",
-    year_prefix = "Ano: ",
-    btn_lang    = "English"
+    year_prefix      = "Ano: ",
+    label_deflator   = "Deflacionar (US$ de 1998)",
+    ylabel_deflator  = "US$ de 1998",
+    btn_lang         = "English"
   ),
   en = list(
-    plot_name   = "Data Zoom Amazônia",
-    plot_desc   = "Countries that most import from the Legal Amazon",
-    plot_title  = "Value Ranking",
-    subtitle    = "Legal Amazon",
-    x_label     = "Value",
-    y_label     = "Rank",
-    color_label = "Country",
-    unit_text   = "Unit of Measurement",
-    year_prefix = "Year: ",
-    btn_lang    = "Português"
+    plot_name        = "Data Zoom Amazônia",
+    plot_desc        = "Countries that most import from the Legal Amazon",
+    plot_title       = "Value Ranking",
+    subtitle         = "Legal Amazon",
+    x_label          = "Value",
+    y_label          = "Rank",
+    color_label      = "Country",
+    unit_text        = "Unit of Measurement",
+    year_prefix      = "Year: ",
+    label_deflator   = "Deflate (1998 US$)",
+    ylabel_deflator  = "1998 US$",
+    btn_lang         = "Português"
   )
 )
 
