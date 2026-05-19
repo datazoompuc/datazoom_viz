@@ -12,9 +12,7 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
 
   # Carrega dados
-  df <- readRDS(files$db_file) %>%
-      right_join(tidyr::expand(., time, group)) %>%
-      mutate(value = ifelse(is.na(value), 0, value))
+  df <- readRDS(files$db_file)
 
   # Carrega índice de preços anual
   indice <- read.csv(files$aux_file, stringsAsFactors = FALSE)
@@ -181,7 +179,7 @@ get_server <- function(files, param) {
             textposition = "middle right",
             showlegend = FALSE,
             hoverinfo = "text"
-          ) %>% animation_opts(redraw = TRUE)
+          ) %>% animation_opts(frame = 1500, transition = 1500, easing = "linear", redraw = FALSE)
 
           # Adiciona barras
           fig_p <- fig_p %>% add_segments(
@@ -189,7 +187,6 @@ get_server <- function(files, param) {
             xend = ~x,
             y = ~y,
             yend = ~y,
-            split = ~id,
             color = ~color,
             line = list(width = 30),
             opacity = 0.7
@@ -207,8 +204,11 @@ get_server <- function(files, param) {
 
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = i18n()$year_prefix, font = f1))
-            fig_p <- fig_p %>% animation_button(label = "Play")
+            fig_p <- plotly_build(fig_p)
+            idx <- which(vapply(fig_p$x$layout$sliders, function(s) inherits(s, "aniSlider"), logical(1)))
+            if (length(idx) == 1) {
+              fig_p$x$layout$sliders[[idx]]$currentvalue <- list(prefix = i18n()$year_prefix, font = f1)
+            }
 
             fig_p$x$layout$updatemenus <- list(
               list(
@@ -303,11 +303,6 @@ get_server <- function(files, param) {
               legend = list(title = list(text = i18n()$color_label)),
               hoverlabel = tooltip
             )
-
-          fig_p <- fig_p %>% animation_opts(
-            1500,
-            easing = "linear", redraw = FALSE
-          )
 
           fig_p <- fig_p %>%
             config(
