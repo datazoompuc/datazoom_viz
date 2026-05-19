@@ -9,7 +9,7 @@ library(stringr)
 library(httr)
 library(jsonlite)
 
-dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2024, raw_data = FALSE)
+dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2025, raw_data = FALSE)
 
 dat <- inner_join(
     dat,
