@@ -99,6 +99,7 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
+        "&", "lang=", lang(),
         "&", "y_option=", param$y_def
       )
 
@@ -127,6 +128,10 @@ get_server <- function(files, param) {
 
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
+
+      if (!is.null(query[["lang"]]) && query[["lang"]] %in% c("pt", "en")) {
+        lang(query[["lang"]])
+      }
 
       if (!is.null(query[["ylog"]])) {
         updateCheckboxInput(session, "ylog",
@@ -174,6 +179,7 @@ get_server <- function(files, param) {
       text
     })
     output$plot_subtitle <- renderText({
+        if (is.null(param$y_def) || param$y_def == "")
             return("")
         
 
