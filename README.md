@@ -13,6 +13,8 @@ All the apps are listed in this sheet. (https://docs.google.com/spreadsheets/d/1
 
 - [Tutorial: Novo UI — Material Switch, Spinner e Lang Toggle](tutorial_novo_ui.md)
 
+App updates are being monitored in this [sheet](https://docs.google.com/spreadsheets/d/1RqOPwqaO94Vxb1_Sfo8moB4tnXTqcIKHYk2YtjVpW2c/edit?gid=1651483482#gid=1651483482).
+
 ## Main Directories
 
  - "./apps": contains one entry-point `.R` file per app (`app_app_id.R`). Each file loads the libraries, defines file paths, sources the scripts from `./scripts/app_id/`, sets visualization parameters and launches the Shiny app.
