@@ -63,10 +63,30 @@ if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
 
 aux2 <- as_tibble(d) %>%
     transmute(
-        CO_SH4       = str_pad(id, 4, pad = "0"),
+        CO_SH4     = str_pad(id, 4, pad = "0"),
         NO_POR_MIN = str_trim(str_remove(text, "^\\d{4}\\s*-\\s*"))
     ) %>%
     distinct(CO_SH4, .keep_all = TRUE)
+
+# busca nomes de capítulos SH2 (2 dígitos) para adicionar NO_SH2_POR
+url_ch <- "https://api-comexstat.mdic.gov.br/cities/filters/chapter?language=pt"
+resp_ch <- GET(url_ch)
+stop_for_status(resp_ch)
+d_ch <- fromJSON(content(resp_ch, as = "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)$data
+if (is.list(d_ch) && length(d_ch) == 1 && is.data.frame(d_ch[[1]])) d_ch <- d_ch[[1]]
+
+aux2_sh2 <- as_tibble(d_ch) %>%
+    transmute(
+        CO_SH2     = str_pad(id, 2, pad = "0"),
+        NO_SH2_POR = str_trim(str_remove(text, "^\\d+\\s*-\\s*"))
+    ) %>%
+    distinct(CO_SH2, .keep_all = TRUE)
+
+aux2 <- aux2 %>%
+    mutate(CO_SH2 = substr(CO_SH4, 1, 2)) %>%
+    left_join(aux2_sh2, by = "CO_SH2") %>%
+    select(-CO_SH2)
+
 saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
 
 
@@ -195,7 +215,6 @@ dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
 dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
-dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
 dat$uf <- NULL
 
 data_val <- dat
@@ -220,6 +239,17 @@ datafinal_val_sh2[is.na(datafinal_val_sh2)] <- 0
 
 datafinal_val_munic <- datafinal_val_munic[order(datafinal_val_munic$group, datafinal_val_munic$time),]
 datafinal_val_sh2 <- datafinal_val_sh2[order(datafinal_val_sh2$group, datafinal_val_sh2$time),]
+
+# Adiciona linha "Amazônia Legal" = soma de todos os municípios por ano
+sh2_cols <- setdiff(names(datafinal_val_sh2), c("time", "group"))
+amazonia_legal <- aggregate(
+    datafinal_val_sh2[, sh2_cols],
+    by = list(time = datafinal_val_sh2$time),
+    FUN = sum, na.rm = TRUE
+)
+amazonia_legal$group <- "Amazônia Legal"
+amazonia_legal <- amazonia_legal[, c("time", "group", sh2_cols)]
+datafinal_val_sh2 <- rbind(amazonia_legal, datafinal_val_sh2)
 
 saveRDS(datafinal_val_munic, "data/comex_exp_munic_sh2.rds")
 saveRDS(datafinal_val_sh2, "data/comex_exp_sh2_munic.rds")
