@@ -25,8 +25,8 @@ get_ui <- function(files, param) {
           selectInput(
             inputId  = "y",
             label    = param$label_y_name,
-            choices  = param$y_choices,
-            selected = param$y_def,
+            choices  = NULL,
+            selected = NULL,
             width    = "100%"
           )
         ),

@@ -15,6 +15,11 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
 
+    # Ordena categorias SH2 alfabeticamente
+    param$y_choices <- lapply(param$y_choices, function(grp) {
+      if (is.list(grp) || length(grp) > 1) grp[order(names(grp))] else grp
+    })
+
     # Cria opções para seleção de grupos
     all_groups <- sort(unique(df$group))
     all_groups <- all_groups[all_groups != " - "]
@@ -38,19 +43,19 @@ get_server <- function(files, param) {
       )
     )
 
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
+    # Função para preencher inputs com valores padrão ao iniciar sem URL
+    default_inputs <- function() {
       updateSelectInput(session,
         "filter1",
-        choices = param$filter_choices_grouped,
-        selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        choices  = param$filter_choices_grouped,
+        selected = "Amazônia Legal"
       )
 
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
+      y_vals <- unlist(param$y_choices[param$y_choices != ""], use.names = FALSE)
       updateSelectInput(session,
         "y",
-        choices = param$y_choices,
-        selected = selected
+        choices  = param$y_choices,
+        selected = sample(y_vals, 1)
       )
     }
 
@@ -113,9 +118,9 @@ get_server <- function(files, param) {
         )
       }
 
-      # Se query está vazia, preenche aleatório
+      # Se query está vazia, aplica seleção padrão
       if (is.null(query[["filter"]]) && is.null(query[["y"]])) {
-        random_inputs() # preenche inputs se estiverem vazios
+        default_inputs()
       }
     }
 
