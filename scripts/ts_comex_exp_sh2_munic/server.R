@@ -16,14 +16,33 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file)
 
     # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
+    all_groups <- sort(unique(df$group))
+    all_groups <- all_groups[all_groups != " - "]
+
+    al_choice  <- "Amazônia Legal"
+    munic_only <- sort(all_groups[all_groups != al_choice])
+
+    extract_uf   <- function(x) sub(".*\\s+-\\s+([A-Z]{2})$", "\\1", x)
+    extract_name <- function(x) sub("\\s+-\\s+[A-Z]{2}$", "", x)
+
+    ufs <- sort(unique(extract_uf(munic_only)))
+    param$filter_choices <- c(al_choice, munic_only)
+    param$filter_choices_grouped <- c(
+      setNames(list(c(setNames(al_choice, al_choice))), al_choice),
+      setNames(
+        lapply(ufs, function(uf) {
+          muns <- munic_only[extract_uf(munic_only) == uf]
+          setNames(muns, extract_name(muns))
+        }),
+        ufs
+      )
+    )
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
       updateSelectInput(session,
         "filter1",
-        choices = param$filter_choices,
+        choices = param$filter_choices_grouped,
         selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
       )
 
@@ -59,7 +78,7 @@ get_server <- function(files, param) {
       # Preenche filtro vazio
       updateSelectInput(session,
         "filter1",
-        choices = param$filter_choices,
+        choices = param$filter_choices_grouped,
         selected = NULL
       )
 
@@ -89,7 +108,7 @@ get_server <- function(files, param) {
       if (!is.null(query[["filter"]])) {
         updateSelectInput(session,
           "filter1",
-          choices = param$filter_choices,
+          choices = param$filter_choices_grouped,
           selected = selected
         )
       }
@@ -271,8 +290,7 @@ get_server <- function(files, param) {
           fig <- fig_p # retorna a figura do gráfico
         },
         error = function(cond) {
-          # se encontrar erro retorna fig em branco
-          print("plot error")
+          print(paste("plot error:", conditionMessage(cond)))
           fig <- plotly_empty()
         }
       )
