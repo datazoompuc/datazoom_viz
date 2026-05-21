@@ -3,6 +3,8 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
+library(shinycssloaders)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -39,9 +41,9 @@ param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da ex
 
 param$label_var_name <- "VARIÁVEIS:"
 param$label_y_name <- "Categoria de exportação (agregação da SH2)"
-param$label_scale_name <- "escala log"
-param$label_axis_name <- "proporcional ao ano inicial (*)"
-param$label_mun_filter <- "Município / Amazônia Legal"
+param$label_scale_name <- "Escala log"
+param$label_axis_name <- "Proporcional ao ano inicial"
+param$label_mun_filter <- "Recorte regional"
 param$link <- "https://datazoom.shinyapps.io/app_ts_comex_exp_sh2_munic/"
 param$currency <- "Por R$"
 param$measurement <- "R$ "
