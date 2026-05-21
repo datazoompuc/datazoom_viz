@@ -15,28 +15,28 @@ get_ui <- function(files, param) {
                       border-color: #40768B !important; }'),
         tags$style(HTML(".switch-label { color: white; }")),
 
-        h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        uiOutput("plot_name_ui"),
+        uiOutput("plot_desc_ui"),
         hr(),
-        p(class = "vars", param$label_var_name),
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
 
         div(
           class = "var_selec_group",
           selectInput(
             inputId  = "y",
-            label    = param$label_y_name,
+            label    = textOutput("label_y_name", inline = TRUE),
             choices  = NULL,
             selected = NULL,
             width    = "100%"
           )
         ),
-        
+
         div(class = "fakecheckbox"),
 
         selectizeInput(
           "filter1",
-          param$label_mun_filter,
           choices = NULL,
+          textOutput("label_mun_filter", inline = TRUE),
           multiple = TRUE,
           options  = list(maxItems = 20),
           width    = "100%"
@@ -48,7 +48,7 @@ get_ui <- function(files, param) {
           style = "margin-top: 10px;",
           materialSwitch(
             inputId = "ylog",
-            label   = tags$span(param$label_scale_name, class = "switch-label"),
+            label   = tags$span(textOutput("label_scale_name", inline = TRUE), class = "switch-label"),
             value   = FALSE,
             status  = "info"
           )
@@ -58,7 +58,7 @@ get_ui <- function(files, param) {
           style = "margin-top: 10px;",
           materialSwitch(
             inputId = "y_option",
-            label   = tags$span(param$label_axis_name, class = "switch-label"),
+            label   = tags$span(textOutput("label_axis_name", inline = TRUE), class = "switch-label"),
             value   = FALSE,
             status  = "info"
           )

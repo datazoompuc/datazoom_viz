@@ -15,10 +15,16 @@ get_server <- function(files, param) {
     # Carrega dados
     df <- readRDS(files$db_file)
 
-    # Ordena categorias SH2 alfabeticamente
-    param$y_choices <- lapply(param$y_choices, function(grp) {
-      if (is.list(grp) || length(grp) > 1) grp[order(names(grp))] else grp
-    })
+    # Helper: constrói y_choices para um idioma, ordenado alfabeticamente
+    build_y_choices <- function(lang_key) {
+      tbl    <- param$tables[[lang_key]]
+      y_cols <- tbl[which(tbl$y), ]
+      choices <- grouped_list(y_cols)
+      choices <- lapply(choices, function(grp) {
+        if (length(grp) > 1) grp[order(names(grp))] else grp
+      })
+      append("", choices)
+    }
 
     # Cria opções para seleção de grupos
     all_groups <- sort(unique(df$group))
@@ -43,18 +49,44 @@ get_server <- function(files, param) {
       )
     )
 
+    # --- LANG TOGGLE ---
+    lang <- reactiveVal("pt")
+    i18n <- reactive({ param$i18n[[lang()]] })
+
+    observeEvent(input$toggle_lang, {
+      lang(ifelse(lang() == "pt", "en", "pt"))
+    })
+
+    # Renderiza textos dinâmicos da sidebar
+    output$plot_name_ui     <- renderUI({ h2(class = "plot_name", i18n()$plot_name) })
+    output$plot_desc_ui     <- renderUI({ p(class  = "plot_desc", i18n()$plot_desc) })
+    output$label_var_name   <- renderText({ i18n()$label_var_name })
+    output$label_y_name     <- renderText({ i18n()$label_y_name })
+    output$label_mun_filter <- renderText({ i18n()$label_mun_filter })
+    output$label_scale_name <- renderText({ i18n()$label_scale_name })
+    output$label_axis_name  <- renderText({ i18n()$label_axis_name })
+
+    # Atualiza y_choices e label do botão quando o idioma muda
+    observeEvent(lang(), {
+      current_y <- isolate(input$y)
+      updateSelectInput(session, "y",
+        choices  = build_y_choices(lang()),
+        selected = current_y
+      )
+      updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
+    }, ignoreInit = FALSE)
+
     # Função para preencher inputs com valores padrão ao iniciar sem URL
     default_inputs <- function() {
-      updateSelectInput(session,
-        "filter1",
-        choices  = param$filter_choices_grouped,
-        selected = "Amazônia Legal"
-      )
+      y_ch   <- build_y_choices(isolate(lang()))
+      y_vals <- Filter(nzchar, unlist(y_ch, use.names = FALSE))
 
-      y_vals <- unlist(param$y_choices[param$y_choices != ""], use.names = FALSE)
-      updateSelectInput(session,
-        "y",
-        choices  = param$y_choices,
+      updateSelectInput(session, "filter1",
+        choices  = param$filter_choices_grouped,
+        selected = al_choice
+      )
+      updateSelectInput(session, "y",
+        choices  = y_ch,
         selected = sample(y_vals, 1)
       )
     }
@@ -63,15 +95,13 @@ get_server <- function(files, param) {
     update_my_queryString <- function() {
       q_string <- paste0(
         "?", "y=", input$y,
+        "&", "lang=", lang(),
         "&", "ylog=", input$ylog,
         "&", "y_option=", input$y_option
       )
 
       for (i in input$filter1) {
-        q_string <- paste0(
-          q_string,
-          "&", "filter=", i
-        )
+        q_string <- paste0(q_string, "&filter=", i)
       }
 
 
@@ -90,9 +120,13 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
+      if (!is.null(query[["lang"]]) && query[["lang"]] %in% c("pt", "en")) {
+        lang(query[["lang"]])
+      }
+
       if (!is.null(query[["y"]])) {
         updateSelectInput(session, "y",
-          choices = param$y_choices,
+          choices  = build_y_choices(isolate(lang())),
           selected = query[["y"]]
         )
       }
@@ -126,31 +160,15 @@ get_server <- function(files, param) {
 
     # Output titulo do gráfico
     output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
-
-        text <- paste0("", y_col$label)
-        if (input$y_option) {
-          text <- paste0("", y_col$label, "*")
-        }
-      }
-
-      text
+      if (is.null(input$y) || input$y == "") return(" ")
+      tbl   <- param$tables[[lang()]]
+      y_col <- tbl[which(tbl$var == input$y), ]
+      label <- if (nrow(y_col) > 0) y_col$label else input$y
+      if (isTRUE(input$y_option)) paste0(label, "*") else label
     })
-    output$plot_subtitle <- renderText({
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        text <- paste0("",param$currency,"")
-      }
 
-      text
+    output$plot_subtitle <- renderText({
+      if (is.null(input$y) || input$y == "") " " else i18n()$currency
     })
 
     # Output gráfico
@@ -167,14 +185,11 @@ get_server <- function(files, param) {
             stop()
           }
 
-          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          # Cria dataframe do gráfico
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
+          tbl       <- param$tables[[lang()]]
+          x_col     <- tbl[which(tbl$var == param$x_def), ]
+          y_col     <- tbl[which(tbl$var == input$y), ]
+          color_col <- tbl[which(tbl$var == param$color_def), ]
 
-          # Filtra dataframe com grupos selecionados
           df_filtered <- df[which(df$group %in% input$filter1), ]
 
           df_p <- data.frame(
@@ -195,37 +210,29 @@ get_server <- function(files, param) {
             stop()
           }
 
-          # Alternativa de medida para y
-          if (input$y_option & is.numeric(df_p$y)) {
+          # Proporcional ao ano inicial
+          measurement <- i18n()$measurement
+          if (isTRUE(input$y_option) && is.numeric(df_p$y)) {
             df_p <- df_p %>%
-              group_by(df_p$group) %>%
-              mutate(
-                aux1 = first(y),
-                y_option = (y / aux1) * 100
-              )
-            df_p$y <- df_p$y_option
-            param$measurement <- ""
+              group_by(group) %>%
+              mutate(y = (y / first(y)) * 100) %>%
+              ungroup()
+            measurement <- ""
           }
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
+          if (all(is.na(df_p$color))) df_p$color <- " "
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
+            i18n()$label_y_name, ": ", y_col$label, "<br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", param$measurement, format(df_p$y, scientific = FALSE,
-                                                         digits = 2,
-                                                         decimal.mark = ",", 
-                                                         big.mark = "."), "<br>"
+            i18n()$label_value, ": ", measurement, format(df_p$y, scientific = FALSE, 
+                                                          digits = 2,
+                                                          decimal.mark = ",", 
+                                                          big.mark = "."), "<br>"
           )
 
-          # Define paleta de cores
-          pallete <- pallete_discrete
-
-          # Monta gráfico
           fig_p <- plot_ly(df_p,
             x = ~x,
             y = ~y,
@@ -247,7 +254,7 @@ get_server <- function(files, param) {
             zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = y_col$label,
+            title = if (isTRUE(input$y_option)) paste0(i18n()$label_value, "*") else i18n()$label_value,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
@@ -256,20 +263,7 @@ get_server <- function(files, param) {
             zeroline = FALSE
           )
 
-          if (input$ylog & is.numeric(df_p$y)) {
-            y_axis_layout$type <- "log"
-          }
-
-          if (input$y_option) {
-            y_axis_layout$title <- paste0(y_col$label, "*")
-          }
-
-          # Layout hover/tooltip
-          tooltip <- list(
-            bordercolor = "rgba(255, 255, 255, 1)",
-            bgopacity = "0.5",
-            font = f1
-          )
+          if (isTRUE(input$ylog) && is.numeric(df_p$y)) y_axis_layout$type <- "log"
 
           # Aplica layout
           fig_p <- fig_p %>%
