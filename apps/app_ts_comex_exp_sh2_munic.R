@@ -48,8 +48,8 @@ param$i18n <- list(
     label_scale_name = "Escala log",
     label_axis_name  = "Proporcional ao ano inicial",
     label_mun_filter = "Recorte Regional",
-    currency         = "Por R$",
-    measurement      = "R$ ",
+    currency         = "Por US$",
+    measurement      = "US$ ",
     label_value      = "Valor",
     btn_lang         = "English"
   ),
@@ -61,8 +61,8 @@ param$i18n <- list(
     label_scale_name = "Log scale",
     label_axis_name  = "Proportional to starting year",
     label_mun_filter = "Regional Scope",
-    currency         = "Per R$",
-    measurement      = "R$ ",
+    currency         = "Per US$",
+    measurement      = "US$ ",
     label_value      = "Value",
     btn_lang         = "Português"
   )
