@@ -60,11 +60,12 @@ data <- data_val_pais %>%
         floresta  = cod_sh4 %in% sh4_floresta
     ) %>%
     dplyr::filter(!is.na(valor_total), valor_total > 0) %>%
-    dplyr::left_join(aux, by = c("cod_sh4" = "CO_SH4")) %>%   
-    dplyr::rename(group = NO_POR_MIN) %>%
+    dplyr::left_join(aux, by = c("cod_sh4" = "CO_SH4")) %>%
+    dplyr::rename(group = NO_POR_MIN, group_en = NO_ENG_MIN) %>%
     dplyr::select(
         time    = ano,
         group,
+        group_en,
         value   = valor_fob,
         uf,
         floresta
@@ -132,6 +133,15 @@ temp_param_table$slider[temp_param_table$var == "time"] <- TRUE
 temp_param_table$slider[temp_param_table$var == "value"] <- FALSE
 temp_param_table$slider[temp_param_table$var == "floresta"] <- FALSE
 
+# group_en: coluna auxiliar de tradução — não exposta na UI
+temp_param_table$x[temp_param_table$var == "group_en"]      <- FALSE
+temp_param_table$y[temp_param_table$var == "group_en"]      <- FALSE
+temp_param_table$color[temp_param_table$var == "group_en"]  <- FALSE
+temp_param_table$size[temp_param_table$var == "group_en"]   <- FALSE
+temp_param_table$slider[temp_param_table$var == "group_en"] <- FALSE
+temp_param_table$label[temp_param_table$var == "group_en"]  <- "Produto EN (SH4)"
+temp_param_table$desc[temp_param_table$var == "group_en"]   <- "Produto EN (SH4)"
+
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic.csv", fileEncoding = "UTF-8")
 
@@ -149,6 +159,9 @@ temp_param_table$desc[temp_param_table$var == "group"] <- "Product (SH4)"
 temp_param_table$desc[temp_param_table$var == "time"] <- "Year"
 temp_param_table$desc[temp_param_table$var == "value"] <- "Value"
 temp_param_table$desc[temp_param_table$var == "floresta"] <- "Forest Compatible Products"
+
+temp_param_table$label[temp_param_table$var == "group_en"]  <- "Product (SH4)"
+temp_param_table$desc[temp_param_table$var == "group_en"]   <- "Product (SH4)"
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_perc_sh4_sel_dic_en.csv", fileEncoding = "UTF-8")

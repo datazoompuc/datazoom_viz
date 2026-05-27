@@ -82,9 +82,39 @@ aux2_sh2 <- as_tibble(d_ch) %>%
     ) %>%
     distinct(CO_SH2, .keep_all = TRUE)
 
+# nomes em inglês para SH4
+url_en <- "https://api-comexstat.mdic.gov.br/cities/filters/heading?language=en"
+resp_en <- GET(url_en)
+stop_for_status(resp_en)
+d_en <- fromJSON(content(resp_en, as = "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)$data
+if (is.list(d_en) && length(d_en) == 1 && is.data.frame(d_en[[1]])) d_en <- d_en[[1]]
+
+aux2_en <- as_tibble(d_en) %>%
+    transmute(
+        CO_SH4     = str_pad(id, 4, pad = "0"),
+        NO_ENG_MIN = str_trim(str_remove(text, "^\\d{4}\\s*-\\s*"))
+    ) %>%
+    distinct(CO_SH4, .keep_all = TRUE)
+
+# nomes em inglês para SH2
+url_ch_en <- "https://api-comexstat.mdic.gov.br/cities/filters/chapter?language=en"
+resp_ch_en <- GET(url_ch_en)
+stop_for_status(resp_ch_en)
+d_ch_en <- fromJSON(content(resp_ch_en, as = "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)$data
+if (is.list(d_ch_en) && length(d_ch_en) == 1 && is.data.frame(d_ch_en[[1]])) d_ch_en <- d_ch_en[[1]]
+
+aux2_sh2_en <- as_tibble(d_ch_en) %>%
+    transmute(
+        CO_SH2     = str_pad(id, 2, pad = "0"),
+        NO_SH2_ENG = str_trim(str_remove(text, "^\\d+\\s*-\\s*"))
+    ) %>%
+    distinct(CO_SH2, .keep_all = TRUE)
+
 aux2 <- aux2 %>%
     mutate(CO_SH2 = substr(CO_SH4, 1, 2)) %>%
-    left_join(aux2_sh2, by = "CO_SH2") %>%
+    left_join(aux2_sh2,    by = "CO_SH2") %>%
+    left_join(aux2_en,     by = "CO_SH4") %>%
+    left_join(aux2_sh2_en, by = "CO_SH2") %>%
     select(-CO_SH2)
 
 saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
