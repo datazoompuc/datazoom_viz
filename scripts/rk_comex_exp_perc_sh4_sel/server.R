@@ -68,7 +68,7 @@ get_server <- function(files, param) {
     output$plot_desc_ui <- renderUI({ p(class = "plot_desc",  i18n()$plot_desc)  })
     output$label_ui1    <- renderText({ i18n()$ui1 })
 
-    # ---- Slider de ano (renderizado no server para ter acesso aos dados) ----
+    # ---- Slider de ano
     output$year_slider <- renderUI({
       sliderInput(
         inputId = "year_filter",
@@ -151,6 +151,8 @@ get_server <- function(files, param) {
 
     # Output gráfico
     output$plot <- renderPlotly({
+
+      updateQueryString(paste0("?lang=", lang()), mode = "replace")
 
       fig <- plotly_empty()
 
@@ -338,6 +340,15 @@ get_server <- function(files, param) {
         )
       fig
     })
+
+    # Lê parâmetros da URL na inicialização
+    observe({
+      query <- parseQueryString(session$clientData$url_search)
+      if (!is.null(query[["lang"]]) && query[["lang"]] %in% c("pt", "en")) {
+        lang(query[["lang"]])
+      }
+    })
+
   }
   server
 }
