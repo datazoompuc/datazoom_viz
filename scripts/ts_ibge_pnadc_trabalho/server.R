@@ -2,343 +2,252 @@
 
 # Paleta de cores
 pallete_discrete <- c("#fcff84", "#ffcf48", "#c3ff83", "#007e47", "#00596d", "#4fdf94", "#99b0c8", "#261c4e", "#000098", "#c368b1", "#60458c", "#757575")
-pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "#33638d", "#287d8e", "#238a8d", "#1f968b", "#20a387", "#29af7f", "#3cbb75", "#55c667", "#73d055", "#95d840", "#b8de29", "#dce319", "#fde725") # Viridis
 
 # Fontes
 f1 <- list(family = "Roboto", size = 14, color = "rgb(0, 0, 0)")
 f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
-# Funcão para retornar objeto server
 get_server <- function(files, param) {
-    
-    # Carrega dados
+
     df <- readRDS(files$db_file)
-    
-    get_uf_choices <- function(df) {
-        df %>%
-            dplyr::filter(grepl("^[A-Z]{2}$", group)) %>%
-            dplyr::distinct(group) %>%
-            dplyr::pull(group) %>%
-            sort()
-    }
-    
-    
-    get_filter_choices <- function(df, lang = FALSE) {
-        ufs <- get_uf_choices(df)
-        
-        if (isTRUE(lang)) {
-            list(
-                "Brazil" = c("Brazil"),
-                "Legal Amazon" = c("Legal Amazon", "Outside Legal Amazon"),
-                "Regions" = c("Central-West", "North", "Northeast", "South", "Southeast"),
-                "UF" = ufs
-            )
-        } else {
-            list(
-                "Brasil" = c("Brasil"),
-                "Amazônia Legal" = c("Amazônia Legal", "Fora da Amazônia Legal"),
-                "Região" = c("Centro-Oeste", "Norte", "Nordeste", "Sul", "Sudeste"),
-                "UF" = ufs
-            )
+
+    categories_df <- read.csv(
+        files$categories_file, sep = ";",
+        stringsAsFactors = FALSE, fileEncoding = "UTF-8"
+    )
+
+    read_pnadc_choices <- function(filter_id, lang_val = "pt") {
+        cats <- categories_df[categories_df$filter_id == filter_id & nzchar(categories_df$value), ]
+        cats <- cats[order(cats$ord_group, cats$ord_item), ]
+        out  <- list()
+        for (g_pt in unique(cats$group_pt)) {
+            items   <- cats[cats$group_pt == g_pt, ]
+            if (g_pt == "UF") items <- items[order(items$value), ]
+            g_label        <- if (lang_val == "pt") items$group_pt[1] else items$group_en[1]
+            labels         <- if (g_pt == "UF") items$value else if (lang_val == "pt") items$label_pt else items$label_en
+            out[[g_label]] <- as.list(setNames(items$value, labels))
         }
+        out
     }
-    
-    get_filter_comp_choices <- function(lang = FALSE) {
-        
-        if (isTRUE(lang)) {
-            list(
-                "All" = c("All"),
-                "Sex" = c("Male", "Female"),
-                "Age Group" = c(
-                    "Between 14 and 17",
-                    "Between 18 and 24",
-                    "Between 25 and 29",
-                    "Between 30 and 39",
-                    "Between 40 and 49",
-                    "Between 50 and 59",
-                    "60 or older"
-                ),
-                "Schooling" = c(
-                    "No formal education",
-                    "1-7 years of schooling",
-                    "8-11 years of schooling",
-                    "9-14 years of schooling",
-                    "15 or more years of schooling"
-                )
-            )
-            
-        } else {
-            
-            list(
-                "Todos" = c("Todos"),
-                "Sexo" = c("Homem", "Mulher"),
-                "Faixa Etária" = c(
-                    "Entre 14 e 17 anos",
-                    "Entre 18 e 24 anos",
-                    "Entre 25 e 29 anos",
-                    "Entre 30 e 39 anos",
-                    "Entre 40 e 49 anos",
-                    "Entre 50 e 59 anos",
-                    "60 anos ou mais"
-                ),
-                "Escolaridade" = c(
-                    "Sem instrução",
-                    "1 a 7 anos de estudo",
-                    "8 a 11 anos de estudo",
-                    "9 a 14 anos de estudo",
-                    "15 ou mais anos de estudo"
-                )
-            )
-        }
+
+    # Helper: traduz vetor de valores PT para labels PT ou EN usando categories_df
+    translate_values <- function(filter_id, values, lang_val = "pt") {
+        cats <- categories_df[categories_df$filter_id == filter_id & nzchar(categories_df$value), ]
+        label_col <- if (lang_val == "pt") cats$label_pt else cats$label_en
+        lookup <- setNames(label_col, cats$value)
+        # UFs ficam iguais (sem tradução)
+        translated <- lookup[values]
+        ifelse(is.na(translated), values, translated)
     }
-    
-    filter_choices <- get_filter_choices(df, lang = param$lang)
-    filter_comp_choices <- get_filter_comp_choices(lang = param$lang)
-    
-    
+
     server <- function(input, output, session) {
-        
-        
-        
-        # filtra dados de composicao demografica
-        df_reactived <- reactive({
-            
-            w <- df %>%
-                filter(composicao_demografica == input$filter_composicao_demografica)
-            
-            return(w)
+
+        # Reativo de língua
+        lang <- reactiveVal({
+            query <- parseQueryString(isolate(session$clientData$url_search))
+            if (identical(query[["lang"]], "en")) "en" else "pt"
         })
-        
-        # Função para atualizar url do app com parâmetros dos inputs
+
+        observeEvent(input$toggle_lang, {
+            lang(ifelse(lang() == "pt", "en", "pt"))
+        })
+
+        txt       <- reactive({ param$i18n[[lang()]] })
+        param_tbl <- reactive({ param$tables[[lang()]] })
+
+        # Textos dinâmicos do menu
+        output$plot_name_ui <- renderUI({ h2(class = "plot_name", txt()$plot_name) })
+        output$plot_desc_ui <- renderUI({ p(class  = "plot_desc", txt()$plot_desc) })
+        output$label_var_ui <- renderUI({ p(class  = "vars",      txt()$label_var_name) })
+
+        # Atualiza inputs quando a língua muda
+        observeEvent(lang(), {
+            t   <- txt()
+            tbl <- param_tbl()
+
+            updateSelectInput(session, "y",
+                              label    = t$label_y_name,
+                              choices  = setNames(tbl$var[tbl$y], tbl$label[tbl$y]),
+                              selected = isolate(if (!is.null(input$y)) input$y else param$y_def))
+
+            sel1 <- isolate(input$filter1)
+            sel2 <- isolate(input$filter_composicao_demografica)
+            if (is.null(sel1) || length(sel1) == 0) sel1 <- param$filter_geo_def
+            if (is.null(sel2) || length(sel2) == 0) sel2 <- param$filter_comp_def
+
+            updateSelectizeInput(session, "filter1",
+                                 label    = t$label_geo_name,
+                                 choices  = read_pnadc_choices("region", lang()),
+                                 selected = sel1,
+                                 options  = list(maxItems = 20))
+
+            updateSelectizeInput(session, "filter_composicao_demografica",
+                                 label    = t$label_comp_name,
+                                 choices  = read_pnadc_choices("composicao_demografica", lang()),
+                                 selected = sel2,
+                                 options  = list(maxItems = 5))
+
+            updateActionButton(session, "toggle_lang", label = t$btn_lang)
+        })
+
+        # Inicializa inputs a partir da URL na primeira carga
+        observe({
+            query <- parseQueryString(session$clientData$url_search)
+            t     <- txt()
+
+            sel1 <- if (!is.null(query[["filter"]])) unlist(query[names(query) == "filter"]) else param$filter_geo_def
+            sel2 <- if (!is.null(query[["filter_composicao"]])) query[["filter_composicao"]] else param$filter_comp_def
+            y_sel <- if (!is.null(query[["y"]])) query[["y"]] else param$y_def
+
+            updateSelectInput(session, "y",
+                              choices  = setNames(param$table$var[param$table$y],
+                                                  param$table$label[param$table$y]),
+                              selected = y_sel)
+
+            updateSelectizeInput(session, "filter1",
+                                 label    = t$label_geo_name,
+                                 choices  = read_pnadc_choices("region", lang()),
+                                 selected = sel1,
+                                 options  = list(maxItems = 20))
+
+            updateSelectizeInput(session, "filter_composicao_demografica",
+                                 label    = t$label_comp_name,
+                                 choices  = read_pnadc_choices("composicao_demografica", lang()),
+                                 selected = sel2,
+                                 options  = list(maxItems = 5))
+        })
+
+        # Atualiza URL
         update_my_queryString <- function() {
-            q_string <- paste0(
-                "?", "y=", input$y,
-                "&", "filter_composicao=", input$filter_composicao_demografica
-            )
-            
+            q_string <- paste0("?y=", input$y,
+                               "&filter_composicao=", paste(input$filter_composicao_demografica, collapse = ","))
             for (i in input$filter1) {
-                q_string <- paste0(
-                    q_string,
-                    "&", "filter=", i
-                )
+                q_string <- paste0(q_string, "&filter=", i)
             }
-            
-            
             updateQueryString(q_string, mode = "replace")
         }
-        
-        # Função para atualizar inputs a partir da URL
-        update_my_inputs <- function() {
-            # Preenche filtro vazio
-            updateSelectizeInput(session,
-                                 "filter1",
-                                 choices = filter_choices,
-                                 selected = param$filter_geo_def
-            )
-            updateSelectInput(session,
-                              "filter_composicao_demografica",
-                              choices = filter_comp_choices,
-                              selected = names(filter_comp_choices)[1]
-            )
-            
-            # Pega parametros da url e atribui aos selectinputs
-            query <- parseQueryString(session$clientData$url_search)
-            
-            if (!is.null(query[["y"]])) {
-                updateSelectInput(session, "y",
-                                  choices = param$y_choices,
-                                  selected = query[["y"]]
-                )
-            }
-            
-            if (!is.null(query[["filter_composicao"]])) {
-                updateSelectInput(session, "filter_composicao_demografica",
-                                  choices = filter_comp_choices,
-                                  selected = query[["filter_composicao"]]
-                )
-            }
-            
-            selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-            if (!is.null(query[["filter"]])) {
-                updateSelectizeInput(session,
-                                     "filter1",
-                                     choices = filter_choices,
-                                     selected = selected
-                )
-            }
-            
-        }
-        
-        # Output título do gráfico
+
+        # Dataframe reativo filtrado por composição demográfica
+        df_reactived <- reactive({
+            req(input$filter_composicao_demografica)
+            df %>% dplyr::filter(composicao_demografica %in% input$filter_composicao_demografica)
+        })
+
+        # Título e subtítulo
         output$plot_title <- renderText({
-            text <- " "
-            # Se algum campo estiver vazio retorna texto vazio
-            if (is.null(input$y) || input$y == "") {
-                text <- " "
-            } else {
-                # Monta título a partir de variáveis selecionadas nos inputs
-                y_col <- param$table[which(param$table$var == input$y), ]
-                
-                text <- paste0(y_col$desc)
-            }
-            
-            text
+            req(input$y)
+            tbl <- param_tbl()
+            y_col <- tbl[which(tbl$var == input$y), ]
+            if (nrow(y_col) == 0) return(" ")
+            y_col$desc[1]
         })
+
         output$plot_subtitle <- renderText({
-            # Se algum campo estiver vazio retorna texto vazio
-            if (is.null(input$y) || input$y == "") {
-                text <- "Variável no eixo Y não selecionada"
-            } else {
-                
-                text <- paste0(param$subtitle_init, " ", input$filter_composicao_demografica)
-            }
-            
-            text
+            req(input$y)
+            t    <- txt()
+            comp <- input$filter_composicao_demografica
+            if (is.null(comp) || length(comp) == 0) return(" ")
+            comp_lbl <- translate_values("composicao_demografica", comp, lang())
+            paste0(t$subtitle_init, paste(comp_lbl, collapse = ", "))
         })
-        
-        # Output gráfico
+
+        # Gráfico
         output$plot <- renderPlotly({
-            update_my_queryString() # atualiza url com parametros dos inputs
-            
-            fig <- plotly_empty() # inicia figura com gráfico em branco
-            tryCatch(
-                {
-                    # Se algum campo estiver vazio retorna gráfico vazio
-                    if (is.null(input$y) || input$y == "" ||
-                        is.null(input$filter_composicao_demografica) || 
-                        input$filter_composicao_demografica == "" ||
-                        is.null(input$filter1) || length(input$filter1) < 1) {
-                        fig <- plotly_empty()
-                        stop()
-                    }
-                    
-                    # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-                    # Cria dataframe do gráfico
-                    x_col <- param$table[which(param$table$var == param$x_def), ]
-                    y_col <- param$table[which(param$table$var == input$y), ]
-                    id_col <- param$table[which(param$table$var == param$id_def), ]
-                    color_col <- param$table[which(param$table$var == param$color_def), ]
-                    
-                    # Filtra dataframe com grupos selecionados
-                    df_filtered <- df_reactived()[which(df_reactived()$group %in% input$filter1), ]
-                    
-                    df_p <- data.frame(
-                        df_filtered[x_col$var],
-                        df_filtered[y_col$var],
-                        df_filtered[color_col$var]
-                    )
-                    colnames(df_p) <- c("x", "y", "color")
-                    df_p$group <- df_filtered$group
-                    df_p$text <- df_p$group
-                    
-                    # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-                    df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
-                    
-                    # Se dataset estiver vazio, não monta o gráfico, retorna em branco
-                    if (nrow(df_p) < 1) {
-                        fig <- plotly_empty()
-                        stop()
-                    }
-                    
-                    # Se a coluna de cor for toda NA, preenche com strings em branco
-                    if (all(is.na(df_p$color))) {
-                        df_p$color <- " "
-                    }
-                    
-                    # Monta html do tooltip
-                    df_p$tooltip <- paste0(
-                        "<b>", df_p$text, "</b><br>",
-                        x_col$label, ": ", paste0(year(df_p$x), '-', 'T', quarter(df_p$x)),"<br>",
-                        param$tooltip , paste0(input$filter_composicao_demografica),"<br>",
-                        y_col$label, ": ", format(100*df_p$y, scientific = FALSE,
-                                                  digits = 2,
-                                                  decimal.mark = ",", 
-                                                  big.mark = "."), "%", "<br>"
-                    )
-                    
-                    # Define paleta de cores
-                    pallete <- pallete_discrete
-                    
-                    # Monta gráfico
-                    fig_p <- plot_ly(df_p,
-                                     x = ~x,
-                                     y = ~y,
-                                     color = ~group,
-                                     type = "scatter",
-                                     mode = "lines+markers",
-                                     text = ~tooltip,
-                                     hoverinfo = "text"
-                    )
-                    
-                    # Layout eixos
-                    x_axis_layout <- list(
-                        title = x_col$label,
-                        titlefont = f1,
-                        tickfont = f2,
-                        automargin = FALSE,
-                        autorange = TRUE,
-                        showgrid = FALSE,
-                        zeroline = FALSE
-                    )
-                    y_axis_layout <- list(
-                        title = y_col$label,
-                        titlefont = f1,
-                        tickfont = f2,
-                        tickformat = ".2%",
-                        automargin = FALSE,
-                        autorange = TRUE,
-                        showgrid = FALSE,
-                        zeroline = FALSE
-                    )
-                    
-                    # Layout hover/tooltip
-                    tooltip <- list(
-                        bordercolor = "rgba(255, 255, 255, 1)",
-                        bgopacity = "0.5",
-                        font = f1
-                    )
-                    
-                    # Aplica layout
-                    fig_p <- fig_p %>%
-                        layout(
-                            font = f1,
-                            xaxis = x_axis_layout,
-                            yaxis = y_axis_layout,
-                            showlegend = TRUE,
-                            hoverlabel = tooltip
-                        )
-                    
-                    #  Configura botões do plotly
-                    fig_p <- fig_p %>%
-                        config(
-                            # toImageButtonOptions = list(format = "svg"),
-                            displaylogo = FALSE,
-                            modeBarButtonsToRemove = c(
-                                "lasso2d",
-                                "select2d",
-                                "hoverCompareCartesian"
-                            )
-                        )
-                    
-                    fig <- fig_p # retorna a figura do gráfico
-                },
-                error = function(cond) {
-                    # se encontrar erro retorna fig em branco
-                    print("plot error")
-                    fig <- plotly_empty()
+            update_my_queryString()
+
+            fig <- plotly_empty()
+            tryCatch({
+                req(input$y, input$filter1, input$filter_composicao_demografica)
+                if (length(input$filter1) < 1 || length(input$filter_composicao_demografica) < 1) stop()
+
+                t   <- txt()
+                tbl <- param_tbl()
+
+                x_col     <- tbl[which(tbl$var == param$x_def), ]
+                y_col     <- tbl[which(tbl$var == input$y), ]
+                color_col <- tbl[which(tbl$var == param$color_def), ]
+
+                df_filtered <- df_reactived()[which(df_reactived()$group %in% input$filter1), ]
+
+                if (nrow(df_filtered) < 1) stop()
+
+                df_p <- data.frame(
+                    x     = df_filtered[[x_col$var]],
+                    y     = df_filtered[[y_col$var]],
+                    group = df_filtered$group,
+                    comp  = df_filtered$composicao_demografica
+                )
+
+                # Traduz group e comp para a língua activa
+                lg <- lang()
+                df_p$group_lbl <- translate_values("region",                 df_p$group, lg)
+                df_p$comp_lbl  <- translate_values("composicao_demografica", df_p$comp,  lg)
+
+                # Chave de série: simples quando só 1 composição, composta quando múltiplas
+                df_p$series <- if (length(input$filter_composicao_demografica) == 1) {
+                    df_p$group_lbl
+                } else {
+                    paste(df_p$group_lbl, "·", df_p$comp_lbl)
                 }
-            )
+
+                df_p <- df_p[!is.na(df_p$x) & !is.na(df_p$y), ]
+                if (nrow(df_p) < 1) stop()
+
+                df_p$tooltip <- paste0(
+                    "<b>", df_p$series, "</b><br>",
+                    x_col$label, ": ", paste0(lubridate::year(df_p$x), "-T", lubridate::quarter(df_p$x)), "<br>",
+                    t$tooltip_comp, df_p$comp_lbl, "<br>",
+                    y_col$label, ": ", format(100 * df_p$y,
+                                              scientific  = FALSE,
+                                              digits      = 2,
+                                              decimal.mark = t$dec_mark,
+                                              big.mark    = t$big_mark), "%<br>"
+                )
+
+                fig_p <- plot_ly(df_p,
+                                 x        = ~x,
+                                 y        = ~y,
+                                 color    = ~series,
+                                 type     = "scatter",
+                                 mode     = "lines+markers",
+                                 text     = ~tooltip,
+                                 hoverinfo = "text")
+
+                fig_p <- fig_p %>%
+                    layout(
+                        font  = f1,
+                        xaxis = list(
+                            title     = x_col$label,
+                            titlefont = f1,
+                            tickfont  = f2,
+                            autorange = TRUE,
+                            showgrid  = FALSE,
+                            zeroline  = FALSE
+                        ),
+                        yaxis = list(
+                            title      = y_col$label,
+                            titlefont  = f1,
+                            tickfont   = f2,
+                            tickformat = ".2%",
+                            autorange  = TRUE,
+                            showgrid   = FALSE,
+                            zeroline   = FALSE
+                        ),
+                        showlegend = TRUE,
+                        hoverlabel = list(bordercolor = "rgba(255,255,255,1)", bgopacity = "0.5", font = f1)
+                    ) %>%
+                    config(
+                        displaylogo = FALSE,
+                        modeBarButtonsToRemove = c("lasso2d", "select2d", "hoverCompareCartesian")
+                    )
+
+                fig <- fig_p
+            }, error = function(e) {
+                print(paste("plot error:", e$message))
+            })
             fig
         })
-        
-        # Observa eventos
-        observe({
-            # Pega parametros da url e atribui aos selectinputs
-            query <- parseQueryString(session$clientData$url_search)
-            update_my_inputs()
-        })
     }
-    
-    # Retorna objeto server
+
     server
 }
