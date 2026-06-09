@@ -1,33 +1,78 @@
-# call packages
+################################################################################
+##
+##  PNADC — Script de geração dos datasets do site Data Zoom Amazônia
+##  Fonte: PNAD Contínua Trimestral (IBGE) via pacote datazoom.social
+##
+##  Datasets gerados:
+##    data/ibge_pnadc_trabalho.rds          — mercado de trabalho (demográfico)
+##    data/ibge_pnadc_trabalho_en.rds        — idem, valores em inglês
+##    data/ibge_pnadc_cnae.rds              — por atividade econômica (CNAE)
+##    data/ibge_pnadc_cod.rds               — por ocupação (COD)
+##    data/ibge_pnadc_atividades_ocupacoes.rds — CNAE + COD + setor combinados
+##
+##  ── COMO ATUALIZAR ──────────────────────────────────────────────────────────
+##
+##  !! IMPORTANTE — DEFLATOR:
+##  A PNADC revisa retroativamente os deflatores a cada nova divulgação.
+##  Por isso, a cada atualização é necessário REBAIXAR TODOS os trimestres
+##  (não apenas o mais recente), do contrário as séries históricas ficam
+##  inconsistentes. Não reutilize arquivos .rds de runs anteriores.
+##
+##  Passo a passo:
+##
+##  1. BAIXAR DADOS (Seção 1 abaixo)
+##     - Ajuste `source_path` para uma pasta onde os .rds serão salvos
+##     - Execute o bloco "SEÇÃO 1 — DOWNLOAD" para baixar todos os trimestres
+##     - Isso pode demorar bastante (vários GB de dados brutos)
+##
+##  2. GERAR DATASET DEMOGRÁFICO — ibge_pnadc_trabalho (Seção 2)
+##     - Execute a "SEÇÃO 2 — DATASET DEMOGRÁFICO"
+##     - Gera: ibge_pnadc_trabalho.rds + ibge_pnadc_trabalho_en.rds
+##
+##  3. GERAR DATASETS CNAE/COD/ATIVIDADES (Seção 3)
+##     - Execute a "SEÇÃO 3 — DATASETS CNAE / COD / ATIVIDADES"
+##     - Gera: ibge_pnadc_cnae.rds, ibge_pnadc_cod.rds,
+##             ibge_pnadc_atividades_ocupacoes.rds
+##
+##  OBS:  Execute as seções 2 e 3 de forma independente — elas redefinem
+##  funções com o mesmo nome (describe_brazil etc.) de forma propositada.
+##  Rodar o script inteiro de uma vez também funciona.
+##
+################################################################################
+
+# ── Pacotes ───────────────────────────────────────────────────────────────────
+
 library(tidyverse)
 library(haven)
 library(tibble)
 library(zoo)
 library(tidyr)
 library(magrittr)
+library(datazoom.social)  # instalar do GitHub se não estiver atualizado com devtools::install_github("datazoompuc/datazoom.social")
 
-# make sure it is updated and from github
-library(datazoom.social)
+# ── SEÇÃO 1 — DOWNLOAD ───────────────────────────────────────────────────────
+#
+#  Ajuste o caminho abaixo para onde os arquivos brutos serão salvos.
+#  Execute este bloco UMA VEZ por atualização (demora bastante).
+#
+#  Sempre baixe TODOS os trimestres disponíveis (não só o novo),
+#  pois o deflator é revisado retroativamente a cada divulgação.
 
-#################################################
-## Mercado de Trabalho na Amazônia Legal
-## Ouput data from:
-## github: https://github.com/datazoompuc/datazoom_labour_amazon
-#################################################
+source_path <- "F:/PNADC/load_pnadc DZ"  
 
-# set path to raw data
-#github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
+load_pnadc(save_to = source_path, 2012:2026, raw_data = FALSE, panel = "none")
 
-# PNAD files must be downloaded to the computer
-source <- "F:/PNADC/load_pnadc DZ"
+# Lê a lista de arquivos baixados
+files <- list.files(source_path, pattern = "*.rds", full.names = TRUE)
 
-# only run this if not already downloaded: takes a long time
-# não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
-load_pnadc(save_to = source, 2012:2025, raw_data = FALSE, panel = "none")
 
-# and then all files must be read
-
-files <- list.files(source, pattern = "*.rds", full.names = TRUE)
+# ── SEÇÃO 2 — DATASET DEMOGRÁFICO ────────────────────────────────────────────
+#
+#  Gera ibge_pnadc_trabalho.rds (PT) e ibge_pnadc_trabalho_en.rds (EN).
+#  Recortes: Brasil, regiões, Amazônia Legal, UFs × Todos/Sexo/Faixa etária/Escolaridade.
+#
+#  Para rodar apenas esta seção: execute do aqui até a linha que salva
+#  ibge_pnadc_trabalho_en.rds (e os dicionários CSV).
 
 # function that calculates summary statistics by grouping variable
 
@@ -527,6 +572,19 @@ temp_param_table <- temp_param_table %>%
 
 write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_insercao_dic.csv", fileEncoding = "UTF-8")
 
+
+# ── SEÇÃO 3 — DATASETS CNAE / COD / ATIVIDADES ───────────────────────────────
+#
+#  Gera três arquivos:
+#    ibge_pnadc_atividades_ocupacoes.rds — dataset completo (CNAE + COD + setor)
+#    ibge_pnadc_cnae.rds                 — filtro: id %in% c("All", "CNAE")
+#    ibge_pnadc_cod.rds                  — filtro: id %in% c("All", "COD")
+#
+#  As funções describe_brazil / describe_region / describe_amazon / describe_states
+#  são REDEFINIDAS aqui (versões CNAE/COD). describe_quarter() é reaproveitada
+#  e chamará automaticamente as novas versões.
+#
+#  Para rodar apenas esta seção: execute do aqui até o final do arquivo.
 
 ################
 ## CNAE e COD ##
