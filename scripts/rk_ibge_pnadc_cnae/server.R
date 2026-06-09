@@ -383,6 +383,15 @@ get_server <- function(files, param) {
     }) %>%
       bindCache(input$x, input$filter1, input$filter3)
 
+    output$deflator_notice_ui <- renderUI({
+        last_ano <- max(df$Ano)
+        last_tri <- max(df$Trimestre[df$Ano == last_ano])
+        tags$p(
+            style = "color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 10px; margin-bottom: 4px;",
+            paste0("Valores em R$ de ", last_ano, "-T", last_tri)
+        )
+    })
+
     # Observa eventos
     observe({
       # Pega parametros da url e atribui aos selectinputs

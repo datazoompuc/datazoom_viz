@@ -46,6 +46,8 @@ get_ui <- function(files, param) {
                        margin-bottom: 6px;
                      }
                    ")),
+                   
+                   uiOutput("last_quarter_ui"),
 
                    div(class = "switch-group",
                        uiOutput("label_scale_ui"),

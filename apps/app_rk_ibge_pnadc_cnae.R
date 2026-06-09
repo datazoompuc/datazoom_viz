@@ -34,7 +34,7 @@ param$id_def <- "composicao_demografica" # variável padrão de id
 
 ### Parametros especificos no UI
 param$label_var_name <- "VARIÁVEIS:"
-param$label_x_name <- "eixo horizontal (x)"
+param$label_x_name <- "Eixo horizontal (x)"
 
 param$label_region_name <- "Recorte regional"
 param$label_sector_name <- "Setor"

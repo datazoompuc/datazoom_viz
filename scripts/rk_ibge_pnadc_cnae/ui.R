@@ -37,6 +37,8 @@ get_ui <- function(files, param) {
                        )
                    ),
                    
+                   uiOutput("deflator_notice_ui"),
+                   
                    # Seleciona filtro de municípios
                    selectizeInput(
                        "filter1",
@@ -56,9 +58,10 @@ get_ui <- function(files, param) {
                    ),
                    # espaço vazio
                    div(class = "fakecheckbox", ),
+
                    div(
-                       shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                                           icon = icon("expand"), 
+                       shiny::actionButton(inputId = 'ab1', label = "Fullscreen",
+                                           icon = icon("expand"),
                                            class = "btn-primary",
                                            onclick = paste0("window.open('", param$link, "', '_blank')"))
                    ),
