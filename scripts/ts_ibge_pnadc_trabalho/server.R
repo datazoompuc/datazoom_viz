@@ -118,13 +118,14 @@ get_server <- function(files, param) {
                                  options  = list(maxItems = 5))
         })
 
-        # Atualiza URL
+        # Atualiza URL (preserva lang=en quando activo)
         update_my_queryString <- function() {
             q_string <- paste0("?y=", input$y,
                                "&filter_composicao=", paste(input$filter_composicao_demografica, collapse = ","))
             for (i in input$filter1) {
                 q_string <- paste0(q_string, "&filter=", i)
             }
+            if (lang() == "en") q_string <- paste0(q_string, "&lang=en")
             updateQueryString(q_string, mode = "replace")
         }
 
