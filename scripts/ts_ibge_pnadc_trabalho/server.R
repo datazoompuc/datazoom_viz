@@ -90,29 +90,30 @@ get_server <- function(files, param) {
             updateActionButton(session, "toggle_lang", label = t$btn_lang)
         })
 
-        # Inicializa inputs a partir da URL na primeira carga
+        # Inicializa inputs a partir da URL na primeira carga (isolate evita re-execução ao trocar língua)
         observe({
-            query <- parseQueryString(session$clientData$url_search)
-            t     <- txt()
+            query    <- parseQueryString(session$clientData$url_search)
+            lang_val <- isolate(lang())
+            t        <- param$i18n[[lang_val]]
+            tbl      <- param$tables[[lang_val]]
 
-            sel1 <- if (!is.null(query[["filter"]])) unlist(query[names(query) == "filter"]) else param$filter_geo_def
-            sel2 <- if (!is.null(query[["filter_composicao"]])) query[["filter_composicao"]] else param$filter_comp_def
+            sel1  <- if (!is.null(query[["filter"]])) unlist(query[names(query) == "filter"]) else param$filter_geo_def
+            sel2  <- if (!is.null(query[["filter_composicao"]])) strsplit(query[["filter_composicao"]], ",")[[1]] else param$filter_comp_def
             y_sel <- if (!is.null(query[["y"]])) query[["y"]] else param$y_def
 
             updateSelectInput(session, "y",
-                              choices  = setNames(param$table$var[param$table$y],
-                                                  param$table$label[param$table$y]),
+                              choices  = setNames(tbl$var[tbl$y], tbl$label[tbl$y]),
                               selected = y_sel)
 
             updateSelectizeInput(session, "filter1",
                                  label    = t$label_geo_name,
-                                 choices  = read_pnadc_choices("region", lang()),
+                                 choices  = read_pnadc_choices("region", lang_val),
                                  selected = sel1,
                                  options  = list(maxItems = 20))
 
             updateSelectizeInput(session, "filter_composicao_demografica",
                                  label    = t$label_comp_name,
-                                 choices  = read_pnadc_choices("composicao_demografica", lang()),
+                                 choices  = read_pnadc_choices("composicao_demografica", lang_val),
                                  selected = sel2,
                                  options  = list(maxItems = 5))
         })
