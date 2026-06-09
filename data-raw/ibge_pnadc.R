@@ -5,7 +5,6 @@
 ##
 ##  Datasets gerados:
 ##    data/ibge_pnadc_trabalho.rds          — mercado de trabalho (demográfico)
-##    data/ibge_pnadc_trabalho_en.rds        — idem, valores em inglês
 ##    data/ibge_pnadc_cnae.rds              — por atividade econômica (CNAE)
 ##    data/ibge_pnadc_cod.rds               — por ocupação (COD)
 ##    data/ibge_pnadc_atividades_ocupacoes.rds — CNAE + COD + setor combinados
@@ -27,7 +26,7 @@
 ##
 ##  2. GERAR DATASET DEMOGRÁFICO — ibge_pnadc_trabalho (Seção 2)
 ##     - Execute a "SEÇÃO 2 — DATASET DEMOGRÁFICO"
-##     - Gera: ibge_pnadc_trabalho.rds + ibge_pnadc_trabalho_en.rds
+##     - Gera: ibge_pnadc_trabalho.rds
 ##
 ##  3. GERAR DATASETS CNAE/COD/ATIVIDADES (Seção 3)
 ##     - Execute a "SEÇÃO 3 — DATASETS CNAE / COD / ATIVIDADES"
@@ -68,11 +67,8 @@ files <- list.files(source_path, pattern = "*.rds", full.names = TRUE)
 
 # ── SEÇÃO 2 — DATASET DEMOGRÁFICO ────────────────────────────────────────────
 #
-#  Gera ibge_pnadc_trabalho.rds (PT) e ibge_pnadc_trabalho_en.rds (EN).
+#  Gera ibge_pnadc_trabalho.rds.
 #  Recortes: Brasil, regiões, Amazônia Legal, UFs × Todos/Sexo/Faixa etária/Escolaridade.
-#
-#  Para rodar apenas esta seção: execute do aqui até a linha que salva
-#  ibge_pnadc_trabalho_en.rds (e os dicionários CSV).
 
 # function that calculates summary statistics by grouping variable
 
@@ -379,51 +375,6 @@ dat %<>% mutate(across(where(is.character), enc2utf8))
 
 readr::write_rds(dat, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds", compress = "gz")
 
-## Data in English
-
-dat <- readr::read_rds("ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds")
-
-# 1. Dicionário de tradução com os caracteres exatamente como aparecem na sua base
-traducao <- c(
-    # Geografia e Grupos
-    "Brasil" = "Brazil",
-    "Amaz\u00f4nia Legal" = "Legal Amazon",
-    "Fora da Amaz\u00f4nia Legal" = "Outside Legal Amazon",
-    "Norte" = "North",
-    "Nordeste" = "Northeast",
-    "Sudeste" = "Southeast",
-    "Sul" = "South",
-    "Centro-Oeste" = "Central-West",
-    
-    # Demografia Geral
-    "Todos" = "All",
-    "Homem" = "Male",
-    "Mulher" = "Female",
-    
-    # Faixas Etárias
-    "Entre 14 e 17 anos" = "Between 14 and 17",
-    "Entre 18 e 24 anos" = "Between 18 and 24",
-    "Entre 25 e 29 anos" = "Between 25 and 29",
-    "Entre 30 e 39 anos" = "Between 30 and 39",
-    "Entre 40 e 49 anos" = "Between 40 and 49",
-    "Entre 50 e 59 anos" = "Between 50 and 59",
-    "60 anos ou mais" = "60 or older",
-    
-    # Escolaridade
-    "Sem instru\u00e7\u00e3o" = "No formal education",
-    "1 a 7 anos de estudo" = "1-7 years of schooling",
-    "8 a 11 anos de estudo" = "8-11 years of schooling",
-    "9 a 14 anos de estudo" = "9-14 years of schooling",
-    "15 ou mais anos de estudo" = "15 or more years of schooling"
-)
-
-# 2. Tradução dos valores na base dat
-dat_traduzido <- dat %>%
-    mutate(across(c(group, composicao_demografica, sexo, faixa_idade, faixa_educ, regiao, legal_amazon),
-                  ~ recode(., !!!traducao)))
-
-readr::write_rds(dat_traduzido, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_en.rds", compress = "gz")
-
 ############################
 ## Dictionary -- Trabalho ##
 ############################
@@ -474,103 +425,6 @@ temp_param_table <- temp_param_table %>%
     )
 
 write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic.csv", fileEncoding = "UTF-8")
-
-## English dictionary
-
-temp_param_table <- tibble::tibble(
-    var = c("group", "composicao_demografica", "time",
-            "taxa_participacao", "taxa_ocupacao",
-            "taxa_desemprego", "taxa_informalidade",
-            "taxa_desalento", "taxa_nem_nem"),
-    x = TRUE,
-    y = FALSE,
-    color = TRUE,
-    label = NA,
-    desc = NA,
-    var_group = "IBGE - Continuous PNAD",
-    categoria = "Economia",
-    subcategoria = "Mercado de Trabalho"
-)
-
-temp_param_table <- temp_param_table %>%
-    mutate(
-        y = ifelse(
-            stringr::str_detect(var, "taxa"), TRUE, FALSE
-        ),
-        label = dplyr::case_match(
-            var,
-            "group" ~ "Region",
-            "composicao_demografica" ~ "Demographic Group",
-            "time" ~ "Year - Quarter",
-            "taxa_participacao" ~ "Participation Rate",
-            "taxa_ocupacao" ~ "Occupation Rate",
-            "taxa_desemprego" ~ "Unemployment Rate",
-            "taxa_informalidade" ~ "Informality Rate",
-            "taxa_desalento" ~ "Discouraged Rate",
-            "taxa_nem_nem" ~ "NEET Rate"
-        ),
-        desc = label,
-        desc = case_match(
-            var,
-            "taxa_participacao" ~ "Participation Rate over the working age population",
-            "taxa_ocupacao" ~ "Occupation Rate over the working age population",
-            "taxa_desemprego" ~ "Unemployment Rate over the Workforce",
-            "taxa_informalidade" ~ "Informality Rate over the Occupied",
-            "taxa_desalento" ~ "Discouraged Rate over the working age population",
-            "taxa_nem_nem" ~ "NEET Rate over the working age population",
-            .default = desc
-        )
-    )
-
-write.csv(temp_param_table, file = "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
-
-############################
-## Dictionary -- Insercao ##
-############################
-
-temp_param_table <- tibble::tibble(
-    var = c("group", "composicao_demografica", "time",
-            "prop_empregado_sc", "prop_informal",
-            "prop_empregado_cc", "prop_conta_propria", "prop_conta_propria_contrib",
-            "prop_conta_propria_nao_contrib", "prop_empregador",
-            "prop_militar_estatutario", "prop_home_office"),
-    x = TRUE,
-    y = FALSE,
-    color = TRUE,
-    label = NA,
-    desc = NA,
-    var_group = "IBGE - PNAD Cont\u00ednua",
-    categoria = "Economia",
-    subcategoria = "Mercado de Trabalho"
-)
-
-temp_param_table <- temp_param_table %>%
-    mutate(
-        y = ifelse(
-            stringr::str_detect(var, "prop"), TRUE, FALSE
-        ),
-        label = dplyr::case_match(
-            var,
-            "group" ~ "Região",
-            "composicao_demografica" ~ "Composição Demográfica",
-            "time" ~ "Ano - Trimestre",
-            "prop_empregado_sc" ~ "Proporção de Empregados Sem Carteira",
-            "prop_empregado_cc" ~ "Proporção de Empregados Com Carteira",
-            "prop_conta_propria" ~ "Proporção de Conta-Própria",
-            "prop_conta_propria_contrib" ~ "Proporção de Conta-Própria Contribuintes",
-            "prop_conta_propria_nao_contrib" ~ "Proporção de Conta-Própria Não-Contribuintes",
-            "prop_empregador" ~ "Proporção de Empregadores",
-            "prop_militar_estatutario" ~ "Proporção de Militares e Estatutários",
-            "prop_home_office" ~ "Proporção de Home Office",
-            "prop_informal" ~ "Proporção de Informais"
-        ),
-        desc = label,
-        desc = ifelse(
-            stringr::str_detect(var, "prop"), paste(label, "entre Total de Ocupados"), desc
-        )
-    )
-
-write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_insercao_dic.csv", fileEncoding = "UTF-8")
 
 
 # ── SEÇÃO 3 — DATASETS CNAE / COD / ATIVIDADES ───────────────────────────────
