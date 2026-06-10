@@ -9,10 +9,11 @@ f1 <- list(family = "Roboto", size = 14, color = "rgb(0, 0, 0)")
 f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 get_server <- function(files, param) {
-    server <- function(input, output, session) {
 
-        df <- readRDS(files$db_file) %>%
-            dplyr::filter(id != "All")
+    df <- readRDS(files$db_file) %>%
+        dplyr::filter(id != "All")
+
+    server <- function(input, output, session) {
 
         update_my_queryString <- function() {
             q_string <- paste0("?x=", input$x, "&filter2=", input$filter2)
