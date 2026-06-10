@@ -5,8 +5,6 @@
 ##
 ##  Datasets gerados:
 ##    data/ibge_pnadc_trabalho.rds          — mercado de trabalho (demográfico)
-##    data/ibge_pnadc_cnae.rds              — por atividade econômica (CNAE)
-##    data/ibge_pnadc_cod.rds               — por ocupação (COD)
 ##    data/ibge_pnadc_atividades_ocupacoes.rds — CNAE + COD + setor combinados
 ##
 ##  ── COMO ATUALIZAR ──────────────────────────────────────────────────────────
@@ -30,8 +28,7 @@
 ##
 ##  3. GERAR DATASETS CNAE/COD/ATIVIDADES (Seção 3)
 ##     - Execute a "SEÇÃO 3 — DATASETS CNAE / COD / ATIVIDADES"
-##     - Gera: ibge_pnadc_cnae.rds, ibge_pnadc_cod.rds,
-##             ibge_pnadc_atividades_ocupacoes.rds
+##     - Gera: ibge_pnadc_atividades_ocupacoes.rds
 ##
 ##  OBS:  Execute as seções 2 e 3 de forma independente — elas redefinem
 ##  funções com o mesmo nome (describe_brazil etc.) de forma propositada.
@@ -684,120 +681,3 @@ dat <- dat %>%
 
 readr::write_rds(dat, "data/ibge_pnadc_atividades_ocupacoes.rds", compress = "gz")
 
-# saving data files
-
-dat_cnae <- dat %>%
-    filter(id %in% c("All", "CNAE")) %>%
-    select(-id)
-
-readr::write_rds(dat_cnae, "data/ibge_pnadc_cnae.rds", compress = "gz")
-
-dat_cod <- dat %>%
-    filter(id %in% c("All", "COD")) %>%
-    select(-id)
-
-readr::write_rds(dat_cod, "data/ibge_pnadc_cod.rds", compress = "gz")
-
-##############################
-## Dictionary -- CNAE e COD ##
-##############################
-
-## CNAE
-
-temp_param_table <- tibble::tibble(
-    var = c("group", "setor", "composicao_demografica", "time",
-            "ocupado", "rendimento_medio", "massa_salarial"),
-    x = TRUE,
-    y = FALSE,
-    color = TRUE,
-    label = NA,
-    desc = NA,
-    var_group = "IBGE - PNAD Cont\u00ednua",
-    categoria = "Economia",
-    subcategoria = "Mercado de Trabalho"
-)
-
-temp_param_table <- temp_param_table %>%
-    mutate(
-        y = ifelse(
-            var %in% c("ocupado", "rendimento_medio", "massa_salarial"), TRUE, FALSE
-        ),
-        label = dplyr::case_match(
-            var,
-            "group" ~ "Região",
-            "setor" ~ "Setor",
-            "composicao_demografica" ~ "Atividade Econômica",
-            "time" ~ "Ano - Trimestre",
-            "ocupado" ~ "Número de ocupados",
-            "rendimento_medio" ~ "Rendimento Médio",
-            "massa_salarial" ~ "Massa Salarial"
-        ),
-        desc = label,
-        desc = case_match(
-            var,
-            "composicao_demografica" ~ "Atividade Econômica - Código CNAE",
-            "rendimento_medio" ~ "Rendimento Habitual Médio Real",
-            .default = desc
-        )
-    )
-
-write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_dic.csv", fileEncoding = "UTF-8")
-
-temp_param_table <- temp_param_table %>%
-    mutate(slider = c(F,F,F,T,F,F,F)) %>%
-    mutate(x = y, y = FALSE)
-
-write.csv(temp_param_table, file = "data/ibge_pnadc_cnae_rk_dic.csv", fileEncoding = "UTF-8")
-
-## COD
-
-temp_param_table <- tibble::tibble(
-    var = c("group", "setor", "composicao_demografica", "time",
-            "ocupado", "rendimento_medio", "massa_salarial"),
-    x = TRUE,
-    y = FALSE,
-    color = TRUE,
-    label = NA,
-    desc = NA,
-    var_group = "IBGE - PNAD Cont\u00ednua",
-    categoria = "Economia",
-    subcategoria = "Mercado de Trabalho"
-)
-
-temp_param_table <- temp_param_table %>%
-    mutate(
-        y = ifelse(
-            var %in% c("ocupado", "rendimento_medio", "massa_salarial"), TRUE, FALSE
-        ),
-        label = dplyr::case_match(
-            var,
-            "group" ~ "Região",
-            "setor" ~ "Setor",
-            "composicao_demografica" ~ "Atividade Econômica",
-            "time" ~ "Ano - Trimestre",
-            "ocupado" ~ "Número de ocupados",
-            "rendimento_medio" ~ "Rendimento Médio",
-            "massa_salarial" ~ "Massa Salarial"
-        ),
-        desc = label,
-        desc = case_match(
-            var,
-            "composicao_demografica" ~ "Atividade Econômica - Código CNAE",
-            "rendimento_medio" ~ "Rendimento Habitual Médio Real",
-            .default = desc
-        )
-    )
-
-temp_param_table <- temp_param_table %>%
-    mutate(
-        label = ifelse(var == "composicao_demografica", "Tipo de Ocupação", label),
-        desc = ifelse(var == "composicao_demografica", "Ocupação - Código COD", desc)
-    )
-
-write.csv(temp_param_table, file = "data/ibge_pnadc_cod_dic.csv", fileEncoding = "UTF-8")
-
-temp_param_table <- temp_param_table %>%
-    mutate(slider = c(F,F,F,T,F,F,F)) %>%
-    mutate(x = y, y = FALSE)
-
-write.csv(temp_param_table, file = "data/ibge_pnadc_cod_rk_dic.csv", fileEncoding = "UTF-8")
