@@ -13,68 +13,154 @@ get_server <- function(files, param) {
     df <- readRDS(files$db_file) %>%
         dplyr::filter(id != "All")
 
+    categories_df <- read.csv(
+        files$categories_file, sep = ";",
+        stringsAsFactors = FALSE, fileEncoding = "UTF-8"
+    )
+
+    translate_values <- function(filter_id, values, lang_val = "pt") {
+        cats      <- categories_df[categories_df$filter_id == filter_id & nzchar(categories_df$value), ]
+        label_col <- if (lang_val == "pt") cats$label_pt else cats$label_en
+        lookup    <- setNames(label_col, cats$value)
+        translated <- lookup[values]
+        ifelse(is.na(translated), values, translated)
+    }
+
+    read_pnadc_choices <- function(filter_id, lang_val = "pt") {
+        cats <- categories_df[categories_df$filter_id == filter_id & nzchar(categories_df$value), ]
+        cats <- cats[order(cats$ord_group, cats$ord_item), ]
+        out  <- list()
+        for (g_pt in unique(cats$group_pt)) {
+            items   <- cats[cats$group_pt == g_pt, ]
+            if (g_pt == "UF") items <- items[order(items$value), ]
+            g_label        <- if (lang_val == "pt") items$group_pt[1] else items$group_en[1]
+            labels         <- if (g_pt == "UF") items$value else if (lang_val == "pt") items$label_pt else items$label_en
+            out[[g_label]] <- as.list(setNames(items$value, labels))
+        }
+        out
+    }
+
     server <- function(input, output, session) {
 
+        # Reativo de língua
+        lang <- reactiveVal({
+            query <- parseQueryString(isolate(session$clientData$url_search))
+            if (identical(query[["lang"]], "en")) "en" else "pt"
+        })
+
+        observeEvent(input$toggle_lang, {
+            lang(ifelse(lang() == "pt", "en", "pt"))
+        })
+
+        txt       <- reactive({ param$i18n[[lang()]] })
+        param_tbl <- reactive({ param$tables[[lang()]] })
+
+        # Textos dinâmicos do menu
+        output$plot_name_ui <- renderUI({ h2(class = "plot_name", txt()$plot_name) })
+        output$plot_desc_ui <- renderUI({ p(class  = "plot_desc", txt()$plot_desc) })
+        output$label_var_ui <- renderUI({ p(class  = "vars",      txt()$label_var_name) })
+
+        output$deflator_notice_ui <- renderUI({
+            last_ano <- max(df$Ano)
+            last_tri <- max(df$Trimestre[df$Ano == last_ano])
+            notice <- if (lang() == "pt")
+                paste0("Valores em R$ de ", last_ano, "-T", last_tri)
+            else
+                paste0("Values in ", last_ano, "-Q", last_tri, " BRL")
+            tags$p(
+                style = "color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 10px; margin-bottom: 4px;",
+                notice
+            )
+        })
+
+        # Atualiza inputs quando a língua muda
+        observeEvent(lang(), {
+            t   <- txt()
+            tbl <- param_tbl()
+
+            updateSelectInput(session, "x",
+                              label    = t$label_x_name,
+                              choices  = setNames(tbl$var[tbl$x], tbl$label[tbl$x]),
+                              selected = isolate(if (!is.null(input$x)) input$x else param$x_def))
+
+            sel1 <- isolate(input$filter1)
+            sel3 <- isolate(input$filter3)
+            sel2 <- isolate(input$filter2)
+            if (is.null(sel1) || !nzchar(sel1)) sel1 <- param$group_def
+            if (is.null(sel3) || !nzchar(sel3)) sel3 <- param$sector_def
+
+            type_choices <- setNames(list("CNAE", "COD"), c(t$type_cnae, t$type_cod))
+            updateSelectInput(session, "filter2",
+                              label    = t$label_type_name,
+                              choices  = type_choices,
+                              selected = if (!is.null(sel2)) sel2 else param$type_def)
+
+            updateSelectizeInput(session, "filter1",
+                                 label    = t$label_region_name,
+                                 choices  = read_pnadc_choices("region", lang()),
+                                 selected = sel1)
+
+            updateSelectizeInput(session, "filter3",
+                                 label    = t$label_sector_name,
+                                 choices  = read_pnadc_choices("sector", lang()),
+                                 selected = sel3)
+
+            updateActionButton(session, "toggle_lang", label = t$btn_lang)
+        })
+
+        # Inicializa inputs a partir da URL na primeira carga
+        observe({
+            query    <- parseQueryString(session$clientData$url_search)
+            lang_val <- isolate(lang())
+            t        <- param$i18n[[lang_val]]
+            tbl      <- param$tables[[lang_val]]
+
+            x_sel <- if (!is.null(query[["x"]])) query[["x"]] else param$x_def
+            sel2  <- if (!is.null(query[["filter2"]])) query[["filter2"]] else param$type_def
+            sel1  <- if (!is.null(query[["filter"]])) unlist(query[names(query) == "filter"]) else param$group_def
+            sel3  <- if (!is.null(query[["filter3"]])) unlist(query[names(query) == "filter3"]) else param$sector_def
+
+            updateSelectInput(session, "x",
+                              choices  = setNames(tbl$var[tbl$x], tbl$label[tbl$x]),
+                              selected = x_sel)
+
+            type_choices <- setNames(list("CNAE", "COD"), c(t$type_cnae, t$type_cod))
+            updateSelectInput(session, "filter2",
+                              label    = t$label_type_name,
+                              choices  = type_choices,
+                              selected = sel2)
+
+            updateSelectizeInput(session, "filter1",
+                                 label    = t$label_region_name,
+                                 choices  = read_pnadc_choices("region", lang_val),
+                                 selected = sel1)
+
+            updateSelectizeInput(session, "filter3",
+                                 label    = t$label_sector_name,
+                                 choices  = read_pnadc_choices("sector", lang_val),
+                                 selected = sel3)
+        })
+
+        # Atualiza URL (preserva lang=en quando activo)
         update_my_queryString <- function() {
-            q_string <- paste0("?x=", input$x, "&filter2=", input$filter2)
-            for (i in input$filter1) {
-                q_string <- paste0(q_string, "&filter=", i)
-            }
-            for (k in input$filter3) {
-                q_string <- paste0(q_string, "&filter3=", k)
-            }
+            q_string <- paste0("?x=", input$x, "&filter2=", input$filter2,
+                               "&filter=", input$filter1,
+                               "&filter3=", input$filter3)
+            if (lang() == "en") q_string <- paste0(q_string, "&lang=en")
             updateQueryString(q_string, mode = "replace")
         }
 
-        update_my_inputs <- function() {
-            updateSelectInput(session, "filter2",
-                              choices  = param$type_choices,
-                              selected = param$type_def)
-            updateSelectInput(session, "filter1",
-                              choices  = param$filter_choices,
-                              selected = param$group_def)
-            updateSelectInput(session, "filter3",
-                              choices  = param$sector_choices,
-                              selected = param$sector_def)
-
-            query <- parseQueryString(session$clientData$url_search)
-
-            if (!is.null(query[["x"]])) {
-                updateSelectInput(session, "x",
-                                  choices  = param$x_choices,
-                                  selected = query[["x"]])
-            }
-
-            if (!is.null(query[["filter2"]])) {
-                updateSelectInput(session, "filter2",
-                                  choices  = param$type_choices,
-                                  selected = query[["filter2"]])
-            }
-
-            selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-            if (!is.null(query[["filter"]])) {
-                updateSelectInput(session, "filter1",
-                                  choices  = param$filter_choices,
-                                  selected = selected)
-            }
-
-            selected3 <- unlist(query[names(query) == "filter3"], use.names = FALSE)
-            if (!is.null(query[["filter3"]])) {
-                updateSelectInput(session, "filter3",
-                                  choices  = param$sector_choices,
-                                  selected = selected3)
-            }
-        }
-
         output$plot_title <- renderText({
-            if (is.null(input$x) || input$x == "") return(param$novar)
-            x_col <- param$table[which(param$table$var == input$x), ]
-            paste0(param$title_init, " ", x_col$label)
+            if (is.null(input$x) || input$x == "") return(" ")
+            tbl   <- param_tbl()
+            x_col <- tbl[which(tbl$var == input$x), ]
+            paste0(txt()$title_init, " ", x_col$label)
         })
 
         output$plot_subtitle <- renderText({
             if (is.null(input$x) || input$x == "") return(" ")
-            if (is.null(input$filter2) || input$filter2 == "CNAE") param$subtitle_cnae else param$subtitle_cod
+            t <- txt()
+            if (is.null(input$filter2) || input$filter2 == "CNAE") t$subtitle_cnae else t$subtitle_cod
         })
 
         output$plot <- renderPlotly({
@@ -85,11 +171,14 @@ get_server <- function(files, param) {
                 if (is.null(input$x) || input$x == "") stop()
                 req(input$filter1, input$filter2, input$filter3)
 
-                x_col      <- param$table[which(param$table$var == input$x), ]
-                color_col  <- param$table[which(param$table$var == param$color_def), ]
-                slider_col <- param$table[which(param$table$var == param$slider_def), ]
-                text_col   <- param$table[which(param$table$var == param$text_def), ]
-                id_col     <- param$table[which(param$table$var == param$id_def), ]
+                t   <- txt()
+                tbl <- param_tbl()
+
+                x_col      <- tbl[which(tbl$var == input$x), ]
+                color_col  <- tbl[which(tbl$var == param$color_def), ]
+                slider_col <- tbl[which(tbl$var == param$slider_def), ]
+                text_col   <- tbl[which(tbl$var == param$text_def), ]
+                id_col     <- tbl[which(tbl$var == param$id_def), ]
 
                 y_col <- list(var = "rank", label = "Ranking")
 
@@ -108,6 +197,11 @@ get_server <- function(files, param) {
                     df_filtered[id_col$var]
                 )
                 colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
+
+                # Traduz labels das barras via pnadc_categories.csv
+                fid <- tolower(input$filter2)  # "cnae" ou "cod"
+                df_p$text  <- translate_values(fid, df_p$text,  lang())
+                df_p$color <- translate_values(fid, df_p$color, lang())
 
                 df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
                 if (nrow(df_p) < 1) stop()
@@ -132,8 +226,8 @@ get_server <- function(files, param) {
                     x_col$label, ": ", format(df_p$x,
                                               scientific   = FALSE,
                                               digits       = 2,
-                                              decimal.mark = ",",
-                                              big.mark     = "."), "<br>",
+                                              decimal.mark = t$dec_mark,
+                                              big.mark     = t$big_mark), "<br>",
                     y_col$label, ": ", df_p$y, "<br>",
                     color_col$label, ": ", df_p$color
                 )
@@ -164,8 +258,10 @@ get_server <- function(files, param) {
                     hoverinfo = "none", textfont = f1, textposition = "middle right")
 
                 if (length(unique(df_p$slider)) > 1) {
-                    fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = "Ano: ", font = f1))
-                    fig_p <- fig_p %>% animation_button(label = "Play")
+                    fig_p <- fig_p %>%
+                        animation_slider(currentvalue = list(prefix = t$slider_prefix, font = f1)) %>%
+                        animation_button(label = "Play")
+
                     fig_p$x$layout$updatemenus <- list(list(
                         type = "buttons", direction = "right", showactive = FALSE,
                         x = 0, y = 0, xanchor = "top", yanchor = "right",
@@ -182,6 +278,7 @@ get_server <- function(files, param) {
                                                           frame = list(redraw = FALSE, duration = 0))))
                         )
                     ))
+
                     first_frame <- min(df_p$slider)
                     last_frame  <- max(df_p$slider)
                     fig_p <- fig_p %>% onRender("
@@ -215,21 +312,8 @@ get_server <- function(files, param) {
             })
             fig
         }) %>%
-            bindCache(input$x, input$filter1, input$filter2, input$filter3)
+            bindCache(input$x, input$filter1, input$filter2, input$filter3, lang())
 
-        output$deflator_notice_ui <- renderUI({
-            last_ano <- max(df$Ano)
-            last_tri <- max(df$Trimestre[df$Ano == last_ano])
-            tags$p(
-                style = "color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 10px; margin-bottom: 4px;",
-                paste0("Valores em R$ de ", last_ano, "-T", last_tri)
-            )
-        })
-
-        observe({
-            query <- parseQueryString(session$clientData$url_search)
-            update_my_inputs()
-        })
     }
 
     server

@@ -9,24 +9,25 @@ get_ui <- function(files, param) {
             column(3,
                    class = "menucol",
 
-                   tags$style('.menucol {
-                        background-color: #3E688B;
-                   }'),
-                   tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
-                        background-color: #3E5688 !important;
-                        border-color: #3E5688 !important;
-                   }'),
+                   tags$style('
+                     .menucol { background-color: #3E688B; }
+                     .btn-primary, .btn-primary:hover,
+                     .btn-primary:active, .btn-primary:visited {
+                       background-color: #3E5688 !important;
+                       border-color: #3E5688 !important;
+                     }
+                   '),
 
-                   h2(class = "plot_name", param$plot_name),
-                   p(class  = "plot_desc", param$plot_desc),
+                   uiOutput("plot_name_ui"),
+                   uiOutput("plot_desc_ui"),
                    hr(),
-                   p(class  = "vars", param$label_var_name),
+                   uiOutput("label_var_ui"),
 
                    div(
                        class = "var_selec_group",
                        selectInput(
                            inputId  = "x",
-                           label    = param$label_x_name,
+                           label    = param$i18n$pt$label_x_name,
                            choices  = param$x_choices,
                            selected = param$x_def,
                            width    = "100%"
@@ -37,29 +38,39 @@ get_ui <- function(files, param) {
 
                    selectInput(
                        inputId  = "filter2",
-                       label    = param$label_type_name,
-                       choices  = param$type_choices,
+                       label    = param$i18n$pt$label_type_name,
+                       choices  = list(
+                           param$i18n$pt$type_cnae,
+                           param$i18n$pt$type_cod
+                       ),
                        selected = param$type_def,
                        width    = "100%"
                    ),
 
                    selectizeInput(
                        "filter1",
-                       param$label_region_name,
-                       choices  = param$filter_choices,
+                       param$i18n$pt$label_region_name,
+                       choices  = NULL,
                        width    = "100%",
                        selected = param$group_def
                    ),
 
                    selectizeInput(
                        "filter3",
-                       param$label_sector_name,
-                       choices  = param$sector_choices,
+                       param$i18n$pt$label_sector_name,
+                       choices  = NULL,
                        width    = "100%",
                        selected = param$sector_def
                    ),
 
                    div(class = "fakecheckbox"),
+
+                   div(actionButton(
+                       "toggle_lang",
+                       label = "English",
+                       icon  = icon("globe"),
+                       class = "btn-primary"
+                   ),
 
                    shiny::actionButton(
                        inputId = "ab1",
@@ -67,7 +78,7 @@ get_ui <- function(files, param) {
                        icon    = icon("expand"),
                        class   = "btn-primary",
                        onclick = paste0("window.open('", param$link, "', '_blank')")
-                   )
+                   ))
             ),
             column(9,
                    class = "plotcol h-100",
