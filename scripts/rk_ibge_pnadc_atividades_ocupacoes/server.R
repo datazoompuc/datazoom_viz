@@ -203,6 +203,11 @@ get_server <- function(files, param) {
                 df_p$text  <- translate_values(fid, df_p$text,  lang())
                 df_p$color <- translate_values(fid, df_p$color, lang())
 
+                # Formata slider como "2025-T1" / "2025-Q1"
+                q_sep <- if (lang() == "pt") "-T" else "-Q"
+                df_p$slider <- paste0(lubridate::year(df_p$slider), q_sep,
+                                      lubridate::quarter(df_p$slider))
+
                 df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
                 if (nrow(df_p) < 1) stop()
 
@@ -259,7 +264,7 @@ get_server <- function(files, param) {
 
                 if (length(unique(df_p$slider)) > 1) {
                     fig_p <- fig_p %>%
-                        animation_slider(currentvalue = list(prefix = t$slider_prefix, font = f1)) %>%
+                        animation_slider(currentvalue = list(prefix = "", font = f1)) %>%
                         animation_button(label = "Play")
 
                     fig_p$x$layout$updatemenus <- list(list(
