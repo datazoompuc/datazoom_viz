@@ -32,7 +32,7 @@ get_server <- function(files, param) {
                               selected = param$type_def)
             updateSelectInput(session, "filter1",
                               choices  = param$filter_choices,
-                              selected = c("Amazônia Legal", "Brasil"))
+                              selected = param$group_def)
             updateSelectInput(session, "filter3",
                               choices  = param$sector_choices,
                               selected = param$sector_def)
