@@ -29,7 +29,7 @@ Para inputs com múltiplas opções (ex: escolha de variável), continue usando 
 
 | Antes (checkboxInput) | Depois (materialSwitch) |
 |---|---|
-| ![Checkboxes antigos](docs/imgs/before_checkbox.png) | ![Material switches](docs/imgs/after_switch.png) |
+| ![Checkboxes antigos](../../../docs/imgs/before_checkbox.png) | ![Material switches](../../../docs/imgs/after_switch.png) |
 
 ### Passo a passo
 
@@ -265,7 +265,7 @@ p(class = "vars", textOutput("label_var_name", inline = TRUE)),
 
 O resultado final fica assim na sidebar:
 
-![Botões Fullscreen e English](docs/imgs/lang_toggle_button.png)
+![Botões Fullscreen e English](../../../docs/imgs/lang_toggle_button.png)
 
 #### 3.3 — No `server.R`
 
