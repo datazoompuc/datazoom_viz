@@ -11,7 +11,10 @@ All the apps are listed in this sheet. (https://docs.google.com/spreadsheets/d/1
 
 ## Documentation
 
-- [Tutorial: Novo UI — Material Switch, Spinner e Lang Toggle](tutorial_novo_ui.md)
+The repository knowledge base lives in the [`.claude/skills/datazoom_viz/`](.claude/skills/datazoom_viz/) Claude skill:
+
+- [SKILL.md](.claude/skills/datazoom_viz/SKILL.md) — full repository reference (structure, app flow, UI standard, config files, deploy, GitHub Actions, datasets).
+- [Tutorial: Novo UI — Material Switch, Spinner e Lang Toggle](.claude/skills/datazoom_viz/tutorial_novo_ui.md)
 
 App updates are being monitored in this [sheet](https://docs.google.com/spreadsheets/d/1RqOPwqaO94Vxb1_Sfo8moB4tnXTqcIKHYk2YtjVpW2c/edit?gid=1651483482#gid=1651483482).
 
