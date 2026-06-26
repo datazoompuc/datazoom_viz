@@ -18,10 +18,10 @@ get_server <- function(files, param) {
   
   # --- auxiliar: CO_SH4 -> label --
   aux_sh4 <- readRDS(files$aux_file)
-  stopifnot(all(c("CO_SH4", "NO_POR_MIN") %in% names(aux_sh4)))
-  
+  stopifnot(all(c("CO_SH4", "NO_SH4_PT") %in% names(aux_sh4)))
+
   aux_sh4$CO_SH4 <- sprintf("%04d", as.numeric(aux_sh4$CO_SH4))
-  map_nome <- stats::setNames(aux_sh4$NO_POR_MIN, aux_sh4$CO_SH4)
+  map_nome <- stats::setNames(aux_sh4$NO_SH4_PT, aux_sh4$CO_SH4)
   
   # colunas de produto
   prod_codes <- setdiff(names(df), c("time", "group"))
