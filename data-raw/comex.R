@@ -1,5 +1,5 @@
 ############################################################
-#### Generate rds data in the folder ./data/ 
+#### Generate rds data in the folder ./data/
 ############################################################
 
 library(datazoom.amazonia)
@@ -9,7 +9,7 @@ library(stringr)
 library(httr)
 library(jsonlite)
 
-dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2024, raw_data = FALSE)
+dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2025, raw_data = FALSE)
 
 dat <- inner_join(
     dat,
@@ -22,11 +22,12 @@ dat <- inner_join(
 saveRDS(dat, file = "data/comex_munic_raw.rds")
 dat <- readRDS(file = "data/comex_munic_raw.rds")
 
-# -------------------------------
+# ================================================================
 # AUXILIARES
-# -------------------------------
+# ================================================================
 
-# gera auxiliar de código de país
+# --- Países (aux1) ---
+# API MDIC: nomes em PT e EN para o mapa de tradução e para o dataset tot_pais/pais_sec/sec_pais
 url <- "https://api-comexstat.mdic.gov.br/general/filters/country?language=pt"
 resp <- GET(url)
 stop_for_status(resp)
@@ -45,7 +46,7 @@ aux1 <- as_tibble(d) %>%
     ) %>%
     distinct(SISCOMEX, .keep_all = TRUE)
 
-# nomes de país em inglês (mesma API, language=en) para gerar os dicionários EN
+# nomes em inglês (mesma API, language=en) para gerar os dicionários EN sem tradução manual
 resp_en <- GET("https://api-comexstat.mdic.gov.br/general/filters/country?language=en")
 stop_for_status(resp_en)
 d_en <- fromJSON(content(resp_en, as = "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)$data
@@ -63,13 +64,10 @@ saveRDS(aux1, "data/auxiliar_cod_pais.rds")
 aux1 <- readRDS("data/auxiliar_cod_pais.rds")
 
 
-# gera auxiliar de cod sh4 (com capítulo SH2 e seção SEC)
-#
-# Fonte: tabela de referência NCM_SH do MDIC, que traz a hierarquia completa
-#
-# Os blocos abaixo usam aux2$NO_SH2_PT (nome do capítulo) e aux2$NO_SEC_PT (nome da seção)
-# para agregar os produtos; por isso este auxiliar PRECISA dessas colunas. As colunas *_EN
-# (inglês) ficam disponíveis para gerar os dicionários EN diretamente, sem traduções manuais.
+# --- Hierarquia de produto (aux2) ---
+# Fonte: NCM_SH.csv do MDIC — hierarquia completa SH4 → SH2 → SEC em PT e EN.
+# Os blocos de dados usam NO_SH2_PT e NO_SEC_PT para agregar; as colunas *_EN
+# servem para gerar os dicionários EN direto da fonte, sem traduções manuais.
 ncm_sh <- readr::read_csv2(
     "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv",
     locale = readr::locale(encoding = "latin1"),
@@ -79,20 +77,20 @@ ncm_sh <- readr::read_csv2(
 aux2 <- ncm_sh %>%
     transmute(
         CO_SH4    = str_pad(as.character(CO_SH4), 4, pad = "0"),
-        NO_SH4_PT = str_trim(NO_SH4_POR),   # nome da posição (SH4) em PT
-        NO_SH2_PT = str_trim(NO_SH2_POR),   # nome do capítulo (SH2) em PT
-        NO_SEC_PT = str_trim(NO_SEC_POR),   # nome da seção (SEC) em PT
-        NO_SH4_EN = str_trim(NO_SH4_ING),   # versões em inglês (para dicionários EN)
+        NO_SH4_PT = str_trim(NO_SH4_POR),   # posição (SH4) em PT
+        NO_SH2_PT = str_trim(NO_SH2_POR),   # capítulo (SH2) em PT
+        NO_SEC_PT = str_trim(NO_SEC_POR),   # seção (SEC) em PT
+        NO_SH4_EN = str_trim(NO_SH4_ING),   # versões em inglês
         NO_SH2_EN = str_trim(NO_SH2_ING),
         NO_SEC_EN = str_trim(NO_SEC_ING)
     ) %>%
     distinct(CO_SH4, .keep_all = TRUE)
 saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
 
-
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
 
-# gera auxiliar de código de município
+
+# --- Municípios (aux3) ---
 url <- "https://api-comexstat.mdic.gov.br/cities/filters/city?language=pt"
 resp <- GET(url)
 stop_for_status(resp)
@@ -114,10 +112,9 @@ saveRDS(aux3, "data/auxiliar_cod_municipais.rds")
 
 aux3 <- readRDS("data/auxiliar_cod_municipais.rds")
 
-# -------------------------------
-# MAPAS PT -> EN (para dicionários EN, direto da fonte; sem traduções manuais)
-# -------------------------------
-# Construídos a partir das colunas *_EN dos auxiliares. 
+
+# --- Mapas PT → EN e helper de tradução ---
+# Usados pelos blocos de dicionário EN abaixo para traduzir labels direto da fonte.
 map_sec  <- aux2 %>% distinct(NO_SEC_PT, NO_SEC_EN); map_sec  <- setNames(map_sec$NO_SEC_EN, map_sec$NO_SEC_PT)
 map_sh2  <- aux2 %>% distinct(NO_SH2_PT, NO_SH2_EN); map_sh2  <- setNames(map_sh2$NO_SH2_EN, map_sh2$NO_SH2_PT)
 map_sh4  <- aux2 %>% distinct(NO_SH4_PT, NO_SH4_EN); map_sh4  <- setNames(map_sh4$NO_SH4_EN, map_sh4$NO_SH4_PT)
@@ -126,48 +123,20 @@ map_pais <- setNames(aux1$NO_EN, aux1$NO_PT)
 # traduz um vetor de nomes PT usando um mapa; mantém o original se não encontrar
 tr <- function(x, map) { out <- unname(map[x]); ifelse(is.na(out), x, out) }
 
-#dat$cod_pais <- as.numeric(dat$cod_pais)
-#aux1$SISCOMEX <- as.numeric(aux1$SISCOMEX)
-#dat$cod_pais <- str_replace_all(dat$cod_pais, setNames(aux1$NO_PT, aux1$SISCOMEX))
-#dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
 
 matriz <- dat
 
 
+# ================================================================
+# DATASETS
+# ================================================================
 
-# exportação total da amazônia por tipo sh2
-dat <- matriz
-dat$mes <- NULL
-dat$nome_sh4 <- NULL
-dat$kg_liquido <- NULL
-dat$uf <- NULL
-dat$cod_municipio <- NULL
-dat$cod_pais <- NULL
+# ----------------------------------------------------------------
+# [1] Município × SH4
+# Saída: comex_exp_munic_sh4.rds  (wide: time, group=posição SH4, cols=municípios)
+#        comex_exp_sh4_munic.rds  (transposta: time, group=município, cols=posições SH4)
+# ----------------------------------------------------------------
 
-data_val_pais <- aggregate(valor_fob ~ ano + cod_sh4, dat, sum)
-
-data_val_pais$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais$cod_sh4))
-aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
-data_val_pais$cod_sh4 <- str_replace_all(data_val_pais$cod_sh4, setNames(aux2$NO_SH2_PT, aux2$CO_SH4))
-
-colnames(data_val_pais) <- c("time", "group", "value")
-
-data_val_pais$time <- as.numeric(data_val_pais$time)
-data_val_pais <- aggregate(value ~ time + group, data_val_pais, sum)
-
-#datafinal_val_pais <- reshape(data_val_pais, idvar = c("group"), timevar = "time", direction = "wide")
-#labl <- colnames(datafinal_val_pais)
-#labl <- labl[-c(1)]
-#labl <- sub("^value\\.", "", labl)   # remove prefixo do reshape sem truncar
-#colnames(datafinal_val_pais) <- c("time", labl)
-#group <- rep("Amazônia", 25)
-#datafinal_val_pais <- cbind(group, datafinal_val_pais)
-
-saveRDS(data_val_pais, "data/comex_exp_tot_sh2.rds")
-
-
-
-# exportação municipal da amazônia por tipo sh4
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -213,8 +182,12 @@ saveRDS(datafinal_val_munic, "data/comex_exp_munic_sh4.rds")
 saveRDS(datafinal_val_sh2, "data/comex_exp_sh4_munic.rds")
 
 
+# ----------------------------------------------------------------
+# [2] Município × SH2
+# Saída: comex_exp_munic_sh2.rds  (wide: time, group=capítulo SH2, cols=municípios)
+#        comex_exp_sh2_munic.rds  (transposta: time, group=município, cols=capítulos SH2)
+# ----------------------------------------------------------------
 
-# exportação municipal da amazônia por tipo sh2
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -227,7 +200,6 @@ dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
 dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_PT, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
-dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
 dat$uf <- NULL
 
 data_val <- dat
@@ -253,44 +225,32 @@ datafinal_val_sh2[is.na(datafinal_val_sh2)] <- 0
 datafinal_val_munic <- datafinal_val_munic[order(datafinal_val_munic$group, datafinal_val_munic$time),]
 datafinal_val_sh2 <- datafinal_val_sh2[order(datafinal_val_sh2$group, datafinal_val_sh2$time),]
 
+# Totais "Amazônia Legal" = soma de todos os municípios por ano.
+sh2_cols <- setdiff(names(datafinal_val_sh2), c("time", "group"))
+amazonia_legal <- aggregate(
+    datafinal_val_sh2[, sh2_cols],
+    by = list(time = datafinal_val_sh2$time),
+    FUN = sum, na.rm = TRUE
+)
+amazonia_legal$group <- "Amazônia Legal"
+amazonia_legal <- amazonia_legal[, c("time", "group", sh2_cols)]
+datafinal_val_sh2 <- rbind(amazonia_legal, datafinal_val_sh2)
+
+munic_cols <- setdiff(names(datafinal_val_munic), c("time", "group"))
+datafinal_val_munic$`Amazônia Legal` <- rowSums(datafinal_val_munic[, munic_cols], na.rm = TRUE)
+
 saveRDS(datafinal_val_munic, "data/comex_exp_munic_sh2.rds")
 saveRDS(datafinal_val_sh2, "data/comex_exp_sh2_munic.rds")
 
 
 
-# exportação total da amazônia por tipo sec
-dat <- matriz
-dat$mes <- NULL
-dat$nome_sh4 <- NULL
-dat$kg_liquido <- NULL
-dat$uf <- NULL
-dat$cod_municipio <- NULL
-dat$cod_pais <- NULL
 
-data_val_pais <- aggregate(valor_fob ~ ano + cod_sh4, dat, sum)
+# ----------------------------------------------------------------
+# [4] Município × SEC
+# Saída: comex_exp_munic_sec.rds  (wide: time, group=seção SEC, cols=municípios)
+#        comex_exp_sec_munic.rds  (transposta: time, group=município, cols=seções SEC)
+# ----------------------------------------------------------------
 
-data_val_pais$cod_sh4 <- sprintf("%04d", as.numeric(data_val_pais$cod_sh4))
-aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
-data_val_pais$cod_sh4 <- str_replace_all(data_val_pais$cod_sh4, setNames(aux2$NO_SEC_PT, aux2$CO_SH4))
-
-colnames(data_val_pais) <- c("time", "group", "value")
-
-data_val_pais$time <- as.numeric(data_val_pais$time)
-data_val_pais <- aggregate(value ~ time + group, data_val_pais, sum)
-
-#datafinal_val_pais <- reshape(data_val_pais, idvar = c("group"), timevar = "time", direction = "wide")
-#labl <- colnames(datafinal_val_pais)
-#labl <- labl[-c(1)]
-#labl <- sub("^value\\.", "", labl)   # remove prefixo do reshape sem truncar
-#colnames(datafinal_val_pais) <- c("time", labl)
-#group <- rep("Amazônia", 25)
-#datafinal_val_pais <- cbind(group, datafinal_val_pais)
-
-saveRDS(data_val_pais, "data/comex_exp_tot_sec.rds")
-
-
-
-# exportação municipal da amazônia por tipo sec
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -301,9 +261,8 @@ dat <- aggregate(valor_fob ~ ano + cod_sh4 + cod_municipio + uf, dat, sum)
 
 dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
-dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_PT, aux2$CO_SH4))
+dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SEC_PT, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
-dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
 dat$uf <- NULL
 
 data_val <- dat
@@ -333,7 +292,13 @@ saveRDS(datafinal_val_munic, "data/comex_exp_munic_sec.rds")
 saveRDS(datafinal_val_sec, "data/comex_exp_sec_munic.rds")
 
 
-# exportação total da amazônia por pais
+# ----------------------------------------------------------------
+# [5] País × SEC
+# Saída: comex_exp_tot_pais.rds   (long: time, group=país, value)
+#        comex_exp_sec_pais.rds   (wide: time, group=seção SEC, cols=países)
+#        comex_exp_pais_sec.rds   (transposta: time, group=país, cols=seções SEC)
+# ----------------------------------------------------------------
+
 dat <- matriz
 dat$mes <- NULL
 dat$nome_sh4 <- NULL
@@ -383,18 +348,22 @@ saveRDS(datafinal_val_pais_sec, "data/comex_exp_sec_pais.rds")
 saveRDS(datafinal_val_pais_munic, "data/comex_exp_pais_sec.rds")
 
 
+# ================================================================
+# DICIONÁRIOS
+#
+# Convenção `var`: sempre em PT, igual aos nomes de coluna do .rds.
+# Só `label`/`desc` são traduzidos nos dicts EN.
+# ================================================================
 
-#####################
-# Build Dictionary 
-#####################
 
-### exportação municipal da amazônia por tipo sh4
-datafinal <- readRDS(file = "data/comex_exp_munic_sh4.rds")
+# ----------------------------------------------------------------
+# [1] Total Amazônia por País
+# ----------------------------------------------------------------
 
-# extract variables from data
+### PT: comex_exp_tot_pais_dic.csv
+datafinal <- readRDS(file = "data/comex_exp_tot_pais.rds")
 columns <- colnames(datafinal)
 
-# generate dictionary
 temp_param_table <- tibble(
   var = columns,
   x = TRUE,
@@ -407,64 +376,27 @@ temp_param_table <- tibble(
   var_group = "Comex",
   tipo = 1,
   unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
+  categoria= "Economia",
+  subcategoria = "Comércio exterior"
 )
 
-temp_param_table$label[2] <- "Produ\u00e7\u00e3o sh4"
+temp_param_table$label[2] <- "País"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sh4"
-
+temp_param_table$desc[2] <- "País"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
+temp_param_table$label[3] <- "Valor"
+temp_param_table$desc[3] <- "Valor"
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_dic.csv", fileEncoding = "UTF-8")
+temp_param_table$x <- c(rep(FALSE, 2), TRUE)
+temp_param_table$y <- c(rep(FALSE, 2), TRUE)
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), FALSE)
+temp_param_table$size <- c(rep(FALSE, 2), TRUE)
+temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
 
-
-### exportação municipal da amazônia por tipo sh4
-datafinal <- readRDS(file = "data/comex_exp_sh4_munic.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
-)
-
-temp_param_table$label[2] <- "Munic\u00edpio"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Munic\u00edpio"
-
-temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 1103))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 1103))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 1103))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 1103))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 1103))
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_sh4_munic_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/comex_exp_tot_pais_dic.csv", fileEncoding = "UTF-8")
 
 
-# generate dictionary in English
+### EN: comex_exp_tot_pais_dic_en.csv  (usado pelo app tot_pais)
 temp_param_table <- tibble(
     var = columns,
     x = TRUE,
@@ -476,231 +408,37 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Comex",
     tipo = 1,
-    unidade = "R$",
-    categoria= "Economia", 
-    subcategoria = "Comércio exterior"
+    unidade = "US$",
+    categoria= "Economy",
+    subcategoria = "Trade"
 )
+
+temp_param_table$label[2] <- "Country"
 temp_param_table$label[1] <- "Year"
-temp_param_table$label[2] <- "Municipality"
-temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_sh4)
-temp_param_table$desc <- temp_param_table$label
+temp_param_table$desc[2] <- "Country"
+temp_param_table$desc[1] <- "Year"
+temp_param_table$label[3] <- "Value"
+temp_param_table$desc[3] <- "Value"
+
+temp_param_table$x <- c(rep(FALSE, 2), TRUE)
+temp_param_table$y <- c(rep(FALSE, 2), TRUE)
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), FALSE)
+temp_param_table$size <- c(rep(FALSE, 2), TRUE)
+temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
+
+write.csv(temp_param_table, file = "data/comex_exp_tot_pais_dic_en.csv", fileEncoding = "UTF-8")
 
 
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 1103))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 1103))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 1103))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 1103))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 1103))
+# ----------------------------------------------------------------
+# [2] País × SEC
+# Transpostas: sec_pais (eixo y = seção, linhas = países)
+#              pais_sec (eixo y = país,  linhas = seções)
+# ----------------------------------------------------------------
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_sh4_munic_dic_en.csv", fileEncoding = "UTF-8")
-
-### exportação municipal da amazônia por tipo sh2
-datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
-)
-
-temp_param_table$label[2] <- "Produ\u00e7\u00e3o sh2"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sh2"
-
-temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_dic.csv", fileEncoding = "UTF-8")
-
-
-
-### exportação municipal da amazônia por tipo sh2
-datafinal <- readRDS(file = "data/comex_exp_sh2_munic.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
-)
-
-temp_param_table$label[2] <- "Munic\u00edpio"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Munic\u00edpio"
-
-temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 96))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_sh2_munic_dic.csv", fileEncoding = "UTF-8")
-
-
-
-
-### exportação municipal da amazônia por tipo sec
-datafinal <- readRDS(file = "data/comex_exp_munic_sec.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
-)
-
-temp_param_table$label[2] <- "Produ\u00e7\u00e3o sec"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Produ\u00e7\u00e3o sec"
-
-temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_munic_sec_dic.csv", fileEncoding = "UTF-8")
-
-
-
-### exportação municipal da amazônia por tipo sec
-datafinal <- readRDS(file = "data/comex_exp_sec_munic.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
-)
-
-temp_param_table$label[2] <- "Munic\u00edpio"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Munic\u00edpio"
-temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 96))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_sec_munic_dic.csv", fileEncoding = "UTF-8")
-
-
-
-
-### exportação total da amazônia por tipo sh2
-datafinal <- readRDS(file = "data/comex_exp_tot_sh2.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
-)
-
-temp_param_table$label[2] <- "Regi\u00e3o"
-temp_param_table$label[1] <- "Ano"
-temp_param_table$label[3] <- "Valor"
-temp_param_table$desc[2] <- "Regi\u00e3o"
-temp_param_table$desc[1] <- "Ano"
-temp_param_table$desc[3] <- "Valor"
-temp_param_table$x <- c(FALSE, FALSE, TRUE)
-temp_param_table$y <- c(FALSE, FALSE, TRUE)
-temp_param_table$color <- c(FALSE, TRUE, FALSE)
-temp_param_table$size <- c(FALSE, FALSE, TRUE)
-temp_param_table$slider <- c(FALSE, FALSE, TRUE)
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_tot_sh2_dic.csv", fileEncoding = "UTF-8")
-
-#############################
-# Build dictionary in english
-#############################
-
-### exportação por pais da amazônia por tipo sec
+### PT: comex_exp_sec_pais_dic.csv
 datafinal <- readRDS(file = "data/comex_exp_sec_pais.rds")
-
-# extract variables from data
 columns <- colnames(datafinal)
 
-# generate dictionary
 temp_param_table <- tibble(
   var = columns,
   x = TRUE,
@@ -713,13 +451,13 @@ temp_param_table <- tibble(
   var_group = "Comex",
   tipo = 1,
   unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
+  categoria= "Economia",
+  subcategoria = "Comércio exterior"
 )
 
-temp_param_table$label[2] <- "Pa\u00eds"
+temp_param_table$label[2] <- "País"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Pa\u00eds"
+temp_param_table$desc[2] <- "País"
 temp_param_table$desc[1] <- "Ano"
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 221))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 221))
@@ -727,18 +465,46 @@ temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 221))
 temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 221))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 221))
 
-# save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_sec_pais_dic.csv", fileEncoding = "UTF-8")
 
 
-
-### exportação por pais da amazônia por tipo sec
-datafinal <- readRDS(file = "data/comex_exp_pais_sec.rds")
-
-# extract variables from data
+### EN: comex_exp_sec_pais_en_dic.csv
+datafinal <- readRDS(file = "data/comex_exp_sec_pais.rds")
 columns <- colnames(datafinal)
 
-# generate dictionary
+temp_param_table <- tibble(
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economy",
+    subcategoria = "Trade"
+)
+temp_param_table$label[1] <- "Year"
+temp_param_table$label[2] <- "Section"
+temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_pais)
+temp_param_table$desc <- temp_param_table$label
+
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 221))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 221))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 221))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 221))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 221))
+
+write.csv(temp_param_table, file = "data/comex_exp_sec_pais_en_dic.csv", fileEncoding = "UTF-8")
+
+
+### EN: comex_exp_pais_sec_dic_en.csv  (transposta: var=país PT, label=seção EN)
+datafinal <- readRDS(file = "data/comex_exp_pais_sec.rds")
+columns <- colnames(datafinal)
+
 temp_param_table <- tibble(
   var = columns,
   x = TRUE,
@@ -759,31 +525,27 @@ temp_param_table$label[2] <- "Country"
 temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_sec)
 temp_param_table$desc <- temp_param_table$label
 
-
 temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 22))
 temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 22))
 temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 22))
 temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 22))
 temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 22))
 
-# translate
-
-# IMPORTANTE: `var` permanece em PT (igual às colunas do .rds e ao dict PT). Só `label`/`desc`
-# são traduzidos. Isso é exigido pelo lang toggle do app ts_comex_exp_pais (a seleção usa `var`
-# como chave para as colunas do .rds, que estão em PT).
-
-# save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_pais_sec_dic_en.csv", fileEncoding = "UTF-8")
 
 
+### EN: comex_exp_pais_sec_en_dic.csv  (nome alternativo, mantido por compatibilidade)
+write.csv(temp_param_table, file = "data/comex_exp_pais_sec_en_dic.csv", fileEncoding = "UTF-8")
 
-### exportação por pais da amazônia total
-datafinal <- readRDS(file = "data/comex_exp_tot_pais.rds")
 
-# extract variables from data
+# ----------------------------------------------------------------
+# [3] Município × SH4
+# ----------------------------------------------------------------
+
+### PT: comex_exp_munic_sh4_dic.csv  (eixo y = município, cols = posições SH4)
+datafinal <- readRDS(file = "data/comex_exp_munic_sh4.rds")
 columns <- colnames(datafinal)
 
-# generate dictionary
 temp_param_table <- tibble(
   var = columns,
   x = TRUE,
@@ -796,33 +558,61 @@ temp_param_table <- tibble(
   var_group = "Comex",
   tipo = 1,
   unidade = "US$",
-  categoria= "Economia", 
-  subcategoria = "Com\u00e9rcio exterior"
+  categoria= "Economia",
+  subcategoria = "Comércio exterior"
 )
 
-temp_param_table$label[2] <- "Pa\u00eds"
+temp_param_table$label[2] <- "Produção sh4"
 temp_param_table$label[1] <- "Ano"
-temp_param_table$desc[2] <- "Pa\u00eds"
+temp_param_table$desc[2] <- "Produção sh4"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$label[3] <- "Valor"
-temp_param_table$desc[3] <- "Valor"
 
-temp_param_table$x <- c(rep(FALSE, 2), TRUE)
-temp_param_table$y <- c(rep(FALSE, 2), TRUE)
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), FALSE)
-temp_param_table$size <- c(rep(FALSE, 2), TRUE)
-temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_tot_pais_dic.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/comex_exp_munic_sh4_dic.csv", fileEncoding = "UTF-8")
 
-### exportação por pais da amazônia total inglês
-datafinal <- readRDS(file = "data/comex_exp_tot_pais.rds")
 
-# extract variables from data
+### PT: comex_exp_sh4_munic_dic.csv  (transposta: eixo y = posição SH4, cols = municípios)
+datafinal <- readRDS(file = "data/comex_exp_sh4_munic.rds")
 columns <- colnames(datafinal)
 
-# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Comex",
+  tipo = 1,
+  unidade = "US$",
+  categoria= "Economia",
+  subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Município"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[1] <- "Ano"
+
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+
+write.csv(temp_param_table, file = "data/comex_exp_sh4_munic_dic.csv", fileEncoding = "UTF-8")
+
+
+### EN: comex_exp_sh4_munic_dic_en.csv  (var = município PT, label = posição SH4 EN)
 temp_param_table <- tibble(
     var = columns,
     x = TRUE,
@@ -835,33 +625,68 @@ temp_param_table <- tibble(
     var_group = "Comex",
     tipo = 1,
     unidade = "US$",
-    categoria= "Economy", 
+    categoria= "Economy",
     subcategoria = "Trade"
 )
-
-temp_param_table$label[2] <- "Country"
 temp_param_table$label[1] <- "Year"
-temp_param_table$desc[2] <- "Country"
-temp_param_table$desc[1] <- "Year"
-temp_param_table$label[3] <- "Value"
-temp_param_table$desc[3] <- "Value"
+temp_param_table$label[2] <- "Municipality"
+temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_sh4)
+temp_param_table$desc <- temp_param_table$label
 
-temp_param_table$x <- c(rep(FALSE, 2), TRUE)
-temp_param_table$y <- c(rep(FALSE, 2), TRUE)
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), FALSE)
-temp_param_table$size <- c(rep(FALSE, 2), TRUE)
-temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
 
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_tot_pais_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/comex_exp_sh4_munic_dic_en.csv", fileEncoding = "UTF-8")
 
-### exportação municipal da amazônia por tipo sh2 inglês
+
+# ----------------------------------------------------------------
+# [4] Município × SH2
+# ----------------------------------------------------------------
+
+### PT: comex_exp_munic_sh2_dic.csv  (eixo y = município, cols = capítulos SH2)
 datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
-
-# extract variables from data
 columns <- colnames(datafinal)
 
-# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Comex",
+  tipo = 1,
+  unidade = "US$",
+  categoria= "Economia",
+  subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Produção sh2"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "Produção sh2"
+
+temp_param_table$desc[1] <- "Ano"
+n_vars <- length(columns) - 2
+
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+
+write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_dic.csv", fileEncoding = "UTF-8")
+
+
+### EN: comex_exp_munic_sh2_en_dic.csv
+datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
+columns <- colnames(datafinal)
+
 temp_param_table <- tibble(
     var = columns,
     x = TRUE,
@@ -873,8 +698,8 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Comex",
     tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
+    unidade = "US$",
+    categoria= "Economy",
     subcategoria = "Trade"
 )
 
@@ -882,25 +707,54 @@ temp_param_table$label[2] <- "Sh2 production"
 temp_param_table$label[1] <- "Year"
 temp_param_table$desc[2] <- "Sh2 production"
 temp_param_table$desc[1] <- "Year"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
 
-# save csv in utf-8 encoding
+n_vars <- length(columns) - 2
+
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+
 write.csv(temp_param_table, file = "data/comex_exp_munic_sh2_en_dic.csv", fileEncoding = "UTF-8")
 
 
-
-
-### exportação municipal da amazônia por tipo sh2 inglês
+### PT: comex_exp_sh2_munic_dic.csv  (transposta: eixo y = capítulo SH2, cols = municípios)
 datafinal <- readRDS(file = "data/comex_exp_sh2_munic.rds")
-
-# extract variables from data
 columns <- colnames(datafinal)
 
-# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Comex",
+  tipo = 1,
+  unidade = "US$",
+  categoria= "Economia",
+  subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Município"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[1] <- "Ano"
+
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+
+write.csv(temp_param_table, file = "data/comex_exp_sh2_munic_dic.csv", fileEncoding = "UTF-8")
+
+
+### EN: comex_exp_sh2_munic_en_dic.csv  (var = município PT, label = capítulo SH2 EN)
 temp_param_table <- tibble(
     var = columns,
     x = TRUE,
@@ -912,8 +766,8 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Comex",
     tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
+    unidade = "US$",
+    categoria= "Economy",
     subcategoria = "Trade"
 )
 temp_param_table$label[1] <- "Year"
@@ -921,26 +775,56 @@ temp_param_table$label[2] <- "Municipality"
 temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_sh2)
 temp_param_table$desc <- temp_param_table$label
 
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
 
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 96))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
-
-# save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_sh2_munic_en_dic.csv", fileEncoding = "UTF-8")
 
 
+# ----------------------------------------------------------------
+# [5] Município × SEC
+# ----------------------------------------------------------------
 
-
-### exportação municipal da amazônia por tipo sec inglês
+### PT: comex_exp_munic_sec_dic.csv
 datafinal <- readRDS(file = "data/comex_exp_munic_sec.rds")
-
-# extract variables from data
 columns <- colnames(datafinal)
 
-# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Comex",
+  tipo = 1,
+  unidade = "US$",
+  categoria= "Economia",
+  subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Produção sec"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "Produção sec"
+temp_param_table$desc[1] <- "Ano"
+
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+
+write.csv(temp_param_table, file = "data/comex_exp_munic_sec_dic.csv", fileEncoding = "UTF-8")
+
+
+### EN: comex_exp_munic_sec_en_dic.csv
 temp_param_table <- tibble(
     var = columns,
     x = TRUE,
@@ -952,8 +836,8 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Comex",
     tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
+    unidade = "US$",
+    categoria= "Economy",
     subcategoria = "Trade"
 )
 
@@ -961,25 +845,53 @@ temp_param_table$label[2] <- "Sec production"
 temp_param_table$label[1] <- "Year"
 temp_param_table$desc[2] <- "Sec production"
 temp_param_table$desc[1] <- "Year"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 418))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 418))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 418))
 
-# save csv in utf-8 encoding
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+
 write.csv(temp_param_table, file = "data/comex_exp_munic_sec_en_dic.csv", fileEncoding = "UTF-8")
 
 
-
-
-### exportação municipal da amazônia por tipo sec inglês
+### PT: comex_exp_sec_munic_dic.csv  (transposta: eixo y = seção SEC, cols = municípios)
 datafinal <- readRDS(file = "data/comex_exp_sec_munic.rds")
-
-# extract variables from data
 columns <- colnames(datafinal)
 
-# generate dictionary
+temp_param_table <- tibble(
+  var = columns,
+  x = TRUE,
+  y = TRUE,
+  color = FALSE,
+  size = FALSE,
+  slider = FALSE,
+  label = columns,
+  desc = columns,
+  var_group = "Comex",
+  tipo = 1,
+  unidade = "US$",
+  categoria= "Economia",
+  subcategoria = "Comércio exterior"
+)
+
+temp_param_table$label[2] <- "Município"
+temp_param_table$label[1] <- "Ano"
+temp_param_table$desc[2] <- "Município"
+temp_param_table$desc[1] <- "Ano"
+
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+
+write.csv(temp_param_table, file = "data/comex_exp_sec_munic_dic.csv", fileEncoding = "UTF-8")
+
+
+### EN: comex_exp_sec_munic_en_dic.csv  (var = seção SEC em PT, label = seção SEC em EN)
 temp_param_table <- tibble(
     var = columns,
     x = TRUE,
@@ -991,189 +903,20 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Comex",
     tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
+    unidade = "US$",
+    categoria= "Economy",
     subcategoria = "Trade"
 )
 temp_param_table$label[1] <- "Year"
 temp_param_table$label[2] <- "Municipality"
-temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_sh2)
-temp_param_table$desc <- temp_param_table$label
-
-
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 96))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_sec_munic_en_dic.csv", fileEncoding = "UTF-8")
-
-
-
-
-### exportação total da amazônia por tipo sh2 inglês
-datafinal <- readRDS(file = "data/comex_exp_tot_sh2.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
-    x = TRUE,
-    y = TRUE,
-    color = FALSE,
-    size = FALSE,
-    slider = FALSE,
-    label = columns,
-    desc = columns,
-    var_group = "Comex",
-    tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
-    subcategoria = "Trade"
-)
-
-temp_param_table$label[2] <- "Region"
-temp_param_table$label[1] <- "Year"
-temp_param_table$label[3] <- "Value"
-temp_param_table$desc[2] <- "Region"
-temp_param_table$desc[1] <- "Year"
-temp_param_table$desc[3] <- "Value"
-temp_param_table$x <- c(FALSE, FALSE, TRUE)
-temp_param_table$y <- c(FALSE, FALSE, TRUE)
-temp_param_table$color <- c(FALSE, TRUE, FALSE)
-temp_param_table$size <- c(FALSE, FALSE, TRUE)
-temp_param_table$slider <- c(FALSE, FALSE, TRUE)
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_tot_sh2_en_dic.csv", fileEncoding = "UTF-8")
-
-
-
-
-
-
-
-### exportação por pais da amazônia por tipo sec inglês
-datafinal <- readRDS(file = "data/comex_exp_sec_pais.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
-    x = TRUE,
-    y = TRUE,
-    color = FALSE,
-    size = FALSE,
-    slider = FALSE,
-    label = columns,
-    desc = columns,
-    var_group = "Comex",
-    tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
-    subcategoria = "Trade"
-)
-temp_param_table$label[1] <- "Year"
-temp_param_table$label[2] <- "Section"
-temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_pais)
-temp_param_table$desc <- temp_param_table$label
-
-
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 221))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 221))
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_sec_pais_en_dic.csv", fileEncoding = "UTF-8")
-
-
-
-
-
-### exportação por pais da amazônia por tipo sec inglês
-datafinal <- readRDS(file = "data/comex_exp_pais_sec.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
-    x = TRUE,
-    y = TRUE,
-    color = FALSE,
-    size = FALSE,
-    slider = FALSE,
-    label = columns,
-    desc = columns,
-    var_group = "Comex",
-    tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
-    subcategoria = "Trade"
-)
-temp_param_table$label[1] <- "Year"
-temp_param_table$label[2] <- "Country"
 temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_sec)
 temp_param_table$desc <- temp_param_table$label
 
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, TRUE, rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
 
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 22))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 22))
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_pais_sec_en_dic.csv", fileEncoding = "UTF-8")
-
-
-
-
-### exportação por pais da amazônia total inglês
-datafinal <- readRDS(file = "data/comex_exp_tot_pais.rds")
-
-# extract variables from data
-columns <- colnames(datafinal)
-
-# generate dictionary
-temp_param_table <- tibble(
-    var = columns,
-    x = TRUE,
-    y = TRUE,
-    color = FALSE,
-    size = FALSE,
-    slider = FALSE,
-    label = columns,
-    desc = columns,
-    var_group = "Comex",
-    tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
-    subcategoria = "Trade"
-)
-
-temp_param_table$label[2] <- "Country"
-temp_param_table$label[1] <- "Year"
-temp_param_table$desc[2] <- "Country"
-temp_param_table$desc[1] <- "Year"
-temp_param_table$label[3] <- "Value"
-temp_param_table$desc[3] <- "Value"
-
-temp_param_table$x <- c(rep(FALSE, 2), TRUE)
-temp_param_table$y <- c(rep(FALSE, 2), TRUE)
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), FALSE)
-temp_param_table$size <- c(rep(FALSE, 2), TRUE)
-temp_param_table$slider <- c(rep(FALSE, 2), TRUE)
-
-# save csv in utf-8 encoding
-write.csv(temp_param_table, file = "data/comex_exp_tot_pais_en_dic.csv", fileEncoding = "UTF-8")
-
+write.csv(temp_param_table, file = "data/comex_exp_sec_munic_en_dic.csv", fileEncoding = "UTF-8")
