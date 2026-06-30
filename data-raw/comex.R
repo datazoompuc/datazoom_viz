@@ -328,6 +328,8 @@ data_val_pais$cod_pais <- str_replace_all(data_val_pais$cod_pais, setNames(aux1$
 colnames(data_val_pais) <- c("time", "group", "value")
 colnames(data_val_pais_sec) <- c("time", "group", "type", "value")
 
+data_val_pais_sec <- aggregate(value ~ time + group + type, data_val_pais_sec, sum)
+
 data_val_pais <- data_val_pais[order(data_val_pais$group, data_val_pais$time),]
 saveRDS(data_val_pais, "data/comex_exp_tot_pais.rds")
 
