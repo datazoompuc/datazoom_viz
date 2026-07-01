@@ -33,16 +33,16 @@ get_ui <- function(files, param) {
               }',),
           
              h2(class = "plot_name", param$plot_name),
-             p(class = "plot_desc", param$plot_desc),
+             p(class = "plot_desc", textOutput("plot_desc", inline = TRUE)),
              hr(),
-             p(class = "vars", param$topo),
+             p(class = "vars", textOutput("topo", inline = TRUE)),
              div(
                class = "var_selec_group",
                # Seleciona variável do eixo x
                selectInput(
                  inputId = "x",
-                 label = param$varxlabel,
-                 choices = param$x_choices,
+                 label = param$i18n$pt$varxlabel,
+                 choices = c("forest", "all", "razao"),
                  selected = param$x_def,
                  width = "100%"
                )
@@ -53,7 +53,7 @@ get_ui <- function(files, param) {
                class = "var_selec_group",
                # Seleciona variável do eixo de data
                sliderInput(inputId = "filter1",
-                           label = param$vardatelabel,
+                           label = param$i18n$pt$vardatelabel,
                            min = param$year_inicio,
                            max = param$year_final,
                            value = param$year_final,
@@ -66,8 +66,12 @@ get_ui <- function(files, param) {
              ),
              # espaço vazio
              div(class = "fakecheckbox", ),
+             # Botão de troca de idioma
              div(
-               shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
+               shiny::actionButton(inputId = 'toggle_lang', label = "English",
+                                   icon = icon("globe"),
+                                   class = "btn-primary"),
+               shiny::actionButton(inputId = 'ab1', label = "Fullscreen",
                                    icon = icon("expand"), 
                                    class = "btn-primary",
                                    onclick = paste0("window.open('", param$link, "', '_blank')"))
