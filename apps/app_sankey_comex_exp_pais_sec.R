@@ -35,9 +35,9 @@ param$plot_name <- "Data Zoom Amaz\u00f4nia"
 param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos por  pa\u00eds de destino"
 
 # Outros parâmetros e configurações
-param$y_choices[[1]] <- NULL
-param$year_inicio <- 1997
-param$year_final <- 2021
+.time_vals <- readRDS(files$db_file)$time
+param$year_inicio <- min(.time_vals, na.rm = TRUE)
+param$year_final  <- max(.time_vals, na.rm = TRUE)
 
 param$label_var_name <- "VARIÁVEIS:"
 param$label_x_name <- "Ano"

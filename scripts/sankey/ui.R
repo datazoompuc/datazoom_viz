@@ -29,18 +29,7 @@ get_ui <- function(files, param) {
         p(class = "vars", param$label_var_name),
         div(
           class = "var_selec_group",
-          # Seleciona variável do eixo x
-          selectInput(
-            inputId = "x",
-            label = param$label_x_name,
-            choices = param$year_inicio:param$year_final,
-            selected = param$year_final,
-            width = "100%"
-          )
-        ),
-        div(
-          class = "var_selec_group",
-          # Seleciona variável de cor
+          # Seleciona variável de cor (produto/categoria)
           selectInput(
             inputId = "y",
             label = param$label_colour_name,
@@ -49,6 +38,7 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
+        # O ano é controlado pelo slider/play nativo do plotly (frames)
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(

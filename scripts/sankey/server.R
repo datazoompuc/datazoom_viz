@@ -279,10 +279,7 @@ get_server <- function(files, param) {
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
-      q_string <- paste0(
-        "?", "y=", input$y,
-        "&", "ano=", input$x
-      )
+      q_string <- paste0("?", "y=", input$y)
 
       updateQueryString(q_string, mode = "replace")
     }
@@ -292,11 +289,6 @@ get_server <- function(files, param) {
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
-      if (!is.null(query[["ano"]])) {
-        updateSelectInput(session, "x",
-          selected = query[["ano"]]
-        )
-      }
       if (!is.null(query[["y"]])) {
         updateSelectInput(session, "y",
           choices = param$y_choices,
@@ -349,105 +341,118 @@ get_server <- function(files, param) {
             stop()
           }
 
-          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
           y_col <- param$table[which(param$table$var == input$y), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
+          pallete <- pallete_discrete
+          anos <- sort(unique(df$time))
 
-          # Filtra dataframe com ano selecionado
-          df_filtered <- df[which(df$time == input$x), ]
+          # Monta o data.frame (país + valor) de um ano, ordenado por valor
+          build_dp <- function(yr) {
+            dff <- df[which(df$time == yr), ]
+            dp <- data.frame(
+              y = dff[[y_col$var]],
+              group = dff$group,
+              stringsAsFactors = FALSE
+            )
+            dp <- dp[which(!is.na(dp$y)), ]
+            dp[order(-dp$y), ]
+          }
 
-          df_p <- data.frame(
-            df_filtered[y_col$var],
-            df_filtered[color_col$var]
-          )
-          colnames(df_p) <- c("y", "color")
-          df_p$group <- df_filtered$group
-          df_p$text <- df_p$group
+          # Constrói os nós/links do sankey para um data.frame de um ano
+          build_nodes_links <- function(dp) {
+            n <- nrow(dp)
+            cores <- c(pallete[4], rep(pallete[3], 5), rep(pallete[2], 5),
+                       rep(pallete[1], max(0, n - 10)))
+            cores <- cores[1:(n + 1)]
+            list(
+              node = list(
+                label = c("Amazônia", dp$group),
+                color = cores,
+                hovertemplate = "<b> %{label} </b>",
+                pad = 15, thickness = 10,
+                line = list(color = "black", width = 0.5),
+                x = c(-0.001, rep(NA, n)),
+                y = c(0.5, rep(NA, n))
+              ),
+              link = list(
+                source = rep(0, n),
+                target = 1:n,
+                value = dp$y / 1e6,
+                hoverinfo = "none"
+              )
+            )
+          }
 
-          # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$y)), ]
-
-          # Se dataset estiver vazio, não monta o gráfico, retorna em branco
-          if (nrow(df_p) < 1) {
+          # Frame inicial = último ano
+          dp0 <- build_dp(anos[length(anos)])
+          if (nrow(dp0) < 1) {
             fig <- plotly_empty()
             stop()
           }
+          nl0 <- build_nodes_links(dp0)
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
-
-          # Ordenar data.frame  
-          df_p <- df_p %>%
-            arrange(desc(y))
-          
-          # Define paleta de cores
-          pallete <- pallete_discrete
-
-          # Monta gráfico
-          fig_p <- plot_ly(df_p,
+          fig_p <- plot_ly(
             type = "sankey",
             orientation = "h",
             valueformat = ".2f",
-            valuesuffix = paste0(" (", param$unit, y_col$unidade, param$unit2 ,input$x, ") "),
+            valuesuffix = paste0(" (", param$unit, y_col$unidade, ") "),
             hoverlabel = list(namelength = -1),
-            
-            node = list(
-              label = c("Amazônia", df_p$group), # label de origem, label de destino
-              color = c(pallete[4], 
-                        rep(pallete[3], 5),
-                        rep(pallete[2], 5),
-                        rep(pallete[1], nrow(df_p) - 10)), # cores para cada node
-              hovertemplate = "<b> %{label} </b>",
-              pad = 15,
-              thickness = 10,
-              line = list(
-                color = "black",
-                width = 0.5
-              ),
-              x = c(-0.001, rep(NA, nrow(df_p))), # definir posicao do node "Amazonia"
-              y = c(0.5, rep(NA, nrow(df_p))) # definir posicao do node "Amazonia"
-            ),
-            
-            link = list(
-              source = rep(0, nrow(df_p)), # repetir mesma source para todos
-              target = 1:nrow(df_p), # definir todos os países destino como target
-              value = df_p$y / 1e6, # valor das exportações (milhões)
-              hoverinfo = "none"
+            node = nl0$node,
+            link = nl0$link
+          )
+
+          # Um frame por ano (o plotly redesenha o sankey a cada frame)
+          fig_p$x$frames <- lapply(anos, function(yr) {
+            nl <- build_nodes_links(build_dp(yr))
+            list(
+              name = as.character(yr),
+              data = list(list(node = nl$node, link = nl$link))
             )
-          )
+          })
 
-          # Layout eixos
-          y_axis_layout <- list(
-            title = y_col$label,
-            titlefont = f1,
-            tickfont = f2,
-            automargin = FALSE,
-            autorange = TRUE,
-            showgrid = FALSE,
-            zeroline = FALSE
-          )
+          # Passos do slider (um por ano)
+          steps <- lapply(anos, function(yr) {
+            list(
+              method = "animate",
+              label = as.character(yr),
+              args = list(
+                list(as.character(yr)),
+                list(mode = "immediate",
+                     frame = list(duration = 10, redraw = TRUE),
+                     transition = list(duration = 0))
+              )
+            )
+          })
 
-          # Layout hover/tooltip
-          tooltip <- list(
-            bordercolor = "rgba(255, 255, 255, 1)",
-            bgopacity = "0.5",
-            font = f1
-          )
-
-          # Aplica layout
+          # Layout + slider + botões de play/pause nativos do plotly
           fig_p <- fig_p %>%
             layout(
               font = f1,
-              yaxis = y_axis_layout,
-              showlegend = TRUE
+              margin = list(b = 80),
+              sliders = list(list(
+                active = length(anos) - 1,
+                x = 0.05, len = 0.9, pad = list(t = 30),
+                currentvalue = list(prefix = paste0(param$label_x_name, ": "), font = f1),
+                steps = steps
+              )),
+              updatemenus = list(list(
+                type = "buttons", direction = "left", showactive = FALSE,
+                x = 0.05, y = -0.02, xanchor = "right", yanchor = "top",
+                pad = list(t = 30, r = 10),
+                buttons = list(
+                  list(method = "animate", label = "▶",
+                       args = list(NA, list(mode = "immediate", fromcurrent = FALSE,
+                                            frame = list(duration = 3000, redraw = TRUE),
+                                            transition = list(duration = 0)))),
+                  list(method = "animate", label = "⏸",
+                       args = list(list(), list(mode = "immediate",
+                                            frame = list(duration = 0, redraw = FALSE),
+                                            transition = list(duration = 0))))
+                )
+              ))
             )
 
-          #  Configura botões do plotly
           fig_p <- fig_p %>%
             config(
-              # toImageButtonOptions = list(format = "svg"),
               displaylogo = FALSE,
               modeBarButtonsToRemove = c(
                 "lasso2d",
