@@ -24,15 +24,15 @@ get_ui <- function(files, param) {
         
         
         h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        p(class = "plot_desc", textOutput("plot_desc", inline = TRUE)),
         hr(),
-        p(class = "vars", param$label_var_name),
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
         div(
           class = "var_selec_group",
           # Seleciona variável de cor (produto/categoria)
           selectInput(
             inputId = "y",
-            label = param$label_colour_name,
+            label = param$i18n$pt$label_colour_name,
             choices = param$y_choices,
             selected = param$y_def,
             width = "100%"
@@ -41,9 +41,14 @@ get_ui <- function(files, param) {
         # O ano é controlado pelo slider/play nativo do plotly (frames)
         # espaço vazio
         div(class = "fakecheckbox", ),
+        # Botão de troca de idioma
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
+          shiny::actionButton(inputId = 'toggle_lang', label = "English",
+                              icon = icon("globe"),
+                              class = "btn-primary"),
+        
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen",
+                              icon = icon("expand"),
                               class = "btn-primary",
                               onclick = paste0("window.open('",param$link,"', '_blank')"))
         ),
