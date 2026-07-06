@@ -1,21 +1,32 @@
 var,x,y,color,size,slider,label,desc,var_group,tipo,unidade,categoria,subcategoria
-group,FALSE,FALSE,TRUE,FALSE,FALSE,group,group,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 time,FALSE,FALSE,FALSE,FALSE,FALSE,time,time,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+group,FALSE,FALSE,TRUE,FALSE,FALSE,group,group,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Agriculture,TRUE,TRUE,FALSE,TRUE,TRUE,Agricultura,Agricultura,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Antropic,TRUE,TRUE,FALSE,TRUE,TRUE,Antrópico,Antrópico,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Farming,TRUE,TRUE,FALSE,TRUE,TRUE,Fazenda,Fazenda,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Floodable Forest,TRUE,TRUE,FALSE,TRUE,TRUE,Floresta Inundável,Floresta Inundável,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Forest,TRUE,TRUE,FALSE,TRUE,TRUE,Floresta,Floresta,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Forest Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Formação de Floresta,Formação de Floresta,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Grassland,TRUE,TRUE,FALSE,TRUE,TRUE,Pradaria,Pradaria,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Natural,TRUE,TRUE,FALSE,TRUE,TRUE,Natural,Natural,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Natural/Antropic,TRUE,TRUE,FALSE,TRUE,TRUE,Natural/Antrópico,Natural/Antrópico,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Non Forest Natural Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Formação Natural Não Florestal,Formação Natural Não Florestal,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Non vegetated area,TRUE,TRUE,FALSE,TRUE,TRUE,Áreas não vegetadas,Áreas não vegetadas,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Not Observed,TRUE,TRUE,FALSE,TRUE,TRUE,Não observado,Não observado,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Other Temporary Crops,TRUE,TRUE,FALSE,TRUE,TRUE,Outras Culturas Temporárias,Outras Culturas Temporárias,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Other non Vegetated Areas,TRUE,TRUE,FALSE,TRUE,TRUE,Outras áreas não vegetadas,Outras áreas não vegetadas,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Pasture,TRUE,TRUE,FALSE,TRUE,TRUE,Pastagem,Pastagem,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 "River, Lake and Ocean",TRUE,TRUE,FALSE,TRUE,TRUE,"Rios, Lagos ou Oceanos","Rios, Lagos ou Oceanos",Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Savanna Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Formação de Savana,Formação de Savana,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Temporary Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Culturas Temporárias,Culturas Temporárias,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Undefined,TRUE,TRUE,FALSE,TRUE,TRUE,Não aplicado,Não aplicado,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Urban Area,TRUE,TRUE,FALSE,TRUE,TRUE,Infraestrutura Urbana,Infraestrutura Urbana,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Water and Marine Environment,TRUE,TRUE,FALSE,TRUE,TRUE,Água,Água,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Wetland,TRUE,TRUE,FALSE,TRUE,TRUE,Pântano,Pântano,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Forest Plantation,TRUE,TRUE,FALSE,TRUE,TRUE,Plantação de Floresta,Plantação de Floresta,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Mangrove,TRUE,TRUE,FALSE,TRUE,TRUE,Mangue,Mangue,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Mining,TRUE,TRUE,FALSE,TRUE,TRUE,Mineração,Mineração,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Rocky Outcrop,TRUE,TRUE,FALSE,TRUE,TRUE,Afloramento rochoso,Afloramento rochoso,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Rocky Outcrop,TRUE,TRUE,FALSE,TRUE,TRUE,Afloramento Rochoso,Afloramento Rochoso,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Soybean,TRUE,TRUE,FALSE,TRUE,TRUE,Soja,Soja,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Aquaculture,TRUE,TRUE,FALSE,TRUE,TRUE,Aquicultura,Aquicultura,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Sugar cane,TRUE,TRUE,FALSE,TRUE,TRUE,Cana-de-açúcar,Cana-de-açúcar,Mapbiomas,1,ha,Meio ambiente,Uso da terra
@@ -24,16 +35,6 @@ Cotton,TRUE,TRUE,FALSE,TRUE,TRUE,Algodão,Algodão,Mapbiomas,1,ha,Meio ambiente,
 Hypersaline Tidal Flat,TRUE,TRUE,FALSE,TRUE,TRUE,Salar,Salar,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Mosaic of Uses,TRUE,TRUE,FALSE,TRUE,TRUE,Mosaico de Uso da Terra,Mosaico de Uso da Terra,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Palm Oil,TRUE,TRUE,FALSE,TRUE,TRUE,Óleo de Palma,Óleo de Palma,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Rice,TRUE,TRUE,FALSE,TRUE,TRUE,Arroz,Arroz,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Temporary Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Culturas Temporárias,Culturas Temporárias,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Perennial Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Culturas Perenes,Culturas Perenes,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Agriculture,TRUE,TRUE,FALSE,TRUE,TRUE,Agricultura,Agricultura,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Farming,TRUE,TRUE,FALSE,TRUE,TRUE,Fazenda,Fazenda,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Forest,TRUE,TRUE,FALSE,TRUE,TRUE,Floresta,Floresta,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Non Forest Natural Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Formação Natural Não Florestal,Formação Natural Não Florestal,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Non vegetated area,TRUE,TRUE,FALSE,TRUE,TRUE,Áreas não vegetadas,Áreas não vegetadas,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Water and Marine Environment,TRUE,TRUE,FALSE,TRUE,TRUE,Água,Água,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Antropic,TRUE,TRUE,FALSE,TRUE,TRUE,Antrópico,Antrópico,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Natural,TRUE,TRUE,FALSE,TRUE,TRUE,Natural,Natural,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Natural/Antropic,TRUE,TRUE,FALSE,TRUE,TRUE,Natural/Antropico,Natural/Antropico,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-Undefined,TRUE,TRUE,FALSE,TRUE,TRUE,Não aplicado,Não aplicado,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Rice,TRUE,TRUE,FALSE,TRUE,TRUE,Arroz,Arroz,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,Área do município (km2),Área do município (km2),Mapbiomas,1,km2,Meio ambiente,Uso da terra
