@@ -37,4 +37,8 @@ Mangrove,TRUE,TRUE,FALSE,TRUE,TRUE,Mangrove,Mangrove,Mapbiomas,1,ha,Environment,
 "Beach, Dune and Sand Spot",TRUE,TRUE,FALSE,TRUE,TRUE,"Beach, Dune and Sand Spot","Beach, Dune and Sand Spot",Mapbiomas,1,ha,Environment,Land use
 Rice,TRUE,TRUE,FALSE,TRUE,TRUE,Rice,Rice,Mapbiomas,1,ha,Environment,Land use
 Cotton,TRUE,TRUE,FALSE,TRUE,TRUE,Cotton,Cotton,Mapbiomas,1,ha,Environment,Land use
+Photovoltaic Project,TRUE,TRUE,FALSE,TRUE,TRUE,Photovoltaic Project,Photovoltaic Project,Mapbiomas,1,ha,Environment,Land use
+Other Perennial Crops,TRUE,TRUE,FALSE,TRUE,TRUE,Other Perennial Crops,Other Perennial Crops,Mapbiomas,1,ha,Environment,Land use
+Herbaceous Sandbank Vegetation,TRUE,TRUE,FALSE,TRUE,TRUE,Herbaceous Sandbank Vegetation,Herbaceous Sandbank Vegetation,Mapbiomas,1,ha,Environment,Land use
+Other non Forest Formations,TRUE,TRUE,FALSE,TRUE,TRUE,Other non Forest Formations,Other non Forest Formations,Mapbiomas,1,ha,Environment,Land use
 area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,Municipal area (km2),Municipal area (km2),Mapbiomas,1,km2,Environment,Land use

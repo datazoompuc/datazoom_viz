@@ -37,4 +37,8 @@ Mangrove,TRUE,TRUE,FALSE,TRUE,TRUE,Mangue,Mangue,Mapbiomas,1,ha,Meio ambiente,Us
 "Beach, Dune and Sand Spot",TRUE,TRUE,FALSE,TRUE,TRUE,Praia e Dunas,Praia e Dunas,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Rice,TRUE,TRUE,FALSE,TRUE,TRUE,Arroz,Arroz,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Cotton,TRUE,TRUE,FALSE,TRUE,TRUE,Algodão,Algodão,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Photovoltaic Project,TRUE,TRUE,FALSE,TRUE,TRUE,Photovoltaic Project,Photovoltaic Project,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Other Perennial Crops,TRUE,TRUE,FALSE,TRUE,TRUE,Outras Culturas Perenes,Outras Culturas Perenes,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Herbaceous Sandbank Vegetation,TRUE,TRUE,FALSE,TRUE,TRUE,Restinga Herbácea,Restinga Herbácea,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+Other non Forest Formations,TRUE,TRUE,FALSE,TRUE,TRUE,Other non Forest Formations,Other non Forest Formations,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,Área do município (km2),Área do município (km2),Mapbiomas,1,km2,Meio ambiente,Uso da terra

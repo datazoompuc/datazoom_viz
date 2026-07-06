@@ -18,10 +18,13 @@
 #   - COLUNAS DE CLASSE sempre em INGLÊS (chave interna neutra).
 #   - RÓTULOS PT/EN vivem nos dicionários (est/munic _dic.csv PT e _dic_en.csv EN).
 #
-# OBS. COLEÇÃO: usar a versão de DESENVOLVIMENTO do pacote (série até 2023,
-# schema com class_level_0..4):
+# OBS. COLEÇÃO: usar a versão de DESENVOLVIMENTO do pacote (Collection 9, série
+# até 2023, schema com class_level_0..4):
 #   devtools::install_github("datazoompuc/datazoom.amazonia")
 # (A versão do CRAN entrega Collection 8, só até 2022, e com outro schema.)
+# O ano de 2024 NÃO vem do pacote — é adicionado na seção 2b, baixando o arquivo
+# de estatísticas da Collection 10 direto do MapBiomas e replicando o mesmo
+# tratamento do load_mapbiomas(). Resultado final: série 1985-2024.
 ################################################################################
 
 ################################################################################
@@ -35,6 +38,9 @@ suppressPackageStartupMessages({
     library(readr)
     library(purrr)
     library(tibble)
+    library(readxl)     # ler o .xlsx de estatísticas da Coleção 10
+    library(janitor)    # clean_names(), igual ao pipeline do pacote
+    library(stringi)    # transliteração Latin-ASCII, igual ao pacote
 })
 
 ################################################################################
@@ -47,6 +53,76 @@ dat <- load_mapbiomas(
     geo_level = "municipality",
     language  = "eng"
 )
+
+################################################################################
+# 2b. ADENDO 2024 (Collection 10) — replica o pipeline do datazoom.amazonia
+#
+# O pacote entrega só a Collection 9 (até 2023). Aqui baixamos o arquivo de
+# ESTATÍSTICAS da Collection 10 direto do storage do MapBiomas e aplicamos
+# EXATAMENTE o mesmo tratamento que o load_mapbiomas() faz internamente
+# (clean_names -> Latin-ASCII -> drop colunas "id" -> pivot dos anos "xYYYY" ->
+#  remove vars auxiliares -> rename eng -> tira prefixo numérico das classes),
+# ficando apenas com 2024 e empilhando na base do pacote.
+#
+# ATENÇÃO metodológica: a Collection 10 reprocessou TODA a série 1985-2024.
+# Enxertar só 2024 (Col10) sobre 1985-2023 (Col9) mistura duas metodologias na
+# mesma série. Se preferir série 100% consistente, use a Col10 para todos os anos:
+# remova o `filter(year == "2024")` abaixo e comente a carga da seção 2.
+#
+# OBS: a URL abaixo segue o mesmo padrão da Col9. Se o MapBiomas mudar o caminho,
+# pegue o link atual do arquivo de estatísticas em
+# https://brasil.mapbiomas.org/en/downloads/ e ajuste `col10_url`.
+################################################################################
+
+col10_url <- paste0(
+    "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/",
+    "collection_10/lulc/statistics/MAPBIOMAS_BRAZIL-COL.10-BIOME_STATE_MUNICIPALITY.xlsx"
+)
+
+tmp10 <- tempfile(fileext = ".xlsx")
+utils::download.file(col10_url, tmp10, mode = "wb", method = "curl")
+
+# planilha de cobertura: detecta pela que contém "cover"/"cobert"; senão, a 1ª
+sheets10 <- readxl::excel_sheets(tmp10)
+sheet10  <- sheets10[grepl("cover|cobert", sheets10, ignore.case = TRUE)][1]
+if (is.na(sheet10)) sheet10 <- sheets10[1]
+message("Collection 10 - planilhas: ", paste(sheets10, collapse = ", "),
+        " | usando: ", sheet10)
+
+dat_2024 <- readxl::read_xlsx(tmp10, sheet = sheet10) %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_if(is.character, function(v) stringi::stri_trans_general(v, "Latin-ASCII")) %>%
+    dplyr::select(-dplyr::contains("id")) %>%
+    tidyr::pivot_longer(
+        dplyr::starts_with("x"),
+        names_to = "year", values_to = "value", names_prefix = "x"
+    ) %>%
+    tidyr::drop_na(value) %>%
+    dplyr::select(-dplyr::any_of(c(
+        "biome_municipality", "color", "category", "biome_state",
+        "to_color", "from_color", "from_class", "to_class", "class_lulc", "group"
+    ))) %>%
+    dplyr::rename_with(~ dplyr::case_match(.,
+        "city"          ~ "municipality",
+        "geocode"       ~ "municipality_code",
+        "state_acronym" ~ "state",
+        .default = .
+    )) %>%
+    dplyr::mutate(dplyr::across(
+        tidyselect::matches("^class_level_\\d+$"),
+        ~ sub("^\\s*\\d+(?:\\.\\d+)*\\.?\\s*", "", as.character(.))
+    )) %>%
+    dplyr::filter(year == "2024") %>%
+    # alinhar tipos com a base do pacote antes de empilhar
+    dplyr::mutate(
+        municipality_code = as.numeric(municipality_code),
+        year              = as.character(year),
+        value             = as.numeric(value)
+    )
+
+dat <- dplyr::bind_rows(dat, dat_2024)
+message("2024 (Col10) adicionado: ", nrow(dat_2024), " linhas | anos agora: ",
+        paste(range(dat$year), collapse = "-"))
 
 ################################################################################
 # 3. REFERÊNCIAS: municípios da Amazônia Legal (nome do estado) e áreas
