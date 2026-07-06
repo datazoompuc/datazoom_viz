@@ -1,30 +1,10 @@
 ################################################################################
 # MapBiomas - Cobertura e Uso da Terra (Amazônia Legal)
-# PIPELINE UNIFICADO para os apps ts_mapbiomas_cobertura (Fase 0 do merge est+munic)
-#
-# Substitui os scripts antigos:
-#   data-raw/mapbiomas_cobertura_est.R
-#   data-raw/mapbiomas_cobertura_munic.R
-# (que geravam schemas divergentes: est com colunas em inglês, munic com _pt/_en).
-#
-# NÃO confundir com data-raw/mapbiomas_cobertura.R (builder do app de MAPA).
-#
-# Gera, de UMA única carga do datazoom.amazonia, os dois datasets com SCHEMA
-# CONSISTENTE:
-#   data/mapbiomas_cobertura_est.rds     -> nível estadual  (group = estado)
-#   data/mapbiomas_cobertura_munic.rds   -> nível municipal (group = "Município - Estado")
-#
-# Convenção (igual ao padrão ts_aneel):
-#   - COLUNAS DE CLASSE sempre em INGLÊS (chave interna neutra).
-#   - RÓTULOS PT/EN vivem nos dicionários (est/munic _dic.csv PT e _dic_en.csv EN).
-#
-# OBS. COLEÇÃO: usar a versão de DESENVOLVIMENTO do pacote (Collection 9, série
-# até 2023, schema com class_level_0..4):
+# Gera est e munic com schema consistente para os apps ts_mapbiomas_cobertura.
+# Classes em inglês (chave interna); rótulos PT/EN nos dicionários.
+# Requer a versão dev do pacote (Collection 9, até 2023):
 #   devtools::install_github("datazoompuc/datazoom.amazonia")
-# (A versão do CRAN entrega Collection 8, só até 2022, e com outro schema.)
-# O ano de 2024 NÃO vem do pacote — é adicionado na seção 2b, baixando o arquivo
-# de estatísticas da Collection 10 direto do MapBiomas e replicando o mesmo
-# tratamento do load_mapbiomas(). Resultado final: série 1985-2024.
+# 2024 vem da Collection 10 na seção 2b. Não confundir com mapbiomas_cobertura.R (mapa).
 ################################################################################
 
 ################################################################################
@@ -41,6 +21,7 @@ suppressPackageStartupMessages({
     library(readxl)     # ler o .xlsx de estatísticas da Coleção 10
     library(janitor)    # clean_names(), igual ao pipeline do pacote
     library(stringi)    # transliteração Latin-ASCII, igual ao pacote
+    library(jsonlite)   # nomes de municípios acentuados (API do IBGE)
 })
 
 ################################################################################
@@ -55,23 +36,9 @@ dat <- load_mapbiomas(
 )
 
 ################################################################################
-# 2b. ADENDO 2024 (Collection 10) — replica o pipeline do datazoom.amazonia
-#
-# O pacote entrega só a Collection 9 (até 2023). Aqui baixamos o arquivo de
-# ESTATÍSTICAS da Collection 10 direto do storage do MapBiomas e aplicamos
-# EXATAMENTE o mesmo tratamento que o load_mapbiomas() faz internamente
-# (clean_names -> Latin-ASCII -> drop colunas "id" -> pivot dos anos "xYYYY" ->
-#  remove vars auxiliares -> rename eng -> tira prefixo numérico das classes),
-# ficando apenas com 2024 e empilhando na base do pacote.
-#
-# ATENÇÃO metodológica: a Collection 10 reprocessou TODA a série 1985-2024.
-# Enxertar só 2024 (Col10) sobre 1985-2023 (Col9) mistura duas metodologias na
-# mesma série. Se preferir série 100% consistente, use a Col10 para todos os anos:
-# remova o `filter(year == "2024")` abaixo e comente a carga da seção 2.
-#
-# OBS: a URL abaixo segue o mesmo padrão da Col9. Se o MapBiomas mudar o caminho,
-# pegue o link atual do arquivo de estatísticas em
-# https://brasil.mapbiomas.org/en/downloads/ e ajuste `col10_url`.
+# 2b. 2024 (Collection 10) — replica o tratamento do load_mapbiomas() no arquivo
+# de estatísticas da Col10 e empilha só 2024. (A Col10 reprocessou toda a série;
+# p/ série 100% consistente, tirar o filter(year=="2024") e comentar a seção 2.)
 ################################################################################
 
 col10_url <- paste0(
@@ -128,14 +95,37 @@ message("2024 (Col10) adicionado: ", nrow(dat_2024), " linhas | anos agora: ",
 # 3. REFERÊNCIAS: municípios da Amazônia Legal (nome do estado) e áreas
 ################################################################################
 
-# nome COMPLETO do estado (a coluna 'state' da carga vem como sigla, ex. "RO")
+# Nomes acentuados/Title Case (a carga e a tabela do pacote vêm em ASCII minúsculo):
+# mapa fixo para os 9 estados e API do IBGE para os municípios.
+
+estados_amz <- c(
+    "acre"        = "Acre",
+    "amapa"       = "Amapá",
+    "amazonas"    = "Amazonas",
+    "maranhao"    = "Maranhão",
+    "mato grosso" = "Mato Grosso",
+    "para"        = "Pará",
+    "rondonia"    = "Rondônia",
+    "roraima"     = "Roraima",
+    "tocantins"   = "Tocantins"
+)
+
 municipios_amazonia <- datazoom.amazonia::municipalities %>%
     filter(legal_amazon == 1) %>%
-    transmute(municipality_code = code_muni, uf = name_state)
+    transmute(
+        municipality_code = code_muni,
+        uf = dplyr::recode(name_state, !!!estados_amz)
+    )
 
-# lookup do nome do município (a partir da própria carga)
-muni_names <- dat %>%
-    distinct(municipality_code, municipality)
+# Nome dos municípios com acento e Title Case, via API de localidades do IBGE
+# (a coluna 'municipality' da carga vem sem acento). 'id' do IBGE = municipality_code.
+ibge_mun <- jsonlite::fromJSON(
+    "https://servicodados.ibge.gov.br/api/v1/localidades/municipios"
+)
+muni_names <- tibble::tibble(
+    municipality_code = as.numeric(ibge_mun$id),
+    municipality      = ibge_mun$nome
+)
 
 # área municipal (km²) — mantida no repositório em global/
 areas_mun <- readr::read_rds("global/area_municipios.rds")   # cols: municipality_code, area_km2
