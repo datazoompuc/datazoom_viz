@@ -141,15 +141,32 @@ get_server <- function(files, param) {
             dp <- dp[which(!is.na(dp$y)), ]
             dp <- dp[order(-dp$y), ]
             if (lg == "en") dp <- traduz_pais_df(dp)  # traduz nomes de país
+            # agrega tudo abaixo do top 10 num único nó "Outros" (evita poluição)
+            if (nrow(dp) > 10) {
+              outros_lab <- if (lg == "en") "Others" else "Outros"
+              resto <- data.frame(
+                y = sum(dp$y[-(1:10)], na.rm = TRUE),
+                group = outros_lab,
+                stringsAsFactors = FALSE
+              )
+              dp <- rbind(dp[1:10, ], resto)
+            }
             dp
           }
 
-          # Constrói os nós/links do sankey para um data.frame de um ano
+          # Constrói os nós/links do sankey para um data.frame de um ano.
+          # Posições fixas: empilha os alvos na ORDEM do dp (top 10 desc, "Outros"
+          # por último = sempre embaixo), independentemente do valor.
           build_nodes_links <- function(dp) {
             n <- nrow(dp)
             cores <- c(pallete[4], rep(pallete[3], 5), rep(pallete[2], 5),
                        rep(pallete[1], max(0, n - 10)))
             cores <- cores[1:(n + 1)]
+            # centro vertical de cada alvo = fração acumulada do valor (empilhamento)
+            frac    <- dp$y / sum(dp$y)
+            tops    <- cumsum(c(0, head(frac, -1)))
+            centros <- tops + frac / 2
+            centros <- pmin(pmax(centros, 1e-3), 1 - 1e-3)
             list(
               node = list(
                 label = c("Amazônia", dp$group),
@@ -157,8 +174,8 @@ get_server <- function(files, param) {
                 hovertemplate = "<b> %{label} </b>",
                 pad = 15, thickness = 10,
                 line = list(color = "black", width = 0.5),
-                x = c(-0.001, rep(NA, n)),
-                y = c(0.5, rep(NA, n))
+                x = c(0.01, rep(0.9, n)),   # fonte à esquerda, alvos à direita
+                y = c(0.5, centros)
               ),
               link = list(
                 source = rep(0, n),
@@ -180,6 +197,7 @@ get_server <- function(files, param) {
           fig_p <- plot_ly(
             type = "sankey",
             orientation = "h",
+            arrangement = "fixed",   # respeita as posições y (mantém "Outros" embaixo)
             valueformat = ".2f",
             valuesuffix = paste0(" (", i18n()$unit, y_col$unidade, ") "),
             hoverlabel = list(namelength = -1),
