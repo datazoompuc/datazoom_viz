@@ -361,6 +361,10 @@ labl <- labl[-c(1,2)]
 labl <- sub("^value\\.", "", labl)   # remove prefixo do reshape sem truncar
 colnames(datafinal_val_pais_munic) <- c("time", "group", labl)
 
+# Ordena por (group, time)
+datafinal_val_pais_sec <- datafinal_val_pais_sec[order(datafinal_val_pais_sec$group, datafinal_val_pais_sec$time), ]
+datafinal_val_pais_munic <- datafinal_val_pais_munic[order(datafinal_val_pais_munic$group, datafinal_val_pais_munic$time), ]
+
 saveRDS(datafinal_val_pais_sec, "data/comex_exp_sec_pais.rds")
 saveRDS(datafinal_val_pais_munic, "data/comex_exp_pais_sec.rds")
 
@@ -476,11 +480,12 @@ temp_param_table$label[2] <- "País"
 temp_param_table$label[1] <- "Ano"
 temp_param_table$desc[2] <- "País"
 temp_param_table$desc[1] <- "Ano"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 221))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 221))
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
 
 write.csv(temp_param_table, file = "data/comex_exp_sec_pais_dic.csv", fileEncoding = "UTF-8")
 
@@ -509,11 +514,12 @@ temp_param_table$label[2] <- "Section"
 temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_pais)
 temp_param_table$desc <- temp_param_table$label
 
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 221))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 221))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 221))
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
 
 write.csv(temp_param_table, file = "data/comex_exp_sec_pais_en_dic.csv", fileEncoding = "UTF-8")
 
@@ -542,11 +548,12 @@ temp_param_table$label[2] <- "Country"
 temp_param_table$label[-(1:2)] <- tr(temp_param_table$var[-(1:2)], map_sec)
 temp_param_table$desc <- temp_param_table$label
 
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 22))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 22))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 22))
+n_vars <- length(columns) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, n_vars))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_vars))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_vars))
 
 write.csv(temp_param_table, file = "data/comex_exp_pais_sec_dic_en.csv", fileEncoding = "UTF-8")
 
