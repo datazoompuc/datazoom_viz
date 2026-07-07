@@ -21,17 +21,17 @@ get_ui <- function(files, param) {
                           border-color: #40768B !important;
               }',),
         
-        h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        uiOutput("plot_name_ui"),
+        uiOutput("plot_desc_ui"),
         hr(),
-        p(class = "vars", param$label_var_name),
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
         
         
         
         # Seleciona filtro de países
         selectizeInput(
             "filter1",
-            param$label_country_filter,
+            textOutput("label_country_filter", inline = TRUE),
             choices = NULL,
             multiple = TRUE,
             options = list(maxItems = 20),
@@ -46,7 +46,7 @@ get_ui <- function(files, param) {
             style = "margin-top: 10px;",
             materialSwitch(
                 inputId = "ydefl",
-                label = tags$span(param$label_deflator, class = "switch-label"),
+                label = tags$span(textOutput("label_deflator", inline = TRUE), class = "switch-label"),
                 value = FALSE,  # começa desligado
                 status = "info"
             )
@@ -55,7 +55,7 @@ get_ui <- function(files, param) {
         # espaço vazio
         div(class = "fakecheckbox", ),
         
-        p(class = "vars", param$label_scales),
+        p(class = "vars", textOutput("label_scales", inline = TRUE)),
 
         
         # Seleciona eixo log
@@ -64,7 +64,7 @@ get_ui <- function(files, param) {
             style = "margin-top: 10px;",
             materialSwitch(
                 inputId = "ylog",
-                label = tags$span(param$label_scale_name, class = "switch-label"),
+                label = tags$span(textOutput("label_scale_name", inline = TRUE), class = "switch-label"),
                 value = FALSE, 
                 status = "info"
             )
@@ -76,7 +76,7 @@ get_ui <- function(files, param) {
             style = "margin-top: 10px;",
             materialSwitch(
                 inputId = "y_option",
-                label = tags$span(param$label_axis_name, class = "switch-label"),
+                label = tags$span(textOutput("label_axis_name", inline = TRUE), class = "switch-label"),
                 value = FALSE, 
                 status = "info"
             )
@@ -92,7 +92,13 @@ get_ui <- function(files, param) {
           shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
                               icon = icon("expand"), 
                               class = "btn-primary",
-                              onclick = paste0("window.open('",param$link,"', '_blank')"))
+                              onclick = paste0("window.open('",param$link,"', '_blank')")),
+          actionButton(
+            inputId = "toggle_lang",
+            label   = "English",
+            icon    = icon("globe"),
+            class   = "btn-primary"
+          ),
         ),
       ),
       column(9,
@@ -115,6 +121,6 @@ get_ui <- function(files, param) {
                  )
              )
       )
-    ),
-  )
+      )
+    )
 }

@@ -9,7 +9,7 @@ library(stringr)
 library(httr)
 library(jsonlite)
 
-dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2024, raw_data = FALSE)
+dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2025, raw_data = FALSE)
 
 dat <- inner_join(
     dat,
@@ -63,10 +63,60 @@ if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
 
 aux2 <- as_tibble(d) %>%
     transmute(
-        CO_SH4       = str_pad(id, 4, pad = "0"),
+        CO_SH4     = str_pad(id, 4, pad = "0"),
         NO_POR_MIN = str_trim(str_remove(text, "^\\d{4}\\s*-\\s*"))
     ) %>%
     distinct(CO_SH4, .keep_all = TRUE)
+
+# busca nomes de capítulos SH2 (2 dígitos) para adicionar NO_SH2_POR
+url_ch <- "https://api-comexstat.mdic.gov.br/cities/filters/chapter?language=pt"
+resp_ch <- GET(url_ch)
+stop_for_status(resp_ch)
+d_ch <- fromJSON(content(resp_ch, as = "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)$data
+if (is.list(d_ch) && length(d_ch) == 1 && is.data.frame(d_ch[[1]])) d_ch <- d_ch[[1]]
+
+aux2_sh2 <- as_tibble(d_ch) %>%
+    transmute(
+        CO_SH2     = str_pad(id, 2, pad = "0"),
+        NO_SH2_POR = str_trim(str_remove(text, "^\\d+\\s*-\\s*"))
+    ) %>%
+    distinct(CO_SH2, .keep_all = TRUE)
+
+# nomes em inglês para SH4
+url_en <- "https://api-comexstat.mdic.gov.br/cities/filters/heading?language=en"
+resp_en <- GET(url_en)
+stop_for_status(resp_en)
+d_en <- fromJSON(content(resp_en, as = "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)$data
+if (is.list(d_en) && length(d_en) == 1 && is.data.frame(d_en[[1]])) d_en <- d_en[[1]]
+
+aux2_en <- as_tibble(d_en) %>%
+    transmute(
+        CO_SH4     = str_pad(id, 4, pad = "0"),
+        NO_ENG_MIN = str_trim(str_remove(text, "^\\d{4}\\s*-\\s*"))
+    ) %>%
+    distinct(CO_SH4, .keep_all = TRUE)
+
+# nomes em inglês para SH2
+url_ch_en <- "https://api-comexstat.mdic.gov.br/cities/filters/chapter?language=en"
+resp_ch_en <- GET(url_ch_en)
+stop_for_status(resp_ch_en)
+d_ch_en <- fromJSON(content(resp_ch_en, as = "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)$data
+if (is.list(d_ch_en) && length(d_ch_en) == 1 && is.data.frame(d_ch_en[[1]])) d_ch_en <- d_ch_en[[1]]
+
+aux2_sh2_en <- as_tibble(d_ch_en) %>%
+    transmute(
+        CO_SH2     = str_pad(id, 2, pad = "0"),
+        NO_SH2_ENG = str_trim(str_remove(text, "^\\d+\\s*-\\s*"))
+    ) %>%
+    distinct(CO_SH2, .keep_all = TRUE)
+
+aux2 <- aux2 %>%
+    mutate(CO_SH2 = substr(CO_SH4, 1, 2)) %>%
+    left_join(aux2_sh2,    by = "CO_SH2") %>%
+    left_join(aux2_en,     by = "CO_SH4") %>%
+    left_join(aux2_sh2_en, by = "CO_SH2") %>%
+    select(-CO_SH2)
+
 saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
 
 
@@ -195,7 +245,6 @@ dat$cod_sh4 <- sprintf("%04d", as.numeric(dat$cod_sh4))
 aux2$CO_SH4 <- sprintf("%04d", as.numeric(aux2$CO_SH4))
 dat$cod_sh4 <- str_replace_all(dat$cod_sh4, setNames(aux2$NO_SH2_POR, aux2$CO_SH4))
 dat$cod_municipio <- str_replace_all(dat$cod_municipio, setNames(aux3$nome, aux3$codigo))
-dat$cod_municipio <- paste(dat$cod_municipio, " - ",dat$uf)
 dat$uf <- NULL
 
 data_val <- dat
@@ -220,6 +269,17 @@ datafinal_val_sh2[is.na(datafinal_val_sh2)] <- 0
 
 datafinal_val_munic <- datafinal_val_munic[order(datafinal_val_munic$group, datafinal_val_munic$time),]
 datafinal_val_sh2 <- datafinal_val_sh2[order(datafinal_val_sh2$group, datafinal_val_sh2$time),]
+
+# Adiciona linha "Amazônia Legal" = soma de todos os municípios por ano
+sh2_cols <- setdiff(names(datafinal_val_sh2), c("time", "group"))
+amazonia_legal <- aggregate(
+    datafinal_val_sh2[, sh2_cols],
+    by = list(time = datafinal_val_sh2$time),
+    FUN = sum, na.rm = TRUE
+)
+amazonia_legal$group <- "Amazônia Legal"
+amazonia_legal <- amazonia_legal[, c("time", "group", sh2_cols)]
+datafinal_val_sh2 <- rbind(amazonia_legal, datafinal_val_sh2)
 
 saveRDS(datafinal_val_munic, "data/comex_exp_munic_sh2.rds")
 saveRDS(datafinal_val_sh2, "data/comex_exp_sh2_munic.rds")
@@ -919,212 +979,122 @@ temp_param_table <- tibble(
     desc = columns,
     var_group = "Comex",
     tipo = 1,
-    unidade = "R$",
-    categoria= "Economy", 
+    unidade = "US$",
+    categoria= "Economy",
     subcategoria = "Trade"
 )
 
-temp_param_table$label[98] <- "Guns and ammunition; their parts and accessories"
-temp_param_table$label[97] <- "Wool, thin or thick fur; threads and hair fabrics"
-temp_param_table$label[96] <- "Non-continuous synthetic or artificial fibers"
-temp_param_table$label[95] <- "Cork and its works"
-temp_param_table$label[94] <- "Lead and its works"
-temp_param_table$label[93] <- "Zinc and its works"
-temp_param_table$label[92] <- "Knitwear fabrics"
-temp_param_table$label[91] <- "Carpets and other textile floor coverings"
-temp_param_table$label[90] <- "Gunpowder and explosives; fireworks; matches; pyrophoric alloys; flammable materials"
-temp_param_table$label[89] <- "Feathers and prepared plumage and their works; artificial flowers; hair works"
-temp_param_table$label[88] <- "Furred pelts and theis crafts; pelt with artificial fur"
-temp_param_table$label[87] <- "Musical instruments; their parts and accessories"
-temp_param_table$label[86] <- "Umbrellas, parasols, sunshades, canes, seat canes, whips, walking sticks"
-temp_param_table$label[85] <- "Watch articles"
-temp_param_table$label[84] <- "Nickel and its works"
-temp_param_table$label[83] <- "Impregnated, coated, covered or laminated fabrics; technical use articles"
-temp_param_table$label[82] <- "Inorganic chemicals; precious metals organic or inorganic compunds"
-temp_param_table$label[81] <- "Tin and its works"
-temp_param_table$label[80] <- "Aircrafts and special devices; and their parts"
-temp_param_table$label[79] <- "Glass and its works"
-temp_param_table$label[78] <- "Knitwear clothing and its accessories"
-temp_param_table$label[77] <- "Special fabrics; tufted fabrics; laces; tapestries; trimmings; embroideries"
-temp_param_table$label[76] <- "Tobbaco and its manufactured substitutes"
-temp_param_table$label[75] <- "Products for photography and cinematography"
-temp_param_table$label[74] <- "Pharmaceutical products"
-temp_param_table$label[73] <- "Cereal based, flours, starches, starches products or milk preparations; pastry products"
-temp_param_table$label[72] <- "Live plants and floriculture products"
-temp_param_table$label[71] <- "Pelt, except furred pelt, and leathers"
-temp_param_table$label[70] <- "Other common metals; cermets; these matters works"
-temp_param_table$label[69] <- "Other vegetal textile fibers; paper threads and paper threads fabrics"
-temp_param_table$label[68] <- "Various works of common metals"
-temp_param_table$label[67] <- "Sparto or basketry works"
-temp_param_table$label[66] <- "Materials for plaiting and other vegetable products, not specified nor contained in other Chapters"
-temp_param_table$label[65] <- "Books, newspapers, engravings and other graphic industry products; handwritten texts"
-temp_param_table$label[64] <- "Synthetic or natural filaments"
-temp_param_table$label[63] <- "Tanning and dyeing extracts; tannins and their derivatives; pigments and other colouring matter"
-temp_param_table$label[62] <- "Boats and floating structures"
-temp_param_table$label[61] <- "Mineral fuels, mineram oils and products of their destiltion; bitunimous substances; wax"
-temp_param_table$label[60] <- "Cooper and its works"
-temp_param_table$label[59] <- "Hats and similar purpose artifacts, and their parts"
-temp_param_table$label[58] <- "Aluminum and its works"
-temp_param_table$label[57] <- "Fertilizers"
-temp_param_table$label[56] <- "Footwear, gaiters and similar artifacts; their parts"
-temp_param_table$label[55] <- "Organic chemicals"
-temp_param_table$label[54] <- "Cotton"
-temp_param_table$label[53] <- "Automobiles, tractors, mopeds and other terrestrial vehicles, and their parts and accessories"
-temp_param_table$label[52] <- "Fish and crustaceans, mollusks and other aquatic invertebrates"
-temp_param_table$label[51] <- "Essential oils and resinoids; perfumery or toilet preparations products"
-temp_param_table$label[50] <- "Various works"
-temp_param_table$label[49] <- "Stone, plaster, cement, asbestos, mica and similar elements works"
-temp_param_table$label[48] <- "Optic, photography or cinematography, measuring, control or precision instruments or devices"
-temp_param_table$label[47] <- "Cocoa and its preparations"
-temp_param_table$label[46] <- "Toys, games, articles for fun or sports; their parts and accessories"
-temp_param_table$label[45] <- "Rubber and its works"
-temp_param_table$label[44] <- "Meat, fish or crustaceans, mollusks and other aquatic invertebrates preparations"
-temp_param_table$label[43] <- "Various food related preparations"
-temp_param_table$label[42] <- "Milk and derivatives; bird's eggs; natural honey; edible products of animal origin, not"
-temp_param_table$label[41] <- "Vehicles and material for railroads and resemblants, and their parts; mechanical devices (including)"
-temp_param_table$label[40] <- "Salt; sulfur; dirt and stones; plaster, lime and cement"
-temp_param_table$label[39] <- "Natural or cultured pearls, precious or semiprecious stones and resemblants, precious metals"
-temp_param_table$label[38] <- "Beverages, alcoholic liquids and vinegars"
-temp_param_table$label[37] <- "Paper and card; paper or card cellulose paste works"
-temp_param_table$label[36] <- "Albuminoids raw material; modified starch or flour-based products, glues and enzymes"
-temp_param_table$label[35] <- "Machines, devices, electric material and their parts; Recording and playing devices"
-temp_param_table$label[34] <- "Other animal origin products, not specified nor contained in other Chapters"
-temp_param_table$label[33] <- "Cast iron, iron or steel"
-temp_param_table$label[32] <- "Edible meat and offal"
-temp_param_table$label[31] <- "Coffee, tea, mate and spices"
-temp_param_table$label[30] <- "Sugar and confectionary products"
-temp_param_table$label[29] <- "Clothing and its accessories, except knitwear"
-temp_param_table$label[28] <- "Special transactions"
-temp_param_table$label[27] <- "Oilseeds and oilseed fruits; grains, seeds and various fruits; industrial or medical plants"
-temp_param_table$label[26] <- "Soaps, surface-active organic agents, washing prepartions, lubricating preparations"
-temp_param_table$label[25] <- "Food industry waste and residuals; food made for animals"
-temp_param_table$label[24] <- "Nuclear reactors, boilers, mechanical instruments and devices and their parts"
-temp_param_table$label[23] <- "Edible horticultural products, plants, roots, and tubers"
-temp_param_table$label[22] <- "Various products from the chemical industry"
-temp_param_table$label[21] <- "Grinding industry products; malt; starches and flours; inulin; wheat gluten"
-temp_param_table$label[20] <- "Pottery products"
-temp_param_table$label[19] <- "Horticultural products, fruit and other plant parts preparation"
-temp_param_table$label[18] <- "Plastic and its works"
-temp_param_table$label[17] <- "Wood or other celullose fiber materials pastes; Paper or card for recycling"
-temp_param_table$label[16] <- "Batt, felt and fake cloth; Special; Special threads; Twines, ropes and cables; Articles of"
-temp_param_table$label[15] <- "Other manufactured textile artifacts; Sorted itens; textile raw materials artifacts, footwear"
-temp_param_table$label[14] <- "Cast iron, iron or steel"
-temp_param_table$label[13] <- "Leather works; Trapecial straps or saddles; Travel articles, purses and similar artifacts"
-temp_param_table$label[12] <- "Art and collection objects and antiques"
-temp_param_table$label[11] <- "Furniture; Medic surgery furniture, matresses, pillows and resemblants; Lighten devices"
-temp_param_table$label[10] <- "Minerals, slag and ashes"
-temp_param_table$label[9] <- "Wood, charcoal and woodcraft"
-temp_param_table$label[8] <- "Fats and vegetable or animal oils; their dissociation products; processed food fats"
-temp_param_table$label[7] <- "Gum, resins and other vegetable juices and extracts"
-temp_param_table$label[6] <- "Fruit; Citrus fruits and melon peel"
-temp_param_table$label[5] <- "Tools, cutlery artifacts and silverware and their made of metal parts"
-temp_param_table$label[4] <- "Cereals"
-temp_param_table$label[3] <- "Live animals"
-temp_param_table$label[2] <- "Municipality"
-temp_param_table$label[1] <- "Year"
-temp_param_table$desc[98] <- "Guns and ammunition; their parts and accessories"
-temp_param_table$desc[97] <- "Wool, thin or thick fur; threads and hair fabrics"
-temp_param_table$desc[96] <- "Non-continuous synthetic or artificial fibers"
-temp_param_table$desc[95] <- "Cork and its works"
-temp_param_table$desc[94] <- "Lead and its works"
-temp_param_table$desc[93] <- "Zinc and its works"
-temp_param_table$desc[92] <- "Knitwear fabrics"
-temp_param_table$desc[91] <- "Carpets and other textile floor coverings"
-temp_param_table$desc[90] <- "Gunpowder and explosives; fireworks; matches; pyrophoric alloys; flammable materials"
-temp_param_table$desc[89] <- "Feathers and prepared plumage and their works; artificial flowers; hair works"
-temp_param_table$desc[88] <- "Furred pelts and theis crafts; pelt with artificial fur"
-temp_param_table$desc[87] <- "Musical instruments; their parts and accessories"
-temp_param_table$desc[86] <- "Umbrellas, parasols, sunshades, canes, seat canes, whips, walking sticks"
-temp_param_table$desc[85] <- "Watch articles"
-temp_param_table$desc[84] <- "Nickel and its works"
-temp_param_table$desc[83] <- "Impregnated, coated, covered or laminated fabrics; technical use articles"
-temp_param_table$desc[82] <- "Inorganic chemicals; precious metals organic or inorganic compunds"
-temp_param_table$desc[81] <- "Tin and its works"
-temp_param_table$desc[80] <- "Aircrafts and special devices; and their parts"
-temp_param_table$desc[79] <- "Glass and its works"
-temp_param_table$desc[78] <- "Knitwear clothing and its accessories"
-temp_param_table$desc[77] <- "Special fabrics; tufted fabrics; laces; tapestries; trimmings; embroideries"
-temp_param_table$desc[76] <- "Tobbaco and its manufactured substitutes"
-temp_param_table$desc[75] <- "Products for photography and cinematography"
-temp_param_table$desc[74] <- "Pharmaceutical products"
-temp_param_table$desc[73] <- "Cereal based, flours, starches, starches products or milk preparations; pastry products"
-temp_param_table$desc[72] <- "Live plants and floriculture products"
-temp_param_table$desc[71] <- "Pelt, except furred pelt, and leathers"
-temp_param_table$desc[70] <- "Other common metals; cermets; these matters works"
-temp_param_table$desc[69] <- "Other vegetal textile fibers; paper threads and paper threads fabrics"
-temp_param_table$desc[68] <- "Various works of common metals"
-temp_param_table$desc[67] <- "Sparto or basketry works"
-temp_param_table$desc[66] <- "Materials for plaiting and other vegetable products, not specified nor contained in other Chapters"
-temp_param_table$desc[65] <- "Books, newspapers, engravings and other graphic industry products; handwritten texts"
-temp_param_table$desc[64] <- "Synthetic or natural filaments"
-temp_param_table$desc[63] <- "Tanning and dyeing extracts; tannins and their derivatives; pigments and other colouring matter"
-temp_param_table$desc[62] <- "Boats and floating structures"
-temp_param_table$desc[61] <- "Mineral fuels, mineram oils and products of their destiltion; bitunimous substances; wax"
-temp_param_table$desc[60] <- "Cooper and its works"
-temp_param_table$desc[59] <- "Hats and similar purpose artifacts, and their parts"
-temp_param_table$desc[58] <- "Aluminum and its works"
-temp_param_table$desc[57] <- "Fertilizers"
-temp_param_table$desc[56] <- "Footwear, gaiters and similar artifacts; their parts"
-temp_param_table$desc[55] <- "Organic chemicals"
-temp_param_table$desc[54] <- "Cotton"
-temp_param_table$desc[53] <- "Automobiles, tractors, mopeds and other terrestrial vehicles, and their parts and accessories"
-temp_param_table$desc[52] <- "Fish and crustaceans, mollusks and other aquatic invertebrates"
-temp_param_table$desc[51] <- "Essential oils and resinoids; perfumery or toilet preparations products"
-temp_param_table$desc[50] <- "Various works"
-temp_param_table$desc[49] <- "Stone, plaster, cement, asbestos, mica and similar elements works"
-temp_param_table$desc[48] <- "Optic, photography or cinematography, measuring, control or precision instruments or devices"
-temp_param_table$desc[47] <- "Cocoa and its preparations"
-temp_param_table$desc[46] <- "Toys, games, articles for fun or sports; their parts and accessories"
-temp_param_table$desc[45] <- "Rubber and its works"
-temp_param_table$desc[44] <- "Meat, fish or crustaceans, mollusks and other aquatic invertebrates preparations"
-temp_param_table$desc[43] <- "Various food related preparations"
-temp_param_table$desc[42] <- "Milk and derivatives; bird's eggs; natural honey; edible products of animal origin, not"
-temp_param_table$desc[41] <- "Vehicles and material for railroads and resemblants, and their parts; mechanical devices (including)"
-temp_param_table$desc[40] <- "Salt; sulfur; dirt and stones; plaster, lime and cement"
-temp_param_table$desc[39] <- "Natural or cultured pearls, precious or semiprecious stones and resemblants, precious metals"
-temp_param_table$desc[38] <- "Beverages, alcoholic liquids and vinegars"
-temp_param_table$desc[37] <- "Paper and card; paper or card cellulose paste works"
-temp_param_table$desc[36] <- "Albuminoids raw material; modified starch or flour-based products, glues and enzymes"
-temp_param_table$desc[35] <- "Machines, devices, electric material and their parts; Recording and playing devices"
-temp_param_table$desc[34] <- "Other animal origin products, not speficied nor contained in other Chapters"
-temp_param_table$desc[33] <- "Cast iron, iron or steel"
-temp_param_table$desc[32] <- "Edible meat and offal"
-temp_param_table$desc[31] <- "Coffee, tea, mate and spices"
-temp_param_table$desc[30] <- "Sugar and confectionary products"
-temp_param_table$desc[29] <- "Clothing and its accessories, except knitwear"
-temp_param_table$desc[28] <- "Special transactions"
-temp_param_table$desc[27] <- "Oilseeds and oilseed fruits; grains, seeds and various fruits; industrial or medical plants"
-temp_param_table$desc[26] <- "Soaps, surface-active organic agents, washing prepartions, lubricating preparations"
-temp_param_table$desc[25] <- "Food industry waste and residuals; food made for animals"
-temp_param_table$desc[24] <- "Nuclear reactors, boilers, mechanical instruments and devices and their parts"
-temp_param_table$desc[23] <- "Edible horticultural products, plants, roots, and tubers"
-temp_param_table$desc[22] <- "Various products from the chemical industry"
-temp_param_table$desc[21] <- "Grinding industry products; malt; starches and flours; inulin; wheat gluten"
-temp_param_table$desc[20] <- "Pottery products"
-temp_param_table$desc[19] <- "Horticultural products, fruit and other plant parts preparation"
-temp_param_table$desc[18] <- "Plastic and its works"
-temp_param_table$desc[17] <-  "Wood or other celullose fiber materials pastes; Paper or card for recycling"
-temp_param_table$desc[16] <- "Batt, felt and fake cloth; Special; Special threads; Twines, ropes and cables; Articles of"
-temp_param_table$desc[15] <- "Other manufactured textile artifacts; Sorted itens; textile raw materials artifacts, footwear"
-temp_param_table$desc[14] <- "Cast iron, iron or steel"
-temp_param_table$desc[13] <- "Leather works; Trapecial straps or saddles; Travel articles, purses and similar artifacts"
-temp_param_table$desc[12] <- "Art and collection objects and antiques"
-temp_param_table$desc[11] <- "Furniture; Medic surgery furniture, matresses, pillows and resemblants; Lighten devices"
-temp_param_table$desc[10] <- "Minerals, slag and ashes"
-temp_param_table$desc[9] <- "Wood, charcoal and woodcraft"
-temp_param_table$desc[8] <-"Fats and vegetable or animal oils; their dissociation products; processed food fats"
-temp_param_table$desc[7] <- "Gum, resins and other vegetable juices and extracts"
-temp_param_table$desc[6] <- "Fruit; Citrus fruits and melon peel"
-temp_param_table$desc[5] <- "Tools, cutlery artifacts and silverware and their made of metal parts"
-temp_param_table$desc[4] <- "Cereals"
-temp_param_table$desc[3] <- "Live animals"
-temp_param_table$desc[2] <- "Municipality"
-temp_param_table$desc[1] <- "Year"
-temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, 96))
-temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, 96))
-temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, 96))
+sh2_en <- c(
+  "time"  = "Year",
+  "group" = "Municipality",
+  "Adubos (fertilizantes)"                                                                                                                    = "Fertilizers",
+  "Aeronaves e aparelhos espaciais, e suas partes"                                                                                            = "Aircrafts and special devices; and their parts",
+  "Algodão"                                                                                                                                   = "Cotton",
+  "Alumínio e suas obras"                                                                                                                     = "Aluminum and its works",
+  "Animais vivos"                                                                                                                             = "Live animals",
+  "Armas e munições; suas partes e acessórios"                                                                                                = "Guns and ammunition; their parts and accessories",
+  "Artigos de relojoaria"                                                                                                                     = "Watch articles",
+  "Açúcares e produtos de confeitaria"                                                                                                        = "Sugar and confectionary products",
+  "Bebidas, líquidos alcoólicos e vinagres"                                                                                                   = "Beverages, alcoholic liquids and vinegars",
+  "Borracha e suas obras"                                                                                                                     = "Rubber and its works",
+  "Brinquedos, jogos, artigos para divertimento ou para esporte; suas partes e acessórios"                                                   = "Toys, games, articles for fun or sports; their parts and accessories",
+  "Cacau e suas preparações"                                                                                                                  = "Cocoa and its preparations",
+  "Café, chá, mate e especiarias"                                                                                                             = "Coffee, tea, mate and spices",
+  "Calçados, polainas e artefatos semelhantes; suas partes"                                                                                  = "Footwear, gaiters and similar artifacts; their parts",
+  "Carnes e miudezas, comestíveis"                                                                                                           = "Edible meat and offal",
+  "Cereais"                                                                                                                                   = "Cereals",
+  "Chapéus e artefatos de uso semelhante, e suas partes"                                                                                     = "Hats and similar purpose artifacts, and their parts",
+  "Chumbo e suas obras"                                                                                                                      = "Lead and its works",
+  "Cobre e suas obras"                                                                                                                       = "Cooper and its works",
+  "Combustíveis minerais, óleos minerais e produtos da sua destilação; matérias betuminosas; cera"                                          = "Mineral fuels, mineram oils and products of their destiltion; bitunimous substances; wax",
+  "Cortiça e suas obras"                                                                                                                     = "Cork and its works",
+  "Embarcações e estruturas flutuantes"                                                                                                      = "Boats and floating structures",
+  "Estanho e suas obras"                                                                                                                     = "Tin and its works",
+  "Extratos tanantes e tintoriais; taninos e seus derivados; pigmentos e outras matérias corantes"                                           = "Tanning and dyeing extracts; tannins and their derivatives; pigments and other colouring matter",
+  "Ferramentas, artefatos de cutelaria e talheres, e suas partes, de metais comuns"                                                         = "Tools, cutlery artifacts and silverware and their made of metal parts",
+  "Ferro fundido, ferro e aço"                                                                                                               = "Cast iron, iron or steel",
+  "Fibras sintéticas ou artificiais, descontínuas"                                                                                           = "Non-continuous synthetic or artificial fibers",
+  "Filamentos sintéticos ou artificiais"                                                                                                     = "Synthetic or natural filaments",
+  "Frutas; cascas de frutos cítricos e de melões"                                                                                            = "Fruit; Citrus fruits and melon peel",
+  "Gomas, resinas e outros sucos e extratos vegetais"                                                                                        = "Gum, resins and other vegetable juices and extracts",
+  "Gorduras e óleos animais ou vegetais; produtos da sua dissociação; gorduras alimentares elabor"                                           = "Fats and vegetable or animal oils; their dissociation products; processed food fats",
+  "Guarda-chuvas, sombrinhas, guarda-sóis, bengalas, bengalas-assentos, chicotes, pingalins, e su"                                          = "Umbrellas, parasols, sunshades, canes, seat canes, whips, walking sticks",
+  "Instrumentos e aparelhos de óptica, de fotografia, de cinematografia, de medida, de controle o"                                          = "Optic, photography or cinematography, measuring, control or precision instruments or devices",
+  "Instrumentos musicais; suas partes e acessórios"                                                                                         = "Musical instruments; their parts and accessories",
+  "Leite e lacticínios; ovos de aves; mel natural; produtos comestíveis de origem animal, não esp"                                          = "Milk and derivatives; bird's eggs; natural honey; edible products of animal origin, not",
+  "Livros, jornais, gravuras e outros produtos das indústrias gráficas; textos manuscritos ou dat"                                           = "Books, newspapers, engravings and other graphic industry products; handwritten texts",
+  "Lã, pelos finos ou grosseiros; fios e tecidos de crina"                                                                                  = "Wool, thin or thick fur; threads and hair fabrics",
+  "Madeira, carvão vegetal e obras de madeira"                                                                                               = "Wood, charcoal and woodcraft",
+  "Matérias albuminóides; produtos à base de amidos ou de féculas modificados; colas; enzimas"                                              = "Albuminoids raw material; modified starch or flour-based products, glues and enzymes",
+  "Matérias para entrançar e outros produtos de origem vegetal, não especificados nem compreendid"                                           = "Materials for plaiting and other vegetable products, not specified nor contained in other Chapters",
+  "Minerios, escórias e cinzas"                                                                                                              = "Minerals, slag and ashes",
+  "Móveis; mobiliário médico-cirúrgico, colchões, almofadas e semelhantes; aparelhos de iluminaçã"                                          = "Furniture; Medic surgery furniture, matresses, pillows and resemblants; Lighten devices",
+  "Máquinas, aparelhos e materiais elétricos, e suas partes; aparelhos de gravação ou de reproduç"                                          = "Machines, devices, electric material and their parts; Recording and playing devices",
+  "Níquel e suas obras"                                                                                                                      = "Nickel and its works",
+  "Objetos de arte, de coleção e antiguidades"                                                                                               = "Art and collection objects and antiques",
+  "Obras de couro; artigos de correeiro ou de seleiro; artigos de viagem, bolsas e artefatos seme"                                          = "Leather works; Trapecial straps or saddles; Travel articles, purses and similar artifacts",
+  "Obras de espartaria ou de cestaria"                                                                                                       = "Sparto or basketry works",
+  "Obras de ferro fundido, ferro ou aço"                                                                                                     = "Cast iron, iron or steel",
+  "Obras de pedra, gesso, cimento, amianto, mica ou de matérias semelhantes"                                                                = "Stone, plaster, cement, asbestos, mica and similar elements works",
+  "Obras diversas"                                                                                                                           = "Various works",
+  "Obras diversas de metais comuns"                                                                                                          = "Various works of common metals",
+  "Outras fibras têxteis vegetais; fios de papel e tecidos de fios de papel"                                                                 = "Other vegetal textile fibers; paper threads and paper threads fabrics",
+  "Outros artefatos têxteis confeccionados; sortidos; artefatos de matérias têxteis, calçados, ch"                                          = "Other manufactured textile artifacts; Sorted itens; textile raw materials artifacts, footwear",
+  "Outros metais comuns; ceramais (cermets); obras dessas matérias"                                                                          = "Other common metals; cermets; these matters works",
+  "Outros produtos de origem animal, não especificados nem compreendidos noutros Capítulos"                                                  = "Other animal origin products, not specified nor contained in other Chapters",
+  "Papel e cartão; obras de pasta de celulose, de papel ou de cartão"                                                                       = "Paper and card; paper or card cellulose paste works",
+  "Pastas (ouates), feltros e falsos tecidos; fios especiais; cordéis, cordas e cabos; artigos de"                                          = "Batt, felt and fake cloth; Special; Special threads; Twines, ropes and cables; Articles of",
+  "Pastas de madeira ou de outras matérias fibrosas celulósicas; papel ou cartão para reciclar (d"                                          = "Wood or other celullose fiber materials pastes; Paper or card for recycling",
+  "Peles com pelo e suas obras; peles com pelo artificiais"                                                                                  = "Furred pelts and theis crafts; pelt with artificial fur",
+  "Peles, exceto as peles com pelo, e couros"                                                                                                = "Pelt, except furred pelt, and leathers",
+  "Penas e penugem preparadas e suas obras; flores artificiais; obras de cabelo"                                                             = "Feathers and prepared plumage and their works; artificial flowers; hair works",
+  "Plantas vivas e produtos de floricultura"                                                                                                 = "Live plants and floriculture products",
+  "Plásticos e suas obras"                                                                                                                   = "Plastic and its works",
+  "Preparações alimentícias diversas"                                                                                                        = "Various food related preparations",
+  "Preparações de carne, de peixes ou de crustáceos, de moluscos ou de outros invertebrados aquát"                                          = "Meat, fish or crustaceans, mollusks and other aquatic invertebrates preparations",
+  "Preparações de produtos hortícolas, de frutas ou de outras partes de plantas"                                                            = "Horticultural products, fruit and other plant parts preparation",
+  "Preparações à base de cereais, farinhas, amidos, féculas ou leite; produtos de pastelaria"                                               = "Cereal based, flours, starches, starches products or milk preparations; pastry products",
+  "Produtos cerâmicos"                                                                                                                       = "Pottery products",
+  "Produtos da indústria de moagem; malte; amidos e féculas; inulina; glúten de trigo"                                                      = "Grinding industry products; malt; starches and flours; inulin; wheat gluten",
+  "Produtos diversos das indústrias químicas"                                                                                                = "Various products from the chemical industry",
+  "Produtos farmacêuticos"                                                                                                                   = "Pharmaceutical products",
+  "Produtos hortícolas, plantas, raízes e tubérculos, comestíveis."                                                                         = "Edible horticultural products, plants, roots, and tubers",
+  "Produtos para fotografia e cinematografia"                                                                                                = "Products for photography and cinematography",
+  "Produtos químicos inorgânicos; compostos inorgânicos ou orgânicos de metais preciosos, de elem"                                          = "Inorganic chemicals; precious metals organic or inorganic compunds",
+  "Produtos químicos orgânicos"                                                                                                              = "Organic chemicals",
+  "Pólvoras e explosivos; artigos de pirotecnia; fósforos; ligas pirofóricas; matérias inflamávei"                                          = "Gunpowder and explosives; fireworks; matches; pyrophoric alloys; flammable materials",
+  "Pérolas naturais ou cultivadas, pedras preciosas ou semipreciosas e semelhantes, metais precio"                                          = "Natural or cultured pearls, precious or semiprecious stones and resemblants, precious metals",
+  "Peixes e crustáceos, moluscos e outros invertebrados aquáticos"                                                                           = "Fish and crustaceans, mollusks and other aquatic invertebrates",
+  "Reatores nucleares, caldeiras, máquinas, aparelhos e instrumentos mecânicos, e suas partes"                                              = "Nuclear reactors, boilers, mechanical instruments and devices and their parts",
+  "Resíduos e desperdícios das indústrias alimentares; alimentos preparados para animais"                                                    = "Food industry waste and residuals; food made for animals",
+  "Sabões, agentes orgânicos de superfície, preparações para lavagem, preparações lubrificantes, "                                          = "Soaps, surface-active organic agents, washing prepartions, lubricating preparations",
+  "Sal; enxofre; terras e pedras; gesso, cal e cimento"                                                                                     = "Salt; sulfur; dirt and stones; plaster, lime and cement",
+  "Seda"                                                                                                                                     = "Silk",
+  "Sementes e frutos oleaginosos; grãos, sementes e frutos diversos; plantas industriais ou medic"                                          = "Oilseeds and oilseed fruits; grains, seeds and various fruits; industrial or medical plants",
+  "Tabaco e seus sucedâneos manufaturados"                                                                                                   = "Tobbaco and its manufactured substitutes",
+  "Tapetes e outros revestimentos para pisos (pavimentos), de matérias têxteis"                                                             = "Carpets and other textile floor coverings",
+  "Tecidos de malha"                                                                                                                         = "Knitwear fabrics",
+  "Tecidos especiais; tecidos tufados; rendas; tapeçarias; passamanarias; bordados."                                                        = "Special fabrics; tufted fabrics; laces; tapestries; trimmings; embroideries",
+  "Tecidos impregnados, revestidos, recobertos ou estratificados; artigos para usos técnicos de m"                                          = "Impregnated, coated, covered or laminated fabrics; technical use articles",
+  "Transações especiais"                                                                                                                     = "Special transactions",
+  "Veículos automóveis, tratores, ciclos e outros veículos terrestres, suas partes e acessórios"                                            = "Automobiles, tractors, mopeds and other terrestrial vehicles, and their parts and accessories",
+  "Veículos e material para vias férreas ou semelhantes, e suas partes; aparelhos mecânicos (incl"                                          = "Vehicles and material for railroads and resemblants, and their parts; mechanical devices (including)",
+  "Vestuário e seus acessórios, de malha"                                                                                                   = "Knitwear clothing and its accessories",
+  "Vestuário e seus acessórios, exceto de Malha"                                                                                            = "Clothing and its accessories, except knitwear",
+  "Vidro e suas obras"                                                                                                                       = "Glass and its works",
+  "Zinco e suas obras"                                                                                                                       = "Zinc and its works",
+  "Óleos essenciais e resinóides; produtos de perfumaria ou de toucador preparados e preparações "                                          = "Essential oils and resinoids; perfumery or toilet preparations products"
+)
+
+translated <- sh2_en[temp_param_table$var]
+temp_param_table$label <- ifelse(!is.na(translated), translated, temp_param_table$var)
+temp_param_table$desc  <- temp_param_table$label
+n_cats <- nrow(temp_param_table) - 2
+temp_param_table$x <- c(rep(FALSE, 2), rep(TRUE, n_cats))
+temp_param_table$y <- c(rep(FALSE, 2), rep(TRUE, n_cats))
+temp_param_table$color <- c(FALSE, rep(TRUE, 1), rep(FALSE, n_cats))
+temp_param_table$size <- c(rep(FALSE, 2), rep(TRUE, n_cats))
+temp_param_table$slider <- c(rep(FALSE, 2), rep(TRUE, n_cats))
 
 # save csv in utf-8 encoding
 write.csv(temp_param_table, file = "data/comex_exp_sh2_munic_en_dic.csv", fileEncoding = "UTF-8")

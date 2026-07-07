@@ -2,17 +2,7 @@
 
 # Funcão para retornar objeto server
 get_ui <- function(files, param) {
-    
-    df_temp <- readRDS(files$db_file)
-    years <- sort(unique(df_temp$time))
-    
-    if (param$lang) {
-        param$uf_choices <- c("All", sort(unique(df_temp$uf)))
-    } else {
-        param$uf_choices <- c("Todos", sort(unique(df_temp$uf)))
-    }
-    
-    
+
   div( # div geral
     includeCSS(files$CSS_script),
     tags$style(type = "text/css", "
@@ -32,6 +22,7 @@ get_ui <- function(files, param) {
           background: transparent;
         }
       "),
+    tags$style(HTML(".switch-label { color: white; }")),
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
@@ -48,19 +39,19 @@ get_ui <- function(files, param) {
                         background-color: #3E5688 !important;
                         border-color: #3E5688 !important;
               }',),
-        
-        h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+
+        uiOutput("plot_name_ui"),
+        uiOutput("plot_desc_ui"),
         hr(),
-        p(class = "vars", param$ui1),
-        
+        p(class = "vars", textOutput("label_ui1", inline = TRUE)),
+
         div(
           class = "var_selec_group",
           selectInput(
             inputId = "forest_filter",
-            label = param$ui2,
-            choices = param$filter_choices,
-            selected = param$filter_def,
+            label = param$i18n$pt$ui2,
+            choices = param$i18n$pt$filter_choices,
+            selected = param$i18n$pt$filter_choices[1],
             width = "100%"
           )),
           
@@ -70,32 +61,23 @@ get_ui <- function(files, param) {
             class = "var_selec_group",
             selectInput(
                 inputId = "uf_filter",
-                label = param$ui5,      
-                choices = param$uf_choices,
-                selected = param$uf_choices[1],
+                label = param$i18n$pt$ui5,
+                choices = NULL,
                 width = "100%"
         )),
           
           div(class = "fakecheckbox", ), # espaço vazio
-          
-          sliderInput(
-              inputId = "year_filter",
-              label = param$ui4,
-              min = min(years, na.rm = TRUE),
-              max = max(years, na.rm = TRUE),
-              value = max(years, na.rm = TRUE),
-              step = 1,
-              sep = "",
-              animate = animationOptions(interval = 2000,
-                                                  playButton = "\u25B6",
-                                                  pauseButton = "\u23F8"),
-          ),
-        
+
+          uiOutput("year_slider"),
+
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
+          shiny::actionButton(inputId = "toggle_lang", label = param$i18n$pt$btn_lang,
+                              icon = icon("globe"),
+                              class = "btn-primary"),
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen",
+                              icon = icon("expand"),
                               class = "btn-primary",
                               onclick = paste0("window.open('", param$ui3, "', '_blank')"))
         ),
