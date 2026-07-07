@@ -61,7 +61,7 @@ aux1_en <- as_tibble(d_en) %>%
 
 aux1 <- left_join(aux1, aux1_en, by = "SISCOMEX")
 saveRDS(aux1, "data/auxiliar_cod_pais.rds")
-aux1 <- readRDS("data/auxiliar_cod_pais.rds")
+
 
 
 # --- Hierarquia de produto (aux2) ---
@@ -87,7 +87,6 @@ aux2 <- ncm_sh %>%
     distinct(CO_SH4, .keep_all = TRUE)
 saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
 
-aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
 
 
 # --- Municípios (aux3) ---
@@ -110,7 +109,6 @@ aux3 <- as_tibble(d) %>%
 
 saveRDS(aux3, "data/auxiliar_cod_municipais.rds")
 
-aux3 <- readRDS("data/auxiliar_cod_municipais.rds")
 
 
 # --- Mapas PT → EN e helper de tradução ---
@@ -125,6 +123,9 @@ tr <- function(x, map) { out <- unname(map[x]); ifelse(is.na(out), x, out) }
 
 
 matriz <- dat
+aux1 <- readRDS("data/auxiliar_cod_pais.rds")
+aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
+aux3 <- readRDS("data/auxiliar_cod_municipais.rds")
 
 
 # ================================================================
@@ -286,7 +287,21 @@ datafinal_val_munic[is.na(datafinal_val_munic)] <- 0
 datafinal_val_sec[is.na(datafinal_val_sec)] <- 0
 
 datafinal_val_munic <- datafinal_val_munic[order(datafinal_val_munic$group, datafinal_val_munic$time),]
-datafinal_val_sec <- datafinal_val_sec[order(datafinal_val_sec$time, datafinal_val_sec$group),]
+datafinal_val_sec <- datafinal_val_sec[order(datafinal_val_sec$group, datafinal_val_sec$time),]
+
+# Totais "Amazônia Legal" = soma de todos os municípios por ano (espelha a seção [2]).
+sec_cols <- setdiff(names(datafinal_val_sec), c("time", "group"))
+amazonia_legal <- aggregate(
+    datafinal_val_sec[, sec_cols],
+    by = list(time = datafinal_val_sec$time),
+    FUN = sum, na.rm = TRUE
+)
+amazonia_legal$group <- "Amazônia Legal"
+amazonia_legal <- amazonia_legal[, c("time", "group", sec_cols)]
+datafinal_val_sec <- rbind(amazonia_legal, datafinal_val_sec)
+
+munic_cols <- setdiff(names(datafinal_val_munic), c("time", "group"))
+datafinal_val_munic$`Amazônia Legal` <- rowSums(datafinal_val_munic[, munic_cols], na.rm = TRUE)
 
 saveRDS(datafinal_val_munic, "data/comex_exp_munic_sec.rds")
 saveRDS(datafinal_val_sec, "data/comex_exp_sec_munic.rds")
