@@ -12,390 +12,111 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
 
   # Carrega dados
-  df <- readRDS(files$db_file) %>% 
-      right_join(tidyr::expand(., time, group)) %>%  # add all combinations of time and group
-      mutate(value = ifelse(is.na(value), 0, value))
-    
-  #######
-  #Translating country names
-   if(param$lang){
-      
-      df <- df %>% 
-          mutate(group = case_when(group == 
-                                       "Afeganistão" ~ "Afghanistan", group ==
-                                       "África do Sul" ~ "South Africa", group ==
-                                       "Albânia" ~ "Albania", group ==
-                                       "Alemanha" ~ "Germany", group ==
-                                       "Andorra" ~ "Andorra", group ==
-                                       "Angola" ~ "Angola", group ==
-                                       "Anguilla" ~ "Anguilla", group ==
-                                       "Antígua e Barbuda" ~ "Antigua and Barbuda", group ==
-                                       "Antilhas Holandesas" ~ "Netherlands Antilles", group ==
-                                       "Arábia Saudita" ~ "Saudi Arabia", group ==
-                                       "Argélia" ~ "Algeria", group ==
-                                       "Argentina" ~ "Argentina", group ==
-                                       "Armênia" ~ "Armenia", group ==
-                                       "Aruba" ~ "Aruba", group ==
-                                       "Austrália" ~ "Australia", group ==
-                                       "Áustria" ~ "Austria", group ==
-                                       "Azerbaijão" ~ "Azerbaijan", group ==
-                                       "Bahamas" ~ "Bahamas", group ==
-                                       "Bahrein" ~ "Bahrain", group ==
-                                       "Bangladesh" ~ "Bangladesh", group ==
-                                       "Barbados" ~ "Barbados", group ==
-                                       "Belarus" ~ "Belarus", group ==
-                                       "Bélgica" ~ "Belgium", group ==
-                                       "Belize" ~ "Belize", group ==
-                                       "Benin" ~ "Benin", group ==
-                                       "Bermudas" ~ "Bermuda", group ==
-                                       "Bolívia" ~ "Bolivia", group ==
-                                       "Bonaires, Saint Eustatius e Saba" ~ "Bonaire, Saint Eustatius and Saba", group ==
-                                       "Bósnia-Herzegovina" ~ "Bosnia and Herzegovina", group ==
-                                       "Botsuana" ~ "Botswana", group ==
-                                       "Bouvet, Ilha" ~ "Bouvet Island", group ==
-                                       "Brasil" ~ "Brazil", group ==
-                                       "Brunei" ~ "Brunei", group ==
-                                       "Bulgária" ~ "Bulgaria", group ==
-                                       "Burkina Faso" ~ "Burkina Faso", group ==
-                                       "Cabo Verde" ~ "Cape Verde", group ==
-                                       "Camarões" ~ "Cameroon", group ==
-                                       "Camboja" ~ "Cambodia", group ==
-                                       "Canadá" ~ "Canada", group ==
-                                       "Canárias, group == Ilhas" ~ "Canary Islands", group ==
-                                       "Catar" ~ "Qatar", group ==
-                                       "Cayman, Ilhas" ~ "Cayman Islands", group ==
-                                       "Cazaquistão" ~ "Kazakhstan", group ==
-                                       "Chade" ~ "Chad", group ==
-                                       "Chile" ~ "Chile", group ==
-                                       "China" ~ "China", group ==
-                                       "Chipre" ~ "Cyprus", group ==
-                                       "Cingapura" ~ "Singapore", group ==
-                                       "Colômbia" ~ "Colombia", group ==
-                                       "Comores" ~ "Comoros", group ==
-                                       "Congo" ~ "Congo", group ==
-                                       "Cook, Ilhas" ~ "Cook Islands", group ==
-                                       "Coreia do Norte" ~ "North Korea", group ==
-                                       "Coreia do Sul" ~ "South Korea", group ==
-                                       "Costa do Marfim" ~ "Ivory Coast", group ==
-                                       "Costa Rica" ~ "Costa Rica", group ==
-                                       "Croácia" ~ "Croatia", group ==
-                                       "Cuba" ~ "Cuba", group ==
-                                       "Curaçao" ~ "Curaçao", group ==
-                                       "Dinamarca" ~ "Denmark", group ==
-                                       "Djibuti" ~ "Djibouti", group ==
-                                       "Dominica" ~ "Dominica", group ==
-                                       "Egito" ~ "Egypt", group ==
-                                       "El Salvador" ~ "El Salvador", group ==
-                                       "Emirados Árabes Unidos" ~ "United Arab Emirates", group ==
-                                       "Equador" ~ "Ecuador", group ==
-                                       "Eritreia" ~ "Eritrea", group ==
-                                       "Eslováquia" ~ "Slovakia", group ==
-                                       "Eslovênia" ~ "Slovenia", group ==
-                                       "Espanha" ~ "Spain", group ==
-                                       "Estados Unidos" ~ "United States", group ==
-                                       "Estônia" ~ "Estonia", group ==
-                                       "Etiópia" ~ "Ethiopia", group ==
-                                       "Falkland, Ilhas (Malvinas)" ~ "Falkland Islands (Malvinas)", group ==
-                                       "Faroé, Ilhas" ~ "Faroe Islands", group ==
-                                       "Fiji" ~ "Fiji", group ==
-                                       "Filipinas" ~ "Philippines", group ==
-                                       "Finlândia" ~ "Finland", group ==
-                                       "França" ~ "France", group ==
-                                       "Gabão" ~ "Gabon", group ==
-                                       "Gâmbia" ~ "Gambia", group ==
-                                       "Gana" ~ "Ghana", group ==
-                                       "Geórgia" ~ "Georgia", group ==
-                                       "Geórgia do Sul e Ilhas Sandwich do Sul" ~ "South Georgia and the South Sandwich Islands", group ==
-                                       "Gibraltar" ~ "Gibraltar", group ==
-                                       "Grécia" ~ "Greece", group ==
-                                       "Grenada" ~ "Grenada", group ==
-                                       "Groenlândia" ~ "Greenland", group ==
-                                       "Guadalupe" ~ "Guadeloupe", group ==
-                                       "Guam" ~ "Guam", group ==
-                                       "Guatemala" ~ "Guatemala", group ==
-                                       "Guiana" ~ "Guyana", group ==
-                                       "Guiana Francesa" ~ "French Guiana", group ==
-                                       "Guiné" ~ "Guinea", group ==
-                                       "Guiné Equatorial" ~ "Equatorial Guinea", group ==
-                                       "Guiné-Bissau" ~ "Guinea-Bissau", group ==
-                                       "Haiti" ~ "Haiti", group ==
-                                       "Holanda (Países Baixos)" ~ "Netherlands", group ==
-                                       "Honduras" ~ "Honduras", group ==
-                                       "Hong Kong" ~ "Hong Kong", group ==
-                                       "Hungria" ~ "Hungary", group ==
-                                       "Iêmen" ~ "Yemen", group ==
-                                       "Ilha Heard e Ilhas McDonald" ~ "Heard Island and McDonald Islands", group ==
-                                       "Ilhas Maldivas" ~ "Maldives", group ==
-                                       "Ilhas Marianas do Norte" ~ "Northern Mariana Islands", group ==
-                                       "Ilhas Marshall" ~ "Marshall Islands", group ==
-                                       "Ilhas Menores Distantes dos Estados Unidos" ~ "United States Minor Outlying Islands", group ==
-                                       "Ilhas Norfolk" ~ "Norfolk Island", group ==
-                                       "Ilhas Pitcairn" ~ "Pitcairn Islands", group ==
-                                       "Ilhas Salomão" ~ "Solomon Islands", group ==
-                                       "Ilhas Turcas e Caicos" ~ "Turks and Caicos Islands", group ==
-                                       "Ilhas Virgens, Britânicas" ~ "British Virgin Islands", group ==
-                                       "Ilhas Virgens, EUA" ~ "United States Virgin Islands", group ==
-                                       "Ilhas Wallis e Futuna" ~ "Wallis and Futuna", group ==
-                                       "Índia" ~ "India", group ==
-                                       "Indonésia" ~ "Indonesia", group ==
-                                       "Irã" ~ "Iran", group ==
-                                       "Iraque" ~ "Iraq", group ==
-                                       "Irlanda" ~ "Ireland", group ==
-                                       "Islândia" ~ "Iceland", group ==
-                                       "Israel" ~ "Israel", group ==
-                                       "Itália" ~ "Italy", group ==
-                                       "Jamaica" ~ "Jamaica", group ==
-                                       "Japão" ~ "Japan", group ==
-                                       "Jersey" ~ "Jersey", group ==
-                                       "Jordânia" ~ "Jordan", group ==
-                                       "Kiribati" ~ "Kiribati", group ==
-                                       "Kuwait" ~ "Kuwait", group ==
-                                       "Laos" ~ "Laos", group ==
-                                       "Lesoto" ~ "Lesotho", group ==
-                                       "Letônia" ~ "Latvia", group ==
-                                       "Líbano" ~ "Lebanon", group ==
-                                       "Libéria" ~ "Liberia", group ==
-                                       "Líbia" ~ "Libya", group ==
-                                       "Liechtenstein" ~ "Liechtenstein", group ==
-                                       "Lituânia" ~ "Lithuania", group ==
-                                       "Luxemburgo" ~ "Luxembourg", group ==
-                                       "Macau" ~ "Macau", group ==
-                                       "Macedônia" ~ "Macedonia", group ==
-                                       "Madagascar" ~ "Madagascar", group ==
-                                       "Malásia" ~ "Malaysia", group ==
-                                       "Malawi" ~ "Malawi", group ==
-                                       "Mali" ~ "Mali", group ==
-                                       "Malta" ~ "Malta", group ==
-                                       "Marrocos" ~ "Morocco", group ==
-                                       "Martinica" ~ "Martinique", group ==
-                                       "Maurício" ~ "Mauritius", group ==
-                                       "Mauritânia" ~ "Mauritania", group ==
-                                       "Mayotte" ~ "Mayotte", group ==
-                                       "México" ~ "Mexico", group ==
-                                       "Micronésia" ~ "Micronesia", group ==
-                                       "Moçambique" ~ "Mozambique", group ==
-                                       "Moldávia" ~ "Moldova", group ==
-                                       "Mônaco" ~ "Monaco", group ==
-                                       "Mongólia" ~ "Mongolia", group ==
-                                       "Montenegro" ~ "Montenegro", group ==
-                                       "Montserrat" ~ "Montserrat", group ==
-                                       "Myanmar" ~ "Myanmar", group ==
-                                       "Namíbia" ~ "Namibia", group ==
-                                       "Nauru" ~ "Nauru", group ==
-                                       "Nepal" ~ "Nepal", group ==
-                                       "Nicarágua" ~ "Nicaragua", group ==
-                                       "Níger" ~ "Niger", group ==
-                                       "Nigéria" ~ "Nigeria", group ==
-                                       "Niue" ~ "Niue", group ==
-                                       "Noruega" ~ "Norway", group ==
-                                       "Nova Caledônia" ~ "New Caledonia", group ==
-                                       "Nova Zelândia" ~ "New Zealand", group ==
-                                       "Omã" ~ "Oman", group ==
-                                       "Palau" ~ "Palau", group ==
-                                       "Palestina" ~ "Palestine", group ==
-                                       "Panamá" ~ "Panama", group ==
-                                       "Papua-Nova Guiné" ~ "Papua New Guinea", group ==
-                                       "Paquistão" ~ "Pakistan", group ==
-                                       "Paraguai" ~ "Paraguay", group ==
-                                       "Peru" ~ "Peru", group ==
-                                       "Polinésia Francesa" ~ "French Polynesia", group ==
-                                       "Polônia" ~ "Poland", group ==
-                                       "Porto Rico" ~ "Puerto Rico", group ==
-                                       "Portugal" ~ "Portugal", group ==
-                                       "Quênia" ~ "Kenya", group ==
-                                       "Reino Unido" ~ "United Kingdom", group ==
-                                       "República Centro-Africana" ~ "Central African Republic", group ==
-                                       "República Dominicana" ~ "Dominican Republic", group ==
-                                       "República Tcheca" ~ "Czech Republic", group ==
-                                       "Reunião" ~ "Réunion", group ==
-                                       "Romênia" ~ "Romania", group ==
-                                       "Ruanda" ~ "Rwanda", group ==
-                                       "Rússia" ~ "Russia", group ==
-                                       "Saara Ocidental" ~ "Western Sahara", group ==
-                                       "Samoa" ~ "Samoa", group ==
-                                       "Samoa Americana" ~ "American Samoa", group ==
-                                       "Santa Helena" ~ "Saint Helena", group ==
-                                       "Santa Lúcia" ~ "Saint Lucia", group ==
-                                       "Santa Sé (Cidade-Estado do Vaticano)" ~ "Vatican City", group ==
-                                       "São Bartolomeu" ~ "Saint Barthélemy", group ==
-                                       "São Cristóvão e Neves" ~ "Saint Kitts and Nevis", group ==
-                                       "São Martinho (França)" ~ "Saint Martin (French part)", group ==
-                                       "São Martinho (Países Baixos)" ~ "Sint Maarten (Dutch part)", group ==
-                                       "São Tomé e Príncipe" ~ "Sao Tome and Principe", group ==
-                                       "São Vicente e Granadinas" ~ "Saint Vincent and the Grenadines", group ==
-                                       "Senegal" ~ "Senegal", group ==
-                                       "Serra Leoa" ~ "Sierra Leone", group ==
-                                       "Sérvia" ~ "Serbia", group ==
-                                       "Seychelles" ~ "Seychelles", group ==
-                                       "Síria" ~ "Syria", group ==
-                                       "Somália" ~ "Somalia", group ==
-                                       "Sri Lanka" ~ "Sri Lanka", group ==
-                                       "Suazilândia" ~ "Eswatini", group ==
-                                       "Sudão" ~ "Sudan", group ==
-                                       "Suécia" ~ "Sweden", group ==
-                                       "Suíça" ~ "Switzerland", group ==
-                                       "Suriname" ~ "Suriname", group ==
-                                       "Svalbard e Jan Mayen" ~ "Svalbard and Jan Mayen", group ==
-                                       "Tadjiquistão" ~ "Tajikistan", group ==
-                                       "Tailândia" ~ "Thailand", group ==
-                                       "Taiwan" ~ "Taiwan", group ==
-                                       "Tanzânia" ~ "Tanzania", group ==
-                                       "Terras Austrais e Antárticas Francesas" ~ "French Southern Territories", group ==
-                                       "Território Britânico do Oceano Índico" ~ "British Indian Ocean Territory", group ==
-                                       "Timor-Leste" ~ "Timor-Leste", group ==
-                                       "Togo" ~ "Togo", group ==
-                                       "Tokelau" ~ "Tokelau", group ==
-                                       "Tonga" ~ "Tonga", group ==
-                                       "Trinidad e Tobago" ~ "Trinidad and Tobago", group ==
-                                       "Tunísia" ~ "Tunisia", group ==
-                                       "Turquemenistão" ~ "Turkmenistan", group ==
-                                       "Turquia" ~ "Turkey", group ==
-                                       "Tuvalu" ~ "Tuvalu", group ==
-                                       "Ucrânia" ~ "Ukraine", group ==
-                                       "Uganda" ~ "Uganda", group ==
-                                       "Uruguai" ~ "Uruguay", group ==
-                                       "Uzbequistão" ~ "Uzbekistan", group ==
-                                       "Vanuatu" ~ "Vanuatu", group ==
-                                       "Venezuela" ~ "Venezuela", group ==
-                                       "Vietnã" ~ "Vietnam", group ==
-                                       "Zâmbia" ~ "Zambia", group ==
-                                       "Zimbábue" ~ "Zimbabwe"))
-      
-      
-  }
-  
+  df <- readRDS(files$db_file)
+
+  # Carrega índice de preços anual
+  indice <- read.csv(files$aux_file, stringsAsFactors = FALSE)
+  indice$time <- as.integer(indice$CO_ANO)
+  indice$indice_anual_base1998 <- as.numeric(indice$indice_anual_base1998)
+  indice <- indice[, c("time", "indice_anual_base1998")]
+
+  # Tabela de tradução de países
+  paises <- read.csv(files$country_map_file, stringsAsFactors = FALSE)
+  country_map <- setNames(paises$en, paises$pt)
+
   server <- function(input, output, session) {
 
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
+    # --- LANG TOGGLE ---
 
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      # se input está vazio preenche com valor aleatório da lista de colunas
-      if (input$x == "") {
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = sample(param$x_cols$var, 1)
-        )
-      }
+    lang <- reactiveVal("pt")
 
-      if (input$color == "") {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = sample(param$color_cols$var, 1)
-        )
+    observeEvent(input$toggle_lang, {
+      lang(ifelse(lang() == "pt", "en", "pt"))
+    })
+
+    i18n <- reactive({ param$i18n[[lang()]] })
+
+    # df reativo: aplica tradução de países quando EN
+    df_plot <- reactive({
+      if (lang() == "en") {
+        df %>% mutate(group = dplyr::recode(group, !!!country_map))
+      } else {
+        df
       }
-    }
+    })
+
+    # Renderiza textos dinâmicos da sidebar
+    output$plot_name_ui  <- renderUI({ h2(class = "plot_name", i18n()$plot_name) })
+    output$plot_desc_ui  <- renderUI({ p(class = "plot_desc", i18n()$plot_desc) })
+    output$label_deflator <- renderText({ i18n()$label_deflator })
+
+    # Atualiza botão quando idioma muda
+    observeEvent(lang(), {
+      updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
+    }, ignoreInit = FALSE)
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
-      q_string <- paste0(
-        "?", "x=", input$x,
-        "&", "color=", input$color
-      )
+      q_string <- paste0("?", "lang=", lang())
       updateQueryString(q_string, mode = "replace")
     }
 
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
-      # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
-
-      if (!is.null(query[["x"]])) {
-        # se tem x na url atribui valor ao selecinput x
-        updateSelectInput(session, "x",
-          choices = param$x_choices,
-          selected = query[["x"]]
-        )
-      }
-
-      if (!is.null(query[["color"]])) {
-        updateSelectInput(session, "color",
-          choices = param$color_choices,
-          selected = query[["color"]]
-        )
+      if (!is.null(query[["lang"]]) && query[["lang"]] %in% c("pt", "en")) {
+        lang(query[["lang"]])
       }
     }
 
-
     # Output título do gráfico
-    output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$x) || input$x == "" ||
-        is.null(input$color) || input$color == "") {
-        text <- param$server1
-      } else {
-        # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
-
-        text <- paste0(param$server2, x_col$label)
-      }
-
-      text
-    })
-    output$plot_subtitle <- renderText({
-      text <- " "
-
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$color) || input$color == "") {
-        text <- " "
-      } else {
-        # Monta título a partir de variáveis selecionadas nos inputs
-        color_col <- param$table[which(param$table$var == input$color), ]
-        text <- paste0(param$server3)
-      }
-
-      text
-    })
+    output$plot_title <- renderText({ i18n()$plot_title })
+    output$plot_subtitle <- renderText({ i18n()$subtitle })
 
     # Output gráfico
     output$plot <- renderPlotly({
+      update_my_queryString()
 
-      # random_inputs() #preenche inputs se estiverem vazios
-      update_my_queryString() # atualiza url com parametros dos inputs
-
-      fig <- plotly_empty() # inicia figura com gráfico em branco
-
+      fig <- plotly_empty()
       tryCatch(
         {
+          df_cur <- df_plot()
 
-          # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$x) || input$x == "" ||
-            is.null(input$color) || input$color == "") {
-            fig <- plotly_empty()
-            stop()
-          }
-
-          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == input$x), ]
-          color_col <- param$table[which(param$table$var == input$color), ]
+          x_col     <- param$table[which(param$table$var == param$x_def), ]
+          color_col <- param$table[which(param$table$var == param$color_def), ]
           slider_col <- param$table[which(param$table$var == param$slider_def), ]
-          text_col <- param$table[which(param$table$var == param$text_def), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
+          id_col    <- param$table[which(param$table$var == param$id_def), ]
 
-          # Cria coluna vazia para o ranking
+          # Coluna de ranking (calculada)
           y_col <- list()
           y_col$var <- "rank"
-          y_col$label <- "Ranking"
+          y_col$label <- i18n()$y_label
 
           df_p <- data.frame(
-            df[x_col$var],
+            df_cur[x_col$var],
             NA,
-            df[color_col$var],
-            df[slider_col$var],
-            df["group"],
-            df["group"],
-            df[id_col$var]
+            df_cur[color_col$var],
+            df_cur[slider_col$var],
+            df_cur["group"],
+            df_cur["group"],
+            df_cur[id_col$var]
           )
-
           colnames(df_p) <- c("x", "y", "color", "slider", "text", "group", "id")
 
-          # Filtra colunas onde variáveis são NA (não serão exibidas no gráfico de qualquer forma)
+          # Filtra colunas onde variáveis são NA
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$color)), ]
 
-          # Se dataset estiver vazio, não monta o gráfico, retorna em branco
+          # Aplica deflação ao valor antes de calcular o ranking
+          if (isTRUE(input$ydefl)) {
+            df_p <- df_p[df_p$slider >= 1998, ]
+            df_p$indice_anual_base1998 <- indice$indice_anual_base1998[
+              match(df_p$slider, indice$time)
+            ]
+            df_p <- df_p[!is.na(df_p$indice_anual_base1998), ]
+            df_p$x <- df_p$x * (100 / df_p$indice_anual_base1998)
+          }
+
+          # Se dataset estiver vazio, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
             stop()
@@ -406,35 +127,35 @@ get_server <- function(files, param) {
 
           # Ordena base por variável de ranking e preenche y
           df_p <- df_p %>%
-            group_by(slider) %>% # para cada ano
-            mutate(y = order(order(x, decreasing = TRUE))) %>% # rank pela var de x
-            arrange(y, .by_group = TRUE) # ordena por rank e ano
+            group_by(slider) %>%
+            mutate(y = order(order(x, decreasing = TRUE))) %>%
+            arrange(y, .by_group = TRUE)
 
-          # Se o rank for NA coloca para o final do ranking e zera x
           df_p$y[is.na(df_p$y)] <- max(df_p$y) + 1
           df_p$x[is.na(df_p$x)] <- 0
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
           if (all(is.na(df_p$color))) {
             df_p$color <- " "
           }
 
-          # Deixa somente grupos que tem rank <n em algum momento
+          # Deixa somente grupos que tem rank <= top_n em algum momento
           top_n <- 10
           top_groups <- unique(df_p$group[which(df_p$y <= top_n)])
           df_p <- df_p %>% filter(group %in% top_groups)
+
+          x_label_full <- if (isTRUE(input$ydefl)) paste0(i18n()$x_label, " (", i18n()$ylabel_deflator, ")") else i18n()$x_label
 
           # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            x_col$label, ": ", format(df_p$x, scientific = FALSE,
-                                      digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>",
-            y_col$label, ": ", df_p$y, "<br>",
-            param$unit_text, ": ", param$unit, "<br>",
-            color_col$label, ": ", df_p$color
+            x_label_full, ": ", format(df_p$x, scientific = FALSE,
+                                          digits = 2,
+                                          decimal.mark = ",",
+                                          big.mark = "."), "<br>",
+            i18n()$y_label, ": ", df_p$y, "<br>",
+            if (isTRUE(input$ydefl)) i18n()$ylabel_deflator else paste0(i18n()$unit_text, ": ", param$unit), "<br>",
+            i18n()$color_label, ": ", df_p$color
           )
 
           # Define paleta de cores
@@ -447,9 +168,7 @@ get_server <- function(files, param) {
           min_x <- min(0, min(df_p$x))
           max_x <- max(0, max(df_p$x))
 
-          # Monta gráfico
-
-          # base do gráfico
+          # Monta gráfico base
           fig_p <- plot_ly(df_p,
             x = ~x,
             y = ~y,
@@ -459,28 +178,23 @@ get_server <- function(files, param) {
             text = ~tooltip,
             textposition = "middle right",
             showlegend = FALSE,
-            # marker = list(
-            #  opacity = 0.5,
-            #  line = list(width = 1, color = 'white')
-            # ),
             hoverinfo = "text"
-          ) %>% animation_opts(redraw = TRUE, transition = 500)
+          ) %>% animation_opts(frame = 1500, transition = 1500, easing = "linear", redraw = FALSE)
 
-          # adiciona barras
+          # Adiciona barras
           fig_p <- fig_p %>% add_segments(
             x = 0,
             xend = ~x,
             y = ~y,
             yend = ~y,
-            split = ~id,
             color = ~color,
             line = list(width = 30),
             opacity = 0.7
           )
 
-          # adiciona textos
+          # Adiciona textos
           fig_p <- fig_p %>% add_text(
-            x = 0.01 * max_x, # ~x/2,
+            x = 0.01 * max_x,
             text = ~text,
             ids = ~id,
             hoverinfo = "none",
@@ -488,17 +202,14 @@ get_server <- function(files, param) {
             textposition = "middle right"
           )
 
-
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
-            # Edita slider
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = "Ano: ", font = f1))
+            fig_p <- plotly_build(fig_p)
+            idx <- which(vapply(fig_p$x$layout$sliders, function(s) inherits(s, "aniSlider"), logical(1)))
+            if (length(idx) == 1) {
+              fig_p$x$layout$sliders[[idx]]$currentvalue <- list(prefix = i18n()$year_prefix, font = f1)
+            }
 
-            # Botões da animação
-            #  edita botão padrão (editar move ele para o updatemenus)
-            fig_p <- fig_p %>% animation_button(label = "Play")
-
-            #  sobrescreve updatemenus, adicionando play e pause
             fig_p$x$layout$updatemenus <- list(
               list(
                 type = "buttons",
@@ -512,9 +223,9 @@ get_server <- function(files, param) {
                 buttons = list(
                   list(
                     method = "animate",
-                    label = "\u25B6",
+                    label = "▶",
                     args = list(
-                      NA, # primeiro arg vazio para play
+                      NA,
                       list(
                         mode = "immediate",
                         transition = list(duration = 1500, easing = "linear", redraw = TRUE),
@@ -525,10 +236,9 @@ get_server <- function(files, param) {
                   ),
                   list(
                     method = "animate",
-                    # label = "<U+25FC>",
                     label = "I I",
                     args = list(
-                      list(), # primeiro arg lista vazia para pause
+                      list(),
                       list(
                         mode = "immediate",
                         transition = list(duration = 0),
@@ -551,20 +261,19 @@ get_server <- function(files, param) {
             )
           }
 
-
           # Layout eixos
           x_axis_layout <- list(
-            title = x_col$label,
+            title = x_label_full,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
             autorange = FALSE,
-            range = c(min_x, max_x), # fixa range do x
+            range = c(min_x, max_x),
             showgrid = FALSE,
             zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = y_col$label,
+            title = i18n()$y_label,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
@@ -573,14 +282,9 @@ get_server <- function(files, param) {
             zeroline = FALSE,
             dtick = 1,
             tick0 = 1,
-            range = c(top_n + 0.5, 0.5), # fixa range do y somente para top 10
+            range = c(top_n + 0.5, 0.5),
             type = "numeric"
           )
-
-          # Tipo de eixo (se log selecionado)
-          # if (input$xlog & is.numeric(df_p$x)) {
-          #  x_axis_layout$type <- "log"
-          # }
 
           # Layout hover/tooltip
           tooltip <- list(
@@ -596,19 +300,12 @@ get_server <- function(files, param) {
               xaxis = x_axis_layout,
               yaxis = y_axis_layout,
               showlegend = TRUE,
-              legend = list(title = list(text = color_col$label)),
+              legend = list(title = list(text = i18n()$color_label)),
               hoverlabel = tooltip
             )
 
-          fig <- fig %>% animation_opts(
-            1500,
-            easing = "linear", redraw = FALSE
-          )
-
-          #  Configura botões do plotly
           fig_p <- fig_p %>%
             config(
-              # toImageButtonOptions = list(format = "svg"),
               displaylogo = FALSE,
               modeBarButtonsToRemove = c(
                 "lasso2d",
@@ -617,21 +314,18 @@ get_server <- function(files, param) {
               )
             )
 
-          fig <- fig_p # retorna a figura do gráfico
+          fig <- fig_p
         },
         error = function(cond) {
-          # se encontrar erro retorna fig em branco
           print("plot error")
           fig <- plotly_empty()
         }
       )
       fig
-    }) %>%
-      bindCache(input$x, input$color)
+    })
 
     # Observa eventos
     observe({
-      # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
       update_my_inputs()
     })
