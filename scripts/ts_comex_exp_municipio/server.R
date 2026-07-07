@@ -12,28 +12,51 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
   server <- function(input, output, session) {
 
-    # Carrega os dois recortes (transpostas)
+    # Carrega os quatro recortes (2 orientações x 2 agregações)
     dfs <- list(
       munic_sh2 = readRDS(files$db_file_munic_sh2), # group = produto (SH2), y = município
-      sh2_munic = readRDS(files$db_file_sh2_munic)  # group = município, y = produto (SH2)
+      sh2_munic = readRDS(files$db_file_sh2_munic), # group = município, y = produto (SH2)
+      munic_sec = readRDS(files$db_file_munic_sec), # group = produto (SEC), y = município
+      sec_munic = readRDS(files$db_file_sec_munic)  # group = município, y = produto (SEC)
     )
 
-    # Estado: idioma, orientação e seleções persistentes
+    # Estado: idioma, orientação (swap), agregação (SH2/SEC) e seleções persistentes
     q0 <- parseQueryString(isolate(session$clientData$url_search))
 
     lang <- reactiveVal(if (identical(q0[["lang"]], "en")) "en" else "pt")
     observeEvent(input$toggle_lang, { lang(ifelse(lang() == "pt", "en", "pt")) })
 
-    mode <- reactiveVal(if (identical(q0[["mode"]], "sh2_munic")) "sh2_munic" else "munic_sh2")
+    # modo = orientação (munic no Y / produto no Y) x agregação (sh2 / sec)
+    valid_modes <- c("munic_sh2", "sh2_munic", "munic_sec", "sec_munic")
+    init_mode <- if (!is.null(q0[["mode"]]) && q0[["mode"]] %in% valid_modes) q0[["mode"]] else "munic_sh2"
+    orient <- reactiveVal(if (startsWith(init_mode, "munic_")) "munic" else "prod")
+
     observeEvent(input$swap, {
-      mode(if (mode() == "munic_sh2") "sh2_munic" else "munic_sh2")
+      orient(if (orient() == "munic") "prod" else "munic")
     })
 
-    # Seleções mantidas entre transposições e idiomas (em PT; produto em nome completo)
-    init_munis    <- if (!is.null(q0[["muni"]]))    unname(unlist(q0[names(q0) == "muni"]))    else param$defaults$munis
-    init_products <- if (!is.null(q0[["product"]])) unname(unlist(q0[names(q0) == "product"])) else param$defaults$products
-    kept_munis    <- reactiveVal(init_munis)
-    kept_products <- reactiveVal(init_products)
+    # Agregação: dois actionButton (SH2 / SEC) -> reactiveVal
+    agg <- reactiveVal(if (grepl("sec", init_mode)) "sec" else "sh2")
+    observeEvent(input$agg_sh2, { agg("sh2") })
+    observeEvent(input$agg_sec, { agg("sec") })
+
+    # Sincroniza o destaque do botão ativo (client-side)
+    observeEvent(agg(), {
+      session$sendCustomMessage("setAgg", agg())
+    }, ignoreInit = FALSE)
+
+    mode <- reactive({
+      if (orient() == "munic") paste0("munic_", agg()) else paste0(agg(), "_munic")
+    })
+
+    # Seleções mantidas entre transposições/idiomas (em PT; produto em nome completo).
+    # Município é compartilhado entre SH2 e SEC; produtos são por agregação (taxonomias distintas).
+    init_munis <- if (!is.null(q0[["muni"]])) unname(unlist(q0[names(q0) == "muni"])) else param$defaults$munis
+    kept_munis <- reactiveVal(init_munis)
+    kept_prods <- reactiveVal(list(sh2 = param$defaults$products_sh2,
+                                   sec = param$defaults$products_sec))
+    cur_prods <- function() kept_prods()[[agg()]]
+    set_prods <- function(v) { l <- kept_prods(); l[[agg()]] <- v; kept_prods(l) }
 
     i18n <- reactive({ param$i18n[[lang()]] })
 
@@ -76,6 +99,7 @@ get_server <- function(files, param) {
     output$label_scale_name <- renderText({ i18n()$label_scale_name })
     output$label_prop_name  <- renderText({ i18n()$label_prop_name })
     output$label_swap       <- renderText({ i18n()$label_swap })
+    output$label_agg        <- renderText({ i18n()$label_agg })
     output$btn_fullscreen   <- renderText({ i18n()$btn_fullscreen })
     output$role_y     <- renderText({ paste0(i18n()$role_y_prefix, i18n()[[mode()]]$dim_y) })
     output$role_lines <- renderText({ paste0(i18n()$role_lines_prefix, i18n()[[mode()]]$dim_lines) })
@@ -89,10 +113,12 @@ get_server <- function(files, param) {
       labs <- i18n()[[m]]
       tbl  <- cfg()$table
 
+      munic_on_y <- startsWith(m, "munic_")   # y = município (vale p/ SH2 e SEC)
+
       ytab <- tbl[which(tbl$y), ]
       ytab <- ytab[order(ytab$label), ]
-      # eixo y = município (modo munic_sh2): "Amazônia Legal" em categoria própria no topo
-      y_choices <- if (m == "munic_sh2") {
+      # eixo y = município: "Amazônia Legal" em categoria própria no topo
+      y_choices <- if (munic_on_y) {
         append("", with_legal_amazon_group(ytab$var, ytab$label, labs$dim_y))
       } else {
         append("", grouped_list(ytab))
@@ -102,19 +128,25 @@ get_server <- function(files, param) {
       pts  <- pts[!is.na(pts)]
       disp <- display_label(pts, m, l)
       ord  <- order(disp)
-      # filtro = município (modo sh2_munic): mesma lógica de destaque
-      f_choices <- if (m == "sh2_munic") {
+      # filtro = município (orientação produto-no-Y): mesma lógica de destaque
+      f_choices <- if (!munic_on_y) {
         with_legal_amazon_group(pts, disp, labs$dim_lines)
       } else {
         setNames(pts[ord], disp[ord])
       }
 
-      if (m == "munic_sh2") {
-        y_sel <- if (length(kept_munis())) kept_munis()[1] else NULL
-        f_sel <- kept_products()
+      # valores disponíveis no recorte atual (evita seleção vazia ao trocar SH2/SEC)
+      avail_y   <- ytab$var
+      avail_pts <- pts
+      if (munic_on_y) {
+        y_sel <- if (length(kept_munis()) && kept_munis()[1] %in% avail_y) kept_munis()[1] else avail_y[1]
+        f_sel <- intersect(cur_prods(), avail_pts)
+        if (!length(f_sel)) f_sel <- head(avail_pts, 2)
       } else {
-        y_sel <- if (length(kept_products())) kept_products()[1] else NULL
-        f_sel <- kept_munis()
+        cp    <- intersect(cur_prods(), avail_y)
+        y_sel <- if (length(cp)) cp[1] else avail_y[1]
+        f_sel <- intersect(kept_munis(), avail_pts)
+        if (!length(f_sel)) f_sel <- head(avail_pts, 1)
       }
 
       updateSelectInput(session, "y",
@@ -128,16 +160,16 @@ get_server <- function(files, param) {
     # Captura edições do usuário no estado mantido
     observeEvent(input$y, {
       if (input$y == "") return()
-      if (mode() == "munic_sh2") {
+      if (orient() == "munic") {
         kept_munis(unique(c(input$y, kept_munis())))
       } else {
-        kept_products(unique(c(input$y, kept_products())))
+        set_prods(unique(c(input$y, cur_prods())))
       }
     }, ignoreInit = TRUE)
 
     observeEvent(input$filter1, {
-      if (mode() == "munic_sh2") {
-        kept_products(input$filter1)
+      if (orient() == "munic") {
+        set_prods(input$filter1)
       } else {
         kept_munis(input$filter1)
       }
@@ -146,8 +178,8 @@ get_server <- function(files, param) {
     # Atualiza a URL
     update_my_queryString <- function() {
       q <- paste0("?lang=", lang(), "&mode=", mode())
-      for (mu in kept_munis())    q <- paste0(q, "&muni=", utils::URLencode(mu, reserved = TRUE))
-      for (pr in kept_products()) q <- paste0(q, "&product=", utils::URLencode(pr, reserved = TRUE))
+      for (mu in kept_munis()) q <- paste0(q, "&muni=", utils::URLencode(mu, reserved = TRUE))
+      for (pr in cur_prods())  q <- paste0(q, "&product=", utils::URLencode(pr, reserved = TRUE))
       updateQueryString(q, mode = "replace")
     }
 

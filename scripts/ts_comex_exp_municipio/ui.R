@@ -62,6 +62,42 @@ get_ui <- function(files, param) {
         
         div(class = "sidebar-gap"),
 
+        # Toggle SH2/SEC com dois actionButton (binding nativo, sempre funciona).
+        # O destaque do ativo é feito por um handler JS custom.
+        tags$style(HTML(
+          ".agg-toggle { display: flex; width: 100%; }
+           .agg-toggle .agg-btn { flex: 1; border-radius: 0; margin: 0;
+             font-size: 14px; padding: 8px 12px; }
+           .agg-toggle .agg-btn:first-child { border-radius: 6px 0 0 6px; }
+           .agg-toggle .agg-btn:last-child  { border-radius: 0 6px 6px 0; }
+           .agg-toggle .agg-active {
+             background-color: #2b5560 !important;
+             box-shadow: inset 0 0 0 2px rgba(255,255,255,.65) !important;
+             font-weight: 600;
+           }"
+        )),
+        tags$script(HTML(
+          "Shiny.addCustomMessageHandler('setAgg', function(v){
+             var a = document.getElementById('agg_sh2');
+             var b = document.getElementById('agg_sec');
+             if (a) a.classList.toggle('agg-active', v === 'sh2');
+             if (b) b.classList.toggle('agg-active', v === 'sec');
+           });"
+        )),
+
+        # Agregação SH2 / SEC (antes do seletor de produtos)
+        div(
+          tags$div(class = "switch-label", style = "margin-bottom: 4px;",
+                   textOutput("label_agg", inline = TRUE)),
+          div(
+            class = "agg-toggle",
+            actionButton("agg_sh2", "SH2", class = "btn-primary agg-btn agg-active"),
+            actionButton("agg_sec", "SEC", class = "btn-primary agg-btn")
+          )
+        ),
+
+        div(class = "sidebar-gap"),
+
         # Filtro (linhas comparadas)
         selectizeInput(
           "filter1",
@@ -71,7 +107,7 @@ get_ui <- function(files, param) {
           options = list(maxItems = 20),
           width = "100%"
         ),
-
+        
         div(class = "sidebar-gap"),
 
         # Escala log
