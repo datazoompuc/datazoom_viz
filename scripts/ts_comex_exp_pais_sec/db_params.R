@@ -51,20 +51,17 @@ get_db_param <-
       # define colunas possíveis para cada dimensão
       x_cols = param_table[which(param_table$x)],
       y_cols = param_table[which(param_table$y)],
-      color_cols = param_table[which(param_table$color)] # ,
-      # size_cols = param_table[which(param_table$size)]
+      color_cols = param_table[which(param_table$color)]
     )
 
     # Define escolhas agrupadas para cada selectinput
     param$x_choices <- append("", grouped_list(param$x_cols))
     param$y_choices <- append("", grouped_list(param$y_cols))
     param$color_choices <- append("", grouped_list(param$color_cols))
-    ## param$size_choices <- append("",grouped_list(param$size_cols))
 
     # Define coluna padrão para cada dimensão
     param$x_def <- ""
     param$y_def <- ""
-    ## param$size_def <- ""
     param$color_def <- ""
     param$text_def <- ""
     param$slider_def <- ""

@@ -18,21 +18,16 @@ get_server <- function(files, param) {
   
   # --- auxiliar: CO_SH4 -> label --
   aux_sh4 <- readRDS(files$aux_file)
-  stopifnot(all(c("CO_SH4", "NO_POR_MIN") %in% names(aux_sh4)))
-  
+  stopifnot(all(c("CO_SH4", "NO_SH4_PT") %in% names(aux_sh4)))
+
   aux_sh4$CO_SH4 <- sprintf("%04d", as.numeric(aux_sh4$CO_SH4))
-  map_nome_pt <- stats::setNames(aux_sh4$NO_POR_MIN, aux_sh4$CO_SH4)
-  map_nome_en <- map_nome_pt
-  if ("NO_ENG_MIN" %in% names(aux_sh4)) {
-      map_nome_en <- stats::setNames(aux_sh4$NO_ENG_MIN, aux_sh4$CO_SH4)
-  }
-  map_nome <- list(pt = map_nome_pt, en = map_nome_en)
+  map_nome <- stats::setNames(aux_sh4$NO_SH4_PT, aux_sh4$CO_SH4)
   
   # colunas de produto
   prod_codes <- setdiff(names(df), c("time", "group"))
   
   # mantém só os códigos que existem no auxiliar
-  prod_codes <- prod_codes[prod_codes %in% names(map_nome_pt)]
+  prod_codes <- prod_codes[prod_codes %in% names(map_nome)]
   
   starter_choices <- list(
       "Agro e alimentos" = c(
@@ -99,35 +94,6 @@ get_server <- function(files, param) {
   # remove dos choices qualquer item cujo código não exista
   starter_choices <- lapply(starter_choices, function(x) x[x %in% starter_codes])
   starter_choices <- starter_choices[lengths(starter_choices) > 0]
-  starter_choices_pt <- starter_choices
-  
-  starter_group_labels_en <- c(
-      "Agro e alimentos" = "Agriculture and food",
-      "Carnes e produtos de origem animal" = "Meat and animal products",
-      "Óleos e derivados" = "Oils and derivatives",
-      "Florestais e madeira" = "Forest products and wood",
-      "Metais e minerais" = "Metals and minerals",
-      "Indústria e manufaturados" = "Industry and manufactured goods"
-  )
-  
-  make_choices_en <- function(choices_pt) {
-      out <- lapply(choices_pt, function(x) {
-          labels <- unname(map_nome_en[x])
-          labels[is.na(labels) | labels == ""] <- names(x)[is.na(labels) | labels == ""]
-          stats::setNames(unname(x), labels)
-      })
-      names(out) <- ifelse(
-          names(out) %in% names(starter_group_labels_en),
-          unname(starter_group_labels_en[names(out)]),
-          names(out)
-      )
-      out
-  }
-  
-  starter_choices_i18n <- list(
-      pt = starter_choices_pt,
-      en = make_choices_en(starter_choices_pt)
-  )
   
   
   df <- df %>% select(time, group, all_of(starter_codes))
@@ -161,53 +127,17 @@ get_server <- function(files, param) {
   
   server <- function(input, output, session) {
     
-    query <- parseQueryString(isolate(session$clientData$url_search))
-    initial_lang <- if (!is.null(query[["lang"]]) && query[["lang"]] == "en") "en" else "pt"
-    lang <- reactiveVal(initial_lang)
-    
-    observeEvent(input$toggle_lang, {
-        lang(ifelse(lang() == "pt", "en", "pt"))
-    })
-    
-    i18n <- reactive({
-        param$i18n[[lang()]]
-    })
-    
-    product_names <- reactive({
-        map_nome[[lang()]]
-    })
-    
-    product_choices <- reactive({
-        starter_choices_i18n[[lang()]]
-    })
-    
-    output$plot_name_ui <- renderUI({
-        h2(class = "plot_name", i18n()$plot_name)
-    })
-    
-    output$plot_desc_ui <- renderUI({
-        p(class = "plot_desc", i18n()$plot_desc)
-    })
-    
-    output$label_variable_ui <- renderUI({
-        p(class = "vars", i18n()$label_variable)
-    })
-    
-    observeEvent(lang(), {
-        selected_x <- isolate(input$x)
-        if (is.null(selected_x) || !(selected_x %in% starter_codes)) {
-            selected_x <- if (!is.null(query[["x"]]) && query[["x"]] %in% starter_codes) query[["x"]] else starter_codes[1]
-        }
-        
-        updateSelectInput(
-            session, "x",
-            label = i18n()$label_x_choice_rk,
-            choices = product_choices(),
-            selected = selected_x
-        )
-        updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
-        updateActionButton(session, "ab1", label = i18n()$btn_fullscreen)
-    }, ignoreInit = FALSE)
+      observeEvent(TRUE, {
+          query <- parseQueryString(session$clientData$url_search)
+          
+          selected_x <- if (!is.null(query[["x"]]) && query[["x"]] %in% starter_codes) query[["x"]] else starter_codes[1]
+          
+          updateSelectInput(
+              session, "x",
+              choices = starter_choices,
+              selected = selected_x
+          )
+      }, once = TRUE)
       
       
     # Cria opções para seleção de grupos
@@ -219,8 +149,8 @@ get_server <- function(files, param) {
       # se input está vazio preenche com valor aleatório da lista de colunas
       if (input$x == "") {
         updateSelectInput(session, "x",
-          choices = product_choices(),
-          selected = sample(starter_codes, 1)
+          choices = param$x_choices,
+          selected = sample(param$x_cols$var, 1)
         )
       }
 
@@ -229,10 +159,7 @@ get_server <- function(files, param) {
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
-      q_string <- paste0(
-          "?", "lang=", lang(),
-          "&", "x=", URLencode(input$x, reserved = TRUE)
-      )
+      q_string <- paste0("?", "x=", URLencode(input$x, reserved = TRUE))
       updateQueryString(q_string, mode = "replace")
     }
 
@@ -254,7 +181,7 @@ get_server <- function(files, param) {
 
     # Output título do gráfico
     output$plot_title <- renderText({
-        i18n()$plot_title
+        param$plot_title
     })
     
     
@@ -262,7 +189,7 @@ get_server <- function(files, param) {
         if (is.null(input$x) || input$x == "") return("")
         
         cod <- sprintf("%04d", as.integer(input$x))
-        nome <- unname(product_names()[cod])
+        nome <- unname(map_nome[cod])
         
         if (is.na(nome) || nome == "") {
             paste0("SH4 ", cod)
@@ -283,13 +210,13 @@ get_server <- function(files, param) {
         {
 
           # Se algum campo estiver vazio retorna gráfico vazio
-          if (is.null(input$x) || input$x == "" || !(input$x %in% starter_codes)) {
+          if (is.null(input$x) || input$x == "") {
             fig <- plotly_empty()
             stop()
           }
             
           
-          x_label <- unname(product_names()[input$x])
+          x_label <- unname(map_nome[input$x])
           if (is.na(x_label) || x_label == "") x_label <- input$x
           
           top_n <- 5
@@ -297,7 +224,7 @@ get_server <- function(files, param) {
           # Cria coluna vazia para o ranking
           y_col <- list()
           y_col$var <- "rank"
-          y_col$label <- i18n()$ranking_label
+          y_col$label <- "Ranking"
 
           df_p <- data.frame(
               x      = df[[input$x]],
@@ -338,11 +265,11 @@ get_server <- function(files, param) {
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             "(", df_p$slider, ")", "<br><br>",
-            i18n()$x_label, " : ", "<b>",format(df_p$x, scientific = FALSE,
+            param$x_label, " : ", "<b>",format(df_p$x, scientific = FALSE,
                                       digits = 2,
-                                      decimal.mark = i18n()$dec_mark, 
-                                      big.mark = i18n()$big_mark), "</b><br>",
-            i18n()$pct_anual, "<b>", format(round(df_p$pct_ano, 2), nsmall = 2, decimal.mark = i18n()$dec_mark), "%</b><br>",
+                                      decimal.mark = ",", 
+                                      big.mark = "."), "</b><br>",
+            param$pct_anual, "<b>", format(round(df_p$pct_ano, 2), nsmall = 2, decimal.mark = ","), "%</b><br>",
             y_col$label, ": ", df_p$y, "<br>"
           )
 
@@ -405,7 +332,7 @@ get_server <- function(files, param) {
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
             # Edita slider
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = i18n()$slider_prefix, font = f1))
+            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = "Ano: ", font = f1))
 
             # Botões da animação
             #  edita botão padrão (editar move ele para o updatemenus)
@@ -468,7 +395,7 @@ get_server <- function(files, param) {
 
           # Layout eixos
           x_axis_layout <- list(
-            title = i18n()$x_label,
+            title = param$x_label,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
@@ -511,7 +438,7 @@ get_server <- function(files, param) {
               xaxis = x_axis_layout,
               yaxis = y_axis_layout,
               showlegend = TRUE,
-              legend = list(title = list(text = param$tables[[lang()]]$label[param$tables[[lang()]]$var == param$color_def])),
+              legend = list(title = list(text = param$table$label[param$table$var == param$color_def])),
               hoverlabel = tooltip
             )
 
@@ -542,7 +469,7 @@ get_server <- function(files, param) {
       )
       fig
     }) %>%
-      bindCache(input$x, lang())
+      bindCache(input$x)
 
     # Observa eventos
     # observe({

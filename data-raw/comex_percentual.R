@@ -61,7 +61,7 @@ data <- data_val_pais %>%
     ) %>%
     dplyr::filter(!is.na(valor_total), valor_total > 0) %>%
     dplyr::left_join(aux, by = c("cod_sh4" = "CO_SH4")) %>%
-    dplyr::rename(group = NO_POR_MIN, group_en = NO_ENG_MIN) %>%
+    dplyr::rename(group = NO_SH4_PT, group_en = NO_SH4_EN) %>%
     dplyr::select(
         time    = ano,
         group,

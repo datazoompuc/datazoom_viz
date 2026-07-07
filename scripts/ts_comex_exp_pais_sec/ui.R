@@ -1,87 +1,141 @@
 #  -------------------------------- Define UI --------------------------------
 
-# FuncÃ£o para retornar objeto server
+# Funcão para retornar objeto ui
 get_ui <- function(files, param) {
   div( # div geral
-    includeCSS(files$CSS_script), # Inclu? script CSS
+    includeCSS(files$CSS_script),
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
-      column(3, # dimensÃ£o da coluna do bootstrap
+      column(3, # dimensão da coluna do bootstrap
         class = "menucol",
-        
+
         # muda cor do background
         tags$style('.menucol {
                              background-color: #41878C;
-              }',),
-        
-        # muda cor do botao 
+              }', ),
+
+        # muda cor do botao
         tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
                           background-color: #40768B !important;
                           border-color: #40768B !important;
-              }',),
-        
+              }', ),
+        tags$style(HTML(".switch-label { color: white; }")),
+        # painel da transposição
+        tags$style(HTML(
+          ".transpose-box { background: rgba(255,255,255,.10); border-radius: 6px;
+             padding: 8px 10px; margin-bottom: 6px; }
+           .transpose-box .role { color: #fff; font-size: 13px; line-height: 1.5; }
+           .transpose-box .role b { font-weight: 600; }
+           .btn-swap { width: 100%; margin-top: 6px; }
+           .sidebar-gap { height: 16px; }"
+        )),
+
         h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        p(class = "plot_desc", textOutput("plot_desc", inline = TRUE)),
         hr(),
-        p(class = "vars", param$label_var_name),
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
+
+        # Painel de transposição (papéis dos eixos + botão de inverter)
         div(
-          class = "var_selec_group",
-          # Seleciona variÃ¡vel do eixo y
-          selectInput(
-            inputId = "y",
-            label = param$label_y_name,
-            choices = param$y_choices,
-            selected = param$y_def,
-            width = "100%"
+          class = "transpose-box",
+          div(class = "role", textOutput("role_y", inline = TRUE)),
+          div(class = "role", textOutput("role_lines", inline = TRUE)),
+          actionButton(
+            "swap",
+            label = textOutput("label_swap", inline = TRUE),
+            icon = icon("right-left"),
+            class = "btn-primary btn-swap"
           )
         ),
 
-        # Seleciona eixo log
-        checkboxInput(
-          inputId = "ylog",
-          param$label_scale_name,
-          value = FALSE,
-          width = "100%"
-        ),
-        # Seleciona eixo
-        checkboxInput(
-          inputId = "y_option",
-          param$label_axis_name,
-          value = FALSE,
-          width = "100%"
-        ),
+        div(class = "sidebar-gap"),
 
-        # Seleciona filtro de municÃ­pios
+        div(
+          class = "var_selec_group",
+          # Eixo y (entidade fixada)
+          selectInput(
+            inputId = "y",
+            label = param$i18n$pt$pais_sec$label_y,
+            choices = NULL,
+            selected = NULL,
+            width = "100%"
+          )
+        ),
+        
+        div(class = "sidebar-gap"),
+
+        # Filtro (linhas comparadas)
         selectizeInput(
           "filter1",
-          param$label_mun_filter,
+          param$i18n$pt$pais_sec$label_filter,
           choices = NULL,
           multiple = TRUE,
           options = list(maxItems = 20),
           width = "100%"
         ),
-        
-        # espaço vazio
-        div(class = "fakecheckbox", ),
-        
+
+        div(class = "sidebar-gap"),
+
+        # Escala log
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
-                              class = "btn-primary",
-                              onclick = paste0("window.open('",param$link,"', '_blank')"))
+          materialSwitch(
+            inputId = "ylog",
+            label = tags$span(textOutput("label_scale_name", inline = TRUE), class = "switch-label"),
+            value = FALSE,
+            status = "info"
+          )
+        ),
+
+        # Proporcional ao ano inicial
+        div(
+          materialSwitch(
+            inputId = "y_option",
+            label = tags$span(textOutput("label_prop_name", inline = TRUE), class = "switch-label"),
+            value = FALSE,
+            status = "info"
+          )
+        ),
+
+        div(class = "sidebar-gap"),
+
+        # Idioma + Fullscreen lado a lado
+        div(
+          style = "display: flex; gap: 8px;",
+          actionButton(
+            "toggle_lang",
+            label = "English",
+            icon = icon("globe"),
+            class = "btn-primary",
+            style = "flex: 1;"
+          ),
+          shiny::actionButton(
+            inputId = "ab1",
+            label = textOutput("btn_fullscreen", inline = TRUE),
+            icon = icon("expand"),
+            class = "btn-primary",
+            style = "flex: 1;",
+            onclick = paste0("window.open('", param$link, "', '_blank')")
+          )
         ),
       ),
       column(9,
         class = "plotcol h-100",
         textOutput("plot_title"),
         textOutput("plot_subtitle"),
-        div( # row do grÃ¡fico
+        div( # row do gráfico
           class = "plotrow row justify-content-center flex-grow-1 w-100",
           div(
             class = "plotdiv w-100 h-100",
-            # GrÃ¡fico
-            plotlyOutput("plot", width = "100%", height = "100%")
+            style = "position: relative; display: flex; flex-direction: column;",
+            div(
+              style = "flex-grow: 1; position: relative;",
+              withSpinner(
+                plotlyOutput("plot", width = "100%", height = "calc(100vh - 150px)"),
+                type = 4,
+                color = "#41878C"
+              )
+            )
           )
         )
       )
