@@ -10950,3 +10950,31 @@ html,body{height:100%;}
 .checkbox input[type="checkbox"] {
   margin-top: 0 !important;
 }
+
+/* Segmented control: dois (ou mais) actionButton lado a lado como um único
+   toggle, para escolher entre alternativas de igual peso (ex.: Estado/Município,
+   SH2/SEC). Usado em apps com toggle de agregação. O botão ativo recebe .seg-active
+   via handler JS no server (sendCustomMessage). Ver seção 4 do tutorial_novo_ui. */
+.seg-toggle {
+  display: flex;
+  width: 100%;
+}
+.seg-toggle .seg-btn {
+  flex: 1;
+  border-radius: 0;
+  margin: 0;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+.seg-toggle .seg-btn:first-child { border-radius: 6px 0 0 6px; }
+.seg-toggle .seg-btn:last-child  { border-radius: 0 6px 6px 0; }
+.seg-toggle .seg-active {
+  background-color: #2b5560 !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .65) !important;
+  font-weight: 600;
+}
+
+/* Espaçador vertical padrão da sidebar */
+.sidebar-gap {
+  height: 16px;
+}
