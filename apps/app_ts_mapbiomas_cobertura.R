@@ -57,7 +57,7 @@ param$i18n <- list(
   pt = list(
     plot_desc        = "Mapeamento Anual do Uso e Cobertura da Terra no Brasil (Fonte: MapBiomas)",
     label_var_name   = "VARIÁVEIS:",
-    label_y_name     = "Variável selecionada",
+    label_y_name     = "Tipo de cobertura",
     label_geo_name   = list(est = "Estados", munic = "Municípios"),
     label_geo_toggle = "Ver por município",
     label_prop_name  = "Proporcional ao ano inicial",
@@ -71,7 +71,7 @@ param$i18n <- list(
   en = list(
     plot_desc        = "Annual Land Use and Land Cover Mapping in Brazil (Source: MapBiomas)",
     label_var_name   = "VARIABLES:",
-    label_y_name     = "Selected variable",
+    label_y_name     = "Land cover type",
     label_geo_name   = list(est = "States", munic = "Municipalities"),
     label_geo_toggle = "View by municipality",
     label_prop_name  = "Proportional to initial year",

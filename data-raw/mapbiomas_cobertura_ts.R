@@ -201,103 +201,147 @@ est_wide <- long %>%
 saveRDS(est_wide, "data/mapbiomas_cobertura_est.rds")
 
 ################################################################################
-# 7. DICIONÁRIOS (PT / EN) — fonte única de tradução EN -> PT
+# 7. LEGENDA (EN -> PT + NÍVEL HIERÁRQUICO)
+# Nível: DINÂMICO — menor class_level onde cada classe aparece na carga (cobre
+#   inclusive as classes novas da Coleção 10, ex.: Photovoltaic Project).
+# Nomes PT: legenda OFICIAL do MapBiomas. O pacote não traduz os valores das
+#   classes (só metadados), então o PT vem dos Códigos de Legenda - Coleção 10:
+#   https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2025/08/Legenda-Colecao-10-Legend-Code.pdf
+# Salva como auxiliar em data/mapbiomas_legenda.csv.
 ################################################################################
 
-translate_en_to_pt <- c(
-    "Aquaculture"                          = "Aquicultura",
-    "Beach, Dune and Sand Spot"            = "Praia e Dunas",
-    "Citrus"                               = "Cítricos",
-    "Coffee"                               = "Café",
-    "Cotton"                               = "Algodão",
-    "Floodable Forest"                     = "Floresta Inundável",
-    "Forest Formation"                     = "Formação de Floresta",
-    "Forest Plantation"                    = "Plantação de Floresta",
-    "Grassland"                            = "Pradaria",
-    "Herbaceous Sandbank Vegetation"       = "Restinga Herbácea",
-    "Hypersaline Tidal Flat"               = "Salar",
-    "Mangrove"                             = "Mangue",
-    "Mining"                               = "Mineração",
-    "Mosaic of Uses"                       = "Mosaico de Uso da Terra",
-    "Not Observed"                         = "Não observado",
-    "Other Non Forest Natural Formation"   = "Outras formações naturais não florestais",
-    "Other non Vegetated Areas"            = "Outras áreas não vegetadas",
-    "Other Perennial Crops"                = "Outras Culturas Perenes",
-    "Other Temporary Crops"                = "Outras Culturas Temporárias",
-    "Palm Oil"                             = "Óleo de Palma",
-    "Pasture"                              = "Pastagem",
-    "Rice"                                 = "Arroz",
-    "River, Lake and Ocean"                = "Rios, Lagos ou Oceanos",
-    "Rocky Outcrop"                        = "Afloramento Rochoso",
-    "Savanna Formation"                    = "Formação de Savana",
-    "Soybean"                              = "Soja",
-    "Sugar cane"                           = "Cana-de-açúcar",
-    "Urban Area"                           = "Infraestrutura Urbana",
-    "Wetland"                              = "Pântano",
-    "Wooded Sandbank Vegetation"           = "Restinga Arborizada",
-    "Perennial Crop"                       = "Culturas Perenes",
-    "Temporary Crop"                       = "Culturas Temporárias",
-    "Agriculture"                          = "Agricultura",
-    "Farming"                              = "Fazenda",
-    "Forest"                               = "Floresta",
-    "Non Forest Natural Formation"         = "Formação Natural Não Florestal",
-    "Non vegetated area"                   = "Áreas não vegetadas",
-    "Water and Marine Environment"         = "Água",
-    "Antropic"                             = "Antrópico",
-    "Natural"                              = "Natural",
-    "Natural/Antropic"                     = "Natural/Antrópico",
-    "Undefined"                            = "Não aplicado"
+legenda_file <- "data/mapbiomas_legenda.csv"
+
+# nível hierárquico dinâmico: menor nível onde cada classe (EN) ocorre
+niveis <- purrr::map_df(0:4, function(n) {
+    tibble::tibble(nome_en = strip_prefix(as.character(dat[[paste0("class_level_", n)]])),
+                   nivel   = n)
+}) %>%
+    dplyr::filter(!is.na(nome_en), nome_en != "") %>%
+    dplyr::group_by(nome_en) %>%
+    dplyr::summarise(nivel = min(nivel), .groups = "drop")
+
+# nomes oficiais em PT (MapBiomas — Códigos de Legenda, Coleção 10)
+nome_pt_oficial <- c(
+    "Antropic"                       = "Antrópico",
+    "Natural"                        = "Natural",
+    "Natural/Antropic"               = "Natural/Antrópico",
+    "Undefined"                      = "Não Aplicável",
+    "Forest"                         = "Floresta",
+    "Non Forest Natural Formation"   = "Formação Natural não Florestal",
+    "Farming"                        = "Agropecuária",
+    "Non vegetated area"             = "Área não Vegetada",
+    "Water and Marine Environment"   = "Corpo D'água",
+    "Not Observed"                   = "Não Observado",
+    "Forest Formation"               = "Formação Florestal",
+    "Savanna Formation"              = "Formação Savânica",
+    "Mangrove"                       = "Mangue",
+    "Floodable Forest"               = "Floresta Alagável",
+    "Wooded Sandbank Vegetation"     = "Restinga Arbórea",
+    "Wetland"                        = "Campo Alagado e Área Pantanosa",
+    "Grassland"                      = "Formação Campestre",
+    "Hypersaline Tidal Flat"         = "Apicum",
+    "Rocky Outcrop"                  = "Afloramento Rochoso",
+    "Herbaceous Sandbank Vegetation" = "Restinga Herbácea",
+    "Other non Forest Formations"    = "Outras Formações não Florestais",
+    "Pasture"                        = "Pastagem",
+    "Agriculture"                    = "Agricultura",
+    "Forest Plantation"              = "Silvicultura",
+    "Mosaic of Uses"                 = "Mosaico de Usos",
+    "Beach, Dune and Sand Spot"      = "Praia, Duna e Areal",
+    "Urban Area"                     = "Área Urbana",
+    "Mining"                         = "Mineração",
+    "Other non Vegetated Areas"      = "Outras Áreas não Vegetadas",
+    "River, Lake and Ocean"          = "Rio, Lago e Oceano",
+    "Aquaculture"                    = "Aquicultura",
+    "Photovoltaic Project"           = "Usina Fotovoltaica",
+    "Temporary Crop"                 = "Lavoura Temporária",
+    "Perennial Crop"                 = "Lavoura Perene",
+    "Soybean"                        = "Soja",
+    "Sugar cane"                     = "Cana",
+    "Rice"                           = "Arroz",
+    "Cotton"                         = "Algodão",
+    "Other Temporary Crops"          = "Outras Lavouras Temporárias",
+    "Coffee"                         = "Café",
+    "Citrus"                         = "Citrus",
+    "Palm Oil"                       = "Dendê",
+    "Other Perennial Crops"          = "Outras Lavouras Perenes"
 )
+
+# aviso: classes sem PT oficial (caem no fallback = nome em inglês)
+faltam_pt <- setdiff(niveis$nome_en, names(nome_pt_oficial))
+if (length(faltam_pt) > 0) {
+    message("Classes sem PT oficial (usando EN): ", paste(faltam_pt, collapse = " | "))
+}
+
+legenda <- niveis %>%
+    dplyr::mutate(nome_pt = dplyr::coalesce(unname(nome_pt_oficial[nome_en]), nome_en))
+
+readr::write_csv(legenda, legenda_file)
+
+################################################################################
+# 7b. DICIONÁRIOS (PT / EN)
+# Rótulos vêm da legenda oficial; var_group = nível hierárquico (vira optgroup no
+# app); linhas ordenadas por nível e depois alfabeticamente pelo rótulo do idioma.
+################################################################################
+
+grupo_nivel_pt <- c("0" = "Nível 0 — Categorias amplas",
+                    "1" = "Nível 1 — Grandes classes",
+                    "2" = "Nível 2 — Subclasses",
+                    "3" = "Nível 3 — Detalhamento",
+                    "4" = "Nível 4 — Classes específicas")
+grupo_nivel_en <- c("0" = "Level 0 — Broad categories",
+                    "1" = "Level 1 — Main classes",
+                    "2" = "Level 2 — Subclasses",
+                    "3" = "Level 3 — Detail",
+                    "4" = "Level 4 — Specific classes")
 
 # Constrói e grava o par de dicionários (PT + EN) para um dataset.
 build_dics <- function(df, out_pt, out_en) {
     cols     <- setdiff(colnames(df), "municipality_code")   # chave técnica fora do dic
     is_class <- !(cols %in% c("group", "time", "area_km2"))
 
-    base <- tibble(
-        var          = cols,
-        x            = is_class,
-        y            = is_class,
-        color        = cols == "group",
-        size         = is_class,
-        slider       = is_class,
-        label        = cols,
-        desc         = cols,
-        var_group    = "Mapbiomas",
-        tipo         = 1L,
-        unidade      = "ha",
-        categoria    = NA_character_,
-        subcategoria = NA_character_
-    )
+    base <- tibble::tibble(var = cols, is_class = is_class) %>%
+        dplyr::left_join(legenda, by = c("var" = "nome_en"))
 
-    dic_en <- base %>%
-        mutate(
-            categoria    = "Environment",
-            subcategoria = "Land use",
-            unidade      = ifelse(var == "area_km2", "km2", unidade),
-            label        = ifelse(var == "area_km2", "Municipal area (km2)", label),
-            desc         = label
-        )
+    make_dic <- function(idioma) {
+        grupo_map <- if (idioma == "pt") grupo_nivel_pt else grupo_nivel_en
+        base %>%
+            dplyr::mutate(
+                x = is_class, y = is_class,
+                color = var == "group", size = is_class, slider = is_class,
+                label = dplyr::case_when(
+                    var == "area_km2" & idioma == "pt" ~ "Área do município (km2)",
+                    var == "area_km2"                  ~ "Municipal area (km2)",
+                    !is_class                          ~ var,
+                    idioma == "pt"                     ~ dplyr::coalesce(nome_pt, var),
+                    TRUE                               ~ var
+                ),
+                desc = label,
+                var_group = dplyr::if_else(
+                    is_class,
+                    dplyr::coalesce(unname(grupo_map[as.character(nivel)]),
+                                    if (idioma == "pt") "Outras" else "Other"),
+                    "Mapbiomas"
+                ),
+                tipo = 1L,
+                unidade = dplyr::if_else(var == "area_km2", "km2", "ha"),
+                categoria    = if (idioma == "pt") "Meio ambiente" else "Environment",
+                subcategoria = if (idioma == "pt") "Uso da terra"  else "Land use"
+            ) %>%
+            dplyr::arrange(!is_class, nivel, label) %>%   # nível, depois alfabético
+            dplyr::select(var, x, y, color, size, slider, label, desc,
+                          var_group, tipo, unidade, categoria, subcategoria)
+    }
 
-    dic_pt <- base %>%
-        mutate(
-            categoria    = "Meio ambiente",
-            subcategoria = "Uso da terra",
-            unidade      = ifelse(var == "area_km2", "km2", unidade),
-            label        = ifelse(var %in% names(translate_en_to_pt),
-                                  translate_en_to_pt[var], var),
-            label        = ifelse(var == "area_km2", "Área do município (km2)", label),
-            desc         = label
-        )
-
-    faltando <- setdiff(cols[is_class], names(translate_en_to_pt))
+    faltando <- base$var[base$is_class & is.na(base$nome_pt)]
     if (length(faltando) > 0) {
-        message("Classes SEM tradução PT (revisar translate_en_to_pt): ",
+        message("Classes sem correspondência na legenda oficial: ",
                 paste(faltando, collapse = " | "))
     }
 
-    readr::write_csv(dic_pt, out_pt)
-    readr::write_csv(dic_en, out_en)
+    readr::write_csv(make_dic("pt"), out_pt)
+    readr::write_csv(make_dic("en"), out_en)
 }
 
 build_dics(est_wide,
