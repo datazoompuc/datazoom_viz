@@ -329,7 +329,14 @@ build_dics <- function(df, out_pt, out_en) {
                 categoria    = if (idioma == "pt") "Meio ambiente" else "Environment",
                 subcategoria = if (idioma == "pt") "Uso da terra"  else "Land use"
             ) %>%
-            dplyr::arrange(!is_class, nivel, label) %>%   # nível, depois alfabético
+            # nível, depois alfabético. dplyr::arrange() ordena strings em locale
+            # "C" (byte order) independente do Sys.setlocale, o que joga acentuadas
+            # (Área, Áreas...) para o fim em vez do lugar certo -- por isso usamos
+            # stringi::stri_rank() com locale explícito como chave de ordenação.
+            dplyr::arrange(!is_class, nivel,
+                           stringi::stri_rank(label, opts_collator = stringi::stri_opts_collator(
+                               locale = if (idioma == "pt") "pt_BR" else "en_US"
+                           ))) %>%
             dplyr::select(var, x, y, color, size, slider, label, desc,
                           var_group, tipo, unidade, categoria, subcategoria)
     }

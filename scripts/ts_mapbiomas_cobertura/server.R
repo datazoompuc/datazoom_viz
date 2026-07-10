@@ -34,22 +34,32 @@ get_server <- function(files, param) {
     i18n <- reactive({ param$i18n[[lang()]] })
 
     # ---------------------------- Nível geográfico ----------------------------
-    geo <- reactive({ if (isTRUE(input$geo_munic)) "munic" else "est" })
-    df  <- reactive({ if (geo() == "munic") df_munic else df_est })
+    # Estado/Município via dois actionButton (não mais materialSwitch) -- mesmo
+    # padrão do toggle SH2/SEC em scripts/ts_comex_exp_municipio/server.R.
+    geo <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["geo"]], "munic")) "munic" else "est"
+    })
+    observeEvent(input$geo_est,   { geo("est") })
+    observeEvent(input$geo_munic, { geo("munic") })
+    observeEvent(geo(), {
+      session$sendCustomMessage("setGeo", geo())
+    }, ignoreInit = FALSE)
+
+    df <- reactive({ if (geo() == "munic") df_munic else df_est })
+
+    # Guarda a última variável Y escolhida pelo usuário, para restaurar ao
+    # trocar entre estado e município (troca de geo não deveria mudar a
+    # variável selecionada)
+    kept_y <- reactiveVal(NULL)
+    observeEvent(input$y, {
+      if (!is.null(input$y) && input$y != "") kept_y(input$y)
+    }, ignoreInit = TRUE)
 
     # Switches renderizados aqui para que os labels acompanhem o idioma
     output$switches <- renderUI({
       i <- param$i18n[[lang()]]
-      gm_default <- {
-        q <- parseQueryString(isolate(session$clientData$url_search))
-        identical(q[["geo"]], "munic")
-      }
       tagList(
-        materialSwitch(
-          "geo_munic", tags$span(i$label_geo_toggle, class = "switch-label"),
-          value = if (is.null(isolate(input$geo_munic))) gm_default else isTRUE(isolate(input$geo_munic)),
-          status = "info"
-        ),
         materialSwitch(
           "y_index_base", tags$span(i$label_prop_name, class = "switch-label"),
           value = iv(isolate(input$y_index_base)), status = "info"
@@ -60,6 +70,10 @@ get_server <- function(files, param) {
         )
       )
     })
+
+    output$label_agg       <- renderText({ i18n()$label_agg })
+    output$label_geo_est   <- renderText({ i18n()$label_geo_name$est })
+    output$label_geo_munic <- renderText({ i18n()$label_geo_name$munic })
 
     # Switches mutuamente exclusivos
     observeEvent(input$y_index_base, {
@@ -153,13 +167,22 @@ get_server <- function(files, param) {
     }, ignoreInit = TRUE)
 
     # Ao trocar de nível geográfico, troca as opções de recorte (a seleção antiga
-    # não é válida no outro nível) e sorteia 2 novos
+    # não é válida no outro nível) e sorteia 2 novos. A variável Y é a mesma nos
+    # dois níveis (mesmas colunas), então é restaurada em vez de resortear.
     observeEvent(geo(), {
       fc <- filter_choices()
       updateSelectizeInput(session, "filter1",
                            label = i18n()$label_geo_name[[geo()]],
                            choices = fc,
                            selected = sample(fc, min(2, length(fc))))
+
+      ky <- isolate(kept_y())
+      if (!is.null(ky) && ky != "") {
+        updateSelectInput(session, "y",
+                          label = i18n()$label_y_name,
+                          choices = y_choices_lang(),
+                          selected = ky)
+      }
     }, ignoreInit = TRUE)
 
     # ---------------------------- Títulos ----------------------------
@@ -292,9 +315,15 @@ get_server <- function(files, param) {
     })
 
     # ---------------------------- Startup ----------------------------
-    observe({
+    # observeEvent (não observe) para que este bloco só rode quando a URL
+    # muda de fato -- um observe() aqui cria dependência incidental em
+    # filter_choices()/i18n() (lidas dentro de update_my_inputs()), o que o
+    # fazia reexecutar a cada troca de geo/idioma e, numa corrida com
+    # update_my_queryString(), acionava random_inputs() e resetava a
+    # variável Y sem o usuário pedir.
+    observeEvent(session$clientData$url_search, {
       update_my_inputs()
-    })
+    }, ignoreInit = FALSE)
   }
 
   # Retorna objeto server

@@ -39,6 +39,6 @@ Palm Oil,TRUE,TRUE,FALSE,TRUE,TRUE,Palm Oil,Palm Oil,Level 4 — Specific classe
 Rice,TRUE,TRUE,FALSE,TRUE,TRUE,Rice,Rice,Level 4 — Specific classes,1,ha,Environment,Land use
 Soybean,TRUE,TRUE,FALSE,TRUE,TRUE,Soybean,Soybean,Level 4 — Specific classes,1,ha,Environment,Land use
 Sugar cane,TRUE,TRUE,FALSE,TRUE,TRUE,Sugar cane,Sugar cane,Level 4 — Specific classes,1,ha,Environment,Land use
-area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,Municipal area (km2),Municipal area (km2),Mapbiomas,1,km2,Environment,Land use
 group,FALSE,FALSE,TRUE,FALSE,FALSE,group,group,Mapbiomas,1,ha,Environment,Land use
+area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,Municipal area (km2),Municipal area (km2),Mapbiomas,1,km2,Environment,Land use
 time,FALSE,FALSE,FALSE,FALSE,FALSE,time,time,Mapbiomas,1,ha,Environment,Land use

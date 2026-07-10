@@ -1,18 +1,19 @@
 var,x,y,color,size,slider,label,desc,var_group,tipo,unidade,categoria,subcategoria
 Antropic,TRUE,TRUE,FALSE,TRUE,TRUE,Antrópico,Antrópico,Nível 0 — Categorias amplas,1,ha,Meio ambiente,Uso da terra
+Undefined,TRUE,TRUE,FALSE,TRUE,TRUE,Não Aplicável,Não Aplicável,Nível 0 — Categorias amplas,1,ha,Meio ambiente,Uso da terra
 Natural,TRUE,TRUE,FALSE,TRUE,TRUE,Natural,Natural,Nível 0 — Categorias amplas,1,ha,Meio ambiente,Uso da terra
 Natural/Antropic,TRUE,TRUE,FALSE,TRUE,TRUE,Natural/Antrópico,Natural/Antrópico,Nível 0 — Categorias amplas,1,ha,Meio ambiente,Uso da terra
-Undefined,TRUE,TRUE,FALSE,TRUE,TRUE,Não Aplicável,Não Aplicável,Nível 0 — Categorias amplas,1,ha,Meio ambiente,Uso da terra
 Farming,TRUE,TRUE,FALSE,TRUE,TRUE,Agropecuária,Agropecuária,Nível 1 — Grandes classes,1,ha,Meio ambiente,Uso da terra
+Non vegetated area,TRUE,TRUE,FALSE,TRUE,TRUE,Área não Vegetada,Área não Vegetada,Nível 1 — Grandes classes,1,ha,Meio ambiente,Uso da terra
 Water and Marine Environment,TRUE,TRUE,FALSE,TRUE,TRUE,Corpo D'água,Corpo D'água,Nível 1 — Grandes classes,1,ha,Meio ambiente,Uso da terra
 Forest,TRUE,TRUE,FALSE,TRUE,TRUE,Floresta,Floresta,Nível 1 — Grandes classes,1,ha,Meio ambiente,Uso da terra
 Non Forest Natural Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Formação Natural não Florestal,Formação Natural não Florestal,Nível 1 — Grandes classes,1,ha,Meio ambiente,Uso da terra
 Not Observed,TRUE,TRUE,FALSE,TRUE,TRUE,Não Observado,Não Observado,Nível 1 — Grandes classes,1,ha,Meio ambiente,Uso da terra
-Non vegetated area,TRUE,TRUE,FALSE,TRUE,TRUE,Área não Vegetada,Área não Vegetada,Nível 1 — Grandes classes,1,ha,Meio ambiente,Uso da terra
 Rocky Outcrop,TRUE,TRUE,FALSE,TRUE,TRUE,Afloramento Rochoso,Afloramento Rochoso,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Agriculture,TRUE,TRUE,FALSE,TRUE,TRUE,Agricultura,Agricultura,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Hypersaline Tidal Flat,TRUE,TRUE,FALSE,TRUE,TRUE,Apicum,Apicum,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Aquaculture,TRUE,TRUE,FALSE,TRUE,TRUE,Aquicultura,Aquicultura,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
+Urban Area,TRUE,TRUE,FALSE,TRUE,TRUE,Área Urbana,Área Urbana,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Wetland,TRUE,TRUE,FALSE,TRUE,TRUE,Campo Alagado e Área Pantanosa,Campo Alagado e Área Pantanosa,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Floodable Forest,TRUE,TRUE,FALSE,TRUE,TRUE,Floresta Alagável,Floresta Alagável,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Grassland,TRUE,TRUE,FALSE,TRUE,TRUE,Formação Campestre,Formação Campestre,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
@@ -21,15 +22,14 @@ Savanna Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Formação Savânica,Formação Sav�
 Mangrove,TRUE,TRUE,FALSE,TRUE,TRUE,Mangue,Mangue,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Mining,TRUE,TRUE,FALSE,TRUE,TRUE,Mineração,Mineração,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Mosaic of Uses,TRUE,TRUE,FALSE,TRUE,TRUE,Mosaico de Usos,Mosaico de Usos,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
-Other non Forest Formations,TRUE,TRUE,FALSE,TRUE,TRUE,Outras Formações não Florestais,Outras Formações não Florestais,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Other non Vegetated Areas,TRUE,TRUE,FALSE,TRUE,TRUE,Outras Áreas não Vegetadas,Outras Áreas não Vegetadas,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
+Other non Forest Formations,TRUE,TRUE,FALSE,TRUE,TRUE,Outras Formações não Florestais,Outras Formações não Florestais,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Pasture,TRUE,TRUE,FALSE,TRUE,TRUE,Pastagem,Pastagem,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 "Beach, Dune and Sand Spot",TRUE,TRUE,FALSE,TRUE,TRUE,"Praia, Duna e Areal","Praia, Duna e Areal",Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Herbaceous Sandbank Vegetation,TRUE,TRUE,FALSE,TRUE,TRUE,Restinga Herbácea,Restinga Herbácea,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 "River, Lake and Ocean",TRUE,TRUE,FALSE,TRUE,TRUE,"Rio, Lago e Oceano","Rio, Lago e Oceano",Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Forest Plantation,TRUE,TRUE,FALSE,TRUE,TRUE,Silvicultura,Silvicultura,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Photovoltaic Project,TRUE,TRUE,FALSE,TRUE,TRUE,Usina Fotovoltaica,Usina Fotovoltaica,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
-Urban Area,TRUE,TRUE,FALSE,TRUE,TRUE,Área Urbana,Área Urbana,Nível 2 — Subclasses,1,ha,Meio ambiente,Uso da terra
 Perennial Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Lavoura Perene,Lavoura Perene,Nível 3 — Detalhamento,1,ha,Meio ambiente,Uso da terra
 Temporary Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Lavoura Temporária,Lavoura Temporária,Nível 3 — Detalhamento,1,ha,Meio ambiente,Uso da terra
 Cotton,TRUE,TRUE,FALSE,TRUE,TRUE,Algodão,Algodão,Nível 4 — Classes específicas,1,ha,Meio ambiente,Uso da terra
@@ -39,6 +39,6 @@ Palm Oil,TRUE,TRUE,FALSE,TRUE,TRUE,Dendê,Dendê,Nível 4 — Classes específic
 Other Perennial Crops,TRUE,TRUE,FALSE,TRUE,TRUE,Outras Lavouras Perenes,Outras Lavouras Perenes,Nível 4 — Classes específicas,1,ha,Meio ambiente,Uso da terra
 Other Temporary Crops,TRUE,TRUE,FALSE,TRUE,TRUE,Outras Lavouras Temporárias,Outras Lavouras Temporárias,Nível 4 — Classes específicas,1,ha,Meio ambiente,Uso da terra
 Soybean,TRUE,TRUE,FALSE,TRUE,TRUE,Soja,Soja,Nível 4 — Classes específicas,1,ha,Meio ambiente,Uso da terra
+area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,Área do município (km2),Área do município (km2),Mapbiomas,1,km2,Meio ambiente,Uso da terra
 group,FALSE,FALSE,TRUE,FALSE,FALSE,group,group,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 time,FALSE,FALSE,FALSE,FALSE,FALSE,time,time,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,Área do município (km2),Área do município (km2),Mapbiomas,1,km2,Meio ambiente,Uso da terra

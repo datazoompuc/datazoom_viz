@@ -25,6 +25,28 @@ get_ui <- function(files, param) {
         # labels dos materialSwitch em branco
         tags$style(HTML(".switch-label { color: white; }")),
 
+        # Toggle Estado/Município: dois actionButton
+        tags$style(HTML(
+          ".geo-toggle { display: flex; width: 100%; }
+           .geo-toggle .geo-btn { flex: 1; border-radius: 0; margin: 0;
+             font-size: 14px; padding: 8px 12px; }
+           .geo-toggle .geo-btn:first-child { border-radius: 6px 0 0 6px; }
+           .geo-toggle .geo-btn:last-child  { border-radius: 0 6px 6px 0; }
+           .geo-toggle .geo-active {
+             background-color: #2b5560 !important;
+             box-shadow: inset 0 0 0 2px rgba(255,255,255,.65) !important;
+             font-weight: 600;
+           }"
+        )),
+        tags$script(HTML(
+          "Shiny.addCustomMessageHandler('setGeo', function(v){
+             var a = document.getElementById('geo_est');
+             var b = document.getElementById('geo_munic');
+             if (a) a.classList.toggle('geo-active', v === 'est');
+             if (b) b.classList.toggle('geo-active', v === 'munic');
+           });"
+        )),
+
         h2(class = "plot_name", param$plot_name),
         p(class = "plot_desc", textOutput("plot_desc", inline = TRUE)),
         hr(),
@@ -42,6 +64,22 @@ get_ui <- function(files, param) {
             selected = param$y_def,
             width = "100%"
           ),
+          
+          div(class = "sidebar-gap"),
+         
+          # Estado / Município
+          div(
+            tags$div(class = "switch-label", style = "margin-bottom: 4px;",
+                     textOutput("label_agg", inline = TRUE)),
+              div(
+                class = "geo-toggle",
+                actionButton("geo_est", textOutput("label_geo_est", inline = TRUE),
+                             class = "btn-primary geo-btn geo-active"),
+                actionButton("geo_munic", textOutput("label_geo_munic", inline = TRUE),
+                             class = "btn-primary geo-btn")
+              )
+            ),
+          
 
           # Seleciona recorte geográfico (estados ou municípios)
           selectizeInput(
@@ -56,7 +94,6 @@ get_ui <- function(files, param) {
           div(style = "margin-top: 5px;"), # espaço em branco
 
           # Switches (renderizados no server p/ traduzir os labels no toggle de idioma):
-          #   geo_munic    -> Estado (off) / Município (on)
           #   y_index_base -> proporcional ao ano inicial (índice base 100)
           #   yprop        -> proporção da área
           uiOutput("switches")
