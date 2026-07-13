@@ -26,10 +26,9 @@ ibge_pnadc_trabalho_insercao,data/ibge_pnadc_trabalho_insercao.rds,,,,NOT_FOUND_
 ips_2021,data/ips_2021.rds,data-raw/dz_varias_amazonias_cross_section.R;data-raw/ips.R,,,MULTIPLE_MATCHES
 mapbiomas8_cover_pastCattle,data/mapbiomas8_cover_pastCattle.rds,data-raw/mapbiomas8_cover_pasture.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas8_cover_pasture,data/mapbiomas8_cover_pasture.rds,data-raw/mapbiomas8_cover_pasture.R,load_mapbiomas(),datazoom.amazonia,
-mapbiomas_cobertura_est,data/mapbiomas_cobertura_est.rds,data-raw/mapbiomas_cobertura_est.R,load_mapbiomas(),datazoom.amazonia,
-mapbiomas_cobertura_munic,data/mapbiomas_cobertura_munic.rds,data-raw/mapbiomas_cobertura_munic_percentual.R;data-raw/mapbiomas8_cobertura_munic_savana.R,load_mapbiomas(),,MULTIPLE_MATCHES
-mapbiomas_cobertura_munic_en,data/mapbiomas_cobertura_munic_en.rds,data-raw/mapbiomas_cobertura_munic.R,load_mapbiomas(),datazoom.amazonia,
-mapbiomas_cobertura_munic_pt,data/mapbiomas_cobertura_munic_pt.rds,data-raw/mapbiomas_cobertura_munic.R,load_mapbiomas(),datazoom.amazonia,
+mapbiomas_cobertura_est,data/mapbiomas_cobertura_est.rds,data-raw/mapbiomas_cobertura_ts.R,load_mapbiomas(),datazoom.amazonia,
+mapbiomas_cobertura_munic_en,data/mapbiomas_cobertura_munic_en.rds,,,,NOT_FOUND_IN_DATA_RAW
+mapbiomas_cobertura_munic_pt,data/mapbiomas_cobertura_munic_pt.rds,,,,NOT_FOUND_IN_DATA_RAW
 mapbiomas_transicao_est,data/mapbiomas_transicao_est.rds,data-raw/mapbiomas_transicao_est.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas_transicao_est_tab,data/mapbiomas_transicao_est_tab.rds,data-raw/mapbiomas_transicao_est_tab.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas_transicao_munic_5,data/mapbiomas_transicao_munic_5.rds,data-raw/mapbiomas_transicao_munic.R,load_mapbiomas(),datazoom.amazonia,
