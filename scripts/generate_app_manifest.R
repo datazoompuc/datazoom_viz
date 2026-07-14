@@ -90,8 +90,13 @@ generate_app_manifest <- function(
       "param_file_en",
       "db_file"
     )
-    
-    extra_candidates <- setdiff(names(fields), known_fields)
+
+    # Qualquer variavel files$db_file* (ex.: db_file_sh2_munic) e tratada como
+    # dataset e vai para a coluna db_file
+    db_file_fields <- grep("^db_file", names(fields), value = TRUE)
+    db_file_values <- unique(unlist(fields[db_file_fields]))
+
+    extra_candidates <- setdiff(names(fields), c(known_fields, db_file_fields))
     extra_values <- unname(unlist(fields[extra_candidates]))
     extra_values <- unique(extra_values[!is.na(extra_values) & nzchar(extra_values)])
     
@@ -104,7 +109,7 @@ generate_app_manifest <- function(
       param_script = normalize_manifest_field(collapse_values(fields$param_script)),
       css_file = normalize_manifest_field(collapse_values(fields$CSS_script)),
       dictionary_files = normalize_manifest_field(collapse_values(dictionary_values)),
-      db_file = normalize_manifest_field(collapse_values(fields$db_file)),
+      db_file = normalize_manifest_field(collapse_values(db_file_values)),
       extra_files = normalize_manifest_field(collapse_values(extra_values)),
       stringsAsFactors = FALSE
     )
