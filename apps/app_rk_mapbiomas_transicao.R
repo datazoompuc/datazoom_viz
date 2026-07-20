@@ -71,8 +71,9 @@ param$i18n <- list(
     server2        = " para ",
     rank_label     = "Ranking",
     slider_prefix  = "Ano: ",
-    subtitle_annual = "Transição em %s",                  # %s = janela selecionada
-    subtitle_cum    = "Acumulado de %s até %s",           # %s = 1º ano ; janela selecionada
+    slider_prefix_cum = "Acumulado até: ",
+    subtitle_annual = "Transição em %s (ha)",             # %s = janela selecionada
+    subtitle_cum    = "Acumulado desde %s (ha)",          # %s = 1º ano (o ano corrente vai no slider)
     label_accum     = "Acumulado desde %s",               # %s = 1º ano da série
     no_variable    = "Variável não selecionada",
     no_observation = "Não há observações",
@@ -93,8 +94,9 @@ param$i18n <- list(
     server2        = " to ",
     rank_label     = "Ranking",
     slider_prefix  = "Year: ",
-    subtitle_annual = "Transition in %s",                     # %s = selected window
-    subtitle_cum    = "Accumulated from %s to %s",            # %s = first year ; selected window
+    slider_prefix_cum = "Accumulated to: ",
+    subtitle_annual = "Transition in %s (ha)",                # %s = selected window
+    subtitle_cum    = "Accumulated since %s (ha)",            # %s = first year (current year shown on the slider)
     label_accum     = "Accumulate since %s",                  # %s = first year
     no_variable    = "No variable selected",
     no_observation = "No observations",

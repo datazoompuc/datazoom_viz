@@ -186,11 +186,12 @@ get_server <- function(files, param) {
       # janela mostrada até o JS do slider atualizar: a última, que é onde a
       # animação começa. O <span> é reescrito no cliente a cada troca de quadro.
       # No acumulado mostramos só o ANO FINAL da janela ("...até 1989").
+      # Acumulado: subtítulo estático (o ano corrente vai no slider, nativo).
+      # Não-acumulado: janela selecionada via <span> reescrito pelo JS do slider.
+      if (isTRUE(input$accumulate)) return(HTML(sprintf(i18n()$subtitle_cum, yr_first)))
       frame0 <- tail(sort(unique(df_reactived()$time)), 1)
-      disp0  <- if (isTRUE(input$accumulate)) sub(".* - ", "", frame0) else frame0
-      span   <- sprintf("<span id='subtitle_frame'>%s</span>", disp0)
-      if (isTRUE(input$accumulate)) HTML(sprintf(i18n()$subtitle_cum, yr_first, span))
-      else                          HTML(sprintf(i18n()$subtitle_annual, span))
+      span   <- sprintf("<span id='subtitle_frame'>%s</span>", frame0)
+      HTML(sprintf(i18n()$subtitle_annual, span))
     })
 
     # ---------------------------- Gráfico (bar-race do ranking) ----------------------------
@@ -242,6 +243,8 @@ get_server <- function(files, param) {
               group_by(group) %>%
               mutate(x = cumsum(x)) %>%
               ungroup()
+            # eixo temporal = ano final ("acumulado até"), não o intervalo
+            df_p$slider <- sub(".* - ", "", df_p$slider)
           }
 
           # Ranking por ano (slider): ordena por x e preenche y
@@ -314,7 +317,10 @@ get_server <- function(files, param) {
           # Animação/slider (se mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
             fig_p <- fig_p %>% animation_slider(
-              currentvalue = list(prefix = i18n()$slider_prefix, font = f1))
+              currentvalue = list(
+                prefix = if (isTRUE(input$accumulate)) i18n()$slider_prefix_cum
+                         else i18n()$slider_prefix,
+                font = f1))
             fig_p <- fig_p %>% animation_button(label = "Play")
 
             fig_p$x$layout$updatemenus <- list(

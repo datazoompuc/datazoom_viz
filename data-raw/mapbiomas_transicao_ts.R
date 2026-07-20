@@ -12,8 +12,8 @@
 #     usuário escolhe quais municípios/estados plotar como linhas);
 #   - MANTÉM from == to: no ts faz sentido ver a persistência de uma classe ao
 #     longo do tempo (o default histórico do app é "Afloramento -> Afloramento");
-#   - est e munic ambos QUINQUENAIS (grade de 1985): série temporal com eixo
-#     regular nos dois níveis (o toggle geográfico não muda a granularidade).
+#   - ESTADO anual (só 9 UFs, leve) e MUNICÍPIO quinquenal (grade de 1985, para
+#     não pesar com ~772 grupos). O toggle geográfico muda a granularidade.
 # Classes from/to em inglês (chave interna); rótulos PT/EN vêm de
 # data/mapbiomas_legenda.csv. Espelha data-raw/mapbiomas_transicao_rk.R.
 ################################################################################
@@ -39,6 +39,11 @@ dat <- load_mapbiomas(
 )
 setDT(dat)
 
+# Janelas ANUAIS (para o estado): "AAAA_AAAA" com diferença de 1 ano.
+tcols  <- grep("^[0-9]{4}_[0-9]{4}$", names(dat), value = TRUE)
+annual <- tcols[vapply(strsplit(tcols, "_"), function(a)
+    as.integer(a[2]) - as.integer(a[1]) == 1L, logical(1))]
+
 # Janelas QUINQUENAIS na grade de 1985. A grade limpa para em 2020 (não há
 # 2020-2025 na Coleção 9; a única janela de 5 anos além disso, 2018-2023,
 # sobrepõe 2015-2020 e fica fora da grade regular).
@@ -59,7 +64,7 @@ strip_prefix <- function(x) sub("^[0-9]+(\\.[0-9]+)*\\.?\\s*", "", as.character(
 
 d <- dat[geocode %in% amz$geocode,
          c("state", "municipality", "geocode",
-           "class_level_4_from", "class_level_4_to", quinq), with = FALSE]
+           "class_level_4_from", "class_level_4_to", union(annual, quinq)), with = FALSE]
 rm(dat); gc()
 
 d[, from := strip_prefix(class_level_4_from)]
@@ -74,7 +79,7 @@ d[, c("class_level_4_from", "class_level_4_to") := NULL]
 long <- melt(
     d,
     id.vars       = c("state", "municipality", "geocode", "from", "to"),
-    measure.vars  = quinq,
+    measure.vars  = union(annual, quinq),
     variable.name = "time_raw",
     value.name    = "value"
 )
@@ -84,11 +89,14 @@ long <- long[!is.na(value) & value > 0]
 long[, time := gsub("_", " - ", as.character(time_raw))]
 long[, time_raw := NULL]
 
+annual_times <- sort(gsub("_", " - ", annual))   # estado
+quinq_times  <- sort(gsub("_", " - ", quinq))    # município
+
 ################################################################################
 # 5. DATASET MUNICIPAL (group = "Município - Estado") — todos os grupos
 ################################################################################
 
-munic <- long[, .(value = round(sum(value, na.rm = TRUE), 2)),
+munic <- long[time %in% quinq_times, .(value = round(sum(value, na.rm = TRUE), 2)),
               by = .(time, group = paste(municipality, "-", state), from, to)]
 setorder(munic, from, to, group, time)
 saveRDS(as.data.frame(munic), "data/mapbiomas_transicao_munic.rds")
@@ -97,7 +105,7 @@ saveRDS(as.data.frame(munic), "data/mapbiomas_transicao_munic.rds")
 # 6. DATASET ESTADUAL (group = estado; área somada por estado)
 ################################################################################
 
-est <- long[, .(value = round(sum(value, na.rm = TRUE), 2)),
+est <- long[time %in% annual_times, .(value = round(sum(value, na.rm = TRUE), 2)),
             by = .(time, group = state, from, to)]
 setorder(est, from, to, group, time)
 saveRDS(as.data.frame(est), "data/mapbiomas_transicao_est.rds")
@@ -141,8 +149,8 @@ build_dics_ts("data/mapbiomas_transicao_munic_dic.csv",
 # 8. CHECAGENS RÁPIDAS (rode e cole a saída)
 ################################################################################
 
-cat("Janelas quinquenais:", length(quinq), "->",
-    paste(gsub("_", "-", quinq), collapse = " ; "), "\n")
+cat("Janelas -> EST (anual):", length(annual_times),
+    "| MUNIC (quinquenal):", length(quinq_times), "\n")
 cat("EST  -> pares from/to:", uniqueN(paste(est$from, est$to)),
     "| estados:", uniqueN(est$group), "| linhas:", nrow(est), "\n")
 cat("MUNIC-> pares from/to:", uniqueN(paste(munic$from, munic$to)),

@@ -215,7 +215,7 @@ get_server <- function(files, param) {
         x_col <- table_lang[which(table_lang$var == param$x_def), ]
         y_col <- table_lang[which(table_lang$var == param$y_def), ]
         y_col$label <- i18n()$y_label
-        x_col$label <- i18n()$x_label
+        x_col$label <- if (isTRUE(input$accumulate)) i18n()$x_label_cum else i18n()$x_label
 
         d <- df_reactived()
         df_p <- data.frame(d[[x_col$var]], d[[y_col$var]], d$group)
@@ -240,6 +240,8 @@ get_server <- function(files, param) {
             dplyr::arrange(x, .by_group = TRUE) %>%
             dplyr::mutate(y = cumsum(y)) %>%
             dplyr::ungroup()
+          # eixo temporal = ano final ("acumulado até"), não o intervalo
+          df_p$x <- sub(".* - ", "", df_p$x)
         }
 
         # Proporcional ao intervalo inicial (índice base 100 por grupo)
