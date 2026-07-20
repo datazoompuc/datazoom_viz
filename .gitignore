@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+
+.claude/settings.json
+.claude/settings.local.json
