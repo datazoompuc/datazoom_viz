@@ -1,0 +1,4 @@
+var,x,y,color,size,slider,label,desc,var_group,tipo,unidade,categoria,subcategoria
+time,FALSE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+group,FALSE,FALSE,TRUE,FALSE,FALSE,Grupo,Grupo,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+value,TRUE,FALSE,FALSE,FALSE,FALSE,Área transicionada,Área transicionada,Mapbiomas,1,ha,Meio ambiente,Uso da terra
