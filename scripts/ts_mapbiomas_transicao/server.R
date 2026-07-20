@@ -1,385 +1,293 @@
 # -------------------------------- Define lógica do server --------------------------------
 
-# Paleta de cores
 pallete_discrete <- c("#fcff84", "#ffcf48", "#c3ff83", "#007e47", "#00596d", "#4fdf94", "#99b0c8", "#261c4e", "#000098", "#c368b1", "#60458c", "#757575")
-pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "#33638d", "#287d8e", "#238a8d", "#1f968b", "#20a387", "#29af7f", "#3cbb75", "#55c667", "#73d055", "#95d840", "#b8de29", "#dce319", "#fde725") # Viridis
 
-# Fontes
 f1 <- list(family = "Roboto", size = 14, color = "rgb(0, 0, 0)")
 f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
-# Funcão para retornar objeto server
+`%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || identical(a, "")) b else a
+
 get_server <- function(files, param) {
+
+  # Duas bases (o toggle geográfico decide qual está ativa). from/to em inglês.
+  df_est   <- readRDS(files$db_file_est)   %>% dplyr::ungroup()
+  df_munic <- readRDS(files$db_file_munic) %>% dplyr::ungroup()
+
+  leg <- data.table::fread(files$legenda, encoding = "UTF-8")
+
+  label_of <- function(keys, lang) {
+    if (lang == "pt") {
+      lab <- leg$nome_pt[match(keys, leg$nome_en)]
+      lab[is.na(lab)] <- keys[is.na(lab)]
+      lab
+    } else keys
+  }
+
+  niveis_lab <- list(
+    pt = c("0" = "Nível 0 — Categorias amplas", "1" = "Nível 1 — Grandes classes",
+           "2" = "Nível 2 — Subclasses",        "3" = "Nível 3 — Detalhamento",
+           "4" = "Nível 4 — Classes específicas"),
+    en = c("0" = "Level 0 — Broad categories",  "1" = "Level 1 — Major classes",
+           "2" = "Level 2 — Subclasses",        "3" = "Level 3 — Detail",
+           "4" = "Level 4 — Specific classes")
+  )
+  # choices agrupadas por nível (optgroup): nome = rótulo exibido, valor = chave inglesa
+  make_choices <- function(keys, lang) {
+    lab <- label_of(keys, lang)
+    niv <- leg$nivel[match(keys, leg$nome_en)]
+    niv[is.na(niv)] <- 99L
+    ord  <- order(niv, lab)
+    keys <- keys[ord]; lab <- lab[ord]; niv <- niv[ord]
+    grp    <- niveis_lab[[lang]]
+    outras <- if (lang == "pt") "Outras" else "Other"
+    hdr <- ifelse(as.character(niv) %in% names(grp), grp[as.character(niv)], outras)
+    split(stats::setNames(keys, lab), factor(hdr, levels = unique(hdr)))
+  }
+
+  from_keys <- sort(unique(c(df_est$from, df_munic$from)))
+  to_keys   <- sort(unique(c(df_est$to,   df_munic$to)))
+
+  # 1º ano da série (rótulo do acumulado)
+  yr_first <- sub(" .*", "", sort(unique(c(df_est$time, df_munic$time)))[1])
+
+  # par inicial fixo: Formação Florestal -> Área Urbana (igual ao rk)
+  default_from <- if ("Forest Formation" %in% from_keys) "Forest Formation" else from_keys[1]
+  default_to   <- if ("Urban Area" %in% to_keys) "Urban Area" else {
+    hit <- grep("urban", to_keys, ignore.case = TRUE, value = TRUE)
+    if (length(hit)) hit[1] else to_keys[1]
+  }
+
   server <- function(input, output, session) {
-      
-    # Carrega dados
-    df <- readRDS(files$db_file)
 
-    if(param$lang) {
-        
-        df$from <- df$from %>%
-            str_replace_all( c("Não Observado" = "Non Observed",
-                               "Formação de Savana" = "Savanna Formation",
-                               "Pradaria" = "Grassland",
-                               "Infraestrutura Urbana" = "Urban Infrastructure",
-                               "Soja" = "Soy Beans",
-                               "Mangue" = "Magrove",
-                               "Outras Formações Não Florestais Naturais" = "Other Non Forest Natural Formation",
-                               "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
-                               "Outras áreas não vegetadas" = "Other Non Vegetated Area",
-                               "Salar" = "Salt flat",
-                               "Restinga Arborizada" = "Wooded Restinga",
-                               "Mineiração" = "Mining",
-                               "Café" = "Coffe",
-                               "Algodão" = "Cotton",
-                               "Formação de Floresta" = "Forest Formation",
-                               "Pântano" = "Wetland",
-                               "Pastagem" = "Pasture",
-                               "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
-                               "Outros Cultivos Temporários" = "Other Temporary Crops",
-                               "Plantação de Floresta" = "Forest Plantation",
-                               "Cana-de-açúcar" = "Sugar Cane",
-                               "Praia e Dunas" = "Beach and Dune",
-                               "Aquacultura" = "Aquaculture",
-                               "Outros Cultivos Perenes" = "Other Perennial Crops",
-                               "Restinga Herbácea/Arbustiva" = "Restinga Herbacea/Arbustiva",
-                               "Afloramento Rochoso" = "Rocky outcrop",
-                               "Cultivos Cítricos" = "Citrus",
-                               "Arroz" = "Rice"))
-        df$to <- df$to %>%
-            str_replace_all( c("Não Observado" = "Non Observed",
-                               "Formação de Savana" = "Savanna Formation",
-                               "Pradaria" = "Grassland",
-                               "Infraestrutura Urbana" = "Urban Infrastructure",
-                               "Soja" = "Soy Beans",
-                               "Mangue" = "Magrove",
-                               "Outras Formações Não Florestais Naturais" = "Other Non Forest Natural Formation",
-                               "Mosaico de Agricultura e Pastagem" = "Mosaic of Agriculture and Pasture",
-                               "Outras áreas não vegetadas" = "Other Non Vegetated Area",
-                               "Salar" = "Salt flat",
-                               "Restinga Arborizada" = "Wooded Restinga",
-                               "Mineiração" = "Mining",
-                               "Café" = "Coffe",
-                               "Algodão" = "Cotton",
-                               "Formação de Floresta" = "Forest Formation",
-                               "Pântano" = "Wetland",
-                               "Pastagem" = "Pasture",
-                               "Rios, Lagos ou Oceanos" = "River, Lake and Ocean",
-                               "Outros Cultivos Temporários" = "Other Temporary Crops",
-                               "Plantação de Floresta" = "Forest Plantation",
-                               "Cana-de-açúcar" = "Sugar Cane",
-                               "Praia e Dunas" = "Beach and Dune",
-                               "Aquacultura" = "Aquaculture",
-                               "Outros Cultivos Perenes" = "Other Perennial Crops",
-                               "Restinga Herbácea/Arbustiva" = "Restinga Herbacea/Arbustiva",
-                               "Afloramento Rochoso" = "Rocky outcrop",
-                               "Cultivos Cítricos" = "Citrus",
-                               "Arroz" = "Rice"))
-        
-    }
-    
-    # Cria opções para seleção de grupos
-    param$x_from_choices <- sort(unique(df$from))
-    param$x_to_choices <- sort(unique(df$to))
-    
-    param$filter_choices <- sort(unique(df$group))
-    
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-        
-      updateSelectInput(session,
-        "x_from",
-        choices = param$x_from_choices,
-        selected = sample(param$x_from_choices, 1) 
-      )
+    # ---------------------------- Idioma ----------------------------
+    lang <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["lang"]], "en")) "en" else "pt"
+    })
+    observeEvent(input$toggle_lang, {
+      new_lang <- ifelse(lang() == "pt", "en", "pt")
+      lang(new_lang)
+      updateActionButton(session, "toggle_lang", label = param$i18n[[new_lang]]$btn_lang)
+    })
+    i18n <- reactive({ param$i18n[[lang()]] })
 
-      updateSelectInput(session,
-        "x_to",
-        choices = param$x_to_choices,
-        selected = sample(param$x_to_choices, 1)
-      )
-      
-      updateSelectInput(session,
-                          inputId = "filter1",
-                          choices = param$filter_choices,
-                          selected = sample(param$filter_choices, 2)
-      )
-    }
+    # ---------------------------- Nível geográfico ----------------------------
+    geo <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["geo"]], "munic")) "munic" else "est"
+    })
+    observeEvent(input$geo_est,   { geo("est") })
+    observeEvent(input$geo_munic, { geo("munic") })
+    observeEvent(geo(), { session$sendCustomMessage("setGeo", geo()) }, ignoreInit = FALSE)
 
-    # Função para atualizar url do app com parâmetros dos inputs
+    df <- reactive({ if (geo() == "munic") df_munic else df_est })
+
+    df_reactived <- reactive({
+      d <- df()
+      if (!is.null(input$x_from) && input$x_from != "") d <- d[d$from == input$x_from, ]
+      if (!is.null(input$x_to)   && input$x_to   != "") d <- d[d$to   == input$x_to, ]
+      if (!is.null(input$filter1)) d <- d[d$group %in% input$filter1, ]
+      d
+    })
+
+    filter_choices <- reactive({
+      fc <- sort(unique(df()$group)); fc[!is.na(fc) & fc != ""]
+    })
+
+    # ---------------------------- Textos da sidebar ----------------------------
+    output$plot_desc      <- renderText({ i18n()$plot_desc })
+    output$label_var_name <- renderText({ i18n()$label_var_name })
+    output$label_agg      <- renderText({ i18n()$label_agg })
+    output$label_geo_est  <- renderText({ i18n()$label_geo_name$est })
+    output$label_geo_munic<- renderText({ i18n()$label_geo_name$munic })
+
+    output$switches <- renderUI({
+      i <- param$i18n[[lang()]]
+      tagList(
+        materialSwitch("y_option",
+          tags$span(i$label_prop, class = "switch-label"),
+          value = isTRUE(isolate(input$y_option)), status = "info"),
+        materialSwitch("accumulate",
+          tags$span(sprintf(i$label_accum, yr_first), class = "switch-label"),
+          value = isTRUE(isolate(input$accumulate)), status = "info")
+      )
+    })
+
+    # proporcional e acumulado são mutuamente exclusivos
+    observeEvent(input$y_option, {
+      if (isTRUE(input$y_option)) updateMaterialSwitch(session, "accumulate", value = FALSE)
+    }, ignoreInit = TRUE)
+    observeEvent(input$accumulate, {
+      if (isTRUE(input$accumulate)) updateMaterialSwitch(session, "y_option", value = FALSE)
+    }, ignoreInit = TRUE)
+
+    # ---------------------------- Preenchimento inicial (choices) ----------------------------
+    observe({
+      lg <- lang()
+      updateSelectInput(session, "x_from", label = i18n()$label_from,
+                        choices = make_choices(from_keys, lg),
+                        selected = isolate(input$x_from) %||% default_from)
+      updateSelectInput(session, "x_to", label = i18n()$label_to,
+                        choices = make_choices(to_keys, lg),
+                        selected = isolate(input$x_to) %||% default_to)
+    })
+
+    # grupos: sorteia 2 no início; troca choices ao mudar de geo
+    observeEvent(geo(), {
+      fc <- filter_choices()
+      updateSelectizeInput(session, "filter1",
+                           label = i18n()$label_geo_name[[geo()]],
+                           choices = fc, selected = sample(fc, min(2, length(fc))))
+    }, ignoreInit = FALSE)
+
+    # retraduz labels ao trocar idioma (mantém seleção)
+    observeEvent(lang(), {
+      updateSelectInput(session, "x_from", label = i18n()$label_from,
+                        choices = make_choices(from_keys, lang()),
+                        selected = isolate(input$x_from))
+      updateSelectInput(session, "x_to", label = i18n()$label_to,
+                        choices = make_choices(to_keys, lang()),
+                        selected = isolate(input$x_to))
+      updateSelectizeInput(session, "filter1",
+                           label = i18n()$label_geo_name[[geo()]],
+                           selected = isolate(input$filter1))
+    }, ignoreInit = TRUE)
+
+    # ---------------------------- URL <-> inputs ----------------------------
     update_my_queryString <- function() {
-      q_string <- paste0(
-        "?", "x_from=", input$x_from,
-        "&", "x_to=", input$x_to,
-        "&", "y_option=", input$y_option
-      )
-
-      for (i in input$filter1) {
-        q_string <- paste0(
-          q_string,
-          "&", "filter1=", i
-        )
-      }
-
-
+      q_string <- paste0("?", "lang=", lang(), "&", "geo=", geo(),
+                         "&", "x_from=", input$x_from, "&", "x_to=", input$x_to,
+                         "&", "y_option=", isTRUE(input$y_option),
+                         "&", "accumulate=", isTRUE(input$accumulate))
+      for (i in input$filter1) q_string <- paste0(q_string, "&", "filter1=", i)
       updateQueryString(q_string, mode = "replace")
     }
 
-    # Função para atualizar inputs a partir da URL
-    update_my_inputs <- function() {
-      # Preenche filtro vazio
-      updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = NULL
-      )
-
-      # Pega parametros da url e atribui aos selectinputs
+    observeEvent(session$clientData$url_search, {
       query <- parseQueryString(session$clientData$url_search)
-
-      if (!is.null(query[["x_from"]])) {
-        updateSelectInput(session, "x_from",
-                          choices = param$x_from_choices,
-                          selected = query[["x_from"]]
-        )
-      }
-
-      if (!is.null(query[["x_to"]])) {
-        updateSelectInput(session, "x_to",
-                            choices = param$x_to_choices,
-                            selected = query[["x_to"]]
-        )
-      }
-
-      if (!is.null(query[["y_option"]])) {
-        updateCheckboxInput(session, "y_option",
-          value = (query[["y_option"]] == "TRUE")
-        )
-      }
-
+      if (!is.null(query[["x_from"]]) && query[["x_from"]] %in% from_keys)
+        updateSelectInput(session, "x_from", choices = make_choices(from_keys, lang()),
+                          selected = query[["x_from"]])
+      if (!is.null(query[["x_to"]]) && query[["x_to"]] %in% to_keys)
+        updateSelectInput(session, "x_to", choices = make_choices(to_keys, lang()),
+                          selected = query[["x_to"]])
+      if (!is.null(query[["y_option"]]))
+        updateMaterialSwitch(session, "y_option", value = (query[["y_option"]] == "TRUE"))
+      if (!is.null(query[["accumulate"]]))
+        updateMaterialSwitch(session, "accumulate", value = (query[["accumulate"]] == "TRUE"))
       selected <- unlist(query[names(query) == "filter1"], use.names = FALSE)
-      if (!is.null(query[["filter1"]])) {
-        updateSelectInput(session,
-          "filter1",
-          choices = param$filter_choices,
-          selected = selected
-        )
-      }
-      
-      # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter1"]]) && is.null(query[["x_from"]]) && is.null(query[["x_to"]])) {
-        random_inputs() # preenche inputs se estiverem vazios
-      }
-    }
+      if (!is.null(selected) && all(selected %in% filter_choices()))
+        updateSelectizeInput(session, "filter1",
+                             label = i18n()$label_geo_name[[geo()]],
+                             choices = filter_choices(), selected = selected)
+    }, ignoreInit = FALSE, once = TRUE)
 
-    # Output titulo do gráfico
-    
+    # ---------------------------- Títulos ----------------------------
+    output$plot_title <- renderText({
+      if (is.null(input$x_from) || input$x_from == "" ||
+          is.null(input$x_to)   || input$x_to == "") return(" ")
+      paste(label_of(input$x_from, lang()), i18n()$to_connector,
+            label_of(input$x_to, lang()))
+    })
 
-    # Output gráfico
+    output$plot_subtitle <- renderText({
+      if (is.null(input$x_from) || input$x_from == "" ||
+          is.null(input$x_to)   || input$x_to == "" ||
+          is.null(input$filter1) || length(input$filter1) < 1) return(" ")
+      if (nrow(df_reactived()) == 0) return(i18n()$no_observation)
+      if (isTRUE(input$accumulate)) return(sprintf(i18n()$subtitle_cum, yr_first))
+      if (isTRUE(input$y_option)) return(i18n()$subtitle_prop)
+      i18n()$subtitle_init
+    })
+
+    # ---------------------------- Gráfico (linhas no tempo) ----------------------------
     output$plot <- renderPlotly({
-      update_my_queryString() # atualiza url com parametros dos inputs
-
-      fig <- plotly_empty() # inicia figura com gráfico em branco
-      tryCatch(
-        {
-          
-            
-          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          # Cria dataframe do gráfico
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == param$y_def), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
-          y_col$label <- param$label_y_name
-          # Filtra dataframe com grupos selecionados
-          df_filtered <- df %>% 
-                            filter(group %in% input$filter1) %>%
-                            filter(to == input$x_to) %>%
-                            filter(from == input$x_from)
-         
-          df_p <- data.frame(
-            df_filtered[x_col$var],
-            df_filtered[y_col$var],
-            df_filtered[color_col$var]
-          )
-          colnames(df_p) <- c("x", "y", "color")
-          df_p$group <- df_filtered$group
-          df_p$text <- df_p$group
-
-          # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
-
-          # Se dataset estiver vazio, não monta o gráfico, retorna em branco
-          if (nrow(df_p) < 1) {
-            fig <- plotly_empty()
-            
-            #Título para quando não há observações
-            output$plot_title <- renderText({
-                text <- 
-                # Se algum campo estiver vazio retorna texto vazio
-                if (is.null(input$x_from) || input$x_from == "") {
-                    text <- " "
-                } else {
-                    # Monta titulo a partir do parâmetro pré-definido
-                    
-                    text <- paste(param$no_observation_title)
-                    
-                }
-                
-                text
-            })
-            #Subtítulo para quando não há observações
-            output$plot_subtitle <- renderText({
-                
-                #Monta subtítulo a partir de variáveis selecionadas e parâmetro pré-definido
-                text <- paste(input$x_from, param$to, input$x_to, param$no_observation_subtitle, sep = " ")
-                
-                text
-                
-            })
-            
-            stop()
-          } else {
-              
-              #Título para quando há observações
-              output$plot_title <- renderText({
-                  text <- " "
-                  # Se algum campo estiver vazio retorna texto vazio
-                  if (is.null(input$x_from) || input$x_from == "") {
-                      text <- " "
-                  } else {
-                      # Monta titulo a partir de variáveis selecionadas nos inputs
-                      
-                      text <- paste(input$x_from, param$to, input$x_to, sep = " ")
-                      
-                  }
-                  
-                  text
-              })
-              
-              #Subtítulo para quando há observações
-              output$plot_subtitle <- renderText({
-                  # Se algum campo estiver vazio retorna texto vazio
-                  if (is.null(input$x_from) || input$x_from == "") {
-                      text <- " "
-                  } else {
-                      text <- paste(param$subtitle_init)
-                  }
-                  
-                  text
-              })
-              
-          }
-
-          # Alternativa de medida para y
-          if (input$y_option & is.numeric(df_p$y)) {
-            df_p <- df_p %>%
-              group_by(df_p$group) %>%
-              mutate(
-                aux1 = first(y),
-                y_option = (y / aux1) * 100
-              )
-            df_p$y <- df_p$y_option
-          }
-
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
-
-          # Monta html do tooltip
-          df_p$tooltip <- paste0(
-            "<b>", df_p$text, "</b><br>",
-            x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", round(df_p$y, 2), param$measur_unit2,"<br>"
-          )
-
-          # Define paleta de cores
-          pallete <- pallete_discrete
-
-          # Monta gráfico
-          fig_p <- plot_ly(df_p,
-            x = ~x,
-            y = ~y,
-            color = ~group,
-            type = "scatter",
-            mode = "lines",
-            text = ~tooltip,
-            hoverinfo = "text"
-          )
-
-          # Layout eixos
-          x_axis_layout <- list(
-            title = x_col$label,
-            titlefont = f1,
-            tickfont = f2,
-            automargin = FALSE,
-            autorange = TRUE,
-            showgrid = FALSE,
-            zeroline = FALSE
-          )
-          y_axis_layout <- list(
-            title = y_col$label,
-            titlefont = f1,
-            tickfont = f2,
-            automargin = FALSE,
-            autorange = TRUE,
-            showgrid = FALSE,
-            zeroline = FALSE
-          )
-
-          if (input$y_option) {
-            y_axis_layout$title <- paste0(y_col$label, "*")
-          }
-
-          # Layout hover/tooltip
-          tooltip <- list(
-            bordercolor = "rgba(255, 255, 255, 1)",
-            bgopacity = "0.5",
-            font = f1
-          )
-
-          # Aplica layout
-          fig_p <- fig_p %>%
-            layout(
-              font = f1,
-              xaxis = x_axis_layout,
-              yaxis = y_axis_layout,
-              showlegend = TRUE,
-              hoverlabel = tooltip
-            )
-
-          #  Configura botões do plotly
-          fig_p <- fig_p %>%
-            config(
-              # toImageButtonOptions = list(format = "svg"),
-              displaylogo = FALSE,
-              modeBarButtonsToRemove = c(
-                "lasso2d",
-                "select2d",
-                "hoverCompareCartesian"
-              )
-            )
-
-          fig <- fig_p # retorna a figura do gráfico
-        },
-        error = function(cond) {
-          # se encontrar erro retorna fig em branco
-          print("plot error")
-          fig <- plotly_empty()
+      update_my_queryString()
+      fig <- plotly_empty()
+      tryCatch({
+        if (is.null(input$x_from) || input$x_from == "" ||
+            is.null(input$x_to)   || input$x_to == "" ||
+            is.null(input$filter1) || length(input$filter1) < 1) {
+          fig <- plotly_empty(); stop()
         }
-      )
-      fig
-    })
 
-    # Observa eventos
-    observe({
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-      update_my_inputs()
-    })
+        table_lang <- param$tables[[lang()]]
+        x_col <- table_lang[which(table_lang$var == param$x_def), ]
+        y_col <- table_lang[which(table_lang$var == param$y_def), ]
+        y_col$label <- i18n()$y_label
+        x_col$label <- i18n()$x_label
+
+        d <- df_reactived()
+        df_p <- data.frame(d[[x_col$var]], d[[y_col$var]], d$group)
+        colnames(df_p) <- c("x", "y", "color")
+        df_p$group <- d$group
+        df_p$text  <- d$group
+        df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
+        if (nrow(df_p) < 1) { fig <- plotly_empty(); stop() }
+
+        # Acumulado desde o 1º ano: completa a série do grupo (0 nas janelas sem
+        # transição) e faz a soma corrente. Vem ANTES do proporcional.
+        if (isTRUE(input$accumulate) && is.numeric(df_p$y)) {
+          all_win <- sort(unique(df()$time))
+          full <- expand.grid(group = unique(df_p$group), x = all_win,
+                              stringsAsFactors = FALSE)
+          df_p <- merge(full, df_p[, c("group", "x", "y")],
+                        by = c("group", "x"), all.x = TRUE)
+          df_p$y[is.na(df_p$y)] <- 0
+          df_p$text <- df_p$group
+          df_p <- df_p %>%
+            dplyr::group_by(group) %>%
+            dplyr::arrange(x, .by_group = TRUE) %>%
+            dplyr::mutate(y = cumsum(y)) %>%
+            dplyr::ungroup()
+        }
+
+        # Proporcional ao intervalo inicial (índice base 100 por grupo)
+        if (isTRUE(input$y_option) && is.numeric(df_p$y)) {
+          df_p <- df_p %>%
+            dplyr::arrange(group, x) %>%
+            dplyr::group_by(group) %>%
+            dplyr::mutate(y = (y / dplyr::first(y)) * 100) %>%
+            dplyr::ungroup()
+        }
+
+        unidade <- if (isTRUE(input$y_option)) "%" else "ha"
+        df_p$tooltip <- paste0(
+          "<b>", df_p$text, "</b><br>",
+          x_col$label, ": ", df_p$x, "<br>",
+          y_col$label, ": ", format(round(df_p$y, 2), scientific = FALSE,
+                                    decimal.mark = ",", big.mark = "."), " (", unidade, ")"
+        )
+
+        df_p <- df_p %>% dplyr::arrange(group, x)
+
+        fig_p <- plot_ly(df_p, x = ~x, y = ~y, color = ~group,
+                         colors = pallete_discrete,
+                         type = "scatter", mode = "lines+markers",
+                         text = ~tooltip, hoverinfo = "text")
+
+        y_title <- y_col$label
+        if (isTRUE(input$y_option)) y_title <- paste0(y_col$label, " *")
+
+        fig_p <- fig_p %>%
+          layout(
+            font = f1,
+            xaxis = list(title = x_col$label, titlefont = f1, tickfont = f2,
+                         automargin = TRUE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE),
+            yaxis = list(title = y_title, titlefont = f1, tickfont = f2,
+                         automargin = FALSE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE),
+            showlegend = TRUE,
+            hoverlabel = list(bordercolor = "rgba(255,255,255,1)", bgopacity = "0.5", font = f1)
+          ) %>%
+          config(displaylogo = FALSE,
+                 modeBarButtonsToRemove = c("lasso2d", "select2d", "hoverCompareCartesian"))
+
+        fig <- fig_p
+      }, error = function(cond) { print("plot error"); fig <- plotly_empty() })
+      fig
+    }) %>% bindCache(input$x_from, input$x_to, input$filter1, input$y_option,
+                     input$accumulate, lang(), geo())
   }
 
-  # Retorna objeto server
   server
 }
