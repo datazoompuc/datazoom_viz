@@ -4,7 +4,7 @@
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Incluí script CSS
-    tags$style(type = "text/css", 
+    tags$style(type = "text/css",
       # remove o ultimo ano no slider (2018 e 2019 estavam um em cima do outro)
       # remove tracos intermediarios do slider
       # move botao de play para a esquerda e para baixo
@@ -20,22 +20,25 @@ get_ui <- function(files, param) {
       class = "mainrow h-100",
       column(3, # dimensão da coluna do bootstrap
         class = "menucol",
-        
+
         # muda cor do background
         tags$style('.menucol {
                              background-color: #50A486;
               }',),
-        
-        # muda cor do botao 
+
+        # muda cor do botao
         tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
                           background-color: #48968B !important;
                           border-color: #48968B !important;
               }',),
-        
-        h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+
+        uiOutput("plot_name_ui"),
+        uiOutput("plot_desc_ui"),
         hr(),
-        p(class = "vars", param$label_var_name),
+
+        tags$style(HTML(".switch-label { color: white; }")),
+
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
@@ -47,25 +50,13 @@ get_ui <- function(files, param) {
             width = "100%"
           )
         ),
-        tags$style(HTML("
-      .switch-label {
-        color: white;
-      }
-    ")),
-        
         div(
             style = "margin-top: 10px;",
             materialSwitch(
                 inputId = "yprop",
-                label = tags$span(param$label_toggle, class = "switch-label"),
-                value = TRUE, 
+                label = tags$span(textOutput("label_toggle", inline = TRUE), class = "switch-label"),
+                value = TRUE,
                 status = "info"
-            
-            # checkboxInput(
-            #     inputId = "yprop",
-            #     param$label_toggle,
-            #     value = TRUE,
-            #     width = "100%"
             )
         ),
         # espaço vazio
@@ -85,9 +76,19 @@ get_ui <- function(files, param) {
         ),
         # espaço vazio
         div(class = "fakecheckbox", ),
+        # Botão de troca de idioma
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
+          actionButton(
+            inputId = "toggle_lang",
+            label   = "English",
+            icon    = icon("globe"),
+            class   = "btn-primary"
+          )
+        ),
+        div(style = "height: 6px;"), # espaço entre os botões
+        div(
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen",
+                              icon = icon("expand"),
                               class = "btn-primary",
                               onclick = paste0("window.open('", param$link, "', '_blank')"))
         ),
@@ -100,9 +101,15 @@ get_ui <- function(files, param) {
           class = "plotrow row justify-content-center flex-grow-1 w-100",
           div(
             class = "plotdiv w-100 h-100",
-            # Map
-            leafletOutput("map", width = "100%", height = "calc(100vh - 150px)") %>% withSpinner(type = 4,
-                                                                                   color = "#41878C")
+            style = "position: relative; display: flex; flex-direction: column;",
+            div(
+              style = "flex-grow: 1; position: relative;",
+              withSpinner(
+                leafletOutput("map", width = "100%", height = "calc(100vh - 150px)"),
+                type = 4,
+                color = "#41878C"
+              )
+            )
           )
         )
       )

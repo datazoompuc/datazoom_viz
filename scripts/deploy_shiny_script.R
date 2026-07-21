@@ -49,10 +49,16 @@ deploy_shiny_script <- function(
     dir.create(td, recursive = TRUE, showWarnings = FALSE)
     
     copy_one <- function(src) {
+        dest <- file.path(td, src)
         if (dir.exists(src)) {
-            file.copy(src, td, recursive = TRUE, overwrite = TRUE)
+            # Copia o conteúdo do diretório preservando o path relativo
+            # (ex: data/mapbiomas_cobertura.parquet/), em vez de
+            # file.copy(src, td) que jogaria só o basename na raiz do
+            # staging e quebraria datasets parquet particionados em pastas
+            dir.create(dest, recursive = TRUE, showWarnings = FALSE)
+            inner <- list.files(src, full.names = TRUE)
+            file.copy(inner, dest, recursive = TRUE, overwrite = TRUE)
         } else {
-            dest <- file.path(td, src)
             dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
             ok <- file.copy(src, dest, overwrite = TRUE)
             if (!ok) stop("Falha ao copiar: ", src)

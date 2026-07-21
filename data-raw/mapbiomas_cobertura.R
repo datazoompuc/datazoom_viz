@@ -2,7 +2,7 @@
 #   SETUP
 ################################################################################
 
-devtools::install_github("datazoompuc/datazoom.amazonia")
+# devtools::install_github("datazoompuc/datazoom.amazonia")
 
 library(datazoom.amazonia)
 library(readxl)
@@ -21,21 +21,39 @@ library(arrow)
 # load data from MAPBIOMAS ---------------------------------------------------------------
 
 # download treated Mapbiomas Cover data in English
-data <- load_mapbiomas(
+data_raw <- load_mapbiomas(
     dataset = "mapbiomas_cover",
     raw_data = FALSE,
     geo_level = "municipality",
     language = "eng"
-) |>
+)
+
+data <- data_raw |>
+    reframe(value = sum(value),
+                        .by = c(municipality_code, municipality, class_level_4, year))  |>
     pivot_wider(
-        id_cols    = c("biome", "municipality", "state", "municipality_code", "year"),
+        id_cols    = c("municipality", "municipality_code", "year"),
         names_from = class_level_4,
         values_from = value
     )
 
+# Resolve state from the canonical one-row-per-code lookup instead of the
+# state MapBiomas attaches per row: border municipalities (e.g. Ibateguara,
+# Luis Eduardo Magalhaes) have a sliver of pixels crossing into the
+# neighboring state, which forks them into a second row if state is grouped
+# on above. Dropping it from the grouping merges the sliver into the single
+# correct row, and we reattach state here from a source with no duplicates.
+state_lookup <- datazoom.amazonia::municipalities |>
+    dplyr::select(municipality_code = code_muni, state = name_state) |>
+    dplyr::mutate(state = stringr::str_to_title(state))
+
+data <- data |>
+    dplyr::left_join(state_lookup, by = "municipality_code") |>
+    dplyr::relocate(state, .after = municipality)
+
 # Add area of each municipality ------------------------------------------
 
-areas_mun <- readr::read_rds(".\\app_map_mapbiomas_cover\\global\\area_municipios.rds")
+areas_mun <- readr::read_rds("global/area_municipios.rds")
 
 data <- data |>
     drop_na(municipality_code) |>
@@ -50,7 +68,6 @@ shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source 
     left_join(datazoom.amazonia::municipalities, by = "code_muni") |> 
     select(municipality_code = code_muni, geom, legal_amazon) |>
     st_make_valid() |>
-    st_simplify(dTolerance = 400) |>
     rmapshaper::ms_simplify()
 
 ################################################################################
@@ -63,11 +80,11 @@ data |>
     dplyr::group_by(year) |>
     # Write data as .parquet
     arrow::write_dataset(
-        path = "app_map_mapbiomas_cover/mapbiomas_cobertura.parquet", 
+        path = "data/mapbiomas_cobertura.parquet",
         format = "parquet")
 
 # Saves shapefile in .rds (parquet does not support geometry)
-saveRDS(shapefile, ".\\app_map_mapbiomas_cover\\global\\munic_shapefile.rds")
+saveRDS(shapefile, "global/munic_shapefile.rds")
 
 
 ################################################################################
@@ -192,7 +209,7 @@ translations_pt <- c(
 dic_pt <- build_dictionary(datafinal, "pt") |>
     apply_label_translations(translations_pt)
 
-write_csv(dic_pt, "./app_map_mapbiomas_cover/dic.csv")
+write_csv(dic_pt, "data/map_mapbiomas_cover_dic.csv")
 
 #####################
 # EN
@@ -200,4 +217,4 @@ write_csv(dic_pt, "./app_map_mapbiomas_cover/dic.csv")
 
 dic_en <- build_dictionary(datafinal, "en")
 
-write_csv(dic_en, "./app_map_mapbiomas_cover_en/dic_en.csv")
+write_csv(dic_en, "data/map_mapbiomas_cover_dic_en.csv")

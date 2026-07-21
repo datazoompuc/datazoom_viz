@@ -7,7 +7,6 @@ Savanna Formation,TRUE,TRUE,FALSE,FALSE,FALSE,Formação de Savana,Savanna Forma
 Pasture,TRUE,TRUE,FALSE,FALSE,FALSE,Pastagem,Pasture,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Soybean,TRUE,TRUE,FALSE,FALSE,FALSE,Soja,Soybean,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Mining,TRUE,TRUE,FALSE,FALSE,FALSE,Mineração,Mining,Mapbiomas,1,ha,Meio ambiente,Uso da terra
-biome,FALSE,FALSE,FALSE,FALSE,FALSE,biome,biome,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Not Observed,TRUE,TRUE,FALSE,FALSE,FALSE,Não observado,Not Observed,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Floodable Forest,TRUE,TRUE,FALSE,FALSE,FALSE,Floresta Inundável,Floodable Forest,Mapbiomas,1,ha,Meio ambiente,Uso da terra
 Wetland,TRUE,TRUE,FALSE,FALSE,FALSE,Pântano,Wetland,Mapbiomas,1,ha,Meio ambiente,Uso da terra
