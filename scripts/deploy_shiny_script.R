@@ -30,7 +30,7 @@ deploy_shiny_script <- function(
         row$param_script,
         row$css_file,
         split_field(row$dictionary_files),
-        row$db_file,
+        split_field(row$db_file),
         split_field(row$extra_files),
         extra
     ))
