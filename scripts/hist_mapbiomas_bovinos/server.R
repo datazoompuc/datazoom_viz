@@ -10,29 +10,102 @@ f1 <- list(family = "Roboto", size = 14, color = "rgb(0, 0, 0)")
 f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 
 # Funcão para retornar objeto server
-get_server <- function(files, param) {
+# `df` chega pronto do arquivo do app (carregado uma vez por processo)
+get_server <- function(files, param, df) {
+
+  # Monta o recorte pedido a partir das colunas neutras da base. Antes esses três
+  # recortes vinham empilhados na coluna "uf" do .rds, triplicando o arquivo.
+  filtra_grupo <- function(d, grupo) {
+    if (grupo == "AMZ_IN") return(d[legal_amazon == TRUE])
+    if (grupo == "AMZ_OUT") return(d[legal_amazon == FALSE])
+    if (grupo %in% levels(d$regiao)) return(d[regiao == grupo])
+    d[uf == grupo]
+  }
+
   server <- function(input, output, session) {
 
-    # Carrega dados
-    df <- readRDS(files$db_file) %>% 
-      filter(!is.na(uf))
-    
-    # Funcão para preencher inputs com coluna/variável aleatória
+    # --- LANG TOGGLE ---
+
+    # Língua inicial (lida da URL)
+    lang <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["lang"]], "en")) "en" else "pt"
+    })
+
+    # Alterna língua ao clicar no botão
+    observeEvent(input$toggle_lang, {
+      lang(ifelse(lang() == "pt", "en", "pt"))
+    })
+
+    # Atalho para os textos da língua ativa
+    i18n <- reactive({ param$i18n[[lang()]] })
+
+    # Rótulo de cada chave de recorte no idioma ativo (siglas de UF não mudam)
+    geo_label <- function(keys) {
+      lbl <- i18n()$geo_labels
+      ifelse(keys %in% names(lbl), unname(lbl[keys]), keys)
+    }
+
+    # Escolhas agrupadas do selectize, com as chaves neutras como valor
+    geo_choices <- reactive({
+      k <- param$geo_keys
+      setNames(
+        list(
+          setNames(k$amazonia, geo_label(k$amazonia)),
+          setNames(k$regioes, geo_label(k$regioes)),
+          setNames(k$estados, k$estados)
+        ),
+        c(i18n()$group_amazonia, i18n()$group_regioes, i18n()$group_estados)
+      )
+    })
+
+    # Rótulo e unidade da variável saem do dicionário, como nos outros apps
+    # (o param$i18n fica só com texto que é de UI mesmo)
+    var_row <- reactive({
+      tbl <- param$tables[[lang()]]
+      tbl[which(tbl$var == param$x_def), ]
+    })
+
+    # Título do eixo x: a unidade do dicionário, embrulhada em Log() quando ligado
+    x_title <- reactive({
+      if (isTRUE(input$ylog)) sprintf(i18n()$fmt_log, var_row()$unidade) else var_row()$unidade
+    })
+
+    # Textos da sidebar que dependem do idioma
+    # (o label do materialSwitch é um textOutput, então se traduz sozinho)
+    output$plot_desc <- renderText({ i18n()$plot_desc })
+    output$label_var_name <- renderText({ i18n()$label_var_name })
+    output$label_scales <- renderText({ i18n()$label_scales })
+    output$label_log_name <- renderText({ i18n()$label_log_name })
+
+    # Atualiza escolhas e labels quando o idioma muda (as chaves selecionadas são
+    # neutras, então a seleção do usuário sobrevive à troca)
+    observeEvent(lang(), {
+      updateSelectizeInput(session, "filter1",
+                           label = i18n()$label_geo_name,
+                           choices = geo_choices(),
+                           selected = isolate(input$filter1))
+      updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
+      updateActionButton(session, "ab1", label = i18n()$btn_fullscreen)
+      # ignoreInit = FALSE para o app já abrir traduzido quando a URL vem com ?lang=en
+    }, ignoreInit = FALSE)
+
+    # Funcão para preencher inputs com os recortes padrão
     random_inputs <- function() {
-      updateSelectInput(session,
+      updateSelectizeInput(session,
         "filter1",
-        choices = param$filter_choices,
-        selected = c(param$legal_amazon_in, param$legal_amazon_out) # 1 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
+        choices = geo_choices(),
+        selected = param$geo_def
       )
     }
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "ylog=", input$ylog,
-        "&", "ano=", input$filter_ano
+        "?", "lang=", lang(),
+        "&", "ylog=", isTRUE(input$ylog)
       )
-      
+
       for (i in input$filter1) {
         q_string <- paste0(
           q_string,
@@ -45,70 +118,55 @@ get_server <- function(files, param) {
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       # Preenche filtro vazio
-      updateSelectInput(session,
+      updateSelectizeInput(session,
         "filter1",
-        choices = param$filter_choices,
+        choices = geo_choices(),
         selected = NULL
       )
 
       # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
 
-      if (!is.null(query[["ylog"]])) {
-        updateCheckboxInput(session, "ylog",
-                            value = (query[["ylog"]] == "TRUE")
-        )
-      }
-      
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       if (!is.null(query[["filter"]])) {
-        updateSelectInput(session,
-                          "filter1",
-                          choices = param$filter_choices,
-                          selected = selected
-        )
-      }
-      
-      selected <- unlist(query[names(query) == "ano"], use.names = FALSE)
-      if (!is.null(query[["ano"]])) {
-        updateSliderInput(session,
-                          "filter_ano",
-                          value = selected
+        updateSelectizeInput(session,
+                             "filter1",
+                             choices = geo_choices(),
+                             selected = selected
         )
       }
 
-      # Se query está vazia, preenche aleatório
+      if (!is.null(query[["ylog"]])) {
+        updateMaterialSwitch(session, "ylog", value = query[["ylog"]] == "TRUE")
+      }
+
+      # Se query está vazia, preenche com os recortes padrão
       if (is.null(query[["filter"]])) {
-        random_inputs() # preenche inputs se estiverem vazios
+        random_inputs()
       }
     }
 
     # Output titulo do gráfico
     output$plot_title <- renderText({
-      
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
+
+      # Se algum campo estiver vazio retorna só o nome da variável
       if (is.null(input$filter1)) {
-        text <- param$bovino
+        text <- var_row()$label
       } else {
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-        text <- param$bovino
-        filt <- paste(sapply(input$filter1, paste, collapse = ", "), 
-                      collapse = ", ")
-        text <- paste0(text, filt)
+        # Monta titulo a partir dos recortes selecionados nos inputs
+        text <- paste0(var_row()$label, ": ",
+                       paste(geo_label(input$filter1), collapse = ", "))
       }
 
       text
     })
     output$plot_subtitle <- renderText({
-      
-      
-      
+
       # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$filter1)) {
         text <- " "
       } else {
-        text <- paste0(param$munic_dist)
+        text <- i18n()$subtitle
       }
 
       text
@@ -116,7 +174,7 @@ get_server <- function(files, param) {
 
     # Output gráfico
     output$plot <- renderPlotly({
-      
+
       update_my_queryString() # atualiza url com parametros dos inputs
 
       fig <- plotly_empty() # inicia figura com gráfico em branco
@@ -128,28 +186,15 @@ get_server <- function(files, param) {
             stop()
           }
 
-          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == param$y_def), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
-          slider_col <- param$table[which(param$table$var == param$slider_def), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
-
-          # Filtra dataframe com grupos selecionados
-          df_filtered <- df[which(df$uf %in% input$filter1), ]
-          df_filtered <- df_filtered %>% filter(ano == input$filter_ano)
-          
-          df_p <- data.frame(
-            df_filtered[x_col$var],
-            df_filtered[y_col$var],
-            df_filtered["uf"],
-            df_filtered[slider_col$var]
-          )
-          colnames(df_p) <- c("x", "y", "group", "slider")
-          df_p$text <- df_p$group
-
-          # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
-          df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
+          # Monta uma série por recorte selecionado, com o ano como frame
+          df_p <- rbindlist(lapply(input$filter1, function(k) {
+            d <- filtra_grupo(df, k)
+            d <- d[!is.na(get(param$x_def))]
+            if (!nrow(d)) return(NULL)
+            data.table(y = d[[param$x_def]],
+                       slider = d[[param$slider_def]],
+                       group = geo_label(k))
+          }))
 
           # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
@@ -157,59 +202,43 @@ get_server <- function(files, param) {
             stop()
           }
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
+          ### Aplicando log(x+1)
+          if (isTRUE(input$ylog)) df_p[, y := log10(y + 1)]
+
+          # Bins fixos: sem isso o plotly re-binaria a cada frame e as barras
+          # mudariam de largura no meio da animação
+          rng <- range(df_p$y, na.rm = TRUE)
+          x_bins <- list(start = rng[1],
+                         end = rng[2],
+                         size = max(diff(rng), .Machine$double.eps) / 40)
 
           # Define paleta de cores
           pallete <- pallete_discrete
 
           # Monta gráfico
-          ### Aplicando log(x+1)
-          if (input$ylog) {
-            fig_p <- plot_ly(df_p,
-                             x = ~log10(y+1),
-                             color = ~group,
-                             colors = pallete,
-                             type = "histogram",
-                             frame = ~slider,
-                             textposition = "middle right",
-                             showlegend = TRUE,
-                             # marker = list(
-                             #  opacity = 0.5,
-                             #  line = list(width = 1, color = 'white')
-                             # ),
-                             hoverinfo = "text",
-                             hovertemplate = param$hover
-            )
-          } else {
-            fig_p <- plot_ly(df_p,
-                             x = ~y,
-                             color = ~group,
-                             colors = pallete,
-                             type = "histogram",
-                             frame = ~slider,
-                             textposition = "middle right",
-                             showlegend = TRUE,
-                             # marker = list(
-                             #  opacity = 0.5,
-                             #  line = list(width = 1, color = 'white')
-                             # ),
-                             hoverinfo = "text",
-                             hovertemplate = param$hover_2 )
-          }
-          
+          fig_p <- plot_ly(df_p,
+                           x = ~y,
+                           color = ~group,
+                           colors = pallete,
+                           type = "histogram",
+                           frame = ~slider,
+                           autobinx = FALSE,
+                           xbins = x_bins,
+                           showlegend = TRUE,
+                           hoverinfo = "text",
+                           hovertemplate = paste0(i18n()$label_count, ": %{y}<br>",
+                                                  x_title(), ": %{x}")
+          )
 
           # Parâmetros animação e slider (se tiver mais de um frame)
           if (length(unique(df_p$slider)) > 1) {
             # Edita slider
-            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = "Ano: ", font = f1))
-            
+            fig_p <- fig_p %>% animation_slider(currentvalue = list(prefix = i18n()$slider_prefix, font = f1))
+
             # Botões da animação
             #  edita botão padrão (editar move ele para o updatemenus)
             fig_p <- fig_p %>% animation_button(label = "Play")
-            
+
             #  sobrescreve updatemenus, adicionando play e pause
             fig_p$x$layout$updatemenus <- list(
               list(
@@ -237,7 +266,6 @@ get_server <- function(files, param) {
                   ),
                   list(
                     method = "animate",
-                    # label = "<U+25FC>",
                     label = "I I",
                     args = list(
                       list(), # primeiro arg lista vazia para pause
@@ -251,7 +279,7 @@ get_server <- function(files, param) {
                 )
               )
             )
-            
+
             # Pula animação para último frame (custom JS)
             first_frame <- min(df_p$slider)
             last_frame <- max(df_p$slider)
@@ -262,12 +290,10 @@ get_server <- function(files, param) {
                                         data = c(first_frame, last_frame)
             )
           }
-          
+
           # Layout eixos
           x_axis_layout <- list(
-            title = ifelse(input$ylog, 
-                           param$log_bovino, 
-                           param$bovino_area_2),
+            title = x_title(),
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
@@ -276,7 +302,7 @@ get_server <- function(files, param) {
             zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = param$munic_num,
+            title = i18n()$label_count,
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
@@ -290,7 +316,7 @@ get_server <- function(files, param) {
             bgopacity = "0.5",
             font = f1
           )
-          
+
           # Aplica layout
           fig_p <- fig_p %>%
             layout(
@@ -301,7 +327,7 @@ get_server <- function(files, param) {
               hoverlabel = tooltip,
               bargap = 0.1
             )
-        
+
           #  Configura botões do plotly
           fig_p <- fig_p %>%
             config(
@@ -325,12 +351,11 @@ get_server <- function(files, param) {
       fig
     })
 
-    # Observa eventos
-    observe({
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
+    # Observa eventos: preenche os inputs a partir da URL no carregamento
+    # (só uma vez - depois quem cuida dos inputs é o observer de idioma)
+    observeEvent(session$clientData$url_search, {
       update_my_inputs()
-    })
+    }, once = TRUE)
   }
 
   # Retorna objeto server
