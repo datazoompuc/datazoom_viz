@@ -149,19 +149,43 @@ class_levels <- paste0("class_level_", 0:4)
 # remove eventual prefixo numérico ("1. Forest" -> "Forest"); no-op no schema dev atual
 strip_prefix <- function(x) sub("^[0-9]+(\\.[0-9]+)*\\.?\\s*", "", x)
 
-long <- purrr::map_df(class_levels, function(lv) {
+
+long_by_level <- purrr::map_df(class_levels, function(lv) {
     dat %>%
         transmute(
             time              = as.integer(year),
             municipality_code,
             aggregation       = strip_prefix(.data[[lv]]),
             area              = as.numeric(value)
-        )
-}) %>%
-    filter(!is.na(aggregation), aggregation != "") %>%
-    inner_join(municipios_amazonia, by = "municipality_code") %>%   # traz uf + filtra Amazônia Legal
-    group_by(time, municipality_code, uf, aggregation) %>%
-    summarise(area = sum(area, na.rm = TRUE), .groups = "drop")
+        ) %>%
+        filter(!is.na(aggregation), aggregation != "") %>%
+        inner_join(municipios_amazonia, by = "municipality_code") %>%   # traz uf + filtra Amazônia Legal
+        reframe(area = sum(area, na.rm = TRUE),                          # soma DENTRO do nível
+                .by = c(time, municipality_code, uf, aggregation))
+})
+
+# Valida a suposição antes de colapsar: repetições entre níveis devem ter a
+# MESMA área (mesmas linhas de origem, só reetiquetadas). Se alguma
+# combinação (time, municipality_code, aggregation) aparecer em mais de um
+# nível com áreas que DIVERGEM de verdade (não só ruído de ponto flutuante),
+# um distinct() silencioso esconderia essa divergência escolhendo uma
+# arbitrariamente -- por isso paramos e avisamos em vez de seguir escondendo.
+divergent <- long_by_level %>%
+    reframe(n = dplyr::n(), area_range = max(area) - min(area),
+            .by = c(time, municipality_code, uf, aggregation)) %>%
+    filter(n > 1, area_range > 1e-6)
+
+if (nrow(divergent) > 0) {
+    warning(
+        nrow(divergent), " combinações (time, municipality_code, aggregation) repetem entre ",
+        "níveis com áreas DIFERENTES (não é só ruído de ponto flutuante) -- verifique o ",
+        "objeto 'divergent' antes de confiar no dataset final. Amostra:\n",
+        paste(utils::capture.output(print(utils::head(divergent, 10))), collapse = "\n")
+    )
+}
+
+long <- long_by_level %>%
+    distinct(time, municipality_code, uf, aggregation, .keep_all = TRUE) # colapsa repetições entre níveis (não soma)
 
 ################################################################################
 # 5. DATASET MUNICIPAL (group = "Município - Estado", mantém municipality_code)

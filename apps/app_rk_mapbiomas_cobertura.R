@@ -50,10 +50,10 @@ param$link      <- "https://datazoom.shinyapps.io/app_rk_mapbiomas_cobertura/"
 # Textos PT/EN (lang toggle)
 param$i18n <- list(
   pt = list(
-    plot_desc       = "Mapeamento Anual do Uso e Cobertura da Terra no Brasil (Fonte: MapBiomas)",
+    plot_desc       = "Mapeamento Anual do Uso e Cobertura da Terra na Amazônia Legal (Fonte: MapBiomas)",
     label_var_name  = "VARIÁVEIS:",
     label_x_name    = "Ranking - eixo horizontal (x):",
-    label_agg       = "Selecione agregação geográfica:",
+    label_agg       = "Selecione agregação geográfica (Amazônia Legal):",
     label_geo_name  = list(est = "Estados", munic = "Municípios"),
     label_prop_muni = "Proporção da área",
     label_area      = "Área",
@@ -65,10 +65,10 @@ param$i18n <- list(
     btn_lang        = "English"
   ),
   en = list(
-    plot_desc       = "Annual Land Use and Land Cover Mapping in Brazil (Source: MapBiomas)",
+    plot_desc       = "Annual Land Use and Land Cover Mapping in the Legal Amazon (Source: MapBiomas)",
     label_var_name  = "VARIABLES:",
     label_x_name    = "Ranking - horizontal axis (x):",
-    label_agg       = "Select geographical aggregation:",
+    label_agg       = "Select geographical aggregation (Legal Amazon):",
     label_geo_name  = list(est = "States", munic = "Municipalities"),
     label_prop_muni = "Proportion of area",
     label_area      = "Area",
