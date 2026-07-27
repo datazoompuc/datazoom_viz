@@ -183,11 +183,10 @@ get_server <- function(files, param) {
           labels <- paste0(
             i18n()$label_munic_name, df_reactived[[param$text_def]], "</b> <br>",
             i18n()$label_state_name, df_reactived[[param$state]], "</b> <br>",
-            x_col[["label"]], ": <b>", format(df_reactived[[input$x]],
+            x_col[["label"]], ": <b>", trimws(format(round(df_reactived[[input$x]], 2),
                                          scientific = FALSE,
-                                         digits = 2,
                                          decimal.mark = ",",
-                                         big.mark = "."), "</b> <br>",
+                                         big.mark = ".")), "</b> <br>",
             i18n()$label_measurement_unit, x_col[["unidade"]], "</b>"
           ) %>%
             lapply(htmltools::HTML)

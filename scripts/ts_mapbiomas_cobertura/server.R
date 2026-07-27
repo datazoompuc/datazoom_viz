@@ -267,9 +267,9 @@ get_server <- function(files, param) {
         df_p$tooltip <- paste0(
           "<b>", df_p$text, "</b><br>",
           i18n()$x_label, ": ", df_p$x, "<br>",
-          y_col$label, ": ", format(df_p$y, scientific = FALSE,
-                                    digits = 2, decimal.mark = ",",
-                                    big.mark = "."), " ", "(", unidade_y, ")"
+          y_col$label, ": ", trimws(format(round(df_p$y, 2), scientific = FALSE,
+                                    decimal.mark = ",",
+                                    big.mark = ".")), " ", "(", unidade_y, ")"
         )
 
         df_p <- df_p %>% dplyr::arrange(group, x)
