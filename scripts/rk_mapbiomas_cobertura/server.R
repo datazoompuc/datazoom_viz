@@ -327,7 +327,7 @@ get_server <- function(files, param) {
 
         # Layout eixos
         x_axis_layout <- list(
-          title = x_col$label,
+          title = paste0(x_col$label, " (", unidade_x, ")"),
           titlefont = f1,
           tickfont = f2,
           automargin = FALSE,

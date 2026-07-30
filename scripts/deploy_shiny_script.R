@@ -3,7 +3,7 @@ deploy_shiny_script <- function(
         manifest = "config/app_manifest.csv",
         account = "datazoom",
         server = "shinyapps.io",
-        extra = c("global", "apps/www"),
+        extra = c("global"),
         forceUpdate = TRUE
 ) {
     man <- read.csv(manifest, stringsAsFactors = FALSE)
@@ -66,7 +66,19 @@ deploy_shiny_script <- function(
     }
     
     invisible(lapply(app_files[app_files != row$app_script], copy_one))
-    
+
+    # Copia apps/www para www/ na raiz do staging (remapeando o path, não
+    # espelhando). O Shiny só serve assets estáticos automaticamente de uma
+    # pasta chamada "www" ao lado do app.R; como o app.R vira a raiz do
+    # bundle, "apps/www" precisa virar "www" aqui, não "apps/www" (que é o
+    # que copy_one() faria, já que ele sempre espelha o path de origem).
+    if (dir.exists("apps/www")) {
+        www_dest <- file.path(td, "www")
+        dir.create(www_dest, recursive = TRUE, showWarnings = FALSE)
+        www_inner <- list.files("apps/www", full.names = TRUE)
+        file.copy(www_inner, www_dest, recursive = TRUE, overwrite = TRUE)
+    }
+
     # Copia o app principal para a raiz do staging como app.R
     app_lines <- readLines(row$app_script, warn = FALSE, encoding = "UTF-8")
     

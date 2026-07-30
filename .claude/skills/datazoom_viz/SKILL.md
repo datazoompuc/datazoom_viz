@@ -91,6 +91,8 @@ Os três componentes abaixo são o padrão atual. Apps de referência já implem
 
 Para detalhes completos de implementação, leia: `tutorial_novo_ui.md`
 
+Para problemas conhecidos e soluções, leia: `troubleshooting.md`
+
 ### 1. `materialSwitch` (pacote `shinyWidgets`)
 - Substitui `checkboxInput` em qualquer input com **dois estados**
 - Label deve ser `tags$span(..., class = "switch-label")` com CSS `.switch-label { color: white; }`
