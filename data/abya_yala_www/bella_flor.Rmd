@@ -1,0 +1,38 @@
+---
+title: "Bella Flor Canche Teh"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Bella Flor Canche Teh é originária de Timucuy, na península de Yucatán. Doutora em linguística pela Universidade de Barcelona (UB) e antropóloga pela Universidade Autônoma de Yucatán (UADY), a professora e pesquisadora independente é falante e estudiosa da língua maia.
+
+Ganhadora da Primeira Bienal Continental de Artes Indígenas Contemporâneas (México, 2012), Flor Canche possui diversas obras/textos em sua área de pesquisa, para mencionar alguns de mais destaque: “Diversidad y contacto: una mirada desde las ideologías y las actitudes lingüísticas” (2019); “Uso, actitudes y aprendizaje del Maya en la UIMQRoo” (2014); e “El rol de las instituciones académicas frente al contacto. Diversidad y Contacto: una mirada desde las ideologías y las actitudes lingüísticas” (2019); “Las políticas lingüísticas y el desplazamiento de las lenguas indígenas en la Sierra de Tabasco” (2014); e “La familia extensa como promotora de la vitalidad del maya yucateco” (2010).
+
+Flor Canche tem a capacidade de trazer à tona, por meio da escrita acadêmica ou da arte, um olhar pluriversal e amplo a respeito das concepções cosmológicas, epistemológicas, políticas e linguísticas existentes nas sociedades atuais. Dessa forma, ela desconstrói os estereótipos e reducionismos presentes na história dita universal em relação aos povos indígenas.   
+   
+## Povo Maia
+
+O território originário do povo maia corresponde à península de Yucatán, no México, englobando os atuais estados de Campeche, Tabasco, Chiapas, Yucatán e Quintana Roo, bem como as terras baixas e altas da Guatemala, Belize e a porção ocidental de Honduras e El Salvador.
+
+Segundo Farfán (2015, p. 99), “Yucatán fue uno de los últimos territorios ‘conquistados’ por los españoles, y que la resistencia indígena se ha – y continúa – manifestando de muy diversas maneras, haciendo de la cultura maya un elemento vivo y cambiante como todas las culturas”. Tal aspecto é demonstrado em abundância nas pesquisas de Flor Canche. 
+
+A ideia de que a existência humana é cíclica está presente no famoso calendário maia. As representações dos muitos deuses e deusas indicam suas funções de auxiliar as pessoas nos ciclos da vida ou de trazer obstáculos. O grande livro religioso dos maias quiché, o Popol Vuh, relata precisamente essa história da natureza cíclica da vida por meio do conto dos gêmeos Hunahpu e Xbalanque e sua vitória sobre as forças do caos e da escuridão, simbolizadas pelos Senhores de Xibalba.
+
+**Texto elaborado por Julia Paula do Nascimento de Moraes**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/VImZwdvEakE?si=KyTB-MEKJH8qPBc5) [![Spotify](spotify.png)](https://open.spotify.com/episode/1O8fran26yIbW184PMBsqD?si=7a71178a81e446a4&nd=1&dlsi=4c83df4b52824cfe)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```   

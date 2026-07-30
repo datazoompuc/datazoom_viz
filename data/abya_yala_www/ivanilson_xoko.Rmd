@@ -1,0 +1,42 @@
+---
+title: "Ivanilson Martins dos Santos Xokó"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpeg", knitr::current_input()))
+```
+
+Ivanilson Martins dos Santos Xokó iniciou sua trajetória escolar no Colégio Estadual Indígena Dom José Brandão de Castro, situado na Terra Indígena Caiçara/Ilha de São Pedro — localidade que, segundo o autor, desempenhou e desempenha papel fundamental no fortalecimento e na reafirmação da etnicidade do povo Xokó. Posteriormente, cursou o Ensino Médio no Centro Estadual de Educação Profissional Dom José Brandão de Castro, em regime concomitante ao curso Técnico em Agroindústria pelo Instituto Federal de Sergipe (IFS).
+
+Indígena pertencente à etnia Xokó, Ivanilson é graduado (2014-2020) e mestre (2021-2024) em História pela Universidade Federal de Alagoas (UFAL). Em sua dissertação, foi orientado pela Profa. Dra. Michelle Reis, integrante do coletivo Caminhos de Abya Yala. Atualmente, desenvolve sua pesquisa de doutorado na Universidade Federal Rural de Pernambuco (UFRPE).
+
+Sua produção acadêmica insere-se no campo da História Indígena, com um recorte cronológico delimitado entre a década de 1970 e o período contemporâneo. Em suas análises, Ivanilson versa prioritariamente sobre a memória recente do Movimento Indígena no Nordeste brasileiro e os processos de autoafirmação identitária e retomada territorial do povo Xokó.
+
+## Povo Xokó
+
+Embora se compreenda que a ocupação humana no baixo Rio São Francisco seja milenar, a historiografia ainda enfrenta lacunas sobre os povos que habitavam a região anteriormente à invasão europeia. Para sanar esse hiato, a Arqueologia, a Antropologia e a História empenham-se em abordagens interdisciplinares: da análise estratigráfica de vestígios materiais ao estudo etnográfico de etnias contemporâneas, passando pela análise crítica da documentação produzida pelo colonizador e pelos órgãos dos períodos imperial e republicano.
+
+No âmbito historiográfico, a primeira menção escrita aos Xokó consta em registros de missionários capuchinhos franceses, produzidos no contexto da expansão colonial em fins do século XVII. Tais documentos, e outros subsequentes do século XVIII, indicam a proximidade deste povo com a bacia sanfranciscana, apesar de uma dispersão populacional que abrangia áreas dos atuais estados de Alagoas, Pernambuco e Sergipe. É imperativo notar que a localização reportada dos Xokó torna-se intrínseca ao projeto evangelizador; o contato e a produção documental pioneira coincidem com a intensificação dos descimentos e da catequese nos aldeamentos dos "sertões".
+
+Este processo — marcado pela violência do silenciamento cultural, pelo epistemicídio e pela tentativa de apagamento das cosmologias originárias — foi, contudo, ressignificado pela população nativa em seu histórico de resistência. Em consonância com a tese de Maria Regina Celestino de Almeida (2003) sobre os aldeamentos coloniais, observa-se que o povo Xokó subverteu o enclausuramento físico e ontológico das missões, conferindo-lhes novos sentidos políticos e identitários.
+
+Essa apropriação é verificável tanto na territorialidade atual quanto na memória coletiva. As antigas missões setecentistas, habitadas de forma contínua pelos Xokó desde meados do século XIX, transmutaram-se nas Terras Indígenas (TIs) Caiçara/Ilha de São Pedro (Porto da Folha, SE) e Kariri-Xokó (Porto Real do Colégio e São Brás, AL). Nestas áreas, o censo mais recente do IBGE registra uma população de 2.600 habitantes, embora o dado específico por etnia sofra com as limitações de desagregação estatística.
+
+Por fim, o depoimento de Ivanilson Xokó é elucidativo quanto à memória coletiva e ao "enquadramento" da tradição oral de seu povo. Sua fala reitera o pertencimento ancestral à TI Caiçara/Ilha de São Pedro, funcionando como uma polifonia que ecoa as vozes de seus anciãos. O exemplo dos Xokó, assim como inúmeros outros pelo continente, não apenas atesta o dinamismo das resistências indígenas, mas fortalece a descolonização de estigmas do senso comum, restituindo aos povos originários sua agência histórica.
+
+**Texto elaborado por Gabriel Souto de Aragão**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://www.youtube.com/watch?v=l5PVFhzh8xo) [![Spotify](spotify.png)](https://open.spotify.com/episode/6mNfkfi0Tjvcu4Gd9uWBnU)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

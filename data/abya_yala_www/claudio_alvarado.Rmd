@@ -1,0 +1,40 @@
+---
+title: "Claudio Alvarado Lincopi"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Claudio Alvarado Lincopi, indígena da etnia Mapuche, nasceu na comuna de Renca, no Chile, em 1988. Historiador e pesquisador, sua trajetória une o rigor acadêmico ao ativismo cultural. É licenciado em História com menção em Estudos Culturais pela *Universidad Academia de Humanismo Cristiano*, mestre em História e Memória pela *Universidad Nacional de La Plata* e doutor em Arquitetura e Estudos Urbanos pela *PUC-Chile*. Seus interesses de pesquisa voltam-se aos processos culturais urbanos e à história do povo Mapuche.
+
+Lincopi tem trabalhado com equipes interdisciplinares para refletir sobre racismo e cidade, resultando em livros, artigos, obras artísticas e montagens teatrais. Além disso, foi bolsista da *Fundación Neruda*, onde recebeu diversos prêmios por sua produção poética. É também pesquisador e colaborador do *Centro de Estudios y Documentación Memoria Mapuche*, da *Universidad Libre Mapuche*, da *Comunidad de Historia Mapuche* e do *Centro de Estudios Interculturales e Indígenas (CIIR)*, entre outras agremiações.
+
+Dentre suas principais produções, destacam-se os livros *Mapurbekistán: ciudad, cuerpo y racismo. Diáspora Mapuche en Santiago, siglo XX* e *Diarios Mapuche 1935-1966: escrituras y pensamientos bajo el colonialismo chileno del siglo XX* — este último em parceria com Enrique Antileo, entrevistado da segunda temporada do projeto.
+
+## Povo Mapuche
+
+O etnônimo Mapuche, consolidado no século XVIII, deriva do idioma *mapudungun* — onde *mapu* significa terra e *che* significa gente — e revela uma conexão intrínseca com a territorialidade que difere radicalmente da visão ocidental de unidade nacional. Para este povo, o território não é apenas um espaço delimitado, mas uma teia que entrelaça cultura e natureza, manifestada no conceito de Wallmapu. Este território circundante abrange o *Puel Mapu*, a leste, e o *Gulu Mapu*, a oeste da Cordilheira dos Andes, áreas que hoje sofrem a sobreposição dos Estados nacionais da Argentina e do Chile.
+
+No período pré-colonial, os Mapuche possuíam uma organização sociopolítica descentralizada, na qual a guerra desempenhava um papel central na reprodução de poder, mas essa estrutura transformou-se profundamente através do contato com agentes externos. Segundo o antropólogo Guillaume Boccara, os Mapuche constituem uma "identidade de fronteira", moldada significativamente pela relação com o outro. A vizinhança com os Incas e, posteriormente, com os colonizadores espanhóis, forçou adaptações que incluíram desde alianças políticas estratégicas — como o apoio de alguns grupos à Coroa Espanhola contra os *criollos* durante as independências — até transformações econômicas, como a ascensão da pecuária.
+
+Esse processo de contato também promoveu uma centralização política interna e uma nova maneira de resistência ao processo colonizador, denominada de parlamentos hispano-mapuche: acordos entre espanhóis e Mapuche que tentavam regular a convivência, as práticas e as fronteiras. Contudo, a diversidade de pisos ecológicos e as diferentes dinâmicas regionais sugerem que seria mais preciso falar em "identidades Mapuche", reconhecendo as nuances endógenas que coexistem em sua vasta extensão territorial.
+
+Com o processo iniciado na década de 1860, chamado de "Pacificação da Araucanía", muitas comunidades passaram a viver em lotes dispersos. Na contemporaneidade, a realidade no *Gulu Mapu* é marcada por uma profunda desigualdade: o povo Mapuche detém apenas 5% de suas terras originárias, enquanto o setor florestal monopoliza a maior parte dos lucros na região da Araucanía. Esse cenário desconsidera marcos históricos importantes, como o Parlamento de Tapihue de 1825, que ratificava a soberania territorial Mapuche ao sul do Rio Bío Bío. Diante desse cerceamento, o movimento Mapuche organiza-se em duas frentes principais: a via gradualista, que aposta na ocupação de espaços institucionais dentro do Estado, e a via rupturista, que rejeita acordos com a institucionalidade chilena. Em suma, a identidade Mapuche é uma construção histórica resiliente que, mesmo diante da expulsão para as cidades e das pressões dos Estados nacionais, permanece fluida e fundamentada na luta pela autonomia e reconstrução do Wallmapu.
+
+**Texto elaborado por Gabriel Constantino Pellegrino Biasoli**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://www.youtube.com/watch?v=HICqs0uNI7g) [![Spotify](spotify.png)](https://open.spotify.com/episode/4fN3g1dk5axQkLzw7kQPFG)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```
