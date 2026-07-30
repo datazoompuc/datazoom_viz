@@ -81,16 +81,17 @@ get_ui <- function(files, param) {
 
         div(
           shiny::actionButton(
-            inputId = "ab1", label = "Fullscreen",
-            icon = icon("expand"),
-            class = "btn-primary",
-            onclick = paste0("window.open('", param$link, "', '_blank')")
-          ),
-          shiny::actionButton(
             "toggle_lang",
             label = param$i18n$pt$btn_lang,
             icon = icon("globe"),
             class = "btn-primary"
+          ),
+          div(style = "height: 6px;"),
+          shiny::actionButton(
+            inputId = "ab1", label = "Fullscreen",
+            icon = icon("expand"),
+            class = "btn-primary",
+            onclick = paste0("window.open('", param$link, "', '_blank')")
           )
         ),
       ),

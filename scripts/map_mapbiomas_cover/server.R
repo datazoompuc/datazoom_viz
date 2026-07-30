@@ -179,7 +179,7 @@ get_server <- function(files, param) {
                  }
 
 
-          title_legend <- paste0("", x_col[["label"]])
+          title_legend <- paste0(x_col[["label"]], " (", x_col$unidade, ")")
           labels <- paste0(
             i18n()$label_munic_name, df_reactived[[param$text_def]], "</b> <br>",
             i18n()$label_state_name, df_reactived[[param$state]], "</b> <br>",

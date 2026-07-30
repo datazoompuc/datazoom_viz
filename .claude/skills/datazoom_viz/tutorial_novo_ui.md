@@ -11,6 +11,7 @@ Este tutorial explica como implementar as três atualizações de UI que estão 
 3. [Criar o botão de lang toggle](#3-criar-o-botão-de-lang-toggle)
 4. [Toggle de agregação com `actionButton` (segmented control)](#4-toggle-de-agregação-com-actionbutton-segmented-control)
 5. [Inversão de eixos (swap / transposição)](#5-inversão-de-eixos-swap--transposição)
+6. [Unidade de medida explícita no eixo (gráficos) ou na legenda (mapas)](#6-unidade-de-medida-explícita-no-eixo-gráficos-ou-na-legenda-mapas)
 
 ---
 
@@ -535,6 +536,79 @@ observeEvent(list(mode(), lang()), {
 > - **Eixo Y de rótulo fixo:** como a *grandeza* medida não muda ao inverter (no COMEX, sempre US$ FOB), o título do eixo Y no plot fica fixo (`i18n()$label_y_axis`); o que muda é o que está *listado* no dropdown.
 > - **Seleção compartilhada vs. por agregação:** município é o mesmo em SH2 e SEC (compartilha um `reactiveVal`), mas produto pertence a taxonomias diferentes — guarde um por agregação (`list(sh2 = ..., sec = ...)`).
 > - **URL:** inclua `mode` (ou `orient` + `agg`) na query string para o deep-link reconstruir a orientação exata.
+
+---
+
+## 6. Unidade de medida explícita no eixo (gráficos) ou na legenda (mapas)
+
+**Regra:** sempre que a variável plotada tiver uma unidade de medida real (moeda, área, %, etc.), essa unidade deve aparecer explicitamente:
+
+- em apps de **gráfico** (Plotly, com eixos de verdade) → no **título do eixo** que carrega o valor;
+- em apps de **mapa** (Leaflet) → no **título da legenda** (a caixa de cores no canto inferior direito do mapa, `addLegend()`).
+
+**Não** é no subtítulo (`output$plot_subtitle`) — o subtítulo é para contexto/estado da seleção, não para a unidade. Isso vale mesmo que a unidade já apareça no tooltip; tooltip só aparece no hover, eixo/legenda ficam visíveis o tempo todo.
+
+**Quando se aplica:**
+
+- Variável tem unidade concreta (R$, US$, ha, %, toneladas...) → aplicar.
+- Variável é uma contagem/proporção adimensional, ou o nome já deixa a unidade óbvia → não obrigatório.
+
+### Apps de referência (já fazem certo)
+
+**Mapa — `map_mapbiomas_cover`**, unidade na legenda (`scripts/map_mapbiomas_cover/server.R`, dentro do `renderLeaflet()`):
+
+```r
+x_col <- tbl()[which(tbl()$var == input$x), ]
+if (input$yprop) {
+  x_col$unidade <- "%"
+}
+
+title_legend <- paste0(x_col[["label"]], " (", x_col$unidade, ")")
+...
+addLegend("bottomright",
+  pal = pal,
+  values = ~ df_reactived[[input$x]],
+  title = title_legend,
+  opacity = 0.8
+)
+```
+
+**Gráfico de linha — `ts_mapbiomas_cobertura`**, unidade no eixo Y (`scripts/ts_mapbiomas_cobertura/server.R`):
+
+```r
+unidade_y <- if (isTRUE(input$yprop) || isTRUE(input$y_index_base)) "%" else "ha"
+...
+y_axis_title <- y_col$label
+if (isTRUE(input$y_index_base)) y_axis_title <- paste0(y_col$label, "*")
+y_axis_title <- paste0(y_axis_title, " (", unidade_y, ")")
+y_axis_layout <- list(title = y_axis_title, ...)
+```
+
+**Gráfico de ranking — `rk_mapbiomas_cobertura`**, unidade no eixo X (`scripts/rk_mapbiomas_cobertura/server.R`):
+
+```r
+unidade_x <- if (isTRUE(input$yprop)) "%" else "ha"
+...
+x_axis_layout <- list(
+  title = paste0(x_col$label, " (", unidade_x, ")"),
+  ...
+)
+```
+
+Nos três casos a unidade já era calculada em algum lugar do arquivo (só usada no tooltip) — a mudança é só reaproveitar essa mesma variável no título do eixo/legenda, não recalcular nada.
+
+### Padrão desatualizado (não seguir mais)
+
+`ts_comex_exp_tot_pais` monta a unidade só no subtítulo, via `i18n()$currency`, sem reforçar no eixo:
+
+```r
+# scripts/ts_comex_exp_tot_pais/server.R — x_axis_layout/y_axis_layout usam
+# x_col$label / y_col$label puros, sem unidade nenhuma
+```
+
+Esse padrão (reaproveitado também em `ts_comex_exp_pais_sec` e `ts_comex_exp_municipio`) era a referência antiga desta seção — mantido funcionando, mas não é mais o exemplo a seguir para apps novos; não foi corrigido junto porque não fazia parte do pedido que motivou essa correção.
+
+> **Padrão de implementação recomendado:** a unidade quase sempre já existe como uma variável local (`unidade_x`, `unidade_y`, `x_col$unidade`) calculada para o tooltip — reaproveite essa mesma variável no `title` do eixo (`x_axis_layout`/`y_axis_layout`) ou da legenda (`addLegend(title = ...)`), em vez de duplicar a lógica ou criar uma chave nova em `i18n()`.
 
 ---
 

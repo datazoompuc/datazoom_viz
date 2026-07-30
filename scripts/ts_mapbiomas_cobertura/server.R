@@ -286,6 +286,7 @@ get_server <- function(files, param) {
         )
         y_axis_title <- y_col$label
         if (isTRUE(input$y_index_base)) y_axis_title <- paste0(y_col$label, "*")
+        y_axis_title <- paste0(y_axis_title, " (", unidade_y, ")")
         y_axis_layout <- list(
           title = y_axis_title, titlefont = f1, tickfont = f2,
           automargin = FALSE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE
