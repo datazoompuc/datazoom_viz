@@ -7,13 +7,12 @@ get_ui <- function(files, param) {
     tags$style(type = "text/css",
       # remove o ultimo ano no slider (2018 e 2019 estavam um em cima do outro)
       # remove tracos intermediarios do slider
-      # move botao de play para a esquerda e para baixo
-      # aumenta tamanho do botao de play
+      # posicionamento e tamanho do botão de play/pause: ver .slider-inline
+      # em global/dza_lumen.css (não duplicar regras aqui — a mesma
+      # especificidade quebraria o layout flex definido lá)
       "
       .irs-grid-text.js-grid-text-10 {display: none;}
       .irs-grid-pol.small {display: none;}
-      .slider-animate-container {width: 5%; margin-top: 1px;}
-      .slider-animate-button {font-size: 20px;}
     "),
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
@@ -62,7 +61,7 @@ get_ui <- function(files, param) {
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
-          class = "var_selec_group",
+          class = "var_selec_group slider-inline",
           # Seleciona variável do eixo de data
           sliderInput(inputId = "filter1",
                       label = param$label_year,
@@ -71,7 +70,9 @@ get_ui <- function(files, param) {
                       value = param$year_final,
                       step = 1,
                       width = "100%",
-                      animate = FALSE,
+                      animate = animationOptions(interval = 20000,
+                                                 playButton = icon("play"),
+                                                 pauseButton = icon("pause")),
                       sep = "")
         ),
         # espaço vazio

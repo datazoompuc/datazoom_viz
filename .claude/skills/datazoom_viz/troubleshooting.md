@@ -214,3 +214,17 @@ if (dir.exists("apps/www")) {
 Afeta qualquer app que use algo de `apps/www/`, não só o logo — vale reconferir depois de um deploy se alguma imagem/asset estático sumiu sem motivo aparente.
 
 ---
+
+## `bindCache` em `renderLeaflet`/`renderPlotly` não é um padrão documentado/obrigatório
+
+**Contexto:** ao contrário do `materialSwitch`/`withSpinner`/lang toggle (`tutorial_novo_ui.md`, seções 1-3), que são o padrão atual e devem ser aplicados em toda migração, `bindCache()` nunca foi formalizado como regra — é algo que apareceu organicamente em alguns apps. Antes de copiar de um app de referência para outro, checar se ele de fato usa.
+
+**Onde já é usado hoje** (checagem feita via grep no repo inteiro): `map_mapbiomas_cover`, `map_cattle` (mapas), `rk_mapbiomas_cobertura`, `rk_ibge_pnadc_cnae`, `rk_comex_exp_munic_produtosamz`, `rk_mapbiomas_transition_est` (rankings) — 6 apps ao todo. Isso é uma fração pequena do repo: os demais ~11 apps de mapa (antes de `map_dz_munic_prodes` também passar a usar, espelhando `map_mapbiomas_cover`) e a maioria dos apps `ts_`/`bar_`/`sankey_`/`tab_` não usam.
+
+**Quando faz sentido:** outputs pesados (`renderLeaflet`/`renderPlotly` serializando bastante geometria/dados — no caso do `map_dz_munic_prodes`, um único mapa renderizado chega a ~7MB de JSON) com espaço de estados pequeno e enumerável (poucas variáveis × poucos anos × idioma × poucos toggles) e onde o dado é público e idêntico entre usuários — o cache padrão do `bindCache()` é `cache = "app"`: compartilhado entre todas as sessões/usuários do processo R, não por sessão. Isso é uma vantagem para dado público (o primeiro usuário "esquenta" o cache pros demais) e um risco em qualquer cenário com dado por-usuário/privado, onde vazaria entre sessões.
+
+**Cuidados ao adicionar:**
+- A chave do `bindCache(...)` precisa listar **todos** os reativos dos quais o output depende. Esquecer um não gera erro — o cache passa a servir silenciosamente um resultado desatualizado sempre que só a variável esquecida muda.
+- Qualquer código com efeito colateral que precise rodar em toda mudança de input (ex: `updateQueryString()`) tem que ficar **fora** do bloco cacheado: num cache hit o corpo do `render*` não executa, então o efeito colateral simplesmente não dispara. Em `map_dz_munic_prodes`, isso significou tirar `update_my_queryString()` de dentro do `renderLeaflet` e colocar num `observe({})` à parte antes de adicionar o `bindCache`.
+
+---

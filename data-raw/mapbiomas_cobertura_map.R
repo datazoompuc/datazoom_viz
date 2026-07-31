@@ -62,18 +62,14 @@ data <- data |>
     relocate(municipality_code, municipality, state, year,
              "Forest Formation", "Savanna Formation", "Pasture", "Soybean", "Mining")
 
-# load data OF GEOGRAPHICAL INFO OF EACH MUNICIPALITY ---------------------------------------------------------------
-
-shapefile <- datazoom.amazonia:::external_download("geo_municipalities", source = "internal") |> 
-    left_join(datazoom.amazonia::municipalities, by = "code_muni") |> 
-    select(municipality_code = code_muni, geom, legal_amazon) |>
-    st_make_valid() |>
-    rmapshaper::ms_simplify()
-
 ################################################################################
 # EXPORT
 ################################################################################
 
+# Nota: a geometria municipal (global/munic_shapefile.rds) não é mais gerada
+# aqui — foi extraída para data-raw/munic_shapefile.R, já que é usada por
+# vários outros apps de mapa municipal e não tinha relação com o pipeline de
+# dados do MapBiomas abaixo.
 
 # Export data in parquet format (faster per year)
 data |>
@@ -82,9 +78,6 @@ data |>
     arrow::write_dataset(
         path = "data/mapbiomas_cobertura.parquet",
         format = "parquet")
-
-# Saves shapefile in .rds (parquet does not support geometry)
-saveRDS(shapefile, "global/munic_shapefile.rds")
 
 
 ################################################################################
