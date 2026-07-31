@@ -2,33 +2,33 @@ var,x,y,color,size,slider,label,desc,var_group,tipo,unidade,categoria,subcategor
 municipality,FALSE,FALSE,FALSE,FALSE,FALSE,Municipality,Municipality,Mapbiomas,1,ha,Environment,Use of land
 state,FALSE,FALSE,FALSE,FALSE,FALSE,state,state,Mapbiomas,1,ha,Environment,Use of land
 year,FALSE,FALSE,FALSE,FALSE,TRUE,Year,Year,Mapbiomas,1,ha,Environment,Use of land
-Forest Formation,TRUE,TRUE,FALSE,FALSE,FALSE,Forest Formation,Forest Formation,Mapbiomas,1,ha,Environment,Use of land
-Savanna Formation,TRUE,TRUE,FALSE,FALSE,FALSE,Savanna Formation,Savanna Formation,Mapbiomas,1,ha,Environment,Use of land
-Pasture,TRUE,TRUE,FALSE,FALSE,FALSE,Pasture,Pasture,Mapbiomas,1,ha,Environment,Use of land
-Soybean,TRUE,TRUE,FALSE,FALSE,FALSE,Soybean,Soybean,Mapbiomas,1,ha,Environment,Use of land
-Mining,TRUE,TRUE,FALSE,FALSE,FALSE,Mining,Mining,Mapbiomas,1,ha,Environment,Use of land
-Not Observed,TRUE,TRUE,FALSE,FALSE,FALSE,Not Observed,Not Observed,Mapbiomas,1,ha,Environment,Use of land
-Floodable Forest,TRUE,TRUE,FALSE,FALSE,FALSE,Floodable Forest,Floodable Forest,Mapbiomas,1,ha,Environment,Use of land
-Wetland,TRUE,TRUE,FALSE,FALSE,FALSE,Wetland,Wetland,Mapbiomas,1,ha,Environment,Use of land
-Grassland,TRUE,TRUE,FALSE,FALSE,FALSE,Grassland,Grassland,Mapbiomas,1,ha,Environment,Use of land
-Urban Area,TRUE,TRUE,FALSE,FALSE,FALSE,Urban Area,Urban Area,Mapbiomas,1,ha,Environment,Use of land
-Other non Vegetated Areas,TRUE,TRUE,FALSE,FALSE,FALSE,Other non Vegetated Areas,Other non Vegetated Areas,Mapbiomas,1,ha,Environment,Use of land
-"River, Lake and Ocean",TRUE,TRUE,FALSE,FALSE,FALSE,"River, Lake and Ocean","River, Lake and Ocean",Mapbiomas,1,ha,Environment,Use of land
-Other Temporary Crops,TRUE,TRUE,FALSE,FALSE,FALSE,Other Temporary Crops,Other Temporary Crops,Mapbiomas,1,ha,Environment,Use of land
-Rocky Outcrop,TRUE,TRUE,FALSE,FALSE,FALSE,Rocky Outcrop,Rocky Outcrop,Mapbiomas,1,ha,Environment,Use of land
 Aquaculture,TRUE,TRUE,FALSE,FALSE,FALSE,Aquaculture,Aquaculture,Mapbiomas,1,ha,Environment,Use of land
-Sugar cane,TRUE,TRUE,FALSE,FALSE,FALSE,Sugar cane,Sugar cane,Mapbiomas,1,ha,Environment,Use of land
-Mangrove,TRUE,TRUE,FALSE,FALSE,FALSE,Mangrove,Mangrove,Mapbiomas,1,ha,Environment,Use of land
-Forest Plantation,TRUE,TRUE,FALSE,FALSE,FALSE,Forest Plantation,Forest Plantation,Mapbiomas,1,ha,Environment,Use of land
 "Beach, Dune and Sand Spot",TRUE,TRUE,FALSE,FALSE,FALSE,"Beach, Dune and Sand Spot","Beach, Dune and Sand Spot",Mapbiomas,1,ha,Environment,Use of land
-Hypersaline Tidal Flat,TRUE,TRUE,FALSE,FALSE,FALSE,Hypersaline Tidal Flat,Hypersaline Tidal Flat,Mapbiomas,1,ha,Environment,Use of land
-Mosaic of Uses,TRUE,TRUE,FALSE,FALSE,FALSE,Mosaic of Uses,Mosaic of Uses,Mapbiomas,1,ha,Environment,Use of land
-Cotton,TRUE,TRUE,FALSE,FALSE,FALSE,Cotton,Cotton,Mapbiomas,1,ha,Environment,Use of land
-Palm Oil,TRUE,TRUE,FALSE,FALSE,FALSE,Palm Oil,Palm Oil,Mapbiomas,1,ha,Environment,Use of land
-Rice,TRUE,TRUE,FALSE,FALSE,FALSE,Rice,Rice,Mapbiomas,1,ha,Environment,Use of land
-Other Perennial Crops,TRUE,TRUE,FALSE,FALSE,FALSE,Other Perennial Crops,Other Perennial Crops,Mapbiomas,1,ha,Environment,Use of land
-Coffee,TRUE,TRUE,FALSE,FALSE,FALSE,Coffee,Coffee,Mapbiomas,1,ha,Environment,Use of land
-Herbaceous Sandbank Vegetation,TRUE,TRUE,FALSE,FALSE,FALSE,Herbaceous Sandbank Vegetation,Herbaceous Sandbank Vegetation,Mapbiomas,1,ha,Environment,Use of land
-Wooded Sandbank Vegetation,TRUE,TRUE,FALSE,FALSE,FALSE,Wooded Sandbank Vegetation,Wooded Sandbank Vegetation,Mapbiomas,1,ha,Environment,Use of land
 Citrus,TRUE,TRUE,FALSE,FALSE,FALSE,Citrus,Citrus,Mapbiomas,1,ha,Environment,Use of land
+Coffee,TRUE,TRUE,FALSE,FALSE,FALSE,Coffee,Coffee,Mapbiomas,1,ha,Environment,Use of land
+Cotton,TRUE,TRUE,FALSE,FALSE,FALSE,Cotton,Cotton,Mapbiomas,1,ha,Environment,Use of land
+Floodable Forest,TRUE,TRUE,FALSE,FALSE,FALSE,Floodable Forest,Floodable Forest,Mapbiomas,1,ha,Environment,Use of land
+Forest Formation,TRUE,TRUE,FALSE,FALSE,FALSE,Forest Formation,Forest Formation,Mapbiomas,1,ha,Environment,Use of land
+Forest Plantation,TRUE,TRUE,FALSE,FALSE,FALSE,Forest Plantation,Forest Plantation,Mapbiomas,1,ha,Environment,Use of land
+Grassland,TRUE,TRUE,FALSE,FALSE,FALSE,Grassland,Grassland,Mapbiomas,1,ha,Environment,Use of land
+Herbaceous Sandbank Vegetation,TRUE,TRUE,FALSE,FALSE,FALSE,Herbaceous Sandbank Vegetation,Herbaceous Sandbank Vegetation,Mapbiomas,1,ha,Environment,Use of land
+Hypersaline Tidal Flat,TRUE,TRUE,FALSE,FALSE,FALSE,Hypersaline Tidal Flat,Hypersaline Tidal Flat,Mapbiomas,1,ha,Environment,Use of land
+Mangrove,TRUE,TRUE,FALSE,FALSE,FALSE,Mangrove,Mangrove,Mapbiomas,1,ha,Environment,Use of land
+Mining,TRUE,TRUE,FALSE,FALSE,FALSE,Mining,Mining,Mapbiomas,1,ha,Environment,Use of land
+Mosaic of Uses,TRUE,TRUE,FALSE,FALSE,FALSE,Mosaic of Uses,Mosaic of Uses,Mapbiomas,1,ha,Environment,Use of land
+Not Observed,TRUE,TRUE,FALSE,FALSE,FALSE,Not Observed,Not Observed,Mapbiomas,1,ha,Environment,Use of land
+Other non Vegetated Areas,TRUE,TRUE,FALSE,FALSE,FALSE,Other non Vegetated Areas,Other non Vegetated Areas,Mapbiomas,1,ha,Environment,Use of land
+Other Perennial Crops,TRUE,TRUE,FALSE,FALSE,FALSE,Other Perennial Crops,Other Perennial Crops,Mapbiomas,1,ha,Environment,Use of land
+Other Temporary Crops,TRUE,TRUE,FALSE,FALSE,FALSE,Other Temporary Crops,Other Temporary Crops,Mapbiomas,1,ha,Environment,Use of land
+Palm Oil,TRUE,TRUE,FALSE,FALSE,FALSE,Palm Oil,Palm Oil,Mapbiomas,1,ha,Environment,Use of land
+Pasture,TRUE,TRUE,FALSE,FALSE,FALSE,Pasture,Pasture,Mapbiomas,1,ha,Environment,Use of land
+Rice,TRUE,TRUE,FALSE,FALSE,FALSE,Rice,Rice,Mapbiomas,1,ha,Environment,Use of land
+"River, Lake and Ocean",TRUE,TRUE,FALSE,FALSE,FALSE,"River, Lake and Ocean","River, Lake and Ocean",Mapbiomas,1,ha,Environment,Use of land
+Rocky Outcrop,TRUE,TRUE,FALSE,FALSE,FALSE,Rocky Outcrop,Rocky Outcrop,Mapbiomas,1,ha,Environment,Use of land
+Savanna Formation,TRUE,TRUE,FALSE,FALSE,FALSE,Savanna Formation,Savanna Formation,Mapbiomas,1,ha,Environment,Use of land
+Soybean,TRUE,TRUE,FALSE,FALSE,FALSE,Soybean,Soybean,Mapbiomas,1,ha,Environment,Use of land
+Sugar cane,TRUE,TRUE,FALSE,FALSE,FALSE,Sugar cane,Sugar cane,Mapbiomas,1,ha,Environment,Use of land
+Urban Area,TRUE,TRUE,FALSE,FALSE,FALSE,Urban Area,Urban Area,Mapbiomas,1,ha,Environment,Use of land
+Wetland,TRUE,TRUE,FALSE,FALSE,FALSE,Wetland,Wetland,Mapbiomas,1,ha,Environment,Use of land
+Wooded Sandbank Vegetation,TRUE,TRUE,FALSE,FALSE,FALSE,Wooded Sandbank Vegetation,Wooded Sandbank Vegetation,Mapbiomas,1,ha,Environment,Use of land
 area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,area_km2,area_km2,Mapbiomas,1,ha,Environment,Use of land
