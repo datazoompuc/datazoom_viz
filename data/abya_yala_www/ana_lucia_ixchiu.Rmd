@@ -1,0 +1,40 @@
+---
+title: "Ana Lucia Ixchíu"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Ana Lucia Ixchiu é uma mulher indígena K’iche’ guatemalteca, nascida em Totonicapán. Formada em Arquitetura, foi a primeira mulher indígena a obter esse título pela Universidade de San Carlos. Seu trabalho compreende diversas áreas de atuação, como ativismo em direitos humanos, gestão cultural, arte e jornalismo. Assim, pode-se afirmar que a sua produção está intrinsecamente baseada em pautas políticas, artísticas e culturais.
+
+A produção da artista pode ser considerada uma externalização de aspectos fundamentais de sua trajetória. Para ela, a arte e a comunicação são ferramentas essenciais para um indígena — especialmente para uma mulher indígena —, pois, juntas, garantem sua liberdade de expressão, algo historicamente negado pelo Estado a muitos indígenas não versados  na língua colonial. Ana Lucía participou da criação de espaços de comunicação capazes de conectar pautas de resistência por meio de diversas manifestações, como o projeto *Mujeres en Movimiento*, a rede latino-americana de gestoras culturais e artistas *Conectadas*, o encontro feminista *ELLA* e os *Festivales Solidarios*.
+
+Atualmente, Ana Lucía reside na cidade de Bilbao, na Espanha, na condição de refugiada política devido à perseguição a jornalistas pelo governo guatemalteco.
+
+## Povo Maya K’iche
+
+Os K'iche' são um dos maiores grupos indígenas da Guatemala, representando aproximadamente 11,3% da população total do país, o que equivale a cerca de 1.680.551 pessoas. Eles estão predominantemente localizados nos departamentos de El Quiché, Totonicapán, Quetzaltenango e Sololá.
+
+A língua K'iche pertence ao ramo Kichean da família de línguas maias e é amplamente falada entre os membros dessa comunidade. Ela desempenha um papel crucial na preservação da identidade cultural do povo K'iche, sendo utilizada não apenas na comunicação diária, mas também em cerimônias e na transmissão de histórias tradicionais. Embora a maioria dos falantes de K'iche também tenha conhecimento básico de espanhol, existem comunidades mais isoladas onde o K'iche é a única língua utilizada.
+
+A cultura K'iche é rica e diversificada, com uma forte ênfase em práticas religiosas e festividades comunitárias. Cada comunidade possui seu santo padroeiro e celebrações específicas, que incluem procissões coloridas, música tradicional e danças. As "cofradías" (irmandades) desempenham um papel central na organização dessas festividades, garantindo a continuidade das tradições. O "Popol Vuh", um dos textos mais importantes da literatura maia, foi escrito pelos K'iche durante o período colonial e contém mitos de criação, histórias de deuses e relatos históricos que são fundamentais para a compreensão da cosmovisão maia.
+
+O povo K'iche' enfrenta diversos desafios políticos e sociais na Guatemala. A desigualdade social e o acesso limitado à terra perpetuam ciclos de pobreza e marginalização. Conflitos territoriais intensificam-se devido à exploração de recursos naturais por empresas extrativistas, levando a deslocamentos forçados e ameaças à sua soberania. A representatividade política indígena ainda é baixa, dificultando a defesa de seus direitos. Além disso, a globalização e políticas de assimilação ameaçam a preservação da língua e das tradições K'iche'. Líderes comunitários enfrentam perseguições, criminalização e violência por defenderem suas terras e direitos. Apesar disso, os K'iche' demonstram resiliência, organizando-se para proteger sua cultura e buscar autonomia. Movimentos comunitários têm se fortalecido na luta por justiça social, preservação ambiental e desenvolvimento sustentável. A luta dos K'iche' reflete a resistência histórica desse povo, que segue buscando melhores condições de vida e o reconhecimento de sua identidade e direitos.
+
+**Texto elaborado por Ana Clara Dutra Barros e Bernardo Barreto Mattos**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/Qhg-ChuVWgY?si=adpZMa6rPGav1xb0) [![Spotify](spotify.png)](https://creators.spotify.com/pod/show/caminhos-de-abya-yala/episodes/Intelectuais-indgenas-do-continente-americano---Temporada-2-8-Ana-Lucia-Ixchu-e2sjcr7)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

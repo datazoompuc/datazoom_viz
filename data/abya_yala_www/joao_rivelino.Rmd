@@ -1,0 +1,40 @@
+---
+title: "João Rivelino Rezende Barreto"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+João Rivelino Rezende Barreto, natural de São Gabriel da Cachoeira (AM), é um intelectual pertencente ao povo Tukano, do sib Yúpiro Sararó. Falante nativo da língua Tukano, possui uma trajetória acadêmica sólida: é licenciado em Filosofia (FSDB, 2008), mestre (PPGAS/UFAM, 2012) e doutor em Antropologia Social (PPGAS/UFSC, 2019). Sua experiência docente abrange desde o Ensino Médio até o Ensino Superior, com destaque para a atuação na formação de professores pelo Plano Nacional de Formação de Professores da Educação Básica (PARFOR).
+
+A contribuição de Rivelino é fundamental para o tensionamento das fronteiras do saber acadêmico. Ao inserir a ontologia Tukano na universidade — espaço historicamente marcado pelo silenciamento de epistemologias não eurocentradas —, ele desafia o monopólio do empirismo ocidental. Em sua tese de doutorado, intitulada *Úkusse: Forma de conhecimento Tukano via arte do diálogo kumuãnica*, o autor analisa como a espiritualidade e a sapiência dos Kumu (especialistas rituais e detentores do conhecimento, muitas vezes traduzidos como xamãs) estruturam os regimes de saber do seu povo (BARRETO, 2019, p. 11).
+
+Mais do que um pesquisador da própria cultura, João Rivelino atua como um mediador epistêmico, mobilizando o pensamento Tukano como ferramenta de resistência e afirmação política em Abya Yala. Sua obra é um convite à descolonização do olhar antropológico, deslocando o indígena de "objeto de estudo" para o lugar de sujeito produtor de teoria.
+
+## Povo Tukano
+
+O povo Tukano (ou Ye'pâ-masa) compreende um contingente de aproximadamente 9 mil indivíduos, habitando a região do noroeste amazônico, na zona transfronteiriça entre o Brasil e a Colômbia. Caracterizam-se por uma organização social segmentar composta por cerca de 37 *sibs* (clãs patrilineares), conforme sistematizado por João Rivelino Barreto. A categoria de "sib" funciona aqui sob uma equivocação controlada: embora aproximem-se do conceito antropológico de clã, possuem especificidades ontológicas que transcendem a mera classificação familiar ocidental.
+
+A estrutura social Tukano é regida por uma rigorosa hierarquia entre *sibs*, fundamentada em sua narrativa cosmogônica de origem. Segundo a tradição oral, os ancestrais primordiais emergiram de uma "Canoa de Transformação" (uma sucuri-canoa) que percorreu os rios da região. A ordem de saída dos antepassados no baixo Rio Negro determinou o status hierárquico de cada *sib*: os primeiros a emergir detêm maior prestígio e responsabilidades rituais (como os chefes e os especialistas rituais), seguidos pelos demais grupos em funções subordinadas ou complementares.
+
+O sistema de parentesco é estritamente patrilinear e rege-se pela exogamia linguística. Neste modelo, os casamentos devem ocorrer necessariamente com membros de outras etnias que falem línguas distintas. A identidade étnica é transmitida exclusivamente pela linhagem paterna: o filho de um homem Tukano com uma mulher de outra etnia (como uma Arapaso ou Tuyuca) será invariavelmente Tukano e falará a língua do pai, embora seja multilíngue por convivência. Inversamente, o descendente de uma mulher Tukano casada com um homem de outra etnia não pertencerá ao povo da mãe.
+
+João Rivelino observa, contudo, processos contemporâneos de flexibilização nessas normas em determinadas regiões. A ausência de literatura específica sobre como essa estrutura tradicional interage com os processos de retomada histórico-identitária representa uma lacuna de pesquisa: não se pode aferir, com os dados atuais, se o rigor da patrilinearidade impõe obstáculos ou se é renegociado pelas lideranças em contextos de reafirmação étnica. No centro dessa organização permanece a espiritualidade, onde o conhecimento não é acumulado de forma enciclopédica, mas vivenciado e transmitido pelos Kumu (especialistas rituais), sob uma lógica de horizontalidade ontológica com o meio ambiente.
+
+**Texto elaborado por Paulo de Almeida Magalhães Neto**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/IKiB4rFXhAw?si=V5ZbF9D_jVT84LUR) [![Spotify](spotify.png)](https://open.spotify.com/episode/2eTdHtJgENp1VkqUwAwELg?si=4MU3zsGfQei45BI0fpGEew&context=spotify%3Ashow%3A0mDQXdzP66IfqMKlkBrA1n)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

@@ -1,0 +1,38 @@
+---
+title: "Rafael Xucuru-Kariri"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Rafael Xucuru-Kariri é cientista político, filho da nação Xucuru-Kariri e doutor em Ciências Sociais pela Universidade Federal da Bahia (UFBA). Trabalhou como analista de Políticas Sociais do Ministério da Educação, em parceria com a UFBA. Dedica-se às questões em torno das políticas públicas focadas na área da educação e às contribuições indígenas para esse campo tão caro e fundamental para a sociedade brasileira. Integra o corpo docente do curso de Licenciatura Intercultural Indígena da UFBA e em 2024 recebeu o Prêmio Tese CAPES pelo seu trabalho defendido em 2023, intitulado "Retomar o Brasil: um estudo das cartas escritas pelos povos indígenas nos últimos 50 anos".
+
+Atua com temas que envolvem a educação escolar indígena, área na qual afirma ser motivado por sua ancestralidade, já que sua mãe era uma professora que trabalhava na área da educação indígena. Ademais, começou sua trajetória acadêmica na área de Ciências Sociais e posteriormente se especializou na área de Ciência Política, com foco em pensar as maneiras de assegurar políticas públicas que garantissem direitos aos indígenas. Atuou como analista do Ministério da Educação, mais especificamente, na Secretaria de Educação Continuada, Alfabetização, Diversidade e Inclusão (SECADI), que tem um papel fundamental no desenvolvimento da diversidade no ensino brasileiro. 
+
+Rafael é um dos pesquisadores do projeto “Cartas Indígenas ao Brasil”, que tem por objetivo “compilar, pesquisar, organizar e apresentar as cartas indígenas produzidas em três importantes períodos da história literária e política do Brasil: 1630-1680 (antes do Brasil), 1888-1930 (na nação Brasil) e 1999-2020 (no presente Brasil)” (Cartas Indígenas ao Brasil, site). Ele é o responsável pela criação dos arquivos das cartas.
+
+## Povo Xucuru-Kariri
+
+Os Xukuru-Kariri surgiram a partir da união de duas etnias distintas, Xucuru e Kariri, e são originários do Estado de Alagoas, mais especificamente do município de Palmeira dos Índios. Entretanto, devido a alguns conflitos por terras que resultaram em mortes de indígenas Xukuru-Kariri, algumas famílias se afastaram da região e foram para diferentes partes do Brasil. Atualmente, é possível encontrá-los em várias regiões, como Ibotirama, na Bahia, e em São Gotardo e Caldas, em Minas Gerais.
+
+Em relação aos aspectos mais ligados às tradições e à cultura dos Xukuru-Kariri podemos destacar o Ouricuri, que é um templo no qual esses indígenas se reúnem e realizam suas cerimônias religiosas. Ademais, o Toré ocupa um lugar de destaque entre os Xukuru-Kariri. O Toré é um ritual comum a diversos povos indígenas do Nordeste brasileiro, que envolve performance corporal e música. Trata-se de uma dança acompanhada por uma música aprendida pelos Xukuru-Kariri com seus antepassados e transmitida de geração a geração. Essa dança é feita em conjunto e simboliza um momento de alegria. Sendo assim, o Toré é feito com cantos e é realizado em diversos contextos como, por exemplo, para receber convidados, pedir por prosperidade e agradecer as coisas boas que ocorrem.
+
+Um outro ponto que também não pode deixar de ser comentado são as escolas indígenas, nas quais é ensinado português, mas também o ruãynyn'rẽuẽ, idioma originário dos Xukuru-Kariri com o propósito de manter vivas tradições consideradas importantíssimas para o povo. Por fim, é evidente que o Estado brasileiro carece muito na criação de medidas que assegurem a existência, a manutenção das tradições e uma vida digna para os indígenas em geral, o que afeta diretamente os Xukuru-Kariri.
+
+**Texto elaborado por Marcos Gabriel Pita da Costa**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/dvyUEb0oUvU?si=AescgrNbtF-5ltCM) [![Spotify](spotify.png)](https://open.spotify.com/episode/4YhjCKLsoe2EsCxCQ9Ynb0?si=Q_Ix3EX0Tc-PMVb2TImmFA&nd=1&dlsi=3b573328c8364ab5)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

@@ -1,0 +1,40 @@
+---
+title: "Maryta de Humahuaca"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpeg", knitr::current_input()))
+```
+
+María Jorgelina Farfán Caparrós, conhecida artisticamente como Maryta de Humahuaca, é uma cantora indígena que, desde muito cedo, sentiu uma intensa conexão entre a música e sua ancestralidade. A conexão com as comunidades indígenas é uma forte inspiração para Maryta, pois, para ela, a música é uma expressão da espiritualidade e do amor, mas também tem um grande significado na luta dos povos indígenas, demonstrando a força da conexão com a Pachamama. Maryta faz parte do povo Omaguaca, que está presente, em grande parte, no território de Quebrada, no departamento de Humahuaca, distrito da província de Jujuy, no norte da Argentina.
+
+O canto ancestral é uma manifestação coletiva da memória ancestral, pois, segundo a cantora, suas produções não partem somente de si, mas de todos os seus antepassados. O canto está relacionado à prática musical da copla. No noroeste argentino, as compleiras perpetuam melodias ancestrais conectadas ao canto da Mãe Terra. Em seu concerto "Somos Água", Maryta apresenta ao público uma manifestação do canto ancestral, ressaltando também a importância do território do Salitre e os perigos da exploração do lítio na região.  A cantora se apresentou em grande parte do continente americano, carregando uma mensagem que não é apenas sua, mas de seu povo.
+
+## Povo Omaguaca
+
+O povo Omaguaca está presente no território da Província de Jujuy, no norte da Argentina. O território é subdividido em cinco regiões: La Puna, La Quebrada, El Ramal e Los Valles. Além dos omaguacas, a província de Jujuy também abriga outros oito povos indígenas: Kolla, Atacama, Ocloya, Tilián, Toara, Guaraní, Kolla Guaraní e Toba.
+
+Estimativas apontam que a população Omaguaca é de aproximadamente 10.500 pessoas, concentradas majoritariamente no departamento de Humahuaca, na região de La Quebrada. O território possui 150 quilômetros de extensão de norte a sul e é dividido em três departamentos: Tumbaya, Tilcara e Humahuaca. A região abriga os registros arqueológicos mais antigos da província, com mais de 10 mil anos. É o caso dos sítios Caverna Inca e Huachichocana. Esses registros são provenientes das atividades de caçadores-coletores na região. Não se sabe exatamente quando o espaço foi ocupado por assentamentos, mas sabe-se que, por volta do ano 700 d.C., já havia instalações de comunidades próximas ao Rio Grande.
+
+A luta dos povos da Província de Jujuy pelo direito e integridade de seus territórios está registrada no movimento do Malón da Paz. O primeiro Malón aconteceu em 1946, quando a comunidade Kolla se organizou para lutar pelos direitos de suas terras de origem, ocupadas por colonos europeus ao longo dos séculos. A marcha em direção a Buenos Aires, que durou 84 dias, chegou à capital, onde os maloneros foram recebidos por uma multidão na famosa Praça de Maio. Apesar de terem conseguido iniciar as discussões com o presidente Perón, o movimento foi cada vez mais reprimido por forças militares, até que foram expulsos do Hotel dos Imigrantes, onde estavam hospedados, e postos em um trem com destino a Abra Pampa. Assim, retornaram para Jujuy sem nenhum título de território.
+
+A língua falada pelo povo Omaguaca não tem consenso absoluto. Atualmente, eles se comunicam em espanhol, mas há quem defenda que a língua originária dos Omaguaca seria o kunza, língua relacionada ao cáncan e ao quéchua.
+
+Em aymara, Omaguaca significa "água sagrada". Esse elemento, indiscutivelmente um dos principais para a manutenção da vida no planeta, é, atualmente, de suma importância para os povos de Jujuy. O chamado “Terceiro Malón da Paz” enfrenta grandes empresas que desejam retirar o lítio da região, mineral utilizado na fabricação de baterias para carros elétricos. A mineração, que afeta diversos povos, utiliza uma quantidade de água que impactaria diretamente toda a dinâmica ambiental de Jujuy, afetando a comunidade.  
+   
+**Texto elaborado por Ana Clara Dutra Barros**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/6n4cosrdNPM?si=7avsZpSl0FZA0IGK) [![Spotify](spotify.png)](https://open.spotify.com/episode/1IyWTEy3N7HnWbHGaTZWsK?si=lMC5nZL6TOuLhJhXID6cpA&nd=1&dlsi=ec1435a840134373)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```
