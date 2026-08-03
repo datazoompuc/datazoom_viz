@@ -13,7 +13,7 @@ library(PAR)
 # Lido com ENCODING=WINDOWS-1252 para preservar os acentos corretamente
 # em português (o .dbf original está nesse encoding).
 dat <- sf::read_sf(
-    "data-raw/abya_yala_raw/tis_poligonaisPolygon.shp",
+    "data/abya_yala_shp/tis_poligonaisPolygon.shp",
     options = "ENCODING=WINDOWS-1252"
 )
 
@@ -138,7 +138,7 @@ geom_tukano <- dat %>%
         temporada = 3
     )
 
-dat_ven <- sf::read_sf("data-raw/abya_yala_raw/240808_TI_VEN_WGS84.shp")
+dat_ven <- sf::read_sf("data/abya_yala_shp/240808_TI_VEN_WGS84.shp")
 
 geom_anu <- dat_ven %>%
     sf::st_make_valid() %>%
