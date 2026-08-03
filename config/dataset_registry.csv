@@ -1,6 +1,8 @@
 dataset_id,db_file,build_script,build_function,source_package,notes
+abya_yala_terras_indigenas,data/abya_yala_terras_indigenas.rds,data-raw/abya_yala_data.R,,,
 aneel_geracao_distribuida,data/aneel_geracao_distribuida.rds,data-raw/aneel_geracao_distribuida.R,load_aneel(),datazoom.amazonia,
 aneel_siga_geracao_distribuida,data/aneel_siga_geracao_distribuida.rds,data-raw/aneel_siga.R,load_aneel(),datazoom.amazonia,
+cempre_municipality_dza,data/cempre_municipality_dza.rds,data-raw/cempre_municipality.R;data-raw/dz_munic.R;data-raw/map_dz_munic_prodes_data.R,load_prodes(),datazoom.amazonia,MULTIPLE_MATCHES
 censoagro_mapbiomas_gado,data/censoagro_mapbiomas_gado.rds,data-raw/censoagro_mapbiomas_gado.R,load_censoagro(),datazoom.amazonia,
 comex_exp_munic_sec,data/comex_exp_munic_sec.rds,data-raw/comex.R,load_br_trade(),datazoom.amazonia,
 comex_exp_munic_sh2,data/comex_exp_munic_sh2.rds,data-raw/comex.R,load_br_trade(),datazoom.amazonia,
@@ -33,10 +35,12 @@ mapbiomas8_cover_pastCattle,data/mapbiomas8_cover_pastCattle.rds,data-raw/mapbio
 mapbiomas8_cover_pasture,data/mapbiomas8_cover_pasture.rds,data-raw/mapbiomas8_cover_pasture.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas_cobertura,data/mapbiomas_cobertura.parquet,data-raw/mapbiomas_cobertura_map.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas_cobertura_est,data/mapbiomas_cobertura_est.rds,data-raw/mapbiomas_cobertura_ts_rk.R,load_mapbiomas(),datazoom.amazonia,
-mapbiomas_cobertura_munic,data/mapbiomas_cobertura_munic.rds,data-raw/mapbiomas_cobertura_ts_rk.R;data-raw/mapbiomas8_cobertura_munic_savana.R,load_mapbiomas(),datazoom.amazonia,MULTIPLE_MATCHES
+mapbiomas_cobertura_munic,data/mapbiomas_cobertura_munic.rds,data-raw/mapbiomas_cobertura_ts_rk.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas_transicao_est,data/mapbiomas_transicao_est.rds,data-raw/mapbiomas_transicao_est.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas_transicao_est_tab,data/mapbiomas_transicao_est_tab.rds,data-raw/mapbiomas_transicao_est_tab.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas_transicao_munic_5,data/mapbiomas_transicao_munic_5.rds,data-raw/mapbiomas_transicao_munic.R,load_mapbiomas(),datazoom.amazonia,
+ppm_municipality_livestock_inventory,data/ppm_municipality_livestock_inventory.rds,data-raw/dz_munic_ppm_mapbiomas.R;data-raw/dz_munic.R;data-raw/dz_varias_amazonias_cross_section.R;data-raw/map_dz_munic_prodes_data.R;data-raw/ppm_municipality.R;data-raw/ppm_state.R,load_mapbiomas(),datazoom.amazonia,MULTIPLE_MATCHES
+prodes,data/prodes.rds,data-raw/dz_munic.R;data-raw/dz_varias_amazonias_cross_section.R;data-raw/map_dz_munic_prodes_data.R;data-raw/map_dz_munic.R;data-raw/prodes.R,load_prodes(),datazoom.amazonia,MULTIPLE_MATCHES
 rais_groups,data/rais_groups.rds,,,,NOT_FOUND_IN_DATA_RAW
 saude_mortalidade,data/saude_mortalidade.rds,data-raw/map_saude_mortalidade.R,,,
 saude_municipality,data/saude_municipality.rds,data-raw/saude_municipality.R,,,
