@@ -19,11 +19,11 @@ library(datazoom.social)
 #github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # PNAD files must be downloaded to the computer
-source <- "F:/PNADC/load_pnadc DZ"
+source <- "/Users/luanalaport/Downloads/DATAZOOM_VIZ_TESTAR/"
 
 # only run this if not already downloaded: takes a long time
 # não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
-load_pnadc(save_to = source, 2012:2025, raw_data = FALSE, panel = "none")
+load_pnadc(save_to = source, 2026, quarters = 1, raw_data = FALSE, panel = "none")
 
 # and then all files must be read
 
@@ -308,14 +308,7 @@ describe_quarter <- function(df) {
 
 # Big loop to run one of those for each quarter
 
-dat <- purrr::map_dfr(
-    files,
-    function(file_name) {
-        message(file_name)
-        readr::read_rds(file_name) %>%
-            describe_quarter()
-    }
-)
+2
 
 # setting up time variable
 
