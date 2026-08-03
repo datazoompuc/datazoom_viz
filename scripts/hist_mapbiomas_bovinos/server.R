@@ -46,13 +46,22 @@ get_server <- function(files, param, df) {
       ifelse(keys %in% names(lbl), unname(lbl[keys]), keys)
     }
 
+    # Ordena as chaves pelo rótulo do idioma ativo: a ordem alfabética do PT não
+    # é a do EN (Norte/Nordeste viram North/Northeast). Estados são siglas, que
+    # não mudam de idioma, então já vêm ordenados da base.
+    ordena_por_label <- function(keys) {
+      lbl <- geo_label(keys)
+      o <- order(lbl)
+      setNames(keys[o], lbl[o])
+    }
+
     # Escolhas agrupadas do selectize, com as chaves neutras como valor
     geo_choices <- reactive({
       k <- param$geo_keys
       setNames(
         list(
-          setNames(k$amazonia, geo_label(k$amazonia)),
-          setNames(k$regioes, geo_label(k$regioes)),
+          ordena_por_label(k$amazonia),
+          ordena_por_label(k$regioes),
           setNames(k$estados, k$estados)
         ),
         c(i18n()$group_amazonia, i18n()$group_regioes, i18n()$group_estados)

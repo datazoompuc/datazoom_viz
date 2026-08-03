@@ -135,6 +135,10 @@ df <- bovinos %>%
                                              NA_real_)) %>%
   filter(ano >= 1985, !is.na(n_bovino_por_area_pastagem))
 
+# Município sem classe Pasture no MapBiomas cai fora do inner_join. Na Amazônia
+# Legal isso hoje atinge só Santa Cruz do Arari/PA (1506401), campo alagado do
+# Marajó, então a base fecha com 771 dos 772 - a checagem no fim lista quem faltou.
+
 ######################################################################
 # 4) Recortes geográficos (chaves neutras, rótulos ficam no app)
 ######################################################################
@@ -259,7 +263,10 @@ cat("Anos na base final .....:", min(df$ano), "-", max(df$ano), "\n")
 cat("Linhas .................:", nrow(df), "\n")
 cat("Municipios .............:", dplyr::n_distinct(df$cod_ibge), "\n")
 cat("Municipios Amaz. Legal .:", dplyr::n_distinct(df$cod_ibge[df$legal_amazon]),
-    "(esperado ~772)\n")
+    "de", length(munic_legal), "\n")
+faltantes <- setdiff(munic_legal, unique(df$cod_ibge))
+cat("Amaz. Legal sem dado ...:",
+    if (length(faltantes)) paste(faltantes, collapse = ", ") else "nenhum", "\n")
 cat("UFs ....................:", nlevels(droplevels(df$uf)), "(esperado 27)\n")
 cat("Tamanho do .rds (MB) ...:",
     round(file.size("./data/dz_munic_ppm_mapbiomas.rds") / 1024^2, 1), "\n")
