@@ -35,7 +35,7 @@ Apesar dos desafios enfrentados, a história do povo Wassu-Cocal é marcada por 
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/FXnlXff6r5U?si=SsuSDAKBsbrxEile) [![Spotify](spotify.png)](https://open.spotify.com/episode/0uafXZKiEvKtRRlHbiCBYq?si=fMWCaEOMQ3WvafAf_DZM0w&nd=1&dlsi=ef31fff27fb9498b)
+<a href="https://youtu.be/FXnlXff6r5U?si=SsuSDAKBsbrxEile" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/0uafXZKiEvKtRRlHbiCBYq?si=fMWCaEOMQ3WvafAf_DZM0w&nd=1&dlsi=ef31fff27fb9498b" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 :::: 
 

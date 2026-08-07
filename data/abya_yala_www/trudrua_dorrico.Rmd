@@ -27,7 +27,7 @@ Historicamente, os Macuxi vêm enfrentando desde pelo menos o século XVIII situ
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/vSm5Znk_Dwc?si=fg1kFuWTQVPFa2Qi) [![Spotify](spotify.png)](https://open.spotify.com/episode/7bjAoVgrJHgLNoxm9Mubzq)
+<a href="https://youtu.be/vSm5Znk_Dwc?si=fg1kFuWTQVPFa2Qi" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/7bjAoVgrJHgLNoxm9Mubzq" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

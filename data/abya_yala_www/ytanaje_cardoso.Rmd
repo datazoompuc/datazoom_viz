@@ -29,7 +29,7 @@ Atualmente, os desafios enfrentados por esse povo incluem o combate ao projeto d
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/YNeWkTu-pOU?si=vgg2TNTTi5ckaEqy) [![Spotify](spotify.png)](https://open.spotify.com/episode/0pZOEE8G8BMzitKEYS7wNa?si=VVJS-MrqRu2-BJ3H76gCNA&nd=1&dlsi=088e4fb51cd641f1)
+<a href="https://youtu.be/YNeWkTu-pOU?si=vgg2TNTTi5ckaEqy" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/0pZOEE8G8BMzitKEYS7wNa?si=VVJS-MrqRu2-BJ3H76gCNA&nd=1&dlsi=088e4fb51cd641f1" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

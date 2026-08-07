@@ -29,7 +29,7 @@ As escolas também têm grande importância nas aldeias pataxó. Desde os anos 1
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/y-iyN4ELfZo?si=QPTrsiUHbkYjdXCh) [![Spotify](spotify.png)](https://open.spotify.com/episode/6sVhSFeUy0whN1qPG2ScnH?si=b907f4c66e7c4543&nd=1&dlsi=dab3ea9d91194d2d)
+<a href="https://youtu.be/y-iyN4ELfZo?si=QPTrsiUHbkYjdXCh" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/6sVhSFeUy0whN1qPG2ScnH?si=b907f4c66e7c4543&nd=1&dlsi=dab3ea9d91194d2d" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 
