@@ -3,6 +3,8 @@ library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinycssloaders)
+library(shinyWidgets)
 
 # Define nome de arquivos a serem carregados
 files <- list()
@@ -12,7 +14,8 @@ files$param_script <- "../scripts/hist_mapbiomas_bovinos/db_params.R"
 
 files$CSS_script <- "../global/dza_lumen.css"
 
-files$param_file <- "../data/dz_munic_ppm_mapbiomas_dic.csv"
+files$param_file_pt <- "../data/dz_munic_ppm_mapbiomas_dic.csv"
+files$param_file_en <- "../data/dz_munic_ppm_mapbiomas_dic_en.csv"
 files$db_file <- "../data/dz_munic_ppm_mapbiomas.rds"
 
 # Carrega scripts
@@ -20,49 +23,78 @@ source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
-# Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
+# Parâmetros da visualização (define as variáveis/colunas padrões para os eixos do gráfico)
 
-param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "ano" # variável padrão do eixo x
-param$y_def <- "n_bovino_por_area_pastagem" # variável padrão do eixo y
-param$color_def <- "uf" # variável padrão de cor
+param_pt <- get_db_param(files$param_file_pt, files$db_file)
+param_en <- get_db_param(files$param_file_en, files$db_file)
+
+param <- param_pt
+param$tables <- list(
+  pt = param_pt$table,
+  en = param_en$table
+)
+
+param$x_def <- "n_bovino_por_area_pastagem" # variável distribuída no eixo x (o y é a contagem)
 param$slider_def <- "ano" # variável padrão do slider
-param$text_def <- "uf" # variável padrão de texto
-param$id_def <- "uf" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Distribuição dos Municípios de acordo com Bovino/Hectares de Área de Pastagem"
+param$link <- "https://datazoom.shinyapps.io/app_hist_mapbiomas_bovinos/"
 
+# Carrega a base uma única vez por processo (e não por sessão)
+df <- load_db(files$db_file)
 
-# Outros parâmetros e configurações
-param$filter_choices <- list("Amazônia Legal" = list("Amazônia Legal", "Fora da Amazônia Legal"),
-                             "Regiões" = list("Centro-Oeste", "Nordeste", "Norte", "Sudeste", "Sul"),
-                             "Estados" = owdbr::uflist()$UF)
+# Chaves neutras dos recortes geográficos: são as mesmas da base, o que permite
+# trocar de idioma sem perder a seleção do usuário nem duplicar o .rds
+param$geo_keys <- list(
+  amazonia = c("AMZ_IN", "AMZ_OUT"),
+  regioes = c("R_CO", "R_NE", "R_N", "R_SE", "R_S"),
+  estados = levels(df$uf)
+)
+param$geo_def <- c("AMZ_IN", "AMZ_OUT")
 
-param$year_inicio <- 1985
-param$year_final <- 2021
-
-#mudanças específicas no server
-param$legal_amazon_in<- "Amazônia Legal"
-param$legal_amazon_out<- "Fora da Amazônia Legal"
-param$bovino<-"Bovino/Hectares de Área de Pastagem: "
-param$munic_dist<- "Distribuição dos Municípios"
-param$hover<-"Número de Municípios: %{y}<br>Log(Número de Bovino/Hectares de Área de Pastagem + 1): %{x}"
-param$hover_2<-"Número de Municípios: %{y}<br>Número de Bovino/Hectares de Área de Pastagem: %{x}"
-param$log_bovino<- "Log(Número de Bovino/Hectares de Área de Pastagem + 1)"
-param$bovino_area_2<- "Bovinos/Hectares de Área de Pastagem"
-param$munic_num<- "Número de Municípios"
-
-#mudanças específicas no UI
-param$variable<- "VARI\u00C1VEIS:"
-param$logx<-"escala log(x+1)"
-param$ref_year<-"Ano referente"
-param$link<-"https://datazoom.shinyapps.io/app_hist_mapbiomas_bovinos/"
-param$subdiv_geog<- "Subdivisões Geográficas"
-
+param$i18n <- list(
+  pt = list(
+    plot_desc       = "Distribuição dos municípios de acordo com o rebanho bovino por hectare de pastagem",
+    label_var_name  = "VARIÁVEIS:",
+    label_geo_name  = "Subdivisões Geográficas",
+    label_scales    = "OPÇÕES DE ESCALA:",
+    label_log_name  = "escala log(x+1)",
+    slider_prefix   = "Ano: ",
+    group_amazonia  = "Amazônia Legal",
+    group_regioes   = "Regiões",
+    group_estados   = "Estados",
+    geo_labels      = c(AMZ_IN = "Amazônia Legal", AMZ_OUT = "Fora da Amazônia Legal",
+                        R_N = "Norte", R_NE = "Nordeste", R_CO = "Centro-Oeste",
+                        R_SE = "Sudeste", R_S = "Sul"),
+    subtitle        = "Distribuição dos Municípios",
+    label_count     = "Número de Municípios",
+    fmt_log         = "Log(%s + 1)",
+    btn_lang        = "English",
+    btn_fullscreen  = "Fullscreen"
+  ),
+  en = list(
+    plot_desc       = "Distribution of municipalities by cattle herd per hectare of pasture",
+    label_var_name  = "VARIABLES:",
+    label_geo_name  = "Geographical Subdivisions",
+    label_scales    = "SCALE OPTIONS:",
+    label_log_name  = "log scale (x+1)",
+    slider_prefix   = "Year: ",
+    group_amazonia  = "Legal Amazon",
+    group_regioes   = "Regions",
+    group_estados   = "States",
+    geo_labels      = c(AMZ_IN = "Legal Amazon", AMZ_OUT = "Outside of the Legal Amazon",
+                        R_N = "North", R_NE = "Northeast", R_CO = "Midwest",
+                        R_SE = "Southeast", R_S = "South"),
+    subtitle        = "Distribution of Municipalities",
+    label_count     = "Number of Municipalities",
+    fmt_log         = "Log(%s + 1)",
+    btn_lang        = "Português",
+    btn_fullscreen  = "Fullscreen"
+  )
+)
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
-server <- get_server(files, param)
+server <- get_server(files, param, df)
 
 shinyApp(ui = ui, server = server)
