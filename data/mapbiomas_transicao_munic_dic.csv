@@ -1,6 +1,4 @@
-"","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","group",TRUE,FALSE,FALSE,FALSE,FALSE,"Município","Município","Mapbiomas",1,"hectare","Meio ambiente","Uso da terra"
-"2","from",FALSE,FALSE,FALSE,FALSE,FALSE,"from","from","Mapbiomas",1,"hectare","Meio ambiente","Uso da terra"
-"3","to",FALSE,FALSE,FALSE,FALSE,FALSE,"to","to","Mapbiomas",1,"hectare","Meio ambiente","Uso da terra"
-"4","time_span",FALSE,FALSE,TRUE,TRUE,TRUE,"Intervalo de tempo","Intervalo","Mapbiomas",1,"hectare","Meio ambiente","Uso da terra"
-"5","value",TRUE,TRUE,TRUE,TRUE,TRUE,"value","value","Mapbiomas",1,"hectare","Meio ambiente","Uso da terra"
+var,x,y,color,size,slider,label,desc,var_group,tipo,unidade,categoria,subcategoria
+time,TRUE,FALSE,FALSE,FALSE,TRUE,Intervalo,Intervalo,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+group,FALSE,FALSE,TRUE,FALSE,FALSE,Grupo,Grupo,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+value,FALSE,TRUE,FALSE,FALSE,FALSE,Área transicionada,Área transicionada,Mapbiomas,1,ha,Meio ambiente,Uso da terra
