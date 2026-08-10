@@ -1,0 +1,42 @@
+---
+title: "Aline Rochedo Pachamama"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+*Nota: o povo Puri não possui atualmente Terra Indígena demarcada. O território exibido no mapa é uma aproximação da região da Serrinha do Alambari (Resende, RJ), reconhecida como Lugar de Memória Puri, e não representa uma demarcação oficial.*
+
+Aline Rochedo Pachamama (Churiah Puri), pertencente ao povo Puri, é historiadora, escritora, ilustradora e uma voz proeminente na reconstrução da memória de povos considerados "extintos" pela historiografia tradicional. Doutora em História pela Universidade Federal Rural do Rio de Janeiro (UFRRJ) e mestra em História Social pela Universidade Federal Fluminense (UFF), sua atuação transcende a academia ao fundar a Pachamama Editora, selo pioneiro gerido por mulheres indígenas que privilegia o protagonismo e a autonomia literária das comunidades.
+
+Sua produção bibliográfica é vasta, incluindo obras como *Guerreiras (m'baima mliguapy): Mulheres indígenas na cidade, mulheres indígenas da aldeia; Taynôh: O menino que tinha cem anos; Boacé Uchô: A história está na terra; Jataí (Butan-baké) e as abelhinhas indígenas*; e *Meu país é nome de árvore e território indígena.* Nessas obras, Aline articula a literatura infantil e infantojuvenil à urgência do reconhecimento dos territórios ancestrais.
+
+No âmbito institucional e comunitário, fundou o Instituto Pachamama, coletivo Puri sediado na Serra da Mantiqueira, onde desenvolve o Projeto Inhã Uchô. Aline tem sido uma defensora incansável da salvaguarda da "Pedra Sonora", na Serrinha do Alambari (RJ), caracterizando a região como um Lugar de Memória Puri — um espaço de resistência onde a expressão cultural e a espiritualidade se fundem à paisagem física. Através do projeto "O Povo Puri da Mantiqueira", a historiadora tem levado às unidades escolares uma pedagogia da presença, desconstruindo o silenciamento histórico e reconectando as novas gerações à história e à cultura viva do povo Puri.
+
+## Povo Puri
+
+O território ancestral do povo Puri abrange vastas extensões do que hoje constitui a região Sudeste do Brasil (Rio de Janeiro, São Paulo, Minas Gerais e Espírito Santo). Durante décadas, a historiografia e as políticas estatais foram pautadas pelo "paradigma da extinção", que sentenciou os Puri ao desaparecimento entre o final do século XIX e o início do XX. Esse apagamento deliberado serviu como dispositivo jurídico e político para a negação de direitos territoriais, resultando em processos de dispersão, fragmentação comunitária, etnocídio e linguicídio.
+
+No alvorecer do século XXI, o povo Puri desencadeou um vigoroso processo de reafirmação étnica coletiva, refutando a tese da extinção e articulando-se em coletivos de resistência. Essa mobilização manifestou-se tanto na ocupação de espaços políticos — como a Aldeia Maraka'nà e a Aldeia Vertical no Rio de Janeiro — quanto na criação de instituições próprias de salvaguarda de memória, a exemplo do Movimento de Ressurgência Puri (MRP), do Movimento Teyxokawa e do Instituto Pachamama.
+
+No campo da revitalização linguística, destaca-se a retomada do Kwaytikindo, adotado por segmentos do povo como língua de resistência e identidade. Segundo dados do Censo IBGE (2022), 1.290 indivíduos autodeclaram-se Puri, com presença em quase todas as unidades da federação, embora com maior concentração em municípios como Araponga (MG), Rio de Janeiro (RJ) e Barbacena (MG). No Espírito Santo, destacam-se os núcleos em Cariacica, Ibatiba e Vitória.
+
+A realidade contemporânea dos Puri é marcada por uma profunda heterogeneidade: desde movimentos de retomada territorial e coletividades em contextos urbanos até indivíduos inseridos no meio rural. Mais do que uma sobrevivência residual, o que se observa é uma coletividade organizada e plural, que mobiliza a produção acadêmica, a literatura, as artes visuais e a museologia como estratégias de insurgência e valorização cultural, reafirmando sua agência histórica no cenário nacional.
+
+**Texto elaborado por**: Guilherme Haniel de Almeida e Silva (Xamum Puri)
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/WOBYhWaovFU) [![Spotify](spotify.png)](https://open.spotify.com/episode/6IBkKKfQy3MuKh50DSqQTi)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

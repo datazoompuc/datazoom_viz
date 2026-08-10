@@ -38,11 +38,11 @@ infer_dataset_id <- function(db_file) {
     tools::file_path_sans_ext(basename(db_file))
 }
 
-extract_rds_from_manifest <- function(manifest) {
+extract_datasets_from_manifest <- function(manifest) {
     if (!"db_file" %in% names(manifest)) {
         stop("A coluna 'db_file' não foi encontrada no app_manifest.csv.")
     }
-    
+
     manifest %>%
         transmute(value = db_file) %>%
         mutate(value = trim_na(value)) %>%
@@ -50,7 +50,7 @@ extract_rds_from_manifest <- function(manifest) {
         mutate(value = map(value, split_multivalue)) %>%
         unnest(value) %>%
         mutate(db_file = normalize_path(value)) %>%
-        filter(str_detect(db_file, "\\.rds$")) %>%
+        filter(str_detect(db_file, "\\.(rds|parquet)$")) %>%
         distinct(db_file) %>%
         arrange(db_file) %>%
         pull(db_file)
@@ -151,10 +151,10 @@ if (length(scripts) == 0) {
     stop("Nenhum script R encontrado em data-raw/.")
 }
 
-manifest_rds <- extract_rds_from_manifest(manifest)
+manifest_datasets <- extract_datasets_from_manifest(manifest)
 
-if (length(manifest_rds) == 0) {
-    stop("Nenhum .rds encontrado na coluna db_file do app_manifest.csv.")
+if (length(manifest_datasets) == 0) {
+    stop("Nenhum dataset (.rds ou .parquet) encontrado na coluna db_file do app_manifest.csv.")
 }
 
 #-----------------------------------
@@ -162,7 +162,7 @@ if (length(manifest_rds) == 0) {
 #-----------------------------------
 
 registry <- tibble(
-    db_file = manifest_rds
+    db_file = manifest_datasets
 ) %>%
     mutate(
         dataset_id = infer_dataset_id(db_file),

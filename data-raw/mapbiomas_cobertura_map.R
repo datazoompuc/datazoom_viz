@@ -1,0 +1,213 @@
+################################################################################
+#   SETUP
+################################################################################
+
+# devtools::install_github("datazoompuc/datazoom.amazonia")
+
+library(datazoom.amazonia)
+library(readxl)
+library(tidyverse)
+library(stringr)
+library(sf)
+library(sp)
+library(rmapshaper)
+library(arrow)
+
+
+################################################################################
+#   DADOS PARA O      files$db_file
+################################################################################
+
+# load data from MAPBIOMAS ---------------------------------------------------------------
+
+# download treated Mapbiomas Cover data in English
+data_raw <- load_mapbiomas(
+    dataset = "mapbiomas_cover",
+    raw_data = FALSE,
+    geo_level = "municipality",
+    language = "eng"
+)
+
+data <- data_raw |>
+    reframe(value = sum(value),
+                        .by = c(municipality_code, municipality, class_level_4, year))  |>
+    pivot_wider(
+        id_cols    = c("municipality", "municipality_code", "year"),
+        names_from = class_level_4,
+        values_from = value
+    )
+
+# Resolve state from the canonical one-row-per-code lookup instead of the
+# state MapBiomas attaches per row: border municipalities (e.g. Ibateguara,
+# Luis Eduardo Magalhaes) have a sliver of pixels crossing into the
+# neighboring state, which forks them into a second row if state is grouped
+# on above. Dropping it from the grouping merges the sliver into the single
+# correct row, and we reattach state here from a source with no duplicates.
+state_lookup <- datazoom.amazonia::municipalities |>
+    dplyr::select(municipality_code = code_muni, state = name_state) |>
+    dplyr::mutate(state = stringr::str_to_title(state))
+
+data <- data |>
+    dplyr::left_join(state_lookup, by = "municipality_code") |>
+    dplyr::relocate(state, .after = municipality)
+
+# Add area of each municipality ------------------------------------------
+
+areas_mun <- readr::read_rds("global/area_municipios.rds")
+
+data <- data |>
+    drop_na(municipality_code) |>
+    left_join(areas_mun, by = "municipality_code") |>
+    rename_with(~sub("^\\\\d+(\\\\.\\\\d+)*\\\\.?\\\\s*", "", .x)) |>
+    relocate(municipality_code, municipality, state, year,
+             "Forest Formation", "Savanna Formation", "Pasture", "Soybean", "Mining")
+
+################################################################################
+# EXPORT
+################################################################################
+
+# Nota: a geometria municipal (global/munic_shapefile.rds) não é mais gerada
+# aqui — foi extraída para data-raw/munic_shapefile.R, já que é usada por
+# vários outros apps de mapa municipal e não tinha relação com o pipeline de
+# dados do MapBiomas abaixo.
+
+# Export data in parquet format (faster per year)
+data |>
+    dplyr::group_by(year) |>
+    # Write data as .parquet
+    arrow::write_dataset(
+        path = "data/mapbiomas_cobertura.parquet",
+        format = "parquet")
+
+
+################################################################################
+#   DADOS DICIONARIO PARA O      files$param_file
+################################################################################
+
+datafinal <- data
+
+#####################
+# Function to generate base dictionary 
+#####################
+
+build_dictionary <- function(data, language = c("pt", "en")) {
+    language <- match.arg(language)
+    labels <- colnames(data)
+    
+    # Vetor de variáveis que devem TER os valores FALSE para 'x' e 'y'
+    # e TRUE para 'slider' (se for 'year')
+    vars_condicionais <- c("biome", "municipality", "state", "year", "area_km2")
+    
+    base_dict <- tibble(
+        var          = labels,
+        x            = TRUE,
+        y            = TRUE,
+        color        = FALSE,
+        size         = FALSE,
+        slider       = FALSE,
+        label        = labels,
+        desc         = labels,
+        var_group    = "Mapbiomas",
+        tipo         = 1,
+        unidade      = "ha",
+        categoria    = ifelse(language == "pt", "Meio ambiente", "Environment"),
+        subcategoria = ifelse(language == "pt", "Uso da terra", "Use of land")
+    ) |>
+        drop_na() |>
+        filter(var != "municipality_code") |> 
+        mutate(
+            # Verifica se 'var' está em 'vars_condicionais'
+            is_conditional = var %in% vars_condicionais,
+            
+            # Aplica FALSE para 'x' e 'y' se 'var' for uma das vars condicionais
+            x = if_else(is_conditional, FALSE, x),
+            y = if_else(is_conditional, FALSE, y),
+            
+            # Aplica TRUE para 'slider' SOMENTE se 'var' for "year"
+            slider = if_else(var == "year", TRUE, slider),
+            
+            # Modifica 'label' e 'desc' para as variáveis específicas
+            label = case_when(
+                var == "municipality" ~ if_else(language == "pt", "Município", "Municipality"),
+                var == "year"         ~ if_else(language == "pt", "Ano", "Year"),
+                TRUE                  ~ label # Mantém o valor original para todas as outras
+            ),
+            desc  = label # 'desc' segue 'label' após as alterações
+        ) |>
+        # Remove a coluna auxiliar 'is_conditional'
+        select(-is_conditional)
+    
+    return(base_dict)
+}
+
+#####################
+# Function to apply PT-EN translations
+#####################
+
+apply_label_translations <- function(dict, translations) {
+    dict |>
+        mutate(label = ifelse(var %in% names(translations),
+                              translations[var],
+                              label))
+}
+
+#####################
+# PT
+#####################
+
+translations_pt <- c(
+    "Aquaculture" = "Aquicultura",
+    "Beach, Dune and Sand Spot" = "Praias, Dunas e Pontos de Areia",
+    "Citrus" = "Cítricos",
+    "Coffee" = "Café",
+    "Cotton" = "Algodão",
+    "Forest Formation" = "Formação de Floresta",
+    "Forest Plantation" = "Plantação de Floresta",
+    "Floodable Forest" = "Floresta Inundável",
+    "Grassland" = "Pradaria",
+    "Hypersaline Tidal Flat" = "Planícies Hipersalinas Costeiras",
+    "Herbaceous Sandbank Vegetation" = "Restinga Herbácea",
+    "Mining" = "Mineração",
+    "Mosaic of Uses" = "Mosaico de Uso da Terra",
+    "Sugar cane" = "Cana-de-açúcar",
+    "Magrove" = "Mangue",
+    "Salt flat" = "Salar",
+    "Not Observed" = "Não observado",
+    "Other Non Forest Natural Formation" = "Outras formações naturais não florestais",
+    "Other non Vegetated Areas" = "Outras áreas não vegetadas",
+    "Other Perennial Crops" = "Outras Culturas Perenes",
+    "Other Temporary Crops" = "Outras Culturas Temporárias",
+    "Rice" = "Arroz",
+    "River, Lake and Ocean" = "Rios, Lagos ou Oceanos",
+    "Rocky Outcrop" = "Afloramento rochoso",
+    "Savanna Formation" = "Formação de Savana",
+    "Soybean" = "Soja",
+    "Pasture" = "Pastagem",
+    "Urban Area" = "Área Urbana",
+    "Wetland" = "Pântano",
+    "Wooded Sandbank Vegetation" = "Restinga Arborizada",
+    "Palm Oil" = "Óleo de Palma",
+    "Perennial Crops" = "Culturas Perenes",
+    "Temporary Crops" = "Culturas Temporárias",
+    "Agriculture" = "Agricultura",
+    "Forest" = "Floresta",
+    "Non Forest Natural Formation" = "Formação Natural Não Florestal",
+    "Farming" = "Fazenda",
+    "Non Vegetated Area" = "Áreas não vegetadas",
+    "Water" = "Água",
+    "Anthropic" = "Antrópico",
+    "Natural" = "Natural"
+)
+
+dic_pt <- build_dictionary(datafinal, "pt") |>
+    apply_label_translations(translations_pt)
+
+write_csv(dic_pt, "data/map_mapbiomas_cover_dic.csv")
+
+#####################
+# EN
+#####################
+
+dic_en <- build_dictionary(datafinal, "en")
+
+write_csv(dic_en, "data/map_mapbiomas_cover_dic_en.csv")

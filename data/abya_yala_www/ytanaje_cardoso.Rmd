@@ -1,0 +1,38 @@
+---
+title: "Ytanajé Cardoso"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Ytanajé Cardoso é professor e escritor, autor da obra Canumã: A travessia (2019). Atua nas áreas de línguas e literaturas indígenas, educação escolar indígena, análise de discursos e políticas linguísticas. Possui doutorado em Educação (2019-2023) pela Universidade Federal do Amazonas, mestrado em Letras e Artes (2015-2017) pela Universidade do Estado do Amazonas e graduação em Letras \- Língua Portuguesa (2011-2014) pela mesma universidade.
+
+Desde 2016, trabalha como professor da Secretaria de Educação e Desporto do Amazonas (SEDUC). Também atuou como professor substituto na Universidade Federal do Amazonas (2018-2020). Desde 2017, é professor colaborador dos cursos de Pedagogia Intercultural Indígena da Universidade do Estado do Amazonas. Faz parte do Núcleo de Estudos de Linguagens da Amazônia (NEL-Amazônia) da Universidade Federal do Amazonas (UFAM) e do Grupo de Estudos e Pesquisas em Educação Escolar Indígena e Etnografia (GEPEE) da Universidade do Estado do Amazonas (UEA).
+
+## Povo Munduruku
+
+Os territórios do povo Munduruku estão localizados sobretudo no Vale do rio Tapajós, entre os estados do Pará e Amazonas, no Brasil. Pertencente à família linguística Munduruku, do tronco tupi, esse povo indígena habita a região. Eles se autodenominam Wuy jugu e, segundo os saberes difundidos oralmente entre alguns anciãos, adotaram a designação Munduruku no final do século XVIII.
+
+As práticas sociais e a cosmologia dos Munduruku são pautadas na relação deles com o espaço e os animais, principalmente. No entanto, tais aspectos passaram por um processo de transformação e reconfiguração à medida que esses grupos se deslocaram e também devido ao impacto das missões católicas e ao contato interétnico. Então, surgem diferenciações em relação à sua localização nos campos ou nas margens dos rios — posteriormente, nas cidades — em termos de estrutura social, alterada por esse movimento e contato.
+
+A partir do século XX, o processo econômico de extrativismo da borracha provocou uma série de alterações na vida indígena, tanto na perspectiva individual quanto coletiva. Essas alterações podem ser percebidas no afastamento em relação ao idioma nativo ou na mudança da concepção de família centrada no “clã” (família extensa) para a ideia ocidental de uma “família nuclear”, composta por um casal e filhos. Todavia, a capacidade de articulação da resistência indígena em torno desse projeto integracionista persiste até os dias de hoje, mesmo após a promulgação da Constituição de 1988\.
+
+Atualmente, os desafios enfrentados por esse povo incluem o combate ao projeto desenvolvimentista estatal e às atividades ilegais em seu território, como o garimpo, responsável por doenças e contaminação por mercúrio. Além disso, a resistência indígena hoje se manifesta em outros espaços de disputa, como cidades, universidades e a política institucional do Estado brasileiro.
+
+**Texto elaborado por Julia Paula do Nascimento de Moraes**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/YNeWkTu-pOU?si=vgg2TNTTi5ckaEqy) [![Spotify](spotify.png)](https://open.spotify.com/episode/0pZOEE8G8BMzitKEYS7wNa?si=VVJS-MrqRu2-BJ3H76gCNA&nd=1&dlsi=088e4fb51cd641f1)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

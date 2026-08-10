@@ -1,0 +1,50 @@
+---
+title: "Ziel Karapotó"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+A trajetória artística do indígena Ziel Karapotó caracteriza-se por uma produção engajada e multifacetada, que articula questões identitárias, políticas e culturais dos povos originários no nordeste brasileiro. Formado em Artes Visuais pela Universidade Federal de Pernambuco (UFPE), o artista emprega linguagens como performance, instalação, audiovisual e curadoria como dispositivos de resistência anticolonial, enfatizando a luta pela visibilidade e representatividade indígena no campo das artes. Sua obra, situada na intersecção entre ancestralidade e contemporaneidade, problematiza estruturas hegemônicas de opressão ao mesmo tempo em que celebra a diversidade étnico-cultural.
+
+Desde 2012, integra coletivos artísticos, como Lambe-Lambe Digital e CriArtvírus, desenvolvendo intervenções urbanas na cidade de Arapiraca (AL). Em 2016, obteve reconhecimento no Salão Universitário de Arte Contemporânea de Pernambuco (UNICO) com a instalação-performance “Inventário Curumim”, obra que ressignifica narrativas sobre a infância indígena. Performances posteriores, como “Entre o fogo e a penumbra” (2016) e “Todos falam de mim, Ninguém me representa” (2017), consolidam seu discurso crítico acerca da invisibilização dos povos originários. Em 2018, participou do laboratório SESC Confluências, onde produziu a performance “Cura” e a vídeo performance “No princípio era verbo...”, esta última exibida em circuitos internacionais.
+
+Seu curta-metragem “O verbo se fez Carne” (2019), laureado em dez festivais — incluindo o Recifest e o FBCU — destaca-se pela fusão entre poética visual e insurgência política indígena. Em 2020, recebeu menção honrosa no EDP nas Artes do Instituto Tomie Ohtake, consolidando sua relevância no cenário artístico nacional. Ao articular arte e ativismo, sua produção consubstancia-se como uma voz fundamental no debate contemporâneo, ampliando reflexões sobre identidade, agência política e justiça social no contexto pós-colonial. Portanto, o artista  Ziel Karapotó se consolida como um potente instrumento de descolonização estética e política, articulando ancestralidade indígena com linguagens contemporâneas para desafiar narrativas hegemônicas.
+
+## Povo Karapotó
+
+Os indígenas da etnia Karapotó vivem na aldeia Karapotó Plaki-ó e na comunidade Karapotó Terra Nova, ambas localizadas na zona rural do município de São Sebastião, em Alagoas.
+
+A região onde hoje habitam os Karapotó, próxima ao vale do rio São Francisco — tradicionalmente chamado de Rio Opara —, vem sendo povoada desde antes do processo de colonização. O território era ocupado por diferentes etnias, desde o litoral até o interior, seguindo o curso do Rio Opara. A habitação próxima ao rio era uma prioridade para os Karapotó, pois, de tempos em tempos, mudavam-se para outros territórios acompanhando seu curso.
+
+Justamente por conta dessa localização estratégica, a área habitada pelos Karapotó esteve mais vulnerável aos massacres promovidos pela colonização portuguesa. À medida que a colonização avançava, mais territórios indígenas eram cobiçados para a instalação de engenhos de cana-de-açúcar. Dessa forma, a comunidade Karapotó, assim como tantas outras, foi sendo gradativamente desestruturada.
+
+Apesar de toda a repressão e perseguição, os povos indígenas resistiram à política institucional de desterritorialização ao longo dos séculos. O controle estatal sobre os indígenas se estruturou em diferentes frentes, sempre com o objetivo de deslegitimar sua liberdade e independência. Medidas como a política de aldeamento e a criação do SPI (Serviço de Proteção aos Índios) tinham como principal meta a assimilação dos indígenas a uma racionalidade ocidental e nacionalista. Esses processos violentos os afastaram tanto de seus territórios quanto de suas próprias cosmogonias.
+
+Os indígenas Karapotó, como grande parte das etnias brasileiras, enfrentaram duras políticas que buscavam distanciá-los de suas respectivas culturas. Assim, alguns chegaram até mesmo a negar publicamente sua ancestralidade indígena como forma de sobrevivência no mundo moderno. Esse panorama começou a mudar a partir da década de 1980, com o fim da ditadura militar no Brasil. Houve, no contexto de redemocratização do país, o ressurgimento de diversos grupos étnicos que haviam se desestruturado ao longo do tempo, fortalecendo ainda mais o movimento indígena no Brasil.
+
+O processo de retomada étnica possibilitou a luta pelo reconhecimento das etnias e de seus territórios, o que resultou na regularização da Terra Indígena Karapotó em 1992\.
+
+Apesar do reconhecimento por parte do Estado brasileiro da Terra Indígena Karapotó, sua demarcação ainda não foi oficialmente regularizada até o ano de 2025\. Essa situação compromete as condições de habitabilidade dos indígenas Karapotó na região reconhecida, resultando na concentração de membros da etnia na zona rural de São Sebastião, junto a não indígenas. O povoado dispõe de uma estrutura mais sólida de acesso a direitos básicos, como saúde e educação.
+
+Uma das principais demandas dos Karapotó é a implantação de uma escola indígena para os jovens e crianças da comunidade, a fim de evitar o deslocamento até a zona urbana da cidade de São Sebastião. Sobre a localização da escola, o cacique Gilvan Karapotó Terra Nova argumenta que a instalação dentro da terra indígena é um meio essencial para que os jovens indígenas possam se conectar com a cultura e a história dos Karapotó.
+
+Apesar da colocação do cacique, a escola indígena, inaugurada em janeiro de 2025, está localizada na zona rural de São Sebastião, com capacidade para 400 alunos.
+
+**Texto elaborado por Ana Clara Dutra Barros e Marcones Portela**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/_ukj3SFwjIE?si=td64p3ki_uutEOTg) [![Spotify](spotify.png)](https://open.spotify.com/episode/6Q17OXEzOI0JFBHZuGTCX7?si=021118a3e7084b01)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

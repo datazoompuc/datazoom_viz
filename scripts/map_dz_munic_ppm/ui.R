@@ -1,47 +1,48 @@
 #  -------------------------------- Define UI --------------------------------
 
-# Funcão para retornar objeto server
+# Funcão para retornar objeto ui
 get_ui <- function(files, param) {
   div( # div geral
     includeCSS(files$CSS_script), # Incluí script CSS
-    tags$style(type = "text/css", 
+    tags$style(type = "text/css",
       # remove o ultimo ano no slider (2018 e 2019 estavam um em cima do outro)
       # remove tracos intermediarios do slider
-      # move botao de play para a esquerda e para baixo
-      # aumenta tamanho do botao de play
+      # posicionamento e tamanho do botão de play/pause: ver .slider-inline
+      # em global/dza_lumen.css (não duplicar regras aqui — a mesma
+      # especificidade quebraria o layout flex definido lá)
       "
       .irs-grid-text.js-grid-text-10 {display: none;}
       .irs-grid-pol.small {display: none;}
-      .slider-animate-container {width: 5%; margin-top: 1px;}
-      .slider-animate-button {font-size: 20px;}
     "),
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
       column(3, # dimensão da coluna do bootstrap
         class = "menucol",
-        
+
         # muda cor do background
         tags$style('.menucol {
                              background-color: #50A486;
               }',),
-        
-        # muda cor do botao 
+
+        # muda cor do botao
         tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
                           background-color: #48968B !important;
                           border-color: #48968B !important;
               }',),
-        
-        h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+
+        tags$style(HTML(".switch-label { color: white; }")),
+
+        uiOutput("plot_name_ui"),
+        uiOutput("plot_desc_ui"),
         hr(),
-        p(class = "vars", param$variables_caps),
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = param$choice_variable,
+            label = param$label_x_name,
             choices = param$x_choices,
             selected = param$x_def,
             width = "100%"
@@ -50,29 +51,37 @@ get_ui <- function(files, param) {
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
-          class = "var_selec_group",
+          class = "var_selec_group slider-inline",
           # Seleciona variável do eixo de data
           sliderInput(inputId = "filter1",
-                      
-                      label = param$reference_year,
+                      label = param$ref_year,
                       min = param$year_inicio,
                       max = param$year_final,
                       value = 2000,
                       step = 1,
                       width = "100%",
-                      animate = animationOptions(interval = 3000,
-                                                 playButton = "\u25B6",
-                                                 pauseButton = "\u23F8"),
+                      animate = animationOptions(interval = 5000,
+                                                 playButton = icon("play"),
+                                                 pauseButton = icon("pause")),
                       sep = "")
         ),
-        
         # espaço vazio
         div(class = "fakecheckbox", ),
+        # Botão de troca de idioma
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
+          actionButton(
+            inputId = "toggle_lang",
+            label   = "English",
+            icon    = icon("globe"),
+            class   = "btn-primary"
+          )
+        ),
+        div(style = "height: 6px;"), # espaço entre os botões
+        div(
+          shiny::actionButton(inputId = 'ab1', label = "Fullscreen",
+                              icon = icon("expand"),
                               class = "btn-primary",
-                              onclick = paste0("window.open('", param$link, "', '_blank')"))
+                              onclick = paste0("window.open('",param$link,"', '_blank')"))
         ),
       ),
       column(9,
@@ -83,8 +92,15 @@ get_ui <- function(files, param) {
           class = "plotrow row justify-content-center flex-grow-1 w-100",
           div(
             class = "plotdiv w-100 h-100",
-            # Map
-            leafletOutput("map", width = "100%", height = "100%") # %>% withSpinner()
+            style = "position: relative; display: flex; flex-direction: column;",
+            div(
+              style = "flex-grow: 1; position: relative;",
+              withSpinner(
+                leafletOutput("map", width = "100%", height = "calc(100vh - 150px)"),
+                type = 4,
+                color = "#41878C"
+              )
+            )
           )
         )
       )
