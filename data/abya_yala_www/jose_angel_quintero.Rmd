@@ -1,0 +1,38 @@
+---
+title: "José Ángel Quintero Weir"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".png", knitr::current_input()))
+```
+
+Ao apresentar-se, é frequente que José Quintero Weir inicie sua fala referenciando a linhagem feminina de sua família: Julia, Izabel, Berta e Victória — mãe, avó, bisavó e tataravó. Tal prática, explica José, é um protocolo tradicional do povo Añú ao dialogar com o Outro, simbolizando não apenas a genealogia pessoal, mas a centralidade das mulheres na preservação da história e da memória coletiva. Como ele próprio sintetiza: "são elas que caminham antes para que possamos caminhar".
+
+Doutor em Estudos Latino-Americanos pela Universidade Nacional Autônoma do México (UNAM), José atua como professor de Literatura e Cultura Indígena na Faculdade de Letras da Universidade de Zulia (LUZ), onde coordena a Unidade de Estudos e Culturas Indígenas. Sua trajetória é marcada pelo protagonismo na concepção e no impulsionamento da Universidade Autônoma Indígena (UAIN) — Wainjirawa, uma iniciativa de educação intercultural que preza pela autonomia pedagógica e epistêmica frente aos modelos hegemônicos.
+
+Há décadas, Quintero Weir dedica-se à militância pelos povos originários de Abya Yala, estabelecendo pontes entre o rigor acadêmico e a sabedoria ancestral. Sua produção intelectual e docente concentra-se na literatura, na cultura e nos estudos decoloniais, consolidando-se como uma voz fundamental na defesa dos direitos, da autodeterminação e da salvaguarda dos saberes indígenas no continente.
+
+## Povo Añú
+
+O povo Añú habita primordialmente o estado de Zulia, na Venezuela, tendo se estabelecido historicamente ao longo da costa do Lago de Maracaibo. Atualmente, um contingente expressivo reside na Lagoa de Sinamaica, situada no município de Páez. Este ecossistema, com extensão aproximada de 1.500 metros, caracteriza-se por uma dinâmica hidrológica sazonal: recebe águas doces do Rio Limón no período pluvial e águas salobras provenientes do mar durante a estação seca.
+
+A demografia Añú distribui-se entre comunidades tradicionais e centros urbanos, como Maracaibo, estimando-se uma população de 15.000 a 20.000 indivíduos que reivindicam essa identidade étnica. A Lagoa de Sinamaica e o Lago de Maracaibo constituem eixos centrais para a compreensão da história e da cosmologia Añú — frequentemente designado como o "povo da água". Essa relação simbiótica com o meio lacustre estrutura seu universo simbólico, manifestando-se desde as arquiteturas de palafitas (que, conforme a historiografia tradicional, teriam inspirado o nome "Venezuela" pela analogia com Veneza) até as narrativas de criação, como a de Ariyuu.
+
+Linguisticamente, o idioma Añú integra a família Arawak (Maipure), compondo um subgrupo próximo ao Lokono e ao Wayuunaiki. No território venezuelano, a família Arawak engloba ainda as línguas Warekena, Curripaco, Baniva, Piapoco e Baré. No contexto das lutas contemporâneas por reafirmação étnica, a revitalização linguística emergiu como um pilar de resistência identitária. Embora o idioma enfrente riscos de obsolescência, observa-se um esforço intergeracional para sua salvaguarda. Um marco fundamental desse processo é a publicação do Liuruchaa añunnükümoyatü (Dicionário Básico da Língua Añú, 2008), coordenado por José Álvarez e María Bravo. Fruto de uma construção coletiva entre pesquisadores e detentores de saberes tradicionais, a obra não apenas documenta o léxico, mas testemunha o caráter colaborativo e político da preservação linguística Añú.
+
+**Texto elaborado por Ana Clara Dutra Barros**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://www.youtube.com/playlist?list=PL28cki-vqjxoHNUWzzoLfDS5AnlHSz96T) [![Spotify](spotify.png)](https://open.spotify.com/episode/3kr1o5Djhj1QPpYEqIsGQk)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

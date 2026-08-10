@@ -1,0 +1,38 @@
+---
+title: "Kâhu Pataxó"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Kâhu Pataxó é uma liderança indígena em constante construção. Sua trajetória começa na adolescência, quando acompanha seu tio, o Cacique Aruã, em sua atuação nas aldeias e no trabalho com a comunidade. Ele se dedicou a aprimorar seus conhecimentos de liderança na Reserva da Jaqueira, lugar de extrema importância para o povo Pataxó, hoje demarcado como território indígena, localizado em Porto Seguro, na Bahia.
+
+Kâhu fez parte da organização inicial do Movimento Unido dos Povos e Organizações Indígenas do Estado da Bahia (MUPOIBA). Ele é conselheiro estadual dos povos indígenas no COPIBA (Conselho Estadual dos Direitos dos Povos Indígenas do Estado da Bahia), representando o povo Pataxó. Em setembro de 2023, foi eleito presidente da Federação Indígena das Nações Pataxó e Tupinambá do Extremo Sul da Bahia (FINPAT). Em 2017, ele foi aprovado no curso de Direito da UFBA. Segundo Kâhu, o curso é um instrumento para garantir a defesa dos direitos da comunidade e de seus territórios.  
+   
+## Povo Pataxó
+
+Segundo o artista indígena Kanatyo Pataxó, “Pataxó é água da chuva batendo na terra, nas pedras, e indo embora para o rio e o mar”. Essa definição, presente em sua obra Txopai e Itohã (1997, s/p), dialoga com a conexão ancestral do povo Pataxó. Segundo o mito de criação pataxó, Txôpay provocou um temporal em Juacema, formando um grande buraco. Nesse buraco, cada gota que caía formava um indígena pataxó que iria povoar as terras.
+
+Existem 36 aldeias pataxó nos seis territórios indígenas no estado da Bahia: Águas Belas, Aldeia Velha, Barra Velha, Coroa Vermelha, Imbiriba e Mata Medonha. Em Minas Gerais, há sete comunidades: Alto das Posses, Imbiruçu, Jeru Tukumâ, Jundiba/Cinta Vermelha, Muã Mimatxí, Retirinho e Sede. As ocupações que reivindicam novos territórios indígenas têm como principal objetivo aumentar o espaço habitável e garantir acesso aos recursos naturais, visto que, em ambos os casos, há uma ameaça constante por parte de fazendeiros invasores e do Estado, que levam o processo de demarcação das terras a um retrocesso.
+
+Devido ao histórico de contato entre colonizadores e indígenas Pataxó, há uma extensa documentação que testemunha a presença de aldeias habitadas por eles ao longo do tempo, como as de Coroa Vermelha e Monte Pascoal, citadas diversas vezes na história da chegada dos colonizadores. No entanto, mensurar a cronologia das ocupações indígenas pode ser complexo, pois, devido a diversas invasões territoriais ao longo do tempo, foi necessária uma reocupação e a reivindicação desses territórios por parte dos indígenas, no processo denominado retomada. Portanto, os critérios para caracterizar uma aldeia não se restringem à demarcação oficial do território, mas incluem também a organização sociopolítica, como a nomeação de um cacique. A relação da aldeia com o cacique não é caracterizada pela hierarquia, mas por relações simétricas, pois ele é um porta-voz da comunidade e um articulador interno.
+
+As escolas também têm grande importância nas aldeias pataxó. Desde os anos 1990, o Grupo de Pesquisadores Pataxó, com a parceria de diferentes gerações da etnia, trabalha na pesquisa da língua pataxó. Em 2003, o ensino da língua tornou-se disciplina para crianças e adolescentes em fase de escolarização. Embora não seja mais falada exclusivamente, sua presença ainda é percebida em vocábulos mesclados ao português na comunicação de indígenas pataxó. A complexidade proporcionada pela retomada da língua Pataxó possibilita à comunidade a retomada de toda a sua cultura e identidade.
+
+**Texto elaborado por Ana Clara Dutra Barros**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/y-iyN4ELfZo?si=QPTrsiUHbkYjdXCh) [![Spotify](spotify.png)](https://open.spotify.com/episode/6sVhSFeUy0whN1qPG2ScnH?si=b907f4c66e7c4543&nd=1&dlsi=dab3ea9d91194d2d)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

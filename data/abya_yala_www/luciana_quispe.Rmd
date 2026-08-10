@@ -1,0 +1,41 @@
+---
+title: "Luciana Quispe"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Luciana Quispe, indígena da etnia quéchua, é nascida na província de *Jujuy*, no extremo Norte da Argentina, em um pequeno povoado chamado de *Puesto del Marqués*. Por conta de seus avós serem ferroviários, sua relação e a de sua família com a cidade foi flexível, fazendo com que hoje ela também seja instalada em *San Salvador de Jujuy*, capital da província, tendo então uma dupla residência, tanto na capital quanto em seu povoado.
+
+Luciana é graduada em Antropologia Social e Cultural pela Faculdade de Filosofia e Letras da Universidade de Buenos Aires (FFYL-UBA). Atualmente está cursando doutorado em Ciências Antropológicas com uma bolsa do *Consejo Nacional de Investigaciones Científicas y Técnicas* (CONICET) e também estudou cinema, buscando um aliado no audiovisual, visto que muitos povos indígenas não utilizam a escrita como método de estudo e transmissão de conhecimentos, na *Escuela Nacional de Experimentación y Realización Cinematográfica* (ENERC).  
+
+Além de todo seu currículo acadêmico, Luciana faz parte da comunidade indígena *quechua-aymara "Qhapajñán"*, onde é ativista. Seu principal interesse é em tornar as pesquisas antropológicas mais diversas e incluir voz aos povos indígenas, buscando mesclar a academia com o território. Ela possui diversos trabalhos publicados sobre as temáticas referentes.
+
+## Povo Quéchua
+
+Os povos Quéchua (também denominados *kichwa, ingas, runakuna' ou nunakuna*) são originários da região da Cordilheira dos Andes, no que hoje são os países como Equador, Colômbia, Peru, Bolívia, Argentina e Chile. Estima-se que sua população seja de 9 a 14 milhões de indivíduos. Esse grupo étnico-linguístico indígena possui um baixo senso de identidade comum, com diversos dialetos sendo tão distintos que são praticamente ininteligíveis entre si.  
+	
+Acredita-se que a língua quéchua se dissemina pela região dos Andes Centrais no Período Intermediário Tardio, sendo uma das três grandes línguas do período e fortemente utilizada pelo *Tawantinsuyu*, ou Império Inca. Entretanto, sua existência é anterior à organização deste e persiste após sua queda e o início do processo de colonização. Sua língua é, até os dias atuais, uma das principais línguas indígenas do continente sulamericano.  
+Os povos Quéchua, assim como outros povos da região dos Andes Centrais, organizam-se socialmente em *ayllus*, entidades sociais que envolvem o mundo humano e não-humano. Após a invasão espanhola e os séculos de conflitos, esses povos absorvem elementos da religião católica, também mantendo elementos de sua religiosidade como o culto aos *apus* (espíritos das montanhas) e à Mãe Terra, ou *Pachamama*, uma deidade tradicional da região. Sua cosmovisão, está expressa na *Pacha*, que significa em quéchua uma maneira de integralizar o espaço-tempo e a vida no cosmos, sem divisões como propõe a modernidade ocidental.
+
+No cenário atual, esses povos vivem ainda uma marginalização social e, em casos como a Argentina, um apagamento e não reconhecimento de sua existência e direitos. Na Bolívia e no Peru, a língua quéchua é reconhecida como oficial, sendo ensinada em escolas em algumas regiões de ambos os países. Além disso, na Bolívia está localizada a *Universidad Indígena Boliviana Quechua “Casimiro Huanca”*, que responde a necessidade de disponibilizar acesso a jovens quéchua que são marginalizados. Dessa forma, é configurado um espaço que permite a disseminação do conhecimento, para que os ensinamentos ancestrais dos povos quéchua se mantenha forte.
+
+Entretanto, o território e estilo de vida desses povos ainda é violado, como mostra o caso de vazamento de petróleo ocorrido no Peru ao final de 2024 que afetou 10 aldeias do povo Quéchua. Em outubro do ano passado, mais um crime ambiental cometido pela *PetroPerú*, companhia petrolífera estatal do Peru, acometeu diversas comunidades indígenas, dentre elas os Quéchua. Desde sua construção há 50 anos, esses povos são afetados pelas práticas criminosas da empresa, e desta vez com um novo vazamento que não foi contido a tempo, fluxos fluviais tiveram seu curso extremamente contaminado, transformando a dinâmica de sobrevivência dessas comunidades indígenas. O povo Quéchua, em conjunto com outras etnias, lutam a anos para que a estatal seja responsabilizada por todos os seus crimes, que de forma irreversível causam danos às estruturas e bases da fauna e da flora, essas duas que são a fonte motriz dos povos indígenas.   
+	  
+**Texto elaborado por Gabriel Constantino Pellegrino Biasoli e Victor de Carvalho Cunha**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/KdR_JhQVnsA?si=PC30_bUi9errkahU) [![Spotify](spotify.png)](https://open.spotify.com/episode/5AC692eXYwcvUavW73BiGI?si=EYQQHygRSZKECbdGVFGSvg&nd=1&dlsi=9f384184a8e3402d)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

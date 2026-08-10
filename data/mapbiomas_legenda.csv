@@ -1,0 +1,44 @@
+nome_en,nivel,nome_pt
+Agriculture,2,Agricultura
+Antropic,0,Antrópico
+Aquaculture,2,Aquicultura
+"Beach, Dune and Sand Spot",2,"Praia, Duna e Areal"
+Citrus,4,Citrus
+Coffee,4,Café
+Cotton,4,Algodão
+Farming,1,Agropecuária
+Floodable Forest,2,Floresta Alagável
+Forest,1,Floresta
+Forest Formation,2,Formação Florestal
+Forest Plantation,2,Silvicultura
+Grassland,2,Formação Campestre
+Herbaceous Sandbank Vegetation,2,Restinga Herbácea
+Hypersaline Tidal Flat,2,Apicum
+Mangrove,2,Mangue
+Mining,2,Mineração
+Mosaic of Uses,2,Mosaico de Usos
+Natural,0,Natural
+Natural/Antropic,0,Natural/Antrópico
+Non Forest Natural Formation,1,Formação Natural não Florestal
+Non vegetated area,1,Área não Vegetada
+Not Observed,1,Não Observado
+Other Perennial Crops,4,Outras Lavouras Perenes
+Other Temporary Crops,4,Outras Lavouras Temporárias
+Other non Forest Formations,2,Outras Formações não Florestais
+Other non Vegetated Areas,2,Outras Áreas não Vegetadas
+Palm Oil,4,Dendê
+Pasture,2,Pastagem
+Perennial Crop,3,Lavoura Perene
+Photovoltaic Project,2,Usina Fotovoltaica
+Rice,4,Arroz
+"River, Lake and Ocean",2,"Rio, Lago e Oceano"
+Rocky Outcrop,2,Afloramento Rochoso
+Savanna Formation,2,Formação Savânica
+Soybean,4,Soja
+Sugar cane,4,Cana
+Temporary Crop,3,Lavoura Temporária
+Undefined,0,Não Aplicável
+Urban Area,2,Área Urbana
+Water and Marine Environment,1,Corpo D'água
+Wetland,2,Campo Alagado e Área Pantanosa
+Wooded Sandbank Vegetation,2,Restinga Arbórea

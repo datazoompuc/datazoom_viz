@@ -12,525 +12,239 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
   server <- function(input, output, session) {
 
-    # Carrega dados
-    df <- readRDS(files$db_file)
+    # Carrega os dois recortes (transpostas) uma única vez.
+    dfs <- list(
+      pais_sec = readRDS(files$db_file_pais_sec), # group = país,  y = seção
+      sec_pais = readRDS(files$db_file_sec_pais)  # group = seção, y = país
+    )
 
-    #######
-    #Translating country names
-    if(param$lang){
-        
-        df <- df %>% 
-            mutate(group = case_when(group == 
-                                         "Afeganistão" ~ "Afghanistan", group ==
-                                         "África do Sul" ~ "South Africa", group ==
-                                         "Albânia" ~ "Albania", group ==
-                                         "Alemanha" ~ "Germany", group ==
-                                         "Andorra" ~ "Andorra", group ==
-                                         "Angola" ~ "Angola", group ==
-                                         "Anguilla" ~ "Anguilla", group ==
-                                         "Antígua e Barbuda" ~ "Antigua and Barbuda", group ==
-                                         "Antilhas Holandesas" ~ "Netherlands Antilles", group ==
-                                         "Arábia Saudita" ~ "Saudi Arabia", group ==
-                                         "Argélia" ~ "Algeria", group ==
-                                         "Argentina" ~ "Argentina", group ==
-                                         "Armênia" ~ "Armenia", group ==
-                                         "Aruba" ~ "Aruba", group ==
-                                         "Austrália" ~ "Australia", group ==
-                                         "Áustria" ~ "Austria", group ==
-                                         "Azerbaijão" ~ "Azerbaijan", group ==
-                                         "Bahamas" ~ "Bahamas", group ==
-                                         "Bahrein" ~ "Bahrain", group ==
-                                         "Bangladesh" ~ "Bangladesh", group ==
-                                         "Barbados" ~ "Barbados", group ==
-                                         "Belarus" ~ "Belarus", group ==
-                                         "Bélgica" ~ "Belgium", group ==
-                                         "Belize" ~ "Belize", group ==
-                                         "Benin" ~ "Benin", group ==
-                                         "Bermudas" ~ "Bermuda", group ==
-                                         "Bolívia" ~ "Bolivia", group ==
-                                         "Bonaires, Saint Eustatius e Saba" ~ "Bonaire, Saint Eustatius and Saba", group ==
-                                         "Bósnia-Herzegovina" ~ "Bosnia and Herzegovina", group ==
-                                         "Botsuana" ~ "Botswana", group ==
-                                         "Bouvet, Ilha" ~ "Bouvet Island", group ==
-                                         "Brasil" ~ "Brazil", group ==
-                                         "Brunei" ~ "Brunei", group ==
-                                         "Bulgária" ~ "Bulgaria", group ==
-                                         "Burkina Faso" ~ "Burkina Faso", group ==
-                                         "Cabo Verde" ~ "Cape Verde", group ==
-                                         "Camarões" ~ "Cameroon", group ==
-                                         "Camboja" ~ "Cambodia", group ==
-                                         "Canadá" ~ "Canada", group ==
-                                         "Canárias, group == Ilhas" ~ "Canary Islands", group ==
-                                         "Catar" ~ "Qatar", group ==
-                                         "Cayman, Ilhas" ~ "Cayman Islands", group ==
-                                         "Cazaquistão" ~ "Kazakhstan", group ==
-                                         "Chade" ~ "Chad", group ==
-                                         "Chile" ~ "Chile", group ==
-                                         "China" ~ "China", group ==
-                                         "Chipre" ~ "Cyprus", group ==
-                                         "Cingapura" ~ "Singapore", group ==
-                                         "Colômbia" ~ "Colombia", group ==
-                                         "Comores" ~ "Comoros", group ==
-                                         "Congo" ~ "Congo", group ==
-                                         "Cook, Ilhas" ~ "Cook Islands", group ==
-                                         "Coreia do Norte" ~ "North Korea", group ==
-                                         "Coreia do Sul" ~ "South Korea", group ==
-                                         "Costa do Marfim" ~ "Ivory Coast", group ==
-                                         "Costa Rica" ~ "Costa Rica", group ==
-                                         "Croácia" ~ "Croatia", group ==
-                                         "Cuba" ~ "Cuba", group ==
-                                         "Curaçao" ~ "Curaçao", group ==
-                                         "Dinamarca" ~ "Denmark", group ==
-                                         "Djibuti" ~ "Djibouti", group ==
-                                         "Dominica" ~ "Dominica", group ==
-                                         "Egito" ~ "Egypt", group ==
-                                         "El Salvador" ~ "El Salvador", group ==
-                                         "Emirados Árabes Unidos" ~ "United Arab Emirates", group ==
-                                         "Equador" ~ "Ecuador", group ==
-                                         "Eritreia" ~ "Eritrea", group ==
-                                         "Eslováquia" ~ "Slovakia", group ==
-                                         "Eslovênia" ~ "Slovenia", group ==
-                                         "Espanha" ~ "Spain", group ==
-                                         "Estados Unidos" ~ "United States", group ==
-                                         "Estônia" ~ "Estonia", group ==
-                                         "Etiópia" ~ "Ethiopia", group ==
-                                         "Falkland, Ilhas (Malvinas)" ~ "Falkland Islands (Malvinas)", group ==
-                                         "Faroé, Ilhas" ~ "Faroe Islands", group ==
-                                         "Fiji" ~ "Fiji", group ==
-                                         "Filipinas" ~ "Philippines", group ==
-                                         "Finlândia" ~ "Finland", group ==
-                                         "França" ~ "France", group ==
-                                         "Gabão" ~ "Gabon", group ==
-                                         "Gâmbia" ~ "Gambia", group ==
-                                         "Gana" ~ "Ghana", group ==
-                                         "Geórgia" ~ "Georgia", group ==
-                                         "Geórgia do Sul e Ilhas Sandwich do Sul" ~ "South Georgia and the South Sandwich Islands", group ==
-                                         "Gibraltar" ~ "Gibraltar", group ==
-                                         "Grécia" ~ "Greece", group ==
-                                         "Grenada" ~ "Grenada", group ==
-                                         "Groenlândia" ~ "Greenland", group ==
-                                         "Guadalupe" ~ "Guadeloupe", group ==
-                                         "Guam" ~ "Guam", group ==
-                                         "Guatemala" ~ "Guatemala", group ==
-                                         "Guiana" ~ "Guyana", group ==
-                                         "Guiana Francesa" ~ "French Guiana", group ==
-                                         "Guiné" ~ "Guinea", group ==
-                                         "Guiné Equatorial" ~ "Equatorial Guinea", group ==
-                                         "Guiné-Bissau" ~ "Guinea-Bissau", group ==
-                                         "Haiti" ~ "Haiti", group ==
-                                         "Holanda (Países Baixos)" ~ "Netherlands", group ==
-                                         "Honduras" ~ "Honduras", group ==
-                                         "Hong Kong" ~ "Hong Kong", group ==
-                                         "Hungria" ~ "Hungary", group ==
-                                         "Iêmen" ~ "Yemen", group ==
-                                         "Ilha Heard e Ilhas McDonald" ~ "Heard Island and McDonald Islands", group ==
-                                         "Ilhas Maldivas" ~ "Maldives", group ==
-                                         "Ilhas Marianas do Norte" ~ "Northern Mariana Islands", group ==
-                                         "Ilhas Marshall" ~ "Marshall Islands", group ==
-                                         "Ilhas Menores Distantes dos Estados Unidos" ~ "United States Minor Outlying Islands", group ==
-                                         "Ilhas Norfolk" ~ "Norfolk Island", group ==
-                                         "Ilhas Pitcairn" ~ "Pitcairn Islands", group ==
-                                         "Ilhas Salomão" ~ "Solomon Islands", group ==
-                                         "Ilhas Turcas e Caicos" ~ "Turks and Caicos Islands", group ==
-                                         "Ilhas Virgens, Britânicas" ~ "British Virgin Islands", group ==
-                                         "Ilhas Virgens, EUA" ~ "United States Virgin Islands", group ==
-                                         "Ilhas Wallis e Futuna" ~ "Wallis and Futuna", group ==
-                                         "Índia" ~ "India", group ==
-                                         "Indonésia" ~ "Indonesia", group ==
-                                         "Irã" ~ "Iran", group ==
-                                         "Iraque" ~ "Iraq", group ==
-                                         "Irlanda" ~ "Ireland", group ==
-                                         "Islândia" ~ "Iceland", group ==
-                                         "Israel" ~ "Israel", group ==
-                                         "Itália" ~ "Italy", group ==
-                                         "Jamaica" ~ "Jamaica", group ==
-                                         "Japão" ~ "Japan", group ==
-                                         "Jersey" ~ "Jersey", group ==
-                                         "Jordânia" ~ "Jordan", group ==
-                                         "Kiribati" ~ "Kiribati", group ==
-                                         "Kuwait" ~ "Kuwait", group ==
-                                         "Laos" ~ "Laos", group ==
-                                         "Lesoto" ~ "Lesotho", group ==
-                                         "Letônia" ~ "Latvia", group ==
-                                         "Líbano" ~ "Lebanon", group ==
-                                         "Libéria" ~ "Liberia", group ==
-                                         "Líbia" ~ "Libya", group ==
-                                         "Liechtenstein" ~ "Liechtenstein", group ==
-                                         "Lituânia" ~ "Lithuania", group ==
-                                         "Luxemburgo" ~ "Luxembourg", group ==
-                                         "Macau" ~ "Macau", group ==
-                                         "Macedônia" ~ "Macedonia", group ==
-                                         "Madagascar" ~ "Madagascar", group ==
-                                         "Malásia" ~ "Malaysia", group ==
-                                         "Malawi" ~ "Malawi", group ==
-                                         "Mali" ~ "Mali", group ==
-                                         "Malta" ~ "Malta", group ==
-                                         "Marrocos" ~ "Morocco", group ==
-                                         "Martinica" ~ "Martinique", group ==
-                                         "Maurício" ~ "Mauritius", group ==
-                                         "Mauritânia" ~ "Mauritania", group ==
-                                         "Mayotte" ~ "Mayotte", group ==
-                                         "México" ~ "Mexico", group ==
-                                         "Micronésia" ~ "Micronesia", group ==
-                                         "Moçambique" ~ "Mozambique", group ==
-                                         "Moldávia" ~ "Moldova", group ==
-                                         "Mônaco" ~ "Monaco", group ==
-                                         "Mongólia" ~ "Mongolia", group ==
-                                         "Montenegro" ~ "Montenegro", group ==
-                                         "Montserrat" ~ "Montserrat", group ==
-                                         "Myanmar" ~ "Myanmar", group ==
-                                         "Namíbia" ~ "Namibia", group ==
-                                         "Nauru" ~ "Nauru", group ==
-                                         "Nepal" ~ "Nepal", group ==
-                                         "Nicarágua" ~ "Nicaragua", group ==
-                                         "Níger" ~ "Niger", group ==
-                                         "Nigéria" ~ "Nigeria", group ==
-                                         "Niue" ~ "Niue", group ==
-                                         "Noruega" ~ "Norway", group ==
-                                         "Nova Caledônia" ~ "New Caledonia", group ==
-                                         "Nova Zelândia" ~ "New Zealand", group ==
-                                         "Omã" ~ "Oman", group ==
-                                         "Palau" ~ "Palau", group ==
-                                         "Palestina" ~ "Palestine", group ==
-                                         "Panamá" ~ "Panama", group ==
-                                         "Papua-Nova Guiné" ~ "Papua New Guinea", group ==
-                                         "Paquistão" ~ "Pakistan", group ==
-                                         "Paraguai" ~ "Paraguay", group ==
-                                         "Peru" ~ "Peru", group ==
-                                         "Polinésia Francesa" ~ "French Polynesia", group ==
-                                         "Polônia" ~ "Poland", group ==
-                                         "Porto Rico" ~ "Puerto Rico", group ==
-                                         "Portugal" ~ "Portugal", group ==
-                                         "Quênia" ~ "Kenya", group ==
-                                         "Reino Unido" ~ "United Kingdom", group ==
-                                         "República Centro-Africana" ~ "Central African Republic", group ==
-                                         "República Dominicana" ~ "Dominican Republic", group ==
-                                         "República Tcheca" ~ "Czech Republic", group ==
-                                         "Reunião" ~ "Réunion", group ==
-                                         "Romênia" ~ "Romania", group ==
-                                         "Ruanda" ~ "Rwanda", group ==
-                                         "Rússia" ~ "Russia", group ==
-                                         "Saara Ocidental" ~ "Western Sahara", group ==
-                                         "Samoa" ~ "Samoa", group ==
-                                         "Samoa Americana" ~ "American Samoa", group ==
-                                         "Santa Helena" ~ "Saint Helena", group ==
-                                         "Santa Lúcia" ~ "Saint Lucia", group ==
-                                         "Santa Sé (Cidade-Estado do Vaticano)" ~ "Vatican City", group ==
-                                         "São Bartolomeu" ~ "Saint Barthélemy", group ==
-                                         "São Cristóvão e Neves" ~ "Saint Kitts and Nevis", group ==
-                                         "São Martinho (França)" ~ "Saint Martin (French part)", group ==
-                                         "São Martinho (Países Baixos)" ~ "Sint Maarten (Dutch part)", group ==
-                                         "São Tomé e Príncipe" ~ "Sao Tome and Principe", group ==
-                                         "São Vicente e Granadinas" ~ "Saint Vincent and the Grenadines", group ==
-                                         "Senegal" ~ "Senegal", group ==
-                                         "Serra Leoa" ~ "Sierra Leone", group ==
-                                         "Sérvia" ~ "Serbia", group ==
-                                         "Seychelles" ~ "Seychelles", group ==
-                                         "Síria" ~ "Syria", group ==
-                                         "Somália" ~ "Somalia", group ==
-                                         "Sri Lanka" ~ "Sri Lanka", group ==
-                                         "Suazilândia" ~ "Eswatini", group ==
-                                         "Sudão" ~ "Sudan", group ==
-                                         "Suécia" ~ "Sweden", group ==
-                                         "Suíça" ~ "Switzerland", group ==
-                                         "Suriname" ~ "Suriname", group ==
-                                         "Svalbard e Jan Mayen" ~ "Svalbard and Jan Mayen", group ==
-                                         "Tadjiquistão" ~ "Tajikistan", group ==
-                                         "Tailândia" ~ "Thailand", group ==
-                                         "Taiwan" ~ "Taiwan", group ==
-                                         "Tanzânia" ~ "Tanzania", group ==
-                                         "Terras Austrais e Antárticas Francesas" ~ "French Southern Territories", group ==
-                                         "Território Britânico do Oceano Índico" ~ "British Indian Ocean Territory", group ==
-                                         "Timor-Leste" ~ "Timor-Leste", group ==
-                                         "Togo" ~ "Togo", group ==
-                                         "Tokelau" ~ "Tokelau", group ==
-                                         "Tonga" ~ "Tonga", group ==
-                                         "Trinidad e Tobago" ~ "Trinidad and Tobago", group ==
-                                         "Tunísia" ~ "Tunisia", group ==
-                                         "Turquemenistão" ~ "Turkmenistan", group ==
-                                         "Turquia" ~ "Turkey", group ==
-                                         "Tuvalu" ~ "Tuvalu", group ==
-                                         "Ucrânia" ~ "Ukraine", group ==
-                                         "Uganda" ~ "Uganda", group ==
-                                         "Uruguai" ~ "Uruguay", group ==
-                                         "Uzbequistão" ~ "Uzbekistan", group ==
-                                         "Vanuatu" ~ "Vanuatu", group ==
-                                         "Venezuela" ~ "Venezuela", group ==
-                                         "Vietnã" ~ "Vietnam", group ==
-                                         "Zâmbia" ~ "Zambia", group ==
-                                         "Zimbábue" ~ "Zimbabwe"))
-        
-        
-    }
-    
-    # Cria opções para seleção de grupos
-    param$filter_choices <- sort(unique(df$group))
-    param$filter_choices <- param$filter_choices[which(param$filter_choices != " - ")]
+    # Estado: idioma, orientação e seleções persistentes
+    q0 <- parseQueryString(isolate(session$clientData$url_search))
 
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = sample(param$filter_choices, 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
-      )
+    lang <- reactiveVal(if (identical(q0[["lang"]], "en")) "en" else "pt")
+    observeEvent(input$toggle_lang, { lang(ifelse(lang() == "pt", "en", "pt")) })
 
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
-      updateSelectInput(session,
-        "y",
-        choices = param$y_choices,
-        selected = selected
-      )
-    }
+    mode <- reactiveVal(if (identical(q0[["mode"]], "sec_pais")) "sec_pais" else "pais_sec")
+    observeEvent(input$swap, {
+      mode(if (mode() == "pais_sec") "sec_pais" else "pais_sec")
+    })
 
-    # Função para atualizar url do app com parâmetros dos inputs
-    update_my_queryString <- function() {
-      q_string <- paste0(
-        "?", "y=", input$y,
-        "&", "ylog=", input$ylog,
-        "&", "y_option=", input$y_option
-      )
+    # Seleções mantidas entre transposições e idiomas (sempre em PT; seção em nome completo)
+    init_countries <- if (!is.null(q0[["country"]])) unname(unlist(q0[names(q0) == "country"])) else param$defaults$countries
+    init_sections  <- if (!is.null(q0[["section"]])) unname(unlist(q0[names(q0) == "section"])) else param$defaults$sections
+    kept_countries <- reactiveVal(init_countries)
+    kept_sections  <- reactiveVal(init_sections)
 
-      for (i in input$filter1) {
-        q_string <- paste0(
-          q_string,
-          "&", "filter=", i
-        )
-      }
+    i18n <- reactive({ param$i18n[[lang()]] })
 
-
-      updateQueryString(q_string, mode = "replace")
-    }
-
-    # Função para atualizar inputs a partir da URL
-    update_my_inputs <- function() {
-      # Preenche filtro vazio
-      updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = NULL
-      )
-
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-
-      if (!is.null(query[["y"]])) {
-        updateSelectInput(session, "y",
-          choices = param$y_choices,
-          selected = query[["y"]]
-        )
-      }
-
-      if (!is.null(query[["ylog"]])) {
-        updateCheckboxInput(session, "ylog",
-          value = (query[["ylog"]] == "TRUE")
-        )
-      }
-
-      if (!is.null(query[["y_option"]])) {
-        updateCheckboxInput(session, "y_option",
-          value = (query[["y_option"]] == "TRUE")
-        )
-      }
-
-      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-      if (!is.null(query[["filter"]])) {
-        updateSelectInput(session,
-          "filter1",
-          choices = param$filter_choices,
-          selected = selected
-        )
-      }
-
-      # Se query está vazia, preenche aleatório
-      if (is.null(query[["filter"]]) && is.null(query[["y"]])) {
-        random_inputs() # preenche inputs se estiverem vazios
-      }
-    }
-
-    # Output titulo do gráfico
-    output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
-        text <- " "
+    # Traduz valores `group` (PT) para o idioma ativo, com fallback ao próprio valor
+    display_label <- function(values, m, l) {
+      if (l == "en") {
+        map <- param$filter_labels_en[[m]]
+        out <- unname(map[values])
+        ifelse(is.na(out), values, out)
       } else {
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
+        values
+      }
+    }
 
-        text <- paste0("", y_col$label)
-        if (input$y_option) {
-          text <- paste0("", y_col$label, "*")
-        }
+    # Configuração do recorte ativo
+    cfg <- reactive({
+      m <- mode(); l <- lang()
+      list(m = m, df = dfs[[m]], table = param$tables[[m]][[l]])
+    })
+
+    # Textos reativos da sidebar
+    output$plot_desc       <- renderText({ i18n()$plot_desc })
+    output$label_var_name  <- renderText({ i18n()$label_var_name })
+    output$label_scale_name<- renderText({ i18n()$label_scale_name })
+    output$label_prop_name <- renderText({ i18n()$label_prop_name })
+    output$label_swap      <- renderText({ i18n()$label_swap })
+    output$btn_fullscreen  <- renderText({ i18n()$btn_fullscreen })
+    output$role_y <- renderText({
+      paste0(i18n()$role_y_prefix, i18n()[[mode()]]$dim_y)
+    })
+    output$role_lines <- renderText({
+      paste0(i18n()$role_lines_prefix, i18n()[[mode()]]$dim_lines)
+    })
+    observeEvent(lang(), {
+      updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
+    }, ignoreInit = FALSE)
+
+    # Remonta choices/seleção de y e filtro quando orientação ou idioma mudam
+    # Mantém as seleções (kept_*) e reordena as choices alfabeticamente no idioma ativo.
+    observeEvent(list(mode(), lang()), {
+      m <- mode(); l <- lang()
+      labs <- i18n()[[m]]
+      tbl  <- cfg()$table
+
+      # Choices do eixo y (ordenadas pelo label do idioma ativo)
+      ytab <- tbl[which(tbl$y), ]
+      ytab <- ytab[order(ytab$label), ]
+      y_choices <- append("", grouped_list(ytab))
+
+      # Choices do filtro (valores em PT, labels traduzidos, ordenados pelo label)
+      pts  <- setdiff(unique(cfg()$df$group), " - ")
+      pts  <- pts[!is.na(pts)]
+      disp <- display_label(pts, m, l)
+      ord  <- order(disp)
+      f_choices <- setNames(pts[ord], disp[ord])
+
+      # Seleção atual a partir do estado mantido
+      if (m == "pais_sec") {
+        y_sel <- if (length(kept_sections())) kept_sections()[1] else NULL
+        f_sel <- kept_countries()
+      } else {
+        y_sel <- if (length(kept_countries())) kept_countries()[1] else NULL
+        f_sel <- kept_sections()
       }
 
-      text
+      updateSelectInput(session, "y",
+        label = labs$label_y, choices = y_choices, selected = y_sel
+      )
+      updateSelectizeInput(session, "filter1",
+        label = labs$label_filter, choices = f_choices, selected = f_sel
+      )
+    }, ignoreInit = FALSE)
+
+    # Captura edições do usuário no estado mantido (ignoreNULL evita apagar em transições)
+    observeEvent(input$y, {
+      if (input$y == "") return()
+      if (mode() == "pais_sec") {
+        kept_sections(unique(c(input$y, kept_sections())))
+      } else {
+        kept_countries(unique(c(input$y, kept_countries())))
+      }
+    }, ignoreInit = TRUE)
+
+    observeEvent(input$filter1, {
+      if (mode() == "pais_sec") {
+        kept_countries(input$filter1)
+      } else {
+        kept_sections(input$filter1)
+      }
+    }, ignoreInit = TRUE)
+
+    # Atualiza a URL (compartilhável: idioma, orientação e seleções)
+    update_my_queryString <- function() {
+      q <- paste0("?lang=", lang(), "&mode=", mode())
+      for (c in kept_countries()) q <- paste0(q, "&country=", utils::URLencode(c, reserved = TRUE))
+      for (s in kept_sections())  q <- paste0(q, "&section=", utils::URLencode(s, reserved = TRUE))
+      updateQueryString(q, mode = "replace")
+    }
+
+    # Título / subtítulo
+    output$plot_title <- renderText({
+      if (is.null(input$y) || input$y == "") return(" ")
+      tbl <- cfg()$table
+      y_col <- tbl[which(tbl$var == input$y), ]
+      txt <- paste0("", y_col$label)
+      if (isTRUE(input$y_option)) txt <- paste0(txt, "*")
+      txt
     })
     output$plot_subtitle <- renderText({
-      # Se algum campo estiver vazio retorna texto vazio
-      if (is.null(input$y) || input$y == "") {
-        text <- " "
-      } else {
-        text <- paste0("",param$currency,"")
-      }
-
-      text
+      if (is.null(input$y) || input$y == "") " " else paste0("", i18n()$currency, "")
     })
 
-    # Output gráfico
+    # Gráfico
     output$plot <- renderPlotly({
-      update_my_queryString() # atualiza url com parametros dos inputs
+      update_my_queryString()
 
-      fig <- plotly_empty() # inicia figura com gráfico em branco
+      fig <- plotly_empty()
       tryCatch(
         {
-          # Se algum campo estiver vazio retorna gráfico vazio
+          act <- cfg()
+          df  <- act$df
+          tbl <- act$table
+
           if (is.null(input$y) || input$y == "" ||
             is.null(input$filter1) || length(input$filter1) < 1) {
             fig <- plotly_empty()
             stop()
           }
 
-          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          # Cria dataframe do gráfico
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
+          x_col <- tbl[which(tbl$var == param$x_def), ]
+          y_col <- tbl[which(tbl$var == input$y), ]
 
-          # Filtra dataframe com grupos selecionados
           df_filtered <- df[which(df$group %in% input$filter1), ]
-
           df_p <- data.frame(
-            df_filtered[x_col$var],
-            df_filtered[y_col$var],
-            df_filtered[color_col$var]
+            x = df_filtered[[x_col$var]],
+            y = df_filtered[[input$y]],
+            group = df_filtered$group
           )
-          colnames(df_p) <- c("x", "y", "color")
-          df_p$group <- df_filtered$group
-          df_p$text <- df_p$group
+          df_p$text <- display_label(df_p$group, act$m, lang())
+          # Legenda enxuta (nomes de seção são longos); tooltip mantém o nome completo
+          leg_max <- 40
+          df_p$legend <- ifelse(
+            nchar(df_p$text) > leg_max,
+            paste0(substr(df_p$text, 1, leg_max - 1), "…"),
+            df_p$text
+          )
 
-          # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
-
-          # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
             stop()
           }
 
-          # Alternativa de medida para y
-          if (input$y_option & is.numeric(df_p$y)) {
+          if (isTRUE(input$y_option) & is.numeric(df_p$y)) {
             df_p <- df_p %>%
-              group_by(df_p$group) %>%
-              mutate(
-                aux1 = first(y),
-                y_option = (y / aux1) * 100
-              )
+              group_by(group) %>%
+              arrange(x) %>%
+              mutate(aux1 = first(y), y_option = (y / aux1) * 100) %>%
+              ungroup()
             df_p$y <- df_p$y_option
           }
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
-          if (all(is.na(df_p$color))) {
-            df_p$color <- " "
-          }
+          measurement <- if (isTRUE(input$y_option)) "" else i18n()$measurement
 
-          # Monta html do tooltip
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", param$measurement, format(df_p$y, scientific = FALSE,
-                                                         digits = 2,
-                                                         decimal.mark = ",", 
-                                                         big.mark = "."), "<br>"
+            y_col$label, ": ", measurement, format(df_p$y,
+              scientific = FALSE, digits = 2,
+              decimal.mark = ",", big.mark = "."
+            ),
+            "<extra></extra>"
           )
 
-          # Define paleta de cores
-          pallete <- pallete_discrete
-
-          # Monta gráfico
           fig_p <- plot_ly(df_p,
-            x = ~x,
-            y = ~y,
-            color = ~group,
-            type = "scatter",
-            mode = "lines",
-            text = ~tooltip,
-            hovertemplate = ~tooltip
+            x = ~x, y = ~y, color = ~legend,
+            type = "scatter", mode = "lines",
+            text = ~tooltip, hovertemplate = ~tooltip
           )
 
-          # Layout eixos
           x_axis_layout <- list(
-            title = x_col$label,
-            titlefont = f1,
-            tickfont = f2,
-            automargin = FALSE,
-            autorange = TRUE,
-            showgrid = FALSE,
-            zeroline = FALSE
+            title = x_col$label, titlefont = f1, tickfont = f2,
+            automargin = FALSE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE
           )
           y_axis_layout <- list(
-            title = y_col$label,
-            titlefont = f1,
-            tickfont = f2,
-            automargin = FALSE,
-            autorange = TRUE,
-            showgrid = FALSE,
-            zeroline = FALSE
+            title = y_col$label, titlefont = f1, tickfont = f2,
+            automargin = FALSE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE
           )
+          if (isTRUE(input$ylog) & is.numeric(df_p$y)) y_axis_layout$type <- "log"
+          if (isTRUE(input$y_option)) y_axis_layout$title <- paste0(y_col$label, "*")
 
-          if (input$ylog & is.numeric(df_p$y)) {
-            y_axis_layout$type <- "log"
-          }
+          tooltip <- list(bordercolor = "rgba(255, 255, 255, 1)", bgopacity = "0.5", font = f1, align = "left")
 
-          if (input$y_option) {
-            y_axis_layout$title <- paste0(y_col$label, "*")
-          }
-
-          # Layout hover/tooltip
-          tooltip <- list(
-            bordercolor = "rgba(255, 255, 255, 1)",
-            bgopacity = "0.5",
-            font = f1
-          )
-
-          # Aplica layout
           fig_p <- fig_p %>%
             layout(
-              font = f1,
-              xaxis = x_axis_layout,
-              yaxis = y_axis_layout,
-              showlegend = TRUE
-            )
-
-          #  Configura botões do plotly
-          fig_p <- fig_p %>%
+              font = f1, xaxis = x_axis_layout, yaxis = y_axis_layout,
+              showlegend = TRUE, hoverlabel = tooltip
+            ) %>%
             config(
-              # toImageButtonOptions = list(format = "svg"),
               displaylogo = FALSE,
-              modeBarButtonsToRemove = c(
-                "lasso2d",
-                "select2d",
-                "hoverCompareCartesian"
-              )
+              modeBarButtonsToRemove = c("lasso2d", "select2d", "hoverCompareCartesian")
             )
 
-          fig <- fig_p # retorna a figura do gráfico
+          fig <- fig_p
         },
         error = function(cond) {
-          # se encontrar erro retorna fig em branco
           print("plot error")
           fig <- plotly_empty()
         }
       )
       fig
-    })
-
-    # Observa eventos
-    observe({
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
-      update_my_inputs()
     })
   }
 

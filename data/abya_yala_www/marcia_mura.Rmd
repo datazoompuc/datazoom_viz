@@ -1,0 +1,32 @@
+---
+title: "Marcia Mura"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Marcia Mura, também conhecida como Tanãmak — nome que significa "grande guerreira", atribuído por Namatuyky e mediado pelo Pandé (pajé) no território Mura Itaparanã —, é uma intelectual indígena cuja trajetória articula educação, literatura, política e cultura. Graduada em História, com mestrado em Sociedade e Cultura na Amazônia pela Universidade Federal do Amazonas (UFAM) e doutorado pela Universidade de São Paulo (USP), a pesquisadora é originária de Porto Velho (RO). Sua atuação junto a comunidades ribeirinhas foca no processo de recuperação da memória do Povo Mura e de outras etnias. Integra, ainda, o movimento Wayrakuna e o Mulherio das Letras Indígenas.
+
+## Povo Mura
+
+Historicamente resilientes, os Mura mantiveram o domínio dos complexos hídricos dos rios Madeira, Solimões e Purus entre os séculos XVIII e XIX, resistindo às incursões coloniais. Atualmente, essa presença se manifesta em mais de 40 Terras Indígenas no Amazonas, em distintas etapas de regularização fundiária. Esse vigor territorial é indissociável de uma identidade singular: o povo ressignificou o termo "caboclo", apropriando-se dele para afirmar sua legitimidade e integrar as redes de parentesco com nordestinos, peruanos e outros grupos que compuseram a etnia ao longo do tempo.
+
+No âmbito cultural e linguístico, os Mura vivenciaram uma transição do idioma originário para o Nheengatu e, posteriormente, para o português. Apesar das sobreposições linguísticas impostas pelo contato histórico, o grupo preserva suas raízes e promove, hoje, um processo de retomada linguística. Essa iniciativa visa valorizar a cultura ancestral e robustecer a identidade Mura diante das transformações contemporâneas, assegurando que a memória de seu tronco linguístico específico — a família Mura — permaneça viva para as futuras gerações.
+
+**Texto elaborado por**: Julia Paula do Nascimento de Moraes
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+[![YouTube](youtube.png)](https://youtu.be/3ad3ZgHJZyg) [![Spotify](spotify.png)](https://open.spotify.com/episode/2vl87iYV9HCIXUlrP5WUXH)
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```
