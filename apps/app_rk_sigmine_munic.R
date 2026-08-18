@@ -40,7 +40,7 @@ param$i18n <- list(
         server0 = "Vari\u00E1vel n\u00E3o selecionada",
         server1 = "Ranking municipal de \u00E1rea de minera\u00E7\u00E3o ativa \u2014 ",
         server2 = "\u00C1rea em m\u00B2 por munic\u00EDpio",
-        plot_desc = "Transi\u00E7\u00E3o/mudan\u00E7a de cobertura e uso do solo",
+        plot_desc = "Ranking municipal de \u00E1rea de minera\u00E7\u00E3o ativa, por tipo de min\u00E9rio",
         btn_lang = "English",
         btn_fullscreen = "Fullscreen"
     ),
@@ -51,7 +51,7 @@ param$i18n <- list(
         server0 = "Variable not selected",
         server1 = "Municipal ranking of active mining area \u2014 ",
         server2 = "Area in m\u00B2 by municipality",
-        plot_desc = "Transition/change of cover and use of land",  # CORRIGIDO: texto exato do app antigo
+        plot_desc = "Municipal ranking of active mining area, by mineral type",
         btn_lang = "Português",
         btn_fullscreen = "Fullscreen"
     )
