@@ -32,7 +32,7 @@ Entretanto, o território e estilo de vida desses povos ainda é violado, como m
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/KdR_JhQVnsA?si=PC30_bUi9errkahU) [![Spotify](spotify.png)](https://open.spotify.com/episode/5AC692eXYwcvUavW73BiGI?si=EYQQHygRSZKECbdGVFGSvg&nd=1&dlsi=9f384184a8e3402d)
+<a href="https://youtu.be/KdR_JhQVnsA?si=PC30_bUi9errkahU" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/5AC692eXYwcvUavW73BiGI?si=EYQQHygRSZKECbdGVFGSvg&nd=1&dlsi=9f384184a8e3402d" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

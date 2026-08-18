@@ -33,7 +33,7 @@ Por fim, o depoimento de Ivanilson Xokó é elucidativo quanto à memória colet
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://www.youtube.com/watch?v=l5PVFhzh8xo) [![Spotify](spotify.png)](https://open.spotify.com/episode/6mNfkfi0Tjvcu4Gd9uWBnU)
+<a href="https://www.youtube.com/watch?v=l5PVFhzh8xo" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/6mNfkfi0Tjvcu4Gd9uWBnU" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

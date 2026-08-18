@@ -30,7 +30,7 @@ A identidade mapuche é, portanto, algo que se construiu historicamente contra o
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/gxqOJJ0yPyg?si=kRPuzCJQXv9tDyNS) [![Spotify](spotify.png)](https://open.spotify.com/episode/7AzNpkZkqF0LqxWAhuY5uD?si=PBdn1l_-RQC1JYOuK5QZCg&nd=1&dlsi=d421a987f1574478)
+<a href="https://youtu.be/gxqOJJ0yPyg?si=kRPuzCJQXv9tDyNS" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/7AzNpkZkqF0LqxWAhuY5uD?si=PBdn1l_-RQC1JYOuK5QZCg&nd=1&dlsi=d421a987f1574478" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

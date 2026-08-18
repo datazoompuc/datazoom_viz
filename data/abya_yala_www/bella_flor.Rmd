@@ -29,7 +29,7 @@ A ideia de que a existência humana é cíclica está presente no famoso calend�
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/VImZwdvEakE?si=KyTB-MEKJH8qPBc5) [![Spotify](spotify.png)](https://open.spotify.com/episode/1O8fran26yIbW184PMBsqD?si=7a71178a81e446a4&nd=1&dlsi=4c83df4b52824cfe)
+<a href="https://youtu.be/VImZwdvEakE?si=KyTB-MEKJH8qPBc5" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/1O8fran26yIbW184PMBsqD?si=7a71178a81e446a4&nd=1&dlsi=4c83df4b52824cfe" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 
