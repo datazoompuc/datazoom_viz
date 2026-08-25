@@ -19,11 +19,11 @@ library(datazoom.social)
 #github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # PNAD files must be downloaded to the computer
-source <- "F:/PNADC/load_pnadc DZ"
+source <- "data-raw/pnadc_raw"
 
 # only run this if not already downloaded: takes a long time
 # não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
-load_pnadc(save_to = source, 2012:2025, raw_data = FALSE, panel = "none")
+load_pnadc(save_to = source, 2012:2026, raw_data = FALSE, panel = "none")
 
 # and then all files must be read
 
@@ -332,11 +332,11 @@ dat %<>% mutate(across(where(is.character), enc2utf8))
 
 # saving data file
 
-readr::write_rds(dat, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds", compress = "gz")
+readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
 
 ## Data in English
 
-dat <- readr::read_rds("ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds")
+dat <- readr::read_rds("data/ibge_pnadc_trabalho.rds")
 
 # 1. Dicionário de tradução com os caracteres exatamente como aparecem na sua base
 traducao <- c(
@@ -377,7 +377,7 @@ dat_traduzido <- dat %>%
     mutate(across(c(group, composicao_demografica, sexo, faixa_idade, faixa_educ, regiao, legal_amazon),
                   ~ recode(., !!!traducao)))
 
-readr::write_rds(dat_traduzido, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_en.rds", compress = "gz")
+readr::write_rds(dat_traduzido, "data/ibge_pnadc_trabalho_en.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##
@@ -477,7 +477,7 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-write.csv(temp_param_table, file = "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
 
 ############################
 ## Dictionary -- Insercao ##
