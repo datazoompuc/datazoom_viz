@@ -21,7 +21,48 @@ library(datazoom.social)
 # PNAD files must be downloaded to the computer
 source <- "data-raw/pnadc_raw"
 
-load_pnadc(save_to = source, 2012:2026, raw_data = FALSE, panel = "none")
+dir.create(source, recursive = TRUE, showWarnings = FALSE)
+
+for (y in 2012:2026) {
+    for (q in 1:4) {
+        if (y == 2026 && q > 2) next # Only download up to 2026 Q2
+        
+        file_name <- sprintf("pnadc_%d_%d.rds", y, q)
+        file_path <- file.path(source, file_name)
+        
+        if (file.exists(file_path)) {
+            message(sprintf("Skipping already downloaded: %d Q%d", y, q))
+            next
+        }
+        
+        success <- FALSE
+        attempt <- 1
+        while (!success && attempt <= 5) {
+            message(sprintf("Downloading %d Q%d (Attempt %d/5)...", y, q, attempt))
+            res <- tryCatch({
+                options(timeout = 1800) # 30 minutes timeout
+                load_pnadc(save_to = source, years = y, quarters = q, raw_data = FALSE, panel = "none")
+                TRUE
+            }, error = function(e) {
+                message(sprintf("Error downloading %d Q%d: %s", y, q, e$message))
+                FALSE
+            })
+            if (res && file.exists(file_path)) {
+                success <- TRUE
+                gc() # Clean up memory (RAM)
+            } else {
+                attempt <- attempt + 1
+                if (attempt <= 5) {
+                    message("Waiting 20 seconds before retrying...")
+                    Sys.sleep(20)
+                }
+            }
+        }
+        if (!success) {
+            stop(sprintf("Failed to download %d Q%d after 5 attempts.", y, q))
+        }
+    }
+}
 
 # and then all files must be read
 
