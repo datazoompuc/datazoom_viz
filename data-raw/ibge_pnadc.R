@@ -19,50 +19,11 @@ library(datazoom.social)
 #github_folder_path <- "https://github.com/datazoompuc/datazoom_labour_amazon/raw/main/Labour_Market/output/" # set github structure path
 
 # PNAD files must be downloaded to the computer
-source <- "data-raw/pnadc_raw"
+source <- "F:/PNADC/load_pnadc DZ"
 
-dir.create(source, recursive = TRUE, showWarnings = FALSE)
-
-for (y in 2012:2026) {
-    for (q in 1:4) {
-        if (y == 2026 && q > 2) next # Only download up to 2026 Q2
-        
-        file_name <- sprintf("pnadc_%d_%d.rds", y, q)
-        file_path <- file.path(source, file_name)
-        
-        if (file.exists(file_path)) {
-            message(sprintf("Skipping already downloaded: %d Q%d", y, q))
-            next
-        }
-        
-        success <- FALSE
-        attempt <- 1
-        while (!success && attempt <= 5) {
-            message(sprintf("Downloading %d Q%d (Attempt %d/5)...", y, q, attempt))
-            res <- tryCatch({
-                options(timeout = 1800) # 30 minutes timeout
-                load_pnadc(save_to = source, years = y, quarters = q, raw_data = FALSE, panel = "none")
-                TRUE
-            }, error = function(e) {
-                message(sprintf("Error downloading %d Q%d: %s", y, q, e$message))
-                FALSE
-            })
-            if (res && file.exists(file_path)) {
-                success <- TRUE
-                gc() # Clean up memory (RAM)
-            } else {
-                attempt <- attempt + 1
-                if (attempt <= 5) {
-                    message("Waiting 20 seconds before retrying...")
-                    Sys.sleep(20)
-                }
-            }
-        }
-        if (!success) {
-            stop(sprintf("Failed to download %d Q%d after 5 attempts.", y, q))
-        }
-    }
-}
+# only run this if not already downloaded: takes a long time
+# não precisa baixar tudo de uma vez, só ter os .rds de cada trimestre
+load_pnadc(save_to = source, 2012:2025, raw_data = FALSE, panel = "none")
 
 # and then all files must be read
 
@@ -371,11 +332,11 @@ dat %<>% mutate(across(where(is.character), enc2utf8))
 
 # saving data file
 
-readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
+readr::write_rds(dat, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds", compress = "gz")
 
 ## Data in English
 
-dat <- readr::read_rds("data/ibge_pnadc_trabalho.rds")
+dat <- readr::read_rds("ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds")
 
 # 1. Dicionário de tradução com os caracteres exatamente como aparecem na sua base
 traducao <- c(
@@ -416,7 +377,7 @@ dat_traduzido <- dat %>%
     mutate(across(c(group, composicao_demografica, sexo, faixa_idade, faixa_educ, regiao, legal_amazon),
                   ~ recode(., !!!traducao)))
 
-readr::write_rds(dat_traduzido, "data/ibge_pnadc_trabalho_en.rds", compress = "gz")
+readr::write_rds(dat_traduzido, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_en.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##
@@ -516,7 +477,7 @@ temp_param_table <- temp_param_table %>%
         )
     )
 
-write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
+write.csv(temp_param_table, file = "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho_dic_en.csv", fileEncoding = "UTF-8")
 
 ############################
 ## Dictionary -- Insercao ##
