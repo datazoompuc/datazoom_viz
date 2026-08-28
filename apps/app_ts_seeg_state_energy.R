@@ -1,60 +1,83 @@
-# Carrega bibliotecas
 library(shiny)
 library(ggplot2)
 library(plotly)
 library(htmlwidgets)
+library(shinyWidgets)
+library(shinycssloaders)
+library(dplyr)
 
-# Define nome de arquivos a serem carregados
 files <- list()
 files$ui_script <- "../scripts/ts_seeg_state_energy/ui.R"
 files$server_script <- "../scripts/ts_seeg_state_energy/server.R"
 files$param_script <- "../scripts/ts_seeg_state_energy/db_params.R"
-
 files$CSS_script <- "../global/dza_lumen.css"
-
-files$param_file <- "../data/seeg_state_energy_dic.csv"
+files$param_file_pt <- "../data/seeg_state_energy_dic.csv"
+files$param_file_en <- "../data/seeg_state_energy_dic_en.csv"
 files$db_file <- "../data/seeg_state_energy.rds"
 
-# Carrega scripts
 source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
-# Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
+param_pt <- get_db_param(files$param_file_pt, files$db_file)
+param_en <- get_db_param(files$param_file_en, files$db_file)
 
-param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "time" # variável padrão do eixo x
-param$y_def <- "" # variável padrão do eixo y
-param$color_def <- "time" # variável padrão de cor
-param$slider_def <- "time" # variável padrão do slider
-param$text_def <- "group" # variável padrão de texto
-param$id_def <- "group" # variável padrão de id
+param        <- param_pt
+param$tables <- list(pt = param_pt$table, en = param_en$table)
 
+param$x_def <- "time"
+param$y_def <- ""
+param$color_def <- "time"
+param$slider_def <- "time"
+param$text_def <- "group"
+param$id_def <- "group"
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Emissões de Gases Estufa no Setor de Energia ao nível estadual"
-param$plot_y <- "Emissões"
 
-### Parametros especificos no UI
-param$label_var_name <- "VARIÁVEIS:"
-param$label_y_name <- "eixo vertical (y)"
-param$label_log_name <- "escala log"
-param$label_prop_name <-  "proporcional ao ano inicial (*)"
-param$label_geo_name <- "Subdivisão geográfica"
+# Tradução das categorias de processo (aplicada em runtime, não no dado bruto)
+param$categoria_traducao <- c(
+    "Agropecuario" = "Farming",
+    "Comercial" = "Commercial",
+    "Industrial" = "Industrial",
+    "Geracao de Eletricidade (Servico Publico)" = "Electricity Generation (Public Service)",
+    "Transportes" = "Transports",
+    "Publico" = "Public"
+)
+
+param$i18n <- list(
+    pt = list(
+        plot_desc      = "Emiss\u00F5es de Gases Estufa no Setor de Energia ao n\u00EDvel estadual",
+        plot_y         = "Emiss\u00F5es",
+        label_var_name = "VARI\u00C1VEIS:",
+        label_y_name   = "eixo vertical (y)",
+        label_log_name = "escala log",
+        label_prop_name = "proporcional ao ano inicial (*)",
+        label_geo_name = "Subdivis\u00E3o geogr\u00E1fica",
+        subtitle_init  = "por Estado",
+        title_init     = "Emiss\u00F5es Totais advindas de ",
+        tooltip_a      = "Emiss\u00F5es",
+        tooltip_c      = "Toneladas",
+        btn_lang       = "English",
+        btn_fullscreen = "Fullscreen"
+    ),
+    en = list(
+        plot_desc      = "Greenhouse Gas Emissions in the Energy Sector at State Level",
+        plot_y         = "Emissions",
+        label_var_name = "VARIABLES:",
+        label_y_name   = "vertical axis (y)",
+        label_log_name = "log scale",
+        label_prop_name = "proportional to the initial year (*)",
+        label_geo_name = "State",
+        subtitle_init  = "by State",
+        title_init     = "Total emissions from ",
+        tooltip_a      = "Emissions",
+        tooltip_c      = "Tons",
+        btn_lang       = "Português",
+        btn_fullscreen = "Fullscreen"
+    )
+)
+
 param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_energy/"
 
-### Parametros especificos no server
-param$subtitle_init <- "por Estado" # expressão subtitulo
-param$title_init <- "Emissões Totais advindas de "
-param$tooltip_a <- "Emissões"
-param$tooltip_b <-  "Unidade de medida: <b>"
-param$tooltip_c <- "Toneladas"
-param$lang = FALSE
-
-# Outros parâmetros e configurações
-
-
-#  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
 server <- get_server(files, param)
-
 shinyApp(ui = ui, server = server)
