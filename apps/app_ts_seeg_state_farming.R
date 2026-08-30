@@ -1,105 +1,107 @@
-#  -------------------------------- Define UI --------------------------------
-get_ui <- function(files, param) {
-    div(
-        includeCSS(files$CSS_script),
-        class = "container-fluid h-100 d-flex flex-column apppanel",
-        
-        tags$style(HTML(".switch-label { color: white; }")),
-        
-        fluidRow(
-            class = "mainrow h-100",
-            column(3,
-                   class = "menucol",
-                   
-                   tags$style('.menucol {
-                             background-color: #41878C;
-              }',),
-                   
-                   tags$style('.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
-                          background-color: #40768B !important;
-                          border-color: #40768B !important;
-              }',),
-                   
-                   h2(class = "plot_name", param$plot_name),
-                   uiOutput("plot_desc_ui"),
-                   hr(),
-                   p(class = "vars", textOutput("label_var_name", inline = TRUE)),
-                   
-                   div(
-                       class = "var_selec_group",
-                       selectInput(
-                           inputId = "y",
-                           label = param$label_y_name,
-                           choices = param$y_choices,
-                           width = "100%"
-                       )
-                   ),
-                   
-                   div(
-                       style = "margin-top: 10px;",
-                       materialSwitch(
-                           inputId = "ylog",
-                           label   = tags$span(textOutput("label_log_name", inline = TRUE), class = "switch-label"),
-                           value   = FALSE,
-                           status  = "info"
-                       )
-                   ),
-                   div(
-                       style = "margin-top: 10px;",
-                       materialSwitch(
-                           inputId = "y_option",
-                           label   = tags$span(textOutput("label_prop_name", inline = TRUE), class = "switch-label"),
-                           value   = FALSE,
-                           status  = "info"
-                       )
-                   ),
-                   
-                   selectInput(
-                       "filter1",
-                       textOutput("label_geo_name", inline = TRUE),
-                       choices = NULL,
-                       width = "100%"
-                   ),
-                   
-                   div(class = "fakecheckbox", ),
-                   
-                   div(
-                       actionButton(
-                           inputId = "toggle_lang",
-                           label   = "English",
-                           icon    = icon("globe"),
-                           class   = "btn-primary"
-                       )
-                   ),
-                   div(style = "height: 6px;"),
-                   
-                   div(
-                       shiny::actionButton(inputId = "ab1", label = "Fullscreen",
-                                           icon = icon("expand"),
-                                           class = "btn-primary",
-                                           onclick = paste0("window.open('", param$link, "', '_blank')"))
-                   ),
-            ),
-            column(9,
-                   class = "plotcol h-100",
-                   textOutput("plot_title"),
-                   textOutput("plot_subtitle"),
-                   div(
-                       class = "plotrow row justify-content-center flex-grow-1 w-100",
-                       div(
-                           class = "plotdiv w-100 h-100",
-                           style = "position: relative; display: flex; flex-direction: column;",
-                           div(
-                               style = "flex-grow: 1; position: relative;",
-                               withSpinner(
-                                   plotlyOutput("plot", width = "100%", height = "calc(100vh - 150px)"),
-                                   type  = 4,
-                                   color = "#41878C"
-                               )
-                           )
-                       )
-                   )
-            )
-        ),
+library(shiny)
+library(ggplot2)
+library(plotly)
+library(htmlwidgets)
+library(shinyWidgets)
+library(shinycssloaders)
+library(dplyr)
+
+files <- list()
+files$ui_script <- "../scripts/ts_seeg_state_farming/ui.R"
+files$server_script <- "../scripts/ts_seeg_state_farming/server.R"
+files$param_script <- "../scripts/ts_seeg_state_farming/db_params.R"
+files$CSS_script <- "../global/dza_lumen.css"
+files$param_file_pt <- "../data/seeg_state_farming_dic.csv"
+files$param_file_en <- "../data/seeg_state_farming_dic_en.csv"
+files$db_file <- "../data/seeg_state_farming.rds"
+
+source(files$param_script)
+source(files$ui_script)
+source(files$server_script)
+
+param_pt <- get_db_param(files$param_file_pt, files$db_file)
+param_en <- get_db_param(files$param_file_en, files$db_file)
+
+param        <- param_pt
+param$tables <- list(pt = param_pt$table, en = param_en$table)
+
+param$x_def <- "time"
+param$y_def <- ""
+param$color_def <- "time"
+param$slider_def <- "time"
+param$text_def <- "group"
+param$id_def <- "group"
+param$plot_name <- "Data Zoom Amazônia"
+
+# Tradução das categorias de "emissores" (aplicada em runtime, não no dado bruto)
+param$categoria_traducao <- c(
+    "Arroz" = "Rice",
+    "Asinino" = "Donkey",
+    "Bubalino" = "Water Buffalo",
+    "Caprino" = "Goat",
+    "Equino" = "Horse",
+    "Gado de Corte" = "Beef Cattle",
+    "Gado de Leite" = "Dairy Cattle",
+    "Muar" = "Mule",
+    "Ovino" = "Sheep",
+    "Suinos" = "Pigs",
+    "Aves" = "Poultry",
+    "Algodao" = "Cotton",
+    "Cana-de-acucar" = "Sugarcane",
+    "Torta de Filtro" = "Filter Cake",
+    "Vinhaca" = "Vinasse",
+    "Fertilizantes Sinteticos" = "Synthetic Fertilizers",
+    "Solos" = "Soils",
+    "Aplicacao de Ureia" = "Urea Application",
+    "Uso de Calcario" = "Limestone Use",
+    "Feijao" = "Beans",
+    "Mandioca" = "Cassava",
+    "Milho" = "Corn",
+    "Outras culturas" = "Other Crops",
+    "Pastagem" = "Pasture",
+    "Soja" = "Soybean",
+    "Trigo" = "Wheat",
+    "Pastagem Degradada" = "Degraded Pasture",
+    "Pastagem Bem Manejada" = "Well-managed Pasture",
+    "Florestas Plantadas" = "Planted Forests",
+    "Sistemas Integrados Lavoura-Pecuaria-Floresta" = "Integrated Crop-Livestock-Forest Systems"
+)
+
+param$i18n <- list(
+    pt = list(
+        plot_desc      = "Emiss\u00F5es de Gases Estufa na Agropecu\u00E1ria ao n\u00EDvel estadual",
+        plot_y         = "Emiss\u00F5es",
+        label_var_name = "VARI\u00C1VEIS:",
+        label_y_name   = "eixo vertical (y)",
+        label_log_name = "escala log",
+        label_prop_name = "proporcional ao ano inicial (*)",
+        label_geo_name = "Subdivis\u00E3o geogr\u00E1fica",
+        subtitle_init  = "por Estado",
+        title_init     = "Emiss\u00F5es Totais advindas de ",
+        tooltip_a      = "Emiss\u00F5es",
+        tooltip_c      = "Toneladas",
+        btn_lang       = "English",
+        btn_fullscreen = "Fullscreen"
+    ),
+    en = list(
+        plot_desc      = "Greenhouse Gas Emissions in Farming at State Level",
+        plot_y         = "Emissions",
+        label_var_name = "VARIABLES:",
+        label_y_name   = "vertical axis (y)",
+        label_log_name = "log scale",
+        label_prop_name = "proportional to the initial year (*)",
+        label_geo_name = "State",
+        subtitle_init  = "by State",
+        title_init     = "Total emissions from ",
+        tooltip_a      = "Emissions",
+        tooltip_c      = "Tons",
+        btn_lang       = "Português",
+        btn_fullscreen = "Fullscreen"
     )
-}
+)
+
+param$link <- "https://datazoom.shinyapps.io/app_ts_seeg_state_farming/"
+
+ui <- get_ui(files, param)
+server <- get_server(files, param)
+shinyApp(ui = ui, server = server)
