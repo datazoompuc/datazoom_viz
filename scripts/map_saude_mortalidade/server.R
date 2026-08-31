@@ -6,20 +6,52 @@ pallete_continuous <- c("#440154", "#481567", "#453781", "#404788", "#39568c", "
 pallete_discrete <- rev(pallete_discrete)
 pallete_continuous <- rev(pallete_continuous)
 
-# Fontes
-
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
 
   # Carrega dados
   df <- readRDS(files$db_file) %>% st_transform(crs = "+init=epsg:4326")
 
-  server <- function(input, output, session) {
-    df_reactived <- reactive({
-      w <- df %>%
-        filter(ano == input$filter1)
+  # Monta as opções (agrupadas) do seletor de variável para o idioma informado
+  x_choices_lang <- function(l) {
+    tbl <- param$tables[[l]]
+    choices <- append("", grouped_list(tbl[which(tbl$x), ]))
+    choices[[1]] <- NULL
+    choices
+  }
 
-      return(w)
+  server <- function(input, output, session) {
+
+    # --- LANG TOGGLE ---
+    lang <- reactiveVal("pt")
+
+    observeEvent(input$toggle_lang, {
+      lang(ifelse(lang() == "pt", "en", "pt"))
+    })
+
+    i18n <- reactive({ param$i18n[[lang()]] })
+    tbl  <- reactive({ param$tables[[lang()]] })
+
+    # Renderiza textos dinâmicos da sidebar
+    output$plot_name_ui   <- renderUI({ h2(class = "plot_name", i18n()$plot_name) })
+    output$plot_desc_ui   <- renderUI({ p(class = "plot_desc", i18n()$plot_desc) })
+    output$label_var_name <- renderText({ i18n()$label_var_name })
+
+    # Atualiza inputs e botões quando o idioma muda
+    observeEvent(lang(), {
+      updateSelectInput(session, "x",
+        label    = i18n()$label_x_name,
+        choices  = x_choices_lang(lang()),
+        selected = isolate(input$x)
+      )
+      updateSliderInput(session, "filter1", label = i18n()$label_year)
+      updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
+      updateActionButton(session, "ab1", label = i18n()$btn_fullscreen)
+    }, ignoreInit = FALSE)
+
+    df_reactived <- reactive({
+      req(input$filter1)
+      df %>% filter(ano == input$filter1)
     })
 
     # Cria opções para seleção de datas
@@ -27,10 +59,10 @@ get_server <- function(files, param) {
 
     # Funcão para preencher inputs com coluna/variável aleatória
     random_inputs <- function() {
-      selected <- "t_total"
+      selected <- param$x_def
       updateSelectInput(session,
         "x",
-        choices = param$x_choices,
+        choices = x_choices_lang(isolate(lang())),
         selected = selected
       )
     }
@@ -38,7 +70,8 @@ get_server <- function(files, param) {
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "x=", input$x,
+        "?", "lang=", lang(),
+        "&", "x=", input$x,
         "&", "filter=", input$filter1
       )
 
@@ -47,110 +80,103 @@ get_server <- function(files, param) {
 
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
-      # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
+
+      # Idioma via deep-link (ex: ?lang=en)
+      if (!is.null(query[["lang"]]) && query[["lang"]] %in% c("pt", "en")) {
+        lang(query[["lang"]])
+      }
 
       # Preenche filtro vazio
       if (!is.null(query[["x"]])) {
-        # se tem x na url atribui valor ao selecinput x
         updateSelectInput(session, "x",
-          choices = param$x_choices,
+          choices = x_choices_lang(isolate(lang())),
           selected = query[["x"]]
         )
       }
 
-      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-      updateSelectizeInput(session,
-        "filter1",
-        choices = param$filter_choices,
-        selected = selected
-      )
-
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
+      if (!is.null(query[["filter"]])) {
+        updateSliderInput(session, "filter1", value = as.numeric(query[["filter"]]))
+      }
 
       # Se query está vazia, preenche aleatório
       if (is.null(query[["filter"]]) && is.null(query[["x"]])) {
-        random_inputs() # preenche inputs se estiverem vazios
+        random_inputs()
       }
     }
 
     # Output título do gráfico
     output$plot_title <- renderText({
-      text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x) || input$x == "") {
-        text <- " "
-      } else {
-        # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
-        text <- param$label_title
+        return(" ")
       }
-
-      text
+      i18n()$label_title
     })
+
     output$plot_subtitle <- renderText({
-      # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$x) || input$x == "") {
-        text <- "Nenhuma variável selecionada"
-      } else {
-        # Monta título a partir de variáveis selecionadas nos inputs
-        x_col <- param$table[which(param$table$var == input$x), ]
-        text <- paste0(param$label_selected_variable, x_col$label)
+        return(i18n()$subtitle_empty)
       }
-
-      text
+      x_col <- tbl()[which(tbl()$var == input$x), ]
+      paste0(i18n()$label_selected_variable, x_col$label)
     })
 
-    # Output gráfico
+    # Inicialização do Mapa Leaflet
     output$map <- renderLeaflet({
+      leaflet() %>%
+        addProviderTiles(provider = "Esri.WorldGrayCanvas") %>%
+        setView(-58, -7, zoom = 5) %>%
+        addPolylines(data = readr::read_rds(files$states_boundary), color = "grey", weight = 1, group = "boundaries") %>%
+        addPolylines(data = readr::read_rds(files$legal_amazon), color = "black", weight = 2, group = "boundaries")
+    })
 
-      # random_inputs() #preenche inputs se estiverem vazios
-      update_my_queryString() # atualiza url com parametros dos inputs
-
-      fig <- leaflet() %>%
-        addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
-        setView(-58, -7, zoom = 5) # inicia figura com gráfico em branco
-
+    # Observer para atualizar o mapa de forma incremental e ultra-rápida via leafletProxy
+    observe({
+      req(input$x, input$filter1, lang())
+      
+      df_sub <- df_reactived()
+      var_name <- input$x
+      
       # Define paleta de cores
       pal1 <- pallete_continuous
-      if (!is.numeric(df_reactived()[[input$x]])) {
+      if (!is.numeric(df_sub[[var_name]])) {
         pal1 <- pallete_discrete
       }
 
       # Determina a paleta para as legendas
-      pal <- colorBin(palette = pal1, 9, domain = df[[input$x]])
+      pal <- colorBin(palette = pal1, 9, domain = df[[var_name]])
 
       tryCatch(
         {
-          
-          # Monta mapa
-
           # Monta html do tooltip
-          x_col <- param$table[which(param$table$var == input$x), ]
-          title_legend <- paste0("", x_col$label)
+          x_col <- tbl()[which(tbl()$var == var_name), ]
+          title_legend <- ifelse(is.na(x_col$unidade) | x_col$unidade == "", x_col$label, paste0(x_col$label, " (", x_col$unidade, ")"))
           labels <- paste0(
-            param$label_munic_name, df_reactived()$nm_municip, "</b> <br>",
-            param$label_state_name, df_reactived()$uf, "</b> <br>",
-            x_col$label, ": <b>", format(df_reactived()[[input$x]], 
+            i18n()$label_munic_name, df_sub$nm_municip, "</b> <br>",
+            i18n()$label_state_name, df_sub$uf, "</b> <br>",
+            x_col$label, ": <b>", trimws(format(round(df_sub[[var_name]], 2), 
                                          scientific = FALSE,
-                                         digits = 2,
                                          decimal.mark = ",", 
-                                         big.mark = "."), "</b> <br>",
-            param$label_measurement_unit, x_col$unidade, "</b>"
+                                         big.mark = ".")), "</b>",
+            ifelse(is.na(x_col$unidade) | x_col$unidade == "", "", paste0(" <br>", i18n()$label_measurement_unit, x_col$unidade, "</b>"))
           ) %>%
             lapply(htmltools::HTML)
 
-          fig_p <- df_reactived() %>% 
-            leaflet() %>%
-            addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
-            setView(-58, -7, zoom = 5) %>%
+          # Atualiza a URL (efeito colateral)
+          update_my_queryString()
+
+          # Atualiza o mapa incrementalmente
+          leafletProxy("map", data = df_sub) %>%
+            clearControls() %>%
+            clearGroup("boundaries") %>%
             addPolygons(
               label = labels,
+              layerId = ~cod_ibge,
               stroke = FALSE,
               smoothFactor = .5,
-              fillOpacity = 0.7,
-              fillColor = ~ pal(df_reactived()[[input$x]]),
+              fillOpacity = ifelse(is.na(df_sub[[var_name]]), 1, 0.8),
+              fillColor = ~ pal(df_sub[[var_name]]),
+              group = "municipalities",
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -159,26 +185,45 @@ get_server <- function(files, param) {
                 bringToFront = TRUE
               )
             ) %>%
+            addPolylines(data = readr::read_rds(files$states_boundary), color = "grey", weight = 1, group = "boundaries") %>%
+            addPolylines(data = readr::read_rds(files$legal_amazon), color = "black", weight = 2, group = "boundaries") %>%
             addLegend("bottomright",
               pal = pal,
-              values = ~ df_reactived()[[input$x]],
+              values = ~ df_sub[[var_name]],
               title = title_legend,
-              opacity = 0.7
-            )
-
-          fig <- fig_p # retorna a figura do gráfico
+              opacity = 0.8
+            ) %>%
+            # Garante que os tooltips não fiquem presos nas novas camadas
+            htmlwidgets::onRender("
+              function(el, x) {
+                var map = this;
+                var openLayer = null;
+                map.eachLayer(function(layer) {
+                  if (layer.getTooltip && layer.getTooltip()) {
+                    layer.on('mouseover', function(e) {
+                      if (openLayer && openLayer !== layer) {
+                        openLayer.closeTooltip();
+                      }
+                      openLayer = layer;
+                    });
+                    layer.on('mouseout', function(e) {
+                      if (openLayer === layer) {
+                        openLayer = null;
+                      }
+                    });
+                  }
+                });
+              }
+            ")
         },
         error = function(cond) {
-          # se encontrar erro retorna fig em branco
-          print("Plot error in tryCatch environment")
+          print(paste("Plot error:", cond))
         }
       )
-      fig
     })
 
     # Observa eventos
     observe({
-      # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
       update_my_inputs()
     })
