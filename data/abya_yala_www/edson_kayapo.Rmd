@@ -1,0 +1,30 @@
+---
+title: "Edson Kayapó"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Edson Kayapó, nascido no estado do Amapá, pertence ao povo Mebêngôkre. Ativista do movimento indígena e de movimentos ambientalistas, é historiador graduado na Universidade Federal de Minas Gerais (UFMG), com pós-graduação na Universidade Federal do Amapá em História e Historiografia da Amazônia. É mestre em História Social pela Pontifícia Universidade Católica de São Paulo (EHPS/PUC-SP), doutor em História, Política, Sociedade pela mesma instituição, membro do Programa de Pós-graduação em Ensino e Relações Étnico-Raciais na Universidade Federal do Sul da Bahia. Atualmente, é professor efetivo do Instituto Federal da Bahia (IFBA), palestrante e escritor premiado.
+
+## Povo Mebêngôkre
+
+O povo Mebêngôkre, “aquele de origem do olho d’água”, foi chamado de Kayapó pelos grupos indígenas rivais como forma de inferiorização. Kayapó é uma palavra oriunda da língua tupi que significa “parecidos com macacos”. O grupo vem de uma origem guerreira, com uma parte localizada próxima aos afluentes do rio Xingu que abarca o território do Pará até o Mato Grosso. Atualmente, o povo Mebêngôkre possui umas das maiores terras indígenas demarcadas no Brasil, sendo cercada por muitos rios, que são alvos de atividades ilegais de garimpo. Além disso, essas comunidades preferem viver mais afastadas e manter relações com as comunidades locais. 
+
+**Texto elaborado por Fernando Antonio Martins Ribeiro e Lorena dos Santos Campos**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+<a href="https://youtu.be/6QSBwBRyjaU?si=AIQbpSlvVXgdFMnQ" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/6dvx3Mj6vjCySABSR0fpsI?si=-M0pGsIXRp62YsI2m2NYBA" target="_blank"><img src="spotify.png" alt="Spotify"></a>
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

@@ -1,0 +1,60 @@
+---
+title: "Caminhos de Abya Yala"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+Caminhos de Abya Yala é um Projeto de Extensão, vinculado ao [Laboratório de Pesquisa e Práticas de Ensino em História (LPPE)](https://lppe.uerj.br), do Instituto de Filosofia e Ciências Humanas da Universidade do Estado do Rio de Janeiro (IFCH-UERJ).
+
+O projeto busca, a partir de entrevistas com um grupo diverso de intelectuais indígenas, questionar as formas como o continente americano e, especialmente, os povos indígenas, têm sido retratados na chamada história "universal".  
+
+Caminhos de Abya Yala pretende tornar visíveis as ideias, lutas, histórias e propostas epistêmicas dos povos indígenas das Américas, assim como construir pontes entre a academia e o pensamento indígena, fomentando a comunicação entre os modos de existência e as práticas de conhecimento presentes nos mundos indígenas e ocidental.
+
+<section>
+    <h1>Coordenação do projeto</h1>
+    <p>Alessandra Gonzalez de Carvalho Seixlack</p>
+  </section>
+
+<section>
+<h2>Equipe</h2>
+<div style="column-count: 3; column-gap: 30px;">
+Alejandro Rámku Maulen Leal  
+Alicia Bastos  
+Ana Clara Dutra  
+Angeli Roberti  
+Bernardo Barreto  
+Bruno Azambuja  
+Claudia Costa  
+Danielle Freire  
+Dimitre de Brito Balby dos Santos  
+Ellen Lima Wassu  
+Enrique Antileo Baeza  
+Fernando Ribeiro  
+Flaviano Isolan  
+Gabriel Constantino Pellegrino Biasoli  
+Guilherme Haniel de Almeida e Silva  
+Jacqueline Ventapane  
+Jamille Oliveira  
+Julia Paula de Moraes  
+Lorena dos Santos Campos  
+Luciana Estefania Quispe  
+Marcones Portela Pereira  
+Marcos Gabriel Pita da Costa  
+Michelle Reis de Macedo  
+Miguel da Silva Leal Neto  
+Natalia Caniguan  
+Paulo Neto  
+Rafael Xucuru-Kariri
+</div>
+</section>
+
+  <section>
+    <h2>Parceria</h2>
+    <p><a href = "https://lppe.uerj.br" target="_blank">LPPE</a> e Projeto Prodocência UERJ <a href = "https://www.descolonizandoconhecimentouerj.com/in%C3%ADcio/caminhos-de-abya-yala" target="_blank">Descolonizando o Conhecimento</a></p>
+    <p> Mapa interativo produzido em parceria com o projeto <a href="https://datazoomamazonia.com.br/" target="_blank"> Data Zoom Amazônia </a> </p>
+  </section>
+  
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```  

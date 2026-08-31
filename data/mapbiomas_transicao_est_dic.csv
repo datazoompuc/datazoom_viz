@@ -1,7 +1,4 @@
-"","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","time",TRUE,FALSE,FALSE,TRUE,TRUE,"Intervalo de tempo","Intervalo de tempo","Mapbiomas",1,"m<sup>2</sup>","Meio ambiente","Uso da terra"
-"2","group",TRUE,FALSE,TRUE,FALSE,FALSE,"Estado","Estado","Mapbiomas",1,"m<sup>2</sup>","Meio ambiente","Uso da terra"
-"3","class_id_to",TRUE,FALSE,FALSE,FALSE,FALSE,"class_id_to","class_id_to","Mapbiomas",1,"m<sup>2</sup>","Meio ambiente","Uso da terra"
-"4","to",TRUE,FALSE,FALSE,FALSE,FALSE,"Transição de","Transição de","Mapbiomas",1,"m<sup>2</sup>","Meio ambiente","Uso da terra"
-"5","from",TRUE,FALSE,FALSE,FALSE,FALSE,"Transição para","Transição para","Mapbiomas",1,"m<sup>2</sup>","Meio ambiente","Uso da terra"
-"6","value",TRUE,TRUE,FALSE,FALSE,FALSE,"value","value","Mapbiomas",1,"m<sup>2</sup>","Meio ambiente","Uso da terra"
+var,x,y,color,size,slider,label,desc,var_group,tipo,unidade,categoria,subcategoria
+time,TRUE,FALSE,FALSE,FALSE,TRUE,Intervalo,Intervalo,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+group,FALSE,FALSE,TRUE,FALSE,FALSE,Grupo,Grupo,Mapbiomas,1,ha,Meio ambiente,Uso da terra
+value,FALSE,TRUE,FALSE,FALSE,FALSE,Área transicionada,Área transicionada,Mapbiomas,1,ha,Meio ambiente,Uso da terra

@@ -21,26 +21,33 @@ get_ui <- function(files, param) {
                         border-color: #3E5688 !important;
               }',),
         
-        h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        uiOutput("plot_name_ui"),
+        uiOutput("plot_desc_ui"),
         hr(),
-        p(class = "vars", param$label_variable),
+        uiOutput("label_variable_ui"),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
           selectInput(
             inputId = "x",
-            label = param$label_x_choice_rk,
-            choices = param$x_choices,
-            selected = param$x_def,
+            label = param$i18n$pt$label_x_choice_rk,
+            choices = NULL,
+            selected = NULL,
             width = "100%"
           )
         ),
         
         # espaço vazio
         div(class = "fakecheckbox", ),
+        actionButton(
+          inputId = "toggle_lang",
+          label = param$i18n$pt$btn_lang,
+          icon = icon("globe"),
+          class = "btn-primary"
+        ),
+        div(style = "height: 6px;"),
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
+          shiny::actionButton(inputId = 'ab1', label = param$i18n$pt$btn_fullscreen, 
                               icon = icon("expand"), 
                               class = "btn-primary",
                               onclick = paste0("window.open('", param$link, "', '_blank')"))

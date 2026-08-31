@@ -1,0 +1,39 @@
+---
+title: "Natalia Caniguan Velarde"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Natalia Caniguan Velarde é antropóloga social, mestra pela Universidad de la Frontera, doutoranda pela Universidad de Buenos Aires e presidenta do Colegio de Antropólogos de Chile. Nascida na cidade de Santiago, ela pertence à etnia mapuche, se define como extremamente urbana, identifica-se como champurria (mestiça, de pai indígena e mãe não-indígena) e é marxista. 
+
+Ela desafia o senso comum que imagina uma identidade mapuche estanque, presa a uma tipificação durkheimiana, segundo a qual sociedades consideradas “simples” são mais homogêneas, com menor divisão do trabalho social. Natalia nega essa premissa, pois, se se espera uma diversidade entre sociedades de maioria branca, por que não se esperaria também entre indígenas? Natalia nega refuta a noção de que intelectuais indígenas devem se ater obrigatoriamente a temáticas consideradas “indígenas”. No início de sua trajetória intelectual, essa convicção a fez não se interessar muito pela temática dos mapuche, o que mudou após ela terminar a graduação e ir morar na zona sul do Chile, em território mapuche. 
+
+Hoje, seus interesses são políticas de reconhecimento e práticas de estado e interculturalidade, tendo estudado questões de identidade, etnia, antropologia da educação, povo mapuche e empoderamento. Ela também desenvolveu pesquisas sobre práticas culturais, como os têxteis e o canto mapuche.  
+   
+## Povo Mapuche
+
+O etnônimo Mapuche é fruto de um longo processo que se consolida no século XVIII. Em mapudungun – o idioma do povo mapuche – mapu significa terra, e che significa gente, o que denota uma estreita ligação com a ideia de território. Tal ideia não deve ser tomada, entretanto, como um pedaço de terra delimitado espacialmente conformando uma unidade nacional como os ocidentais; a ideia mapuche de território entrelaça o que conhecemos como cultura e natureza, e sua identidade antecede os processos de independência da América Latina. O Wallmapu (em mapudungum, território circundante ao país mapuche) conforma sua porção leste (o Puel Mapu) e porção oeste (Gulu Mapu), dos dois lados da Cordilheira dos Andes, e hoje é sobreposto pelas unidades nacionais de Argentina e Chile. Mas nem sempre foi assim.  
+No período pré-colonial, sua organização sociopolítica era dispersa e descentralizada, tendo a guerra um importante papel na reprodução das estruturas de poder e na formação desses grupos. Mas identidades e etnias sofrem transformações: são elementos históricos. Tendo isso em consideração, e o fato de que os mapuche foram submetidos em conjunto a certos elementos – como a vizinhança com os Inca e os espanhóis, cada qual a seu modo buscando submetê-los – o antropólogo Guillaume Boccara postula que os mapuche constituem uma identidade de fronteira. Isso é, a relação com o externo seria importante na construção da identidade mapuche; o próprio contato com os espanhóis provocou diferentes reações entre os indígenas, com alguns preferindo aliarem-se aos espanhóis contra os criollos nos processos de Independência Nacional do Chile. Tal contato ainda propiciou a ascensão da pecuária como atividade econômica predominante, bem como processos de concentração de poder dentro das comunidades indígenas através dos Parlamentos. Entretanto, seria mais justo falar em identidades mapuche, posto que não só elementos exógenos, mas também endógenos contribuem para diferenças internas, como a própria variedade de pisos ecológicos compartilhados em grande extensão territorial.
+
+Hoje, a situação dos povos mapuche no Gulu Mapu é preocupante: possuem somente 5,5% do seu território originário, e empresas florestais monopolizam mais de 70% dos lucros gerados pelas exportações na região da Araucania. Relações estabelecidas há tempos são desrespeitadas, como os limites territoriais estabelecidos no nunca revogado Parlamento de Tapihue (1825) – que estabeleceu relações entre o recém-formado Estado nacional chileno independente e os povos mapuche, ratificando a fronteira do território mapuche ao sul do Rio Bío Bío, limite já acordado entre os mapuche e a coroa espanhola em parlamentos anteriores. Contra tal estado de coisas, os Mapuche têm se organizado de distintos modos. Entre as principais reivindicações de seus movimentos está a autonomia, autodeterminação e a construção do Wallmapu. Os movimentos mapuche são variados, segundo o historiador Fernando Pairicán, e é possível dividi-los entre os que buscam alcançar seus objetivos através de uma via gradualista – que prevê como tática a ocupação de espaços dentro da institucionalidade do Estado –, e uma via rupturista – que nega a ocupação e acordos com o Estado nacional chileno como uma tática válida ou efetiva.
+
+A identidade mapuche é, portanto, algo que se construiu historicamente contra os projetos de Estado ocidentais que, se de certo modo centralizaram as representações políticas mapuche através dos Parlamentos, delimitando seus espaços e modos de interação endógena e exógena, também tornaram a identidade mapuche mais fluida na medida em que a expulsão das terras os levou a viver nas cidades.
+
+**Texto elaborado por Fernando Antonio Martins Ribeiro**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+<a href="https://youtu.be/gxqOJJ0yPyg?si=kRPuzCJQXv9tDyNS" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/7AzNpkZkqF0LqxWAhuY5uD?si=PBdn1l_-RQC1JYOuK5QZCg&nd=1&dlsi=d421a987f1574478" target="_blank"><img src="spotify.png" alt="Spotify"></a>
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

@@ -1,0 +1,39 @@
+---
+title: "Omeasoo Wahpasiw"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, echo = FALSE, results = "asis"}
+cat(paste0(
+  '<div style="text-align:center;"><img src="',
+  sub("\\.Rmd$", ".png", knitr::current_input()),
+  '" style="max-height:200px; width:auto; object-fit:contain;"></div>'
+))
+```
+
+Omeasoo Wahpasiw é professora de Estudos Indígenas na Universidade de Carleton. Historiadora, é Mestra pela Universidade de Ottawa e Doutora pela Universidade de Saskatchewan, com a tese: "Habitação, arquitetura e territórios domésticos Tla'amin no século XX: espaços invisíveis moldando a educação indígena histórica". Foi coautora da "Apresentação da Comissão de Mulheres da Federação das Nações Indígenas Soberanas à Investigação Nacional sobre Mulheres e Meninas Indígenas Desaparecidas e Assassinadas e Pessoas 2SLGBTQQIA". Nascida na província de Saskatchewan, Omeasoo cresceu na cidade de Saskatoon, e hoje vive em território Algonquin não cedido. Filha da poetisa Louise Halfe e de um homem branco não-indígena, Omeasoo cresceu entre o território Nehiyaw de sua mãe e a cidade de Saskatoon; por essa vivência entre-mundos, refere-se a si mesma como uma "aborígena urbana".
+
+## Povo Cree/Nehiyaw
+
+O termo Cree origina-se de uma corruptela francesa de Kinistino, nome pelo qual os Ojibwe se referiam aos povos indígenas localizados nos arredores da Baía de James, no território hoje sobreposto pela unidade nacional do Canadá. Um termo mais adequado para se referir a estes povos, na língua cree das pradarias, é *nêhiyawak*, ou *nehiyaw*.
+
+Entretanto, os povos nativos que reivindicam esta identidade compartilhada não se limitam ao território da Baía de James: são atualmente o povo indígena mais populoso do Canadá, com 223.745 pessoas de acordo com o censo de 2021. Encontram-se distribuídos em diferentes pisos ecológicos, como nas regiões subárticas entre as províncias de Alberta e Quebec, bem como nas regiões das pradarias em Alberta e Saskatchewan.
+
+Tais diferenças também se refletem em variações dialetais da língua: a mencionada língua *cree* das pradarias, que é a mais difundida; a das florestas e a dos pântanos. Apesar de tais variações, os *nehiyaw* são unidos por práticas culturais e pela memória da experiência compartilhada do colonialismo.
+
+**Texto elaborado por Fernando Antonio Martins Ribeiro**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+
+::: {.icons}
+<a href="https://youtu.be/FPxaGfg0fwM" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/3Qj9nMrGNqVWwnHdkHJQV7" target="_blank"><img src="spotify.png" alt="Spotify"></a>
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

@@ -1,0 +1,36 @@
+---
+title: "Lisa Henrito"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".png", knitr::current_input()))
+```
+
+Lisa Henrito é "capitana" da aldeia Maurak, do povo Pemón, localizada na Venezuela, em Santa Elena de Uairén. Nasceu na comunidade Paruima, localizada na República Cooperativa da Guiana. É ativista pelos direitos às terras indígenas, trabalhando contra o garimpo e o contrabando no território indígena. Atuou na Federação Indígena do Estado de Bolívar e na Coordenação de Saúde Indígena do Ministério da Saúde da Venezuela. Além disso, atua em organizações de mulheres indígenas, trabalhando ativamente para o reconhecimento de terras indígenas e da identidade ancestral de seu povo. Articula também com universidades brasileiras na busca de resolver as questões de demarcação com as burocracias dos países que o seu território ancestral ocupa. Foi acusada de traição pelas forças armadas venezuelanas ao se mostrar defensora do território Pemón. Possui formação em administração pelo Instituto Universitário Adventista da Venezuela (IUNAV), além de ser fundadora do Conselho de Chefes Gerais do Povo Pemón.
+
+## Povo Pemón
+
+O povo Pemón, cujo etnônimo significa "pessoa", habita a região fronteiriça entre três Estados-nação: a Venezuela (Gran Sabana), o Brasil (Roraima) e a República Cooperativa da Guiana, ocupando uma extensão territorial descontínua. Na Venezuela, o Censo de 2011 estimou uma população de 30.148 indivíduos. O grupo apresenta variadas autodenominações — como Arekuna, Kamarako, Taurepang (termo mais difundido em território brasileiro) e Makuxi —, subdivisões que se articulam conforme variantes linguísticas e localização geográfica.
+
+A cosmologia e a organização social Pemón fundamentam-se em uma relação intrínseca com os maciços rochosos denominados tepuys. Embora pertençam à família linguística Karib, as comunidades apresentam uma complexa diversidade dialetal, com variações significativas de pronúncia e gramática. Do ponto de vista produtivo, enquanto alguns grupos mantêm a subsistência baseada na agricultura, caça e pesca, outros incorporaram atividades como o turismo, o artesanato e o trabalho no garimpo como estratégias de reprodução econômica e resistência territorial. Nesse cenário, as mulheres exercem papel central na economia comunitária através da produção de cerâmicas e cestaria de fibras.
+
+A comunidade situada no Parque Nacional Canaima (Venezuela) tem enfrentado sistemáticas incursões em seus territórios ancestrais, impulsionadas pelo avanço da atividade mineradora e pela construção de gasodutos por empresas privadas, frequentemente amparadas por projetos de "megadesenvolvimento" do Governo Nacional. Em resposta a essas tensões, o Conselho Geral de Chefes do Povo Pemón e órgãos como a Anistia Internacional foram acionados devido a episódios de violência e letalidade contra membros da comunidade na defesa do território.
+
+Recentemente, em 2023, registraram-se óbitos decorrentes de desabamentos em áreas de mineração ilegal. Tais atividades extrativistas não apenas ameaçam a integridade física dos Pemón, mas degradam elementos naturais essenciais à sua organização social e espiritual, atingindo os tepuys, pilares simbólicos do grupo. Apesar do uso recorrente de forças armadas para assegurar o acesso às áreas de exploração, a resistência Pemón permanece ativa na contestação ao modelo extrativista predatório.
+
+**Texto elaborado por Lorena dos Santos Campos**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+<a href="https://youtu.be/BpSkwTF3Djg" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/3rgwmn3SFlJQxECSFk4rmD?si=Jb0amIQ6SWKxBuAX9x9moA" target="_blank"><img src="spotify.png" alt="Spotify"></a>
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

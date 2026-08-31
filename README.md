@@ -11,7 +11,10 @@ All the apps are listed in this sheet. (https://docs.google.com/spreadsheets/d/1
 
 ## Documentation
 
-- [Tutorial: Novo UI — Material Switch, Spinner e Lang Toggle](tutorial_novo_ui.md)
+The repository knowledge base lives in the [`.claude/skills/datazoom_viz/`](.claude/skills/datazoom_viz/) Claude skill:
+
+- [SKILL.md](.claude/skills/datazoom_viz/SKILL.md) — full repository reference (structure, app flow, UI standard, config files, deploy, GitHub Actions, datasets).
+- [Tutorial: Novo UI — Material Switch, Spinner e Lang Toggle](.claude/skills/datazoom_viz/tutorial_novo_ui.md)
 
 App updates are being monitored in this [sheet](https://docs.google.com/spreadsheets/d/1RqOPwqaO94Vxb1_Sfo8moB4tnXTqcIKHYk2YtjVpW2c/edit?gid=1651483482#gid=1651483482).
 
@@ -50,6 +53,8 @@ datazoom_viz/
 ```
 
 ## App Deployment
+
+The first time you deploy from a machine, log in to rsconnect through **shinyapps.io** (`rsconnect::setAccountInfo()` with a token/secret from the shinyapps.io dashboard) — **not** through RStudio Cloud Connect. Login credentials are provided by the moderator on request.
 
 To deploy a Shiny application, first load the deploy script:
 
@@ -248,11 +253,7 @@ The data has yearly frequency and is available starting from the year
 
 - `app_map_mapbiomas_cover`: map of annual land use and land cover in brazil. (english version: `app_map_mapbiomas_cover_en`)
 
-- `app_rk_mapbiomas_cobertura_est`: ranking of annual land use and cover at state level. (english version: `app_rk_mapbiomas_cobertura_est_en`)
-
-- `app_rk_mapbiomas_cobertura_munic`: ranking of annual land use and cover at the municipality level. (english version: `app_rk_mapbiomas_cobertura_munic_en`)
-
-- `app_rk_mapbiomas_cobertura_munic_percentual`: ????como diferenciar do de cima???? (english version: `app_rk_mapbiomas_cobertura_munic_percentual_en`)
+- `app_rk_mapbiomas_cobertura`: ranking of annual land use and cover, with toggles for state/municipality level and absolute (ha) / percentual of area. Single app with PT/EN lang toggle (merged from the former `app_rk_mapbiomas_cobertura_est` and `app_rk_mapbiomas_cobertura_munic_percentual` + their `_en` versions).
 
 - `app_rk_mapbiomas_transicao_est`: ranking of transition/change of soil cover and use at state level through the years. (english version: `app_rk_mapbiomas_transicao_est_en`)
 

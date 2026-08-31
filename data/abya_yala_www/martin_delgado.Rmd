@@ -1,0 +1,49 @@
+---
+title: "Martin Delgado Cultelli"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Martin Delgado Cultelli, indígena Charrua, ativista e representante do Conselho da Nação Charrua (CONACHA), nasceu e cresceu em Montevideo, Uruguai, no bairro rural de Lezica. Descendente dos Charrua por parte da avó paterna, cresceu ouvindo que “vinham dos índios”, e se engajou no ativismo aos doze anos, quando conheceu a comunidade Charrua Basquadé Inchalá através do projeto artístico Oyendau: El grito de la memoria, que retratava o massacre de Salsipuedes. Desde então, Cultelli abraçou sua identidade indígena e passou a dedicar sua vida à luta pelo reconhecimento e resgate da cultura Charrua no Uruguai.
+
+Cultelli é graduado em Povos Indígenas, Direitos Humanos e Cooperação Internacional na Universidade Carlos III de Madrid, e em Antropologia Social naUniversidade da República do Uruguai. Ele possui uma trajetória rica e marcada por participações em diversos espaços internacionais de discussão e movimentação social dos povos originários, como a Cúpula Continental dos Povos e Nacionalidades Indígenas, o Fundo para o Desenvolvimento dos Povos Indígenas da América Latina, e o Foro Permanente para Questões Indígenas, entre outros. Ele assumiu pela primeira vez o cargo de presidente do CONACHA em 2015-16, e posteriormente em 2021-22, no contexto da pandemia do COVID-19.
+
+## Povo Charrua
+
+Os Charrua são um povo indígena originário da América do Sul, historicamentepresente no nordeste da Argentina, no extremo sul do Brasil e em todo o território do Uruguai, onde constituíram a principal etnia indígena. Acredita-se que tenham migrado para a região do  
+Rio da Prata há milhares de anos e, ao longo do século XVI, expandiram seu domínio por  
+meio de conflitos com as missões jesuíticas Guarani. Durante esse período, integraram-se a  
+outros povos indígenas, como os Chanás, Minuanos, Caingangues, Yarós e Boháns, que hoje  
+são considerados parte da nação Charrua.
+
+A língua Charrua ainda é tema de debate entre linguistas. A hipótese mais aceita sugere que pertencia ao tronco linguístico Macro-Jê. Durante a colonização espanhola, os Charrua eram um povo nômade, vivendo da caça, pesca e coleta. Após a introdução do cavalo pelos europeus, tornaram-se exímios cavaleiros, o que lhes proporcionou vantagens tanto na caça quanto no combate. Organizavam-se em pequenos grupos familiares e moravam em tendas leves feitas de couro e madeira, projetadas para serem desmontadas e transportadas com facilidade. Sua cultura era baseada em tradições orais, e sua espiritualidade estava profundamente conectada à natureza. Realizavam rituais para honrar os elementos naturais, como o sol, a lua e os rios, acreditando em espíritos protetores e promovendo cerimônias para garantir a caça farta e a segurança da comunidade.
+
+Os Charrua resistiram ferozmente à colonização espanhola e, mais tarde, à formação dos estados nacionais sul-americanos. Essa resistência culminou no Massacre de Salsipuedes, em 1831, quando o governo uruguaio, sob a liderança do presidente Fructuoso Rivera, organizou uma emboscada para exterminar grande parte da população Charrua. Os poucos sobreviventes foram capturados, e alguns foram enviados à França como prisioneiros, incluindo Vaimaca Pirú, o último cacique Charrua, que foi levado a um zoológico humano antes de morrer em Paris.  
+Após esse massacre, os Charrua foram por muito tempo considerados extintos pela historiografia oficial do Uruguai. A narrativa dominante, construída no século XIX, buscou apagar deliberadamente a presença e a herança Charrua, em um esforço para consolidar uma  
+identidade nacional baseada em valores europeus, que visava reforçar a imagem do Uruguai  
+como uma nação moderna e civilizada, distanciando-se de suas raízes indígenas. No entanto,  
+as tradições Charrua continuaram a ser transmitidas por meio da memória oral e de práticas  
+culturais transmitidas ao longo das gerações, e hoje movimentos indígenas e acadêmicos têm  
+trabalhado para resgatar a identidade Charrua desde o fim da ditadura civil-militar uruguaia  
+em 1985\. Em 2005, foi fundado o Conselho da Nação Charrua a partir de organizações que  
+visavam promover a identidade cultural aos descendentes dos Charrua, incluindo a luta por  
+direitos territoriais e sociais.
+
+**Texto elaborado por Dimitri Balby**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+<a href="https://youtu.be/iQkgxgI4SZY?si=QJQhcTwrwDx0Ej5W" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/5sHXgLrQbwUrxOeW2s94C9?si=721dfaacea184e9e" target="_blank"><img src="spotify.png" alt="Spotify"></a>
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

@@ -1,0 +1,44 @@
+---
+title: "Juliana Tupinambá"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Juliana Tupinambá é uma mulher indígena da nação Tupinambá. Nasceu e reside no território Tupinambá de Olivença, na aldeia Mãe Oliveirense, sul da Bahia, e desde da sua alfabetização, ainda jovem, atua e milita a favor da educação dentro das comunidades originárias locais. 
+
+O que diverge Juliana da maioria dos militantes pela educação é o fato de que a mesma não luta especificamente a favor da implementação educacional tradicional, como é aplicada nas grandes metrópoles, mas principalmente a favor da educação indígena Tupinambá que não se restringe a fórmulas matemáticas, história e ciências que utilizam como referencial os saberes ocidentais.
+
+ Juliana Tupinambá luta, através da educação, por reconhecimento étnico, demarcação territorial e para que história da sua etnia permaneça viva, para que os saberes dos anciãos de sua aldeia sejam tão respeitados quanto os acadêmicos, para que as crianças tupinambás compreendam que elas e a terra não são duas, e sim uma só. Em poucas palavras, Juliana luta pela (re)existência da nação Tupinambá, que já foi considerada extinta pela historiografia, erroneamente, após o Levante Tupinambá (1618-1623), e também pela Lei de Terras de 1850, que transformou o indígena no pardo e outras diversos termos empregados para se referir à miscigenação. 
+
+**Povo Tupinambá**
+
+O povo Tupinambá é um dos grupos indígenas mais antigos e emblemáticos do Brasil, sendo um dos primeiros a estabelecer contato com os colonizadores portugueses no século XVI. Historicamente, os Tupinambá habitaram a região litorânea do Brasil, estendendo-se do atual estado do Ceará até o litoral paulista. Com uma cultura marcada pela prática da agricultura, pesca e rituais religiosos, os Tupinambá possuíam uma organização social complexa e uma forte ligação com seu território.
+
+A chegada dos portugueses representou um marco de resistência para os Tupinambá. Durante o processo de colonização, foram alvo de políticas de escravização e genocídio, principalmente devido à exploração de suas terras e ao desejo dos colonizadores de expandir seus domínios. Um dos episódios mais violentos dessa resistência foi a chamada “Batalha dos Nadadores” ou “Massacre do Rio Cururupe”, ocorrida em 1559, quando o governador-geral Mem de Sá ordenou a aniquilação de milhares de indígenas ao longo do litoral da Bahia.
+
+Apesar das constantes tentativas de extermínio e assimilação forçada, os Tupinambá mantiveram vivas suas práticas culturais e sua identidade étnica ao longo dos séculos. Durante o período colonial e mesmo após a independência do Brasil, muitos foram forçados a se esconder ou a se identificar como "caboclos" para evitar perseguições. No entanto, no final do século XX, iniciou-se um processo de reafirmação étnica e luta pelo reconhecimento oficial de suas terras tradicionais.
+
+Na década de 1990, os Tupinambá de Olivença, na Bahia, começaram um movimento de retomada de seu território e identidade. Esse processo foi impulsionado por lideranças indígenas e pelo fortalecimento da educação escolar indígena, que permitiu a transmissão dos saberes ancestrais para as novas gerações. Em 2000, em uma assembleia comunitária, reafirmaram oficialmente sua identidade como povo Tupinambá, reforçando sua luta pela demarcação da Terra Indígena Tupinambá de Olivença.
+
+A luta pela terra continua sendo um dos principais desafios dos Tupinambá, que enfrentam resistência por parte de fazendeiros e setores do agronegócio. O reconhecimento oficial de seu território ainda é um processo em disputa, e as lideranças indígenas frequentemente sofrem perseguições e tentativas de criminalização. No entanto, a resistência Tupinambá se mantém firme, reforçada por práticas culturais como a Caminhada do Povo Tupinambá, os Jogos Indígenas e rituais tradicionais que fortalecem a identidade e a união da comunidade.
+
+Em suma, a trajetória dos Tupinambá é marcada pela resistência e pela ressignificação de sua cultura frente às adversidades impostas pela colonização e pelo Estado brasileiro. Seu compromisso com a preservação de sua identidade e território evidencia a continuidade de uma luta ancestral que ainda hoje se manifesta de maneira ativa e vigorosa.
+
+**Texto elaborado por Bernardo Barreto Mattos e Paulo de Almeida Magalhães Neto**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+<a href="https://youtu.be/ah_3RodhR4k?si=_yPVRf3OkvCgLxTv" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/4Zq4DBQAYQhuKb8MZIblVt?si=USMjb7I_R362A_xfKEgyng" target="_blank"><img src="spotify.png" alt="Spotify"></a>
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

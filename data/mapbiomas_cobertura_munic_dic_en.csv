@@ -1,45 +1,44 @@
-"var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"time",FALSE,FALSE,FALSE,FALSE,FALSE,"Year","Year","Mapbiomas",1,"ha","Environment","Land use"
-"group",FALSE,FALSE,TRUE,TRUE,TRUE,"Municipality","Municipality","Mapbiomas",1,"ha","Environment","Land use"
-"Aquaculture",TRUE,TRUE,FALSE,FALSE,TRUE,"Aquaculture","Aquaculture","Mapbiomas",1,"ha","Environment","Land use"
-"Beach, Dune and Sand Spot",TRUE,TRUE,FALSE,FALSE,TRUE,"Beach, Dune and Sand Spot","Beach, Dune and Sand Spot","Mapbiomas",1,"ha","Environment","Land use"
-"Citrus",TRUE,TRUE,FALSE,FALSE,TRUE,"Citrus","Citrus","Mapbiomas",1,"ha","Environment","Land use"
-"Coffee",TRUE,TRUE,FALSE,FALSE,TRUE,"Coffee","Coffee","Mapbiomas",1,"ha","Environment","Land use"
-"Cotton",TRUE,TRUE,FALSE,FALSE,TRUE,"Cotton","Cotton","Mapbiomas",1,"ha","Environment","Land use"
-"Floodable Forest",TRUE,TRUE,FALSE,FALSE,TRUE,"Floodable Forest","Floodable Forest","Mapbiomas",1,"ha","Environment","Land use"
-"Forest Formation",TRUE,TRUE,FALSE,FALSE,TRUE,"Forest Formation","Forest Formation","Mapbiomas",1,"ha","Environment","Land use"
-"Forest Plantation",TRUE,TRUE,FALSE,FALSE,TRUE,"Forest Plantation","Forest Plantation","Mapbiomas",1,"ha","Environment","Land use"
-"Grassland",TRUE,TRUE,FALSE,FALSE,TRUE,"Grassland","Grassland","Mapbiomas",1,"ha","Environment","Land use"
-"Herbaceous Sandbank Vegetation",TRUE,TRUE,FALSE,FALSE,TRUE,"Herbaceous Sandbank Vegetation","Herbaceous Sandbank Vegetation","Mapbiomas",1,"ha","Environment","Land use"
-"Hypersaline Tidal Flat",TRUE,TRUE,FALSE,FALSE,TRUE,"Hypersaline Tidal Flat","Hypersaline Tidal Flat","Mapbiomas",1,"ha","Environment","Land use"
-"Mangrove",TRUE,TRUE,FALSE,FALSE,TRUE,"Mangrove","Mangrove","Mapbiomas",1,"ha","Environment","Land use"
-"Mining",TRUE,TRUE,FALSE,FALSE,TRUE,"Mining","Mining","Mapbiomas",1,"ha","Environment","Land use"
-"Mosaic of Uses",TRUE,TRUE,FALSE,FALSE,TRUE,"Mosaic of Uses","Mosaic of Uses","Mapbiomas",1,"ha","Environment","Land use"
-"Not Observed",TRUE,TRUE,FALSE,FALSE,TRUE,"Not Observed","Not Observed","Mapbiomas",1,"ha","Environment","Land use"
-"Other non Vegetated Areas",TRUE,TRUE,FALSE,FALSE,TRUE,"Other non Vegetated Areas","Other non Vegetated Areas","Mapbiomas",1,"ha","Environment","Land use"
-"Other Perennial Crops",TRUE,TRUE,FALSE,FALSE,TRUE,"Other Perennial Crops","Other Perennial Crops","Mapbiomas",1,"ha","Environment","Land use"
-"Other Temporary Crops",TRUE,TRUE,FALSE,FALSE,TRUE,"Other Temporary Crops","Other Temporary Crops","Mapbiomas",1,"ha","Environment","Land use"
-"Palm Oil",TRUE,TRUE,FALSE,FALSE,TRUE,"Palm Oil","Palm Oil","Mapbiomas",1,"ha","Environment","Land use"
-"Pasture",TRUE,TRUE,FALSE,FALSE,TRUE,"Pasture","Pasture","Mapbiomas",1,"ha","Environment","Land use"
-"Rice",TRUE,TRUE,FALSE,FALSE,TRUE,"Rice","Rice","Mapbiomas",1,"ha","Environment","Land use"
-"River, Lake and Ocean",TRUE,TRUE,FALSE,FALSE,TRUE,"River, Lake and Ocean","River, Lake and Ocean","Mapbiomas",1,"ha","Environment","Land use"
-"Rocky Outcrop",TRUE,TRUE,FALSE,FALSE,TRUE,"Rocky Outcrop","Rocky Outcrop","Mapbiomas",1,"ha","Environment","Land use"
-"Savanna Formation",TRUE,TRUE,FALSE,FALSE,TRUE,"Savanna Formation","Savanna Formation","Mapbiomas",1,"ha","Environment","Land use"
-"Soybean",TRUE,TRUE,FALSE,FALSE,TRUE,"Soybean","Soybean","Mapbiomas",1,"ha","Environment","Land use"
-"Sugar cane",TRUE,TRUE,FALSE,FALSE,TRUE,"Sugar cane","Sugar cane","Mapbiomas",1,"ha","Environment","Land use"
-"Urban Area",TRUE,TRUE,FALSE,FALSE,TRUE,"Urban Area","Urban Area","Mapbiomas",1,"ha","Environment","Land use"
-"Wetland",TRUE,TRUE,FALSE,FALSE,TRUE,"Wetland","Wetland","Mapbiomas",1,"ha","Environment","Land use"
-"Wooded Sandbank Vegetation",TRUE,TRUE,FALSE,FALSE,TRUE,"Wooded Sandbank Vegetation","Wooded Sandbank Vegetation","Mapbiomas",1,"ha","Environment","Land use"
-"Perennial Crop",TRUE,TRUE,FALSE,FALSE,TRUE,"Perennial Crop","Perennial Crop","Mapbiomas",1,"ha","Environment","Land use"
-"Temporary Crop",TRUE,TRUE,FALSE,FALSE,TRUE,"Temporary Crop","Temporary Crop","Mapbiomas",1,"ha","Environment","Land use"
-"Agriculture",TRUE,TRUE,FALSE,FALSE,TRUE,"Agriculture","Agriculture","Mapbiomas",1,"ha","Environment","Land use"
-"Farming",TRUE,TRUE,FALSE,FALSE,TRUE,"Farming","Farming","Mapbiomas",1,"ha","Environment","Land use"
-"Forest",TRUE,TRUE,FALSE,FALSE,TRUE,"Forest","Forest","Mapbiomas",1,"ha","Environment","Land use"
-"Non Forest Natural Formation",TRUE,TRUE,FALSE,FALSE,TRUE,"Non Forest Natural Formation","Non Forest Natural Formation","Mapbiomas",1,"ha","Environment","Land use"
-"Non vegetated area",TRUE,TRUE,FALSE,FALSE,TRUE,"Non vegetated area","Non vegetated area","Mapbiomas",1,"ha","Environment","Land use"
-"Water and Marine Environment",TRUE,TRUE,FALSE,FALSE,TRUE,"Water and Marine Environment","Water and Marine Environment","Mapbiomas",1,"ha","Environment","Land use"
-"Antropic",TRUE,TRUE,FALSE,FALSE,TRUE,"Antropic","Antropic","Mapbiomas",1,"ha","Environment","Land use"
-"Natural",TRUE,TRUE,FALSE,FALSE,TRUE,"Natural","Natural","Mapbiomas",1,"ha","Environment","Land use"
-"Natural/Antropic",TRUE,TRUE,FALSE,FALSE,TRUE,"Natural/Antropic","Natural/Antropic","Mapbiomas",1,"ha","Environment","Land use"
-"Undefined",TRUE,TRUE,FALSE,FALSE,TRUE,"Undefined","Undefined","Mapbiomas",1,"ha","Environment","Land use"
-"area_km2",FALSE,FALSE,FALSE,FALSE,FALSE,"Área do município (km²)","Área territorial do município em quilômetros quadrados","Mapbiomas",1,"ha","Environment","Land use"
+var,x,y,color,size,slider,label,desc,var_group,tipo,unidade,categoria,subcategoria
+Antropic,TRUE,TRUE,FALSE,TRUE,TRUE,Antropic,Antropic,Level 0 — Broad categories,1,ha,Environment,Land use
+Natural,TRUE,TRUE,FALSE,TRUE,TRUE,Natural,Natural,Level 0 — Broad categories,1,ha,Environment,Land use
+Natural/Antropic,TRUE,TRUE,FALSE,TRUE,TRUE,Natural/Antropic,Natural/Antropic,Level 0 — Broad categories,1,ha,Environment,Land use
+Undefined,TRUE,TRUE,FALSE,TRUE,TRUE,Undefined,Undefined,Level 0 — Broad categories,1,ha,Environment,Land use
+Farming,TRUE,TRUE,FALSE,TRUE,TRUE,Farming,Farming,Level 1 — Main classes,1,ha,Environment,Land use
+Forest,TRUE,TRUE,FALSE,TRUE,TRUE,Forest,Forest,Level 1 — Main classes,1,ha,Environment,Land use
+Non Forest Natural Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Non Forest Natural Formation,Non Forest Natural Formation,Level 1 — Main classes,1,ha,Environment,Land use
+Non vegetated area,TRUE,TRUE,FALSE,TRUE,TRUE,Non vegetated area,Non vegetated area,Level 1 — Main classes,1,ha,Environment,Land use
+Not Observed,TRUE,TRUE,FALSE,TRUE,TRUE,Not Observed,Not Observed,Level 1 — Main classes,1,ha,Environment,Land use
+Water and Marine Environment,TRUE,TRUE,FALSE,TRUE,TRUE,Water and Marine Environment,Water and Marine Environment,Level 1 — Main classes,1,ha,Environment,Land use
+Agriculture,TRUE,TRUE,FALSE,TRUE,TRUE,Agriculture,Agriculture,Level 2 — Subclasses,1,ha,Environment,Land use
+Aquaculture,TRUE,TRUE,FALSE,TRUE,TRUE,Aquaculture,Aquaculture,Level 2 — Subclasses,1,ha,Environment,Land use
+"Beach, Dune and Sand Spot",TRUE,TRUE,FALSE,TRUE,TRUE,"Beach, Dune and Sand Spot","Beach, Dune and Sand Spot",Level 2 — Subclasses,1,ha,Environment,Land use
+Floodable Forest,TRUE,TRUE,FALSE,TRUE,TRUE,Floodable Forest,Floodable Forest,Level 2 — Subclasses,1,ha,Environment,Land use
+Forest Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Forest Formation,Forest Formation,Level 2 — Subclasses,1,ha,Environment,Land use
+Forest Plantation,TRUE,TRUE,FALSE,TRUE,TRUE,Forest Plantation,Forest Plantation,Level 2 — Subclasses,1,ha,Environment,Land use
+Grassland,TRUE,TRUE,FALSE,TRUE,TRUE,Grassland,Grassland,Level 2 — Subclasses,1,ha,Environment,Land use
+Herbaceous Sandbank Vegetation,TRUE,TRUE,FALSE,TRUE,TRUE,Herbaceous Sandbank Vegetation,Herbaceous Sandbank Vegetation,Level 2 — Subclasses,1,ha,Environment,Land use
+Hypersaline Tidal Flat,TRUE,TRUE,FALSE,TRUE,TRUE,Hypersaline Tidal Flat,Hypersaline Tidal Flat,Level 2 — Subclasses,1,ha,Environment,Land use
+Mangrove,TRUE,TRUE,FALSE,TRUE,TRUE,Mangrove,Mangrove,Level 2 — Subclasses,1,ha,Environment,Land use
+Mining,TRUE,TRUE,FALSE,TRUE,TRUE,Mining,Mining,Level 2 — Subclasses,1,ha,Environment,Land use
+Mosaic of Uses,TRUE,TRUE,FALSE,TRUE,TRUE,Mosaic of Uses,Mosaic of Uses,Level 2 — Subclasses,1,ha,Environment,Land use
+Other non Forest Formations,TRUE,TRUE,FALSE,TRUE,TRUE,Other non Forest Formations,Other non Forest Formations,Level 2 — Subclasses,1,ha,Environment,Land use
+Other non Vegetated Areas,TRUE,TRUE,FALSE,TRUE,TRUE,Other non Vegetated Areas,Other non Vegetated Areas,Level 2 — Subclasses,1,ha,Environment,Land use
+Pasture,TRUE,TRUE,FALSE,TRUE,TRUE,Pasture,Pasture,Level 2 — Subclasses,1,ha,Environment,Land use
+Photovoltaic Project,TRUE,TRUE,FALSE,TRUE,TRUE,Photovoltaic Project,Photovoltaic Project,Level 2 — Subclasses,1,ha,Environment,Land use
+"River, Lake and Ocean",TRUE,TRUE,FALSE,TRUE,TRUE,"River, Lake and Ocean","River, Lake and Ocean",Level 2 — Subclasses,1,ha,Environment,Land use
+Rocky Outcrop,TRUE,TRUE,FALSE,TRUE,TRUE,Rocky Outcrop,Rocky Outcrop,Level 2 — Subclasses,1,ha,Environment,Land use
+Savanna Formation,TRUE,TRUE,FALSE,TRUE,TRUE,Savanna Formation,Savanna Formation,Level 2 — Subclasses,1,ha,Environment,Land use
+Urban Area,TRUE,TRUE,FALSE,TRUE,TRUE,Urban Area,Urban Area,Level 2 — Subclasses,1,ha,Environment,Land use
+Wetland,TRUE,TRUE,FALSE,TRUE,TRUE,Wetland,Wetland,Level 2 — Subclasses,1,ha,Environment,Land use
+Perennial Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Perennial Crop,Perennial Crop,Level 3 — Detail,1,ha,Environment,Land use
+Temporary Crop,TRUE,TRUE,FALSE,TRUE,TRUE,Temporary Crop,Temporary Crop,Level 3 — Detail,1,ha,Environment,Land use
+Cotton,TRUE,TRUE,FALSE,TRUE,TRUE,Cotton,Cotton,Level 4 — Specific classes,1,ha,Environment,Land use
+Other Perennial Crops,TRUE,TRUE,FALSE,TRUE,TRUE,Other Perennial Crops,Other Perennial Crops,Level 4 — Specific classes,1,ha,Environment,Land use
+Other Temporary Crops,TRUE,TRUE,FALSE,TRUE,TRUE,Other Temporary Crops,Other Temporary Crops,Level 4 — Specific classes,1,ha,Environment,Land use
+Palm Oil,TRUE,TRUE,FALSE,TRUE,TRUE,Palm Oil,Palm Oil,Level 4 — Specific classes,1,ha,Environment,Land use
+Rice,TRUE,TRUE,FALSE,TRUE,TRUE,Rice,Rice,Level 4 — Specific classes,1,ha,Environment,Land use
+Soybean,TRUE,TRUE,FALSE,TRUE,TRUE,Soybean,Soybean,Level 4 — Specific classes,1,ha,Environment,Land use
+Sugar cane,TRUE,TRUE,FALSE,TRUE,TRUE,Sugar cane,Sugar cane,Level 4 — Specific classes,1,ha,Environment,Land use
+group,FALSE,FALSE,TRUE,FALSE,FALSE,group,group,Mapbiomas,1,ha,Environment,Land use
+area_km2,FALSE,FALSE,FALSE,FALSE,FALSE,Municipal area (km2),Municipal area (km2),Mapbiomas,1,km2,Environment,Land use
+time,FALSE,FALSE,FALSE,FALSE,FALSE,time,time,Mapbiomas,1,ha,Environment,Land use

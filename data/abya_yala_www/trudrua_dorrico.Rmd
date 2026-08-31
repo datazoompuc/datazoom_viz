@@ -1,0 +1,36 @@
+---
+title: "Trudruá Dorrico"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpg", knitr::current_input()))
+```
+
+Trudruá Dorrico é uma escritora, poeta, pesquisadora e ativista indígena pertencente ao povo Macuxi. Nascida em Guajará-Mirim, Rondônia, ela é doutora em Teoria da Literatura pela Pontifícia Universidade Católica do Rio Grande do Sul (PUCRS) e mestre em Estudos Literários pela Universidade Federal de Rondônia. Seu trabalho tem sido fundamental para a valorização da literatura indígena contemporânea no Brasil. Em 2019, Trudruá publicou o livro *Eu sou Macuxi e outras histórias*, vencedor do prêmio Tamoios/FNLIJ/UKA de Novos Escritores Indígenas. A obra apresenta narrativas que mesclam oralidade e tradição dos povos indígenas com reflexões sobre a identidade e a resistência cultural. Além disso, em 2023, organizou a coletânea *Originárias: uma antologia feminina de literatura indígena*, reunindo vozes de escritoras indígenas de diversas etnias.
+
+Além de sua atuação como escritora e pesquisadora, Trudruá Dorrico também é uma grande divulgadora da literatura indígena. Ela gerencia o perfil coletivo @leiamulheresindigenas no Instagram e o canal no YouTube "Literatura Indígena Contemporânea", espaços em que compartilha entrevistas com autores indígenas e promove discussões sobre a produção literária dos povos originários. Seu trabalho contribui significativamente para romper estereótipos e ampliar o reconhecimento da diversidade cultural indígena no Brasil. Em 2023, Trudruá participou de uma residência artística na Cité Internationale des Arts, em Paris, no festival Brasil Cena Aberta, reforçando sua projeção internacional. Com sua escrita e ativismo, ela segue sendo uma das principais vozes da literatura indígena contemporânea.
+
+ **Povo Macuxi:**
+
+No que diz respeito à origem, do povo Macuxi,  alguns autores acreditam que são originários das ilhas caribe . Outro viés, de cunho narrativo e que ganha reforço em sua tradição oral, diz que são descendentes dos filhos do sol, Makunaima e Insikiran.
+
+O termo macuxi significa “aqueles que nascem em Roraima”. Os Macuxi se distinguem dos seus vizinhos que vivem mais ao norte em terras montanhosas designadas Kapon, com quem compartilham representações mitológicas. Macuxi é a designação comum para os grupos Pemon que habitam o sul da área no entorno do Monte Roraima na tríplice fronteira dividida entre Guianas, Venezuela e Brasil – entre as cabeceiras dos rios Branco e Rupununi, território atualmente partilhado entre o Brasil e a Guiana. Os Macuxi são falantes da língua macuxi pertencente à família “Karib” e, por viverem em uma zona de tríplice fronteira, também falam português, inglês e espanhol. 
+
+Historicamente, os Macuxi vêm enfrentando desde pelo menos o século XVIII situações adversas em razão da ocupação não-indígena na região, ameaçando a convivência em seus aldeamentos, empurrando-os a migrações forçadas e a processos de desterritorialização. Esse povo está exposto às constantes investidas das políticas econômicas colonizadoras do Estado, e ao modelo desenvolvimentista moderno, marcado pelo avanço de frentes extrativistas e pecuaristas, e mais recentemente, pela incidência de garimpeiros e a proliferação de grileiros em suas terras. 
+
+**Texto elaborado por Julia Paula do Nascimento de Moraes e Marcos Gabriel Pita da Costa**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+<a href="https://youtu.be/vSm5Znk_Dwc?si=fg1kFuWTQVPFa2Qi" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/7bjAoVgrJHgLNoxm9Mubzq" target="_blank"><img src="spotify.png" alt="Spotify"></a>
+:::
+::::
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

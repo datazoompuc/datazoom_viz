@@ -10709,24 +10709,22 @@ a.list-group-item-danger.active:hover, a.list-group-item-danger.active:focus {
   background-color: #43868c;
     padding: 20px;
   border-radius: 10px;
-  
+
   position: relative;
   min-height: calc(100vh - 40px);
-  padding-bottom: 160px;     
+  display: flex;
+  flex-direction: column;
 }
 
 .menucol::after {
   content: "";
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
+  margin-top: auto;
   height: 100px;
 
   background-image: url("img/logo_datazoom_branco_horizontal.png");
   background-repeat: no-repeat;
   background-position: center bottom;
-  background-size: contain; 
+  background-size: contain;
 
   pointer-events: none;
   opacity: 0.95;
@@ -10758,9 +10756,13 @@ a.list-group-item-danger.active:hover, a.list-group-item-danger.active:focus {
 
 
 .menucol>hr {
-  border: 1.0px solid rgba(255, 255, 255, 0.38);
+  border: none;
+  background-color: rgba(255, 255, 255, 0.38);
   margin-top: 35px;
   margin-bottom: 35px;
+  flex-shrink: 0;
+  width: 100%;
+  height: 2px;
 }
 .vars { 
   font-family: JetBrains Mono;
@@ -10949,4 +10951,109 @@ html,body{height:100%;}
 
 .checkbox input[type="checkbox"] {
   margin-top: 0 !important;
+}
+
+/* Segmented control: dois (ou mais) actionButton lado a lado como um único
+   toggle, para escolher entre alternativas de igual peso (ex.: Estado/Município,
+   SH2/SEC). Usado em apps com toggle de agregação. O botão ativo recebe .seg-active
+   via handler JS no server (sendCustomMessage). Ver seção 4 do tutorial_novo_ui. */
+.seg-toggle {
+  display: flex;
+  width: 100%;
+}
+.seg-toggle .seg-btn {
+  flex: 1;
+  border-radius: 0;
+  margin: 0;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+.seg-toggle .seg-btn:first-child { border-radius: 6px 0 0 6px; }
+.seg-toggle .seg-btn:last-child  { border-radius: 0 6px 6px 0; }
+.seg-toggle .seg-active {
+  background-color: #2b5560 !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .65) !important;
+  font-weight: 600;
+}
+
+/* Espaçador vertical padrão da sidebar */
+.sidebar-gap {
+  height: 16px;
+}
+
+/* Botão de play/pause do slider de anos (sliderInput(animate = ...)). Por
+   padrão o Shiny só desenha o glyph/ícone passado em playButton/pauseButton
+   sem nenhum estilo próprio, herdando a cor de link — aqui vira um botão
+   circular pequeno no mesmo tom dos outros botões dos apps de mapa
+   (#48968B), com o mesmo efeito de "pressão" que .btn/.seg-btn já usam
+   (borda inferior encolhendo no hover/active). Não mexe no tamanho/posição
+   já definidos por cada app em .slider-animate-container/.slider-animate-button
+   font-size — só a aparência do botão em si. Usado hoje só em
+   map_dz_munic_prodes/_ppm/_cempre, que passam playButton = icon("play")/
+   pauseButton = icon("pause"); os demais apps com slider animado continuam
+   com o glyph unicode antigo e não são afetados por esta classe existir.
+*/
+.slider-animate-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #48968B;
+  color: #fff !important;
+  text-decoration: none !important;
+  border-style: solid;
+  border-color: #3a7b71;
+  border-width: 0 1px 3px 1px;
+  transition: margin-top .05s ease, border-bottom-width .05s ease, background-color .15s ease;
+}
+.slider-animate-button:hover {
+  margin-top: 1px;
+  border-bottom-width: 2px;
+  background-color: #3f847a;
+}
+.slider-animate-button:active {
+  margin-top: 2px;
+  border-bottom-width: 1px;
+}
+.slider-animate-button .play,
+.slider-animate-button .pause {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Slider de ano com o botão de play/pause ao lado (à esquerda) em vez de
+   embaixo. O Shiny/ionRangeSlider monta dentro do .form-group, nesta ordem:
+   label.control-label · span.irs (slider visível, inserido pelo
+   ionRangeSlider antes do input) · input.irs-hidden-input (position:
+   absolute, fora do fluxo) · div.slider-animate-container (o botão). Como o
+   container é o último filho em bloco, ele cai embaixo por padrão — aqui
+   reordenamos via flex: rótulo em cima (linha própria), botão + trilha do
+   slider lado a lado abaixo. Aplicar a classe .slider-inline no wrapper do
+   sliderInput (não no form-group, que o Shiny gera).
+*/
+.slider-inline .form-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 10px;
+}
+.slider-inline .form-group > .control-label {
+  order: 1;
+  flex: 0 0 100%;
+}
+.slider-inline .form-group > .slider-animate-container {
+  order: 2;
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+  text-align: left;
+}
+.slider-inline .form-group > .irs {
+  order: 3;
+  flex: 1 1 auto;
+  min-width: 0;
 }

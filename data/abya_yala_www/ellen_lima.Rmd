@@ -1,0 +1,44 @@
+---
+title: "Ellen Lima Wassu"
+output: 
+    html_document:
+        css: textstyle.css
+---
+
+```{r, fig.align = "center", out.height = "200px", echo = FALSE}
+knitr::include_graphics(sub("\\.Rmd$", ".jpeg", knitr::current_input()))
+```
+
+Nascida no Rio de Janeiro e indígena Wassu-Cocal, Ellen Lima Wassu transcende fronteiras artísticas e acadêmicas. Com licenciatura plena e mestrado em Artes Visuais, atualmente está imersa no doutorado em Modernidades Comparadas: Literaturas, Artes e Culturas na Universidade do Minho, em Braga, onde reside. Sua jornada literária começou com a publicação de Ixé ygara voltando para \`y’kûá (Sou canoa voltando pra enseada do rio), pela editora Urutau. Ela também é autora de Yby Kûatiara. Um livro de terra, publicado pela mesma editora.
+
+Ellen, que é professora, artista e poeta, carrega consigo as raízes da natureza, sendo inspirada pelo rio, pela árvore, pelo vento e pela mata atlântica. Sua expressão artística vai além da escrita, abrangendo também a representação visual e a performance. Como acadêmica engajada, sua pesquisa transcende fronteiras, explorando literatura, estudos culturais e movimentos indígenas no Brasil. Em sua biografia fluida, ela destaca a constante evolução de sua identidade, marcada por suas formações em artes visuais e história da arte, e sua transição para a literatura.
+
+Ellen Lima Wassu é um farol de inspiração, conectando-se profundamente com suas raízes enquanto navega pelos mares da arte e do conhecimento, deixando uma marca indelével no cenário artístico contemporâneo.
+
+## Povo Wassu-Cocal
+
+O povo Wassu-Cocal é originário do atual território de Maceió, em Alagoas, no nordeste do Brasil. A etnia faz parte do complexo mosaico cultural que compõe a diversidade indígena no país. Com uma rica herança cultural e tradições profundas, o povo Wassu-Cocal mantém uma conexão intrínseca com a natureza e uma identidade fortemente enraizada em sua história.
+
+A língua originária desse grupo é o Wassu, uma língua tupi, que é essencial para a transmissão de suas tradições orais e conhecimentos ancestrais. A oralidade é uma característica marcante da cultura Wassu-Cocal, destacando a importância da comunicação e da preservação da história por meio de narrativas transmitidas de geração em geração.
+
+As práticas culturais desse povo são intrinsecamente ligadas à natureza. A relação simbiótica com o ambiente se manifesta em suas cerimônias, rituais e expressões artísticas. A dança e a música têm um papel fundamental em suas celebrações, servindo como meios de expressão espiritual e social. As pinturas corporais, elaboradas com pigmentos naturais, são uma forma de arte distintiva que simboliza a conexão espiritual com o meio ambiente.
+
+A organização social do povo Wassu-Cocal é baseada em estruturas comunitárias sólidas. A comunidade é guiada por líderes anciãos, detentores de sabedoria e experiência, cuja liderança é fundamentada no respeito mútuo e na busca pelo bem-estar coletivo. A transmissão de conhecimento é um processo contínuo no qual os mais velhos compartilham suas experiências e ensinamentos com as gerações mais jovens.
+
+No entanto, o povo Wassu-Cocal, assim como muitas comunidades indígenas, enfrenta desafios significativos. A pressão exercida pelo avanço da sociedade moderna, com impactos socioeconômicos e ambientais, ameaça a integridade de suas tradições e modos de vida. A luta pela preservação de terras ancestrais e pela garantia dos direitos indígenas é uma batalha constante para muitos de seus membros.
+
+Apesar dos desafios enfrentados, a história do povo Wassu-Cocal é marcada por uma profunda conexão com a terra, uma riqueza cultural que transcende os séculos. Apesar dos desafios, essa narrativa também é caracterizada pela resiliência e pela esperança de que a identidade e as tradições desse povo continuem a florescer, preservando assim a riqueza e a diversidade do patrimônio indígena brasileiro.
+
+**Texto elaborado por Bernardo Barreto Mattos**
+
+:::: {.linkbox}
+Ouça a entrevista completa:
+
+::: {.icons}
+<a href="https://youtu.be/FXnlXff6r5U?si=SsuSDAKBsbrxEile" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/0uafXZKiEvKtRRlHbiCBYq?si=fMWCaEOMQ3WvafAf_DZM0w&nd=1&dlsi=ef31fff27fb9498b" target="_blank"><img src="spotify.png" alt="Spotify"></a>
+:::
+:::: 
+
+```{r, fig.align = "center", echo = FALSE}
+knitr::include_graphics("banner.png")
+```

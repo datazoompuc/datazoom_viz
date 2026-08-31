@@ -3,7 +3,7 @@ deploy_shiny_script <- function(
         manifest = "config/app_manifest.csv",
         account = "datazoom",
         server = "shinyapps.io",
-        extra = c("global", "apps/www"),
+        extra = c("global"),
         forceUpdate = TRUE
 ) {
     man <- read.csv(manifest, stringsAsFactors = FALSE)
@@ -30,7 +30,7 @@ deploy_shiny_script <- function(
         row$param_script,
         row$css_file,
         split_field(row$dictionary_files),
-        row$db_file,
+        split_field(row$db_file),
         split_field(row$extra_files),
         extra
     ))
@@ -49,10 +49,16 @@ deploy_shiny_script <- function(
     dir.create(td, recursive = TRUE, showWarnings = FALSE)
     
     copy_one <- function(src) {
+        dest <- file.path(td, src)
         if (dir.exists(src)) {
-            file.copy(src, td, recursive = TRUE, overwrite = TRUE)
+            # Copia o conteúdo do diretório preservando o path relativo
+            # (ex: data/mapbiomas_cobertura.parquet/), em vez de
+            # file.copy(src, td) que jogaria só o basename na raiz do
+            # staging e quebraria datasets parquet particionados em pastas
+            dir.create(dest, recursive = TRUE, showWarnings = FALSE)
+            inner <- list.files(src, full.names = TRUE)
+            file.copy(inner, dest, recursive = TRUE, overwrite = TRUE)
         } else {
-            dest <- file.path(td, src)
             dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
             ok <- file.copy(src, dest, overwrite = TRUE)
             if (!ok) stop("Falha ao copiar: ", src)
@@ -60,7 +66,19 @@ deploy_shiny_script <- function(
     }
     
     invisible(lapply(app_files[app_files != row$app_script], copy_one))
-    
+
+    # Copia apps/www para www/ na raiz do staging (remapeando o path, não
+    # espelhando). O Shiny só serve assets estáticos automaticamente de uma
+    # pasta chamada "www" ao lado do app.R; como o app.R vira a raiz do
+    # bundle, "apps/www" precisa virar "www" aqui, não "apps/www" (que é o
+    # que copy_one() faria, já que ele sempre espelha o path de origem).
+    if (dir.exists("apps/www")) {
+        www_dest <- file.path(td, "www")
+        dir.create(www_dest, recursive = TRUE, showWarnings = FALSE)
+        www_inner <- list.files("apps/www", full.names = TRUE)
+        file.copy(www_inner, www_dest, recursive = TRUE, overwrite = TRUE)
+    }
+
     # Copia o app principal para a raiz do staging como app.R
     app_lines <- readLines(row$app_script, warn = FALSE, encoding = "UTF-8")
     

@@ -12,61 +12,93 @@ files$ui_script <- "../scripts/map_comex_exp_sh4_sel/ui.R"
 files$server_script <- "../scripts/map_comex_exp_sh4_sel/server.R"
 files$param_script <- "../scripts/map_comex_exp_sh4_sel/db_params.R"
 files$CSS_script <- "../global/dza_lumen.css"
-files$param_file <- "../data/comex_exp_munic_sh4_sel_dic.csv"
+files$param_file_pt <- "../data/comex_exp_munic_sh4_sel_dic.csv"
+files$param_file_en <- "../data/comex_exp_munic_sh4_sel_dic_en.csv"
 files$db_file <- "../data/comex_exp_munic_sh4_sel.rds"
+files$aux_file <- "../data/auxiliar_cod_sh4.rds"   # nomes SH4/SH2 em PT e EN
 
 # Carrega scripts
 source(files$param_script)
 source(files$ui_script)
 source(files$server_script)
 
-# Parâmetros da visualização (define as variáveis/culunas padrões para os eixos do gráfico)
+# Parâmetros da visualização (PT como idioma padrão)
+param_pt <- get_db_param(files$param_file_pt, files$db_file)
+param_en <- get_db_param(files$param_file_en, files$db_file)
 
-param <- get_db_param(files$param_file, files$db_file) # carrega lista de variáveis e parâmetros
-param$x_def <- "Todos os Produtos" # variável padrão do eixo x
-param$y_def <- "" # variável padrão do eixo y
-param$color_def <- "" # variável padrão de cor
-param$size_def <- "" # variável padrão de tamanho
-param$slider_def <- "time" # variável padrão do slider
-param$text_def <- "group" # variável padrão de texto
-param$id_def <- "cod_ibge" # variável padrão de id
-param$lang <- FALSE
-param$forest <- "Produtos Compativeis com a Floresta"
-param$razao <- "Razão: Floresta / Outros produtos"
+param        <- param_pt
+param$tables <- list(pt = param_pt$table, en = param_en$table)
 
-param$plot_name <- "Data Zoom Amaz\u00f4nia"
-param$plot_desc <- "Com\u00e9rcio exterior na Amaz\u00f4nia (COMEX): Valor da exporta\u00e7\u00e3o de produtos"
+# Colunas padrão para os eixos/dimensões
+param$x_def      <- "all"      # valor (idioma-independente) do seletor x
+param$slider_def <- "time"
+param$text_def   <- "group"
+param$id_def     <- "cod_ibge"
 
-# Parâmetros específicos do UI
-param$topo <- "VARI\u00C1VEIS:"
-param$varxlabel <- "Tipo de produto:"
-param$vardatelabel <- "Ano referente"
+# Ano inicial/final derivados do próprio dado (evita hardcode)
+.time_vals <- readRDS(files$db_file)$time
+param$year_inicio <- min(.time_vals, na.rm = TRUE)
+param$year_final  <- max(.time_vals, na.rm = TRUE)
+
+# Nome do app (igual nos dois idiomas)
+param$plot_name <- "Data Zoom Amazônia"
 param$link <- "https://datazoom.shinyapps.io/app_map_comex_exp_sh4_sel/"
 
-# Parâmetros específicos do server
-param$titulo1 <- "Mapa dos municípios da Amazônia Legal"
-param$titulo2 <- "Nenhuma variável selecionada"
-param$titulo3 <- "Principal produto exportado: "
-
-param$tooltip1 <- "Nome do município:"
-param$tooltip2 <- "Estado:"
-param$tooltip3 <- "Principal Produto:"
-param$tooltip4 <- "Categoria do Principal Produto:"
-param$tooltip5 <- "Valor: "
-param$tooltip6 <- "Unidade de medida:"
-param$tooltip7 <- "% das exportações do produto vindas da Amazônia no ano"
-
-param$legend <- "Categoria do Principal Produto"
-
-# Outros parâmetros e configurações
-param$x_choices <- c("Produtos Compativeis com a Floresta", "Todos os Produtos", "Razão: Floresta / Outros produtos")
-param$year_inicio <- 1997
-param$year_final <- 2021
-
-if(param$lang){
-    param$x_choices[param$x_choices == "Produtos Compativeis com a Floresta"] <- "Forest Compatible Products"
-    param$x_choices[param$x_choices == "Todos os Produtos"] <- "All Products"
-}
+# Textos internacionalizados (PT / EN)
+param$i18n <- list(
+  pt = list(
+    plot_desc      = "Comércio exterior na Amazônia (COMEX): Valor da exportação de produtos",
+    topo           = "VARIÁVEIS:",
+    varxlabel      = "Tipo de produto:",
+    vardatelabel   = "Ano referente",
+    # opções do seletor x (valores fixos: forest/all/razao)
+    x_forest       = "Produtos Compatíveis com a Floresta",
+    x_all          = "Todos os Produtos",
+    x_razao        = "Razão: Floresta / Outros produtos",
+    titulo1        = "Mapa dos municípios da Amazônia Legal",
+    titulo2        = "Nenhuma variável selecionada",
+    titulo3        = "Principal produto exportado: ",
+    tooltip1       = "Nome do município:",
+    tooltip2       = "Estado:",
+    tooltip3       = "Principal Produto:",
+    tooltip4       = "Categoria do Principal Produto:",
+    tooltip5       = "Valor: ",
+    tooltip6       = "Unidade de medida:",
+    tooltip7       = "% das exportações do produto vindas da Amazônia no ano",
+    legend         = "Categoria do Principal Produto",
+    # classes da visão "Razão"
+    ratio_same     = "Mesmo produto",
+    ratio_nao      = "Principal produto não compatível",
+    ratio_sim      = "Principal produto compatível",
+    btn_lang       = "English",
+    btn_fullscreen = "Fullscreen"
+  ),
+  en = list(
+    plot_desc      = "Foreign trade in the Amazon: Value of the product's export",
+    topo           = "VARIABLES:",
+    varxlabel      = "Product type:",
+    vardatelabel   = "Reference year",
+    x_forest       = "Forest Compatible Products",
+    x_all          = "All Products",
+    x_razao        = "Ratio: Forest / Other products",
+    titulo1        = "Legal Amazon's municipalities map",
+    titulo2        = "No variable selected",
+    titulo3        = "Main exported product: ",
+    tooltip1       = "Municipality name:",
+    tooltip2       = "State:",
+    tooltip3       = "Main product:",
+    tooltip4       = "Main product's category:",
+    tooltip5       = "Value: ",
+    tooltip6       = "Unit measure:",
+    tooltip7       = "% of the product's exports that came from the Amazon in the reference year",
+    legend         = "Main Product's Category",
+    ratio_same     = "Same product",
+    ratio_nao      = "Main product not compatible",
+    ratio_sim      = "Main product compatible",
+    btn_lang       = "Português",
+    btn_fullscreen = "Fullscreen"
+  )
+)
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
 ui <- get_ui(files, param)
