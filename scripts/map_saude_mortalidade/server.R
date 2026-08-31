@@ -45,8 +45,8 @@ get_server <- function(files, param) {
         selected = isolate(input$x)
       )
       updateSliderInput(session, "filter1", label = i18n()$label_year)
-      updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
-      updateActionButton(session, "ab1", label = i18n()$btn_fullscreen)
+      updateActionButton(session, "toggle_lang", label = i18n()$btn_lang, icon = icon("globe"))
+      updateActionButton(session, "ab1", label = i18n()$btn_fullscreen, icon = icon("expand"))
     }, ignoreInit = FALSE)
 
     df_reactived <- reactive({
@@ -126,8 +126,20 @@ get_server <- function(files, param) {
       leaflet() %>%
         addProviderTiles(provider = "Esri.WorldGrayCanvas") %>%
         setView(-58, -7, zoom = 5) %>%
-        addPolylines(data = readr::read_rds(files$states_boundary), color = "grey", weight = 1, group = "boundaries") %>%
-        addPolylines(data = readr::read_rds(files$legal_amazon), color = "black", weight = 2, group = "boundaries")
+        # Painel customizado para que os contornos fiquem permanentemente fixados no topo sem piscar ao mudar de ano
+        addMapPane("boundaries_pane", zIndex = 450) %>%
+        addPolylines(
+          data = readr::read_rds(files$states_boundary),
+          color = "grey",
+          weight = 1,
+          options = pathOptions(pane = "boundaries_pane")
+        ) %>%
+        addPolylines(
+          data = readr::read_rds(files$legal_amazon),
+          color = "black",
+          weight = 2,
+          options = pathOptions(pane = "boundaries_pane")
+        )
     })
 
     # Observer para atualizar o mapa de forma incremental e ultra-rápida via leafletProxy
@@ -168,7 +180,6 @@ get_server <- function(files, param) {
           # Atualiza o mapa incrementalmente
           leafletProxy("map", data = df_sub) %>%
             clearControls() %>%
-            clearGroup("boundaries") %>%
             addPolygons(
               label = labels,
               layerId = ~cod_ibge,
@@ -185,8 +196,6 @@ get_server <- function(files, param) {
                 bringToFront = TRUE
               )
             ) %>%
-            addPolylines(data = readr::read_rds(files$states_boundary), color = "grey", weight = 1, group = "boundaries") %>%
-            addPolylines(data = readr::read_rds(files$legal_amazon), color = "black", weight = 2, group = "boundaries") %>%
             addLegend("bottomright",
               pal = pal,
               values = ~ df_sub[[var_name]],

@@ -82,15 +82,22 @@ get_ui <- function(files, param) {
                                                  pauseButton = icon("pause")),
                       sep = "")
         ),
-        # espaço vazio
-        div(class = "fakecheckbox", ),
+        # Botão de troca de idioma e tela cheia
         div(
-          class = "d-flex gap-2",
-          shiny::actionButton(inputId = 'ab1', label = "Tela Cheia", 
-                              icon = icon("expand"), 
-                              class = "btn-primary",
-                              onclick = paste0("window.open('", param$link, "', '_blank')")),
-          actionButton("toggle_lang", label = "English", class = "btn-primary")
+          actionButton(
+            inputId = "toggle_lang",
+            label   = "English",
+            icon    = icon("globe"),
+            class   = "btn-primary"
+          ),
+          div(style = "height: 6px;"),
+          shiny::actionButton(
+            inputId = "ab1",
+            label   = param$i18n$pt$btn_fullscreen,
+            icon    = icon("expand"),
+            class   = "btn-primary",
+            onclick = paste0("window.open('", param$link, "', '_blank')")
+          )
         ),
       ),
       column(9,
