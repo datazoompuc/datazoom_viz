@@ -43,38 +43,38 @@ t_ncommunicable_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Mortalidade indígena brut
 t_injuries_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Mortalidade indígena por causas comunicáveis 100 mil habitantes,t_injuries_ind,Saúde - DATASUS,1,,Social,Saúde
 t_ndef_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Mortalidade indígena por causas não comunicáveis 100 mil habitantes,t_ndef_ind,Saúde - DATASUS,1,,Social,Saúde
 t_mortalidade_inf_ind,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Mortalidade indígena por causas externas 100 mil habitantes,t_mortalidade_inf_ind,Saúde - DATASUS,1,,Social,Saúde
-pc_cobertura_sf,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Mortalidade indígena por causas não definidas 100 mil habitantes,pc_cobertura_sf,Saúde - DATASUS,1,,Social,Saúde
-pc_cobertura_sf_ab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Mortalidade indígena infantil por mil nascidos vivos,pc_cobertura_sf_ab,Saúde - DATASUS,1,,Social,Saúde
-pc_cobertura_acs,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de cobertura da Estratégia Saúde da Família (eSF),pc_cobertura_acs,Saúde - DATASUS,1,,Social,Saúde
-sf_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de cobertura da Atenção Básica (Equipes AB + Equipes eSF),sf_km,Saúde - DATASUS,1,,Social,Saúde
-sf_ab_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de cobertura dos Agentes Comunitários de Saúde (ACS),sf_ab_km,Saúde - DATASUS,1,,Social,Saúde
-acs_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Equipes de eSF por 1000km2,acs_km,Saúde - DATASUS,1,,Social,Saúde
-ubsf_estab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Equipes de AB por 1000km2,ubsf_estab,Saúde - DATASUS,1,,Social,Saúde
-ubsf_equip,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,ACS por 1000km2,ubsf_equip,Saúde - DATASUS,1,,Social,Saúde
-bed_total_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Estabelecimentos de Saúde da Família Ribeirinhas e Fluviais,bed_total_hab,Saúde - DATASUS,1,,Social,Saúde
-bed_sus_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Equipes de Saúde da Família Ribeirinhas e Fluviais,bed_sus_hab,Saúde - DATASUS,1,,Social,Saúde
-uti_total_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos totais,uti_total_hab,Saúde - DATASUS,1,,Social,Saúde
-uti_sus_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos SUS,uti_sus_hab,Saúde - DATASUS,1,,Social,Saúde
-dist_emg,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos de UTI totais,dist_emg,Saúde - DATASUS,1,,Social,Saúde
-dist_mc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos de UTI SUS,dist_mc,Saúde - DATASUS,1,,Social,Saúde
-dist_hc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de urgência-emergência mais próximo,dist_hc,Saúde - DATASUS,1,,Social,Saúde
-dist_uti,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de média complexidade mais próximo,dist_uti,Saúde - DATASUS,1,,Social,Saúde
-dist_dialise,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de alta complexidade mais próximo,dist_dialise,Saúde - DATASUS,1,,Social,Saúde
-dist_quimio,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até a UTI mais próxima,dist_quimio,Saúde - DATASUS,1,,Social,Saúde
-phys_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de diálise mais próximo,phys_hab,Saúde - DATASUS,1,,Social,Saúde
-enf_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de quimioterapia mais próximo,enf_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_cardio_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Médicos por mil habitantes,phys_cardio_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_gineco_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Profissionais de Enfermagem por mil habitantes,phys_gineco_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_endo_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Cardiologistas por mil habitantes,phys_endo_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_onco_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Ginecologistas por mil habitantes,phys_onco_hab,Saúde - DATASUS,1,,Social,Saúde
-phys_pmm,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Endocrinologistas por mil habitantes,phys_pmm,Saúde - DATASUS,1,,Social,Saúde
-prop_pmm,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Oncologistas por mil habitantes,prop_pmm,Saúde - DATASUS,1,,Social,Saúde
-prop_benef,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Médicos do Programa Mais Médicos,prop_benef,Saúde - DATASUS,1,,Social,Saúde
-prop_hosp_nsus,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proporção de médicos do Programa Mais Médicos sobre total de médicos,prop_hosp_nsus,Saúde - DATASUS,1,,Social,Saúde
-bed_priv_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proporção de beneficiários de planos privados de saúde,bed_priv_hab,Saúde - DATASUS,1,,Social,Saúde
-uti_priv_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proporção de hospitais sem vínculo com SUS,uti_priv_hab,Saúde - DATASUS,1,,Social,Saúde
-hosp_sus_priv_pc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos privados por 100 mil habitantes,hosp_sus_priv_pc,Saúde - DATASUS,1,,Social,Saúde
-hosp_nsus_priv_pc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos de UTI privados por 100 mil habitantes,hosp_nsus_priv_pc,Saúde - DATASUS,1,,Social,Saúde
-siops_despsaude_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Hospitais privados com vínculo SUS por 100 mil habitantes,siops_despsaude_def_pc,Saúde - DATASUS,1,,Social,Saúde
-siops_despexrecproprio_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Hospitais privados sem vínculo SUS por 100 mil habitantes,siops_despexrecproprio_def_pc,Saúde - DATASUS,1,,Social,Saúde
-siops_desprecpropsaude_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Gasto total em saúde per capita,siops_desprecpropsaude_def_pc,Saúde - DATASUS,1,,Social,Saúde
+pc_cobertura_sf,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de cobertura da Estratégia Saúde da Família (eSF),pc_cobertura_sf,Saúde - DATASUS,1,,Social,Saúde
+pc_cobertura_sf_ab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de cobertura da Atenção Básica (Equipes AB + Equipes eSF),pc_cobertura_sf_ab,Saúde - DATASUS,1,,Social,Saúde
+pc_cobertura_acs,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Percentual de cobertura dos Agentes Comunitários de Saúde (ACS),pc_cobertura_acs,Saúde - DATASUS,1,,Social,Saúde
+sf_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Equipes de eSF por 1000km2,sf_km,Saúde - DATASUS,1,,Social,Saúde
+sf_ab_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Equipes de AB por 1000km2,sf_ab_km,Saúde - DATASUS,1,,Social,Saúde
+acs_km,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,ACS por 1000km2,acs_km,Saúde - DATASUS,1,,Social,Saúde
+ubsf_estab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Estabelecimentos de Saúde da Família Ribeirinhas e Fluviais,ubsf_estab,Saúde - DATASUS,1,,Social,Saúde
+ubsf_equip,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Equipes de Saúde da Família Ribeirinhas e Fluviais,ubsf_equip,Saúde - DATASUS,1,,Social,Saúde
+bed_total_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos totais por 100 mil habitantes,bed_total_hab,Saúde - DATASUS,1,,Social,Saúde
+bed_sus_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos SUS por 100 mil habitantes,bed_sus_hab,Saúde - DATASUS,1,,Social,Saúde
+uti_total_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos de UTI totais por 100 mil habitantes,uti_total_hab,Saúde - DATASUS,1,,Social,Saúde
+uti_sus_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos de UTI SUS por 100 mil habitantes,uti_sus_hab,Saúde - DATASUS,1,,Social,Saúde
+dist_emg,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de urgência-emergência mais próximo,dist_emg,Saúde - DATASUS,1,,Social,Saúde
+dist_mc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de média complexidade mais próximo,dist_mc,Saúde - DATASUS,1,,Social,Saúde
+dist_hc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de alta complexidade mais próximo,dist_hc,Saúde - DATASUS,1,,Social,Saúde
+dist_uti,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até a UTI mais próxima,dist_uti,Saúde - DATASUS,1,,Social,Saúde
+dist_dialise,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de diálise mais próximo,dist_dialise,Saúde - DATASUS,1,,Social,Saúde
+dist_quimio,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Distância até o serviço de quimioterapia mais próximo,dist_quimio,Saúde - DATASUS,1,,Social,Saúde
+phys_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Médicos por mil habitantes,phys_hab,Saúde - DATASUS,1,,Social,Saúde
+enf_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Profissionais de Enfermagem por mil habitantes,enf_hab,Saúde - DATASUS,1,,Social,Saúde
+phys_cardio_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Cardiologistas por mil habitantes,phys_cardio_hab,Saúde - DATASUS,1,,Social,Saúde
+phys_gineco_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Ginecologistas por mil habitantes,phys_gineco_hab,Saúde - DATASUS,1,,Social,Saúde
+phys_endo_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Endocrinologistas por mil habitantes,phys_endo_hab,Saúde - DATASUS,1,,Social,Saúde
+phys_onco_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Oncologistas por mil habitantes,phys_onco_hab,Saúde - DATASUS,1,,Social,Saúde
+phys_pmm,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Médicos do Programa Mais Médicos,phys_pmm,Saúde - DATASUS,1,,Social,Saúde
+prop_pmm,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proporção de médicos do Programa Mais Médicos sobre total de médicos,prop_pmm,Saúde - DATASUS,1,,Social,Saúde
+prop_benef,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proporção de beneficiários de planos privados de saúde,prop_benef,Saúde - DATASUS,1,,Social,Saúde
+prop_hosp_nsus,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Proporção de hospitais sem vínculo com SUS,prop_hosp_nsus,Saúde - DATASUS,1,,Social,Saúde
+bed_priv_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos privados por 100 mil habitantes,bed_priv_hab,Saúde - DATASUS,1,,Social,Saúde
+uti_priv_hab,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Leitos de UTI privados por 100 mil habitantes,uti_priv_hab,Saúde - DATASUS,1,,Social,Saúde
+hosp_sus_priv_pc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Hospitais privados com vínculo SUS por 100 mil habitantes,hosp_sus_priv_pc,Saúde - DATASUS,1,,Social,Saúde
+hosp_nsus_priv_pc,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Hospitais privados sem vínculo SUS por 100 mil habitantes,hosp_nsus_priv_pc,Saúde - DATASUS,1,,Social,Saúde
+siops_despsaude_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Gasto total em saúde per capita,siops_despsaude_def_pc,Saúde - DATASUS,1,,Social,Saúde
+siops_despexrecproprio_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Gasto em saúde com recursos próprios per capita,siops_despexrecproprio_def_pc,Saúde - DATASUS,1,,Social,Saúde
+siops_desprecpropsaude_def_pc,TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,Percentual de gasto próprio aplicado em saúde,siops_desprecpropsaude_def_pc,Saúde - DATASUS,1,,Social,Saúde
