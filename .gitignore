@@ -7,3 +7,6 @@
 
 .claude/settings.json
 .claude/settings.local.json
+
+data-raw/pnadc_raw/
+reports/
