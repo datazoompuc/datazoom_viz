@@ -77,7 +77,7 @@ get_ui <- function(files, param) {
             selectizeInput(
               "filter1",
               param$label_geo_name,
-              choices  = param$munic_def,
+              choices  = param$munic_choices,
               selected = param$munic_def,
               multiple = TRUE,
               options  = list(maxItems = 20, plugins = list('remove_button')),

@@ -93,6 +93,7 @@ param$y_choices[[1]] <- NULL
 param$uf_choices <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", 
                       "PI", "BA", "MS", "MT", "GO")
 param$uf_def <- "RO"
+param$munic_choices <- sort(unique(readRDS(files$db_file)$municipio))
 param$munic_def <- c("Alta Floresta D'Oeste (RO)", "Ariquemes (RO)")
 
 #  --------------------------------  Roda a aplicação Shiny --------------------------------
