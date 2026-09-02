@@ -76,23 +76,13 @@ get_server <- function(files, param) {
       updateSelectizeInput(
         session,
         "filter1",
-        label    = i18n()$label_geo_name,
-        choices  = all_municipios,
-        server   = TRUE
+        label = i18n()$label_geo_name
       )
       
       updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
       updateActionButton(session, "ab1",         label = i18n()$btn_fullscreen)
     }, ignoreInit = TRUE)
 
-    # Inicializa escolhas do seletor de municípios (server-side para fluidez com todos os municípios)
-    updateSelectizeInput(
-      session,
-      "filter1",
-      choices  = all_municipios,
-      selected = param$munic_def,
-      server   = TRUE
-    )
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
