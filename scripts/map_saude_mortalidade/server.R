@@ -121,34 +121,13 @@ get_server <- function(files, param) {
       paste0(i18n()$label_selected_variable, x_col$label)
     })
 
-    # Inicialização do Mapa Leaflet
+    # Output gráfico
     output$map <- renderLeaflet({
-      leaflet() %>%
-        addProviderTiles(provider = "Esri.WorldGrayCanvas") %>%
-        setView(-58, -7, zoom = 5) %>%
-        # Painel customizado para que os contornos fiquem permanentemente fixados no topo sem piscar ao mudar de ano
-        addMapPane("boundaries_pane", zIndex = 450) %>%
-        addPolylines(
-          data = readr::read_rds(files$states_boundary),
-          color = "grey",
-          weight = 1,
-          options = pathOptions(pane = "boundaries_pane")
-        ) %>%
-        addPolylines(
-          data = readr::read_rds(files$legal_amazon),
-          color = "black",
-          weight = 2,
-          options = pathOptions(pane = "boundaries_pane")
-        )
-    })
-
-    # Observer para atualizar o mapa de forma incremental e ultra-rápida via leafletProxy
-    observe({
       req(input$x, input$filter1, lang())
-      
+
       df_sub <- df_reactived()
       var_name <- input$x
-      
+
       # Define paleta de cores
       pal1 <- pallete_continuous
       if (!is.numeric(df_sub[[var_name]])) {
@@ -177,17 +156,16 @@ get_server <- function(files, param) {
           # Atualiza a URL (efeito colateral)
           update_my_queryString()
 
-          # Atualiza o mapa incrementalmente
-          leafletProxy("map", data = df_sub) %>%
-            clearControls() %>%
+          fig_p <- df_sub %>%
+            leaflet() %>%
+            addProviderTiles(provider = "Esri.WorldGrayCanvas") %>%
+            setView(-58, -7, zoom = 5) %>%
             addPolygons(
               label = labels,
-              layerId = ~cod_ibge,
               stroke = FALSE,
               smoothFactor = .5,
               fillOpacity = ifelse(is.na(df_sub[[var_name]]), 1, 0.8),
               fillColor = ~ pal(df_sub[[var_name]]),
-              group = "municipalities",
               highlightOptions = highlightOptions(
                 weight = 5,
                 fillOpacity = 1,
@@ -201,8 +179,17 @@ get_server <- function(files, param) {
               values = ~ df_sub[[var_name]],
               title = title_legend,
               opacity = 0.8
-            ) %>%
-            # Garante que os tooltips não fiquem presos nas novas camadas
+            )
+
+          states_boundary <- readr::read_rds(files$states_boundary)
+          legal_amazon_boundary <- readr::read_rds(files$legal_amazon)
+
+          fig_p <- fig_p %>%
+            addPolylines(data = states_boundary, color = "grey", weight = 1) %>%
+            addPolylines(data = legal_amazon_boundary, color = "black", weight = 2)
+
+          # Corrige tooltips "presos" abertos conforme troubleshooting.md
+          fig_p <- fig_p %>%
             htmlwidgets::onRender("
               function(el, x) {
                 var map = this;
@@ -224,6 +211,8 @@ get_server <- function(files, param) {
                 });
               }
             ")
+
+          fig_p
         },
         error = function(cond) {
           print(paste("Plot error:", cond))

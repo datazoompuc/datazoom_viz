@@ -53,7 +53,8 @@ get_ui <- function(files, param) {
         uiOutput("plot_name_ui"),
         uiOutput("plot_desc_ui"),
         hr(),
-        textOutput("label_var_name"),
+        tags$style(HTML(".switch-label { color: white; }")),
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
@@ -82,6 +83,8 @@ get_ui <- function(files, param) {
                                                  pauseButton = icon("pause")),
                       sep = "")
         ),
+        # espaço vazio
+        div(class = "fakecheckbox", ),
         # Botão de troca de idioma e tela cheia
         div(
           actionButton(
@@ -89,8 +92,10 @@ get_ui <- function(files, param) {
             label   = "English",
             icon    = icon("globe"),
             class   = "btn-primary"
-          ),
-          div(style = "height: 6px;"),
+          )
+        ),
+        div(style = "height: 6px;"),
+        div(
           shiny::actionButton(
             inputId = "ab1",
             label   = param$i18n$pt$btn_fullscreen,
