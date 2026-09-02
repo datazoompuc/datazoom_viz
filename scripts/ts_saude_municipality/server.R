@@ -31,23 +31,10 @@ get_server <- function(files, param) {
     output$label_var_name <- renderText({ i18n()$label_var_name })
     output$label_scale_name <- renderText({ i18n()$label_scale_name })
     output$label_prop_name  <- renderText({ i18n()$label_prop_name })
-    output$label_agg        <- renderText({ i18n()$label_agg })
-    output$label_geo_est    <- renderText({ i18n()$label_geo_est })
-    output$label_geo_munic  <- renderText({ i18n()$label_geo_munic })
 
-    # --- GEOGRAPHIC LEVEL (SEGMENTED CONTROL) ---
-    geo <- reactiveVal({
-      query <- parseQueryString(isolate(session$clientData$url_search))
-      if (identical(query[["geo"]], "est")) "est" else "munic"
-    })
-    
-    observeEvent(input$geo_est,   { geo("est") })
-    observeEvent(input$geo_munic, { geo("munic") })
-    
-    observeEvent(geo(), {
-      session$sendCustomMessage("setGeo", geo())
-      updateTextInput(session, "geo_hidden", value = geo())
-    }, ignoreInit = FALSE)
+    # Carrega dados
+    df <- readRDS(files$db_file)
+    all_municipios <- sort(unique(df$municipio))
 
     # Atualiza choices e labels ao trocar idioma
     observeEvent(lang(), {
@@ -65,50 +52,24 @@ get_server <- function(files, param) {
       
       updateSelectizeInput(
         session,
-        "uf",
-        label = i18n()$label_uf_name
-      )
-      
-      updateSelectizeInput(
-        session,
         "filter1",
-        label = i18n()$label_geo_name
+        label    = i18n()$label_geo_name,
+        choices  = all_municipios,
+        server   = TRUE
       )
       
       updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
       updateActionButton(session, "ab1",         label = i18n()$btn_fullscreen)
     }, ignoreInit = TRUE)
 
-    # Carrega dados
-    df <- readRDS(files$db_file)
-    
-    # Cria opções para seleção de grupos
-    param$filter_choices <- reactive({
-      df$municipio[stringr::str_detect(df$municipio, purrr::reduce(input$uf, paste, sep = "|", .init = "_"))] # selecionar municipios dos estados escolhidos],
-    })
-    
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      selected_uf <- sample(param$uf_choices, 2)
-      updateSelectInput(session,
-        "uf",
-        choices = param$uf_choices,
-        selected = selected_uf
-      )
-      
-      updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices(),
-        selected = sample(param$filter_choices(), 2)
-      )
-
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
-      updateSelectInput(session,
-        "y",
-        choices = param$y_choices,
-        selected = selected
-      )
-    }
+    # Inicializa escolhas do seletor de municípios (server-side para fluidez)
+    updateSelectizeInput(
+      session,
+      "filter1",
+      choices  = all_municipios,
+      selected = param$munic_def,
+      server   = TRUE
+    )
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
@@ -116,13 +77,8 @@ get_server <- function(files, param) {
         "?", "lang=", lang(),
         "&", "y=", input$y,
         "&", "ylog=", input$ylog,
-        "&", "y_index_base=", input$y_index_base,
-        "&", "geo=", geo()
+        "&", "y_index_base=", input$y_index_base
       )
-
-      for (i in input$uf) {
-        q_string <- paste0(q_string, "&", "uf=", i)
-      }
 
       for (i in input$filter1) {
         q_string <- paste0(q_string, "&", "filter=", i)
@@ -140,10 +96,6 @@ get_server <- function(files, param) {
 
       if (!is.null(query[["lang"]]) && query[["lang"]] %in% c("pt", "en")) {
         lang(query[["lang"]])
-      }
-
-      if (!is.null(query[["geo"]]) && query[["geo"]] %in% c("munic", "est")) {
-        geo(query[["geo"]])
       }
 
       if (!is.null(query[["y"]])) {
@@ -166,19 +118,12 @@ get_server <- function(files, param) {
         )
       }
 
-      selected_uf <- unlist(query[names(query) == "uf"], use.names = FALSE)
-      if (!is.null(query[["uf"]])) {
-        updateSelectInput(session, "uf",
-          choices  = param$uf_choices,
-          selected = selected_uf
-        )
-      }
-
       selected_filter <- unlist(query[names(query) == "filter"], use.names = FALSE)
       if (!is.null(query[["filter"]])) {
-        updateSelectInput(session, "filter1",
-          choices  = param$filter_choices(),
-          selected = selected_filter
+        updateSelectizeInput(session, "filter1",
+          choices  = all_municipios,
+          selected = selected_filter,
+          server   = TRUE
         )
       }
     }
@@ -201,16 +146,7 @@ get_server <- function(files, param) {
     output$plot_subtitle <- renderText({
         if (is.null(input$y) || input$y == "") return(" ")
         
-        subtitles <- c()
-        
-        # Nível geográfico (municipal ou estadual)
-        level_text <- if (geo() == "est") {
-            i18n()$label_state
-        } else {
-            i18n()$label_municipal
-        }
-        
-        subtitles <- c(subtitles, level_text)
+        subtitles <- c(i18n()$label_municipal)
         
         # Botões ativos
         if (isTRUE(input$y_index_base)) {
@@ -227,15 +163,6 @@ get_server <- function(files, param) {
         i18n()$stitle_init
     })
     
-    # observeEvent isolado para evitar loop infinito
-    observeEvent(param$filter_choices(), {
-      selected_filter <- isolate(input$filter1)
-      updateSelectInput(session,
-                        "filter1",
-                        choices = param$filter_choices(),
-                        selected = selected_filter)
-    })
-    
     # Atualiza a URL em observer separado para não criar loop com renderPlotly
     observe({
       update_my_queryString()
@@ -248,8 +175,7 @@ get_server <- function(files, param) {
       tryCatch(
         {
           if (is.null(input$y) || input$y == "" ||
-              is.null(input$uf) || length(input$uf) < 1 ||
-              (!is.null(geo()) && geo() == "munic" && (is.null(input$filter1) || length(input$filter1) < 1))) {
+              is.null(input$filter1) || length(input$filter1) < 1) {
             fig <- plotly_empty()
             stop()
           }
@@ -259,22 +185,9 @@ get_server <- function(files, param) {
           id_col <- active_table()[which(active_table()$var == param$id_def), ]
           color_col <- active_table()[which(active_table()$var == param$color_def), ]
 
-          # Filtra dataframe com grupos selecionados
+          # Filtra dataframe com municípios selecionados
           df_filtered <- reactive({
-              if (geo() == "est") {
-                  df_uf <- df[which(df$sigla_uf %in% input$uf), ]
-                  df_uf %>%
-                      group_by(ano, sigla_uf) %>%
-                      summarise(
-                          across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),
-                          municipio = first(sigla_uf),
-                          nome_uf = first(nome_uf),
-                          regiao = first(regiao),
-                          .groups = "drop"
-                      )
-              } else {
-                  df[which(df$municipio %in% input$filter1), ]
-              }
+              df[which(df$municipio %in% input$filter1), ]
           })
 
           df_p <- data.frame(

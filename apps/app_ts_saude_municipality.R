@@ -41,12 +41,12 @@ param$text_def <- "municipio" # variável padrão de texto
 param$id_def <- "cod_ibge" # variável padrão de id
 
 param$plot_name <- "Data Zoom Amazônia"
-param$plot_desc <- "Dados de Saúde ao nível municipal"
+param$plot_desc <- "Dados de Saúde ao nível municipal na Amazônia Legal"
 
 # --- ESTRUTURAÇÃO DE TRADUÇÃO (I18N) ---
 param$i18n <- list(
   pt = list(
-    plot_desc = "Dados de Saúde ao nível municipal",
+    plot_desc = "Dados de Saúde ao nível municipal na Amazônia Legal",
     label_var_name = "VARIÁVEIS:",
     label_y_name = "Variável selecionada",
     label_scale_name = "Escala log",
@@ -65,7 +65,7 @@ param$i18n <- list(
     label_geo_munic = "MUNICÍPIO"
   ),
   en = list(
-    plot_desc = "Health Data at municipal level",
+    plot_desc = "Health Data at municipal level in the Legal Amazon",
     label_var_name = "VARIABLES:",
     label_y_name = "Selected variable",
     label_scale_name = "Log scale",

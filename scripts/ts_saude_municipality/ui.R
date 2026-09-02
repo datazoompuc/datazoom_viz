@@ -25,17 +25,6 @@ get_ui <- function(files, param) {
         # labels dos materialSwitch em branco
         tags$style(HTML(".switch-label { color: white; }")),
 
-        # Toggle Estado/Município: dois actionButton estilizados como segmented
-        # control. O CSS (.seg-toggle/.seg-btn/.seg-active) está no CSS global.
-        tags$script(HTML(
-          "Shiny.addCustomMessageHandler('setGeo', function(v){
-             var a = document.getElementById('geo_est');
-             var b = document.getElementById('geo_munic');
-             if (a) a.classList.toggle('seg-active', v === 'est');
-             if (b) b.classList.toggle('seg-active', v === 'munic');
-           });"
-        )),
-
         uiOutput("plot_name_ui"),
         uiOutput("plot_desc_ui"),
         hr(),
@@ -54,63 +43,20 @@ get_ui <- function(files, param) {
             width = "100%"
           ),
 
-          div(class = "sidebar-gap"),
-
-          # 2. Segmented Control — Estado / Município (logo após a variável)
-          div(
-            tags$div(class = "switch-label", style = "margin-bottom: 4px;",
-                     textOutput("label_agg", inline = TRUE)),
-            div(
-              class = "seg-toggle",
-              actionButton("geo_munic", textOutput("label_geo_munic", inline = TRUE),
-                           class = "btn-primary seg-btn seg-active"),
-              actionButton("geo_est",   textOutput("label_geo_est",   inline = TRUE),
-                           class = "btn-primary seg-btn")
-            )
-          ),
-
-          # 3. Seleciona filtro de UF
+          # 2. Seleciona municípios de todos os estados (sem seletor de estado)
           selectizeInput(
-            "uf",
-            param$label_uf_name,
-            choices = c("Rondônia (RO)" = "RO",
-                        "Acre (AC)" = "AC",
-                        "Amazonas (AM)" = "AM",
-                        "Roraima (RR)" = "RR",
-                        "Pará (PA)" = "PA",
-                        "Amapá (AP)" = "AP",
-                        "Tocantins (TO)" = "TO",
-                        "Maranhão (MA)" = "MA",
-                        "Piauí (PI)" = "PI",
-                        "Bahia (BA)" = "BA",
-                        "Mato Grosso do Sul (MS)" = "MS",
-                        "Mato Grosso (MT)" = "MT",
-                        "Goiás (GO)" = "GO"),
-            selected = param$uf_def,
+            "filter1",
+            param$label_geo_name,
+            choices  = param$munic_def,
+            selected = param$munic_def,
             multiple = TRUE,
-            options = list(maxItems = 20, plugins = list('remove_button')),
+            options  = list(maxItems = 20, plugins = list('remove_button')),
             width = "100%"
-          ),
-
-          # 4. Filtro de municípios (oculto quando geo == "est")
-          # Campo oculto para sincronizar o conditionalPanel com o reativo geo()
-          div(style = "display: none;", textInput("geo_hidden", label = NULL, value = "munic")),
-          conditionalPanel(
-            condition = "input.geo_hidden == 'munic'",
-            selectizeInput(
-              "filter1",
-              param$label_geo_name,
-              choices  = param$munic_def,
-              selected = param$munic_def,
-              multiple = TRUE,
-              options  = list(maxItems = 20, plugins = list('remove_button')),
-              width = "100%"
-            )
           ),
 
           div(style = "margin-top: 5px;"),
 
-          # 5. Switches
+          # 3. Switches
           materialSwitch(
             inputId = "y_index_base",
             label   = tags$span(textOutput("label_prop_name", inline = TRUE), class = "switch-label"),
