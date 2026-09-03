@@ -70,6 +70,45 @@ html, body {
   color: #222;
 }
 
+.sparkline-wrap {
+  margin-bottom: 4px;
+}
+
+#year-sparkline {
+  width: 100%;
+  height: 40px;
+  display: block;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.spark-area {
+  fill: rgba(255, 255, 255, 0.25);
+  stroke: none;
+}
+
+.spark-line {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.spark-guide {
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.spark-marker {
+  fill: #fff;
+  stroke: #2f6e5c;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  transition: cx 150ms linear, cy 250ms ease;
+}
+
 .slider-row {
   display: flex;
   align-items: center;
@@ -195,3 +234,12 @@ html, body {
 }
 
 .leaflet-tooltip b { color: inherit; }
+
+/* Municipality fill animates between years instead of jump-cutting.
+   Works because Leaflet's SVG renderer sets `fill`/`fill-opacity` as
+   presentation attributes via setAttribute — browsers still animate
+   those under a CSS transition as long as nothing sets an inline
+   style with higher precedence. */
+.muni-path {
+  transition: fill 400ms ease, fill-opacity 250ms ease;
+}

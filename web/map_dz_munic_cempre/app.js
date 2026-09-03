@@ -48,6 +48,9 @@
 
   const DATA_DIR = "data";
   const N_BINS = 9;
+  const SPARK_W = 260;
+  const SPARK_H = 40;
+  const SPARK_PAD = 4;
 
   const state = {
     lang: "pt",
@@ -57,8 +60,20 @@
     playTimer: null
   };
 
-  let map, geojsonLayer, legendControl;
+  let map, legendControl;
   let municGeo, statesGeo, legalAmazonGeo, attributesByYear, dictionary, fullDomainByVar;
+
+  // Built once in buildMapLayer(); year/variable/lang changes update these
+  // layers in place (setStyle / setTooltipContent) instead of tearing down
+  // and recreating the whole GeoJSON layer. That's what lets the CSS
+  // transition on .muni-path actually animate — a fresh element every
+  // frame has no "previous" fill to transition from.
+  const layersByCodIbge = new Map();
+  const breaksCache = {}; // var -> { breaks, colors }, since the domain (and so the bins) only depends on the variable, not the year
+  let openTooltipLayer = null;
+  let sparkSeries = [];
+  let sparkXFor = null;
+  let sparkYFor = null;
 
   // ---- Boot ----
 
@@ -79,6 +94,7 @@
 
     initState();
     initMap();
+    buildMapLayer();
     initControls();
     render();
     document.getElementById("spinner").classList.add("hidden");
@@ -183,11 +199,14 @@
     slider.min = dictionary.year_inicio;
     slider.max = dictionary.year_final;
     slider.addEventListener("input", () => {
-      stopPlaying();
-      state.year = parseInt(slider.value, 10);
-      updateUrl();
-      renderMapLayer();
-      document.getElementById("year-value").textContent = state.year;
+      jumpToYear(parseInt(slider.value, 10));
+    });
+
+    document.getElementById("year-sparkline").addEventListener("click", (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const frac = (e.clientX - rect.left) / rect.width;
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      jumpToYear(Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year)));
     });
 
     document.getElementById("play-btn").addEventListener("click", togglePlay);
@@ -196,6 +215,24 @@
       updateUrl();
       render();
     });
+  }
+
+  // Applies state.year to every year-dependent bit of UI (slider position,
+  // map colors, sparkline marker) without touching the play/pause state —
+  // this is the tick handler for autoplay.
+  function applyYear(newYear) {
+    state.year = newYear;
+    document.getElementById("year-slider").value = newYear;
+    document.getElementById("year-value").textContent = newYear;
+    updateUrl();
+    updateMapColors();
+    updateSparklineMarker();
+  }
+
+  // User-initiated seek (slider drag, sparkline click) — also stops autoplay.
+  function jumpToYear(newYear) {
+    stopPlaying();
+    applyYear(newYear);
   }
 
   function togglePlay() {
@@ -210,11 +247,7 @@
           stopPlaying();
           return;
         }
-        state.year += 1;
-        document.getElementById("year-slider").value = state.year;
-        document.getElementById("year-value").textContent = state.year;
-        updateUrl();
-        renderMapLayer();
+        applyYear(state.year + 1);
       }, 5000);
     } else {
       clearInterval(state.playTimer);
@@ -262,64 +295,146 @@
     const varMeta = dict.find((d) => d.var === state.x);
     document.getElementById("plot-subtitle").textContent = `${t.label_var_name} ${varMeta.label}`;
 
-    renderMapLayer();
+    renderSparkline();
+    updateMapColors();
   }
 
-  function renderMapLayer() {
-    const dict = dictionary[state.lang];
-    const varMeta = dict.find((d) => d.var === state.x);
-    const t = I18N[state.lang];
-
-    const breaks = prettyBreaks(fullDomainByVar[state.x], N_BINS);
-    const colors = samplePalette(PALETTE_CONTINUOUS, breaks.length - 1);
-    const yearData = attributesByYear.get(state.year) || new Map();
-
-    function valueFor(codIbge) {
-      const row = yearData.get(codIbge);
-      return row ? row[state.x] : null;
-    }
-
-    function colorFor(value) {
-      if (value === null || value === undefined || Number.isNaN(value)) return "#cccccc";
-      return colors[binIndex(value, breaks)];
-    }
-
-    if (geojsonLayer) map.removeLayer(geojsonLayer);
-
-    let openTooltipLayer = null;
-
-    geojsonLayer = L.geoJSON(municGeo, {
-      style: (feature) => ({
+  // Builds the 772 municipality polygons ONCE, wiring up hover/tooltip
+  // behavior that doesn't change across renders. Every subsequent
+  // variable/year/lang change goes through updateMapColors() instead of
+  // rebuilding this layer — see the layersByCodIbge comment above.
+  function buildMapLayer() {
+    L.geoJSON(municGeo, {
+      style: () => ({
+        className: "muni-path",
         stroke: false,
         fillOpacity: 0.8,
-        fillColor: colorFor(valueFor(feature.properties.cod_ibge))
+        fillColor: "#cccccc"
       }),
       onEachFeature: (feature, layer) => {
-        const row = yearData.get(feature.properties.cod_ibge);
-        const value = row ? row[state.x] : null;
-        const html = [
-          t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
-          t.label_state_name, row ? row.estado : "—", "</b><br>",
-          varMeta.label, ": <b>", fmtNumber(value), "</b><br>",
-          t.label_measurement_unit, varMeta.unidade, "</b>"
-        ].join("");
-
-        layer.bindTooltip(html, { sticky: true });
+        layersByCodIbge.set(feature.properties.cod_ibge, layer);
+        layer.bindTooltip("", { sticky: true });
 
         layer.on("mouseover", () => {
           if (openTooltipLayer && openTooltipLayer !== layer) openTooltipLayer.closeTooltip();
           openTooltipLayer = layer;
-          layer.setStyle({ weight: 5, color: "black", opacity: 1, fillOpacity: 1 });
+          layer.setStyle({ stroke: true, weight: 5, color: "black", opacity: 1, fillOpacity: 1 });
           layer.bringToFront();
         });
         layer.on("mouseout", () => {
           if (openTooltipLayer === layer) openTooltipLayer = null;
-          geojsonLayer.resetStyle(layer);
+          // Explicit rest style rather than layer.resetStyle(): resetStyle
+          // reverts to the style captured when the layer was created, which
+          // would snap fillColor back to the very first year ever shown
+          // instead of the current one. Omitting fillColor here keeps
+          // whatever updateMapColors() last set (setStyle merges options).
+          layer.setStyle({ stroke: false, fillOpacity: 0.8 });
         });
       }
     }).addTo(map);
+  }
+
+  function getBreaksAndColors(varName) {
+    if (!breaksCache[varName]) {
+      const breaks = prettyBreaks(fullDomainByVar[varName], N_BINS);
+      const colors = samplePalette(PALETTE_CONTINUOUS, breaks.length - 1);
+      breaksCache[varName] = { breaks, colors };
+    }
+    return breaksCache[varName];
+  }
+
+  // Re-colors and re-tooltips the existing polygons for the current
+  // variable/year/lang. Changing only `fillColor` on an already-mounted
+  // <path> (rather than replacing the element) is what makes the
+  // .muni-path CSS transition animate the year-to-year change.
+  function updateMapColors() {
+    const dict = dictionary[state.lang];
+    const varMeta = dict.find((d) => d.var === state.x);
+    const t = I18N[state.lang];
+    const { breaks, colors } = getBreaksAndColors(state.x);
+    const yearData = attributesByYear.get(state.year) || new Map();
+
+    for (const [codIbge, layer] of layersByCodIbge) {
+      const row = yearData.get(codIbge);
+      const value = row ? row[state.x] : null;
+      const color = value === null || value === undefined || Number.isNaN(value)
+        ? "#cccccc"
+        : colors[binIndex(value, breaks)];
+
+      layer.setStyle({ fillColor: color });
+      layer.setTooltipContent([
+        t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
+        t.label_state_name, row ? row.estado : "—", "</b><br>",
+        varMeta.label, ": <b>", fmtNumber(value), "</b><br>",
+        t.label_measurement_unit, varMeta.unidade, "</b>"
+      ].join(""));
+    }
 
     renderLegend(breaks, colors, `${varMeta.label} (${varMeta.unidade})`);
+  }
+
+  // ---- Sparkline: total value per year for the selected variable, above
+  // the slider. Lets you see the shape of the series before scrubbing, and
+  // click any point on it to jump straight there. ----
+
+  function computeYearSeries(varName) {
+    const series = [];
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) {
+      const yearData = attributesByYear.get(y);
+      let sum = 0;
+      let has = false;
+      if (yearData) {
+        for (const row of yearData.values()) {
+          const v = row[varName];
+          if (v !== null && v !== undefined && !Number.isNaN(v)) {
+            sum += v;
+            has = true;
+          }
+        }
+      }
+      series.push({ year: y, value: has ? sum : null });
+    }
+    return series;
+  }
+
+  function renderSparkline() {
+    sparkSeries = computeYearSeries(state.x);
+    const values = sparkSeries.map((d) => d.value).filter((v) => v !== null);
+    const minV = Math.min(...values);
+    const maxV = Math.max(...values);
+
+    sparkXFor = (year) => ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * SPARK_W;
+    sparkYFor = (value) => (maxV === minV
+      ? SPARK_H / 2
+      : SPARK_PAD + (1 - (value - minV) / (maxV - minV)) * (SPARK_H - 2 * SPARK_PAD));
+
+    const known = sparkSeries.filter((d) => d.value !== null);
+    const pts = known.map((d) => `${sparkXFor(d.year).toFixed(1)},${sparkYFor(d.value).toFixed(1)}`);
+
+    document.getElementById("spark-line").setAttribute("d", pts.length ? `M${pts.join(" L")}` : "");
+    document.getElementById("spark-area").setAttribute("d", pts.length
+      ? `M${sparkXFor(known[0].year).toFixed(1)},${SPARK_H} L${pts.join(" L")} L${sparkXFor(known[known.length - 1].year).toFixed(1)},${SPARK_H} Z`
+      : "");
+
+    updateSparklineMarker();
+  }
+
+  function updateSparklineMarker() {
+    if (!sparkXFor) return;
+    const x = sparkXFor(state.year);
+    const guide = document.getElementById("spark-guide");
+    guide.setAttribute("x1", x);
+    guide.setAttribute("x2", x);
+
+    const d = sparkSeries.find((d) => d.year === state.year);
+    const marker = document.getElementById("spark-marker");
+    if (d && d.value !== null) {
+      marker.setAttribute("cx", x);
+      marker.setAttribute("cy", sparkYFor(d.value));
+      marker.setAttribute("opacity", "1");
+    } else {
+      marker.setAttribute("opacity", "0");
+    }
   }
 
   function renderLegend(breaks, colors, title) {

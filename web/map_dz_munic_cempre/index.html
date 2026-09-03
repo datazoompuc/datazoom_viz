@@ -22,6 +22,14 @@
     </div>
     <div class="var_selec_group slider-inline">
       <label id="label_year" for="year-slider"></label>
+      <div class="sparkline-wrap">
+        <svg id="year-sparkline" viewBox="0 0 260 40" preserveAspectRatio="none">
+          <path id="spark-area" class="spark-area"></path>
+          <path id="spark-line" class="spark-line"></path>
+          <line id="spark-guide" class="spark-guide" y1="0" y2="40"></line>
+          <circle id="spark-marker" class="spark-marker" r="3"></circle>
+        </svg>
+      </div>
       <div class="slider-row">
         <button id="play-btn" class="icon-btn" title="Play/Pause">&#9654;</button>
         <input type="range" id="year-slider" step="1">
