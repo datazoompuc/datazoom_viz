@@ -166,12 +166,12 @@
 
     // NOTE: the original app uses CartoDB.PositronNoLabels (no-label light
     // basemap), but Carto retired free anonymous raster tile access — that
-    // style now needs an API key. Using stock OSM tiles for this PoC;
-    // getting the same visual basemap back requires a Carto account.
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      subdomains: "abc",
-      maxZoom: 19
+    // style now needs an API key. Esri's World_Light_Gray_Base is the
+    // closest free, no-key equivalent: light, minimal roads, no labels
+    // fighting the choropleth for attention (stock OSM tiles are far busier).
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",
+      maxZoom: 16
     }).addTo(map);
 
     L.geoJSON(statesGeo, { style: { color: "grey", weight: 1, fill: false }, interactive: false }).addTo(map);
@@ -308,7 +308,7 @@
       style: () => ({
         className: "muni-path",
         stroke: false,
-        fillOpacity: 0.8,
+        fillOpacity: 0.9,
         fillColor: "#cccccc"
       }),
       onEachFeature: (feature, layer) => {
@@ -328,7 +328,7 @@
           // would snap fillColor back to the very first year ever shown
           // instead of the current one. Omitting fillColor here keeps
           // whatever updateMapColors() last set (setStyle merges options).
-          layer.setStyle({ stroke: false, fillOpacity: 0.8 });
+          layer.setStyle({ stroke: false, fillOpacity: 0.9 });
         });
       }
     }).addTo(map);
