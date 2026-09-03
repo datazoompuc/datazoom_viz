@@ -22,6 +22,7 @@
       label_munic_name: "Nome do Município <b>",
       label_state_name: "Estado: <b>",
       label_measurement_unit: "Unidade de medida: <b>",
+      label_no_data: "Sem dado",
       btn_lang: "English"
     },
     en: {
@@ -34,17 +35,38 @@
       label_munic_name: "Municipality name: <b>",
       label_state_name: "State: <b>",
       label_measurement_unit: "Measurement unit: <b>",
+      label_no_data: "No data",
       btn_lang: "Português"
     }
   };
 
-  // Reversed viridis, same order as pallete_continuous in
-  // scripts/map_dz_munic_cempre/server.R (low value = yellow, high = purple).
+  // Single-hue sequential ramp (green, ~170deg OKLCH hue — close to the
+  // app's own #50A486/#48968B brand greens), light -> dark = low -> high.
+  // Replaces the original reversed-viridis palette (yellow->purple), which
+  // is a multi-hue rainbow ramp encoding magnitude — exactly what the
+  // dataviz skill's color formula rules out ("Sequential = one hue,
+  // light->dark. Never a rainbow.") Validated with the skill's own checker
+  // as an ordinal ramp (these 9 stops render as discrete legend swatches,
+  // not a continuous gradient, so --ordinal is the applicable check):
+  // monotone lightness, adjacent ΔL >= 0.06, single hue (spread 2deg), and
+  // light-end contrast 2.07:1 against a white legend surface (>= the 2:1
+  // floor) — see data-raw/build_sequential_ramp.mjs for the generator.
   const PALETTE_CONTINUOUS = [
-    "#fde725", "#dce319", "#b8de29", "#95d840", "#73d055", "#55c667",
-    "#3cbb75", "#29af7f", "#20a387", "#1f968b", "#238a8d", "#287d8e",
-    "#33638d", "#39568c", "#404788", "#453781", "#481567", "#440154"
+    "#a4b6af", "#82a799", "#659685", "#4b8571", "#35735f",
+    "#23604e", "#154e3d", "#0b3b2e", "#052a1f"
   ];
+
+  // "No data" gets a hatch texture, not a flat gray: at dE 8.8 (OKLab, the
+  // dataviz skill's CVD-separation metric) the previous flat #cccccc sat
+  // below even the CVD floor (6) against the lightest green bin — on a
+  // choropleth, an under-vs-missing mixup is a real misread, not just an
+  // aesthetic gap. NODATA_FILL colors the pattern itself (see
+  // ensureNoDataPattern); its base clears the normal-vision floor (dE 15.4)
+  // against the lightest bin, and the diagonal hatch is the accessibility
+  // skill's texture channel — a second, hue-independent signal.
+  const NODATA_PATTERN_ID = "nodata-hatch";
+  const NODATA_BASE = "#e4e2dd";
+  const NODATA_LINE = "#b8b5ae";
 
   const DATA_DIR = "data";
   const N_BINS = 9;
@@ -303,13 +325,30 @@
   // behavior that doesn't change across renders. Every subsequent
   // variable/year/lang change goes through updateMapColors() instead of
   // rebuilding this layer — see the layersByCodIbge comment above.
+  // Injects an SVG <pattern> for the "no data" fill into Leaflet's own SVG
+  // renderer, so polygons can set fillColor to `url(#nodata-hatch)` — a
+  // valid SVG paint reference, same as any other setStyle value. Must run
+  // after the first polygon layer exists (that's what makes Leaflet create
+  // its SVG root).
+  function ensureNoDataPattern() {
+    var svg = document.querySelector("#map svg");
+    if (!svg || svg.querySelector("#" + NODATA_PATTERN_ID)) return;
+    var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.innerHTML =
+      '<pattern id="' + NODATA_PATTERN_ID + '" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+      '<rect width="6" height="6" fill="' + NODATA_BASE + '"></rect>' +
+      '<line x1="0" y1="0" x2="0" y2="6" stroke="' + NODATA_LINE + '" stroke-width="2"></line>' +
+      "</pattern>";
+    svg.insertBefore(defs, svg.firstChild);
+  }
+
   function buildMapLayer() {
     L.geoJSON(municGeo, {
       style: () => ({
         className: "muni-path",
         stroke: false,
         fillOpacity: 0.9,
-        fillColor: "#cccccc"
+        fillColor: "#cccccc" // placeholder; updateMapColors() repaints before this ever renders a frame
       }),
       onEachFeature: (feature, layer) => {
         layersByCodIbge.set(feature.properties.cod_ibge, layer);
@@ -332,6 +371,8 @@
         });
       }
     }).addTo(map);
+
+    ensureNoDataPattern();
   }
 
   function getBreaksAndColors(varName) {
@@ -358,7 +399,7 @@
       const row = yearData.get(codIbge);
       const value = row ? row[state.x] : null;
       const color = value === null || value === undefined || Number.isNaN(value)
-        ? "#cccccc"
+        ? "url(#" + NODATA_PATTERN_ID + ")"
         : colors[binIndex(value, breaks)];
 
       layer.setStyle({ fillColor: color });
@@ -370,7 +411,7 @@
       ].join(""));
     }
 
-    renderLegend(breaks, colors, `${varMeta.label} (${varMeta.unidade})`);
+    renderLegend(breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
   }
 
   // ---- Sparkline: total value per year for the selected variable, above
@@ -437,12 +478,13 @@
     }
   }
 
-  function renderLegend(breaks, colors, title) {
+  function renderLegend(breaks, colors, title, noDataLabel) {
     const div = legendControl._div;
     let html = `<div class="legend-title">${title}</div>`;
     for (let i = colors.length - 1; i >= 0; i--) {
       html += `<div class="legend-row"><span class="swatch" style="background:${colors[i]}"></span>${fmtNumber(breaks[i])} &ndash; ${fmtNumber(breaks[i + 1])}</div>`;
     }
+    html += `<div class="legend-row"><span class="swatch swatch-nodata"></span>${noDataLabel}</div>`;
     div.innerHTML = html;
   }
 

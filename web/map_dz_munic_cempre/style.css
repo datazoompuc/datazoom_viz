@@ -233,6 +233,18 @@ html, body {
   display: inline-block;
 }
 
+/* Matches the SVG hatch pattern used for "no data" polygons on the map
+   (ensureNoDataPattern in app.js) — same base/line colors, same 45deg
+   angle, so the legend swatch and the map fill read as the same thing. */
+.legend .swatch-nodata {
+  background-color: #e4e2dd;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #b8b5ae 0, #b8b5ae 1.5px,
+    transparent 1.5px, transparent 6px
+  );
+}
+
 .leaflet-tooltip b { color: inherit; }
 
 /* Municipality fill animates between years instead of jump-cutting.
