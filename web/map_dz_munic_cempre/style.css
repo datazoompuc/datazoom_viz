@@ -72,6 +72,7 @@ html, body {
 
 .sparkline-wrap {
   margin-bottom: 4px;
+  position: relative; /* anchors .spark-tooltip */
 }
 
 #year-sparkline {
@@ -83,17 +84,23 @@ html, body {
 }
 
 .spark-area {
-  fill: rgba(255, 255, 255, 0.25);
+  /* No neutral "chart surface" here — the sparkline sits directly on the
+     brand-green sidebar, so the area wash is white-on-green rather than
+     the series' own hue (which is effectively white/ink in this context). */
+  fill: rgba(255, 255, 255, 0.14);
   stroke: none;
 }
 
 .spark-line {
   fill: none;
   stroke: #fff;
-  stroke-width: 1.5;
+  stroke-width: 2; /* dataviz skill mark spec: line = 2px */
+  stroke-linecap: round;
+  stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
+/* Persistent indicator for the currently selected year. */
 .spark-guide {
   stroke: rgba(255, 255, 255, 0.6);
   stroke-width: 1;
@@ -101,12 +108,53 @@ html, body {
   vector-effect: non-scaling-stroke;
 }
 
+/* Transient crosshair that tracks the pointer on hover — shown/hidden via
+   opacity in app.js, separate from .spark-guide (the selection marker). */
+.spark-hover-line {
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .spark-marker {
   fill: #fff;
-  stroke: #2f6e5c;
-  stroke-width: 1.5;
+  /* 2px ring in the surface color (the sidebar green) — separates the
+     marker from the line passing behind it without drawing a border. */
+  stroke: #50A486;
+  stroke-width: 2;
   vector-effect: non-scaling-stroke;
   transition: cx 150ms linear, cy 250ms ease;
+}
+
+.spark-hover-marker {
+  fill: #fff;
+  stroke: #50A486;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spark-tooltip {
+  position: absolute;
+  top: -4px;
+  transform: translate(-50%, -100%);
+  background: #1f3b32;
+  color: #fff;
+  font-size: 11.5px;
+  line-height: 1.3;
+  padding: 4px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+.spark-tooltip strong {
+  font-weight: 700;
 }
 
 .slider-row {

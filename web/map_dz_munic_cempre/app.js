@@ -118,6 +118,7 @@
     initMap();
     buildMapLayer();
     initControls();
+    initSparklineHover();
     render();
     document.getElementById("spinner").classList.add("hidden");
   }).catch((err) => {
@@ -225,10 +226,7 @@
     });
 
     document.getElementById("year-sparkline").addEventListener("click", (e) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const frac = (e.clientX - rect.left) / rect.width;
-      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
-      jumpToYear(Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year)));
+      jumpToYear(yearFromPointerEvent(e));
     });
 
     document.getElementById("play-btn").addEventListener("click", togglePlay);
@@ -236,6 +234,62 @@
       state.lang = state.lang === "pt" ? "en" : "pt";
       updateUrl();
       render();
+    });
+  }
+
+  // Shared by the sparkline's click-to-jump and hover-preview: which year
+  // does this pointer position (over the sparkline wrapper) correspond to.
+  function yearFromPointerEvent(e) {
+    const rect = document.querySelector(".sparkline-wrap").getBoundingClientRect();
+    const frac = (e.clientX - rect.left) / rect.width;
+    const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+    return Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year));
+  }
+
+  // Hover crosshair + tooltip on the sparkline (dataviz skill's interaction
+  // spec: "the crosshair finds the X" — a vertical hairline snaps to the
+  // nearest data position, with a tooltip, independent of the persistent
+  // .spark-guide/.spark-marker that mark the currently *selected* year).
+  function initSparklineHover() {
+    const wrap = document.querySelector(".sparkline-wrap");
+    const hoverLine = document.getElementById("spark-hover-line");
+    const hoverMarker = document.getElementById("spark-hover-marker");
+    const tooltip = document.getElementById("spark-tooltip");
+
+    wrap.addEventListener("pointermove", (e) => {
+      if (!sparkXFor) return;
+      const year = yearFromPointerEvent(e);
+      const d = sparkSeries.find((s) => s.year === year);
+      const svgX = sparkXFor(year);
+
+      hoverLine.setAttribute("x1", svgX);
+      hoverLine.setAttribute("x2", svgX);
+      hoverLine.style.opacity = "1";
+
+      const dict = dictionary[state.lang];
+      const varMeta = dict.find((v) => v.var === state.x);
+      const t = I18N[state.lang];
+
+      if (d && d.value !== null) {
+        hoverMarker.setAttribute("cx", svgX);
+        hoverMarker.setAttribute("cy", sparkYFor(d.value));
+        hoverMarker.style.opacity = "1";
+        tooltip.innerHTML = "<strong>" + fmtNumber(d.value) + "</strong> " + varMeta.unidade + "<br>" + year;
+      } else {
+        hoverMarker.style.opacity = "0";
+        tooltip.innerHTML = "<strong>" + year + "</strong><br>" + t.label_no_data;
+      }
+
+      const rect = wrap.getBoundingClientRect();
+      const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      tooltip.style.left = Math.min(rect.width - 4, Math.max(4, frac * rect.width)) + "px";
+      tooltip.style.opacity = "1";
+    });
+
+    wrap.addEventListener("pointerleave", () => {
+      hoverLine.style.opacity = "0";
+      hoverMarker.style.opacity = "0";
+      tooltip.style.opacity = "0";
     });
   }
 
