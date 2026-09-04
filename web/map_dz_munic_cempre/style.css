@@ -137,6 +137,40 @@ html, body {
   pointer-events: none;
 }
 
+/* Compare mode swaps the single year marker/guide for two draggable ones.
+   Year A / year B are an identity pair (which side, not a magnitude), so
+   they take the dataviz skill's categorical slots 1/2 (blue/orange) rather
+   than another green — distinct from both the sequential ramp and each
+   other, and already validated (documented default, ΔE 9.1 light).
+   One "compare-mode" class on .apppanel gates every compare-only element
+   below, rather than toggling a class per element in app.js. */
+.spark-marker-compare, .spark-guide-compare { display: none; }
+.apppanel.compare-mode .spark-marker-compare,
+.apppanel.compare-mode .spark-guide-compare {
+  display: block;
+}
+.apppanel.compare-mode .spark-marker,
+.apppanel.compare-mode .spark-guide {
+  display: none;
+}
+
+.spark-guide-compare {
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  vector-effect: non-scaling-stroke;
+}
+#spark-guide-a { stroke: rgba(42, 120, 214, 0.7); }
+#spark-guide-b { stroke: rgba(235, 104, 52, 0.75); }
+
+.spark-marker-compare {
+  fill: #fff;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+  cursor: ew-resize;
+}
+.spark-marker-a { stroke: #2a78d6; }
+.spark-marker-b { stroke: #eb6834; }
+
 .spark-tooltip {
   position: absolute;
   top: -4px;
@@ -162,6 +196,7 @@ html, body {
   align-items: center;
   gap: 8px;
 }
+.apppanel.compare-mode .slider-row { display: none; }
 
 #year-slider {
   flex: 1 1 auto;
@@ -203,6 +238,7 @@ html, body {
   gap: 6px;
 }
 .btn-primary:hover { background-color: #3d827a; }
+.btn-primary.active { background-color: #2f6e5c; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5); }
 
 /* ---- Map column ---- */
 
@@ -253,6 +289,64 @@ html, body {
 .spinner.hidden { display: none; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- Compare-years swipe (map-wrap overlay, siblings of #map so Leaflet's
+   own drag handling never sees pointer events meant for the divider) ---- */
+
+.compare-label, .swipe-divider { display: none; }
+.apppanel.compare-mode .compare-label,
+.apppanel.compare-mode .swipe-divider {
+  display: block;
+}
+
+.compare-label {
+  position: absolute;
+  /* Leaflet's default zoom control (+/-) sits at top:10px; left:10px,
+     ~30px wide by ~64px tall — top-left would collide with it. */
+  top: 82px;
+  z-index: 900;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.compare-label-a { left: 10px; background: #2a78d6; }
+.compare-label-b { right: 10px; background: #eb6834; }
+
+.swipe-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  border-left: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  z-index: 900;
+  transform: translateX(-1px);
+}
+
+.divider-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #333;
+  cursor: ew-resize;
+  touch-action: none;
+  pointer-events: auto;
+}
 
 /* ---- Leaflet legend ---- */
 

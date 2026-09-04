@@ -30,6 +30,10 @@
           <line id="spark-hover-line" class="spark-hover-line" y1="0" y2="40"></line>
           <circle id="spark-marker" class="spark-marker" r="4"></circle>
           <circle id="spark-hover-marker" class="spark-hover-marker" r="4"></circle>
+          <line id="spark-guide-a" class="spark-guide-compare" y1="0" y2="40"></line>
+          <line id="spark-guide-b" class="spark-guide-compare" y1="0" y2="40"></line>
+          <circle id="spark-marker-a" class="spark-marker-compare spark-marker-a" r="5"></circle>
+          <circle id="spark-marker-b" class="spark-marker-compare spark-marker-b" r="5"></circle>
         </svg>
         <div id="spark-tooltip" class="spark-tooltip"></div>
       </div>
@@ -40,6 +44,10 @@
       </div>
     </div>
     <div class="spacer"></div>
+    <button id="compare-toggle" class="btn-primary">
+      <span class="icon">&#8646;</span> <span id="compare-toggle-label"></span>
+    </button>
+    <div style="height: 6px;"></div>
     <button id="lang-toggle" class="btn-primary">
       <span class="icon">&#127760;</span> <span id="lang-toggle-label"></span>
     </button>
@@ -50,6 +58,11 @@
     <div class="map-wrap">
       <div id="map"></div>
       <div id="spinner" class="spinner"></div>
+      <div id="compare-label-a" class="compare-label compare-label-a"></div>
+      <div id="compare-label-b" class="compare-label compare-label-b"></div>
+      <div id="swipe-divider" class="swipe-divider">
+        <div class="divider-handle">&#8646;</div>
+      </div>
     </div>
   </div>
 </div>

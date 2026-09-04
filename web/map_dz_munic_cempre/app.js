@@ -23,6 +23,8 @@
       label_state_name: "Estado: <b>",
       label_measurement_unit: "Unidade de medida: <b>",
       label_no_data: "Sem dado",
+      btn_compare: "Comparar anos",
+      btn_compare_exit: "Sair da comparação",
       btn_lang: "English"
     },
     en: {
@@ -36,6 +38,8 @@
       label_state_name: "State: <b>",
       label_measurement_unit: "Measurement unit: <b>",
       label_no_data: "No data",
+      btn_compare: "Compare years",
+      btn_compare_exit: "Exit comparison",
       btn_lang: "Português"
     }
   };
@@ -79,7 +83,11 @@
     x: null,
     year: null,
     playing: false,
-    playTimer: null
+    playTimer: null,
+    compareMode: false,
+    yearA: null,
+    yearB: null,
+    dividerFrac: 0.5
   };
 
   let map, legendControl;
@@ -91,6 +99,11 @@
   // transition on .muni-path actually animate — a fresh element every
   // frame has no "previous" fill to transition from.
   const layersByCodIbge = new Map();
+  // Each municipality's centroid (bounds center), precomputed once — compare
+  // mode needs "which side of the divider is this polygon on" on every
+  // drag/pan/zoom, and re-deriving that from the full polygon geometry each
+  // time would be needless work when the geometry never changes.
+  const centroidByCodIbge = new Map();
   const breaksCache = {}; // var -> { breaks, colors }, since the domain (and so the bins) only depends on the variable, not the year
   let openTooltipLayer = null;
   let sparkSeries = [];
@@ -197,8 +210,17 @@
       maxZoom: 16
     }).addTo(map);
 
-    L.geoJSON(statesGeo, { style: { color: "grey", weight: 1, fill: false }, interactive: false }).addTo(map);
-    L.geoJSON(legalAmazonGeo, { style: { color: "black", weight: 2, fill: false }, interactive: false }).addTo(map);
+    // Explicit panes/z-index for every layer (rather than relying on add
+    // order within the shared default pane) so stacking is guaranteed, not
+    // incidental — this matters more once compare mode adds two more fill
+    // layers that must both sit under the boundaries.
+    map.createPane("paneMain");
+    map.getPane("paneMain").style.zIndex = 400;
+    map.createPane("paneBoundaries");
+    map.getPane("paneBoundaries").style.zIndex = 450;
+
+    L.geoJSON(statesGeo, { pane: "paneBoundaries", style: { color: "grey", weight: 1, fill: false }, interactive: false }).addTo(map);
+    L.geoJSON(legalAmazonGeo, { pane: "paneBoundaries", style: { color: "black", weight: 2, fill: false }, interactive: false }).addTo(map);
 
     legendControl = L.control({ position: "bottomright" });
     legendControl.onAdd = function () {
@@ -235,6 +257,13 @@
       updateUrl();
       render();
     });
+
+    document.getElementById("compare-toggle").addEventListener("click", () => {
+      setCompareMode(!state.compareMode);
+    });
+
+    initCompareMarkers();
+    initSwipeDivider();
   }
 
   // Shared by the sparkline's click-to-jump and hover-preview: which year
@@ -257,7 +286,7 @@
     const tooltip = document.getElementById("spark-tooltip");
 
     wrap.addEventListener("pointermove", (e) => {
-      if (!sparkXFor) return;
+      if (!sparkXFor || state.compareMode) return; // compare mode has its own markers/guides for A and B
       const year = yearFromPointerEvent(e);
       const d = sparkSeries.find((s) => s.year === year);
       const svgX = sparkXFor(year);
@@ -291,6 +320,161 @@
       hoverMarker.style.opacity = "0";
       tooltip.style.opacity = "0";
     });
+  }
+
+  // ---- Compare mode: two draggable year markers on the sparkline (year A,
+  // year B — an identity pair, categorical slots 1/2 blue/orange) driving a
+  // swipe divider on the map. ----
+
+  function initCompareMarkers() {
+    const markerA = document.getElementById("spark-marker-a");
+    const markerB = document.getElementById("spark-marker-b");
+    let dragging = null; // "a" | "b" | null
+
+    function onMove(e) {
+      if (!dragging || !sparkXFor) return;
+      const year = yearFromPointerEvent(e);
+      if (dragging === "a") state.yearA = year; else state.yearB = year;
+      updateCompareYearPositions();
+      updateCompareColors();
+      updateCompareLabels();
+    }
+
+    markerA.addEventListener("pointerdown", (e) => { dragging = "a"; markerA.setPointerCapture(e.pointerId); });
+    markerB.addEventListener("pointerdown", (e) => { dragging = "b"; markerB.setPointerCapture(e.pointerId); });
+    markerA.addEventListener("pointermove", onMove);
+    markerB.addEventListener("pointermove", onMove);
+    markerA.addEventListener("pointerup", () => { dragging = null; });
+    markerB.addEventListener("pointerup", () => { dragging = null; });
+  }
+
+  function updateCompareYearPositions() {
+    if (!sparkXFor) return;
+    placeCompareMarker("a", state.yearA);
+    placeCompareMarker("b", state.yearB);
+  }
+
+  function placeCompareMarker(which, year) {
+    const marker = document.getElementById("spark-marker-" + which);
+    const guide = document.getElementById("spark-guide-" + which);
+    const x = sparkXFor(year);
+    guide.setAttribute("x1", x);
+    guide.setAttribute("x2", x);
+    const d = sparkSeries.find((s) => s.year === year);
+    if (d && d.value !== null) {
+      marker.setAttribute("cx", x);
+      marker.setAttribute("cy", sparkYFor(d.value));
+      marker.setAttribute("opacity", "1");
+    } else {
+      marker.setAttribute("opacity", "0");
+    }
+  }
+
+  function updateCompareLabels() {
+    document.getElementById("compare-label-a").textContent = state.yearA;
+    document.getElementById("compare-label-b").textContent = state.yearB;
+  }
+
+  function initSwipeDivider() {
+    const handle = document.querySelector(".divider-handle");
+    let dragging = false;
+
+    handle.addEventListener("pointerdown", (e) => { dragging = true; handle.setPointerCapture(e.pointerId); });
+    handle.addEventListener("pointerup", () => { dragging = false; });
+    handle.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const rect = document.querySelector(".map-wrap").getBoundingClientRect();
+      setDividerFrac((e.clientX - rect.left) / rect.width);
+    });
+  }
+
+  function setDividerFrac(frac) {
+    state.dividerFrac = Math.min(0.95, Math.max(0.05, frac));
+    document.getElementById("swipe-divider").style.left = (state.dividerFrac * 100) + "%";
+    if (state.compareMode) updateCompareColors();
+  }
+
+  // Recolors when the map pans/zooms: a municipality's *screen* position
+  // relative to the divider is what decides which year it shows, so panning
+  // moves the effective split even though state.dividerFrac hasn't changed.
+  function onCompareMapMove() {
+    if (state.compareMode) updateCompareColors();
+  }
+
+  function setCompareMode(on) {
+    state.compareMode = on;
+    document.querySelector(".apppanel").classList.toggle("compare-mode", on);
+    document.getElementById("compare-toggle").classList.toggle("active", on);
+    document.getElementById("compare-toggle-label").textContent =
+      I18N[state.lang][on ? "btn_compare_exit" : "btn_compare"];
+
+    if (on) {
+      stopPlaying();
+      // In case the single-year hover crosshair was mid-display when the
+      // toggle was clicked — it stops updating in compare mode (see
+      // initSparklineHover) but was already visible.
+      document.getElementById("spark-hover-line").style.opacity = "0";
+      document.getElementById("spark-hover-marker").style.opacity = "0";
+      document.getElementById("spark-tooltip").style.opacity = "0";
+      if (state.yearA == null) state.yearA = dictionary.year_inicio;
+      if (state.yearB == null) state.yearB = dictionary.year_final;
+      updateCompareYearPositions();
+      updateCompareLabels();
+      setDividerFrac(state.dividerFrac); // positions the handle + repaints via updateCompareColors()
+      map.on("move zoom", onCompareMapMove);
+    } else {
+      map.off("move zoom", onCompareMapMove);
+      updateMapColors();
+    }
+  }
+
+  // Recolors and re-tooltips the SAME polygons the single-year map uses —
+  // compare mode isn't a second map layer, just a different rule for which
+  // year's data each polygon currently shows. A polygon whose *screen*
+  // centroid sits left of the divider shows year A, right shows year B, so
+  // dragging the divider (or panning/zooming the map, see
+  // onCompareMapMove) changes the split live. Same breaks/colors as the
+  // single-year map (the domain is fit across all years, not per-year —
+  // see computeFullDomains), so year A and year B share one legend.
+  //
+  // (An earlier version tried two separate Leaflet layers in their own
+  // panes, clipped with CSS clip-path to build the swipe visually. That
+  // doesn't work: Leaflet's pane <div>s are deliberately unsized —
+  // position:absolute with no explicit width/height, since the SVG/tile
+  // children position themselves via their own transforms rather than
+  // filling a box — so clip-path's percentage insets had no box to resolve
+  // against and clipped everything to nothing. Recoloring one set of
+  // polygons sidesteps that entirely.)
+  function updateCompareColors() {
+    const dict = dictionary[state.lang];
+    const varMeta = dict.find((d) => d.var === state.x);
+    const t = I18N[state.lang];
+    const { breaks, colors } = getBreaksAndColors(state.x);
+    const yearDataA = attributesByYear.get(state.yearA) || new Map();
+    const yearDataB = attributesByYear.get(state.yearB) || new Map();
+    const dividerX = state.dividerFrac * map.getSize().x;
+
+    for (const [codIbge, layer] of layersByCodIbge) {
+      const screenX = map.latLngToContainerPoint(centroidByCodIbge.get(codIbge)).x;
+      const useA = screenX < dividerX;
+      const year = useA ? state.yearA : state.yearB;
+      const row = (useA ? yearDataA : yearDataB).get(codIbge);
+      const value = row ? row[state.x] : null;
+      const color = value === null || value === undefined || Number.isNaN(value)
+        ? "url(#" + NODATA_PATTERN_ID + ")"
+        : colors[binIndex(value, breaks)];
+
+      layer.setStyle({ fillColor: color });
+      layer.setTooltipContent([
+        "<strong>", year, "</strong><br>",
+        t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
+        t.label_state_name, row ? row.estado : "—", "</b><br>",
+        varMeta.label, ": <b>", fmtNumber(value), "</b><br>",
+        t.label_measurement_unit, varMeta.unidade, "</b>"
+      ].join(""));
+    }
+
+    renderLegend(breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
   }
 
   // Applies state.year to every year-dependent bit of UI (slider position,
@@ -371,8 +555,17 @@
     const varMeta = dict.find((d) => d.var === state.x);
     document.getElementById("plot-subtitle").textContent = `${t.label_var_name} ${varMeta.label}`;
 
+    document.getElementById("compare-toggle-label").textContent =
+      t[state.compareMode ? "btn_compare_exit" : "btn_compare"];
+
     renderSparkline();
-    updateMapColors();
+    if (state.compareMode) {
+      updateCompareYearPositions();
+      updateCompareColors();
+      updateCompareLabels();
+    } else {
+      updateMapColors();
+    }
   }
 
   // Builds the 772 municipality polygons ONCE, wiring up hover/tooltip
@@ -396,16 +589,23 @@
     svg.insertBefore(defs, svg.firstChild);
   }
 
+  // Builds the 772 municipality polygons ONCE, wiring up hover/tooltip
+  // behavior that doesn't change across renders. Every subsequent
+  // variable/year/lang/compare change goes through updateMapColors() or
+  // updateCompareColors() instead of rebuilding this layer — see the
+  // layersByCodIbge comment above.
   function buildMapLayer() {
     L.geoJSON(municGeo, {
+      pane: "paneMain",
       style: () => ({
         className: "muni-path",
         stroke: false,
         fillOpacity: 0.9,
-        fillColor: "#cccccc" // placeholder; updateMapColors() repaints before this ever renders a frame
+        fillColor: "#cccccc" // placeholder; the first color update repaints before this ever renders a frame
       }),
       onEachFeature: (feature, layer) => {
         layersByCodIbge.set(feature.properties.cod_ibge, layer);
+        centroidByCodIbge.set(feature.properties.cod_ibge, layer.getBounds().getCenter());
         layer.bindTooltip("", { sticky: true });
 
         layer.on("mouseover", () => {
@@ -420,7 +620,7 @@
           // reverts to the style captured when the layer was created, which
           // would snap fillColor back to the very first year ever shown
           // instead of the current one. Omitting fillColor here keeps
-          // whatever updateMapColors() last set (setStyle merges options).
+          // whatever the last color update set (setStyle merges options).
           layer.setStyle({ stroke: false, fillOpacity: 0.9 });
         });
       }
