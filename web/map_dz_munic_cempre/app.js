@@ -92,6 +92,7 @@
   const SPARK_H = 40;
   const SPARK_PAD = 4;
   const PLAY_INTERVAL_MS = 1200; // autoplay tick — kept comfortably above the .muni-path fill transition (style.css) so each year settles before the next
+  const SNAPSHOT_TITLE_BAND_H = 52; // dedicated header strip on exported images — see captureSnapshot
 
   const state = {
     lang: "pt",
@@ -101,26 +102,26 @@
     playTimer: null,
     compareMode: false,
     yearA: null,
-    yearB: null,
-    dividerFrac: 0.5
+    yearB: null
   };
 
   let map, legendControl;
+  // Compare mode is two independent, pan/zoom-synced Leaflet maps (small
+  // multiples) rather than one map with a divider — see setCompareMode.
+  // Built lazily on first use, since most sessions never touch compare mode.
+  let mapA, mapB, compareLegendControl;
+  let compareBuilt = false;
   let municGeo, statesGeo, legalAmazonGeo, attributesByYear, dictionary, fullDomainByVar;
 
-  // Built once in buildMapLayer(); year/variable/lang changes update these
-  // layers in place (setStyle / setTooltipContent) instead of tearing down
-  // and recreating the whole GeoJSON layer. That's what lets the CSS
-  // transition on .muni-path actually animate — a fresh element every
-  // frame has no "previous" fill to transition from.
+  // Built once in buildMapLayer()/buildCompareMaps(); year/variable/lang
+  // changes update these layers in place (setStyle / setTooltipContent)
+  // instead of tearing down and recreating the whole GeoJSON layer. That's
+  // what lets the CSS transition on .muni-path actually animate — a fresh
+  // element every frame has no "previous" fill to transition from.
   const layersByCodIbge = new Map();
-  // Each municipality's centroid (bounds center), precomputed once — compare
-  // mode needs "which side of the divider is this polygon on" on every
-  // drag/pan/zoom, and re-deriving that from the full polygon geometry each
-  // time would be needless work when the geometry never changes.
-  const centroidByCodIbge = new Map();
+  const layersACodIbge = new Map();
+  const layersBCodIbge = new Map();
   const breaksCache = {}; // var -> { breaks, colors }, since the domain (and so the bins) only depends on the variable, not the year
-  let openTooltipLayer = null;
   let sparkSeries = [];
   let sparkXFor = null;
   let sparkYFor = null;
@@ -212,8 +213,10 @@
 
   // ---- Map setup ----
 
-  function initMap() {
-    map = L.map("map", { zoomControl: true }).setView([-7, -58], 5);
+  // Builds one full map instance — tiles, panes, boundary lines — shared by
+  // the single-year map and by each of compare mode's two small multiples.
+  function createBaseMap(containerId) {
+    const m = L.map(containerId, { zoomControl: true }).setView([-7, -58], 5);
 
     // NOTE: the original app uses CartoDB.PositronNoLabels (no-label light
     // basemap), but Carto retired free anonymous raster tile access — that
@@ -232,26 +235,73 @@
       // be fixed retroactively — it has to be set before the tile's first
       // fetch, i.e. here.
       crossOrigin: true
-    }).addTo(map);
+    }).addTo(m);
 
     // Explicit panes/z-index for every layer (rather than relying on add
     // order within the shared default pane) so stacking is guaranteed, not
-    // incidental — this matters more once compare mode adds two more fill
-    // layers that must both sit under the boundaries.
-    map.createPane("paneMain");
-    map.getPane("paneMain").style.zIndex = 400;
-    map.createPane("paneBoundaries");
-    map.getPane("paneBoundaries").style.zIndex = 450;
+    // incidental.
+    m.createPane("paneMain");
+    m.getPane("paneMain").style.zIndex = 400;
+    m.createPane("paneBoundaries");
+    m.getPane("paneBoundaries").style.zIndex = 450;
 
-    L.geoJSON(statesGeo, { pane: "paneBoundaries", style: { color: "grey", weight: 1, fill: false }, interactive: false }).addTo(map);
-    L.geoJSON(legalAmazonGeo, { pane: "paneBoundaries", style: { color: "black", weight: 2, fill: false }, interactive: false }).addTo(map);
+    L.geoJSON(statesGeo, { pane: "paneBoundaries", style: { color: "grey", weight: 1, fill: false }, interactive: false }).addTo(m);
+    L.geoJSON(legalAmazonGeo, { pane: "paneBoundaries", style: { color: "black", weight: 2, fill: false }, interactive: false }).addTo(m);
 
-    legendControl = L.control({ position: "bottomright" });
-    legendControl.onAdd = function () {
+    return m;
+  }
+
+  function makeLegendControl(targetMap) {
+    const control = L.control({ position: "bottomright" });
+    control.onAdd = function () {
       this._div = L.DomUtil.create("div", "legend");
       return this._div;
     };
-    legendControl.addTo(map);
+    control.addTo(targetMap);
+    return control;
+  }
+
+  function initMap() {
+    map = createBaseMap("map");
+    legendControl = makeLegendControl(map);
+  }
+
+  // Compare mode's two maps, built lazily on first use and pan/zoom-synced
+  // (dragging/zooming either one moves both) so the same geographic area is
+  // always what's being compared. Small multiples rather than one map with
+  // a swipe divider: for a continent-scale choropleth you want to survey
+  // the whole thing for both years at once, not drag a divider across every
+  // region in turn.
+  function buildCompareMaps() {
+    if (compareBuilt) return;
+    compareBuilt = true;
+
+    mapA = createBaseMap("map-a");
+    mapB = createBaseMap("map-b");
+    buildPolygonLayer(mapA, layersACodIbge);
+    buildPolygonLayer(mapB, layersBCodIbge);
+    ensureNoDataPattern("map-a");
+    ensureNoDataPattern("map-b");
+    compareLegendControl = makeLegendControl(mapB);
+
+    syncMapViews(mapA, mapB);
+  }
+
+  // Mirrors center/zoom between two maps in both directions. The `suppress`
+  // flag (shared by both directions via this closure) stops the mirrored
+  // setView from re-triggering its own move/zoom handler and recursing —
+  // Leaflet fires move/zoom synchronously for an animate:false setView, so
+  // the flag is still up the whole time the mirrored update runs.
+  function syncMapViews(m1, m2) {
+    let suppress = false;
+    function mirror(from, to) {
+      if (suppress) return;
+      suppress = true;
+      to.setView(from.getCenter(), from.getZoom(), { animate: false });
+      suppress = false;
+    }
+    m1.on("move zoom", () => mirror(m1, m2));
+    m2.on("move zoom", () => mirror(m2, m1));
   }
 
   // ---- Controls ----
@@ -287,7 +337,6 @@
     });
 
     initCompareMarkers();
-    initSwipeDivider();
 
     document.getElementById("snapshot-btn").addEventListener("click", captureSnapshot);
   }
@@ -362,7 +411,7 @@
       const year = yearFromPointerEvent(e);
       if (dragging === "a") state.yearA = year; else state.yearB = year;
       updateCompareYearPositions();
-      updateCompareColors();
+      updateCompareMapColors();
       updateCompareLabels();
     }
 
@@ -401,32 +450,6 @@
     document.getElementById("compare-label-b").textContent = state.yearB;
   }
 
-  function initSwipeDivider() {
-    const handle = document.querySelector(".divider-handle");
-    let dragging = false;
-
-    handle.addEventListener("pointerdown", (e) => { dragging = true; handle.setPointerCapture(e.pointerId); });
-    handle.addEventListener("pointerup", () => { dragging = false; });
-    handle.addEventListener("pointermove", (e) => {
-      if (!dragging) return;
-      const rect = document.querySelector(".map-wrap").getBoundingClientRect();
-      setDividerFrac((e.clientX - rect.left) / rect.width);
-    });
-  }
-
-  function setDividerFrac(frac) {
-    state.dividerFrac = Math.min(0.95, Math.max(0.05, frac));
-    document.getElementById("swipe-divider").style.left = (state.dividerFrac * 100) + "%";
-    if (state.compareMode) updateCompareColors();
-  }
-
-  // Recolors when the map pans/zooms: a municipality's *screen* position
-  // relative to the divider is what decides which year it shows, so panning
-  // moves the effective split even though state.dividerFrac hasn't changed.
-  function onCompareMapMove() {
-    if (state.compareMode) updateCompareColors();
-  }
-
   function setCompareMode(on) {
     state.compareMode = on;
     document.querySelector(".apppanel").classList.toggle("compare-mode", on);
@@ -444,63 +467,62 @@
       document.getElementById("spark-tooltip").style.opacity = "0";
       if (state.yearA == null) state.yearA = dictionary.year_inicio;
       if (state.yearB == null) state.yearB = dictionary.year_final;
+
+      buildCompareMaps(); // lazy + idempotent
+
       updateCompareYearPositions();
       updateCompareLabels();
-      setDividerFrac(state.dividerFrac); // positions the handle + repaints via updateCompareColors()
-      map.on("move zoom", onCompareMapMove);
+      updateCompareMapColors();
+
+      // .compare-mode was just toggled on above, making #compare-maps
+      // visible — mapA/mapB may have been built (or last shown) while it
+      // was display:none, which leaves Leaflet's cached container size
+      // stale/zero. invalidateSize() re-measures now that it's visible.
+      mapA.invalidateSize();
+      mapB.invalidateSize();
     } else {
-      map.off("move zoom", onCompareMapMove);
       updateMapColors();
     }
   }
 
-  // Recolors and re-tooltips the SAME polygons the single-year map uses —
-  // compare mode isn't a second map layer, just a different rule for which
-  // year's data each polygon currently shows. A polygon whose *screen*
-  // centroid sits left of the divider shows year A, right shows year B, so
-  // dragging the divider (or panning/zooming the map, see
-  // onCompareMapMove) changes the split live. Same breaks/colors as the
-  // single-year map (the domain is fit across all years, not per-year —
-  // see computeFullDomains), so year A and year B share one legend.
-  //
-  // (An earlier version tried two separate Leaflet layers in their own
-  // panes, clipped with CSS clip-path to build the swipe visually. That
-  // doesn't work: Leaflet's pane <div>s are deliberately unsized —
-  // position:absolute with no explicit width/height, since the SVG/tile
-  // children position themselves via their own transforms rather than
-  // filling a box — so clip-path's percentage insets had no box to resolve
-  // against and clipped everything to nothing. Recoloring one set of
-  // polygons sidesteps that entirely.)
-  function updateCompareColors() {
+  // Recolors and re-tooltips mapA/mapB's polygons for their respective
+  // years. Same breaks/colors as the single-year map (the domain is fit
+  // across all years, not per-year — see computeFullDomains), so year A and
+  // year B can still share one legend even though each map computes its own
+  // fill independently.
+  function updateCompareMapColors() {
     const dict = dictionary[state.lang];
     const varMeta = dict.find((d) => d.var === state.x);
     const t = I18N[state.lang];
     const { breaks, colors } = getBreaksAndColors(state.x);
-    const yearDataA = attributesByYear.get(state.yearA) || new Map();
-    const yearDataB = attributesByYear.get(state.yearB) || new Map();
-    const dividerX = state.dividerFrac * map.getSize().x;
 
-    for (const [codIbge, layer] of layersByCodIbge) {
-      const screenX = map.latLngToContainerPoint(centroidByCodIbge.get(codIbge)).x;
-      const useA = screenX < dividerX;
-      const year = useA ? state.yearA : state.yearB;
-      const row = (useA ? yearDataA : yearDataB).get(codIbge);
+    paintYear(layersACodIbge, state.yearA, breaks, colors, varMeta, t);
+    paintYear(layersBCodIbge, state.yearB, breaks, colors, varMeta, t);
+
+    renderLegendInto(compareLegendControl, breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
+  }
+
+  function paintYear(layersMap, year, breaks, colors, varMeta, t) {
+    const yearData = attributesByYear.get(year) || new Map();
+    for (const [codIbge, layer] of layersMap) {
+      const row = yearData.get(codIbge);
       const value = row ? row[state.x] : null;
       const color = value === null || value === undefined || Number.isNaN(value)
         ? "url(#" + NODATA_PATTERN_ID + ")"
         : colors[binIndex(value, breaks)];
 
       layer.setStyle({ fillColor: color, color: strokeColorFor(color) });
-      layer.setTooltipContent([
-        "<strong>", year, "</strong><br>",
-        t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
-        t.label_state_name, row ? row.estado : "—", "</b><br>",
-        varMeta.label, ": <b>", fmtNumber(value), "</b><br>",
-        t.label_measurement_unit, varMeta.unidade, "</b>"
-      ].join(""));
+      layer.setTooltipContent(tooltipHtml(t, varMeta, row, value));
     }
+  }
 
-    renderLegend(breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
+  function tooltipHtml(t, varMeta, row, value) {
+    return [
+      t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
+      t.label_state_name, row ? row.estado : "—", "</b><br>",
+      varMeta.label, ": <b>", fmtNumber(value), "</b><br>",
+      t.label_measurement_unit, varMeta.unidade, "</b>"
+    ].join("");
   }
 
   // ---- Snapshot: composite the live map (basemap tiles + choropleth/
@@ -516,51 +538,38 @@
 
     try {
       const dpr = window.devicePixelRatio || 1;
-      const mapEl = document.getElementById("map");
-      const mapRect = mapEl.getBoundingClientRect();
+      // In compare mode, #compare-maps is the reference frame (it bounds
+      // both mini-maps plus the gap between them); otherwise plain #map.
+      const refEl = state.compareMode ? document.getElementById("compare-maps") : document.getElementById("map");
+      const refRect = refEl.getBoundingClientRect();
+      // The title/subtitle live in a dedicated strip ABOVE the captured
+      // map content (added to canvas height, map content shifted down by
+      // it), not overlaid on top of it — an overlay would either hide the
+      // top sliver of the single-year map, or in compare mode paint over
+      // the year-A/year-B header bars (which sit at real y=0, same band a
+      // simple overlay would occupy).
+      const totalW = refRect.width;
+      const totalH = refRect.height + SNAPSHOT_TITLE_BAND_H;
 
       const canvas = document.createElement("canvas");
-      canvas.width = Math.round(mapRect.width * dpr);
-      canvas.height = Math.round(mapRect.height * dpr);
+      canvas.width = Math.round(totalW * dpr);
+      canvas.height = Math.round(totalH * dpr);
       const ctx = canvas.getContext("2d");
       ctx.scale(dpr, dpr);
 
-      // Basemap tiles. Each tile's getBoundingClientRect() already reflects
-      // Leaflet's internal pane/tile transforms post-resolution, so drawing
-      // at that rect (relative to the map container) lines up correctly
-      // without re-deriving any of Leaflet's own transform math.
-      const tiles = mapEl.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded");
-      for (const tile of tiles) {
-        const r = tile.getBoundingClientRect();
-        try {
-          ctx.drawImage(tile, r.left - mapRect.left, r.top - mapRect.top, r.width, r.height);
-        } catch (err) {
-          // A tainted or not-yet-decoded tile — skip it rather than losing
-          // the whole capture over one missing tile.
-          console.warn("Snapshot: skipped a tile", err);
-        }
+      let labelRects = null;
+      if (state.compareMode) {
+        await drawMapContentOnto(ctx, document.getElementById("map-a"), refRect);
+        await drawMapContentOnto(ctx, document.getElementById("map-b"), refRect);
+        labelRects = {
+          a: relativeRect(document.getElementById("compare-label-a"), refRect),
+          b: relativeRect(document.getElementById("compare-label-b"), refRect)
+        };
+      } else {
+        await drawMapContentOnto(ctx, refEl, refRect);
       }
 
-      // Choropleth fill + state/country boundaries: each of our two map-data
-      // panes (paneMain, paneBoundaries) gets its own <svg> root. Serializing
-      // and redrawing each as an image is simpler and more robust than
-      // walking Leaflet's internal layer objects, and needs no CORS handling
-      // since it's an inline data: URI.
-      //
-      // Scoped to those two panes specifically, not a blanket "#map svg":
-      // that also matches Leaflet's own UI-chrome SVGs (e.g. the tiny 12x8
-      // flag icon in the attribution control), which would otherwise get
-      // rasterized and stamped onto the map content at whatever screen
-      // position that control happens to occupy.
-      const svgs = mapEl.querySelectorAll(".leaflet-paneMain-pane svg, .leaflet-paneBoundaries-pane svg");
-      for (const svg of svgs) {
-        const r = svg.getBoundingClientRect();
-        const svgText = new XMLSerializer().serializeToString(svg);
-        const img = await loadImage("data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgText));
-        ctx.drawImage(img, r.left - mapRect.left, r.top - mapRect.top, r.width, r.height);
-      }
-
-      drawSnapshotOverlay(ctx, mapRect.width, mapRect.height);
+      drawSnapshotOverlay(ctx, totalW, totalH, labelRects);
 
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
       const url = URL.createObjectURL(blob);
@@ -580,6 +589,57 @@
     }
   }
 
+  // Draws one map's tiles + choropleth/boundary SVGs onto ctx, offset by
+  // that map's own position relative to refRect (the overall canvas's
+  // origin) — the single-map capture and each half of the compare-mode
+  // capture both go through this, so there's exactly one place that knows
+  // how to rasterize a Leaflet map onto a canvas.
+  async function drawMapContentOnto(ctx, mapEl, refRect) {
+    const mapRect = mapEl.getBoundingClientRect();
+    const ox = mapRect.left - refRect.left;
+    const oy = mapRect.top - refRect.top + SNAPSHOT_TITLE_BAND_H;
+
+    // Basemap tiles. Each tile's getBoundingClientRect() already reflects
+    // Leaflet's internal pane/tile transforms post-resolution, so drawing
+    // at that rect (relative to the map container) lines up correctly
+    // without re-deriving any of Leaflet's own transform math.
+    const tiles = mapEl.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded");
+    for (const tile of tiles) {
+      const r = tile.getBoundingClientRect();
+      try {
+        ctx.drawImage(tile, ox + (r.left - mapRect.left), oy + (r.top - mapRect.top), r.width, r.height);
+      } catch (err) {
+        // A tainted or not-yet-decoded tile — skip it rather than losing
+        // the whole capture over one missing tile.
+        console.warn("Snapshot: skipped a tile", err);
+      }
+    }
+
+    // Choropleth fill + state/country boundaries: each of our two map-data
+    // panes (paneMain, paneBoundaries) gets its own <svg> root. Serializing
+    // and redrawing each as an image is simpler and more robust than
+    // walking Leaflet's internal layer objects, and needs no CORS handling
+    // since it's an inline data: URI.
+    //
+    // Scoped to those two panes specifically, not a blanket "svg" query:
+    // that also matches Leaflet's own UI-chrome SVGs (e.g. the tiny 12x8
+    // flag icon in the attribution control), which would otherwise get
+    // rasterized and stamped onto the map content at whatever screen
+    // position that control happens to occupy.
+    const svgs = mapEl.querySelectorAll(".leaflet-paneMain-pane svg, .leaflet-paneBoundaries-pane svg");
+    for (const svg of svgs) {
+      const r = svg.getBoundingClientRect();
+      const svgText = new XMLSerializer().serializeToString(svg);
+      const img = await loadImage("data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgText));
+      ctx.drawImage(img, ox + (r.left - mapRect.left), oy + (r.top - mapRect.top), r.width, r.height);
+    }
+  }
+
+  function relativeRect(el, refRect) {
+    const r = el.getBoundingClientRect();
+    return { x: r.left - refRect.left, y: r.top - refRect.top + SNAPSHOT_TITLE_BAND_H, w: r.width, h: r.height };
+  }
+
   function loadImage(src) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -596,10 +656,14 @@
   }
 
   // Everything baked into the exported image beyond the raw map pixels:
-  // title, the year (or year A vs year B + divider), the legend, and
-  // attribution — all read from the same state/dictionary the on-screen UI
-  // uses, not scraped from the DOM.
-  function drawSnapshotOverlay(ctx, width, height) {
+  // title, the year (or year A vs year B), the per-map header bars in
+  // compare mode, the legend, and attribution — all read from the same
+  // state/dictionary the on-screen UI uses, not scraped from the DOM.
+  // labelRects is null in single-year mode, or {a, b} (each an {x,y,w,h}
+  // from relativeRect) in compare mode — the real on-screen position of
+  // each map's year-label bar, so the redrawn header lands exactly where
+  // the live one does rather than at a guessed/hardcoded offset.
+  function drawSnapshotOverlay(ctx, width, height, labelRects) {
     const t = I18N[state.lang];
     const dict = dictionary[state.lang];
     const varMeta = dict.find((d) => d.var === state.x);
@@ -607,8 +671,11 @@
     const fontUi = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
 
     ctx.textBaseline = "top";
-    ctx.fillStyle = "rgba(255,255,255,0.92)";
-    ctx.fillRect(0, 0, width, 52);
+    // Solid, not translucent: this is a dedicated header strip now (see
+    // captureSnapshot/SNAPSHOT_TITLE_BAND_H), not an overlay painted over
+    // real map/label content, so there's nothing underneath it to blend with.
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, SNAPSHOT_TITLE_BAND_H);
     ctx.fillStyle = "#17211c";
     ctx.font = `700 15px ${fontUi}`;
     ctx.fillText(t.label_title, 12, 8);
@@ -620,19 +687,9 @@
       : `${t.label_var_name} ${varMeta.label} (${state.year})`;
     ctx.fillText(subtitle, 12, 29);
 
-    if (state.compareMode) {
-      const dividerX = state.dividerFrac * width;
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(dividerX, 52);
-      ctx.lineTo(dividerX, height);
-      ctx.stroke();
-
-      ctx.font = `700 12px ${fontUi}`;
-      drawBadge(ctx, fontUi, 10, 90, String(state.yearA), "#2a78d6");
-      const bWidth = ctx.measureText(String(state.yearB)).width + 20;
-      drawBadge(ctx, fontUi, width - 10 - bWidth, 90, String(state.yearB), "#eb6834");
+    if (state.compareMode && labelRects) {
+      drawMapHeaderBar(ctx, fontUi, labelRects.a, String(state.yearA), "#2a78d6");
+      drawMapHeaderBar(ctx, fontUi, labelRects.b, String(state.yearB), "#eb6834");
     }
 
     drawLegendOnCanvas(ctx, fontUi, width, height, breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
@@ -644,17 +701,15 @@
     ctx.textAlign = "left";
   }
 
-  function drawBadge(ctx, fontUi, x, y, text, color) {
-    ctx.font = `700 12px ${fontUi}`;
-    const padding = 10;
-    const w = ctx.measureText(text).width + padding * 2;
-    const h = 22;
-    roundRectPath(ctx, x, y, w, h, 11);
+  function drawMapHeaderBar(ctx, fontUi, rect, text, color) {
     ctx.fillStyle = color;
-    ctx.fill();
+    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
     ctx.fillStyle = "#fff";
+    ctx.font = `700 13px ${fontUi}`;
+    ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(text, x + padding, y + h / 2 + 1);
+    ctx.fillText(text, rect.x + rect.w / 2, rect.y + rect.h / 2 + 1);
+    ctx.textAlign = "left";
     ctx.textBaseline = "top";
   }
 
@@ -825,24 +880,21 @@
     renderSparkline();
     if (state.compareMode) {
       updateCompareYearPositions();
-      updateCompareColors();
+      updateCompareMapColors();
       updateCompareLabels();
     } else {
       updateMapColors();
     }
   }
 
-  // Builds the 772 municipality polygons ONCE, wiring up hover/tooltip
-  // behavior that doesn't change across renders. Every subsequent
-  // variable/year/lang change goes through updateMapColors() instead of
-  // rebuilding this layer — see the layersByCodIbge comment above.
-  // Injects an SVG <pattern> for the "no data" fill into Leaflet's own SVG
-  // renderer, so polygons can set fillColor to `url(#nodata-hatch)` — a
-  // valid SVG paint reference, same as any other setStyle value. Must run
-  // after the first polygon layer exists (that's what makes Leaflet create
-  // its SVG root).
-  function ensureNoDataPattern() {
-    var svg = document.querySelector("#map svg");
+  // Injects an SVG <pattern> for the "no data" fill into the given map
+  // container's own SVG renderer, so polygons in that map can set fillColor
+  // to `url(#nodata-hatch)` — a valid SVG paint reference, same as any
+  // other setStyle value. Must run after that map's first polygon layer
+  // exists (that's what makes Leaflet create its SVG root), and once per
+  // map container, since each Leaflet map instance gets its own SVG root.
+  function ensureNoDataPattern(containerId) {
+    var svg = document.querySelector("#" + containerId + " svg");
     if (!svg || svg.querySelector("#" + NODATA_PATTERN_ID)) return;
     var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
     defs.innerHTML =
@@ -853,12 +905,17 @@
     svg.insertBefore(defs, svg.firstChild);
   }
 
-  // Builds the 772 municipality polygons ONCE, wiring up hover/tooltip
-  // behavior that doesn't change across renders. Every subsequent
-  // variable/year/lang/compare change goes through updateMapColors() or
-  // updateCompareColors() instead of rebuilding this layer — see the
-  // layersByCodIbge comment above.
-  function buildMapLayer() {
+  // Builds the 772 municipality polygons ONCE for a given map, into
+  // layersMap, wiring up hover/tooltip behavior that doesn't change across
+  // renders. Every subsequent variable/year/lang/compare change goes
+  // through updateMapColors()/updateCompareMapColors() instead of
+  // rebuilding the layer — see the layersByCodIbge comment above. Shared by
+  // the single-year map and each of compare mode's two small multiples, so
+  // each gets its own polygon set and its own hover state (openTooltipLayer
+  // is local to this call, not shared across maps).
+  function buildPolygonLayer(targetMap, layersMap) {
+    let openTooltipLayer = null;
+
     L.geoJSON(municGeo, {
       pane: "paneMain",
       style: () => ({
@@ -879,8 +936,7 @@
         color: "#cccccc"
       }),
       onEachFeature: (feature, layer) => {
-        layersByCodIbge.set(feature.properties.cod_ibge, layer);
-        centroidByCodIbge.set(feature.properties.cod_ibge, layer.getBounds().getCenter());
+        layersMap.set(feature.properties.cod_ibge, layer);
         layer.bindTooltip("", { sticky: true });
 
         layer.on("mouseover", () => {
@@ -901,9 +957,12 @@
           layer.setStyle({ weight: 1, opacity: 1, fillOpacity: 0.9, color: strokeColorFor(layer.options.fillColor) });
         });
       }
-    }).addTo(map);
+    }).addTo(targetMap);
+  }
 
-    ensureNoDataPattern();
+  function buildMapLayer() {
+    buildPolygonLayer(map, layersByCodIbge);
+    ensureNoDataPattern("map");
   }
 
   function getBreaksAndColors(varName) {
@@ -924,23 +983,8 @@
     const varMeta = dict.find((d) => d.var === state.x);
     const t = I18N[state.lang];
     const { breaks, colors } = getBreaksAndColors(state.x);
-    const yearData = attributesByYear.get(state.year) || new Map();
 
-    for (const [codIbge, layer] of layersByCodIbge) {
-      const row = yearData.get(codIbge);
-      const value = row ? row[state.x] : null;
-      const color = value === null || value === undefined || Number.isNaN(value)
-        ? "url(#" + NODATA_PATTERN_ID + ")"
-        : colors[binIndex(value, breaks)];
-
-      layer.setStyle({ fillColor: color, color: strokeColorFor(color) });
-      layer.setTooltipContent([
-        t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
-        t.label_state_name, row ? row.estado : "—", "</b><br>",
-        varMeta.label, ": <b>", fmtNumber(value), "</b><br>",
-        t.label_measurement_unit, varMeta.unidade, "</b>"
-      ].join(""));
-    }
+    paintYear(layersByCodIbge, state.year, breaks, colors, varMeta, t);
 
     renderLegend(breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
   }
@@ -1010,7 +1054,11 @@
   }
 
   function renderLegend(breaks, colors, title, noDataLabel) {
-    const div = legendControl._div;
+    renderLegendInto(legendControl, breaks, colors, title, noDataLabel);
+  }
+
+  function renderLegendInto(control, breaks, colors, title, noDataLabel) {
+    const div = control._div;
     let html = `<div class="legend-title">${title}</div>`;
     for (let i = colors.length - 1; i >= 0; i--) {
       html += `<div class="legend-row"><span class="swatch" style="background:${colors[i]}"></span>${fmtNumber(breaks[i])} &ndash; ${fmtNumber(breaks[i + 1])}</div>`;

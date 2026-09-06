@@ -292,62 +292,45 @@ html, body {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ---- Compare-years swipe (map-wrap overlay, siblings of #map so Leaflet's
-   own drag handling never sees pointer events meant for the divider) ---- */
+/* ---- Compare-years: two small-multiple maps, pan/zoom synced (app.js
+   buildCompareMaps), rather than one map swiped by a divider — better for
+   surveying a whole continent-scale choropleth than a divider you'd have
+   to drag over every region in turn. ---- */
 
-.compare-label, .swipe-divider { display: none; }
-.apppanel.compare-mode .compare-label,
-.apppanel.compare-mode .swipe-divider {
-  display: block;
+.compare-maps { display: none; }
+.apppanel.compare-mode .compare-maps { display: flex; }
+.apppanel.compare-mode #map { display: none; }
+
+.compare-maps {
+  position: absolute;
+  inset: 0;
+  gap: 8px;
 }
 
-.compare-label {
-  position: absolute;
-  /* Leaflet's default zoom control (+/-) sits at top:10px; left:10px,
-     ~30px wide by ~64px tall — top-left would collide with it. */
-  top: 82px;
-  z-index: 900;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #fff;
-  font-variant-numeric: tabular-nums;
-  pointer-events: none;
-}
-.compare-label-a { left: 10px; background: #2a78d6; }
-.compare-label-b { right: 10px; background: #eb6834; }
-
-.swipe-divider {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  border-left: 2px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
-  z-index: 900;
-  transform: translateX(-1px);
-}
-
-.divider-handle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 30px;
-  height: 30px;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+.compare-map-col {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  color: #333;
-  cursor: ew-resize;
-  touch-action: none;
-  pointer-events: auto;
+  flex-direction: column;
+}
+
+.compare-map-label {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  border-radius: 4px 4px 0 0;
+}
+.compare-map-label-a { background: #2a78d6; }
+.compare-map-label-b { background: #eb6834; }
+
+.compare-map {
+  flex: 1 1 auto;
+  position: relative;
+  min-height: 0;
 }
 
 /* ---- Leaflet legend ---- */
