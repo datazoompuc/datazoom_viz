@@ -25,6 +25,10 @@
       label_no_data: "Sem dado",
       btn_compare: "Comparar anos",
       btn_compare_exit: "Sair da comparação",
+      btn_snapshot: "Salvar imagem",
+      btn_snapshot_busy: "Gerando imagem…",
+      snapshot_error: "Não foi possível gerar a imagem. Veja o console para detalhes.",
+      compare_vs: "vs.",
       btn_lang: "English"
     },
     en: {
@@ -40,6 +44,10 @@
       label_no_data: "No data",
       btn_compare: "Compare years",
       btn_compare_exit: "Exit comparison",
+      btn_snapshot: "Save image",
+      btn_snapshot_busy: "Generating image…",
+      snapshot_error: "Couldn't generate the image — see console for details.",
+      compare_vs: "vs.",
       btn_lang: "Português"
     }
   };
@@ -207,7 +215,16 @@
     // fighting the choropleth for attention (stock OSM tiles are far busier).
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
       attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",
-      maxZoom: 16
+      maxZoom: 16,
+      // Esri's tile server sends Access-Control-Allow-Origin: * — this asks
+      // the browser to actually fetch tiles in CORS mode instead of the
+      // default opaque cross-origin request, which is what lets
+      // captureSnapshot() draw them onto a canvas at all: an image loaded
+      // without crossOrigin taints any canvas it's drawn to (toBlob/toDataURL
+      // throw) regardless of what headers the server sends, and this can't
+      // be fixed retroactively — it has to be set before the tile's first
+      // fetch, i.e. here.
+      crossOrigin: true
     }).addTo(map);
 
     // Explicit panes/z-index for every layer (rather than relying on add
@@ -264,6 +281,8 @@
 
     initCompareMarkers();
     initSwipeDivider();
+
+    document.getElementById("snapshot-btn").addEventListener("click", captureSnapshot);
   }
 
   // Shared by the sparkline's click-to-jump and hover-preview: which year
@@ -477,6 +496,235 @@
     renderLegend(breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
   }
 
+  // ---- Snapshot: composite the live map (basemap tiles + choropleth/
+  // boundary SVG) onto a canvas, draw a title/legend on top from the same
+  // app state the on-screen legend uses, and download it as a PNG. ----
+
+  async function captureSnapshot() {
+    const btn = document.getElementById("snapshot-btn");
+    const label = document.getElementById("snapshot-btn-label");
+    const t = I18N[state.lang];
+    btn.disabled = true;
+    label.textContent = t.btn_snapshot_busy;
+
+    try {
+      const dpr = window.devicePixelRatio || 1;
+      const mapEl = document.getElementById("map");
+      const mapRect = mapEl.getBoundingClientRect();
+
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(mapRect.width * dpr);
+      canvas.height = Math.round(mapRect.height * dpr);
+      const ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+
+      // Basemap tiles. Each tile's getBoundingClientRect() already reflects
+      // Leaflet's internal pane/tile transforms post-resolution, so drawing
+      // at that rect (relative to the map container) lines up correctly
+      // without re-deriving any of Leaflet's own transform math.
+      const tiles = mapEl.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded");
+      for (const tile of tiles) {
+        const r = tile.getBoundingClientRect();
+        try {
+          ctx.drawImage(tile, r.left - mapRect.left, r.top - mapRect.top, r.width, r.height);
+        } catch (err) {
+          // A tainted or not-yet-decoded tile — skip it rather than losing
+          // the whole capture over one missing tile.
+          console.warn("Snapshot: skipped a tile", err);
+        }
+      }
+
+      // Choropleth fill + state/country boundaries: each Leaflet pane with
+      // vector content gets its own <svg> root. Serializing and redrawing
+      // each as an image is simpler and more robust than walking Leaflet's
+      // internal layer objects, and needs no CORS handling since it's an
+      // inline data: URI.
+      const svgs = mapEl.querySelectorAll("svg");
+      for (const svg of svgs) {
+        const r = svg.getBoundingClientRect();
+        const svgText = new XMLSerializer().serializeToString(svg);
+        const img = await loadImage("data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgText));
+        ctx.drawImage(img, r.left - mapRect.left, r.top - mapRect.top, r.width, r.height);
+      }
+
+      drawSnapshotOverlay(ctx, mapRect.width, mapRect.height);
+
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = snapshotFilename();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error("Snapshot failed", err);
+      alert(t.snapshot_error);
+    } finally {
+      btn.disabled = false;
+      label.textContent = t.btn_snapshot;
+    }
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function snapshotFilename() {
+    const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
+    const yearPart = state.compareMode ? `${state.yearA}-vs-${state.yearB}` : String(state.year);
+    return `datazoom_cempre_${state.x}_${yearPart}_${stamp}.png`;
+  }
+
+  // Everything baked into the exported image beyond the raw map pixels:
+  // title, the year (or year A vs year B + divider), the legend, and
+  // attribution — all read from the same state/dictionary the on-screen UI
+  // uses, not scraped from the DOM.
+  function drawSnapshotOverlay(ctx, width, height) {
+    const t = I18N[state.lang];
+    const dict = dictionary[state.lang];
+    const varMeta = dict.find((d) => d.var === state.x);
+    const { breaks, colors } = getBreaksAndColors(state.x);
+    const fontUi = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
+
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.fillRect(0, 0, width, 52);
+    ctx.fillStyle = "#17211c";
+    ctx.font = `700 15px ${fontUi}`;
+    ctx.fillText(t.label_title, 12, 8);
+
+    ctx.font = `400 12px ${fontUi}`;
+    ctx.fillStyle = "#555";
+    const subtitle = state.compareMode
+      ? `${varMeta.label} — ${state.yearA} ${t.compare_vs} ${state.yearB}`
+      : `${t.label_var_name} ${varMeta.label} (${state.year})`;
+    ctx.fillText(subtitle, 12, 29);
+
+    if (state.compareMode) {
+      const dividerX = state.dividerFrac * width;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(dividerX, 52);
+      ctx.lineTo(dividerX, height);
+      ctx.stroke();
+
+      ctx.font = `700 12px ${fontUi}`;
+      drawBadge(ctx, fontUi, 10, 90, String(state.yearA), "#2a78d6");
+      const bWidth = ctx.measureText(String(state.yearB)).width + 20;
+      drawBadge(ctx, fontUi, width - 10 - bWidth, 90, String(state.yearB), "#eb6834");
+    }
+
+    drawLegendOnCanvas(ctx, fontUi, width, height, breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
+
+    ctx.font = `400 10px ${fontUi}`;
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.textAlign = "right";
+    ctx.fillText("Tiles © Esri — Esri, DeLorme, NAVTEQ | Leaflet | datazoom.com.br/amazonia", width - 6, height - 14);
+    ctx.textAlign = "left";
+  }
+
+  function drawBadge(ctx, fontUi, x, y, text, color) {
+    ctx.font = `700 12px ${fontUi}`;
+    const padding = 10;
+    const w = ctx.measureText(text).width + padding * 2;
+    const h = 22;
+    roundRectPath(ctx, x, y, w, h, 11);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, x + padding, y + h / 2 + 1);
+    ctx.textBaseline = "top";
+  }
+
+  function roundRectPath(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function wrapCanvasText(ctx, text, maxWidth) {
+    const words = text.split(" ");
+    const lines = [];
+    let line = "";
+    for (const word of words) {
+      const test = line ? line + " " + word : word;
+      if (line && ctx.measureText(test).width > maxWidth) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawLegendOnCanvas(ctx, fontUi, width, height, breaks, colors, title, noDataLabel) {
+    const pad = 10;
+    const rowH = 18;
+    const swatch = 14;
+    const boxW = 232;
+    const innerW = boxW - pad * 2 - swatch - 6;
+
+    ctx.font = `700 12px ${fontUi}`;
+    const titleLines = wrapCanvasText(ctx, title, boxW - pad * 2);
+
+    const rows = colors.length + 1; // + no-data row
+    const boxH = pad * 2 + titleLines.length * 16 + 4 + rows * rowH;
+    const boxX = width - boxW - 10;
+    const boxY = height - boxH - 10;
+
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    roundRectPath(ctx, boxX, boxY, boxW, boxH, 6);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,0.12)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    let cy = boxY + pad;
+    ctx.fillStyle = "#17211c";
+    ctx.font = `700 12px ${fontUi}`;
+    for (const line of titleLines) {
+      ctx.fillText(line, boxX + pad, cy);
+      cy += 16;
+    }
+    cy += 4;
+
+    ctx.font = `400 11px ${fontUi}`;
+    for (let i = colors.length - 1; i >= 0; i--) {
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(boxX + pad, cy + 2, swatch, swatch);
+      ctx.fillStyle = "#17211c";
+      const label = `${fmtNumber(breaks[i])} – ${fmtNumber(breaks[i + 1])}`;
+      ctx.fillText(wrapCanvasText(ctx, label, innerW)[0], boxX + pad + swatch + 6, cy + 3);
+      cy += rowH;
+    }
+
+    // "No data" row, matching the hatch swatch used on the map/legend.
+    ctx.fillStyle = "#e4e2dd";
+    ctx.fillRect(boxX + pad, cy + 2, swatch, swatch);
+    ctx.strokeStyle = "#b8b5ae";
+    ctx.beginPath();
+    ctx.moveTo(boxX + pad, cy + 2 + swatch);
+    ctx.lineTo(boxX + pad + swatch, cy + 2);
+    ctx.stroke();
+    ctx.fillStyle = "#17211c";
+    ctx.fillText(noDataLabel, boxX + pad + swatch + 6, cy + 3);
+  }
+
   // Applies state.year to every year-dependent bit of UI (slider position,
   // map colors, sparkline marker) without touching the play/pause state —
   // this is the tick handler for autoplay.
@@ -536,6 +784,9 @@
     document.getElementById("label_year").textContent = t.label_year;
     document.getElementById("plot-title").textContent = t.label_title;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
+    if (!document.getElementById("snapshot-btn").disabled) {
+      document.getElementById("snapshot-btn-label").textContent = t.btn_snapshot;
+    }
 
     const xSelect = document.getElementById("x-select");
     const prevValue = state.x;

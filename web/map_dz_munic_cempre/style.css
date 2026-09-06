@@ -239,6 +239,8 @@ html, body {
 }
 .btn-primary:hover { background-color: #3d827a; }
 .btn-primary.active { background-color: #2f6e5c; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5); }
+.btn-primary:disabled { opacity: 0.6; cursor: default; }
+.btn-primary:disabled:hover { background-color: #48968B; }
 
 /* ---- Map column ---- */
 
