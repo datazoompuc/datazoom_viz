@@ -534,12 +534,18 @@
         }
       }
 
-      // Choropleth fill + state/country boundaries: each Leaflet pane with
-      // vector content gets its own <svg> root. Serializing and redrawing
-      // each as an image is simpler and more robust than walking Leaflet's
-      // internal layer objects, and needs no CORS handling since it's an
-      // inline data: URI.
-      const svgs = mapEl.querySelectorAll("svg");
+      // Choropleth fill + state/country boundaries: each of our two map-data
+      // panes (paneMain, paneBoundaries) gets its own <svg> root. Serializing
+      // and redrawing each as an image is simpler and more robust than
+      // walking Leaflet's internal layer objects, and needs no CORS handling
+      // since it's an inline data: URI.
+      //
+      // Scoped to those two panes specifically, not a blanket "#map svg":
+      // that also matches Leaflet's own UI-chrome SVGs (e.g. the tiny 12x8
+      // flag icon in the attribution control), which would otherwise get
+      // rasterized and stamped onto the map content at whatever screen
+      // position that control happens to occupy.
+      const svgs = mapEl.querySelectorAll(".leaflet-paneMain-pane svg, .leaflet-paneBoundaries-pane svg");
       for (const svg of svgs) {
         const r = svg.getBoundingClientRect();
         const svgText = new XMLSerializer().serializeToString(svg);
