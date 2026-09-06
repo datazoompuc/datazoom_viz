@@ -80,6 +80,12 @@
   const NODATA_BASE = "#e4e2dd";
   const NODATA_LINE = "#b8b5ae";
 
+  // The seam-hiding stroke (see buildMapLayer) needs a plain color, not the
+  // no-data hatch's pattern url() — reuse its line color there instead.
+  function strokeColorFor(fillColor) {
+    return fillColor === "url(#" + NODATA_PATTERN_ID + ")" ? NODATA_LINE : fillColor;
+  }
+
   const DATA_DIR = "data";
   const N_BINS = 9;
   const SPARK_W = 260;
@@ -484,7 +490,7 @@
         ? "url(#" + NODATA_PATTERN_ID + ")"
         : colors[binIndex(value, breaks)];
 
-      layer.setStyle({ fillColor: color });
+      layer.setStyle({ fillColor: color, color: strokeColorFor(color) });
       layer.setTooltipContent([
         "<strong>", year, "</strong><br>",
         t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
@@ -857,9 +863,20 @@
       pane: "paneMain",
       style: () => ({
         className: "muni-path",
-        stroke: false,
+        // A thin stroke in the *same color as the fill* (see
+        // strokeColorFor), not stroke:false. Adjacent unstroked SVG
+        // polygons each anti-alias their own edge independently, and at
+        // low zoom — many small municipalities packed into a small screen
+        // area — those sub-pixel seams show up as a visible hairline gap
+        // network exposing the basemap underneath; the same ~1px seam is
+        // imperceptible once a polygon is large on screen, which is why it
+        // disappears when zooming in. A matching-color stroke fills the
+        // seam instead of trying to eliminate anti-aliasing itself.
+        stroke: true,
+        weight: 1,
         fillOpacity: 0.9,
-        fillColor: "#cccccc" // placeholder; the first color update repaints before this ever renders a frame
+        fillColor: "#cccccc", // placeholder; the first color update repaints before this ever renders a frame
+        color: "#cccccc"
       }),
       onEachFeature: (feature, layer) => {
         layersByCodIbge.set(feature.properties.cod_ibge, layer);
@@ -869,7 +886,7 @@
         layer.on("mouseover", () => {
           if (openTooltipLayer && openTooltipLayer !== layer) openTooltipLayer.closeTooltip();
           openTooltipLayer = layer;
-          layer.setStyle({ stroke: true, weight: 5, color: "black", opacity: 1, fillOpacity: 1 });
+          layer.setStyle({ weight: 5, color: "black", opacity: 1, fillOpacity: 1 });
           layer.bringToFront();
         });
         layer.on("mouseout", () => {
@@ -879,7 +896,9 @@
           // would snap fillColor back to the very first year ever shown
           // instead of the current one. Omitting fillColor here keeps
           // whatever the last color update set (setStyle merges options).
-          layer.setStyle({ stroke: false, fillOpacity: 0.9 });
+          // color (the seam-hiding stroke) does need restoring here, since
+          // mouseover just overwrote it with the highlight's black.
+          layer.setStyle({ weight: 1, opacity: 1, fillOpacity: 0.9, color: strokeColorFor(layer.options.fillColor) });
         });
       }
     }).addTo(map);
@@ -914,7 +933,7 @@
         ? "url(#" + NODATA_PATTERN_ID + ")"
         : colors[binIndex(value, breaks)];
 
-      layer.setStyle({ fillColor: color });
+      layer.setStyle({ fillColor: color, color: strokeColorFor(color) });
       layer.setTooltipContent([
         t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
         t.label_state_name, row ? row.estado : "—", "</b><br>",
