@@ -85,6 +85,7 @@
   const SPARK_W = 260;
   const SPARK_H = 40;
   const SPARK_PAD = 4;
+  const PLAY_INTERVAL_MS = 1200; // autoplay tick — kept comfortably above the .muni-path fill transition (style.css) so each year settles before the next
 
   const state = {
     lang: "pt",
@@ -762,7 +763,7 @@
           return;
         }
         applyYear(state.year + 1);
-      }, 5000);
+      }, PLAY_INTERVAL_MS);
     } else {
       clearInterval(state.playTimer);
     }

@@ -397,5 +397,7 @@ html, body {
    those under a CSS transition as long as nothing sets an inline
    style with higher precedence. */
 .muni-path {
-  transition: fill 400ms ease, fill-opacity 250ms ease;
+  /* Kept comfortably under PLAY_INTERVAL_MS (app.js) so each year's fill
+     settles before autoplay advances to the next. */
+  transition: fill 300ms ease, fill-opacity 180ms ease;
 }
