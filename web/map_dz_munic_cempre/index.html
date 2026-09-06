@@ -38,22 +38,30 @@
         <div id="spark-tooltip" class="spark-tooltip"></div>
       </div>
       <div class="slider-row">
-        <button id="play-btn" class="icon-btn" title="Play/Pause">&#9654;</button>
+        <button id="play-btn" class="icon-btn" title="Play/Pause">
+          <svg id="play-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
         <input type="range" id="year-slider" step="1">
         <span id="year-value" class="year-value"></span>
       </div>
     </div>
     <div class="spacer"></div>
     <button id="compare-toggle" class="btn-primary">
-      <span class="icon">&#8646;</span> <span id="compare-toggle-label"></span>
+      <span class="icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"></path></svg>
+      </span> <span id="compare-toggle-label"></span>
     </button>
     <div style="height: 6px;"></div>
     <button id="lang-toggle" class="btn-primary">
-      <span class="icon">&#127760;</span> <span id="lang-toggle-label"></span>
+      <span class="icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+      </span> <span id="lang-toggle-label"></span>
     </button>
     <div style="height: 6px;"></div>
     <button id="snapshot-btn" class="btn-primary">
-      <span class="icon">&#128247;</span> <span id="snapshot-btn-label"></span>
+      <span class="icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+      </span> <span id="snapshot-btn-label"></span>
     </button>
   </div>
   <div class="plotcol">

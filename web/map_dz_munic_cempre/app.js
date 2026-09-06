@@ -94,6 +94,15 @@
   const PLAY_INTERVAL_MS = 1200; // autoplay tick — kept comfortably above the .muni-path fill transition (style.css) so each year settles before the next
   const SNAPSHOT_TITLE_BAND_H = 52; // dedicated header strip on exported images — see captureSnapshot
 
+  // Play/pause icon swap for #play-btn (Feather Icons, MIT license —
+  // https://github.com/feathericons/feather — "play"/"pause", inlined
+  // rather than pulled from a CDN so the app stays offline-capable with
+  // one less network request). stroke="currentColor" in the markup already
+  // set in index.html means these just need swapping wholesale, no
+  // separate color handling.
+  const PLAY_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+  const PAUSE_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
+
   const state = {
     lang: "pt",
     x: null,
@@ -815,7 +824,7 @@
     state.playing = !state.playing;
     const btn = document.getElementById("play-btn");
     btn.classList.toggle("playing", state.playing);
-    btn.innerHTML = state.playing ? "&#10074;&#10074;" : "&#9654;";
+    btn.innerHTML = state.playing ? PAUSE_ICON_SVG : PLAY_ICON_SVG;
 
     if (state.playing) {
       state.playTimer = setInterval(() => {
@@ -836,7 +845,7 @@
     clearInterval(state.playTimer);
     const btn = document.getElementById("play-btn");
     btn.classList.remove("playing");
-    btn.innerHTML = "&#9654;";
+    btn.innerHTML = PLAY_ICON_SVG;
   }
 
   // ---- Rendering ----
