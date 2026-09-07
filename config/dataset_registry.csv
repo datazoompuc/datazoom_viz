@@ -27,8 +27,6 @@ ibge_pnadc_atividades_ocupacoes,data/ibge_pnadc_atividades_ocupacoes.rds,data-ra
 ibge_pnadc_cnae,data/ibge_pnadc_cnae.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
 ibge_pnadc_cod,data/ibge_pnadc_cod.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
 ibge_pnadc_trabalho,data/ibge_pnadc_trabalho.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
-ibge_pnadc_trabalho_en,data/ibge_pnadc_trabalho_en.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
-ibge_pnadc_trabalho_insercao,data/ibge_pnadc_trabalho_insercao.rds,,,,NOT_FOUND_IN_DATA_RAW
 ips_2021,data/ips_2021.rds,data-raw/dz_varias_amazonias_cross_section.R;data-raw/ips.R,,,MULTIPLE_MATCHES
 mapbiomas_cobertura,data/mapbiomas_cobertura.parquet,data-raw/mapbiomas_cobertura_map.R,load_mapbiomas(),datazoom.amazonia,
 mapbiomas_cobertura_est,data/mapbiomas_cobertura_est.rds,data-raw/mapbiomas_cobertura_ts_rk.R,load_mapbiomas(),datazoom.amazonia,
