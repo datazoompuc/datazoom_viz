@@ -301,45 +301,160 @@ html, body {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ---- Compare-years: two small-multiple maps, pan/zoom synced (app.js
-   buildCompareMaps), rather than one map swiped by a divider — better for
-   surveying a whole continent-scale choropleth than a divider you'd have
-   to drag over every region in turn. ---- */
+/* ---- Compare-years: a ranked dumbbell chart (year A vs year B dots per
+   municipality, connected by a line, sorted by change) rather than two
+   side-by-side maps. With 700+ municipalities in the Legal Amazon a single
+   ranked list isn't readable at a glance, so it's filtered to one state at
+   a time (compare-state-select) — from 15 municipalities (RR) to 181 (MA),
+   always a manageable, scrollable list. The map is strong at "where did
+   this happen"; the dumbbell chart is strong at "who changed the most,"
+   which a color-coded map can't rank. ---- */
 
-.compare-maps { display: none; }
-.apppanel.compare-mode .compare-maps { display: flex; }
+.compare-panel { display: none; }
+.apppanel.compare-mode .compare-panel { display: flex; }
 .apppanel.compare-mode #map { display: none; }
 
-.compare-maps {
+.compare-panel {
   position: absolute;
   inset: 0;
-  gap: 8px;
-}
-
-.compare-map-col {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
   flex-direction: column;
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-.compare-map-label {
+.compare-panel-bar {
   flex: 0 0 auto;
-  padding: 5px 10px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: #fff;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e5e5;
 }
-.compare-map-label-a { background: #2a78d6; }
-.compare-map-label-b { background: #eb6834; }
 
-.compare-map {
+.compare-state-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #333;
+}
+.compare-state-filter select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 0.85rem;
+  background: #fff;
+  color: #222;
+}
+
+.compare-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: #333;
+  font-variant-numeric: tabular-nums;
+}
+.compare-legend-chip { display: flex; align-items: center; gap: 6px; }
+.compare-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.compare-legend-dot-a { background: #2a78d6; }
+.compare-legend-dot-b { background: #eb6834; }
+
+/* Shared row grid — the axis header and every data row use the same three
+   columns (label / track / delta) so the min/max ticks line up exactly
+   above the dots they describe. */
+.dumbbell-axis,
+.dumbbell-row {
+  display: flex;
+  align-items: center;
+}
+.dumbbell-axis {
+  flex: 0 0 auto;
+  padding: 8px 0 6px;
+  font-size: 0.72rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.dumbbell-row { height: 22px; }
+.dumbbell-row:hover { background: rgba(80, 164, 134, 0.08); }
+
+.dumbbell-col-label {
+  flex: 0 0 170px;
+  padding: 0 10px 0 14px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #333;
+}
+.dumbbell-col-track {
   flex: 1 1 auto;
   position: relative;
-  min-height: 0;
+  height: 22px;
+}
+.dumbbell-axis .dumbbell-col-track {
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+}
+.dumbbell-col-delta {
+  flex: 0 0 84px;
+  padding: 0 14px 0 8px;
+  text-align: right;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: #333;
+}
+
+.dumbbell-scroll { flex: 1 1 auto; overflow-y: auto; }
+#dumbbell-rows { display: flex; flex-direction: column; }
+
+.dumbbell-line {
+  position: absolute;
+  top: 50%;
+  height: 2px; /* dataviz skill mark spec: line = 2px */
+  background: #c7c7c7;
+  transform: translateY(-50%);
+}
+.dumbbell-dot {
+  position: absolute;
+  top: 50%;
+  width: 10px; /* dataviz skill mark spec: markers >= 8px */
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1.5px #fff; /* separates overlapping dots from the line/each other without a border */
+}
+/* Year A / year B are an identity pair (which side, not a magnitude) —
+   same categorical blue/orange slots used by the sparkline's compare
+   markers, so the color meaning is consistent across the whole app. */
+.dumbbell-dot-a { background: #2a78d6; }
+.dumbbell-dot-b { background: #eb6834; }
+
+.dumbbell-note {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  color: #888;
+}
+.dumbbell-note.hidden { display: none; }
+
+.dumbbell-tooltip {
+  position: absolute;
+  background: #1f3b32;
+  color: #fff;
+  font-size: 11.5px;
+  line-height: 1.35;
+  padding: 6px 9px;
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  z-index: 10;
 }
 
 /* ---- Leaflet legend ---- */

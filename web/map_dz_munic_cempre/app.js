@@ -23,12 +23,13 @@
       label_state_name: "Estado: <b>",
       label_measurement_unit: "Unidade de medida: <b>",
       label_no_data: "Sem dado",
+      label_compare_state: "Estado",
       btn_compare: "Comparar anos",
       btn_compare_exit: "Sair da comparação",
       btn_snapshot: "Salvar imagem",
       btn_snapshot_busy: "Gerando imagem…",
       snapshot_error: "Não foi possível gerar a imagem. Veja o console para detalhes.",
-      compare_vs: "vs.",
+      dumbbell_note: (n) => `${n} município(s) sem dado em um dos dois anos selecionados`,
       btn_lang: "English"
     },
     en: {
@@ -42,14 +43,22 @@
       label_state_name: "State: <b>",
       label_measurement_unit: "Measurement unit: <b>",
       label_no_data: "No data",
+      label_compare_state: "State",
       btn_compare: "Compare years",
       btn_compare_exit: "Exit comparison",
       btn_snapshot: "Save image",
       btn_snapshot_busy: "Generating image…",
       snapshot_error: "Couldn't generate the image — see console for details.",
-      compare_vs: "vs.",
+      dumbbell_note: (n) => `${n} municipalit${n === 1 ? "y" : "ies"} missing data in one of the selected years`,
       btn_lang: "Português"
     }
+  };
+
+  // UF -> display name, same in pt/en (Brazilian state names aren't
+  // translated). Used to label the compare-mode state filter.
+  const STATE_NAMES = {
+    AC: "Acre", AM: "Amazonas", AP: "Amapá", MA: "Maranhão",
+    MT: "Mato Grosso", PA: "Pará", RO: "Rondônia", RR: "Roraima", TO: "Tocantins"
   };
 
   // Single-hue sequential ramp (green, ~170deg OKLCH hue — close to the
@@ -93,6 +102,17 @@
   const SPARK_PAD = 4;
   const PLAY_INTERVAL_MS = 1200; // autoplay tick — kept comfortably above the .muni-path fill transition (style.css) so each year settles before the next
   const SNAPSHOT_TITLE_BAND_H = 52; // dedicated header strip on exported images — see captureSnapshot
+  const COMPARE_LEGEND_BAND_H = 34; // year A/B color-chip strip under the title, compare-mode snapshots only
+
+  // Dumbbell chart row geometry — must match the column widths in style.css
+  // (.dumbbell-col-label/.dumbbell-col-track/.dumbbell-col-delta) since the
+  // snapshot export redraws the same layout procedurally on a canvas
+  // instead of rasterizing the live DOM.
+  const DUMBBELL_ROW_H = 22;
+  const DUMBBELL_LABEL_W = 170;
+  const DUMBBELL_DELTA_W = 84;
+  const DUMBBELL_PAD_L = 14;
+  const DUMBBELL_PAD_R = 14;
 
   // Play/pause icon swap for #play-btn (Feather Icons, MIT license —
   // https://github.com/feathericons/feather — "play"/"pause", inlined
@@ -111,29 +131,26 @@
     playTimer: null,
     compareMode: false,
     yearA: null,
-    yearB: null
+    yearB: null,
+    compareState: null // UF filter for the compare-mode dumbbell chart
   };
 
   let map, legendControl;
-  // Compare mode is two independent, pan/zoom-synced Leaflet maps (small
-  // multiples) rather than one map with a divider — see setCompareMode.
-  // Built lazily on first use, since most sessions never touch compare mode.
-  let mapA, mapB, compareLegendControl;
-  let compareBuilt = false;
   let municGeo, statesGeo, legalAmazonGeo, attributesByYear, dictionary, fullDomainByVar;
+  let statesList = []; // sorted unique UF codes present in the data, for the compare-mode state filter
+  let municMetaByCodIbge; // cod_ibge -> { estado, nome }, for the dumbbell chart's per-municipality lookups
 
-  // Built once in buildMapLayer()/buildCompareMaps(); year/variable/lang
-  // changes update these layers in place (setStyle / setTooltipContent)
-  // instead of tearing down and recreating the whole GeoJSON layer. That's
-  // what lets the CSS transition on .muni-path actually animate — a fresh
-  // element every frame has no "previous" fill to transition from.
+  // Built once in buildMapLayer(); year/variable/lang changes update these
+  // layers in place (setStyle / setTooltipContent) instead of tearing down
+  // and recreating the whole GeoJSON layer. That's what lets the CSS
+  // transition on .muni-path actually animate — a fresh element every frame
+  // has no "previous" fill to transition from.
   const layersByCodIbge = new Map();
-  const layersACodIbge = new Map();
-  const layersBCodIbge = new Map();
   const breaksCache = {}; // var -> { breaks, colors }, since the domain (and so the bins) only depends on the variable, not the year
   let sparkSeries = [];
   let sparkXFor = null;
   let sparkYFor = null;
+  let dumbbellRender = null; // last dumbbell dataset computed by updateDumbbellChart() — reused by the snapshot export
 
   // ---- Boot ----
 
@@ -151,6 +168,8 @@
 
     attributesByYear = groupByYear(attrs);
     fullDomainByVar = computeFullDomains(attrs, dict.pt.map((d) => d.var));
+    statesList = computeStatesList(attrs);
+    municMetaByCodIbge = buildMunicMeta(attrs);
 
     initState();
     initMap();
@@ -170,6 +189,18 @@
       if (!r.ok) throw new Error(`${url}: ${r.status}`);
       return r.json();
     });
+  }
+
+  function computeStatesList(rows) {
+    return Array.from(new Set(rows.map((r) => r.estado))).sort();
+  }
+
+  function buildMunicMeta(rows) {
+    const meta = new Map();
+    for (const row of rows) {
+      if (!meta.has(row.cod_ibge)) meta.set(row.cod_ibge, { estado: row.estado, nome: row.nm_municip });
+    }
+    return meta;
   }
 
   function groupByYear(rows) {
@@ -222,8 +253,7 @@
 
   // ---- Map setup ----
 
-  // Builds one full map instance — tiles, panes, boundary lines — shared by
-  // the single-year map and by each of compare mode's two small multiples.
+  // Builds the map instance: tiles, panes, boundary lines.
   function createBaseMap(containerId) {
     const m = L.map(containerId, { zoomControl: true }).setView([-7, -58], 5);
 
@@ -275,44 +305,6 @@
     legendControl = makeLegendControl(map);
   }
 
-  // Compare mode's two maps, built lazily on first use and pan/zoom-synced
-  // (dragging/zooming either one moves both) so the same geographic area is
-  // always what's being compared. Small multiples rather than one map with
-  // a swipe divider: for a continent-scale choropleth you want to survey
-  // the whole thing for both years at once, not drag a divider across every
-  // region in turn.
-  function buildCompareMaps() {
-    if (compareBuilt) return;
-    compareBuilt = true;
-
-    mapA = createBaseMap("map-a");
-    mapB = createBaseMap("map-b");
-    buildPolygonLayer(mapA, layersACodIbge);
-    buildPolygonLayer(mapB, layersBCodIbge);
-    ensureNoDataPattern("map-a");
-    ensureNoDataPattern("map-b");
-    compareLegendControl = makeLegendControl(mapB);
-
-    syncMapViews(mapA, mapB);
-  }
-
-  // Mirrors center/zoom between two maps in both directions. The `suppress`
-  // flag (shared by both directions via this closure) stops the mirrored
-  // setView from re-triggering its own move/zoom handler and recursing —
-  // Leaflet fires move/zoom synchronously for an animate:false setView, so
-  // the flag is still up the whole time the mirrored update runs.
-  function syncMapViews(m1, m2) {
-    let suppress = false;
-    function mirror(from, to) {
-      if (suppress) return;
-      suppress = true;
-      to.setView(from.getCenter(), from.getZoom(), { animate: false });
-      suppress = false;
-    }
-    m1.on("move zoom", () => mirror(m1, m2));
-    m2.on("move zoom", () => mirror(m2, m1));
-  }
-
   // ---- Controls ----
 
   function initControls() {
@@ -346,6 +338,18 @@
     });
 
     initCompareMarkers();
+
+    const stateSelect = document.getElementById("compare-state-select");
+    for (const uf of statesList) {
+      const opt = document.createElement("option");
+      opt.value = uf;
+      opt.textContent = STATE_NAMES[uf] ? `${STATE_NAMES[uf]} (${uf})` : uf;
+      stateSelect.appendChild(opt);
+    }
+    stateSelect.addEventListener("change", () => {
+      state.compareState = stateSelect.value;
+      updateDumbbellChart();
+    });
 
     document.getElementById("snapshot-btn").addEventListener("click", captureSnapshot);
   }
@@ -420,7 +424,7 @@
       const year = yearFromPointerEvent(e);
       if (dragging === "a") state.yearA = year; else state.yearB = year;
       updateCompareYearPositions();
-      updateCompareMapColors();
+      updateDumbbellChart();
       updateCompareLabels();
     }
 
@@ -455,8 +459,8 @@
   }
 
   function updateCompareLabels() {
-    document.getElementById("compare-label-a").textContent = state.yearA;
-    document.getElementById("compare-label-b").textContent = state.yearB;
+    document.getElementById("compare-legend-a-label").textContent = state.yearA;
+    document.getElementById("compare-legend-b-label").textContent = state.yearB;
   }
 
   function setCompareMode(on) {
@@ -476,39 +480,15 @@
       document.getElementById("spark-tooltip").style.opacity = "0";
       if (state.yearA == null) state.yearA = dictionary.year_inicio;
       if (state.yearB == null) state.yearB = dictionary.year_final;
-
-      buildCompareMaps(); // lazy + idempotent
+      if (state.compareState == null) state.compareState = statesList[0];
+      document.getElementById("compare-state-select").value = state.compareState;
 
       updateCompareYearPositions();
       updateCompareLabels();
-      updateCompareMapColors();
-
-      // .compare-mode was just toggled on above, making #compare-maps
-      // visible — mapA/mapB may have been built (or last shown) while it
-      // was display:none, which leaves Leaflet's cached container size
-      // stale/zero. invalidateSize() re-measures now that it's visible.
-      mapA.invalidateSize();
-      mapB.invalidateSize();
+      updateDumbbellChart();
     } else {
       updateMapColors();
     }
-  }
-
-  // Recolors and re-tooltips mapA/mapB's polygons for their respective
-  // years. Same breaks/colors as the single-year map (the domain is fit
-  // across all years, not per-year — see computeFullDomains), so year A and
-  // year B can still share one legend even though each map computes its own
-  // fill independently.
-  function updateCompareMapColors() {
-    const dict = dictionary[state.lang];
-    const varMeta = dict.find((d) => d.var === state.x);
-    const t = I18N[state.lang];
-    const { breaks, colors } = getBreaksAndColors(state.x);
-
-    paintYear(layersACodIbge, state.yearA, breaks, colors, varMeta, t);
-    paintYear(layersBCodIbge, state.yearB, breaks, colors, varMeta, t);
-
-    renderLegendInto(compareLegendControl, breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
   }
 
   function paintYear(layersMap, year, breaks, colors, varMeta, t) {
@@ -534,6 +514,152 @@
     ].join("");
   }
 
+  // ---- Compare mode: ranked dumbbell chart. Filtered to one state
+  // (state.compareState) at a time — see the style.css comment above
+  // .compare-panel for why. Sorted by (valueB - valueA) descending, so the
+  // biggest gainers land at the top; dot color is a fixed identity pair
+  // (year A = blue, year B = orange, same slots the sparkline's draggable
+  // markers use) rather than encoding which value is larger. ----
+
+  function computeDumbbellRows(varName, yearA, yearB, uf) {
+    const dataA = attributesByYear.get(yearA) || new Map();
+    const dataB = attributesByYear.get(yearB) || new Map();
+    const rows = [];
+    let missing = 0;
+
+    for (const [codIbge, meta] of municMetaByCodIbge) {
+      if (meta.estado !== uf) continue;
+      const rowA = dataA.get(codIbge);
+      const rowB = dataB.get(codIbge);
+      const valueA = rowA ? rowA[varName] : null;
+      const valueB = rowB ? rowB[varName] : null;
+      if (valueA === null || valueA === undefined || Number.isNaN(valueA) ||
+          valueB === null || valueB === undefined || Number.isNaN(valueB)) {
+        missing++;
+        continue;
+      }
+      rows.push({ codIbge, nome: meta.nome, valueA, valueB, delta: valueB - valueA });
+    }
+
+    rows.sort((a, b) => b.delta - a.delta);
+    return { rows, missing };
+  }
+
+  // A domain fit to just the selected state + years (not the map's global,
+  // all-years domain) — states vary hugely in scale, and a ranked list is
+  // read within one state at a time, so a locally-fit axis keeps the dots
+  // spread out and readable rather than compressed into a shared extreme.
+  function dumbbellDomain(rows) {
+    if (!rows.length) return { min: 0, max: 1 };
+    let min = Infinity, max = -Infinity;
+    for (const r of rows) {
+      min = Math.min(min, r.valueA, r.valueB);
+      max = Math.max(max, r.valueA, r.valueB);
+    }
+    if (min === max) { min -= 1; max += 1; }
+    const pad = (max - min) * 0.05;
+    return { min: min - pad, max: max + pad };
+  }
+
+  function pctFor(value, domain) {
+    return ((value - domain.min) / (domain.max - domain.min)) * 100;
+  }
+
+  function updateDumbbellChart() {
+    const dict = dictionary[state.lang];
+    const varMeta = dict.find((d) => d.var === state.x);
+    const t = I18N[state.lang];
+
+    const { rows, missing } = computeDumbbellRows(state.x, state.yearA, state.yearB, state.compareState);
+    const domain = dumbbellDomain(rows);
+    dumbbellRender = { rows, missing, domain, varMeta, uf: state.compareState, yearA: state.yearA, yearB: state.yearB };
+
+    document.getElementById("dumbbell-axis-min").textContent = fmtNumber(domain.min);
+    document.getElementById("dumbbell-axis-max").textContent = fmtNumber(domain.max);
+
+    const container = document.getElementById("dumbbell-rows");
+    container.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    for (const r of rows) frag.appendChild(buildDumbbellRowEl(r, domain, varMeta));
+    container.appendChild(frag);
+
+    const note = document.getElementById("dumbbell-note");
+    if (missing > 0) {
+      note.textContent = t.dumbbell_note(missing);
+      note.classList.remove("hidden");
+    } else {
+      note.textContent = "";
+      note.classList.add("hidden");
+    }
+  }
+
+  function buildDumbbellRowEl(r, domain, varMeta) {
+    const pctA = pctFor(r.valueA, domain);
+    const pctB = pctFor(r.valueB, domain);
+    const lo = Math.min(pctA, pctB);
+    const hi = Math.max(pctA, pctB);
+
+    const row = document.createElement("div");
+    row.className = "dumbbell-row";
+
+    const label = document.createElement("div");
+    label.className = "dumbbell-col-label";
+    label.textContent = r.nome;
+    row.appendChild(label);
+
+    const track = document.createElement("div");
+    track.className = "dumbbell-col-track";
+    const line = document.createElement("div");
+    line.className = "dumbbell-line";
+    line.style.left = lo + "%";
+    line.style.width = (hi - lo) + "%";
+    track.appendChild(line);
+    const dotA = document.createElement("div");
+    dotA.className = "dumbbell-dot dumbbell-dot-a";
+    dotA.style.left = pctA + "%";
+    track.appendChild(dotA);
+    const dotB = document.createElement("div");
+    dotB.className = "dumbbell-dot dumbbell-dot-b";
+    dotB.style.left = pctB + "%";
+    track.appendChild(dotB);
+    row.appendChild(track);
+
+    const delta = document.createElement("div");
+    delta.className = "dumbbell-col-delta";
+    delta.textContent = (r.delta > 0 ? "+" : "") + fmtNumber(r.delta);
+    row.appendChild(delta);
+
+    row.addEventListener("pointerenter", (e) => showDumbbellTooltip(e, r, varMeta));
+    row.addEventListener("pointermove", moveDumbbellTooltip);
+    row.addEventListener("pointerleave", hideDumbbellTooltip);
+
+    return row;
+  }
+
+  function showDumbbellTooltip(e, r) {
+    const tooltip = document.getElementById("dumbbell-tooltip");
+    const pct = r.valueA !== 0 ? (r.delta / Math.abs(r.valueA)) * 100 : null;
+    tooltip.innerHTML =
+      "<strong>" + r.nome + "</strong><br>" +
+      state.yearA + ": " + fmtNumber(r.valueA) + "<br>" +
+      state.yearB + ": " + fmtNumber(r.valueB) + "<br>" +
+      (r.delta >= 0 ? "+" : "") + fmtNumber(r.delta) +
+      (pct !== null ? " (" + (pct >= 0 ? "+" : "") + pct.toFixed(1) + "%)" : "");
+    tooltip.style.opacity = "1";
+    moveDumbbellTooltip(e);
+  }
+
+  function moveDumbbellTooltip(e) {
+    const tooltip = document.getElementById("dumbbell-tooltip");
+    const panelRect = document.getElementById("compare-panel").getBoundingClientRect();
+    tooltip.style.left = (e.clientX - panelRect.left + 12) + "px";
+    tooltip.style.top = (e.clientY - panelRect.top + 12) + "px";
+  }
+
+  function hideDumbbellTooltip() {
+    document.getElementById("dumbbell-tooltip").style.opacity = "0";
+  }
+
   // ---- Snapshot: composite the live map (basemap tiles + choropleth/
   // boundary SVG) onto a canvas, draw a title/legend on top from the same
   // app state the on-screen legend uses, and download it as a PNG. ----
@@ -547,38 +673,14 @@
 
     try {
       const dpr = window.devicePixelRatio || 1;
-      // In compare mode, #compare-maps is the reference frame (it bounds
-      // both mini-maps plus the gap between them); otherwise plain #map.
-      const refEl = state.compareMode ? document.getElementById("compare-maps") : document.getElementById("map");
-      const refRect = refEl.getBoundingClientRect();
-      // The title/subtitle live in a dedicated strip ABOVE the captured
-      // map content (added to canvas height, map content shifted down by
-      // it), not overlaid on top of it — an overlay would either hide the
-      // top sliver of the single-year map, or in compare mode paint over
-      // the year-A/year-B header bars (which sit at real y=0, same band a
-      // simple overlay would occupy).
-      const totalW = refRect.width;
-      const totalH = refRect.height + SNAPSHOT_TITLE_BAND_H;
-
       const canvas = document.createElement("canvas");
-      canvas.width = Math.round(totalW * dpr);
-      canvas.height = Math.round(totalH * dpr);
       const ctx = canvas.getContext("2d");
-      ctx.scale(dpr, dpr);
 
-      let labelRects = null;
       if (state.compareMode) {
-        await drawMapContentOnto(ctx, document.getElementById("map-a"), refRect);
-        await drawMapContentOnto(ctx, document.getElementById("map-b"), refRect);
-        labelRects = {
-          a: relativeRect(document.getElementById("compare-label-a"), refRect),
-          b: relativeRect(document.getElementById("compare-label-b"), refRect)
-        };
+        renderDumbbellSnapshot(canvas, ctx, dpr);
       } else {
-        await drawMapContentOnto(ctx, refEl, refRect);
+        await renderMapSnapshot(canvas, ctx, dpr);
       }
-
-      drawSnapshotOverlay(ctx, totalW, totalH, labelRects);
 
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
       const url = URL.createObjectURL(blob);
@@ -598,11 +700,27 @@
     }
   }
 
-  // Draws one map's tiles + choropleth/boundary SVGs onto ctx, offset by
-  // that map's own position relative to refRect (the overall canvas's
-  // origin) — the single-map capture and each half of the compare-mode
-  // capture both go through this, so there's exactly one place that knows
-  // how to rasterize a Leaflet map onto a canvas.
+  // Single-year snapshot: composite the live map onto the canvas, then a
+  // title/legend header on top from the same app state the on-screen legend
+  // uses. Title lives in a dedicated strip ABOVE the map content (canvas
+  // made taller, map content shifted down by it) rather than overlaid on
+  // top of it, which used to hide the top sliver of the map.
+  async function renderMapSnapshot(canvas, ctx, dpr) {
+    const refEl = document.getElementById("map");
+    const refRect = refEl.getBoundingClientRect();
+    const totalW = refRect.width;
+    const totalH = refRect.height + SNAPSHOT_TITLE_BAND_H;
+
+    canvas.width = Math.round(totalW * dpr);
+    canvas.height = Math.round(totalH * dpr);
+    ctx.scale(dpr, dpr);
+
+    await drawMapContentOnto(ctx, refEl, refRect);
+    drawMapSnapshotOverlay(ctx, totalW, totalH);
+  }
+
+  // Draws the map's tiles + choropleth/boundary SVGs onto ctx, offset by
+  // the map's own position relative to refRect (the canvas's origin).
   async function drawMapContentOnto(ctx, mapEl, refRect) {
     const mapRect = mapEl.getBoundingClientRect();
     const ox = mapRect.left - refRect.left;
@@ -644,11 +762,6 @@
     }
   }
 
-  function relativeRect(el, refRect) {
-    const r = el.getBoundingClientRect();
-    return { x: r.left - refRect.left, y: r.top - refRect.top + SNAPSHOT_TITLE_BAND_H, w: r.width, h: r.height };
-  }
-
   function loadImage(src) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -660,19 +773,16 @@
 
   function snapshotFilename() {
     const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
-    const yearPart = state.compareMode ? `${state.yearA}-vs-${state.yearB}` : String(state.year);
+    const yearPart = state.compareMode
+      ? `${state.compareState}_${state.yearA}-vs-${state.yearB}`
+      : String(state.year);
     return `datazoom_cempre_${state.x}_${yearPart}_${stamp}.png`;
   }
 
   // Everything baked into the exported image beyond the raw map pixels:
-  // title, the year (or year A vs year B), the per-map header bars in
-  // compare mode, the legend, and attribution — all read from the same
+  // title, the year, the legend, and attribution — all read from the same
   // state/dictionary the on-screen UI uses, not scraped from the DOM.
-  // labelRects is null in single-year mode, or {a, b} (each an {x,y,w,h}
-  // from relativeRect) in compare mode — the real on-screen position of
-  // each map's year-label bar, so the redrawn header lands exactly where
-  // the live one does rather than at a guessed/hardcoded offset.
-  function drawSnapshotOverlay(ctx, width, height, labelRects) {
+  function drawMapSnapshotOverlay(ctx, width, height) {
     const t = I18N[state.lang];
     const dict = dictionary[state.lang];
     const varMeta = dict.find((d) => d.var === state.x);
@@ -682,7 +792,7 @@
     ctx.textBaseline = "top";
     // Solid, not translucent: this is a dedicated header strip now (see
     // captureSnapshot/SNAPSHOT_TITLE_BAND_H), not an overlay painted over
-    // real map/label content, so there's nothing underneath it to blend with.
+    // real map content, so there's nothing underneath it to blend with.
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, width, SNAPSHOT_TITLE_BAND_H);
     ctx.fillStyle = "#17211c";
@@ -691,15 +801,7 @@
 
     ctx.font = `400 12px ${fontUi}`;
     ctx.fillStyle = "#555";
-    const subtitle = state.compareMode
-      ? `${varMeta.label} — ${state.yearA} ${t.compare_vs} ${state.yearB}`
-      : `${t.label_var_name} ${varMeta.label} (${state.year})`;
-    ctx.fillText(subtitle, 12, 29);
-
-    if (state.compareMode && labelRects) {
-      drawMapHeaderBar(ctx, fontUi, labelRects.a, String(state.yearA), "#2a78d6");
-      drawMapHeaderBar(ctx, fontUi, labelRects.b, String(state.yearB), "#eb6834");
-    }
+    ctx.fillText(`${t.label_var_name} ${varMeta.label} (${state.year})`, 12, 29);
 
     drawLegendOnCanvas(ctx, fontUi, width, height, breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
 
@@ -710,16 +812,111 @@
     ctx.textAlign = "left";
   }
 
-  function drawMapHeaderBar(ctx, fontUi, rect, text, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-    ctx.fillStyle = "#fff";
-    ctx.font = `700 13px ${fontUi}`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(text, rect.x + rect.w / 2, rect.y + rect.h / 2 + 1);
-    ctx.textAlign = "left";
+  // Compare-mode snapshot: draws the ranked dumbbell chart procedurally
+  // (line + two dots + labels per row), mirroring drawLegendOnCanvas's
+  // approach rather than rasterizing the live DOM — there's no Leaflet map/
+  // tiles/CORS concern here, just our own layout math. Draws every row, not
+  // just whatever's scrolled into view: a "save image" of a ranked list
+  // should be the whole ranking.
+  function renderDumbbellSnapshot(canvas, ctx, dpr) {
+    const t = I18N[state.lang];
+    const fontUi = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
+    const data = dumbbellRender;
+    const { rows, domain, varMeta, uf, yearA, yearB, missing } = data;
+
+    const panelRect = document.getElementById("compare-panel").getBoundingClientRect();
+    const totalW = panelRect.width;
+    const trackX0 = DUMBBELL_LABEL_W;
+    const trackW = totalW - DUMBBELL_LABEL_W - DUMBBELL_DELTA_W;
+    const noteH = missing > 0 ? 22 : 0;
+    const totalH = SNAPSHOT_TITLE_BAND_H + COMPARE_LEGEND_BAND_H + rows.length * DUMBBELL_ROW_H + noteH + 26;
+
+    canvas.width = Math.round(totalW * dpr);
+    canvas.height = Math.round(totalH * dpr);
+    ctx.scale(dpr, dpr);
     ctx.textBaseline = "top";
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, totalW, totalH);
+    ctx.fillStyle = "#17211c";
+    ctx.font = `700 15px ${fontUi}`;
+    ctx.fillText(t.label_title, 12, 8);
+    ctx.font = `400 12px ${fontUi}`;
+    ctx.fillStyle = "#555";
+    const ufLabel = STATE_NAMES[uf] ? `${STATE_NAMES[uf]} (${uf})` : uf;
+    ctx.fillText(`${varMeta.label} — ${ufLabel}`, 12, 29);
+
+    const ly = SNAPSHOT_TITLE_BAND_H + 10;
+    drawSnapshotLegendChip(ctx, fontUi, 14, ly, "#2a78d6", String(yearA));
+    drawSnapshotLegendChip(ctx, fontUi, 100, ly, "#eb6834", String(yearB));
+
+    ctx.font = `400 10px ${fontUi}`;
+    ctx.fillStyle = "#888";
+    ctx.fillText(fmtNumber(domain.min), trackX0, ly + 2);
+    ctx.textAlign = "right";
+    ctx.fillText(fmtNumber(domain.max), trackX0 + trackW, ly + 2);
+    ctx.textAlign = "left";
+
+    let ry = SNAPSHOT_TITLE_BAND_H + COMPARE_LEGEND_BAND_H;
+    ctx.font = `400 11px ${fontUi}`;
+    for (const r of rows) {
+      const cy = ry + DUMBBELL_ROW_H / 2;
+      const xA = trackX0 + (pctFor(r.valueA, domain) / 100) * trackW;
+      const xB = trackX0 + (pctFor(r.valueB, domain) / 100) * trackW;
+
+      ctx.fillStyle = "#333";
+      ctx.fillText(wrapCanvasText(ctx, r.nome, DUMBBELL_LABEL_W - DUMBBELL_PAD_L - 4)[0], DUMBBELL_PAD_L, cy - 5);
+
+      ctx.strokeStyle = "#c7c7c7";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(Math.min(xA, xB), cy);
+      ctx.lineTo(Math.max(xA, xB), cy);
+      ctx.stroke();
+
+      drawSnapshotDot(ctx, xA, cy, "#2a78d6");
+      drawSnapshotDot(ctx, xB, cy, "#eb6834");
+
+      ctx.fillStyle = "#333";
+      ctx.textAlign = "right";
+      ctx.fillText((r.delta > 0 ? "+" : "") + fmtNumber(r.delta), totalW - DUMBBELL_PAD_R, cy - 5);
+      ctx.textAlign = "left";
+
+      ry += DUMBBELL_ROW_H;
+    }
+
+    if (missing > 0) {
+      ctx.font = `400 11px ${fontUi}`;
+      ctx.fillStyle = "#888";
+      ctx.fillText(t.dumbbell_note(missing), DUMBBELL_PAD_L, ry + 4);
+      ry += noteH;
+    }
+
+    ctx.font = `400 10px ${fontUi}`;
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.textAlign = "right";
+    ctx.fillText("datazoom.com.br/amazonia", totalW - 6, totalH - 16);
+    ctx.textAlign = "left";
+  }
+
+  function drawSnapshotLegendChip(ctx, fontUi, x, y, color, text) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x + 5, y + 5, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#17211c";
+    ctx.font = `700 12px ${fontUi}`;
+    ctx.fillText(text, x + 14, y);
+  }
+
+  function drawSnapshotDot(ctx, x, y, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
   }
 
   function roundRectPath(ctx, x, y, w, h, r) {
@@ -861,6 +1058,7 @@
     document.getElementById("label_year").textContent = t.label_year;
     document.getElementById("plot-title").textContent = t.label_title;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
+    document.getElementById("label_compare_state").textContent = t.label_compare_state;
     if (!document.getElementById("snapshot-btn").disabled) {
       document.getElementById("snapshot-btn-label").textContent = t.btn_snapshot;
     }
@@ -889,7 +1087,7 @@
     renderSparkline();
     if (state.compareMode) {
       updateCompareYearPositions();
-      updateCompareMapColors();
+      updateDumbbellChart();
       updateCompareLabels();
     } else {
       updateMapColors();
@@ -914,15 +1112,11 @@
     svg.insertBefore(defs, svg.firstChild);
   }
 
-  // Builds the 772 municipality polygons ONCE for a given map, into
-  // layersMap, wiring up hover/tooltip behavior that doesn't change across
-  // renders. Every subsequent variable/year/lang/compare change goes
-  // through updateMapColors()/updateCompareMapColors() instead of
-  // rebuilding the layer — see the layersByCodIbge comment above. Shared by
-  // the single-year map and each of compare mode's two small multiples, so
-  // each gets its own polygon set and its own hover state (openTooltipLayer
-  // is local to this call, not shared across maps).
-  function buildPolygonLayer(targetMap, layersMap) {
+  // Builds the 772 municipality polygons ONCE, into layersByCodIbge, wiring
+  // up hover/tooltip behavior that doesn't change across renders. Every
+  // subsequent variable/year/lang change goes through updateMapColors()
+  // instead of rebuilding the layer — see the layersByCodIbge comment above.
+  function buildMapLayer() {
     let openTooltipLayer = null;
 
     L.geoJSON(municGeo, {
@@ -945,7 +1139,7 @@
         color: "#cccccc"
       }),
       onEachFeature: (feature, layer) => {
-        layersMap.set(feature.properties.cod_ibge, layer);
+        layersByCodIbge.set(feature.properties.cod_ibge, layer);
         layer.bindTooltip("", { sticky: true });
 
         layer.on("mouseover", () => {
@@ -966,11 +1160,8 @@
           layer.setStyle({ weight: 1, opacity: 1, fillOpacity: 0.9, color: strokeColorFor(layer.options.fillColor) });
         });
       }
-    }).addTo(targetMap);
-  }
+    }).addTo(map);
 
-  function buildMapLayer() {
-    buildPolygonLayer(map, layersByCodIbge);
     ensureNoDataPattern("map");
   }
 

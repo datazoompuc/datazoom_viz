@@ -70,15 +70,30 @@
     <div class="map-wrap">
       <div id="map"></div>
       <div id="spinner" class="spinner"></div>
-      <div id="compare-maps" class="compare-maps">
-        <div class="compare-map-col">
-          <div id="compare-label-a" class="compare-map-label compare-map-label-a"></div>
-          <div id="map-a" class="compare-map"></div>
+      <div id="compare-panel" class="compare-panel">
+        <div class="compare-panel-bar">
+          <div class="compare-state-filter">
+            <label id="label_compare_state" for="compare-state-select"></label>
+            <select id="compare-state-select"></select>
+          </div>
+          <div class="compare-legend">
+            <span class="compare-legend-chip"><span class="compare-legend-dot compare-legend-dot-a"></span><span id="compare-legend-a-label"></span></span>
+            <span class="compare-legend-chip"><span class="compare-legend-dot compare-legend-dot-b"></span><span id="compare-legend-b-label"></span></span>
+          </div>
         </div>
-        <div class="compare-map-col">
-          <div id="compare-label-b" class="compare-map-label compare-map-label-b"></div>
-          <div id="map-b" class="compare-map"></div>
+        <div class="dumbbell-axis">
+          <div class="dumbbell-col-label"></div>
+          <div class="dumbbell-col-track">
+            <span id="dumbbell-axis-min"></span>
+            <span id="dumbbell-axis-max"></span>
+          </div>
+          <div class="dumbbell-col-delta"></div>
         </div>
+        <div class="dumbbell-scroll">
+          <div id="dumbbell-rows"></div>
+        </div>
+        <div id="dumbbell-note" class="dumbbell-note hidden"></div>
+        <div id="dumbbell-tooltip" class="dumbbell-tooltip"></div>
       </div>
     </div>
   </div>
