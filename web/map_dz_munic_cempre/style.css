@@ -66,6 +66,24 @@ html, body {
   color: #fff;
   padding: 20px;
   overflow-y: auto;
+  /* Flex column so .menucol-logo can pin to the bottom via margin-top:auto
+     — same approach the original Shiny app uses for its logo placement
+     (global/dza_lumen.css's .menucol::after). */
+  display: flex;
+  flex-direction: column;
+}
+
+.menucol-logo {
+  margin-top: auto;
+  padding-top: 24px;
+  height: 64px;
+  background-image: url("img/logo_datazoom_branco_horizontal.png");
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: contain;
+  pointer-events: none;
+  opacity: 0.95;
+  flex: 0 0 auto;
 }
 
 .plot_name {
