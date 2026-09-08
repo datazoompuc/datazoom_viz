@@ -43,6 +43,14 @@
       title_trends: "Tendências por município",
       subtitle_trends: "Top municípios por valor total exportado, 1997–2025",
       label_since_prefix: "Desde ",
+      view_explore: "Explorar",
+      title_explore: "Comparar municípios",
+      subtitle_explore: "Valor exportado (US$) ao longo do tempo, municípios selecionados",
+      label_explore_munis: "Municípios (Ctrl/Cmd+clique para vários)",
+      explore_hint: "Ordenado por valor total exportado",
+      label_log_scale: "Escala logarítmica",
+      label_index_first: "Indexado ao ano inicial (=100)",
+      explore_no_base: "sem exportação em {year}",
       btn_lang: "English"
     },
     en: {
@@ -72,6 +80,14 @@
       title_trends: "Trends by municipality",
       subtitle_trends: "Top municipalities by total export value, 1997–2025",
       label_since_prefix: "Since ",
+      view_explore: "Explore",
+      title_explore: "Compare municipalities",
+      subtitle_explore: "Export value (US$) over time, selected municipalities",
+      label_explore_munis: "Municipalities (Ctrl/Cmd+click for multiple)",
+      explore_hint: "Sorted by total export value",
+      label_log_scale: "Log scale",
+      label_index_first: "Indexed to first year (=100)",
+      explore_no_base: "no exports in {year}",
       btn_lang: "Português"
     }
   };
@@ -95,12 +111,15 @@
     lang: "pt",
     year: null,
     topN: 15,
-    view: "ranking", // "ranking" | "composition" | "change"
+    view: "ranking", // "ranking" | "composition" | "change" | "trends" | "explore"
     playing: false,
     playTimer: null,
     changeState: null, // UF filter for the change (dumbbell) view
     yearA: null,
-    yearB: null
+    yearB: null,
+    exploreMunis: [], // hand-picked municipalities for the explore view
+    exploreLog: false,
+    exploreIndex: false
   };
 
   let dictionary, municipalityTotals, regionTotals, composition, products;
@@ -136,6 +155,7 @@
     initControls();
     initSparklineHover();
     initCompositionHover();
+    initExploreHover();
     setView(state.view);
     document.getElementById("spinner").classList.add("hidden");
   }).catch((err) => {
@@ -192,13 +212,16 @@
     const qState = params.get("state");
     const qYearA = parseInt(params.get("yeara"), 10);
     const qYearB = parseInt(params.get("yearb"), 10);
+    const qMunis = params.get("munis");
+    const qLog = params.get("log");
+    const qIndex = params.get("index");
 
     state.lang = qLang === "en" ? "en" : "pt";
     state.year = Number.isFinite(qYear) && qYear >= dictionary.year_inicio && qYear <= dictionary.year_final
       ? qYear
       : dictionary.year_final;
     state.topN = [10, 15, 20, 30].includes(qTopN) ? qTopN : 15;
-    state.view = ["ranking", "composition", "change", "trends"].includes(qView) ? qView : "ranking";
+    state.view = ["ranking", "composition", "change", "trends", "explore"].includes(qView) ? qView : "ranking";
     state.changeState = ufList.includes(qState) ? qState : ufList[0];
     state.yearA = Number.isFinite(qYearA) && qYearA >= dictionary.year_inicio && qYearA <= dictionary.year_final
       ? qYearA
@@ -206,6 +229,10 @@
     state.yearB = Number.isFinite(qYearB) && qYearB >= dictionary.year_inicio && qYearB <= dictionary.year_final
       ? qYearB
       : dictionary.year_final;
+    const decodedMunis = qMunis ? qMunis.split("|").filter((m) => totalsByMunicipio.has(m)) : [];
+    state.exploreMunis = decodedMunis.length ? decodedMunis : computeTrendMunicipalities(5);
+    state.exploreLog = qLog === "1";
+    state.exploreIndex = qIndex === "1";
   }
 
   function updateUrl() {
@@ -217,6 +244,9 @@
     params.set("state", state.changeState);
     params.set("yeara", state.yearA);
     params.set("yearb", state.yearB);
+    params.set("munis", state.exploreMunis.join("|"));
+    params.set("log", state.exploreLog ? "1" : "0");
+    params.set("index", state.exploreIndex ? "1" : "0");
     history.replaceState(null, "", `?${params.toString()}`);
   }
 
@@ -253,6 +283,38 @@
     document.getElementById("view-composition").addEventListener("click", () => setView("composition"));
     document.getElementById("view-change").addEventListener("click", () => setView("change"));
     document.getElementById("view-trends").addEventListener("click", () => setView("trends"));
+    document.getElementById("view-explore").addEventListener("click", () => setView("explore"));
+
+    const munisSelect = document.getElementById("explore-munis-select");
+    const munisByTotal = computeTrendMunicipalities(municipioMeta.size);
+    for (const municipio of munisByTotal) {
+      const opt = document.createElement("option");
+      opt.value = municipio;
+      opt.textContent = municipio;
+      opt.selected = state.exploreMunis.includes(municipio);
+      munisSelect.appendChild(opt);
+    }
+    munisSelect.addEventListener("change", () => {
+      state.exploreMunis = Array.from(munisSelect.selectedOptions).map((o) => o.value);
+      updateUrl();
+      renderExplore();
+    });
+
+    const logCheckbox = document.getElementById("explore-log");
+    logCheckbox.checked = state.exploreLog;
+    logCheckbox.addEventListener("change", (e) => {
+      state.exploreLog = e.target.checked;
+      updateUrl();
+      renderExplore();
+    });
+
+    const indexCheckbox = document.getElementById("explore-index");
+    indexCheckbox.checked = state.exploreIndex;
+    indexCheckbox.addEventListener("change", (e) => {
+      state.exploreIndex = e.target.checked;
+      updateUrl();
+      renderExplore();
+    });
 
     const stateSelect = document.getElementById("change-state-select");
     for (const uf of ufList) {
@@ -299,14 +361,17 @@
     document.getElementById("view-composition").classList.toggle("active", view === "composition");
     document.getElementById("view-change").classList.toggle("active", view === "change");
     document.getElementById("view-trends").classList.toggle("active", view === "trends");
+    document.getElementById("view-explore").classList.toggle("active", view === "explore");
     document.getElementById("ranking-panel").classList.toggle("hidden", view !== "ranking");
     document.getElementById("composition-panel").classList.toggle("hidden", view !== "composition");
     document.getElementById("change-panel").classList.toggle("hidden", view !== "change");
     document.getElementById("trends-panel").classList.toggle("hidden", view !== "trends");
+    document.getElementById("explore-panel").classList.toggle("hidden", view !== "explore");
     // topn-group is shared between ranking (per-year top-N) and trends
     // (all-time top-N) — same control, different underlying ranking.
     document.getElementById("topn-group").classList.toggle("hidden", view !== "ranking" && view !== "trends");
     document.getElementById("change-group").classList.toggle("hidden", view !== "change");
+    document.getElementById("explore-group").classList.toggle("hidden", view !== "explore");
     document.querySelector(".slider-inline").classList.toggle("hidden", view === "change");
     updateUrl();
     render();
@@ -369,6 +434,8 @@
       updateCompositionGuide();
     } else if (state.view === "trends") {
       updateTrendsMarkers();
+    } else if (state.view === "explore") {
+      updateExploreGuide();
     } else {
       renderRanking();
     }
@@ -428,15 +495,20 @@
     document.getElementById("view-composition").textContent = t.view_composition;
     document.getElementById("view-change").textContent = t.view_change;
     document.getElementById("view-trends").textContent = t.view_trends;
+    document.getElementById("view-explore").textContent = t.view_explore;
     document.getElementById("ranking-axis-label").textContent = t.ranking_axis_label;
     document.getElementById("change-axis-label").textContent = t.change_axis_label;
     document.getElementById("label_state").textContent = t.label_state;
     document.getElementById("label_year_a").textContent = t.label_year_a;
     document.getElementById("label_year_b").textContent = t.label_year_b;
+    document.getElementById("label_explore_munis").textContent = t.label_explore_munis;
+    document.getElementById("explore-hint").textContent = t.explore_hint;
+    document.getElementById("label_log_scale").textContent = t.label_log_scale;
+    document.getElementById("label_index_first").textContent = t.label_index_first;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
 
-    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change, trends: t.title_trends };
-    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change, trends: t.subtitle_trends };
+    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change, trends: t.title_trends, explore: t.title_explore };
+    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change, trends: t.subtitle_trends, explore: t.subtitle_explore };
     document.getElementById("plot-title").textContent = titles[state.view];
     document.getElementById("plot-subtitle").textContent = subtitles[state.view];
 
@@ -451,6 +523,8 @@
       renderChange();
     } else if (state.view === "trends") {
       renderTrends();
+    } else if (state.view === "explore") {
+      renderExplore();
     } else {
       renderRanking();
     }
@@ -982,6 +1056,180 @@
       marker.setAttribute("cy", yFor(value));
       marker.setAttribute("opacity", "1");
     }
+  }
+
+  // ---- Explore: hand-picked municipalities plotted directly as lines —
+  // the "advanced" view, trimmed down from the original Shiny app's full
+  // any-entity-vs-any-product flexibility. Scoped to municipality-vs-
+  // municipality comparison only, since that's what the already-exported
+  // data (municipality_totals.json) supports without a new, much larger
+  // muni x product x year export; defaults to the top 5 by all-time total
+  // rather than an empty picker, so there's always something on screen.
+
+  const EXPLORE_PAD_L = 60, EXPLORE_PAD_R = 16, EXPLORE_PAD_T = 12, EXPLORE_PAD_B = 28;
+  const EXPLORE_VB_W = 1000, EXPLORE_VB_H = 520;
+
+  function buildExploreSeries() {
+    const years = [];
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) years.push(y);
+
+    return state.exploreMunis.map((municipio, i) => {
+      const yearMap = totalsByMunicipio.get(municipio);
+      const raw = years.map((y) => (yearMap ? yearMap.get(y) || 0 : 0));
+      const first = raw[0];
+      // Indexing to a zero base is undefined (not "no growth" — the flat
+      // 0/0=0 fallback would misrepresent a municipality that grew from
+      // nothing into a real exporter as having never changed at all).
+      // Flagged so the line is skipped rather than drawn wrong.
+      const undefinedIndex = state.exploreIndex && first === 0;
+      const values = state.exploreIndex && !undefinedIndex
+        ? raw.map((v) => (v / first) * 100)
+        : raw;
+      return { municipio, color: CATEGORY_COLORS[i % CATEGORY_COLORS.length], years, values, undefinedIndex };
+    });
+  }
+
+  function renderExplore() {
+    const svg = document.getElementById("explore-svg");
+    svg.innerHTML = "";
+    const series = buildExploreSeries();
+
+    if (!series.length) {
+      renderExploreLegend(series);
+      return;
+    }
+
+    const years = series[0].years;
+    const logScale = state.exploreLog;
+    const allValues = series.filter((s) => !s.undefinedIndex).flatMap((s) => s.values);
+    const rawMax = Math.max(...allValues, 1);
+    const rawMin = logScale ? Math.min(...allValues.filter((v) => v > 0), 1) : Math.min(0, ...allValues);
+
+    const xFor = (year) => EXPLORE_PAD_L + ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (EXPLORE_VB_W - EXPLORE_PAD_L - EXPLORE_PAD_R);
+    const yFor = (value) => {
+      const innerH = EXPLORE_VB_H - EXPLORE_PAD_T - EXPLORE_PAD_B;
+      if (logScale) {
+        const v = Math.max(value, rawMin);
+        const frac = (Math.log(v) - Math.log(rawMin)) / (Math.log(rawMax) - Math.log(rawMin) || 1);
+        return EXPLORE_PAD_T + (1 - frac) * innerH;
+      }
+      const frac = (value - rawMin) / (rawMax - rawMin || 1);
+      return EXPLORE_PAD_T + (1 - frac) * innerH;
+    };
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const addEl = (tag, attrs) => {
+      const el = document.createElementNS(svgNS, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      svg.appendChild(el);
+      return el;
+    };
+
+    for (let i = 0; i <= 4; i++) {
+      const v = logScale
+        ? rawMin * Math.pow(rawMax / rawMin, i / 4)
+        : rawMin + ((rawMax - rawMin) / 4) * i;
+      const y = yFor(v);
+      addEl("line", { class: "comp-gridline", x1: EXPLORE_PAD_L, x2: EXPLORE_VB_W - EXPLORE_PAD_R, y1: y, y2: y });
+      addEl("text", { class: "comp-axis-label", x: EXPLORE_PAD_L - 8, y: y + 3, "text-anchor": "end" }).textContent =
+        state.exploreIndex ? Math.round(v) : fmtAbbrev(v);
+    }
+
+    for (const y of years) {
+      if ((y - dictionary.year_inicio) % 4 !== 0 && y !== dictionary.year_final) continue;
+      addEl("text", { class: "comp-axis-label", x: xFor(y), y: EXPLORE_VB_H - EXPLORE_PAD_B + 16, "text-anchor": "middle" }).textContent = y;
+    }
+
+    for (const s of series) {
+      if (s.undefinedIndex) continue;
+      const pts = s.years.map((y, j) => `${xFor(y).toFixed(1)},${yFor(s.values[j]).toFixed(1)}`);
+      addEl("path", { class: "explore-line", stroke: s.color, d: `M${pts.join(" L")}` });
+    }
+
+    const guideX = xFor(state.year);
+    addEl("line", { id: "explore-guide", class: "explore-guide", x1: guideX, x2: guideX, y1: EXPLORE_PAD_T, y2: EXPLORE_VB_H - EXPLORE_PAD_B });
+
+    renderExploreLegend(series);
+  }
+
+  function renderExploreLegend(series) {
+    const t = I18N[state.lang];
+    const legend = document.getElementById("explore-legend");
+    legend.innerHTML = "";
+    for (const s of series) {
+      const item = document.createElement("div");
+      item.className = "legend-item";
+      if (s.undefinedIndex) item.classList.add("legend-item-muted");
+      const swatch = document.createElement("span");
+      swatch.className = "swatch";
+      swatch.style.background = s.undefinedIndex ? "transparent" : s.color;
+      swatch.style.borderColor = s.color;
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = s.undefinedIndex
+        ? `${s.municipio} (${t.explore_no_base.replace("{year}", dictionary.year_inicio)})`
+        : s.municipio;
+      label.title = label.textContent;
+      item.appendChild(swatch);
+      item.appendChild(label);
+      legend.appendChild(item);
+    }
+  }
+
+  function updateExploreGuide() {
+    const guide = document.getElementById("explore-guide");
+    if (!guide) return;
+    const x = EXPLORE_PAD_L + ((state.year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (EXPLORE_VB_W - EXPLORE_PAD_L - EXPLORE_PAD_R);
+    guide.setAttribute("x1", x);
+    guide.setAttribute("x2", x);
+  }
+
+  function initExploreHover() {
+    const area = document.getElementById("explore-chart-area");
+    const tooltip = document.getElementById("explore-tooltip");
+
+    area.addEventListener("pointermove", (e) => {
+      if (state.view !== "explore" || !state.exploreMunis.length) return;
+      const svg = document.getElementById("explore-svg");
+      const rect = svg.getBoundingClientRect();
+      const fracX = (e.clientX - rect.left) / rect.width;
+      const vbX = fracX * EXPLORE_VB_W;
+      const frac = (vbX - EXPLORE_PAD_L) / (EXPLORE_VB_W - EXPLORE_PAD_L - EXPLORE_PAD_R);
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      if (year < dictionary.year_inicio || year > dictionary.year_final) {
+        tooltip.style.opacity = "0";
+        return;
+      }
+
+      const series = buildExploreSeries();
+      const idx = year - dictionary.year_inicio;
+      const rowsHtml = series
+        .map((s) => ({ label: s.municipio, color: s.color, valor: s.values[idx] }))
+        .sort((a, b) => b.valor - a.valor)
+        .map((r) => `<div style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:2px;background:${r.color};display:inline-block;flex:0 0 auto;"></span><span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.label}</span><span style="flex:0 0 auto;padding-left:8px;">${state.exploreIndex ? r.valor.toFixed(0) : fmtAbbrev(r.valor)}</span></div>`)
+        .join("");
+
+      tooltip.innerHTML = `<strong>${year}</strong>` + rowsHtml;
+      const areaRect = area.getBoundingClientRect();
+      const left = e.clientX - areaRect.left;
+      tooltip.style.left = Math.min(areaRect.width - 260, left + 14) + "px";
+      tooltip.style.top = (e.clientY - areaRect.top - 10) + "px";
+      tooltip.style.opacity = "1";
+    });
+
+    area.addEventListener("pointerleave", () => {
+      tooltip.style.opacity = "0";
+    });
+
+    area.addEventListener("click", (e) => {
+      const svg = document.getElementById("explore-svg");
+      const rect = svg.getBoundingClientRect();
+      const fracX = (e.clientX - rect.left) / rect.width;
+      const vbX = fracX * EXPLORE_VB_W;
+      const frac = (vbX - EXPLORE_PAD_L) / (EXPLORE_VB_W - EXPLORE_PAD_L - EXPLORE_PAD_R);
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      jumpToYear(Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year)));
+    });
   }
 
   // ---- Sparkline: region-wide total export value per year ----

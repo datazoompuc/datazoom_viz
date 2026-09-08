@@ -147,6 +147,31 @@ html, body {
 .change-year-field { flex: 1 1 0; min-width: 0; }
 .change-year-field label { font-size: 0.85rem; }
 
+#explore-munis-select {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--ink);
+}
+#explore-munis-select option { padding: 3px 6px; }
+
+.explore-hint {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 4px 0 0;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.switch-row input { accent-color: #2c5f64; width: 16px; height: 16px; }
+
 .sparkline-wrap { margin-bottom: 4px; position: relative; }
 
 #year-sparkline {
@@ -446,6 +471,14 @@ html, body {
   pointer-events: none;
 }
 
+.explore-line { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.explore-guide {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
 .composition-legend {
   flex: 0 0 auto;
   display: flex;
@@ -467,12 +500,23 @@ html, body {
   width: 11px;
   height: 11px;
   border-radius: 3px;
+  border: 1px solid transparent;
   flex: 0 0 auto;
 }
 .legend-item span.label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.legend-item-muted {
+  opacity: 0.6;
+}
+.legend-item-muted span.swatch {
+  border-width: 1.5px;
+  border-style: dashed;
+}
+.legend-item-muted span.label {
+  font-style: italic;
 }
 
 /* ---- Change (dumbbell) view — same pattern as the CEMPRE map rebuild's
