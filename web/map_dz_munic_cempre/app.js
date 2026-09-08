@@ -1312,29 +1312,52 @@
     div.innerHTML = html;
   }
 
-  // ---- Color scale helpers (approximates leaflet::colorBin(bins = 9)) ----
+  // ---- Color scale helpers (approximates leaflet::colorBin(bins = 9), which
+  // in turn calls R's base pretty() to pick the bin edges) ----
 
+  // R's pretty() doesn't pick the smallest "nice" step >= the raw step size —
+  // it biases toward rounder units (2, 5, 10x a power of ten) using weighted
+  // over/undershoot comparisons, not fixed ratio thresholds. A naive port
+  // (smallest nice unit >= rawStep, via fixed cutoffs) diverges from R for
+  // borderline cases: e.g. domain [2, 25979] has a raw step of ~2886, which
+  // a fixed-cutoff version rounds to 2000 (13 bins) but R's pretty() rounds
+  // to 5000 (6 bins) — verified against `pretty(c(2, 25979), n = 9)` in R.
+  // This ports R's actual bias-corrected unit selection (high.u.bias = 1.5,
+  // u5.bias = 0.5 + 1.5*1.5 = 2.75 — R's own defaults) instead, and was
+  // checked against R's pretty() across the app's real data domains plus a
+  // battery of synthetic ranges (small/large/negative/fractional) — all
+  // matched exactly.
   function prettyBreaks(values, n) {
     if (!values.length) return [0, 1];
     const min = Math.min(...values);
     const max = Math.max(...values);
     if (min === max) return [min, min + 1];
 
-    const rawStep = (max - min) / n;
-    const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
-    const norm = rawStep / mag;
-    let niceNorm;
-    if (norm < 1.5) niceNorm = 1;
-    else if (norm < 3) niceNorm = 2;
-    else if (norm < 7) niceNorm = 5;
-    else niceNorm = 10;
-    const step = niceNorm * mag;
+    const H = 1.5; // R's high.u.bias
+    const H5 = 0.5 + 1.5 * H; // R's u5.bias
 
-    const niceMin = Math.floor(min / step) * step;
-    const niceMax = Math.ceil(max / step) * step;
+    const cell = (max - min) / n;
+    const base = Math.pow(10, Math.floor(Math.log10(cell)));
+
+    let unit = base;
+    let candidate = 2 * base;
+    if (candidate - cell < H * (cell - unit)) {
+      unit = candidate;
+      candidate = 5 * base;
+      if (candidate - cell < H5 * (cell - unit)) {
+        unit = candidate;
+        candidate = 10 * base;
+        if (candidate - cell < H * (cell - unit)) {
+          unit = candidate;
+        }
+      }
+    }
+
+    const niceMin = Math.floor(min / unit + 1e-10) * unit;
+    const niceMax = Math.ceil(max / unit - 1e-10) * unit;
 
     const breaks = [];
-    for (let v = niceMin; v <= niceMax + step / 2; v += step) {
+    for (let v = niceMin; v <= niceMax + unit / 2; v += unit) {
       breaks.push(Math.round(v * 1e6) / 1e6);
     }
     return breaks;
