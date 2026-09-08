@@ -22,7 +22,9 @@ get_server <- function(files, param) {
         tbl  <- reactive({ param$tables[[lang()]] })
         
         y_choices_lang <- reactive({
-            append("", grouped_list(tbl()[which(tbl()$y)]))
+            tabela_ordenada <- tbl()[which(tbl()$y), ]
+            tabela_ordenada <- tabela_ordenada[order(tabela_ordenada$label), ]
+            append("", grouped_list(tabela_ordenada))
         })
         
         param$filter_choices <- sort(unique(df$group))

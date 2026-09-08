@@ -30,7 +30,11 @@ get_server <- function(files, param) {
         tbl  <- reactive({ param$tables[[lang()]] })
         
         # Choices agrupadas (mesma lógica de grouped_list() do db_params.R), recalculadas por idioma
-        x_choices_lang     <- reactive({ append("", grouped_list(tbl()[which(tbl()$x)])) })
+        x_choices_lang <- reactive({
+            tabela_ordenada <- tbl()[which(tbl()$x), ]
+            tabela_ordenada <- tabela_ordenada[order(tabela_ordenada$label), ]
+            append("", grouped_list(tabela_ordenada))
+        })
         color_choices_lang <- reactive({ append("", grouped_list(tbl()[which(tbl()$color)])) })
         
         # Cria opções para seleção de grupos
