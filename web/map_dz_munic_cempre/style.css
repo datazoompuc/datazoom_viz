@@ -1,14 +1,14 @@
 * { box-sizing: border-box; }
 
 :root {
-  /* Warm, slightly-off-black/gray ink instead of generic #222/#555 — ties
-     body text to the map's new amber ramp rather than reading as a
-     browser-default gray. */
+  /* Warm, slightly-off-black/gray ink instead of generic #222/#555 — reads
+     as a deliberate choice for this brand rather than a browser-default
+     gray, independent of whichever hue the choropleth ramp uses. */
   --ink: #221d17;
   --muted: #6b6156;
   --border: #e4ded3;
   --shadow: rgba(34, 29, 23, 0.12);
-  --legend-accent: #a76f48; /* mid-tone step of PALETTE_CONTINUOUS (app.js) */
+  --legend-accent: #a63c89; /* mid-tone step of PALETTE_CONTINUOUS (app.js) */
   --sidebar-a: #50A486;
   --sidebar-b: #2f6e5c;
 }

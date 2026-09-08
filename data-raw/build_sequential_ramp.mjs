@@ -1,4 +1,4 @@
-// Generates the 9-step sequential amber/copper ramp used by
+// Generates the 9-step sequential plum/berry ramp used by
 // web/map_dz_munic_cempre/app.js (PALETTE_CONTINUOUS), following the
 // dataviz skill's color formula: sequential = one hue, monotone lightness,
 // light -> dark. Run: node data-raw/build_sequential_ramp.mjs
@@ -14,17 +14,18 @@
 
 // Deliberately NOT close to the app's brand greens (#50A486/#48968B, H
 // ~168-183): the sidebar and the choropleth were both green, so the data
-// layer visually merged into the UI chrome. H55 (amber/copper) sits on the
-// warm side of the wheel, clearly separating "this is data" from "this is
-// app chrome," and reads as intensity/heat — a good fit for economic-
-// activity data (companies, jobs, wages).
-const HUE = 55;
+// layer visually merged into the UI chrome. H340 (plum/berry) sits far
+// enough around the wheel to separate cleanly from the sidebar's green —
+// the boldest, most saturated of the three hues considered (amber and
+// blue were the other two), traded off against being less thematically
+// tied to economic-activity data than a warm hue.
+const HUE = 340;
 const N = 9; // matches N_BINS in app.js
 
 // Lightest step: an ordinal ramp's light end must itself clear >=2:1
 // contrast against a white surface (these render as legend swatches, not a
 // continuous fade into the background) — L=0.78 is the lightest step at
-// this hue that still clears 2:1 (2.01:1); anything lighter drops below it.
+// this hue that still clears 2:1 (2.02:1); anything lighter drops below it.
 // Darkest step: spaced 0.50 below the light end so 9 EVEN steps still clear
 // the ordinal minimum adjacent ΔL of 0.06 (0.50/8 = 0.0625).
 const L_LIGHT = 0.78;
