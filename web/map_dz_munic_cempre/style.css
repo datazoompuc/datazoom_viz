@@ -17,7 +17,9 @@ html, body {
   margin: 0;
   height: 100%;
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  font-size: 0.875rem;
+  /* Base size for every rem-sized element in this file — bumped from
+     0.875rem (14px) since the whole app read small on an average screen. */
+  font-size: 1rem;
   color: var(--ink);
 }
 
@@ -115,7 +117,7 @@ html, body {
 
 .vars {
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   letter-spacing: 0.05em;
   font-weight: 700;
   margin: 0 0 8px;
@@ -248,7 +250,7 @@ html, body {
   transform: translate(-50%, -100%);
   background: #1f3b32;
   color: #fff;
-  font-size: 11.5px;
+  font-size: 13px;
   line-height: 1.3;
   padding: 4px 7px;
   border-radius: 5px;
@@ -463,7 +465,7 @@ html, body {
 .dumbbell-axis {
   flex: 0 0 auto;
   padding: 8px 0 6px;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -527,7 +529,7 @@ html, body {
 .dumbbell-note {
   flex: 0 0 auto;
   padding: 6px 14px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 .dumbbell-note.hidden { display: none; }
@@ -536,7 +538,7 @@ html, body {
   position: absolute;
   background: #1f3b32;
   color: #fff;
-  font-size: 11.5px;
+  font-size: 13px;
   line-height: 1.35;
   padding: 6px 9px;
   border-radius: 5px;
