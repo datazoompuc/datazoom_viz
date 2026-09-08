@@ -104,6 +104,7 @@
   }
 
   const DATA_DIR = "data";
+  const LOGO_URL = "img/logo_datazoom_branco_horizontal.png"; // watermark on exported snapshots — see getTintedLogo()
   const N_BINS = 9;
   const SPARK_W = 260;
   const SPARK_H = 40;
@@ -685,7 +686,7 @@
       const ctx = canvas.getContext("2d");
 
       if (state.compareMode) {
-        renderDumbbellSnapshot(canvas, ctx, dpr);
+        await renderDumbbellSnapshot(canvas, ctx, dpr);
       } else {
         await renderMapSnapshot(canvas, ctx, dpr);
       }
@@ -724,7 +725,8 @@
     ctx.scale(dpr, dpr);
 
     await drawMapContentOnto(ctx, refEl, refRect);
-    drawMapSnapshotOverlay(ctx, totalW, totalH);
+    const logo = await getTintedLogo();
+    drawMapSnapshotOverlay(ctx, totalW, totalH, logo);
   }
 
   // Draws the map's tiles + choropleth/boundary SVGs onto ctx, offset by
@@ -779,6 +781,36 @@
     });
   }
 
+  // The sidebar logo asset is white-on-transparent (meant for the green
+  // sidebar), which would be invisible on the white title band exported
+  // snapshots use. Recolors it to CANVAS_INK once via canvas compositing
+  // (draw the source, then "source-in" fill with the target color — keeps
+  // the original alpha shape, replaces its color) rather than shipping a
+  // second logo asset just for this. Cached: every snapshot after the
+  // first reuses the same tinted canvas instead of re-decoding+re-tinting.
+  let logoTintedCanvas = null;
+  async function getTintedLogo() {
+    if (logoTintedCanvas) return logoTintedCanvas;
+    const img = await loadImage(LOGO_URL);
+    const off = document.createElement("canvas");
+    off.width = img.naturalWidth;
+    off.height = img.naturalHeight;
+    const octx = off.getContext("2d");
+    octx.drawImage(img, 0, 0);
+    octx.globalCompositeOperation = "source-in";
+    octx.fillStyle = CANVAS_INK;
+    octx.fillRect(0, 0, off.width, off.height);
+    logoTintedCanvas = off;
+    return off;
+  }
+
+  // Draws the (already-tinted) logo at a fixed height, right-aligned to x,
+  // vertically centered on y, preserving its aspect ratio.
+  function drawLogoWatermark(ctx, logo, rightX, centerY, targetH) {
+    const w = (logo.width / logo.height) * targetH;
+    ctx.drawImage(logo, rightX - w, centerY - targetH / 2, w, targetH);
+  }
+
   function snapshotFilename() {
     const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
     const yearPart = state.compareMode
@@ -790,7 +822,7 @@
   // Everything baked into the exported image beyond the raw map pixels:
   // title, the year, the legend, and attribution — all read from the same
   // state/dictionary the on-screen UI uses, not scraped from the DOM.
-  function drawMapSnapshotOverlay(ctx, width, height) {
+  function drawMapSnapshotOverlay(ctx, width, height, logo) {
     const t = I18N[state.lang];
     const dict = dictionary[state.lang];
     const varMeta = dict.find((d) => d.var === state.x);
@@ -811,6 +843,8 @@
     ctx.fillStyle = CANVAS_MUTED;
     ctx.fillText(`${t.label_var_name} ${varMeta.label} (${state.year})`, 12, 29);
 
+    drawLogoWatermark(ctx, logo, width - 14, SNAPSHOT_TITLE_BAND_H / 2, 22);
+
     drawLegendOnCanvas(ctx, fontUi, width, height, breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
 
     ctx.font = `400 10px ${fontUi}`;
@@ -826,11 +860,12 @@
   // tiles/CORS concern here, just our own layout math. Draws every row, not
   // just whatever's scrolled into view: a "save image" of a ranked list
   // should be the whole ranking.
-  function renderDumbbellSnapshot(canvas, ctx, dpr) {
+  async function renderDumbbellSnapshot(canvas, ctx, dpr) {
     const t = I18N[state.lang];
     const fontUi = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
     const data = dumbbellRender;
     const { rows, domain, varMeta, uf, yearA, yearB, missing } = data;
+    const logo = await getTintedLogo();
 
     const panelRect = document.getElementById("compare-panel").getBoundingClientRect();
     const totalW = panelRect.width;
@@ -853,6 +888,8 @@
     ctx.fillStyle = CANVAS_MUTED;
     const ufLabel = STATE_NAMES[uf] ? `${STATE_NAMES[uf]} (${uf})` : uf;
     ctx.fillText(`${varMeta.label} — ${ufLabel}`, 12, 29);
+
+    drawLogoWatermark(ctx, logo, totalW - 14, SNAPSHOT_TITLE_BAND_H / 2, 22);
 
     const ly = SNAPSHOT_TITLE_BAND_H + 10;
     drawSnapshotLegendChip(ctx, fontUi, 14, ly, "#2a78d6", String(yearA));
