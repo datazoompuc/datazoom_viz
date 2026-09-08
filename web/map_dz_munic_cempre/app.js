@@ -1068,6 +1068,12 @@
     btn.innerHTML = state.playing ? PAUSE_ICON_SVG : PLAY_ICON_SVG;
 
     if (state.playing) {
+      // Pressing play already sitting on the last year would otherwise just
+      // stop immediately on the first tick (year >= year_final) — restart
+      // from the first year instead, so play always plays something.
+      if (state.year >= dictionary.year_final) {
+        applyYear(dictionary.year_inicio);
+      }
       state.playTimer = setInterval(() => {
         if (state.year >= dictionary.year_final) {
           stopPlaying();
