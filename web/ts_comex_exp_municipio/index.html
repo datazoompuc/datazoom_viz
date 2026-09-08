@@ -15,6 +15,14 @@
     <p class="plot_desc" id="plot_desc"></p>
     <hr>
 
+    <p class="vars" id="label_view_name"></p>
+    <div class="view-toggle" id="view-toggle">
+      <button class="view-btn active" id="view-ranking" data-view="ranking"></button>
+      <button class="view-btn" id="view-composition" data-view="composition"></button>
+    </div>
+
+    <div class="spacer"></div>
+
     <div class="var_selec_group slider-inline">
       <label id="label_year" for="year-slider"></label>
       <div class="sparkline-wrap">
@@ -38,8 +46,8 @@
     </div>
 
     <div class="spacer"></div>
-    <p class="vars" id="label_topn_name"></p>
-    <div class="var_selec_group">
+    <div class="var_selec_group" id="topn-group">
+      <p class="vars" id="label_topn_name"></p>
       <select id="topn-select">
         <option value="10">10</option>
         <option value="15" selected>15</option>
@@ -69,6 +77,14 @@
         </div>
         <div id="ranking-rows" class="ranking-rows"></div>
         <div id="ranking-tooltip" class="chart-tooltip"></div>
+      </div>
+
+      <div id="composition-panel" class="composition-panel hidden">
+        <div class="composition-chart-area">
+          <svg id="composition-svg" class="composition-svg" viewBox="0 0 1000 520" preserveAspectRatio="none"></svg>
+          <div id="composition-tooltip" class="chart-tooltip"></div>
+        </div>
+        <div id="composition-legend" class="composition-legend"></div>
       </div>
     </div>
   </div>

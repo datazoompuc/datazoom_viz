@@ -5,10 +5,12 @@
 // Everything below runs client-side against those static files — no R
 // server, no shinyapps.io.
 //
-// v1 scope: the ranked bar chart view only (top-N municipalities by export
-// value for a selected year, with a year slider/play). The composition
-// (stacked-area) and per-entity trend views are follow-up work — see the
-// brainstorm in the PR/conversation history for the full plan.
+// Two views so far: a ranked bar chart (top-N municipalities by export
+// value for a selected year) and a region-wide composition view (stacked
+// area of export value by product category over the whole time range).
+// Per-entity trend small multiples and a year-over-year dumbbell view are
+// still follow-up work — see the brainstorm in the PR/conversation history
+// for the full plan.
 
 (function () {
   "use strict";
@@ -19,11 +21,17 @@
       plot_desc: "Comércio exterior na Amazônia (COMEX): valor da exportação por município",
       label_topn_name: "Municípios exibidos",
       label_year: "Ano",
-      label_title: "Ranking de municípios exportadores",
-      label_subtitle: "Valor exportado (US$), por município",
+      label_view_name: "Visualização",
+      view_ranking: "Ranking",
+      view_composition: "Composição",
+      title_ranking: "Ranking de municípios exportadores",
+      subtitle_ranking: "Valor exportado (US$), por município",
+      title_composition: "Composição das exportações da Amazônia Legal",
+      subtitle_composition: "Valor exportado (US$) por categoria de produto, 1997–2025",
       ranking_axis_label: "Valor exportado (US$)",
       region_total_prefix: "Total Amazônia Legal: ",
       label_no_data: "Sem dado",
+      label_others: "Outros",
       btn_lang: "English"
     },
     en: {
@@ -31,14 +39,29 @@
       plot_desc: "External trade in the Amazon (COMEX): export value by municipality",
       label_topn_name: "Municipalities shown",
       label_year: "Year",
-      label_title: "Ranking of exporting municipalities",
-      label_subtitle: "Export value (US$), by municipality",
+      label_view_name: "View",
+      view_ranking: "Ranking",
+      view_composition: "Composition",
+      title_ranking: "Ranking of exporting municipalities",
+      subtitle_ranking: "Export value (US$), by municipality",
+      title_composition: "Legal Amazon export composition",
+      subtitle_composition: "Export value (US$) by product category, 1997–2025",
       ranking_axis_label: "Export value (US$)",
       region_total_prefix: "Legal Amazon total: ",
       label_no_data: "No data",
+      label_others: "Other",
       btn_lang: "Português"
     }
   };
+
+  // Okabe-Ito — a published, colorblind-safe 8-hue categorical palette.
+  // Assigned once, in a fixed order, to the top-8 products by all-time
+  // total value; every other category folds into "Outros"/"Other" (a
+  // neutral gray, not a 9th hue). Order is fixed regardless of how a
+  // product's per-year rank moves — color follows the entity, never its
+  // rank in a given year.
+  const CATEGORY_COLORS = ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#666666"];
+  const OTHERS_COLOR = "#c9c4ba";
 
   const DATA_DIR = "data";
   const PLAY_INTERVAL_MS = 900;
@@ -50,13 +73,15 @@
     lang: "pt",
     year: null,
     topN: 15,
+    view: "ranking", // "ranking" | "composition"
     playing: false,
     playTimer: null
   };
 
-  let dictionary, municipalityTotals, regionTotals;
+  let dictionary, municipalityTotals, regionTotals, composition, products;
   let totalsByYear; // year -> [{municipio, valor}], sorted descending
   let regionTotalByYear; // year -> valor
+  let compositionSeries; // [{ produto, color, isOthers, values: Map(year -> valor) }], top-8 + Outros, fixed order
   let sparkSeries = [];
   let sparkXFor = null;
   let sparkYFor = null;
@@ -64,18 +89,24 @@
   Promise.all([
     fetchJson(`${DATA_DIR}/dictionary.json`),
     fetchJson(`${DATA_DIR}/municipality_totals.json`),
-    fetchJson(`${DATA_DIR}/region_totals.json`)
-  ]).then(([dict, munTotals, regTotals]) => {
+    fetchJson(`${DATA_DIR}/region_totals.json`),
+    fetchJson(`${DATA_DIR}/composition.json`),
+    fetchJson(`${DATA_DIR}/products.json`)
+  ]).then(([dict, munTotals, regTotals, comp, prod]) => {
     dictionary = dict;
     municipalityTotals = munTotals;
     regionTotals = regTotals;
+    composition = comp;
+    products = prod;
 
     totalsByYear = groupByYear(municipalityTotals);
     regionTotalByYear = new Map(regionTotals.map((r) => [r.ano, r.valor]));
+    compositionSeries = buildCompositionSeries(composition, dictionary);
 
     initState();
     initControls();
     initSparklineHover();
+    initCompositionHover();
     render();
     document.getElementById("spinner").classList.add("hidden");
   }).catch((err) => {
@@ -152,6 +183,20 @@
       updateUrl();
       renderRanking();
     });
+
+    document.getElementById("view-ranking").addEventListener("click", () => setView("ranking"));
+    document.getElementById("view-composition").addEventListener("click", () => setView("composition"));
+  }
+
+  function setView(view) {
+    state.view = view;
+    document.getElementById("view-ranking").classList.toggle("active", view === "ranking");
+    document.getElementById("view-composition").classList.toggle("active", view === "composition");
+    document.getElementById("ranking-panel").classList.toggle("hidden", view !== "ranking");
+    document.getElementById("composition-panel").classList.toggle("hidden", view !== "composition");
+    document.getElementById("topn-group").classList.toggle("hidden", view !== "ranking");
+    updateUrl();
+    render();
   }
 
   function yearFromPointerEvent(e) {
@@ -207,7 +252,11 @@
     document.getElementById("year-slider").value = newYear;
     document.getElementById("year-value").textContent = newYear;
     updateUrl();
-    renderRanking();
+    if (state.view === "composition") {
+      updateCompositionGuide();
+    } else {
+      renderRanking();
+    }
     updateSparklineMarker();
   }
 
@@ -259,17 +308,24 @@
     document.getElementById("plot_desc").textContent = t.plot_desc;
     document.getElementById("label_year").textContent = t.label_year;
     document.getElementById("label_topn_name").textContent = t.label_topn_name;
-    document.getElementById("plot-title").textContent = t.label_title;
-    document.getElementById("plot-subtitle").textContent = t.label_subtitle;
+    document.getElementById("label_view_name").textContent = t.label_view_name;
+    document.getElementById("view-ranking").textContent = t.view_ranking;
+    document.getElementById("view-composition").textContent = t.view_composition;
     document.getElementById("ranking-axis-label").textContent = t.ranking_axis_label;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
+    document.getElementById("plot-title").textContent = state.view === "composition" ? t.title_composition : t.title_ranking;
+    document.getElementById("plot-subtitle").textContent = state.view === "composition" ? t.subtitle_composition : t.subtitle_ranking;
 
     const slider = document.getElementById("year-slider");
     slider.value = state.year;
     document.getElementById("year-value").textContent = state.year;
 
     renderSparkline();
-    renderRanking();
+    if (state.view === "composition") {
+      renderComposition();
+    } else {
+      renderRanking();
+    }
   }
 
   function renderRanking() {
@@ -342,6 +398,199 @@
 
   function hideRankTooltip() {
     document.getElementById("ranking-tooltip").style.opacity = "0";
+  }
+
+  // ---- Composition: stacked area of region-wide export value by product
+  // category (SEC level, 22 categories) over the full time range. Reduced
+  // to the top 8 by all-time total + an "Outros"/"Other" bucket, since 22
+  // stacked bands would be unreadable and the dataviz convention here is a
+  // 9th-plus series folds into Other rather than generating another hue. ----
+
+  const COMP_PAD_L = 60, COMP_PAD_R = 16, COMP_PAD_T = 12, COMP_PAD_B = 28;
+  const COMP_VB_W = 1000, COMP_VB_H = 520;
+
+  function buildCompositionSeries(rows, dict) {
+    const totalByProduct = new Map();
+    for (const r of rows) {
+      totalByProduct.set(r.produto, (totalByProduct.get(r.produto) || 0) + r.valor);
+    }
+    const ranked = Array.from(totalByProduct.entries()).sort((a, b) => b[1] - a[1]);
+    const topProducts = ranked.slice(0, 8).map(([produto]) => produto);
+    const topSet = new Set(topProducts);
+
+    const years = [];
+    for (let y = dict.year_inicio; y <= dict.year_final; y++) years.push(y);
+
+    const byProdYear = new Map(); // produto -> Map(year -> valor)
+    for (const p of topProducts) byProdYear.set(p, new Map());
+    const othersByYear = new Map(years.map((y) => [y, 0]));
+
+    for (const r of rows) {
+      if (topSet.has(r.produto)) {
+        byProdYear.get(r.produto).set(r.ano, r.valor);
+      } else {
+        othersByYear.set(r.ano, (othersByYear.get(r.ano) || 0) + r.valor);
+      }
+    }
+
+    const series = topProducts.map((produto, i) => ({
+      produto,
+      color: CATEGORY_COLORS[i],
+      isOthers: false,
+      values: byProdYear.get(produto)
+    }));
+    series.push({ produto: null, color: OTHERS_COLOR, isOthers: true, values: othersByYear });
+
+    return series;
+  }
+
+  function productLabel(produto) {
+    if (produto === null) return I18N[state.lang].label_others;
+    const list = products[state.lang] || products.pt;
+    const hit = list.find((p) => p.var === produto);
+    return hit ? hit.label : produto;
+  }
+
+  function renderComposition() {
+    const svg = document.getElementById("composition-svg");
+    svg.innerHTML = "";
+
+    const years = [];
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) years.push(y);
+
+    // Stacked cumulative bounds per year, in the fixed series order.
+    const cumByYear = new Map(years.map((y) => [y, 0]));
+    const bandBounds = compositionSeries.map((s) => {
+      const bottoms = [], tops = [];
+      for (const y of years) {
+        const bottom = cumByYear.get(y);
+        const top = bottom + (s.values.get(y) || 0);
+        bottoms.push(bottom);
+        tops.push(top);
+        cumByYear.set(y, top);
+      }
+      return { bottoms, tops };
+    });
+
+    const maxTotal = Math.max(...years.map((y) => cumByYear.get(y)));
+    const xFor = (year) => COMP_PAD_L + ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
+    const yFor = (value) => COMP_PAD_T + (1 - value / maxTotal) * (COMP_VB_H - COMP_PAD_T - COMP_PAD_B);
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const addEl = (tag, attrs) => {
+      const el = document.createElementNS(svgNS, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      svg.appendChild(el);
+      return el;
+    };
+
+    // Gridlines + Y labels (4 bands, recessive per the dataviz mark spec).
+    for (let i = 0; i <= 4; i++) {
+      const v = (maxTotal / 4) * i;
+      const y = yFor(v);
+      addEl("line", { class: "comp-gridline", x1: COMP_PAD_L, x2: COMP_VB_W - COMP_PAD_R, y1: y, y2: y });
+      addEl("text", { class: "comp-axis-label", x: COMP_PAD_L - 8, y: y + 3, "text-anchor": "end" }).textContent = fmtAbbrev(v);
+    }
+
+    // X labels every 4 years.
+    for (const y of years) {
+      if ((y - dictionary.year_inicio) % 4 !== 0 && y !== dictionary.year_final) continue;
+      addEl("text", { class: "comp-axis-label", x: xFor(y), y: COMP_VB_H - COMP_PAD_B + 16, "text-anchor": "middle" }).textContent = y;
+    }
+
+    // Stacked bands, in series order (largest all-time total at the
+    // bottom, Outros last/top).
+    compositionSeries.forEach((s, i) => {
+      const { bottoms, tops } = bandBounds[i];
+      const topPts = years.map((y, j) => `${xFor(y).toFixed(1)},${yFor(tops[j]).toFixed(1)}`);
+      const botPts = years.map((y, j) => `${xFor(y).toFixed(1)},${yFor(bottoms[j]).toFixed(1)}`).reverse();
+      addEl("path", {
+        class: "comp-band",
+        fill: s.color,
+        d: `M${topPts.join(" L")} L${botPts.join(" L")} Z`,
+        "data-index": i
+      });
+    });
+
+    // Selected-year guide line.
+    const guideX = xFor(state.year);
+    addEl("line", { id: "comp-guide", class: "comp-guide", x1: guideX, x2: guideX, y1: COMP_PAD_T, y2: COMP_VB_H - COMP_PAD_B });
+
+    renderCompositionLegend();
+  }
+
+  function updateCompositionGuide() {
+    const guide = document.getElementById("comp-guide");
+    if (!guide) return;
+    const x = COMP_PAD_L + ((state.year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
+    guide.setAttribute("x1", x);
+    guide.setAttribute("x2", x);
+  }
+
+  function renderCompositionLegend() {
+    const legend = document.getElementById("composition-legend");
+    legend.innerHTML = "";
+    for (const s of compositionSeries) {
+      const item = document.createElement("div");
+      item.className = "legend-item";
+      const swatch = document.createElement("span");
+      swatch.className = "swatch";
+      swatch.style.background = s.color;
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = productLabel(s.produto);
+      label.title = productLabel(s.produto);
+      item.appendChild(swatch);
+      item.appendChild(label);
+      legend.appendChild(item);
+    }
+  }
+
+  function initCompositionHover() {
+    const area = document.querySelector(".composition-chart-area");
+    const tooltip = document.getElementById("composition-tooltip");
+
+    area.addEventListener("pointermove", (e) => {
+      if (state.view !== "composition") return;
+      const svg = document.getElementById("composition-svg");
+      const rect = svg.getBoundingClientRect();
+      const fracX = (e.clientX - rect.left) / rect.width;
+      const vbX = fracX * COMP_VB_W;
+      const frac = (vbX - COMP_PAD_L) / (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      if (year < dictionary.year_inicio || year > dictionary.year_final) {
+        tooltip.style.opacity = "0";
+        return;
+      }
+
+      const truncate = (s, n) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
+      const rowsHtml = compositionSeries
+        .map((s) => ({ label: productLabel(s.produto), color: s.color, valor: s.values.get(year) || 0 }))
+        .sort((a, b) => b.valor - a.valor)
+        .map((r) => `<div style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:2px;background:${r.color};display:inline-block;flex:0 0 auto;"></span><span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;">${truncate(r.label, 42)}</span><span style="flex:0 0 auto;padding-left:8px;">${fmtAbbrev(r.valor)}</span></div>`)
+        .join("");
+
+      tooltip.innerHTML = `<strong>${year}</strong>` + rowsHtml;
+      const areaRect = area.getBoundingClientRect();
+      const left = e.clientX - areaRect.left;
+      tooltip.style.left = Math.min(areaRect.width - 300, left + 14) + "px";
+      tooltip.style.top = (e.clientY - areaRect.top - 10) + "px";
+      tooltip.style.opacity = "1";
+    });
+
+    area.addEventListener("pointerleave", () => {
+      tooltip.style.opacity = "0";
+    });
+
+    area.addEventListener("click", (e) => {
+      const svg = document.getElementById("composition-svg");
+      const rect = svg.getBoundingClientRect();
+      const fracX = (e.clientX - rect.left) / rect.width;
+      const vbX = fracX * COMP_VB_W;
+      const frac = (vbX - COMP_PAD_L) / (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      jumpToYear(Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year)));
+    });
   }
 
   // ---- Sparkline: region-wide total export value per year ----
