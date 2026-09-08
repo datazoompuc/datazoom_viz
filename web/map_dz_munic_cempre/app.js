@@ -61,33 +61,41 @@
     MT: "Mato Grosso", PA: "Pará", RO: "Rondônia", RR: "Roraima", TO: "Tocantins"
   };
 
-  // Single-hue sequential ramp (green, ~170deg OKLCH hue — close to the
-  // app's own #50A486/#48968B brand greens), light -> dark = low -> high.
-  // Replaces the original reversed-viridis palette (yellow->purple), which
-  // is a multi-hue rainbow ramp encoding magnitude — exactly what the
-  // dataviz skill's color formula rules out ("Sequential = one hue,
-  // light->dark. Never a rainbow.") Validated with the skill's own checker
-  // as an ordinal ramp (these 9 stops render as discrete legend swatches,
-  // not a continuous gradient, so --ordinal is the applicable check):
-  // monotone lightness, adjacent ΔL >= 0.06, single hue (spread 2deg), and
-  // light-end contrast 2.07:1 against a white legend surface (>= the 2:1
-  // floor) — see data-raw/build_sequential_ramp.mjs for the generator.
+  // Single-hue sequential ramp — amber/copper, ~55deg OKLCH hue, light ->
+  // dark = low -> high. Deliberately NOT the app's own greens (H~168-183):
+  // the sidebar and the choropleth used to share a hue family, so the data
+  // layer visually merged into the brand chrome. A warm ramp sits far
+  // enough around the wheel from the sidebar's cool green to read as
+  // clearly separate, and warm-ramp-as-intensity fits economic-activity
+  // data (companies, jobs, wages) better than a cool hue would. Validated
+  // with the skill's own checker as an ordinal ramp (these 9 stops render
+  // as discrete legend swatches, not a continuous gradient, so --ordinal is
+  // the applicable check): monotone lightness, adjacent ΔL >= 0.06, single
+  // hue, and light-end contrast 2.01:1 against a white legend surface (>=
+  // the 2:1 floor) — see data-raw/build_sequential_ramp.mjs for the
+  // generator.
   const PALETTE_CONTINUOUS = [
-    "#a4b6af", "#82a799", "#659685", "#4b8571", "#35735f",
-    "#23604e", "#154e3d", "#0b3b2e", "#052a1f"
+    "#c3b4aa", "#c19b82", "#b68462", "#a76f48", "#955c33",
+    "#814b21", "#6c3b14", "#562c0a", "#401f05"
   ];
 
-  // "No data" gets a hatch texture, not a flat gray: at dE 8.8 (OKLab, the
-  // dataviz skill's CVD-separation metric) the previous flat #cccccc sat
-  // below even the CVD floor (6) against the lightest green bin — on a
-  // choropleth, an under-vs-missing mixup is a real misread, not just an
-  // aesthetic gap. NODATA_FILL colors the pattern itself (see
-  // ensureNoDataPattern); its base clears the normal-vision floor (dE 15.4)
-  // against the lightest bin, and the diagonal hatch is the accessibility
-  // skill's texture channel — a second, hue-independent signal.
+  // "No data" gets a hatch texture, not a flat gray: an under-vs-missing
+  // mixup on a choropleth is a real misread, not just an aesthetic gap.
+  // NODATA_BASE/LINE use a cool, low-chroma blue-gray — the opposite side
+  // of the wheel from the warm amber ramp above, same reasoning as the
+  // ramp's own hue choice (maximum separation from "this is data"). Base
+  // clears the normal-vision floor (dE 15.4, OKLab, the dataviz skill's
+  // CVD-separation metric) against the lightest bin, same as the ramp this
+  // replaced; the diagonal hatch is the accessibility skill's texture
+  // channel — a second, hue-independent signal.
   const NODATA_PATTERN_ID = "nodata-hatch";
-  const NODATA_BASE = "#e4e2dd";
-  const NODATA_LINE = "#b8b5ae";
+  const NODATA_BASE = "#deeaef";
+  const NODATA_LINE = "#a2adb1";
+
+  // Canvas text colors for exported snapshots — matches style.css's
+  // --ink/--muted tokens (the warm neutral that replaced generic #222/#555).
+  const CANVAS_INK = "#221d17";
+  const CANVAS_MUTED = "#6b6156";
 
   // The seam-hiding stroke (see buildMapLayer) needs a plain color, not the
   // no-data hatch's pattern url() — reuse its line color there instead.
@@ -795,12 +803,12 @@
     // real map content, so there's nothing underneath it to blend with.
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, width, SNAPSHOT_TITLE_BAND_H);
-    ctx.fillStyle = "#17211c";
+    ctx.fillStyle = CANVAS_INK;
     ctx.font = `700 15px ${fontUi}`;
     ctx.fillText(t.label_title, 12, 8);
 
     ctx.font = `400 12px ${fontUi}`;
-    ctx.fillStyle = "#555";
+    ctx.fillStyle = CANVAS_MUTED;
     ctx.fillText(`${t.label_var_name} ${varMeta.label} (${state.year})`, 12, 29);
 
     drawLegendOnCanvas(ctx, fontUi, width, height, breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
@@ -838,11 +846,11 @@
 
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, totalW, totalH);
-    ctx.fillStyle = "#17211c";
+    ctx.fillStyle = CANVAS_INK;
     ctx.font = `700 15px ${fontUi}`;
     ctx.fillText(t.label_title, 12, 8);
     ctx.font = `400 12px ${fontUi}`;
-    ctx.fillStyle = "#555";
+    ctx.fillStyle = CANVAS_MUTED;
     const ufLabel = STATE_NAMES[uf] ? `${STATE_NAMES[uf]} (${uf})` : uf;
     ctx.fillText(`${varMeta.label} — ${ufLabel}`, 12, 29);
 
@@ -864,7 +872,7 @@
       const xA = trackX0 + (pctFor(r.valueA, domain) / 100) * trackW;
       const xB = trackX0 + (pctFor(r.valueB, domain) / 100) * trackW;
 
-      ctx.fillStyle = "#333";
+      ctx.fillStyle = CANVAS_INK;
       ctx.fillText(wrapCanvasText(ctx, r.nome, DUMBBELL_LABEL_W - DUMBBELL_PAD_L - 4)[0], DUMBBELL_PAD_L, cy - 5);
 
       ctx.strokeStyle = "#c7c7c7";
@@ -877,7 +885,7 @@
       drawSnapshotDot(ctx, xA, cy, "#2a78d6");
       drawSnapshotDot(ctx, xB, cy, "#eb6834");
 
-      ctx.fillStyle = "#333";
+      ctx.fillStyle = CANVAS_INK;
       ctx.textAlign = "right";
       ctx.fillText((r.delta > 0 ? "+" : "") + fmtNumber(r.delta), totalW - DUMBBELL_PAD_R, cy - 5);
       ctx.textAlign = "left";
@@ -904,7 +912,7 @@
     ctx.beginPath();
     ctx.arc(x + 5, y + 5, 5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "#17211c";
+    ctx.fillStyle = CANVAS_INK;
     ctx.font = `700 12px ${fontUi}`;
     ctx.fillText(text, x + 14, y);
   }
@@ -969,7 +977,7 @@
     ctx.stroke();
 
     let cy = boxY + pad;
-    ctx.fillStyle = "#17211c";
+    ctx.fillStyle = CANVAS_INK;
     ctx.font = `700 12px ${fontUi}`;
     for (const line of titleLines) {
       ctx.fillText(line, boxX + pad, cy);
@@ -981,7 +989,7 @@
     for (let i = colors.length - 1; i >= 0; i--) {
       ctx.fillStyle = colors[i];
       ctx.fillRect(boxX + pad, cy + 2, swatch, swatch);
-      ctx.fillStyle = "#17211c";
+      ctx.fillStyle = CANVAS_INK;
       const label = `${fmtNumber(breaks[i])} – ${fmtNumber(breaks[i + 1])}`;
       ctx.fillText(wrapCanvasText(ctx, label, innerW)[0], boxX + pad + swatch + 6, cy + 3);
       cy += rowH;
@@ -995,7 +1003,7 @@
     ctx.moveTo(boxX + pad, cy + 2 + swatch);
     ctx.lineTo(boxX + pad + swatch, cy + 2);
     ctx.stroke();
-    ctx.fillStyle = "#17211c";
+    ctx.fillStyle = CANVAS_INK;
     ctx.fillText(noDataLabel, boxX + pad + swatch + 6, cy + 3);
   }
 

@@ -1,4 +1,4 @@
-// Generates the 9-step sequential green ramp used by
+// Generates the 9-step sequential amber/copper ramp used by
 // web/map_dz_munic_cempre/app.js (PALETTE_CONTINUOUS), following the
 // dataviz skill's color formula: sequential = one hue, monotone lightness,
 // light -> dark. Run: node data-raw/build_sequential_ramp.mjs
@@ -12,18 +12,23 @@
 // gradient, so the relevant gates are monotone L, adjacent ΔL >= 0.06,
 // single hue, and light-end contrast >= 2:1 against a white legend surface.
 
-const HUE = 170; // close to the app's #50A486 (L .657/C .094/H 168) and #48968B (H 183) brand greens
+// Deliberately NOT close to the app's brand greens (#50A486/#48968B, H
+// ~168-183): the sidebar and the choropleth were both green, so the data
+// layer visually merged into the UI chrome. H55 (amber/copper) sits on the
+// warm side of the wheel, clearly separating "this is data" from "this is
+// app chrome," and reads as intensity/heat — a good fit for economic-
+// activity data (companies, jobs, wages).
+const HUE = 55;
 const N = 9; // matches N_BINS in app.js
 
 // Lightest step: an ordinal ramp's light end must itself clear >=2:1
 // contrast against a white surface (these render as legend swatches, not a
-// continuous fade into the background) — the skill's own reference blue
-// ramp draws that line at step 250 (L=0.764, 2.06:1); L=0.76 lands there.
-// Darkest step: pushed low enough that 9 EVEN steps between the two
-// anchors still clear the ordinal minimum adjacent ΔL of 0.06
-// ((0.76-0.32)/8 = 0.055 was just under; (0.76-0.255)/8 = 0.063 clears it).
-const L_LIGHT = 0.76;
-const L_DARK = 0.255;
+// continuous fade into the background) — L=0.78 is the lightest step at
+// this hue that still clears 2:1 (2.01:1); anything lighter drops below it.
+// Darkest step: spaced 0.50 below the light end so 9 EVEN steps still clear
+// the ordinal minimum adjacent ΔL of 0.06 (0.50/8 = 0.0625).
+const L_LIGHT = 0.78;
+const L_DARK = 0.28;
 
 // ---- OKLab/OKLCH <-> sRGB (forward math matches the skill's validator) ----
 

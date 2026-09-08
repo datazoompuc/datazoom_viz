@@ -1,11 +1,24 @@
 * { box-sizing: border-box; }
 
+:root {
+  /* Warm, slightly-off-black/gray ink instead of generic #222/#555 — ties
+     body text to the map's new amber ramp rather than reading as a
+     browser-default gray. */
+  --ink: #221d17;
+  --muted: #6b6156;
+  --border: #e4ded3;
+  --shadow: rgba(34, 29, 23, 0.12);
+  --legend-accent: #a76f48; /* mid-tone step of PALETTE_CONTINUOUS (app.js) */
+  --sidebar-a: #50A486;
+  --sidebar-b: #2f6e5c;
+}
+
 html, body {
   margin: 0;
   height: 100%;
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   font-size: 0.875rem;
-  color: #222;
+  color: var(--ink);
 }
 
 .apppanel {
@@ -17,7 +30,11 @@ html, body {
 
 .menucol {
   flex: 0 0 300px;
-  background-color: #50A486;
+  /* A gradient instead of a flat fill — brand green at the top settling
+     into the deeper green already used for the "active" button state, so
+     the sidebar reads as one panel with depth rather than a poster-flat
+     color block. */
+  background: linear-gradient(165deg, var(--sidebar-a), var(--sidebar-b));
   color: #fff;
   padding: 20px;
   overflow-y: auto;
@@ -25,8 +42,16 @@ html, body {
 
 .plot_name {
   margin: 0 0 4px;
-  font-size: 1.5rem;
-  font-weight: 700;
+  /* JetBrains Mono, uppercase, tight tracking — the original Shiny app's
+     .plot_name/#plot_title treatment (global/dza_lumen.css). Reused as-is
+     rather than a new typeface, so this brand name still reads as *the*
+     Data Zoom brand mark, not a redesign of it. Controls and body copy
+     stay on Source Sans Pro. */
+  font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 1.4rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
   color: #fff;
 }
 
@@ -67,7 +92,7 @@ html, body {
   border: 1px solid #ced4da;
   font-size: 0.875rem;
   background: #fff;
-  color: #222;
+  color: var(--ink);
 }
 
 .sparkline-wrap {
@@ -262,13 +287,18 @@ html, body {
 }
 
 .plot-title {
+  /* Same treatment as .plot_name (JetBrains Mono, uppercase, tight
+     tracking) — matches the original Shiny app's #plot_title. */
+  font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
 }
 
 .plot-subtitle {
   font-size: 0.9rem;
-  color: #555;
+  color: var(--muted);
   margin-bottom: 10px;
 }
 
@@ -280,7 +310,12 @@ html, body {
 #map {
   position: absolute;
   inset: 0;
-  border-radius: 4px;
+  border-radius: 8px;
+  /* A card, not a same-white-as-background rectangle: a border plus a soft
+     shadow separates the map from the page instead of relying on
+     border-radius alone. */
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px var(--shadow);
 }
 
 .spinner {
@@ -319,7 +354,9 @@ html, body {
   inset: 0;
   flex-direction: column;
   background: #fff;
-  border-radius: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px var(--shadow);
   overflow: hidden;
 }
 
@@ -330,7 +367,7 @@ html, body {
   justify-content: space-between;
   gap: 16px;
   padding: 10px 14px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--border);
 }
 
 .compare-state-filter {
@@ -338,7 +375,7 @@ html, body {
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
-  color: #333;
+  color: var(--ink);
 }
 .compare-state-filter select {
   padding: 4px 8px;
@@ -346,14 +383,14 @@ html, body {
   border: 1px solid #ced4da;
   font-size: 0.85rem;
   background: #fff;
-  color: #222;
+  color: var(--ink);
 }
 
 .compare-legend {
   display: flex;
   gap: 16px;
   font-size: 0.85rem;
-  color: #333;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 .compare-legend-chip { display: flex; align-items: center; gap: 6px; }
@@ -373,7 +410,7 @@ html, body {
   flex: 0 0 auto;
   padding: 8px 0 6px;
   font-size: 0.72rem;
-  color: #888;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -387,7 +424,7 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #333;
+  color: var(--ink);
 }
 .dumbbell-col-track {
   flex: 1 1 auto;
@@ -405,7 +442,7 @@ html, body {
   text-align: right;
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
-  color: #333;
+  color: var(--ink);
 }
 
 .dumbbell-scroll { flex: 1 1 auto; overflow-y: auto; }
@@ -437,7 +474,7 @@ html, body {
   flex: 0 0 auto;
   padding: 6px 14px;
   font-size: 0.75rem;
-  color: #888;
+  color: var(--muted);
 }
 .dumbbell-note.hidden { display: none; }
 
@@ -461,37 +498,43 @@ html, body {
 
 .legend {
   background: #fff;
-  padding: 8px 10px;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  padding: 10px 12px 8px;
+  border-radius: 2px 2px 8px 8px;
+  /* Thin accent edge in the ramp's own mid-tone, rather than a plain
+     rectangle — ties the legend visually to the choropleth it explains. */
+  border-top: 3px solid var(--legend-accent);
+  box-shadow: 0 4px 14px var(--shadow);
   font-size: 0.8rem;
   line-height: 1.4;
   max-width: 220px;
+  color: var(--ink);
 }
 .legend .legend-title {
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .legend .legend-row {
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-bottom: 2px;
 }
 .legend .swatch {
   width: 14px;
   height: 14px;
   flex: 0 0 auto;
   display: inline-block;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 /* Matches the SVG hatch pattern used for "no data" polygons on the map
    (ensureNoDataPattern in app.js) — same base/line colors, same 45deg
    angle, so the legend swatch and the map fill read as the same thing. */
 .legend .swatch-nodata {
-  background-color: #e4e2dd;
+  background-color: #deeaef;
   background-image: repeating-linear-gradient(
     45deg,
-    #b8b5ae 0, #b8b5ae 1.5px,
+    #a2adb1 0, #a2adb1 1.5px,
     transparent 1.5px, transparent 6px
   );
 }
