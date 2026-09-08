@@ -765,7 +765,22 @@
     const svgs = mapEl.querySelectorAll(".leaflet-paneMain-pane svg, .leaflet-paneBoundaries-pane svg");
     for (const svg of svgs) {
       const r = svg.getBoundingClientRect();
-      const svgText = new XMLSerializer().serializeToString(svg);
+
+      // Leaflet's SVG renderer draws onto an oversized <svg> (buffered past
+      // the visible viewport so panning doesn't need a redraw) and slides it
+      // into place with an inline `transform: translate3d(...)` on the <svg>
+      // element itself — getBoundingClientRect() above already reflects that
+      // transform. Serializing the element as-is bakes the same transform
+      // into the standalone rasterized copy too, so it gets applied a SECOND
+      // time (once inside the image's own self-contained canvas, once again
+      // by us positioning that image at r.left/r.top) — the choropleth and
+      // boundaries end up shifted relative to the basemap tiles by however
+      // much Leaflet's current pan buffer offset is. Stripping the transform
+      // before serializing leaves just the viewBox mapping, which is what
+      // actually needs to land at r.left/r.top.
+      const clone = svg.cloneNode(true);
+      clone.style.transform = "none";
+      const svgText = new XMLSerializer().serializeToString(clone);
       const img = await loadImage("data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgText));
       ctx.drawImage(img, ox + (r.left - mapRect.left), oy + (r.top - mapRect.top), r.width, r.height);
     }
