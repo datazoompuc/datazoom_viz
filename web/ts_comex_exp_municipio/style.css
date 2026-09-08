@@ -130,7 +130,10 @@ html, body {
 .var_selec_group { margin-bottom: 16px; }
 .var_selec_group label { display: block; margin-bottom: 6px; font-weight: 400; }
 
-#topn-select {
+#topn-select,
+#change-state-select,
+#change-year-a,
+#change-year-b {
   width: 100%;
   padding: 6px 8px;
   border-radius: 4px;
@@ -139,6 +142,10 @@ html, body {
   background: #fff;
   color: var(--ink);
 }
+
+.change-years-row { display: flex; gap: 10px; }
+.change-year-field { flex: 1 1 0; min-width: 0; }
+.change-year-field label { font-size: 0.85rem; }
 
 .sparkline-wrap { margin-bottom: 4px; position: relative; }
 
@@ -467,5 +474,106 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ---- Change (dumbbell) view — same pattern as the CEMPRE map rebuild's
+   compare mode: year A (blue) / year B (orange) dots per entity, connected
+   by a line, ranked by change, filtered by state to keep row count sane
+   (13 to 115 municipalities per state here). ---- */
+
+.change-panel {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.change-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.change-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.change-legend-chip { display: flex; align-items: center; gap: 6px; }
+.change-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.change-legend-dot-a { background: #2a78d6; }
+.change-legend-dot-b { background: #eb6834; }
+
+.change-axis,
+.change-row {
+  display: flex;
+  align-items: center;
+}
+.change-axis {
+  flex: 0 0 auto;
+  padding: 8px 20px 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.change-row { height: 24px; padding: 0 20px; }
+.change-row:hover { background: rgba(74, 154, 160, 0.08); }
+
+.change-col-label {
+  flex: 0 0 200px;
+  padding-right: 10px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.change-col-track {
+  flex: 1 1 auto;
+  position: relative;
+  height: 24px;
+}
+.change-axis .change-col-track {
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+}
+.change-col-delta {
+  flex: 0 0 100px;
+  padding-left: 8px;
+  text-align: right;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.change-scroll { flex: 1 1 auto; overflow-y: auto; padding-bottom: 12px; }
+#change-rows { display: flex; flex-direction: column; }
+
+.change-line {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  background: #c7c7c7;
+  transform: translateY(-50%);
+}
+.change-dot {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1.5px #fff;
+}
+.change-dot-a { background: #2a78d6; }
+.change-dot-b { background: #eb6834; }
 
 .hidden { display: none; }

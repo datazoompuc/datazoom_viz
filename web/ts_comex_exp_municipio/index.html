@@ -19,9 +19,26 @@
     <div class="view-toggle" id="view-toggle">
       <button class="view-btn active" id="view-ranking" data-view="ranking"></button>
       <button class="view-btn" id="view-composition" data-view="composition"></button>
+      <button class="view-btn" id="view-change" data-view="change"></button>
     </div>
 
     <div class="spacer"></div>
+
+    <div class="var_selec_group hidden" id="change-group">
+      <label id="label_state" for="change-state-select"></label>
+      <select id="change-state-select"></select>
+      <div class="spacer"></div>
+      <div class="change-years-row">
+        <div class="change-year-field">
+          <label id="label_year_a" for="change-year-a"></label>
+          <select id="change-year-a"></select>
+        </div>
+        <div class="change-year-field">
+          <label id="label_year_b" for="change-year-b"></label>
+          <select id="change-year-b"></select>
+        </div>
+      </div>
+    </div>
 
     <div class="var_selec_group slider-inline">
       <label id="label_year" for="year-slider"></label>
@@ -85,6 +102,28 @@
           <div id="composition-tooltip" class="chart-tooltip"></div>
         </div>
         <div id="composition-legend" class="composition-legend"></div>
+      </div>
+
+      <div id="change-panel" class="change-panel hidden">
+        <div class="change-header">
+          <span id="change-axis-label" class="ranking-axis-label"></span>
+          <div class="change-legend">
+            <span class="change-legend-chip"><span class="change-legend-dot change-legend-dot-a"></span><span id="change-legend-a-label"></span></span>
+            <span class="change-legend-chip"><span class="change-legend-dot change-legend-dot-b"></span><span id="change-legend-b-label"></span></span>
+          </div>
+        </div>
+        <div class="change-axis">
+          <div class="change-col-label"></div>
+          <div class="change-col-track">
+            <span id="change-axis-min"></span>
+            <span id="change-axis-max"></span>
+          </div>
+          <div class="change-col-delta"></div>
+        </div>
+        <div class="change-scroll">
+          <div id="change-rows"></div>
+        </div>
+        <div id="change-tooltip" class="chart-tooltip"></div>
       </div>
     </div>
   </div>

@@ -32,6 +32,13 @@
       region_total_prefix: "Total Amazônia Legal: ",
       label_no_data: "Sem dado",
       label_others: "Outros",
+      view_change: "Variação",
+      title_change: "Variação entre dois anos",
+      subtitle_change: "Municípios ordenados pela variação no valor exportado",
+      label_state: "Estado",
+      label_year_a: "Ano A",
+      label_year_b: "Ano B",
+      change_axis_label: "Valor exportado (US$)",
       btn_lang: "English"
     },
     en: {
@@ -50,6 +57,13 @@
       region_total_prefix: "Legal Amazon total: ",
       label_no_data: "No data",
       label_others: "Other",
+      view_change: "Change",
+      title_change: "Change between two years",
+      subtitle_change: "Municipalities ranked by change in export value",
+      label_state: "State",
+      label_year_a: "Year A",
+      label_year_b: "Year B",
+      change_axis_label: "Export value (US$)",
       btn_lang: "Português"
     }
   };
@@ -73,15 +87,21 @@
     lang: "pt",
     year: null,
     topN: 15,
-    view: "ranking", // "ranking" | "composition"
+    view: "ranking", // "ranking" | "composition" | "change"
     playing: false,
-    playTimer: null
+    playTimer: null,
+    changeState: null, // UF filter for the change (dumbbell) view
+    yearA: null,
+    yearB: null
   };
 
   let dictionary, municipalityTotals, regionTotals, composition, products;
   let totalsByYear; // year -> [{municipio, valor}], sorted descending
   let regionTotalByYear; // year -> valor
   let compositionSeries; // [{ produto, color, isOthers, values: Map(year -> valor) }], top-8 + Outros, fixed order
+  let totalsByMunicipio; // municipio -> Map(year -> valor)
+  let municipioMeta; // municipio -> { uf }
+  let ufList; // sorted distinct UF codes
   let sparkSeries = [];
   let sparkXFor = null;
   let sparkYFor = null;
@@ -102,12 +122,13 @@
     totalsByYear = groupByYear(municipalityTotals);
     regionTotalByYear = new Map(regionTotals.map((r) => [r.ano, r.valor]));
     compositionSeries = buildCompositionSeries(composition, dictionary);
+    ({ totalsByMunicipio, municipioMeta, ufList } = buildMunicipioIndex(municipalityTotals));
 
     initState();
     initControls();
     initSparklineHover();
     initCompositionHover();
-    render();
+    setView(state.view);
     document.getElementById("spinner").classList.add("hidden");
   }).catch((err) => {
     console.error("Failed to load data", err);
@@ -132,6 +153,26 @@
     return byYear;
   }
 
+  // The source data keys municipalities by a "Nome - UF" string (the .rds
+  // pipeline discards the IBGE code in favor of this name early on — see
+  // the export script) — UF is parsed from that suffix rather than
+  // re-fetched from anywhere else, same pattern the CEMPRE map used for
+  // its own compare-mode state filter.
+  function buildMunicipioIndex(rows) {
+    const byMuni = new Map();
+    const meta = new Map();
+    for (const row of rows) {
+      if (!byMuni.has(row.municipio)) {
+        byMuni.set(row.municipio, new Map());
+        const uf = row.municipio.slice(row.municipio.lastIndexOf(" - ") + 3);
+        meta.set(row.municipio, { uf });
+      }
+      byMuni.get(row.municipio).set(row.ano, row.valor);
+    }
+    const ufs = Array.from(new Set(Array.from(meta.values()).map((m) => m.uf))).sort();
+    return { totalsByMunicipio: byMuni, municipioMeta: meta, ufList: ufs };
+  }
+
   // ---- State init from query string ----
 
   function initState() {
@@ -139,12 +180,24 @@
     const qLang = params.get("lang");
     const qYear = parseInt(params.get("year"), 10);
     const qTopN = parseInt(params.get("topn"), 10);
+    const qView = params.get("view");
+    const qState = params.get("state");
+    const qYearA = parseInt(params.get("yeara"), 10);
+    const qYearB = parseInt(params.get("yearb"), 10);
 
     state.lang = qLang === "en" ? "en" : "pt";
     state.year = Number.isFinite(qYear) && qYear >= dictionary.year_inicio && qYear <= dictionary.year_final
       ? qYear
       : dictionary.year_final;
     state.topN = [10, 15, 20, 30].includes(qTopN) ? qTopN : 15;
+    state.view = ["ranking", "composition", "change"].includes(qView) ? qView : "ranking";
+    state.changeState = ufList.includes(qState) ? qState : ufList[0];
+    state.yearA = Number.isFinite(qYearA) && qYearA >= dictionary.year_inicio && qYearA <= dictionary.year_final
+      ? qYearA
+      : dictionary.year_inicio;
+    state.yearB = Number.isFinite(qYearB) && qYearB >= dictionary.year_inicio && qYearB <= dictionary.year_final
+      ? qYearB
+      : dictionary.year_final;
   }
 
   function updateUrl() {
@@ -152,6 +205,10 @@
     params.set("lang", state.lang);
     params.set("year", state.year);
     params.set("topn", state.topN);
+    params.set("view", state.view);
+    params.set("state", state.changeState);
+    params.set("yeara", state.yearA);
+    params.set("yearb", state.yearB);
     history.replaceState(null, "", `?${params.toString()}`);
   }
 
@@ -186,15 +243,58 @@
 
     document.getElementById("view-ranking").addEventListener("click", () => setView("ranking"));
     document.getElementById("view-composition").addEventListener("click", () => setView("composition"));
+    document.getElementById("view-change").addEventListener("click", () => setView("change"));
+
+    const stateSelect = document.getElementById("change-state-select");
+    for (const uf of ufList) {
+      const opt = document.createElement("option");
+      opt.value = uf;
+      opt.textContent = uf;
+      stateSelect.appendChild(opt);
+    }
+    stateSelect.value = state.changeState;
+    stateSelect.addEventListener("change", (e) => {
+      state.changeState = e.target.value;
+      updateUrl();
+      renderChange();
+    });
+
+    const yearASelect = document.getElementById("change-year-a");
+    const yearBSelect = document.getElementById("change-year-b");
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) {
+      const optA = document.createElement("option");
+      optA.value = y; optA.textContent = y;
+      yearASelect.appendChild(optA);
+      const optB = document.createElement("option");
+      optB.value = y; optB.textContent = y;
+      yearBSelect.appendChild(optB);
+    }
+    yearASelect.value = state.yearA;
+    yearBSelect.value = state.yearB;
+    yearASelect.addEventListener("change", (e) => {
+      state.yearA = parseInt(e.target.value, 10);
+      updateUrl();
+      renderChange();
+    });
+    yearBSelect.addEventListener("change", (e) => {
+      state.yearB = parseInt(e.target.value, 10);
+      updateUrl();
+      renderChange();
+    });
   }
 
   function setView(view) {
+    stopPlaying();
     state.view = view;
     document.getElementById("view-ranking").classList.toggle("active", view === "ranking");
     document.getElementById("view-composition").classList.toggle("active", view === "composition");
+    document.getElementById("view-change").classList.toggle("active", view === "change");
     document.getElementById("ranking-panel").classList.toggle("hidden", view !== "ranking");
     document.getElementById("composition-panel").classList.toggle("hidden", view !== "composition");
+    document.getElementById("change-panel").classList.toggle("hidden", view !== "change");
     document.getElementById("topn-group").classList.toggle("hidden", view !== "ranking");
+    document.getElementById("change-group").classList.toggle("hidden", view !== "change");
+    document.querySelector(".slider-inline").classList.toggle("hidden", view === "change");
     updateUrl();
     render();
   }
@@ -311,10 +411,18 @@
     document.getElementById("label_view_name").textContent = t.label_view_name;
     document.getElementById("view-ranking").textContent = t.view_ranking;
     document.getElementById("view-composition").textContent = t.view_composition;
+    document.getElementById("view-change").textContent = t.view_change;
     document.getElementById("ranking-axis-label").textContent = t.ranking_axis_label;
+    document.getElementById("change-axis-label").textContent = t.change_axis_label;
+    document.getElementById("label_state").textContent = t.label_state;
+    document.getElementById("label_year_a").textContent = t.label_year_a;
+    document.getElementById("label_year_b").textContent = t.label_year_b;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
-    document.getElementById("plot-title").textContent = state.view === "composition" ? t.title_composition : t.title_ranking;
-    document.getElementById("plot-subtitle").textContent = state.view === "composition" ? t.subtitle_composition : t.subtitle_ranking;
+
+    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change };
+    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change };
+    document.getElementById("plot-title").textContent = titles[state.view];
+    document.getElementById("plot-subtitle").textContent = subtitles[state.view];
 
     const slider = document.getElementById("year-slider");
     slider.value = state.year;
@@ -323,6 +431,8 @@
     renderSparkline();
     if (state.view === "composition") {
       renderComposition();
+    } else if (state.view === "change") {
+      renderChange();
     } else {
       renderRanking();
     }
@@ -591,6 +701,125 @@
       const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
       jumpToYear(Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year)));
     });
+  }
+
+  // ---- Change: ranked dumbbell chart, year A vs year B, filtered to one
+  // state — same pattern as the CEMPRE map rebuild's compare mode (446
+  // municipalities isn't readable as one ranked list; 13-115 per state is).
+  // Dot color is a fixed identity pair (year A = blue, year B = orange),
+  // not an encoding of which value is larger. ----
+
+  function computeChangeRows(uf, yearA, yearB) {
+    const rows = [];
+    for (const [municipio, meta] of municipioMeta) {
+      if (meta.uf !== uf) continue;
+      const years = totalsByMunicipio.get(municipio);
+      const valueA = years.get(yearA) || 0;
+      const valueB = years.get(yearB) || 0;
+      rows.push({ municipio, valueA, valueB, delta: valueB - valueA });
+    }
+    rows.sort((a, b) => b.delta - a.delta);
+    return rows;
+  }
+
+  function changeDomain(rows) {
+    if (!rows.length) return { min: 0, max: 1 };
+    let min = Infinity, max = -Infinity;
+    for (const r of rows) {
+      min = Math.min(min, r.valueA, r.valueB);
+      max = Math.max(max, r.valueA, r.valueB);
+    }
+    if (min === max) { min -= 1; max += 1; }
+    const pad = (max - min) * 0.05;
+    return { min: min - pad, max: max + pad };
+  }
+
+  function pctForChange(value, domain) {
+    return ((value - domain.min) / (domain.max - domain.min)) * 100;
+  }
+
+  function renderChange() {
+    document.getElementById("change-legend-a-label").textContent = state.yearA;
+    document.getElementById("change-legend-b-label").textContent = state.yearB;
+
+    const rows = computeChangeRows(state.changeState, state.yearA, state.yearB);
+    const domain = changeDomain(rows);
+    document.getElementById("change-axis-min").textContent = fmtAbbrev(domain.min);
+    document.getElementById("change-axis-max").textContent = fmtAbbrev(domain.max);
+
+    const container = document.getElementById("change-rows");
+    container.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    for (const r of rows) frag.appendChild(buildChangeRowEl(r, domain));
+    container.appendChild(frag);
+  }
+
+  function buildChangeRowEl(r, domain) {
+    const pctA = pctForChange(r.valueA, domain);
+    const pctB = pctForChange(r.valueB, domain);
+    const lo = Math.min(pctA, pctB);
+    const hi = Math.max(pctA, pctB);
+
+    const row = document.createElement("div");
+    row.className = "change-row";
+
+    const label = document.createElement("div");
+    label.className = "change-col-label";
+    label.textContent = r.municipio;
+    label.title = r.municipio;
+    row.appendChild(label);
+
+    const track = document.createElement("div");
+    track.className = "change-col-track";
+    const line = document.createElement("div");
+    line.className = "change-line";
+    line.style.left = lo + "%";
+    line.style.width = (hi - lo) + "%";
+    track.appendChild(line);
+    const dotA = document.createElement("div");
+    dotA.className = "change-dot change-dot-a";
+    dotA.style.left = pctA + "%";
+    track.appendChild(dotA);
+    const dotB = document.createElement("div");
+    dotB.className = "change-dot change-dot-b";
+    dotB.style.left = pctB + "%";
+    track.appendChild(dotB);
+    row.appendChild(track);
+
+    const delta = document.createElement("div");
+    delta.className = "change-col-delta";
+    delta.textContent = (r.delta > 0 ? "+" : "") + fmtAbbrev(r.delta);
+    row.appendChild(delta);
+
+    row.addEventListener("pointerenter", (e) => showChangeTooltip(e, r));
+    row.addEventListener("pointermove", moveChangeTooltip);
+    row.addEventListener("pointerleave", hideChangeTooltip);
+
+    return row;
+  }
+
+  function showChangeTooltip(e, r) {
+    const tooltip = document.getElementById("change-tooltip");
+    const pct = r.valueA !== 0 ? (r.delta / Math.abs(r.valueA)) * 100 : null;
+    tooltip.innerHTML =
+      "<strong>" + r.municipio + "</strong><br>" +
+      state.yearA + ": US$ " + fmtNumber(r.valueA) + "<br>" +
+      state.yearB + ": US$ " + fmtNumber(r.valueB) + "<br>" +
+      (r.delta >= 0 ? "+" : "") + fmtNumber(r.delta) +
+      (pct !== null ? " (" + (pct >= 0 ? "+" : "") + pct.toFixed(1) + "%)" : "");
+    tooltip.style.opacity = "1";
+    moveChangeTooltip(e);
+  }
+
+  function moveChangeTooltip(e) {
+    const tooltip = document.getElementById("change-tooltip");
+    const panelRect = document.getElementById("change-panel").getBoundingClientRect();
+    tooltip.style.left = (e.clientX - panelRect.left + 12) + "px";
+    tooltip.style.top = (e.clientY - panelRect.top + 12) + "px";
+  }
+
+  function hideChangeTooltip() {
+    document.getElementById("change-tooltip").style.opacity = "0";
   }
 
   // ---- Sparkline: region-wide total export value per year ----
