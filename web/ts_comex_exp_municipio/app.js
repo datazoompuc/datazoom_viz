@@ -39,6 +39,10 @@
       label_year_a: "Ano A",
       label_year_b: "Ano B",
       change_axis_label: "Valor exportado (US$)",
+      view_trends: "Tendências",
+      title_trends: "Tendências por município",
+      subtitle_trends: "Top municípios por valor total exportado, 1997–2025",
+      label_since_prefix: "Desde ",
       btn_lang: "English"
     },
     en: {
@@ -64,6 +68,10 @@
       label_year_a: "Year A",
       label_year_b: "Year B",
       change_axis_label: "Export value (US$)",
+      view_trends: "Trends",
+      title_trends: "Trends by municipality",
+      subtitle_trends: "Top municipalities by total export value, 1997–2025",
+      label_since_prefix: "Since ",
       btn_lang: "Português"
     }
   };
@@ -190,7 +198,7 @@
       ? qYear
       : dictionary.year_final;
     state.topN = [10, 15, 20, 30].includes(qTopN) ? qTopN : 15;
-    state.view = ["ranking", "composition", "change"].includes(qView) ? qView : "ranking";
+    state.view = ["ranking", "composition", "change", "trends"].includes(qView) ? qView : "ranking";
     state.changeState = ufList.includes(qState) ? qState : ufList[0];
     state.yearA = Number.isFinite(qYearA) && qYearA >= dictionary.year_inicio && qYearA <= dictionary.year_final
       ? qYearA
@@ -238,12 +246,13 @@
     document.getElementById("topn-select").addEventListener("change", (e) => {
       state.topN = parseInt(e.target.value, 10);
       updateUrl();
-      renderRanking();
+      if (state.view === "trends") renderTrends(); else renderRanking();
     });
 
     document.getElementById("view-ranking").addEventListener("click", () => setView("ranking"));
     document.getElementById("view-composition").addEventListener("click", () => setView("composition"));
     document.getElementById("view-change").addEventListener("click", () => setView("change"));
+    document.getElementById("view-trends").addEventListener("click", () => setView("trends"));
 
     const stateSelect = document.getElementById("change-state-select");
     for (const uf of ufList) {
@@ -289,10 +298,14 @@
     document.getElementById("view-ranking").classList.toggle("active", view === "ranking");
     document.getElementById("view-composition").classList.toggle("active", view === "composition");
     document.getElementById("view-change").classList.toggle("active", view === "change");
+    document.getElementById("view-trends").classList.toggle("active", view === "trends");
     document.getElementById("ranking-panel").classList.toggle("hidden", view !== "ranking");
     document.getElementById("composition-panel").classList.toggle("hidden", view !== "composition");
     document.getElementById("change-panel").classList.toggle("hidden", view !== "change");
-    document.getElementById("topn-group").classList.toggle("hidden", view !== "ranking");
+    document.getElementById("trends-panel").classList.toggle("hidden", view !== "trends");
+    // topn-group is shared between ranking (per-year top-N) and trends
+    // (all-time top-N) — same control, different underlying ranking.
+    document.getElementById("topn-group").classList.toggle("hidden", view !== "ranking" && view !== "trends");
     document.getElementById("change-group").classList.toggle("hidden", view !== "change");
     document.querySelector(".slider-inline").classList.toggle("hidden", view === "change");
     updateUrl();
@@ -354,6 +367,8 @@
     updateUrl();
     if (state.view === "composition") {
       updateCompositionGuide();
+    } else if (state.view === "trends") {
+      updateTrendsMarkers();
     } else {
       renderRanking();
     }
@@ -412,6 +427,7 @@
     document.getElementById("view-ranking").textContent = t.view_ranking;
     document.getElementById("view-composition").textContent = t.view_composition;
     document.getElementById("view-change").textContent = t.view_change;
+    document.getElementById("view-trends").textContent = t.view_trends;
     document.getElementById("ranking-axis-label").textContent = t.ranking_axis_label;
     document.getElementById("change-axis-label").textContent = t.change_axis_label;
     document.getElementById("label_state").textContent = t.label_state;
@@ -419,8 +435,8 @@
     document.getElementById("label_year_b").textContent = t.label_year_b;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
 
-    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change };
-    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change };
+    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change, trends: t.title_trends };
+    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change, trends: t.subtitle_trends };
     document.getElementById("plot-title").textContent = titles[state.view];
     document.getElementById("plot-subtitle").textContent = subtitles[state.view];
 
@@ -433,6 +449,8 @@
       renderComposition();
     } else if (state.view === "change") {
       renderChange();
+    } else if (state.view === "trends") {
+      renderTrends();
     } else {
       renderRanking();
     }
@@ -820,6 +838,150 @@
 
   function hideChangeTooltip() {
     document.getElementById("change-tooltip").style.opacity = "0";
+  }
+
+  // ---- Trends: small multiples, one sparkline per top-N municipality by
+  // all-time total value (independent of the ranking view's per-year
+  // top-N, since a sparkline shows the whole range at once — there's no
+  // single year to rank by). Shares the topn-select control with the
+  // ranking view. ----
+
+  const TREND_SPARK_W = 200, TREND_SPARK_H = 44, TREND_SPARK_PAD = 4;
+
+  function computeTrendMunicipalities(topN) {
+    const totals = Array.from(totalsByMunicipio.entries()).map(([municipio, years]) => {
+      let sum = 0;
+      for (const v of years.values()) sum += v;
+      return { municipio, total: sum };
+    });
+    totals.sort((a, b) => b.total - a.total);
+    return totals.slice(0, topN).map((d) => d.municipio);
+  }
+
+  function renderTrends() {
+    const t = I18N[state.lang];
+    const munis = computeTrendMunicipalities(state.topN);
+    const grid = document.getElementById("trends-grid");
+    grid.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    for (const municipio of munis) frag.appendChild(buildTrendCard(municipio, t));
+    grid.appendChild(frag);
+  }
+
+  function buildTrendCard(municipio, t) {
+    const years = totalsByMunicipio.get(municipio);
+    const series = [];
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) {
+      series.push({ year: y, value: years.get(y) || 0 });
+    }
+    const values = series.map((d) => d.value);
+    const minV = Math.min(...values);
+    const maxV = Math.max(...values);
+    const xFor = (year) => ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * TREND_SPARK_W;
+    const yFor = (value) => (maxV === minV
+      ? TREND_SPARK_H / 2
+      : TREND_SPARK_PAD + (1 - (value - minV) / (maxV - minV)) * (TREND_SPARK_H - 2 * TREND_SPARK_PAD));
+
+    const card = document.createElement("div");
+    card.className = "trend-card";
+    card.dataset.municipio = municipio;
+
+    const header = document.createElement("div");
+    header.className = "trend-card-header";
+    const name = document.createElement("span");
+    name.className = "trend-card-name";
+    name.textContent = municipio;
+    name.title = municipio;
+    const latest = document.createElement("span");
+    latest.className = "trend-card-value";
+    latest.textContent = fmtAbbrev(values[values.length - 1]);
+    header.appendChild(name);
+    header.appendChild(latest);
+    card.appendChild(header);
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "trend-sparkline");
+    svg.setAttribute("viewBox", `0 0 ${TREND_SPARK_W} ${TREND_SPARK_H}`);
+    svg.setAttribute("preserveAspectRatio", "none");
+
+    const pts = series.map((d) => `${xFor(d.year).toFixed(1)},${yFor(d.value).toFixed(1)}`);
+    const areaPath = document.createElementNS(svgNS, "path");
+    areaPath.setAttribute("class", "trend-spark-area");
+    areaPath.setAttribute("d", `M${xFor(series[0].year).toFixed(1)},${TREND_SPARK_H} L${pts.join(" L")} L${xFor(series[series.length - 1].year).toFixed(1)},${TREND_SPARK_H} Z`);
+    svg.appendChild(areaPath);
+
+    const linePath = document.createElementNS(svgNS, "path");
+    linePath.setAttribute("class", "trend-spark-line");
+    linePath.setAttribute("d", `M${pts.join(" L")}`);
+    svg.appendChild(linePath);
+
+    const marker = document.createElementNS(svgNS, "circle");
+    marker.setAttribute("class", "trend-spark-marker");
+    marker.setAttribute("r", "3");
+    marker.dataset.role = "marker";
+    svg.appendChild(marker);
+
+    card.appendChild(svg);
+
+    const footer = document.createElement("div");
+    footer.className = "trend-card-footer";
+    const first = values[0];
+    // A near-zero 1997 base (common for municipalities that only started
+    // exporting significant volumes later) makes the raw percentage
+    // explode into six figures — technically correct, but not a useful
+    // number to scan. Capped display; the sparkline shape already tells
+    // the real story for these cases.
+    const pctChange = first !== 0 ? ((values[values.length - 1] - first) / Math.abs(first)) * 100 : null;
+    let pctLabel = "—";
+    if (pctChange !== null) {
+      // A decline is bounded at -100% (export value can't go below 0), so
+      // anything past the cap can only be on the growth side.
+      pctLabel = pctChange > 999
+        ? ">999%"
+        : (pctChange >= 0 ? "+" : "") + Math.round(pctChange) + "%";
+    }
+    footer.textContent = t.label_since_prefix + dictionary.year_inicio + ": " + pctLabel;
+    card.appendChild(footer);
+
+    positionTrendMarker(card, series, xFor, yFor);
+    return card;
+  }
+
+  function positionTrendMarker(card, series, xFor, yFor) {
+    const marker = card.querySelector('[data-role="marker"]');
+    if (!marker) return;
+    const d = series.find((s) => s.year === state.year);
+    if (!d) { marker.setAttribute("opacity", "0"); return; }
+    marker.setAttribute("cx", xFor(d.year));
+    marker.setAttribute("cy", yFor(d.value));
+    marker.setAttribute("opacity", "1");
+  }
+
+  // Repositions each card's selected-year marker without rebuilding the
+  // grid — called on every autoplay tick, so it needs to be cheap.
+  function updateTrendsMarkers() {
+    const grid = document.getElementById("trends-grid");
+    for (const card of grid.children) {
+      const municipio = card.dataset.municipio;
+      const years = totalsByMunicipio.get(municipio);
+      if (!years) continue;
+      const value = years.get(state.year);
+      const marker = card.querySelector('[data-role="marker"]');
+      if (!marker) continue;
+      if (value === undefined) { marker.setAttribute("opacity", "0"); continue; }
+      const series = [];
+      for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) series.push(years.get(y) || 0);
+      const minV = Math.min(...series);
+      const maxV = Math.max(...series);
+      const xFor = (year) => ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * TREND_SPARK_W;
+      const yFor = (v) => (maxV === minV
+        ? TREND_SPARK_H / 2
+        : TREND_SPARK_PAD + (1 - (v - minV) / (maxV - minV)) * (TREND_SPARK_H - 2 * TREND_SPARK_PAD));
+      marker.setAttribute("cx", xFor(state.year));
+      marker.setAttribute("cy", yFor(value));
+      marker.setAttribute("opacity", "1");
+    }
   }
 
   // ---- Sparkline: region-wide total export value per year ----
