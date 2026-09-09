@@ -27,7 +27,7 @@
       title_ranking: "Ranking de municípios exportadores",
       subtitle_ranking: "Valor exportado (US$), por município",
       title_composition: "Composição das exportações da Amazônia Legal",
-      subtitle_composition: "Valor exportado (US$) por categoria de produto, 1997–2025",
+      subtitle_composition: "Valor exportado (US$) por categoria de produto, empilhado por ano — passe o mouse para ver o detalhamento",
       ranking_axis_label: "Valor exportado (US$)",
       region_total_prefix: "Total Amazônia Legal: ",
       label_no_data: "Sem dado",
@@ -64,7 +64,7 @@
       title_ranking: "Ranking of exporting municipalities",
       subtitle_ranking: "Export value (US$), by municipality",
       title_composition: "Legal Amazon export composition",
-      subtitle_composition: "Export value (US$) by product category, 1997–2025",
+      subtitle_composition: "Export value (US$) by product category, stacked per year — hover to see the breakdown",
       ranking_axis_label: "Export value (US$)",
       region_total_prefix: "Legal Amazon total: ",
       label_no_data: "No data",
@@ -653,6 +653,16 @@
     return hit ? hit.label : produto;
   }
 
+  // Official SEC category names are long compound clauses joined by ";"
+  // (e.g. "Madeira, carvão vegetal e obras de madeira; Cortiça e suas
+  // obras..."). Cutting at the first clause boundary reads as a clean short
+  // name instead of an arbitrary mid-word ellipsis.
+  function productShortLabel(produto) {
+    const full = productLabel(produto);
+    const clause = full.split(";")[0].trim();
+    return clause.length > 60 ? clause.slice(0, 57).trimEnd() + "…" : clause;
+  }
+
   function renderComposition() {
     const svg = document.getElementById("composition-svg");
     svg.innerHTML = "";
@@ -740,7 +750,7 @@
       swatch.style.background = s.color;
       const label = document.createElement("span");
       label.className = "label";
-      label.textContent = productLabel(s.produto);
+      label.textContent = productShortLabel(s.produto);
       label.title = productLabel(s.produto);
       item.appendChild(swatch);
       item.appendChild(label);
@@ -765,11 +775,10 @@
         return;
       }
 
-      const truncate = (s, n) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
       const rowsHtml = compositionSeries
-        .map((s) => ({ label: productLabel(s.produto), color: s.color, valor: s.values.get(year) || 0 }))
+        .map((s) => ({ label: productShortLabel(s.produto), full: productLabel(s.produto), color: s.color, valor: s.values.get(year) || 0 }))
         .sort((a, b) => b.valor - a.valor)
-        .map((r) => `<div style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:2px;background:${r.color};display:inline-block;flex:0 0 auto;"></span><span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;">${truncate(r.label, 42)}</span><span style="flex:0 0 auto;padding-left:8px;">${fmtAbbrev(r.valor)}</span></div>`)
+        .map((r) => `<div title="${r.full.replace(/"/g, "&quot;")}" style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:2px;background:${r.color};display:inline-block;flex:0 0 auto;"></span><span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.label}</span><span style="flex:0 0 auto;padding-left:8px;">${fmtAbbrev(r.valor)}</span></div>`)
         .join("");
 
       tooltip.innerHTML = `<strong>${year}</strong>` + rowsHtml;

@@ -494,7 +494,8 @@ html, body {
   gap: 6px;
   font-size: 0.8rem;
   color: var(--ink);
-  max-width: 220px;
+  max-width: 280px;
+  cursor: default;
 }
 .legend-item span.swatch {
   width: 11px;
