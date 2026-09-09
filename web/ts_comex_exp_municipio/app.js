@@ -58,7 +58,15 @@
       view_prodrank: "Produto",
       title_prodrank: "Ranking de municípios por produto",
       subtitle_prodrank: "Municípios que mais exportam o produto selecionado, por ano",
-      label_prodrank_select: "Produto (SH4)",
+      label_prodrank_select: "Produto",
+      label_prodrank_search: "Ou busque outro produto (todos os SH4)",
+      prodrank_custom_option: "(produto buscado)",
+      prodrank_cat_agro: "Agro e alimentos",
+      prodrank_cat_carnes: "Carnes e produtos de origem animal",
+      prodrank_cat_oleos: "Óleos e derivados",
+      prodrank_cat_florestais: "Florestais e madeira",
+      prodrank_cat_metais: "Metais e minerais",
+      prodrank_cat_industria: "Indústria e manufaturados",
       prodrank_total_prefix: "Total exportado no ano: ",
       label_loading: "Carregando…",
       btn_lang: "English"
@@ -105,7 +113,15 @@
       view_prodrank: "Product",
       title_prodrank: "Municipality ranking by product",
       subtitle_prodrank: "Municipalities exporting the most of the selected product, by year",
-      label_prodrank_select: "Product (SH4)",
+      label_prodrank_select: "Product",
+      label_prodrank_search: "Or search another product (all SH4)",
+      prodrank_custom_option: "(searched product)",
+      prodrank_cat_agro: "Agriculture & food",
+      prodrank_cat_carnes: "Meat & animal products",
+      prodrank_cat_oleos: "Oils & derivatives",
+      prodrank_cat_florestais: "Forestry & wood",
+      prodrank_cat_metais: "Metals & minerals",
+      prodrank_cat_industria: "Industry & manufactured goods",
       prodrank_total_prefix: "Total exported that year: ",
       label_loading: "Loading…",
       btn_lang: "Português"
@@ -257,6 +273,23 @@
 
   // ---- Product ranking (SH4): lazy-loaded on first visit to that view ----
 
+  // The original app_rk_comex_exp_munic_produtosamz didn't expose all ~1,142
+  // SH4 codes either — its server.R hand-curated this ~35-item, 6-category
+  // "starter_choices" list (ported verbatim, codes only; labels come from
+  // our own bilingual productsByCode lookup instead of its PT-only custom
+  // strings, so the category picker stays correct under the lang toggle).
+  // The full catalog stays reachable via the separate search input for
+  // anyone looking for something outside this curated set.
+  const PRODRANK_CATEGORIES = [
+    { key: "agro", codes: ["1201", "1005", "0713", "0710", "0702", "0707", "1104", "1904", "2005", "2008", "2201", "2101"] },
+    { key: "carnes", codes: ["0202", "0201", "0206", "0504", "1502", "2301"] },
+    { key: "oleos", codes: ["1507"] },
+    { key: "florestais", codes: ["4407", "4409", "0801"] },
+    { key: "metais", codes: ["7108", "5201"] },
+    { key: "industria", codes: ["7318", "8482", "4818", "6204", "4202", "3006"] }
+  ];
+  const PRODRANK_DEFAULT_CODE = "1201"; // Soja — first item of the first curated category
+
   function ensureProductRankingLoaded() {
     if (productRankingPromise) return productRankingPromise;
     productRankingPromise = fetchJson(`${DATA_DIR}/product_ranking.json`).then((data) => {
@@ -264,7 +297,9 @@
       productsByCode = new Map(data.produtos.map((p) => [p.code, p]));
       productRankingRowsByCode = buildProductRankingIndex(data);
       if (!state.prodrankCode || !productRankingRowsByCode.has(state.prodrankCode)) {
-        state.prodrankCode = computeTopProductCode();
+        state.prodrankCode = productRankingRowsByCode.has(PRODRANK_DEFAULT_CODE)
+          ? PRODRANK_DEFAULT_CODE
+          : computeTopProductCode();
         updateUrl();
       }
       populateProdrankPicker();
@@ -309,6 +344,33 @@
   }
 
   function populateProdrankPicker() {
+    const t = I18N[state.lang];
+
+    // Curated dropdown, grouped exactly like the original app's optgroups.
+    const curatedSelect = document.getElementById("prodrank-curated-select");
+    curatedSelect.innerHTML = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = t.prodrank_custom_option;
+    curatedSelect.appendChild(placeholder);
+    for (const cat of PRODRANK_CATEGORIES) {
+      const codes = cat.codes.filter((c) => productsByCode.has(c));
+      if (!codes.length) continue;
+      const group = document.createElement("optgroup");
+      group.label = t[`prodrank_cat_${cat.key}`];
+      const items = codes
+        .map((code) => ({ code, label: prodrankShortLabel(code) }))
+        .sort((a, b) => a.label.localeCompare(b.label, state.lang));
+      for (const { code, label } of items) {
+        const opt = document.createElement("option");
+        opt.value = code;
+        opt.textContent = label;
+        group.appendChild(opt);
+      }
+      curatedSelect.appendChild(group);
+    }
+
+    // Full-catalog search, for anything outside the curated set above.
     const datalist = document.getElementById("prodrank-datalist");
     datalist.innerHTML = "";
     prodrankLabelToCode = new Map();
@@ -321,13 +383,17 @@
       opt.value = label;
       datalist.appendChild(opt);
     }
-    syncProdrankInput();
+
+    syncProdrankControls();
   }
 
-  function syncProdrankInput() {
+  function syncProdrankControls() {
     if (!state.prodrankCode) return;
     document.getElementById("prodrank-input").value = prodrankShortLabel(state.prodrankCode);
     document.getElementById("prodrank-full-label").textContent = prodrankLabel(state.prodrankCode);
+    const curatedSelect = document.getElementById("prodrank-curated-select");
+    const isCurated = Array.from(curatedSelect.options).some((o) => o.value === state.prodrankCode);
+    curatedSelect.value = isCurated ? state.prodrankCode : "";
   }
 
   // ---- State init from query string ----
@@ -432,12 +498,21 @@
     prodrankInput.addEventListener("change", (e) => {
       const code = prodrankLabelToCode && prodrankLabelToCode.get(e.target.value);
       if (!code) {
-        syncProdrankInput(); // typed text didn't match a real option — revert
+        syncProdrankControls(); // typed text didn't match a real option — revert
         return;
       }
       state.prodrankCode = code;
       updateUrl();
-      syncProdrankInput();
+      syncProdrankControls();
+      renderProdRank();
+    });
+
+    const prodrankCuratedSelect = document.getElementById("prodrank-curated-select");
+    prodrankCuratedSelect.addEventListener("change", (e) => {
+      if (!e.target.value) return; // "(produto buscado)" placeholder — no-op
+      state.prodrankCode = e.target.value;
+      updateUrl();
+      syncProdrankControls();
       renderProdRank();
     });
 
@@ -692,6 +767,7 @@
     document.getElementById("label_index_first").textContent = t.label_index_first;
     document.getElementById("label_municomp_select").textContent = t.label_municomp_select;
     document.getElementById("label_prodrank_select").textContent = t.label_prodrank_select;
+    document.getElementById("label_prodrank_search").textContent = t.label_prodrank_search;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
     // Repopulate the datalist too — its option labels are language-specific.
     if (productRanking) populateProdrankPicker();

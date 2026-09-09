@@ -140,6 +140,7 @@ html, body {
 #change-year-a,
 #change-year-b,
 #municomp-select,
+#prodrank-curated-select,
 #prodrank-input {
   width: 100%;
   padding: 6px 8px;
@@ -156,6 +157,11 @@ html, body {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.75);
   margin: 4px 0 0;
+}
+
+.prodrank-search-label {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .prodrank-loading {
