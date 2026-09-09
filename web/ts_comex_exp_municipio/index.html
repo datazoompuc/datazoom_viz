@@ -22,6 +22,7 @@
       <button class="view-btn" id="view-change" data-view="change"></button>
       <button class="view-btn" id="view-trends" data-view="trends"></button>
       <button class="view-btn" id="view-explore" data-view="explore"></button>
+      <button class="view-btn" id="view-municomp" data-view="municomp"></button>
     </div>
 
     <div class="spacer"></div>
@@ -62,6 +63,11 @@
         <input type="range" id="year-slider" step="1">
         <span id="year-value" class="year-value"></span>
       </div>
+    </div>
+
+    <div class="var_selec_group hidden" id="municomp-group">
+      <label id="label_municomp_select" for="municomp-select"></label>
+      <select id="municomp-select"></select>
     </div>
 
     <div class="var_selec_group hidden" id="explore-group">
@@ -115,7 +121,7 @@
       </div>
 
       <div id="composition-panel" class="composition-panel hidden">
-        <div class="composition-chart-area">
+        <div id="composition-chart-area" class="composition-chart-area">
           <svg id="composition-svg" class="composition-svg" viewBox="0 0 1000 520" preserveAspectRatio="none"></svg>
           <div id="composition-tooltip" class="chart-tooltip"></div>
         </div>
@@ -154,6 +160,14 @@
           <div id="explore-tooltip" class="chart-tooltip"></div>
         </div>
         <div id="explore-legend" class="composition-legend"></div>
+      </div>
+
+      <div id="municomp-panel" class="composition-panel hidden">
+        <div id="municomp-chart-area" class="composition-chart-area">
+          <svg id="municomp-svg" class="composition-svg" viewBox="0 0 1000 520" preserveAspectRatio="none"></svg>
+          <div id="municomp-tooltip" class="chart-tooltip"></div>
+        </div>
+        <div id="municomp-legend" class="composition-legend"></div>
       </div>
     </div>
   </div>

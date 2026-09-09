@@ -51,6 +51,10 @@
       label_log_scale: "Escala logarítmica",
       label_index_first: "Indexado ao ano inicial (=100)",
       explore_no_base: "sem exportação em {year}",
+      view_municomp: "Município",
+      title_municomp: "Composição das exportações por município",
+      subtitle_municomp: "Categorias de produto exportadas pelo município selecionado, 1997–2025 — passe o mouse para ver o detalhamento",
+      label_municomp_select: "Município",
       btn_lang: "English"
     },
     en: {
@@ -88,6 +92,10 @@
       label_log_scale: "Log scale",
       label_index_first: "Indexed to first year (=100)",
       explore_no_base: "no exports in {year}",
+      view_municomp: "Municipality",
+      title_municomp: "Municipality export composition",
+      subtitle_municomp: "Product categories exported by the selected municipality, 1997–2025 — hover to see the breakdown",
+      label_municomp_select: "Municipality",
       btn_lang: "Português"
     }
   };
@@ -111,7 +119,7 @@
     lang: "pt",
     year: null,
     topN: 15,
-    view: "ranking", // "ranking" | "composition" | "change" | "trends" | "explore"
+    view: "ranking", // "ranking" | "composition" | "change" | "trends" | "explore" | "municomp"
     playing: false,
     playTimer: null,
     changeState: null, // UF filter for the change (dumbbell) view
@@ -119,16 +127,19 @@
     yearB: null,
     exploreMunis: [], // hand-picked municipalities for the explore view
     exploreLog: false,
-    exploreIndex: false
+    exploreIndex: false,
+    municompMuni: null // selected municipality for the per-municipality composition view
   };
 
-  let dictionary, municipalityTotals, regionTotals, composition, products;
+  let dictionary, municipalityTotals, regionTotals, composition, products, muniComposition;
   let totalsByYear; // year -> [{municipio, valor}], sorted descending
   let regionTotalByYear; // year -> valor
   let compositionSeries; // [{ produto, color, isOthers, values: Map(year -> valor) }], top-8 + Outros, fixed order
   let totalsByMunicipio; // municipio -> Map(year -> valor)
   let municipioMeta; // municipio -> { uf }
   let ufList; // sorted distinct UF codes
+  let muniCompositionRowsByMuni; // municipio -> [{produto, ano, valor}], only municipalities with any exports
+  let muniCompositionSeries; // current municompMuni's series, same shape as compositionSeries
   let sparkSeries = [];
   let sparkXFor = null;
   let sparkYFor = null;
@@ -138,24 +149,28 @@
     fetchJson(`${DATA_DIR}/municipality_totals.json`),
     fetchJson(`${DATA_DIR}/region_totals.json`),
     fetchJson(`${DATA_DIR}/composition.json`),
-    fetchJson(`${DATA_DIR}/products.json`)
-  ]).then(([dict, munTotals, regTotals, comp, prod]) => {
+    fetchJson(`${DATA_DIR}/products.json`),
+    fetchJson(`${DATA_DIR}/municipality_composition.json`)
+  ]).then(([dict, munTotals, regTotals, comp, prod, muniComp]) => {
     dictionary = dict;
     municipalityTotals = munTotals;
     regionTotals = regTotals;
     composition = comp;
     products = prod;
+    muniComposition = muniComp;
 
     totalsByYear = groupByYear(municipalityTotals);
     regionTotalByYear = new Map(regionTotals.map((r) => [r.ano, r.valor]));
     compositionSeries = buildCompositionSeries(composition, dictionary);
     ({ totalsByMunicipio, municipioMeta, ufList } = buildMunicipioIndex(municipalityTotals));
+    muniCompositionRowsByMuni = buildMuniCompositionIndex(muniComposition);
 
     initState();
     initControls();
     initSparklineHover();
     initCompositionHover();
     initExploreHover();
+    initMuniCompositionHover();
     setView(state.view);
     document.getElementById("spinner").classList.add("hidden");
   }).catch((err) => {
@@ -201,6 +216,23 @@
     return { totalsByMunicipio: byMuni, municipioMeta: meta, ufList: ufs };
   }
 
+  // municipality_composition.json ships as index-referencing [municipio_idx,
+  // produto_idx, ano, valor] cells (zero-value cells dropped) rather than
+  // one JSON object per municipio x produto x year — the full grid is 96%
+  // zero, so this cuts the payload from ~285k rows to ~18k. Expand once
+  // into the same {produto, ano, valor} row shape buildCompositionSeries()
+  // already consumes for the region-wide chart.
+  function buildMuniCompositionIndex(data) {
+    const byMuni = new Map();
+    for (const [municipioIdx, produtoIdx, ano, valor] of data.cells) {
+      const municipio = data.municipios[municipioIdx];
+      const produto = data.produtos[produtoIdx];
+      if (!byMuni.has(municipio)) byMuni.set(municipio, []);
+      byMuni.get(municipio).push({ produto, ano, valor });
+    }
+    return byMuni;
+  }
+
   // ---- State init from query string ----
 
   function initState() {
@@ -215,13 +247,14 @@
     const qMunis = params.get("munis");
     const qLog = params.get("log");
     const qIndex = params.get("index");
+    const qMuniComp = params.get("municomp");
 
     state.lang = qLang === "en" ? "en" : "pt";
     state.year = Number.isFinite(qYear) && qYear >= dictionary.year_inicio && qYear <= dictionary.year_final
       ? qYear
       : dictionary.year_final;
     state.topN = [10, 15, 20, 30].includes(qTopN) ? qTopN : 15;
-    state.view = ["ranking", "composition", "change", "trends", "explore"].includes(qView) ? qView : "ranking";
+    state.view = ["ranking", "composition", "change", "trends", "explore", "municomp"].includes(qView) ? qView : "ranking";
     state.changeState = ufList.includes(qState) ? qState : ufList[0];
     state.yearA = Number.isFinite(qYearA) && qYearA >= dictionary.year_inicio && qYearA <= dictionary.year_final
       ? qYearA
@@ -233,6 +266,9 @@
     state.exploreMunis = decodedMunis.length ? decodedMunis : computeTrendMunicipalities(5);
     state.exploreLog = qLog === "1";
     state.exploreIndex = qIndex === "1";
+    state.municompMuni = qMuniComp && muniCompositionRowsByMuni.has(qMuniComp)
+      ? qMuniComp
+      : computeTrendMunicipalities(municipioMeta.size).find((m) => muniCompositionRowsByMuni.has(m));
   }
 
   function updateUrl() {
@@ -247,6 +283,7 @@
     params.set("munis", state.exploreMunis.join("|"));
     params.set("log", state.exploreLog ? "1" : "0");
     params.set("index", state.exploreIndex ? "1" : "0");
+    params.set("municomp", state.municompMuni || "");
     history.replaceState(null, "", `?${params.toString()}`);
   }
 
@@ -284,6 +321,22 @@
     document.getElementById("view-change").addEventListener("click", () => setView("change"));
     document.getElementById("view-trends").addEventListener("click", () => setView("trends"));
     document.getElementById("view-explore").addEventListener("click", () => setView("explore"));
+    document.getElementById("view-municomp").addEventListener("click", () => setView("municomp"));
+
+    const municompSelect = document.getElementById("municomp-select");
+    const municompMunis = computeTrendMunicipalities(municipioMeta.size).filter((m) => muniCompositionRowsByMuni.has(m));
+    for (const municipio of municompMunis) {
+      const opt = document.createElement("option");
+      opt.value = municipio;
+      opt.textContent = municipio;
+      municompSelect.appendChild(opt);
+    }
+    municompSelect.value = state.municompMuni;
+    municompSelect.addEventListener("change", (e) => {
+      state.municompMuni = e.target.value;
+      updateUrl();
+      renderMuniComposition();
+    });
 
     const munisSelect = document.getElementById("explore-munis-select");
     const munisByTotal = computeTrendMunicipalities(municipioMeta.size);
@@ -362,16 +415,19 @@
     document.getElementById("view-change").classList.toggle("active", view === "change");
     document.getElementById("view-trends").classList.toggle("active", view === "trends");
     document.getElementById("view-explore").classList.toggle("active", view === "explore");
+    document.getElementById("view-municomp").classList.toggle("active", view === "municomp");
     document.getElementById("ranking-panel").classList.toggle("hidden", view !== "ranking");
     document.getElementById("composition-panel").classList.toggle("hidden", view !== "composition");
     document.getElementById("change-panel").classList.toggle("hidden", view !== "change");
     document.getElementById("trends-panel").classList.toggle("hidden", view !== "trends");
     document.getElementById("explore-panel").classList.toggle("hidden", view !== "explore");
+    document.getElementById("municomp-panel").classList.toggle("hidden", view !== "municomp");
     // topn-group is shared between ranking (per-year top-N) and trends
     // (all-time top-N) — same control, different underlying ranking.
     document.getElementById("topn-group").classList.toggle("hidden", view !== "ranking" && view !== "trends");
     document.getElementById("change-group").classList.toggle("hidden", view !== "change");
     document.getElementById("explore-group").classList.toggle("hidden", view !== "explore");
+    document.getElementById("municomp-group").classList.toggle("hidden", view !== "municomp");
     document.querySelector(".slider-inline").classList.toggle("hidden", view === "change");
     updateUrl();
     render();
@@ -436,6 +492,8 @@
       updateTrendsMarkers();
     } else if (state.view === "explore") {
       updateExploreGuide();
+    } else if (state.view === "municomp") {
+      updateMuniCompositionGuide();
     } else {
       renderRanking();
     }
@@ -496,6 +554,7 @@
     document.getElementById("view-change").textContent = t.view_change;
     document.getElementById("view-trends").textContent = t.view_trends;
     document.getElementById("view-explore").textContent = t.view_explore;
+    document.getElementById("view-municomp").textContent = t.view_municomp;
     document.getElementById("ranking-axis-label").textContent = t.ranking_axis_label;
     document.getElementById("change-axis-label").textContent = t.change_axis_label;
     document.getElementById("label_state").textContent = t.label_state;
@@ -505,10 +564,11 @@
     document.getElementById("explore-hint").textContent = t.explore_hint;
     document.getElementById("label_log_scale").textContent = t.label_log_scale;
     document.getElementById("label_index_first").textContent = t.label_index_first;
+    document.getElementById("label_municomp_select").textContent = t.label_municomp_select;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
 
-    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change, trends: t.title_trends, explore: t.title_explore };
-    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change, trends: t.subtitle_trends, explore: t.subtitle_explore };
+    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change, trends: t.title_trends, explore: t.title_explore, municomp: t.title_municomp };
+    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change, trends: t.subtitle_trends, explore: t.subtitle_explore, municomp: t.subtitle_municomp };
     document.getElementById("plot-title").textContent = titles[state.view];
     document.getElementById("plot-subtitle").textContent = subtitles[state.view];
 
@@ -525,6 +585,8 @@
       renderTrends();
     } else if (state.view === "explore") {
       renderExplore();
+    } else if (state.view === "municomp") {
+      renderMuniComposition();
     } else {
       renderRanking();
     }
@@ -663,8 +725,34 @@
     return clause.length > 60 ? clause.slice(0, 57).trimEnd() + "…" : clause;
   }
 
+  // renderComposition (region-wide) and renderMuniComposition (one
+  // municipality) are the same stacked-area chart over a different series —
+  // shared here as renderStackedComposition/updateStackedGuide/
+  // renderStackedLegend/initStackedHover, parameterized by which series and
+  // which set of DOM ids to draw into. Unlike composition vs. explore
+  // (different chart shapes), these two are genuinely identical logic, so
+  // this is a real shared implementation rather than two copies.
+
   function renderComposition() {
-    const svg = document.getElementById("composition-svg");
+    renderStackedComposition(compositionSeries, { svg: "composition-svg", guide: "comp-guide", legend: "composition-legend" });
+  }
+
+  function updateCompositionGuide() {
+    updateStackedGuide("comp-guide");
+  }
+
+  function renderMuniComposition() {
+    const rows = muniCompositionRowsByMuni.get(state.municompMuni) || [];
+    muniCompositionSeries = buildCompositionSeries(rows, dictionary);
+    renderStackedComposition(muniCompositionSeries, { svg: "municomp-svg", guide: "municomp-guide", legend: "municomp-legend" });
+  }
+
+  function updateMuniCompositionGuide() {
+    updateStackedGuide("municomp-guide");
+  }
+
+  function renderStackedComposition(series, ids) {
+    const svg = document.getElementById(ids.svg);
     svg.innerHTML = "";
 
     const years = [];
@@ -672,7 +760,7 @@
 
     // Stacked cumulative bounds per year, in the fixed series order.
     const cumByYear = new Map(years.map((y) => [y, 0]));
-    const bandBounds = compositionSeries.map((s) => {
+    const bandBounds = series.map((s) => {
       const bottoms = [], tops = [];
       for (const y of years) {
         const bottom = cumByYear.get(y);
@@ -684,7 +772,7 @@
       return { bottoms, tops };
     });
 
-    const maxTotal = Math.max(...years.map((y) => cumByYear.get(y)));
+    const maxTotal = Math.max(...years.map((y) => cumByYear.get(y)), 1);
     const xFor = (year) => COMP_PAD_L + ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
     const yFor = (value) => COMP_PAD_T + (1 - value / maxTotal) * (COMP_VB_H - COMP_PAD_T - COMP_PAD_B);
 
@@ -712,7 +800,7 @@
 
     // Stacked bands, in series order (largest all-time total at the
     // bottom, Outros last/top).
-    compositionSeries.forEach((s, i) => {
+    series.forEach((s, i) => {
       const { bottoms, tops } = bandBounds[i];
       const topPts = years.map((y, j) => `${xFor(y).toFixed(1)},${yFor(tops[j]).toFixed(1)}`);
       const botPts = years.map((y, j) => `${xFor(y).toFixed(1)},${yFor(bottoms[j]).toFixed(1)}`).reverse();
@@ -726,23 +814,23 @@
 
     // Selected-year guide line.
     const guideX = xFor(state.year);
-    addEl("line", { id: "comp-guide", class: "comp-guide", x1: guideX, x2: guideX, y1: COMP_PAD_T, y2: COMP_VB_H - COMP_PAD_B });
+    addEl("line", { id: ids.guide, class: "comp-guide", x1: guideX, x2: guideX, y1: COMP_PAD_T, y2: COMP_VB_H - COMP_PAD_B });
 
-    renderCompositionLegend();
+    renderStackedLegend(series, ids.legend);
   }
 
-  function updateCompositionGuide() {
-    const guide = document.getElementById("comp-guide");
+  function updateStackedGuide(guideId) {
+    const guide = document.getElementById(guideId);
     if (!guide) return;
     const x = COMP_PAD_L + ((state.year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
     guide.setAttribute("x1", x);
     guide.setAttribute("x2", x);
   }
 
-  function renderCompositionLegend() {
-    const legend = document.getElementById("composition-legend");
+  function renderStackedLegend(series, legendId) {
+    const legend = document.getElementById(legendId);
     legend.innerHTML = "";
-    for (const s of compositionSeries) {
+    for (const s of series) {
       const item = document.createElement("div");
       item.className = "legend-item";
       const swatch = document.createElement("span");
@@ -759,12 +847,20 @@
   }
 
   function initCompositionHover() {
-    const area = document.querySelector(".composition-chart-area");
-    const tooltip = document.getElementById("composition-tooltip");
+    initStackedHover({ svg: "composition-svg", area: "composition-chart-area", tooltip: "composition-tooltip", view: "composition" }, () => compositionSeries);
+  }
+
+  function initMuniCompositionHover() {
+    initStackedHover({ svg: "municomp-svg", area: "municomp-chart-area", tooltip: "municomp-tooltip", view: "municomp" }, () => muniCompositionSeries);
+  }
+
+  function initStackedHover(ids, getSeries) {
+    const area = document.getElementById(ids.area);
+    const tooltip = document.getElementById(ids.tooltip);
 
     area.addEventListener("pointermove", (e) => {
-      if (state.view !== "composition") return;
-      const svg = document.getElementById("composition-svg");
+      if (state.view !== ids.view) return;
+      const svg = document.getElementById(ids.svg);
       const rect = svg.getBoundingClientRect();
       const fracX = (e.clientX - rect.left) / rect.width;
       const vbX = fracX * COMP_VB_W;
@@ -775,7 +871,7 @@
         return;
       }
 
-      const rowsHtml = compositionSeries
+      const rowsHtml = getSeries()
         .map((s) => ({ label: productShortLabel(s.produto), full: productLabel(s.produto), color: s.color, valor: s.values.get(year) || 0 }))
         .sort((a, b) => b.valor - a.valor)
         .map((r) => `<div title="${r.full.replace(/"/g, "&quot;")}" style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:2px;background:${r.color};display:inline-block;flex:0 0 auto;"></span><span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.label}</span><span style="flex:0 0 auto;padding-left:8px;">${fmtAbbrev(r.valor)}</span></div>`)
@@ -794,7 +890,7 @@
     });
 
     area.addEventListener("click", (e) => {
-      const svg = document.getElementById("composition-svg");
+      const svg = document.getElementById(ids.svg);
       const rect = svg.getBoundingClientRect();
       const fracX = (e.clientX - rect.left) / rect.width;
       const vbX = fracX * COMP_VB_W;

@@ -82,6 +82,42 @@ products <- list(pt = dic_pt, en = dic_en)
 write_json(products, file.path(out_dir, "products.json"),
            dataframe = "rows", auto_unbox = TRUE, pretty = TRUE)
 
+# ---- Per-municipality product composition (which categories each
+# municipality exports, not just the region-wide total) — drives the
+# municipality composition view. Full municipio x produto x year grid is
+# 446 x 22 x 29 = 284,548 cells but only ~7% are non-zero (this trade data
+# is extremely sparse), so it's exported as a compact index-referencing
+# array rather than one JSON object per cell: municipios/produtos give the
+# lookup tables, cells is [municipio_idx, produto_idx, ano, valor] with
+# zero-value cells dropped entirely. produtos uses the same PT category
+# strings as `group`/products.json's `var` field, so productLabel() in
+# app.js resolves them without a separate lookup. ----
+
+munic_produto_long <- munic_sec %>%
+  select(time, group, all_of(munic_cols)) %>%
+  pivot_longer(all_of(munic_cols), names_to = "municipio", values_to = "valor") %>%
+  filter(valor > 0)
+
+municipios_idx <- sort(unique(munic_produto_long$municipio))
+produtos_idx <- sort(unique(munic_produto_long$group))
+
+muni_composition <- list(
+  municipios = municipios_idx,
+  produtos = produtos_idx,
+  cells = munic_produto_long %>%
+    transmute(
+      municipio_idx = match(municipio, municipios_idx) - 1L,
+      produto_idx = match(group, produtos_idx) - 1L,
+      ano = as.integer(time),
+      valor = round(valor)
+    ) %>%
+    as.matrix() %>%
+    unname()
+)
+
+write_json(muni_composition, file.path(out_dir, "municipality_composition.json"),
+           auto_unbox = TRUE)
+
 # ---- App metadata (year range) ----
 
 dictionary <- list(year_inicio = year_inicio, year_final = year_final)
@@ -93,5 +129,6 @@ cat("Exported:\n",
     " -", file.path(out_dir, "municipality_totals.json"), "\n",
     " -", file.path(out_dir, "region_totals.json"), "\n",
     " -", file.path(out_dir, "composition.json"), "\n",
+    " -", file.path(out_dir, "municipality_composition.json"), "\n",
     " -", file.path(out_dir, "products.json"), "\n",
     " -", file.path(out_dir, "dictionary.json"), "\n")
