@@ -1,6 +1,9 @@
 ############################################################
-# Export static GeoJSON + JSON for a serverless JS/Leaflet rebuild of
-# app_map_comex_exp_sh4_sel.
+# Export static GeoJSON + JSON for the "Mapa" view of the JS rebuild of
+# app_ts_comex_exp_municipio — a serverless rebuild of the (separate,
+# original) app_map_comex_exp_sh4_sel, folded in here as a lazy-loaded
+# view rather than kept as its own app, since it's the same underlying
+# COMEX municipality data as the rest of this app, just a different lens.
 #
 # Geometry export mirrors data-raw's app_map_dz_munic_cempre precedent
 # exactly (same global/*.rds sources, same crs 4326 transform) — that map
@@ -18,7 +21,14 @@
 #
 # The "ratio" mode (forest-dominant vs. not) from the original Shiny app
 # is computed client-side in app.js from the forest+all rows already
-# loaded here, rather than exported as a third redundant dataset.
+# loaded here, rather than exported as a third redundant dataset. No
+# separate dictionary.json either — this dataset's year range (1997-2025)
+# is identical to the rest of the app's, so the map view reuses the
+# already-loaded dictionary/year slider instead of fetching its own.
+#
+# Output goes under web/ts_comex_exp_municipio/data/map/ — a subfolder,
+# not the app's main data/ dir, since app.js only fetches this ~6MB
+# (mostly state-boundary geometry) when the map view is actually opened.
 #
 # Run from repo root: Rscript data-raw/export_map_comex_exp_sh4_sel_web.R
 ############################################################
@@ -27,7 +37,7 @@ library(dplyr)
 library(sf)
 library(jsonlite)
 
-out_dir <- "web/map_comex_exp_sh4_sel/data"
+out_dir <- "web/ts_comex_exp_municipio/data/map"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 # ---- Geometry: Legal Amazon municipalities + boundary overlays ----
@@ -101,17 +111,13 @@ map_data <- list(
 
 write_json(map_data, file.path(out_dir, "map_data.json"), auto_unbox = TRUE)
 
-# ---- App metadata ----
-
-dictionary <- list(
-  year_inicio = min(sel$time, na.rm = TRUE),
-  year_final = max(sel$time, na.rm = TRUE)
-)
-write_json(dictionary, file.path(out_dir, "dictionary.json"), auto_unbox = TRUE, pretty = TRUE)
+# Sanity check only, not exported — confirms this dataset's year range
+# still matches the rest of the app's dictionary.json before relying on
+# the shared one in app.js.
+stopifnot(min(sel$time, na.rm = TRUE) == 1997, max(sel$time, na.rm = TRUE) == 2025)
 
 cat("Exported:\n",
     " -", file.path(out_dir, "municipalities.geojson"), "\n",
     " -", file.path(out_dir, "states_boundary.geojson"), "\n",
     " -", file.path(out_dir, "legal_amazon_boundary.geojson"), "\n",
-    " -", file.path(out_dir, "map_data.json"), "\n",
-    " -", file.path(out_dir, "dictionary.json"), "\n")
+    " -", file.path(out_dir, "map_data.json"), "\n")
