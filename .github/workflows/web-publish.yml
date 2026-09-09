@@ -1,0 +1,39 @@
+name: Publish web/ to datazoom_viz_web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up deploy key for datazoom_viz_web
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VIZ_WEB_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+
+      - name: Clone datazoom_viz_web
+        run: git clone git@github.com:datazoompuc/datazoom_viz_web.git target
+
+      - name: Mirror web/ into target
+        run: rsync -av --delete --exclude=".git" web/ target/
+
+      - name: Commit and push if changed
+        working-directory: target
+        run: |
+          git config user.name "datazoom_viz web sync"
+          git config user.email "viz-web-sync@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+          else
+            git commit -m "Sync from datazoompuc/datazoom_viz@${{ github.sha }}"
+            git push
+          fi
