@@ -23,6 +23,7 @@
       <button class="view-btn" id="view-trends" data-view="trends"></button>
       <button class="view-btn" id="view-explore" data-view="explore"></button>
       <button class="view-btn" id="view-municomp" data-view="municomp"></button>
+      <button class="view-btn" id="view-prodrank" data-view="prodrank"></button>
     </div>
 
     <div class="spacer"></div>
@@ -68,6 +69,13 @@
     <div class="var_selec_group hidden" id="municomp-group">
       <label id="label_municomp_select" for="municomp-select"></label>
       <select id="municomp-select"></select>
+    </div>
+
+    <div class="var_selec_group hidden" id="prodrank-group">
+      <label id="label_prodrank_select" for="prodrank-input"></label>
+      <input type="text" id="prodrank-input" list="prodrank-datalist" autocomplete="off">
+      <datalist id="prodrank-datalist"></datalist>
+      <p class="prodrank-full-label" id="prodrank-full-label"></p>
     </div>
 
     <div class="var_selec_group hidden" id="explore-group">
@@ -168,6 +176,15 @@
           <div id="municomp-tooltip" class="chart-tooltip"></div>
         </div>
         <div id="municomp-legend" class="composition-legend"></div>
+      </div>
+
+      <div id="prodrank-panel" class="ranking-panel hidden">
+        <div class="ranking-header">
+          <span id="prodrank-axis-label" class="ranking-axis-label"></span>
+          <span id="prodrank-total-label" class="region-total-label"></span>
+        </div>
+        <div id="prodrank-rows" class="ranking-rows"></div>
+        <div id="prodrank-tooltip" class="chart-tooltip"></div>
       </div>
     </div>
   </div>

@@ -55,6 +55,12 @@
       title_municomp: "Composição das exportações por município",
       subtitle_municomp: "Categorias de produto exportadas pelo município selecionado, 1997–2025 — passe o mouse para ver o detalhamento",
       label_municomp_select: "Município",
+      view_prodrank: "Produto",
+      title_prodrank: "Ranking de municípios por produto",
+      subtitle_prodrank: "Municípios que mais exportam o produto selecionado, por ano",
+      label_prodrank_select: "Produto (SH4)",
+      prodrank_total_prefix: "Total exportado no ano: ",
+      label_loading: "Carregando…",
       btn_lang: "English"
     },
     en: {
@@ -96,6 +102,12 @@
       title_municomp: "Municipality export composition",
       subtitle_municomp: "Product categories exported by the selected municipality, 1997–2025 — hover to see the breakdown",
       label_municomp_select: "Municipality",
+      view_prodrank: "Product",
+      title_prodrank: "Municipality ranking by product",
+      subtitle_prodrank: "Municipalities exporting the most of the selected product, by year",
+      label_prodrank_select: "Product (SH4)",
+      prodrank_total_prefix: "Total exported that year: ",
+      label_loading: "Loading…",
       btn_lang: "Português"
     }
   };
@@ -119,7 +131,7 @@
     lang: "pt",
     year: null,
     topN: 15,
-    view: "ranking", // "ranking" | "composition" | "change" | "trends" | "explore" | "municomp"
+    view: "ranking", // "ranking" | "composition" | "change" | "trends" | "explore" | "municomp" | "prodrank"
     playing: false,
     playTimer: null,
     changeState: null, // UF filter for the change (dumbbell) view
@@ -128,7 +140,8 @@
     exploreMunis: [], // hand-picked municipalities for the explore view
     exploreLog: false,
     exploreIndex: false,
-    municompMuni: null // selected municipality for the per-municipality composition view
+    municompMuni: null, // selected municipality for the per-municipality composition view
+    prodrankCode: null // selected SH4 product code for the product ranking view
   };
 
   let dictionary, municipalityTotals, regionTotals, composition, products, muniComposition;
@@ -140,6 +153,15 @@
   let ufList; // sorted distinct UF codes
   let muniCompositionRowsByMuni; // municipio -> [{produto, ano, valor}], only municipalities with any exports
   let muniCompositionSeries; // current municompMuni's series, same shape as compositionSeries
+
+  // Product ranking (SH4-level, ~1,142 specific products vs. the 22 broad
+  // SEC categories used elsewhere) is fetched lazily — it's ~1MB, by far
+  // the heaviest dataset in the app, and most visits never open this view.
+  let productRanking = null; // raw {municipios, produtos, cells} once loaded
+  let productRankingPromise = null;
+  let productRankingRowsByCode; // code -> [{municipio, ano, valor}]
+  let productsByCode; // code -> {code, label_pt, label_en}
+  let prodrankLabelToCode; // current-language short label -> code, for the datalist picker
   let sparkSeries = [];
   let sparkXFor = null;
   let sparkYFor = null;
@@ -233,6 +255,81 @@
     return byMuni;
   }
 
+  // ---- Product ranking (SH4): lazy-loaded on first visit to that view ----
+
+  function ensureProductRankingLoaded() {
+    if (productRankingPromise) return productRankingPromise;
+    productRankingPromise = fetchJson(`${DATA_DIR}/product_ranking.json`).then((data) => {
+      productRanking = data;
+      productsByCode = new Map(data.produtos.map((p) => [p.code, p]));
+      productRankingRowsByCode = buildProductRankingIndex(data);
+      if (!state.prodrankCode || !productRankingRowsByCode.has(state.prodrankCode)) {
+        state.prodrankCode = computeTopProductCode();
+        updateUrl();
+      }
+      populateProdrankPicker();
+    });
+    return productRankingPromise;
+  }
+
+  function buildProductRankingIndex(data) {
+    const byCode = new Map();
+    for (const [produtoIdx, municipioIdx, ano, valor] of data.cells) {
+      const code = data.produtos[produtoIdx].code;
+      const municipio = data.municipios[municipioIdx];
+      if (!byCode.has(code)) byCode.set(code, []);
+      byCode.get(code).push({ municipio, ano, valor });
+    }
+    return byCode;
+  }
+
+  function computeTopProductCode() {
+    let best = null, bestTotal = -1;
+    for (const [code, rows] of productRankingRowsByCode.entries()) {
+      let sum = 0;
+      for (const r of rows) sum += r.valor;
+      if (sum > bestTotal) { bestTotal = sum; best = code; }
+    }
+    return best;
+  }
+
+  function prodrankLabel(code) {
+    const p = productsByCode.get(code);
+    if (!p) return code;
+    return state.lang === "en" ? p.label_en : p.label_pt;
+  }
+
+  // Same clause-boundary truncation as SEC product names (productShortLabel)
+  // — official SH4 customs descriptions are just as long (median ~107
+  // chars, max 255) and just as compound-clause-shaped.
+  function prodrankShortLabel(code) {
+    const full = prodrankLabel(code);
+    const clause = full.split(";")[0].trim();
+    return clause.length > 60 ? clause.slice(0, 57).trimEnd() + "…" : clause;
+  }
+
+  function populateProdrankPicker() {
+    const datalist = document.getElementById("prodrank-datalist");
+    datalist.innerHTML = "";
+    prodrankLabelToCode = new Map();
+    const sorted = Array.from(productsByCode.keys())
+      .map((code) => ({ code, label: prodrankShortLabel(code) }))
+      .sort((a, b) => a.label.localeCompare(b.label, state.lang));
+    for (const { code, label } of sorted) {
+      prodrankLabelToCode.set(label, code);
+      const opt = document.createElement("option");
+      opt.value = label;
+      datalist.appendChild(opt);
+    }
+    syncProdrankInput();
+  }
+
+  function syncProdrankInput() {
+    if (!state.prodrankCode) return;
+    document.getElementById("prodrank-input").value = prodrankShortLabel(state.prodrankCode);
+    document.getElementById("prodrank-full-label").textContent = prodrankLabel(state.prodrankCode);
+  }
+
   // ---- State init from query string ----
 
   function initState() {
@@ -248,13 +345,14 @@
     const qLog = params.get("log");
     const qIndex = params.get("index");
     const qMuniComp = params.get("municomp");
+    const qProdrank = params.get("prodrank");
 
     state.lang = qLang === "en" ? "en" : "pt";
     state.year = Number.isFinite(qYear) && qYear >= dictionary.year_inicio && qYear <= dictionary.year_final
       ? qYear
       : dictionary.year_final;
     state.topN = [10, 15, 20, 30].includes(qTopN) ? qTopN : 15;
-    state.view = ["ranking", "composition", "change", "trends", "explore", "municomp"].includes(qView) ? qView : "ranking";
+    state.view = ["ranking", "composition", "change", "trends", "explore", "municomp", "prodrank"].includes(qView) ? qView : "ranking";
     state.changeState = ufList.includes(qState) ? qState : ufList[0];
     state.yearA = Number.isFinite(qYearA) && qYearA >= dictionary.year_inicio && qYearA <= dictionary.year_final
       ? qYearA
@@ -269,6 +367,9 @@
     state.municompMuni = qMuniComp && muniCompositionRowsByMuni.has(qMuniComp)
       ? qMuniComp
       : computeTrendMunicipalities(municipioMeta.size).find((m) => muniCompositionRowsByMuni.has(m));
+    // Validated once product_ranking.json is lazy-loaded (ensureProductRankingLoaded)
+    // — the raw query value is kept provisionally so a shared URL still resolves.
+    state.prodrankCode = qProdrank || null;
   }
 
   function updateUrl() {
@@ -284,6 +385,7 @@
     params.set("log", state.exploreLog ? "1" : "0");
     params.set("index", state.exploreIndex ? "1" : "0");
     params.set("municomp", state.municompMuni || "");
+    params.set("prodrank", state.prodrankCode || "");
     history.replaceState(null, "", `?${params.toString()}`);
   }
 
@@ -313,7 +415,9 @@
     document.getElementById("topn-select").addEventListener("change", (e) => {
       state.topN = parseInt(e.target.value, 10);
       updateUrl();
-      if (state.view === "trends") renderTrends(); else renderRanking();
+      if (state.view === "trends") renderTrends();
+      else if (state.view === "prodrank") renderProdRank();
+      else renderRanking();
     });
 
     document.getElementById("view-ranking").addEventListener("click", () => setView("ranking"));
@@ -322,6 +426,20 @@
     document.getElementById("view-trends").addEventListener("click", () => setView("trends"));
     document.getElementById("view-explore").addEventListener("click", () => setView("explore"));
     document.getElementById("view-municomp").addEventListener("click", () => setView("municomp"));
+    document.getElementById("view-prodrank").addEventListener("click", () => setView("prodrank"));
+
+    const prodrankInput = document.getElementById("prodrank-input");
+    prodrankInput.addEventListener("change", (e) => {
+      const code = prodrankLabelToCode && prodrankLabelToCode.get(e.target.value);
+      if (!code) {
+        syncProdrankInput(); // typed text didn't match a real option — revert
+        return;
+      }
+      state.prodrankCode = code;
+      updateUrl();
+      syncProdrankInput();
+      renderProdRank();
+    });
 
     const municompSelect = document.getElementById("municomp-select");
     const municompMunis = computeTrendMunicipalities(municipioMeta.size).filter((m) => muniCompositionRowsByMuni.has(m));
@@ -416,18 +534,22 @@
     document.getElementById("view-trends").classList.toggle("active", view === "trends");
     document.getElementById("view-explore").classList.toggle("active", view === "explore");
     document.getElementById("view-municomp").classList.toggle("active", view === "municomp");
+    document.getElementById("view-prodrank").classList.toggle("active", view === "prodrank");
     document.getElementById("ranking-panel").classList.toggle("hidden", view !== "ranking");
     document.getElementById("composition-panel").classList.toggle("hidden", view !== "composition");
     document.getElementById("change-panel").classList.toggle("hidden", view !== "change");
     document.getElementById("trends-panel").classList.toggle("hidden", view !== "trends");
     document.getElementById("explore-panel").classList.toggle("hidden", view !== "explore");
     document.getElementById("municomp-panel").classList.toggle("hidden", view !== "municomp");
-    // topn-group is shared between ranking (per-year top-N) and trends
-    // (all-time top-N) — same control, different underlying ranking.
-    document.getElementById("topn-group").classList.toggle("hidden", view !== "ranking" && view !== "trends");
+    document.getElementById("prodrank-panel").classList.toggle("hidden", view !== "prodrank");
+    // topn-group is shared between ranking (per-year top-N), trends
+    // (all-time top-N), and prodrank (per-year top-N for one product) —
+    // same control, different underlying ranking.
+    document.getElementById("topn-group").classList.toggle("hidden", view !== "ranking" && view !== "trends" && view !== "prodrank");
     document.getElementById("change-group").classList.toggle("hidden", view !== "change");
     document.getElementById("explore-group").classList.toggle("hidden", view !== "explore");
     document.getElementById("municomp-group").classList.toggle("hidden", view !== "municomp");
+    document.getElementById("prodrank-group").classList.toggle("hidden", view !== "prodrank");
     document.querySelector(".slider-inline").classList.toggle("hidden", view === "change");
     updateUrl();
     render();
@@ -494,6 +616,8 @@
       updateExploreGuide();
     } else if (state.view === "municomp") {
       updateMuniCompositionGuide();
+    } else if (state.view === "prodrank") {
+      renderProdRank();
     } else {
       renderRanking();
     }
@@ -555,7 +679,9 @@
     document.getElementById("view-trends").textContent = t.view_trends;
     document.getElementById("view-explore").textContent = t.view_explore;
     document.getElementById("view-municomp").textContent = t.view_municomp;
+    document.getElementById("view-prodrank").textContent = t.view_prodrank;
     document.getElementById("ranking-axis-label").textContent = t.ranking_axis_label;
+    document.getElementById("prodrank-axis-label").textContent = t.ranking_axis_label;
     document.getElementById("change-axis-label").textContent = t.change_axis_label;
     document.getElementById("label_state").textContent = t.label_state;
     document.getElementById("label_year_a").textContent = t.label_year_a;
@@ -565,10 +691,13 @@
     document.getElementById("label_log_scale").textContent = t.label_log_scale;
     document.getElementById("label_index_first").textContent = t.label_index_first;
     document.getElementById("label_municomp_select").textContent = t.label_municomp_select;
+    document.getElementById("label_prodrank_select").textContent = t.label_prodrank_select;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
+    // Repopulate the datalist too — its option labels are language-specific.
+    if (productRanking) populateProdrankPicker();
 
-    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change, trends: t.title_trends, explore: t.title_explore, municomp: t.title_municomp };
-    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change, trends: t.subtitle_trends, explore: t.subtitle_explore, municomp: t.subtitle_municomp };
+    const titles = { ranking: t.title_ranking, composition: t.title_composition, change: t.title_change, trends: t.title_trends, explore: t.title_explore, municomp: t.title_municomp, prodrank: t.title_prodrank };
+    const subtitles = { ranking: t.subtitle_ranking, composition: t.subtitle_composition, change: t.subtitle_change, trends: t.subtitle_trends, explore: t.subtitle_explore, municomp: t.subtitle_municomp, prodrank: t.subtitle_prodrank };
     document.getElementById("plot-title").textContent = titles[state.view];
     document.getElementById("plot-subtitle").textContent = subtitles[state.view];
 
@@ -587,10 +716,15 @@
       renderExplore();
     } else if (state.view === "municomp") {
       renderMuniComposition();
+    } else if (state.view === "prodrank") {
+      renderProdRank();
     } else {
       renderRanking();
     }
   }
+
+  const RANKING_IDS = { rows: "ranking-rows", tooltip: "ranking-tooltip", panel: "ranking-panel" };
+  const PRODRANK_IDS = { rows: "prodrank-rows", tooltip: "prodrank-tooltip", panel: "prodrank-panel" };
 
   function renderRanking() {
     const t = I18N[state.lang];
@@ -602,14 +736,48 @@
     document.getElementById("region-total-label").innerHTML =
       regionTotal != null ? t.region_total_prefix + "<b>" + fmtAbbrev(regionTotal) + "</b>" : "";
 
-    const container = document.getElementById("ranking-rows");
+    const container = document.getElementById(RANKING_IDS.rows);
     container.innerHTML = "";
     const frag = document.createDocumentFragment();
-    top.forEach((row, i) => frag.appendChild(buildRankRow(row, i, maxVal)));
+    top.forEach((row, i) => frag.appendChild(buildRankRow(row, i, maxVal, RANKING_IDS)));
     container.appendChild(frag);
   }
 
-  function buildRankRow(row, index, maxVal) {
+  // Product ranking (SH4): same top-N bar list as Ranking, but rows come
+  // from one selected product's municipality breakdown instead of overall
+  // totals — reuses buildRankRow/tooltip wiring via PRODRANK_IDS.
+  function renderProdRank() {
+    const t = I18N[state.lang];
+    const container = document.getElementById(PRODRANK_IDS.rows);
+
+    if (!productRanking) {
+      container.innerHTML = `<div class="prodrank-loading">${t.label_loading}</div>`;
+      document.getElementById("prodrank-total-label").textContent = "";
+      ensureProductRankingLoaded().then(() => {
+        if (state.view === "prodrank") render();
+      });
+      return;
+    }
+
+    const allRows = productRankingRowsByCode.get(state.prodrankCode) || [];
+    const rows = allRows
+      .filter((r) => r.ano === state.year)
+      .map((r) => ({ municipio: r.municipio, valor: r.valor }))
+      .sort((a, b) => b.valor - a.valor);
+    const top = rows.slice(0, state.topN);
+    const maxVal = top.length ? top[0].valor : 1;
+
+    const yearTotal = rows.reduce((sum, r) => sum + r.valor, 0);
+    document.getElementById("prodrank-total-label").innerHTML =
+      rows.length ? t.prodrank_total_prefix + "<b>" + fmtAbbrev(yearTotal) + "</b>" : "";
+
+    container.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    top.forEach((row, i) => frag.appendChild(buildRankRow(row, i, maxVal, PRODRANK_IDS)));
+    container.appendChild(frag);
+  }
+
+  function buildRankRow(row, index, maxVal, ids) {
     const el = document.createElement("div");
     el.className = "rank-row";
 
@@ -637,31 +805,31 @@
     value.textContent = fmtAbbrev(row.valor);
     el.appendChild(value);
 
-    el.addEventListener("pointerenter", (e) => showRankTooltip(e, row, index));
-    el.addEventListener("pointermove", moveRankTooltip);
-    el.addEventListener("pointerleave", hideRankTooltip);
+    el.addEventListener("pointerenter", (e) => showRankTooltip(e, row, index, ids));
+    el.addEventListener("pointermove", (e) => moveRankTooltip(e, ids));
+    el.addEventListener("pointerleave", () => hideRankTooltip(ids));
 
     return el;
   }
 
-  function showRankTooltip(e, row, index) {
-    const tooltip = document.getElementById("ranking-tooltip");
+  function showRankTooltip(e, row, index, ids) {
+    const tooltip = document.getElementById(ids.tooltip);
     tooltip.innerHTML =
       "<strong>" + row.municipio + "</strong><br>" +
       "#" + (index + 1) + " · US$ " + fmtNumber(row.valor);
     tooltip.style.opacity = "1";
-    moveRankTooltip(e);
+    moveRankTooltip(e, ids);
   }
 
-  function moveRankTooltip(e) {
-    const tooltip = document.getElementById("ranking-tooltip");
-    const panelRect = document.getElementById("ranking-panel").getBoundingClientRect();
+  function moveRankTooltip(e, ids) {
+    const tooltip = document.getElementById(ids.tooltip);
+    const panelRect = document.getElementById(ids.panel).getBoundingClientRect();
     tooltip.style.left = (e.clientX - panelRect.left + 12) + "px";
     tooltip.style.top = (e.clientY - panelRect.top + 12) + "px";
   }
 
-  function hideRankTooltip() {
-    document.getElementById("ranking-tooltip").style.opacity = "0";
+  function hideRankTooltip(ids) {
+    document.getElementById(ids.tooltip).style.opacity = "0";
   }
 
   // ---- Composition: stacked area of region-wide export value by product
