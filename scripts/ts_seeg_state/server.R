@@ -11,6 +11,7 @@ get_server <- function(files, param) {
             energy   = readRDS(files$db_file_energy) %>%
                 filter(processos_geradores_emissoes != "Nao Identificado") %>%
                 filter(processos_geradores_emissoes != "Producao de Combustiveis") %>%
+                filter(processos_geradores_emissoes != "NA") %>%
                 filter(!is.na(processos_geradores_emissoes)) %>%
                 rename(categoria = processos_geradores_emissoes),
             farming  = readRDS(files$db_file_farming) %>%
@@ -28,28 +29,39 @@ get_server <- function(files, param) {
         i18n <- reactive({ param$i18n[[lang()]] })
         tbl  <- reactive({ param$tables[[lang()]] })
         
-        # Escolhas agrupadas por setor, com chave "setor::categoria" para evitar
-        # colisão e permitir identificar o dataset a partir da seleção
+        # Escolhas agrupadas por setor, em ordem alfabética (label de exibição),
+        # com chave "setor::categoria" (categoria = valor cru do dado, para
+        # bater com o filtro sem ambiguidade entre setores)
         y_choices_lang <- reactive({
             setores <- names(df_list)
             lapply_result <- lapply(setores, function(s) {
                 cats <- sort(unique(df_list[[s]]$categoria))
                 chave <- paste0(s, "::", cats)
                 if (lang() == "en") {
-                    trad <- unname(param$categoria_traducao[[s]][cats])
-                    trad[is.na(trad)] <- cats[is.na(trad)]  # fallback: mantém nome PT se não houver tradução
-                    setNames(chave, trad)
+                    labels <- unname(param$categoria_traducao[[s]][cats])
                 } else {
-                    setNames(chave, cats)
+                    labels <- unname(param$categoria_label_pt[[s]][cats])
                 }
+                labels[is.na(labels)] <- cats[is.na(labels)]  # fallback: nome cru se faltar tradução/label
+                # ordena alfabeticamente pelo label de exibição, não pela chave crua
+                ord <- order(labels)
+                setNames(chave[ord], labels[ord])
             })
-            setNames(lapply_result, unname(param$setor_labels[[lang()]][names(df_list)]))
+            setNames(lapply_result, unname(param$setor_labels[[lang()]][setores]))
         })
         
-        # Extrai setor e categoria (PT) da chave selecionada
         parse_selection <- function(sel) {
             partes <- strsplit(sel, "::", fixed = TRUE)[[1]]
             list(setor = partes[1], categoria = partes[2])
+        }
+        
+        label_categoria <- function(setor, categoria) {
+            if (lang() == "en") {
+                lbl <- unname(param$categoria_traducao[[setor]][categoria])
+            } else {
+                lbl <- unname(param$categoria_label_pt[[setor]][categoria])
+            }
+            if (is.na(lbl)) categoria else lbl
         }
         
         param$filter_choices <- reactive({
@@ -95,10 +107,22 @@ get_server <- function(files, param) {
         output$label_prop_name <- renderText({ i18n()$label_prop_name })
         output$label_geo_name  <- renderText({ i18n()$label_geo_name })
         
+        # NOVO (itens 4 e 6): disclaimer do setor + estados disponíveis
+        output$setor_disclaimer <- renderText({
+            if (is.null(input$y) || input$y == "") return("")
+            s <- parse_selection(input$y)$setor
+            disc_setor <- i18n()$disclaimer_setor[[s]]
+            estados <- sort(unique(df_list[[s]]$group))
+            estados <- estados[estados != " - " & !is.na(estados)]
+            txt <- paste0(i18n()$disclaimer_estados, paste(estados, collapse = ", "))
+            if (!is.null(disc_setor)) txt <- paste0(disc_setor, " ", txt)
+            txt
+        })
+        
         output$plot_title <- renderText({
             if (is.null(input$y) || input$y == "") return(" ")
             p <- parse_selection(input$y)
-            label <- if (lang() == "en") unname(param$categoria_traducao[[p$setor]][p$categoria]) else p$categoria
+            label <- label_categoria(p$setor, p$categoria)
             text <- paste0(i18n()$title_init, label)
             if (isTRUE(input$y_option)) text <- paste0(text, "*")
             text
@@ -125,7 +149,7 @@ get_server <- function(files, param) {
                 df_filtered <- df_filtered %>%
                     filter(categoria == p$categoria) %>%
                     group_by(time, group = gas) %>%
-                    summarise(valor = sum(Valor, na.rm = TRUE))
+                    summarise(valor = sum(Valor, na.rm = TRUE), .groups = "drop")
                 
                 df_p <- data.frame(df_filtered[x_col$var], df_filtered["valor"], df_filtered["group"])
                 colnames(df_p) <- c("x", "y", "color")
@@ -134,6 +158,9 @@ get_server <- function(files, param) {
                 df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
                 if (nrow(df_p) < 1) { fig <- plotly_empty(); stop() }
                 
+                # unidade de medida (item 3): toneladas por padrão, % se proporcional
+                unidade <- if (isTRUE(input$y_option)) i18n()$tooltip_prop else i18n()$tooltip_c
+                
                 if (isTRUE(input$y_option) & is.numeric(df_p$y)) {
                     df_p <- df_p %>% group_by(df_p$group) %>%
                         mutate(aux1 = first(y), y_option = (y / aux1) * 100)
@@ -141,10 +168,12 @@ get_server <- function(files, param) {
                 }
                 if (all(is.na(df_p$color))) df_p$color <- " "
                 
+                # tooltip com ~2 casas decimais (item 7 de outro pedido) e unidade
+                # correta conforme o modo (item 2: % no proporcional, não toneladas)
                 df_p$tooltip <- paste0(
                     "<b>", df_p$text, "</b><br>", x_col$label, ": ", df_p$x, "<br>",
-                    i18n()$tooltip_a, ": ", format(df_p$y, scientific = FALSE, digits = 2,
-                                                   decimal.mark = ",", big.mark = "."), " ", i18n()$tooltip_c
+                    i18n()$tooltip_a, ": ", trimws(format(round(df_p$y, 2), scientific = FALSE,
+                                                          decimal.mark = ",", big.mark = ".")), " ", unidade
                 )
                 
                 fig_p <- plot_ly(df_p, x = ~x, y = ~y, color = ~group, type = "scatter",
@@ -152,10 +181,13 @@ get_server <- function(files, param) {
                 
                 x_axis_layout <- list(title = x_col$label, titlefont = f1, tickfont = f2,
                                       automargin = TRUE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE)
-                y_axis_layout <- list(title = i18n()$plot_y, titlefont = f1, tickfont = f2,
+                
+                # unidade no título do eixo Y (item 3), trocando conforme o modo
+                y_title <- paste0(i18n()$plot_y, " (", unidade, ")")
+                y_axis_layout <- list(title = y_title, titlefont = f1, tickfont = f2,
                                       automargin = FALSE, autorange = TRUE, showgrid = FALSE, zeroline = FALSE)
                 if (isTRUE(input$ylog) & is.numeric(df_p$y)) y_axis_layout$type <- "log"
-                if (isTRUE(input$y_option)) y_axis_layout$title <- paste0(i18n()$plot_y, "*")
+                if (isTRUE(input$y_option)) y_axis_layout$title <- paste0(y_title, "*")
                 
                 fig_p <- fig_p %>%
                     layout(font = f1, xaxis = x_axis_layout, yaxis = y_axis_layout,

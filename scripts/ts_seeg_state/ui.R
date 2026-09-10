@@ -49,9 +49,13 @@ get_ui <- function(files, param) {
                        )
                    ),
                    
-                   selectInput("filter1", textOutput("label_geo_name", inline = TRUE),
-                               choices = NULL, width = "100%"),
-                   
+                  selectInput("filter1", textOutput("label_geo_name", inline = TRUE),
+                  choices = NULL, width = "100%"),
+
+div(
+  style = "font-size: 12px; color: white; opacity: 0.85; margin-top: 8px;",
+  textOutput("setor_disclaimer")
+),
                    div(class = "fakecheckbox", ),
                    
                    div(
