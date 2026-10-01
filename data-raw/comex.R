@@ -1,5 +1,9 @@
 ############################################################
 #### Generate rds data in the folder ./data/
+####
+#### Para atualizar: rodar o script inteiro. O ano final é o último
+#### disponível na fonte (ver ultimo_ano_fonte) e o deflator é baixado
+#### da SIDRA a cada rodada. Só mexer nos parâmetros abaixo se precisar.
 ############################################################
 
 library(datazoom.amazonia)
@@ -8,8 +12,33 @@ library(tidyverse)
 library(stringr)
 library(httr)
 library(jsonlite)
+library(sidrar)
 
-dat <- load_br_trade(dataset="comex_export_mun", language = "pt", time_period = 1997:2025, raw_data = FALSE)
+# Parâmetros
+ano_inicial <- 1997
+ano_base    <- NULL   # NULL = usa o último ano que tem deflator (ver base única, abaixo)
+
+# Os arquivos anuais do MDIC têm ~50 MB; o timeout padrão do R (60 s) é curto
+options(timeout = max(1200, getOption("timeout")))
+
+# Último ano disponível na fonte: confere (sem baixar o arquivo) se o CSV anual
+# do MDIC existe, do ano atual para trás.
+ultimo_ano_fonte <- function(ano_inicial) {
+    for (a in as.integer(format(Sys.Date(), "%Y")):ano_inicial) {
+        url <- sprintf("https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_%d_MUN.csv", a)
+        r <- tryCatch(httr::HEAD(url, httr::timeout(60)),
+                      error = function(e) { message(a, ": ", conditionMessage(e)); NULL })
+        if (!is.null(r) && httr::status_code(r) == 200) return(a)
+        message(a, ": indisponível", if (!is.null(r)) paste0(" (HTTP ", httr::status_code(r), ")"))
+    }
+    stop("Nenhum ano disponível na fonte a partir de ", ano_inicial)
+}
+
+ano_final <- ultimo_ano_fonte(ano_inicial)
+message("COMEX: ", ano_inicial, " a ", ano_final)
+
+dat <- load_br_trade(dataset = "comex_export_mun", language = "pt",
+                     time_period = ano_inicial:ano_final, raw_data = FALSE)
 
 dat <- inner_join(
     dat,
@@ -126,6 +155,63 @@ matriz <- dat
 aux1 <- readRDS("data/auxiliar_cod_pais.rds")
 aux2 <- readRDS("data/auxiliar_cod_sh4.rds")
 aux3 <- readRDS("data/auxiliar_cod_municipais.rds")
+
+
+# ================================================================
+# DEFLATOR E BASE ÚNICA
+# ================================================================
+
+# --- Deflator implícito do PIB (IBGE/SIDRA) ---
+# TODO: confirmar no SIDRA (Contas Nacionais, PIB anual) as duas tabelas:
+#   - PIB a preços correntes (R$)
+#   - índice de volume do PIB
+# Em "Gerar API" no SIDRA sai a string que vai em api =.
+# Conferir que sobra uma linha por ano; se vier mais de uma variável ou
+# setor, filtrar antes (o stopifnot abaixo avisa).
+pib_nom <- sidrar::get_sidra(api = "<API do PIB a preços correntes>")
+pib_vol <- sidrar::get_sidra(api = "<API do índice de volume do PIB>")
+
+deflator <- inner_join(
+    pib_nom %>% transmute(ano = as.integer(`Ano (Código)`), nominal = Valor),
+    pib_vol %>% transmute(ano = as.integer(`Ano (Código)`), vol = Valor),
+    by = "ano"
+) %>%
+    mutate(def = nominal / vol)
+
+stopifnot(!anyDuplicated(deflator$ano))
+
+# reescala para o ano-base (def = 1 nesse ano)
+if (is.null(ano_base)) ano_base <- max(deflator$ano)
+deflator <- deflator %>% mutate(def = def / def[ano == ano_base])
+message("Deflator: ano-base ", ano_base, ", série até ", max(deflator$ano))
+
+# ATENÇÃO: valor_fob está em US$. Confirmar com o Antonio se é isso mesmo
+# (deflator do PIB do Brasil aplicado em dólar) antes de fechar.
+
+# --- Base única, formato longo ---
+# Os pivots (largo/transposto) de cada bloco abaixo saem daqui no futuro.
+base <- dat %>%
+    mutate(cod_sh4 = sprintf("%04d", as.numeric(cod_sh4))) %>%
+    group_by(ano, cod_sh4, cod_municipio, uf) %>%
+    summarise(valor_nominal = sum(valor_fob, na.rm = TRUE), .groups = "drop") %>%
+    left_join(select(deflator, ano, def), by = "ano") %>%
+    mutate(valor_real = valor_nominal / def) %>%   # NA nos anos sem deflator
+    select(-def)
+
+anos_sem_def <- setdiff(unique(base$ano), deflator$ano)
+if (length(anos_sem_def) > 0) {
+    warning("Sem deflator para: ", paste(anos_sem_def, collapse = ", "),
+            " (valor_real fica NA)")
+}
+
+# Checagens
+stopifnot(!anyDuplicated(base[, c("ano", "cod_sh4", "cod_municipio")]))
+stopifnot(isTRUE(all.equal(sum(base$valor_nominal), sum(dat$valor_fob, na.rm = TRUE))))
+no_base <- base$ano == ano_base
+stopifnot(isTRUE(all.equal(sum(base$valor_nominal[no_base]),
+                           sum(base$valor_real[no_base]))))
+
+saveRDS(base, "data/comex_exp_munic_base.rds")
 
 
 # ================================================================
@@ -386,19 +472,19 @@ datafinal <- readRDS(file = "data/comex_exp_tot_pais.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia",
-  subcategoria = "Comércio exterior"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economia",
+    subcategoria = "Comércio exterior"
 )
 
 temp_param_table$label[2] <- "País"
@@ -461,19 +547,19 @@ datafinal <- readRDS(file = "data/comex_exp_sec_pais.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia",
-  subcategoria = "Comércio exterior"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economia",
+    subcategoria = "Comércio exterior"
 )
 
 temp_param_table$label[2] <- "País"
@@ -529,19 +615,19 @@ datafinal <- readRDS(file = "data/comex_exp_pais_sec.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economy",
-  subcategoria = "Trade"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economy",
+    subcategoria = "Trade"
 )
 temp_param_table$label[1] <- "Year"
 temp_param_table$label[2] <- "Country"
@@ -571,19 +657,19 @@ datafinal <- readRDS(file = "data/comex_exp_munic_sh4.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia",
-  subcategoria = "Comércio exterior"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economia",
+    subcategoria = "Comércio exterior"
 )
 
 temp_param_table$label[2] <- "Produção sh4"
@@ -606,19 +692,19 @@ datafinal <- readRDS(file = "data/comex_exp_sh4_munic.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia",
-  subcategoria = "Comércio exterior"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economia",
+    subcategoria = "Comércio exterior"
 )
 
 temp_param_table$label[2] <- "Município"
@@ -676,19 +762,19 @@ datafinal <- readRDS(file = "data/comex_exp_munic_sh2.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia",
-  subcategoria = "Comércio exterior"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economia",
+    subcategoria = "Comércio exterior"
 )
 
 temp_param_table$label[2] <- "Produção sh2"
@@ -748,19 +834,19 @@ datafinal <- readRDS(file = "data/comex_exp_sh2_munic.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia",
-  subcategoria = "Comércio exterior"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economia",
+    subcategoria = "Comércio exterior"
 )
 
 temp_param_table$label[2] <- "Município"
@@ -818,19 +904,19 @@ datafinal <- readRDS(file = "data/comex_exp_munic_sec.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia",
-  subcategoria = "Comércio exterior"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economia",
+    subcategoria = "Comércio exterior"
 )
 
 temp_param_table$label[2] <- "Produção sec"
@@ -885,19 +971,19 @@ datafinal <- readRDS(file = "data/comex_exp_sec_munic.rds")
 columns <- colnames(datafinal)
 
 temp_param_table <- tibble(
-  var = columns,
-  x = TRUE,
-  y = TRUE,
-  color = FALSE,
-  size = FALSE,
-  slider = FALSE,
-  label = columns,
-  desc = columns,
-  var_group = "Comex",
-  tipo = 1,
-  unidade = "US$",
-  categoria= "Economia",
-  subcategoria = "Comércio exterior"
+    var = columns,
+    x = TRUE,
+    y = TRUE,
+    color = FALSE,
+    size = FALSE,
+    slider = FALSE,
+    label = columns,
+    desc = columns,
+    var_group = "Comex",
+    tipo = 1,
+    unidade = "US$",
+    categoria= "Economia",
+    subcategoria = "Comércio exterior"
 )
 
 temp_param_table$label[2] <- "Município"
