@@ -1,0 +1,8 @@
+"","var","x","y","color","label","desc","var_group","categoria","subcategoria","slider"
+"1","group",FALSE,FALSE,TRUE,"Region","Region","IBGE - Continuous PNAD","Economia","Mercado de Trabalho",FALSE
+"2","setor",FALSE,FALSE,TRUE,"Sector","Sector","IBGE - Continuous PNAD","Economia","Mercado de Trabalho",FALSE
+"3","composicao_demografica",FALSE,FALSE,TRUE,"Activity / Occupation","Economic Activity or Occupation","IBGE - Continuous PNAD","Economia","Mercado de Trabalho",FALSE
+"4","time",FALSE,FALSE,TRUE,"Quarter - Year","Quarter - Year","IBGE - Continuous PNAD","Economia","Mercado de Trabalho",TRUE
+"5","ocupado",TRUE,FALSE,TRUE,"Employed people","Employed people","IBGE - Continuous PNAD","Economia","Mercado de Trabalho",FALSE
+"6","rendimento_medio",TRUE,FALSE,TRUE,"Mean income","Real mean usual income","IBGE - Continuous PNAD","Economia","Mercado de Trabalho",FALSE
+"7","massa_salarial",TRUE,FALSE,TRUE,"Total wage","Total wage (R$)","IBGE - Continuous PNAD","Economia","Mercado de Trabalho",FALSE

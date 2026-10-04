@@ -12,6 +12,7 @@ Este tutorial explica como implementar as três atualizações de UI que estão 
 4. [Toggle de agregação com `actionButton` (segmented control)](#4-toggle-de-agregação-com-actionbutton-segmented-control)
 5. [Inversão de eixos (swap / transposição)](#5-inversão-de-eixos-swap--transposição)
 6. [Unidade de medida explícita no eixo (gráficos) ou na legenda (mapas)](#6-unidade-de-medida-explícita-no-eixo-gráficos-ou-na-legenda-mapas)
+7. [Legenda retrátil no Leaflet (dropdown / hover / pin)](#7-legenda-retrátil-no-leaflet-dropdown--hover--pin)
 
 ---
 
@@ -610,6 +611,48 @@ Esse padrão (reaproveitado também em `ts_comex_exp_pais_sec` e `ts_comex_exp_m
 
 > **Padrão de implementação recomendado:** a unidade quase sempre já existe como uma variável local (`unidade_x`, `unidade_y`, `x_col$unidade`) calculada para o tooltip — reaproveite essa mesma variável no `title` do eixo (`x_axis_layout`/`y_axis_layout`) ou da legenda (`addLegend(title = ...)`), em vez de duplicar a lógica ou criar uma chave nova em `i18n()`.
 
+> ⚠️ **Gotcha de Dicionário com Unidade Duplicada (Complemento à Seção 6):**
+>
+> - **Problema:** Se o arquivo `dic.csv` já tiver a unidade escrita dentro da coluna `label` (ex.: `"Mortalidade bruta por 100 mil habitantes"`) e a coluna `unidade` também estiver preenchida (`"por 100 mil habitantes"`), a regra de montagem da legenda (`paste0(label, " (", unidade, ")")`) gera texto redundante: `"Mortalidade bruta por 100 mil habitantes (por 100 mil habitantes)"`.
+> - **Regra:** O `label` no `dic.csv` deve conter estritamente o nome limpo da variável (`"Mortalidade bruta"`), deixando a unidade apenas na coluna `unidade`.
+
+---
+
+## 7. Legenda retrátil no Leaflet (dropdown / hover / pin)
+
+Em mapas do Leaflet com legendas coropléticas grandes (ex: 9 intervalos/bins de cores), a caixa fixa da legenda no canto inferior direito pode cobrir áreas substanciais do mapa, especialmente em telas menores ou dispositivos móveis.
+
+Para manter o mapa limpo e acessível, adotamos o padrão de **legenda retrátil estilo dropdown**:
+- **Estado padrão:** recolhida mostrando apenas a primeira linha / título.
+- **Ao passar o mouse (`:hover`):** expande suavemente com animação de `max-height`.
+- **Ao clicar:** fixa aberta (`.pinned`), permitindo ao usuário navegar no mapa com a legenda aberta se desejar.
+
+### Implementação no `ui.R`
+
+Adicione o bloco de CSS e o handler JS dentro do `div()` principal do `ui.R`:
+
+```r
+tags$style(type = "text/css", "
+  /* Legenda retrátil no hover para não poluir o mapa */
+  .legend {
+    max-height: 28px;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, opacity 0.3s;
+    opacity: 0.85;
+    cursor: pointer;
+  }
+  .legend:hover, .legend.pinned {
+    max-height: 500px;
+    opacity: 1;
+  }
+"),
+tags$script(HTML("
+  $(document).on('click', '.legend', function() {
+    $(this).toggleClass('pinned');
+  });
+"))
+```
+
 ---
 
 ## Resumo: o que muda em cada arquivo
@@ -618,13 +661,14 @@ Esse padrão (reaproveitado também em `ts_comex_exp_pais_sec` e `ts_comex_exp_m
 |---|---|
 | `app_meuapp.R` | Adicionar `library(shinyWidgets)` e `library(shinycssloaders)`; montar `param$i18n` e `param$tables` |
 | `app_meuapp_en.R` | **Deletar** (não é mais necessário) |
-| `scripts/meuapp/ui.R` | Trocar `checkboxInput` por `materialSwitch`; envolver plot com `withSpinner`; adicionar botão `toggle_lang`; usar `textOutput`/`uiOutput` para textos dinâmicos |
-| `scripts/meuapp/server.R` | Adicionar `reactiveVal`, `observeEvent(toggle_lang)`, `observeEvent(lang())` para atualizar inputs e botões |
+| `scripts/meuapp/ui.R` | Trocar `checkboxInput` por `materialSwitch`; envolver plot com `withSpinner`; adicionar botão `toggle_lang`; usar `textOutput`/`uiOutput` para textos dinâmicos; adicionar CSS da legenda retrátil se for mapa |
+| `scripts/meuapp/server.R` | Adicionar `reactiveVal`, `observeEvent(toggle_lang)`, `observeEvent(lang())` para atualizar inputs e botões; acoplar `htmlwidgets::onRender` direto no `renderLeaflet` se for mapa |
 
-### Padrões opcionais (seções 4 e 5)
+### Padrões opcionais (seções 4, 5 e 7)
 
 | Padrão | Quando usar | Arquivos-chave |
 |---|---|---|
 | Toggle de agregação (segmented control, seção 4) | Duas alternativas de igual peso (Estado/Município, SH2/SEC) | `global/dza_lumen.css`: classes `.seg-*` (já existem). `ui.R`: `tags$script` handler + dois `actionButton` com classe `seg-btn`. `server.R`: `reactiveVal` + `observeEvent` por botão + `sendCustomMessage` |
 | Inversão de eixos (swap, seção 5) | Inverter entidade fixada ↔ série comparada | `data-raw/`: um `.rds` por orientação. `server.R`: `orient`/`mode` reactives, `observeEvent(input$swap)`, remontagem de inputs preservando seleção |
+| Legenda retrátil / dropdown (seção 7) | Mapas Leaflet com legenda extensa | `scripts/<app>/ui.R`: tags de estilo `.legend` + toggle de classe `.pinned` no click |
 

@@ -4,7 +4,6 @@
 library(dplyr)
 library(data.table)
 
-
 # Função para criar lista nomeada hierarquica dos grupos (para que as variáveis apareçam agrupadas no selectinput)
 grouped_list <- function(df) {
   # cria lista hierarquica a partir de dataframe, para os selecinputs
@@ -21,14 +20,12 @@ grouped_list <- function(df) {
   return(grouped_list)
 }
 
-
-
 # Função para retornar parâmetros da base
 get_db_param <-
   function(param_filename = "param.csv", db_filename = "") {
     # Se arquivo de parametros não existe, cria um vazio
     if (!file.exists(param_filename)) {
-      temp_db <- read.csv(db_filename)
+      temp_db <- read.csv(db_filename, fileEncoding = "UTF-8") # Convenção importante = UTF-8
       columns <- colnames(temp_db)
       rm(temp_db)
       temp_param_table <- data_frame(
@@ -45,10 +42,8 @@ get_db_param <-
 
       write.csv(temp_param_table, file = param_filename)
     }
-
-
     # Carrega arquivo de parâmetros
-    param_table <- fread(param_filename, encoding = "UTF-8")
+    param_table <- fread(param_filename, encoding = "UTF-8") # Convenção importante = UTF-8
 
     # Cria lista de parâmetros
     param <- list(
@@ -56,22 +51,20 @@ get_db_param <-
       # define colunas possíveis para cada dimensão
       x_cols = param_table[which(param_table$x)],
       y_cols = param_table[which(param_table$y)],
-      color_cols = param_table[which(param_table$color)],
-      size_cols = param_table[which(param_table$size)],
-      slider_cols = param_table[which(param_table$slider)]
+      color_cols = param_table[which(param_table$color)] # ,
+      # size_cols = param_table[which(param_table$size)]
     )
 
     # Define escolhas agrupadas para cada selectinput
     param$x_choices <- append("", grouped_list(param$x_cols))
     param$y_choices <- append("", grouped_list(param$y_cols))
     param$color_choices <- append("", grouped_list(param$color_cols))
-    param$size_choices <- append("", grouped_list(param$size_cols))
-    param$slider_choices <- append("", grouped_list(param$slider_cols))
+    ## param$size_choices <- append("",grouped_list(param$size_cols))
 
     # Define coluna padrão para cada dimensão
     param$x_def <- ""
     param$y_def <- ""
-    param$size_def <- ""
+    ## param$size_def <- ""
     param$color_def <- ""
     param$text_def <- ""
     param$slider_def <- ""

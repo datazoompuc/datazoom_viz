@@ -5,8 +5,12 @@ output:
         css: textstyle.css
 ---
 
-```{r, fig.align = "center", out.height = "200px", echo = FALSE}
-knitr::include_graphics(sub("\\.Rmd$", ".png", knitr::current_input()))
+```{r, echo = FALSE, results = "asis"}
+cat(paste0(
+  '<div style="text-align:center;"><img src="',
+  sub("\\.Rmd$", ".png", knitr::current_input()),
+  '" style="max-height:200px; width:auto; object-fit:contain;"></div>'
+))
 ```
 
 Omeasoo Wahpasiw é professora de Estudos Indígenas na Universidade de Carleton. Historiadora, é Mestra pela Universidade de Ottawa e Doutora pela Universidade de Saskatchewan, com a tese: "Habitação, arquitetura e territórios domésticos Tla'amin no século XX: espaços invisíveis moldando a educação indígena histórica". Foi coautora da "Apresentação da Comissão de Mulheres da Federação das Nações Indígenas Soberanas à Investigação Nacional sobre Mulheres e Meninas Indígenas Desaparecidas e Assassinadas e Pessoas 2SLGBTQQIA". Nascida na província de Saskatchewan, Omeasoo cresceu na cidade de Saskatoon, e hoje vive em território Algonquin não cedido. Filha da poetisa Louise Halfe e de um homem branco não-indígena, Omeasoo cresceu entre o território Nehiyaw de sua mãe e a cidade de Saskatoon; por essa vivência entre-mundos, refere-se a si mesma como uma "aborígena urbana".
@@ -26,7 +30,7 @@ Ouça a entrevista completa:
 
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/FPxaGfg0fwM) [![Spotify](spotify.png)](https://open.spotify.com/episode/3Qj9nMrGNqVWwnHdkHJQV7)
+<a href="https://youtu.be/FPxaGfg0fwM" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/3Qj9nMrGNqVWwnHdkHJQV7" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

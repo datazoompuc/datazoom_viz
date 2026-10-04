@@ -31,7 +31,7 @@ Em aymara, Omaguaca significa "água sagrada". Esse elemento, indiscutivelmente 
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/6n4cosrdNPM?si=7avsZpSl0FZA0IGK) [![Spotify](spotify.png)](https://open.spotify.com/episode/1IyWTEy3N7HnWbHGaTZWsK?si=lMC5nZL6TOuLhJhXID6cpA&nd=1&dlsi=ec1435a840134373)
+<a href="https://youtu.be/6n4cosrdNPM?si=7avsZpSl0FZA0IGK" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/1IyWTEy3N7HnWbHGaTZWsK?si=lMC5nZL6TOuLhJhXID6cpA&nd=1&dlsi=ec1435a840134373" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

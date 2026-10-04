@@ -21,7 +21,7 @@ O povo Mebêngôkre, “aquele de origem do olho d’água”, foi chamado de Ka
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/6QSBwBRyjaU?si=AIQbpSlvVXgdFMnQ) [![Spotify](spotify.png)](https://open.spotify.com/episode/6dvx3Mj6vjCySABSR0fpsI?si=-M0pGsIXRp62YsI2m2NYBA)
+<a href="https://youtu.be/6QSBwBRyjaU?si=AIQbpSlvVXgdFMnQ" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/6dvx3Mj6vjCySABSR0fpsI?si=-M0pGsIXRp62YsI2m2NYBA" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

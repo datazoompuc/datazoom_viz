@@ -5,8 +5,12 @@ output:
         css: textstyle.css
 ---
 
-```{r, fig.align = "center", out.height = "200px", echo = FALSE}
-knitr::include_graphics(sub("\\.Rmd$", ".png", knitr::current_input()))
+```{r, echo = FALSE, results = "asis"}
+cat(paste0(
+  '<div style="text-align:center;"><img src="',
+  sub("\\.Rmd$", ".png", knitr::current_input()),
+  '" style="max-height:200px; width:auto; object-fit:contain;"></div>'
+))
 ```
 
 Ao apresentar-se, é frequente que José Quintero Weir inicie sua fala referenciando a linhagem feminina de sua família: Julia, Izabel, Berta e Victória — mãe, avó, bisavó e tataravó. Tal prática, explica José, é um protocolo tradicional do povo Añú ao dialogar com o Outro, simbolizando não apenas a genealogia pessoal, mas a centralidade das mulheres na preservação da história e da memória coletiva. Como ele próprio sintetiza: "são elas que caminham antes para que possamos caminhar".
@@ -29,7 +33,7 @@ Linguisticamente, o idioma Añú integra a família Arawak (Maipure), compondo u
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://www.youtube.com/playlist?list=PL28cki-vqjxoHNUWzzoLfDS5AnlHSz96T) [![Spotify](spotify.png)](https://open.spotify.com/episode/3kr1o5Djhj1QPpYEqIsGQk)
+<a href="https://www.youtube.com/playlist?list=PL28cki-vqjxoHNUWzzoLfDS5AnlHSz96T" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/3kr1o5Djhj1QPpYEqIsGQk" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

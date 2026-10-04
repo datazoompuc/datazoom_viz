@@ -31,7 +31,7 @@ O povo K'iche' enfrenta diversos desafios políticos e sociais na Guatemala. A d
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/Qhg-ChuVWgY?si=adpZMa6rPGav1xb0) [![Spotify](spotify.png)](https://creators.spotify.com/pod/show/caminhos-de-abya-yala/episodes/Intelectuais-indgenas-do-continente-americano---Temporada-2-8-Ana-Lucia-Ixchu-e2sjcr7)
+<a href="https://youtu.be/Qhg-ChuVWgY?si=adpZMa6rPGav1xb0" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://creators.spotify.com/pod/show/caminhos-de-abya-yala/episodes/Intelectuais-indgenas-do-continente-americano---Temporada-2-8-Ana-Lucia-Ixchu-e2sjcr7" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

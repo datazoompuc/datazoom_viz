@@ -70,6 +70,18 @@ get_server <- function(files, param) {
         output$label_var_ui  <- renderUI({ p(class  = "vars",      txt()$label_var_name) })
         output$label_scale_ui <- renderUI({ tags$span(txt()$label_scale_name, class = "switch-title") })
         output$label_prop_ui  <- renderUI({ tags$span(txt()$label_prop_name,  class = "switch-title") })
+        output$last_quarter_ui <- renderUI({
+            last_ano <- max(df$Ano)
+            last_tri <- max(df$Trimestre[df$Ano == last_ano])
+            notice <- if (lang() == "pt")
+                paste0("Valores em R$ de ", last_ano, "-T", last_tri)
+            else
+                paste0("Values in ", last_ano, "-Q", last_tri, " BRL")
+            tags$p(
+                style = "color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 10px; margin-bottom: 4px;",
+                notice
+            )
+        })
 
         # Atualiza todos os inputs quando a língua muda
         observeEvent(lang(), {

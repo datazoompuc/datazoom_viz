@@ -41,7 +41,7 @@ Apesar da colocação do cacique, a escola indígena, inaugurada em janeiro de 2
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/_ukj3SFwjIE?si=td64p3ki_uutEOTg) [![Spotify](spotify.png)](https://open.spotify.com/episode/6Q17OXEzOI0JFBHZuGTCX7?si=021118a3e7084b01)
+<a href="https://youtu.be/_ukj3SFwjIE?si=td64p3ki_uutEOTg" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/6Q17OXEzOI0JFBHZuGTCX7?si=021118a3e7084b01" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

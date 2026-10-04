@@ -29,7 +29,7 @@ Um outro ponto que também não pode deixar de ser comentado são as escolas ind
 Ouça a entrevista completa:
 
 ::: {.icons}
-[![YouTube](youtube.png)](https://youtu.be/dvyUEb0oUvU?si=AescgrNbtF-5ltCM) [![Spotify](spotify.png)](https://open.spotify.com/episode/4YhjCKLsoe2EsCxCQ9Ynb0?si=Q_Ix3EX0Tc-PMVb2TImmFA&nd=1&dlsi=3b573328c8364ab5)
+<a href="https://youtu.be/dvyUEb0oUvU?si=AescgrNbtF-5ltCM" target="_blank"><img src="youtube.png" alt="YouTube"></a> <a href="https://open.spotify.com/episode/4YhjCKLsoe2EsCxCQ9Ynb0?si=Q_Ix3EX0Tc-PMVb2TImmFA&nd=1&dlsi=3b573328c8364ab5" target="_blank"><img src="spotify.png" alt="Spotify"></a>
 :::
 ::::
 

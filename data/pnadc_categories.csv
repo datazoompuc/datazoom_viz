@@ -99,3 +99,19 @@ cnae;Atividade Econômica;Economic Activity;Serviços pessoais (cabelereiros, la
 cnae;Atividade Econômica;Economic Activity;Terceirização de mão-de-obra;Terceirização de mão-de-obra;Labor outsourcing;1;28
 cnae;Atividade Econômica;Economic Activity;Têxtil, vestuário, couro e calçados;Têxtil, vestuário, couro e calçados;Textiles, clothing, leather and footwear;1;29
 cnae;Atividade Econômica;Economic Activity;Transporte e correio;Transporte e correio;Transport and mail;1;30
+
+composicao_demografica;Todos;All;Todos;Todos;All;1;1
+composicao_demografica;Sexo;Sex;Homem;Homem;Male;2;1
+composicao_demografica;Sexo;Sex;Mulher;Mulher;Female;2;2
+composicao_demografica;Faixa Etária;Age Group;Entre 14 e 17 anos;Entre 14 e 17 anos;Between 14 and 17;3;1
+composicao_demografica;Faixa Etária;Age Group;Entre 18 e 24 anos;Entre 18 e 24 anos;Between 18 and 24;3;2
+composicao_demografica;Faixa Etária;Age Group;Entre 25 e 29 anos;Entre 25 e 29 anos;Between 25 and 29;3;3
+composicao_demografica;Faixa Etária;Age Group;Entre 30 e 39 anos;Entre 30 e 39 anos;Between 30 and 39;3;4
+composicao_demografica;Faixa Etária;Age Group;Entre 40 e 49 anos;Entre 40 e 49 anos;Between 40 and 49;3;5
+composicao_demografica;Faixa Etária;Age Group;Entre 50 e 59 anos;Entre 50 e 59 anos;Between 50 and 59;3;6
+composicao_demografica;Faixa Etária;Age Group;60 anos ou mais;60 anos ou mais;60 or older;3;7
+composicao_demografica;Escolaridade;Schooling;Sem instrução;Sem instrução;No formal education;4;1
+composicao_demografica;Escolaridade;Schooling;1 a 7 anos de estudo;1 a 7 anos de estudo;1-7 years of schooling;4;2
+composicao_demografica;Escolaridade;Schooling;8 a 11 anos de estudo;8 a 11 anos de estudo;8-11 years of schooling;4;3
+composicao_demografica;Escolaridade;Schooling;9 a 14 anos de estudo;9 a 14 anos de estudo;9-14 years of schooling;4;4
+composicao_demografica;Escolaridade;Schooling;15 ou mais anos de estudo;15 ou mais anos de estudo;15 or more years of schooling;4;5
