@@ -1,50 +1,63 @@
-pkgs <- c("tidyverse","openxlsx","data.table","lubridate","magrittr","stringr")
+# Índice de preços de exportação (MDIC) -> data/indice_precos_anual.csv
+# Usado pelos apps de série/ranking do COMEX para deflacionar valores em US$ (base 1998 = 100).
+#
+# Fonte: https://balanca.economia.gov.br/balanca/IPQ/totais_mes.html
+# ("Baixar: Dados brutos (.csv)"). A série começa em 1998, por isso a base 100 é 1998.
+#
+# Como atualizar:
+#   1. Rode este script a partir da raiz do repositório (setwd("~/datazoom_viz")).
+#   2. Se `url_ipq` estiver preenchida, o arquivo é baixado automaticamente.
+#      Se estiver NULL, baixe o CSV na página acima e salve em data/Dados_totais_mensal.csv.
 
-aux <- rownames(installed.packages())
+library(tidyverse)
 
-for (pkg in pkgs) {
-  print(pkg)
-  
-  if (pkg %in% aux) {
-    library(pkg, character.only = TRUE)
-    print(paste("pacote", pkg, "loaded"))
-  } else{
-    install.packages(pkg)
-    library(pkg, character.only = TRUE)
-    print(paste("pacote", pkg, "installed and loaded"))
-  }
+# Cole aqui o endereço do botão "Baixar: Dados brutos (.csv)" (botão direito -> copiar endereço do link)
+url_ipq <- NULL
+
+arquivo_bruto <- "data/Dados_totais_mensal.csv"
+
+if (!dir.exists("data")) {
+  stop("Pasta 'data/' não encontrada em ", getwd(), ". Rode setwd() para a raiz do repositório.")
 }
 
-# Raw data from https://balanca.economia.gov.br/balanca/IPQ/totais_mes.html#:~:text=%C3%8Dndices%20de%20Pre%C3%A7os%20e%20Quantum%20%2D%20Total%20Mensal
-# downloaded from "Baixar: Dados brutos (.csv)" button
-# Those contain price index for exports. Note, however, that it starts from 1998, so we are not able to fix
-# the base 100 in 1997.
-indice_precos_quantum <- read_csv2("data/Dados_totais_mensal.csv",col_names = TRUE,col_types = cols(
-  TIPO = col_character(),
-  TIPO_INDICE = col_character(),
-  CO_ANO = col_number(),
-  CO_MES = col_number(),
-  NO_CLASSIFICACAO = col_character(),
-  INDICE = col_double()))
-indice_precos <- indice_precos_quantum %>%
-  filter(TIPO=="EXP"&TIPO_INDICE=="PRECO")
-indice_precos$NO_CLASSIFICACAO <- NULL
-indice_precos$TIPO <- NULL
-indice_precos$TIPO_INDICE <- NULL
+if (!is.null(url_ipq)) {
+  options(timeout = max(300, getOption("timeout")))
+  download.file(url_ipq, arquivo_bruto, mode = "wb")
+} else if (!file.exists(arquivo_bruto)) {
+  stop("Arquivo ", arquivo_bruto, " não encontrado. Baixe o CSV em ",
+       "https://balanca.economia.gov.br/balanca/IPQ/totais_mes.html e salve nesse caminho.")
+}
 
-indice_precos$date <- as.Date(paste(indice_precos$CO_ANO, indice_precos$CO_MES, "01", sep = "-"))
-
-# Proceeded as in the original source: took the annual average to determine annual value of the index
-# and rescaled index to have base 100 in 1998
-indice_precos_anual <- aggregate(INDICE ~ CO_ANO, indice_precos, mean)
-indice_ref <- indice_precos_anual$INDICE[1]
-indice_precos_anual$indice_anual_base1998 <- indice_precos_anual$INDICE/indice_ref*100
-
-write.csv(
-  indice_precos_anual, 
-  file.path(
-    "data/indice_precos_anual.csv"
-  ), 
-  row.names = TRUE
+indice_precos_quantum <- read_csv2(
+  arquivo_bruto,
+  col_names = TRUE,
+  col_types = cols(
+    TIPO = col_character(),
+    TIPO_INDICE = col_character(),
+    CO_ANO = col_number(),
+    CO_MES = col_number(),
+    NO_CLASSIFICACAO = col_character(),
+    INDICE = col_double()
+  )
 )
 
+indice_precos <- indice_precos_quantum %>%
+  filter(TIPO == "EXP" & TIPO_INDICE == "PRECO") %>%
+  select(CO_ANO, CO_MES, INDICE)
+
+stopifnot(nrow(indice_precos) > 0)
+
+ult <- indice_precos %>% arrange(desc(CO_ANO), desc(CO_MES)) %>% slice(1)
+message("Índice de preços de exportação: último dado = ", ult$CO_ANO, "-", sprintf("%02d", ult$CO_MES))
+
+# Valor anual = média dos meses disponíveis (o último ano pode ser parcial)
+indice_precos_anual <- aggregate(INDICE ~ CO_ANO, indice_precos, mean)
+indice_precos_anual <- indice_precos_anual[order(indice_precos_anual$CO_ANO), ]
+
+# Reescala para base 100 em 1998
+indice_ref <- indice_precos_anual$INDICE[indice_precos_anual$CO_ANO == 1998]
+stopifnot(length(indice_ref) == 1)
+indice_precos_anual$indice_anual_base1998 <- indice_precos_anual$INDICE / indice_ref * 100
+rownames(indice_precos_anual) <- NULL
+
+write.csv(indice_precos_anual, file = "data/indice_precos_anual.csv", row.names = TRUE)

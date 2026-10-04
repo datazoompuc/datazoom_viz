@@ -33,9 +33,18 @@ options(timeout = max(1200, getOption("timeout")))
 ultimo_ano_fonte <- function(ano_inicial) {
   for (a in as.integer(format(Sys.Date(), "%Y")):ano_inicial) {
     url <- sprintf("https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_%d_MUN.csv", a)
+    # Erro de conexão (site fora do ar, certificado inválido, sem internet) é
+    # diferente de "ano ainda não publicado": para na hora, com o motivo,
+    # em vez de varrer todos os anos e dizer que nenhum existe.
     r <- tryCatch(httr::HEAD(url, httr::timeout(60)),
-                  error = function(e) { message(a, ": ", conditionMessage(e)); NULL })
-    if (!is.null(r) && httr::status_code(r) == 200) {
+                  error = function(e) {
+                    stop("Não consegui conectar ao site do MDIC (", url, "): ",
+                         conditionMessage(e),
+                         "\nNão é problema do script: confira a internet ou se o site está com ",
+                         "erro (por exemplo, certificado vencido) e tente de novo mais tarde.",
+                         call. = FALSE)
+                  })
+    if (httr::status_code(r) == 200) {
       tipo <- httr::headers(r)[["content-type"]]
       tam  <- suppressWarnings(as.numeric(httr::headers(r)[["content-length"]]))
       if (length(tam) == 0) tam <- NA_real_
