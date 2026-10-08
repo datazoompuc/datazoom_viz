@@ -67,7 +67,7 @@ Os apps de série e ranking do COMEX (por exemplo `app_ts_comex_exp_tot_pais.R` 
 
 ## Observações
 
-- A lista de SH4 "compatíveis com a floresta" (16 códigos) está escrita em dois lugares, `comex_munic_sel.R` e `comex_percentual.R`. Conferido em 04/10/2026: as duas listas são iguais. Se uma mudar, a outra precisa mudar junto.
+- A lista de SH4 "compatíveis com a floresta" (16 códigos) fica em um único arquivo, `data-raw/sh4_floresta.R`, lido por `comex_munic_sel.R` (mapa) e `comex_percentual.R` (gráfico de %). Para mudar a classificação, edite só esse arquivo e rode os dois scripts de novo. (Antes, a lista estava escrita nos dois scripts; em 04/10/2026 as duas eram idênticas.)
 - O ano mais recente do COMEX pode ser parcial (em 2026, só alguns meses), o que faz as séries caírem no último ponto.
 - O mapa do site (`web/ts_comex_exp_municipio`, branch `poc/js-ts-comex-exp-municipio`) calcula a classificação do mapa no `app.js` (`computeMapRatioClass`), não nos scripts R.
 
