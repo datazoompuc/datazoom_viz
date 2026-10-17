@@ -31,8 +31,9 @@ get_server <- function(files, param) {
         
         output$map <- renderLeaflet({
             leaflet(regions) %>%
-                addTiles(attribution = '| <a href = "https://native-land.ca/">Native Land Digital</a>') %>%
-                addProviderTiles("CartoDB.DarkMatter") %>%
+                addProviderTiles("Esri.WorldGrayCanvas",
+                                 options = providerTileOptions(className = "tiles-escuros")) %>%
+                htmlwidgets::onRender("function(el, x) { this.attributionControl.addAttribution('<a href=\"https://native-land.ca/\">Native Land Digital</a>'); }") %>%
                 addControl(
                     html = '<button onclick="Shiny.setInputValue(\'showHelp\', Math.random())"
                       style="background:#007BFF;color:white;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;">
