@@ -1,6 +1,7 @@
 ############################################################
 #### COMEX: exportações municipais da Amazônia Legal (MDIC)
-#### Gera todos os .rds e dicionários .csv da COMEX em ./data/
+#### Gera, em ./data/, a base longa comex_exp_munic_base.rds e as
+#### auxiliares de código (países e hierarquia de produtos SH4/SH2/seção).
 ####
 #### Fonte: Comex Stat / MDIC, via datazoom.amazonia::load_br_trade
 #### (dataset "export_mun"). Valores em US$ FOB (nominais, sem deflator)
@@ -13,12 +14,8 @@
 ####
 #### Seções:
 ####   1. Download e dado bruto
-####   2. Auxiliares (países, SH4, municípios)
+####   2. Auxiliares (países e hierarquia de produtos)
 ####   3. Base central (longo, com valor e quantidade)
-####   4. Bases largas/transpostas (município, país × SH4/SH2/seção)
-####   5. Dicionários das bases da seção 4
-####   6. Mapa: principal produto por município (comex_exp_munic_sh4_sel)
-####   7. Participação nas exportações mundiais (comex_exp_perc_sh4_sel)
 ############################################################
 
 library(datazoom.amazonia)
@@ -46,36 +43,26 @@ options(timeout = max(1200, getOption("timeout")))
 # ----------------------------------------------------------------
 # Acesso ao site do MDIC
 # ----------------------------------------------------------------
-# O site balanca.economia.gov.br costuma estar com a cadeia de certificado
-# incompleta (erro SSL 60). Primeiro tenta com verificação normal; se der erro
-# de certificado, repete sem verificar e avisa. Vale só para estes arquivos
-# públicos do MDIC (decisão combinada com o Antônio).
+# O site balanca.economia.gov.br está com a cadeia de certificado incompleta
+# (erro SSL 60) e a verificação sempre falha. Por isso as requisições vão
+# direto, sem verificar o certificado. Vale só para estes arquivos públicos
+# do MDIC (decisão combinada com o Antônio).
 mdic_estado <- new.env()
-mdic_estado$sem_verificacao <- FALSE
+mdic_estado$sem_verificacao <- TRUE
 
 mdic_get <- function(url, metodo = "GET") {
-    tentar <- function(verificar) {
-        req <- httr2::request(url)
-        req <- httr2::req_method(req, metodo)
-        req <- httr2::req_timeout(req, 1200)
-        # o status HTTP é tratado por quem chama
-        req <- httr2::req_error(req, is_error = function(resp) FALSE)
-        if (!verificar) req <- httr2::req_options(req, ssl_verifypeer = 0L)
-        httr2::req_perform(req)
-    }
+    req <- httr2::request(url)
+    req <- httr2::req_method(req, metodo)
+    req <- httr2::req_timeout(req, 1200)
+    req <- httr2::req_options(req, ssl_verifypeer = 0L)
+    # o status HTTP é tratado por quem chama
+    req <- httr2::req_error(req, is_error = function(resp) FALSE)
     tryCatch(
-        tentar(!mdic_estado$sem_verificacao),
+        httr2::req_perform(req),
         error = function(e) {
-            msg <- rlang::cnd_message(e)
-            if (!grepl("SSL|certificate|certificado", msg, ignore.case = TRUE)) {
-                stop("Não consegui conectar ao MDIC (", url, "): ", msg,
-                     "\nConfira a internet ou se o site está fora do ar e tente de novo mais tarde.",
-                     call. = FALSE)
-            }
-            message("Certificado SSL do MDIC não pôde ser verificado (", url, "). ",
-                    "Repetindo sem verificação, só para este site público.")
-            mdic_estado$sem_verificacao <- TRUE
-            tentar(FALSE)
+            stop("Não consegui conectar ao MDIC (", url, "): ", rlang::cnd_message(e),
+                 "\nConfira a internet ou se o site está fora do ar e tente de novo mais tarde.",
+                 call. = FALSE)
         }
     )
 }
