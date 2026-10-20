@@ -119,7 +119,7 @@ message("COMEX: ", ano_inicial, " a ", ano_final)
 # só durante esta chamada.
 opcoes_antigas <- options()[c("download.file.method", "download.file.extra")]
 if (mdic_estado$sem_verificacao) {
-    options(download.file.method = "curl", download.file.extra = "-k -L")
+    options(download.file.method = "curl", download.file.extra = "-k -L -C - --retry 30 --retry-all-errors --retry-delay 3 --speed-limit 5000 --speed-time 60")
 }
 # A tabela de produtos (NCM_SH.csv) também fica no site do MDIC com certificado
 # incompleto, e o load_br_trade() a lê direto da URL (readr), sem passar pelo
