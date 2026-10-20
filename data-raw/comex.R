@@ -121,6 +121,22 @@ opcoes_antigas <- options()[c("download.file.method", "download.file.extra")]
 if (mdic_estado$sem_verificacao) {
     options(download.file.method = "curl", download.file.extra = "-k -L")
 }
+# A tabela de produtos (NCM_SH.csv) também fica no site do MDIC com certificado
+# incompleto, e o load_br_trade() a lê direto da URL (readr), sem passar pelo
+# curl -k. Enquanto o pacote não for corrigido, troca-se aqui a função interna
+# load_trade_dic() por uma versão que baixa o arquivo com mdic_arquivo().
+load_trade_dic_mdic <- function(type) {
+    nome <- switch(type, hs = "NCM_SH.csv", ncm = "NCM.csv", stop("tipo inválido: ", type))
+    arq  <- mdic_arquivo(paste0("https://balanca.economia.gov.br/balanca/bd/tabelas/", nome))
+    readr::read_delim(arq, delim = ";", locale = readr::locale(encoding = "Latin1"),
+                      progress = FALSE, show_col_types = FALSE) %>%
+        dplyr::mutate_if(is.character, function(var) {
+            stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+        }) %>%
+        janitor::clean_names()
+}
+utils::assignInNamespace("load_trade_dic", load_trade_dic_mdic, ns = "datazoom.amazonia")
+
 municipios_amz <- datazoom.amazonia::municipalities[, c("code_muni", "legal_amazon")]
 
 # O servidor do MDIC derruba conexões ao acaso em downloads grandes. Por isso o
@@ -137,7 +153,7 @@ baixar_ano <- function(a, tentativas = 5) {
             load_br_trade(dataset = "export_mun", language = "pt",
                           time_period = a, raw_data = FALSE),
             error = function(e) {
-                message(a, ": tentativa ", i, " de ", tentativas, " falhou")
+                message(a, ": tentativa ", i, " de ", tentativas, " falhou: ", substr(paste(rlang::cnd_message(e), collapse = " "), 1, 400))
                 NULL
             })
         if (!is.null(d)) {
