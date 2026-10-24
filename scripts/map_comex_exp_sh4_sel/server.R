@@ -218,7 +218,7 @@ get_server <- function(files, param) {
       update_my_queryString()
 
       fig <- leaflet() %>%
-        addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
+        addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
         setView(-58, -7, zoom = 5)
 
       vals <- df_reactived()[["nome_sh2"]]
@@ -256,14 +256,14 @@ get_server <- function(files, param) {
 
           fig_p <- df_reactived() %>%
             leaflet() %>%
-            addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
+            addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
             setView(-58, -7, zoom = 5) %>%
             addPolygons(
               data = df_reactived(),
               label = labels,
               stroke = FALSE,
               smoothFactor = .5,
-              fillOpacity = 0.7,
+              fillOpacity = 1,
               fillColor = ~ pal(df_reactived()[["nome_sh2"]]),
               highlightOptions = highlightOptions(
                 weight = 5,
@@ -277,7 +277,7 @@ get_server <- function(files, param) {
                       pal = pal,
                       values = ~ df_reactived()[["nome_sh2"]],
                       title = i18n()$legend,
-                      opacity = 0.7
+                      opacity = 1
             )
 
           fig <- fig_p

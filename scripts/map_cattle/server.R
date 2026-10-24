@@ -118,7 +118,7 @@ get_server <- function(files, param) {
       update_my_queryString() # atualiza url com parametros dos inputs
 
       fig <- leaflet() %>%
-        addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
+        addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
         setView(-58, -7, zoom = 5) # inicia figura com gráfico em branco
 
       # Define paleta de cores
@@ -184,13 +184,13 @@ get_server <- function(files, param) {
 
           fig_p <- df_reactived() %>% 
             leaflet() %>%
-            addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
+            addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
             setView(-58, -7, zoom = 5) %>%
             addPolygons(
               label = labels,
               stroke = FALSE,
               smoothFactor = .5,
-              fillOpacity = 0.7,
+              fillOpacity = 1,
               fillColor = ~ pal(df_reactived()[[input$x]]),
               highlightOptions = highlightOptions(
                 weight = 5,
@@ -204,7 +204,7 @@ get_server <- function(files, param) {
               pal = pal,
               values = ~ df_reactived()[[input$x]],
               title = title_legend,
-              opacity = 0.7
+              opacity = 1
             )
 
           legal_amazon_boundary <- readr::read_rds(files$legal_amazon)
