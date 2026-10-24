@@ -12,11 +12,11 @@ setwd("~/datazoom_viz")
 source("data-raw/comex.R")
 ```
 
-O script descobre sozinho o último ano disponível no site do MDIC (`ano_inicial` é o único parâmetro) e sempre baixa os dados de novo. Se o ano mais recente não for detectado, defina `ano_final_manual`.
+O último ano vem do `available_time` do manifest do `datazoom.amazonia` (`ano_inicial` é o único parâmetro; use `ano_final_manual` para forçar outro) e o script sempre baixa os dados de novo.
 
-O servidor do MDIC tem certificado SSL incompleto e costuma derrubar conexões em arquivos grandes. Por isso o script não verifica o certificado (só para esse site público), baixa ano a ano, retoma o download de onde caiu e repete até 5 vezes cada ano. Os anos já baixados ficam guardados, então, se o script parar em algum ano, basta rodar de novo na mesma sessão do R.
+O servidor do MDIC (balanca.mdic.gov.br) tem a cadeia de certificado incompleta (visto no macOS) e costuma derrubar conexões em arquivos grandes. Por isso os downloads usam o curl do sistema sem verificar o certificado (só para esses arquivos públicos), retomam de onde caíram e repetem até 5 vezes por ano. Os anos já baixados ficam guardados, então, se o script parar em algum ano, basta rodar de novo na mesma sessão do R.
 
-O `datazoom.amazonia::load_br_trade()` lê o `NCM_SH.csv` direto da URL e ignora as opções de download. O script contorna isso substituindo `load_trade_dic()` durante a execução.
+O script precisa do `datazoom.amazonia` com o dicionário do COMEX baixado por `download.file()` (PR `comex-dicionario-download-file`). Enquanto o PR não for mergeado, rode antes `devtools::load_all("~/datazoom.amazonia")` na branch desse PR; depois do merge, basta instalar o pacote atualizado. O ano final e a URL do dicionário são lidos com funções internas do pacote (`:::`).
 
 ## Arquivos gerados
 
