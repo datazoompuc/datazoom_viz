@@ -1,7 +1,7 @@
 ############################################################
 #### COMEX: exportações municipais da Amazônia Legal (MDIC)
-#### Gera, em ./data/, a base longa comex_exp_munic_base.rds e as
-#### auxiliares de código (países e hierarquia de produtos SH4/SH2/seção).
+#### Gera, em ./data/, a base longa comex_exp_munic_base.rds, já com os
+#### nomes de país e de produto (SH4/SH2/seção, em PT e EN). Não gera arquivos auxiliares.
 ####
 #### Fonte: Comex Stat / MDIC, via datazoom.amazonia::load_br_trade
 #### (dataset "export_mun"). Valores em US$ FOB (nominais, sem deflator)
@@ -20,7 +20,7 @@
 ####
 #### Seções:
 ####   1. Download e dado bruto
-####   2. Auxiliares (países e hierarquia de produtos)
+####   2. Nomes de países e de produtos (só em memória, para juntar à base)
 ####   3. Base central (longo, com valor e quantidade)
 ############################################################
 
@@ -120,21 +120,29 @@ dat <- dplyr::bind_rows(lapply(ano_inicial:ano_final, baixar_ano))
 
 
 # --- Países (aux1) ---
-# API MDIC: nomes em PT e EN para o mapa de tradução e para o dataset tot_pais/pais_sec/sec_pais
-paises_api <- function(idioma) {
-  url <- paste0("https://api-comexstat.mdic.gov.br/general/filters/country?language=", idioma)
-  d <- jsonlite::fromJSON(url, simplifyDataFrame = TRUE)$data
-  # a doc mostra que às vezes vem aninhado; isso deixa robusto:
-  if (is.list(d) && length(d) == 1 && is.data.frame(d[[1]])) d <- d[[1]]
-  as_tibble(d) %>%
-    transmute(SISCOMEX = str_pad(id, 3, pad = "0"), nome = text) %>%
-    distinct(SISCOMEX, .keep_all = TRUE)
-}
-
-aux1 <- paises_api("pt") %>%
-  rename(NO_PT = nome) %>%
-  left_join(rename(paises_api("en"), NO_EN = nome), by = "SISCOMEX")
-saveRDS(aux1, "data/auxiliar_cod_pais.rds")
+# PAIS.csv do MDIC (mesmo servidor e mesma pasta do NCM_SH.csv): código e nomes
+# em PT e EN. Substitui a API do Comex Stat, que às vezes responde 503.
+arq_pais <- tempfile(fileext = ".csv")
+withr::with_options(
+  opcoes_mdic,
+  utils::download.file(
+    sub("NCM_SH\\.csv$", "PAIS.csv",
+        datazoom.amazonia:::dataset_url("comex_dic", "hs_codes")),
+    arq_pais, mode = "wb", quiet = TRUE
+  )
+)
+aux1 <- readr::read_csv2(
+  arq_pais,
+  locale = readr::locale(encoding = "latin1"),
+  col_types = readr::cols(.default = "c")
+) %>%
+  transmute(
+    SISCOMEX = str_pad(str_trim(CO_PAIS), 3, pad = "0"),
+    NO_PT    = str_trim(NO_PAIS),
+    NO_EN    = str_trim(NO_PAIS_ING)
+  ) %>%
+  distinct(SISCOMEX, .keep_all = TRUE)
+stopifnot(nrow(aux1) > 200)
 
 
 # --- Hierarquia de produto (aux2) ---
@@ -167,13 +175,12 @@ aux2 <- ncm_sh %>%
     NO_SEC_EN = str_trim(NO_SEC_ING)
   ) %>%
   distinct(CO_SH4, .keep_all = TRUE)
-saveRDS(aux2, "data/auxiliar_cod_sh4.rds")
 
 
 # ================================================================
 # BASE CENTRAL
 # ================================================================
-# Formato longo: ano × SH4 × município × UF. Sem deflator (decisão do
+# Formato longo: ano × SH4 × município × UF × país de destino. Sem deflator (decisão do
 # Antonio, out/2026): valor nominal em US$ FOB mais a quantidade em kg,
 # que serve de base para qualquer cálculo de valor real depois.
 #
@@ -185,12 +192,25 @@ meses_por_ano <- dat %>%
   mutate(ano_parcial = n_meses < 12)
 
 base <- dat %>%
-  mutate(cod_sh4 = sprintf("%04d", as.numeric(cod_sh4))) %>%
-  group_by(ano, cod_sh4, cod_municipio, uf) %>%
+  mutate(cod_sh4  = sprintf("%04d", as.numeric(cod_sh4)),
+         cod_pais = str_pad(as.character(cod_pais), 3, pad = "0")) %>%
+  group_by(ano, cod_sh4, cod_municipio, uf, cod_pais) %>%
   summarise(valor_fob = sum(valor_fob, na.rm = TRUE),
             kg_liquido = sum(kg_liquido, na.rm = TRUE),
             .groups = "drop") %>%
-  left_join(meses_por_ano, by = "ano")
+  left_join(meses_por_ano, by = "ano") %>%
+  left_join(
+    transmute(aux1, cod_pais = SISCOMEX, pais_pt = NO_PT, pais_en = NO_EN),
+    by = "cod_pais"
+  ) %>%
+  left_join(
+    transmute(aux2, cod_sh4 = CO_SH4,
+              sh4_pt = NO_SH4_PT, sh4_en = NO_SH4_EN,
+              sh2_pt = NO_SH2_PT, sh2_en = NO_SH2_EN,
+              sec_pt = NO_SEC_PT, sec_en = NO_SEC_EN),
+    by = "cod_sh4"
+  ) %>%
+  mutate(cod_sh2 = substr(cod_sh4, 1, 2), .after = cod_sh4)
 
 if (any(base$ano_parcial)) {
   message("Ano(s) parcial(is): ",
@@ -198,9 +218,22 @@ if (any(base$ano_parcial)) {
 }
 
 # Checagens
-stopifnot(!anyDuplicated(base[, c("ano", "cod_sh4", "cod_municipio")]))
+stopifnot(!anyDuplicated(base[, c("ano", "cod_sh4", "cod_municipio", "cod_pais")]))
 stopifnot(isTRUE(all.equal(sum(base$valor_fob), sum(dat$valor_fob, na.rm = TRUE))))
 stopifnot(isTRUE(all.equal(sum(base$kg_liquido), sum(dat$kg_liquido, na.rm = TRUE))))
 stopifnot("kg_liquido" %in% names(base))
+
+# Nenhum nome pode ficar vazio depois das juncoes
+rotulos <- c("pais_pt", "pais_en", "sh4_pt", "sh4_en",
+             "sh2_pt", "sh2_en", "sec_pt", "sec_en")
+sem_rotulo <- vapply(rotulos, function(v) sum(is.na(base[[v]])), numeric(1))
+if (any(sem_rotulo > 0)) {
+  print(sem_rotulo[sem_rotulo > 0])
+  print(base %>%
+          filter(if_any(all_of(rotulos), is.na)) %>%
+          distinct(cod_pais, cod_sh4) %>%
+          head(30))
+  stop("Há linhas sem nome de país ou de produto (códigos acima).", call. = FALSE)
+}
 
 saveRDS(base, "data/comex_exp_munic_base.rds")
