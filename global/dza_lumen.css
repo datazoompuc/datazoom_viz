@@ -11057,3 +11057,8 @@ html,body{height:100%;}
   flex: 1 1 auto;
   min-width: 0;
 }
+/* Legendas dos mapas Leaflet: fundo opaco sobre o relevo */
+.leaflet-container .info.legend {
+  background: #ffffff !important;
+  opacity: 1 !important;
+}
