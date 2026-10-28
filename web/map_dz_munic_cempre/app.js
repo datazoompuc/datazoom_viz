@@ -29,6 +29,8 @@
       btn_snapshot: "Salvar imagem",
       btn_snapshot_busy: "Gerando imagem…",
       snapshot_error: "Não foi possível gerar a imagem. Veja o console para detalhes.",
+      label_load_error: "Não foi possível carregar os dados.",
+      label_retry: "Tentar novamente",
       dumbbell_note: (n) => `${n} município(s) sem dado em um dos dois anos selecionados`,
       btn_lang: "English"
     },
@@ -49,6 +51,8 @@
       btn_snapshot: "Save image",
       btn_snapshot_busy: "Generating image…",
       snapshot_error: "Couldn't generate the image — see console for details.",
+      label_load_error: "Could not load the data.",
+      label_retry: "Try again",
       dumbbell_note: (n) => `${n} municipalit${n === 1 ? "y" : "ies"} missing data in one of the selected years`,
       btn_lang: "Português"
     }
@@ -187,9 +191,24 @@
     render();
     document.getElementById("spinner").classList.add("hidden");
   }).catch((err) => {
+    // Os dados principais falharam, então não há mapa nenhum para mostrar.
+    // Isto antes levantava um alert() pedindo para conferir o console e
+    // rodar o script de export — recado para quem desenvolve, não para
+    // quem abriu a página. O detalhe fica no console; a página só diz que
+    // não carregou e oferece recarregar.
+    //
+    // initState() não chegou a rodar, então o idioma vem direto da URL.
     console.error("Failed to load data", err);
     document.getElementById("spinner").classList.add("hidden");
-    alert("Failed to load map data — see console. Did you run the export script and serve this folder over HTTP?");
+    const lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "pt";
+    const t = I18N[lang];
+    const panel = document.createElement("div");
+    panel.className = "fatal-error";
+    panel.innerHTML =
+      `<p class="fatal-error-text">${escapeHtml(t.label_load_error)}</p>` +
+      `<button type="button" class="retry-btn" id="fatal-reload">${escapeHtml(t.label_retry)}</button>`;
+    document.querySelector(".map-wrap").appendChild(panel);
+    document.getElementById("fatal-reload").addEventListener("click", () => location.reload());
   });
 
   function fetchJson(url) {
@@ -515,7 +534,7 @@
 
   function tooltipHtml(t, varMeta, row, value) {
     return [
-      t.label_munic_name, row ? row.nm_municip : "—", "</b><br>",
+      t.label_munic_name, row ? escapeHtml(row.nm_municip) : "—", "</b><br>",
       t.label_state_name, row ? row.estado : "—", "</b><br>",
       varMeta.label, ": <b>", fmtNumber(value), "</b><br>",
       t.label_measurement_unit, varMeta.unidade, "</b>"
@@ -700,8 +719,18 @@
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (err) {
+      // Falha de ação do usuário: mostra no próprio botão por alguns
+      // segundos em vez de abrir um alert(), que bloqueia a página inteira
+      // por causa de um PNG que não saiu.
       console.error("Snapshot failed", err);
-      alert(t.snapshot_error);
+      btn.classList.add("snapshot-error");
+      label.textContent = t.snapshot_error;
+      setTimeout(() => {
+        btn.classList.remove("snapshot-error");
+        label.textContent = t.btn_snapshot;
+        btn.disabled = false;
+      }, 4000);
+      return;
     } finally {
       btn.disabled = false;
       label.textContent = t.btn_snapshot;
@@ -1123,6 +1152,10 @@
     document.getElementById("label_year").textContent = t.label_year;
     document.getElementById("plot-title").textContent = t.label_title;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
+    // index.html nasce com lang="pt-BR"; sem isto um leitor de tela lê o
+    // conteúdo em inglês com fonética portuguesa. Aqui, e não no handler do
+    // toggle, para cobrir também o carregamento com ?lang=en.
+    document.documentElement.lang = numLocale();
     document.getElementById("label_compare_state").textContent = t.label_compare_state;
     if (!document.getElementById("snapshot-btn").disabled) {
       document.getElementById("snapshot-btn-label").textContent = t.btn_snapshot;
@@ -1416,8 +1449,20 @@
     return { r: (v >> 16) & 255, g: (v >> 8) & 255, b: v & 255 };
   }
 
+  // pt-BR e en-US discordam dos dois separadores, então um número na
+  // convenção errada não é só estranho: "1.234" é mil para um público e
+  // 1,234 para o outro.
+  function numLocale() {
+    return state.lang === "en" ? "en-US" : "pt-BR";
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
   function fmtNumber(x) {
     if (x === null || x === undefined || Number.isNaN(x)) return "";
-    return Number(x).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+    return Number(x).toLocaleString(numLocale(), { maximumFractionDigits: 2 });
   }
 })();

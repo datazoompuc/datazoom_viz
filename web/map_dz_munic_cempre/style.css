@@ -390,6 +390,41 @@ html, body {
 }
 .spinner.hidden { display: none; }
 
+/* Falha ao carregar os dados principais: não há mapa nenhum, então cobre a
+   área toda. Portado do app de COMEX, mesma convenção visual. */
+.fatal-error {
+  position: absolute;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.fatal-error-text { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+.retry-btn {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.retry-btn:hover { background: #f6f2ea; }
+
+/* Erro ao gerar a imagem: aparece no próprio botão por alguns segundos,
+   em vez de um alert() que trava a página inteira. */
+.snapshot-error { opacity: 1 !important; }
+.snapshot-error #snapshot-btn-label { font-size: 0.78rem; line-height: 1.2; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ---- Compare-years: a ranked dumbbell chart (year A vs year B dots per
