@@ -152,6 +152,62 @@ export_aggregation <- function(level, col_pt, col_en) {
 export_aggregation("sec", "sec_pt", "sec_en")
 export_aggregation("sh2", "sh2_pt", "sh2_en")
 
+# ---- Destination country ----
+#
+# Same three outputs as a SEC/SH2 aggregation, with the destination country
+# in the categorical slot instead of a product category. Kept as its own
+# block (rather than a third export_aggregation call) only because the
+# column names and output filenames differ; the shape is identical, which
+# is what lets the app treat "pais" as just another level.
+#
+# Lazily fetched by the app: the municipio x pais x ano grid is 2.7% dense,
+# so the sparse format matters even more here than for SH2.
+
+por_pais_municipio <- base %>%
+  group_by(municipio, pais = pais_pt, ano) %>%
+  summarise(valor = sum(valor), .groups = "drop") %>%
+  filter(valor > 0)
+
+composition_pais <- por_pais_municipio %>%
+  group_by(pais, ano) %>%
+  summarise(valor = round(sum(valor)), .groups = "drop") %>%
+  arrange(pais, ano)
+
+write_json(composition_pais, file.path(out_dir, "composition_pais.json"),
+           dataframe = "rows", auto_unbox = TRUE)
+
+paises_idx <- sort(unique(por_pais_municipio$pais))
+municipios_pais_idx <- sort(unique(por_pais_municipio$municipio))
+
+muni_pais <- list(
+  municipios = municipios_pais_idx,
+  paises = paises_idx,
+  cells = por_pais_municipio %>%
+    transmute(
+      municipio_idx = match(municipio, municipios_pais_idx) - 1L,
+      pais_idx = match(pais, paises_idx) - 1L,
+      ano = as.integer(ano),
+      valor = round(valor)
+    ) %>%
+    as.matrix() %>%
+    unname()
+)
+write_json(muni_pais, file.path(out_dir, "municipality_composition_pais.json"),
+           auto_unbox = TRUE)
+
+dic_pais <- base %>%
+  distinct(var = pais_pt, label_en = pais_en) %>%
+  filter(var %in% paises_idx) %>%
+  arrange(var)
+
+write_json(list(pt = dic_pais %>% transmute(var, label = var),
+                en = dic_pais %>% transmute(var, label = coalesce(label_en, var))),
+           file.path(out_dir, "paises.json"),
+           dataframe = "rows", auto_unbox = TRUE, pretty = TRUE)
+
+cat(sprintf(" - %d paises, %d celulas nao-zero (pais)\n",
+            length(paises_idx), nrow(por_pais_municipio)))
+
 # ---- Municipality and region totals (all products, all destinations) ----
 
 munic_totals <- base %>%
@@ -235,6 +291,9 @@ cat("Exported:\n",
     " -", file.path(out_dir, "products_sec.json"), "\n",
     " -", file.path(out_dir, "products_sh2.json"), "\n",
     " -", file.path(out_dir, "product_ranking.json"), "\n",
+    " -", file.path(out_dir, "composition_pais.json"), "\n",
+    " -", file.path(out_dir, "municipality_composition_pais.json"), "\n",
+    " -", file.path(out_dir, "paises.json"), "\n",
     " -", file.path(out_dir, "dictionary.json"), "\n")
 cat(sprintf("\nAnos: %d-%d (ultimo completo: %d)\n", year_inicio, year_final, year_final_completo))
 if (length(anos_parciais)) {

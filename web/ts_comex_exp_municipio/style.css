@@ -428,6 +428,12 @@ html, body {
   opacity: 0.85;
 }
 
+/* Mesmo tratamento nas linhas do Explorar. */
+.explore-line-partial {
+  stroke-dasharray: 5 3;
+  opacity: 0.85;
+}
+
 .icon-btn {
   border: none;
   background: rgba(255, 255, 255, 0.2);
