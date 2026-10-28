@@ -14,7 +14,25 @@ get_ui <- function(files, param) {
       .irs-grid-pol.small {display: none;}
       .slider-animate-container {width: 5%; margin-top: 1px;}
       .slider-animate-button {font-size: 20px;}
+      
+      /* Legenda retrátil no hover para não poluir o mapa */
+      .legend {
+        max-height: 28px;
+        overflow: hidden;
+        transition: max-height 0.4s ease-in-out, opacity 0.3s;
+        opacity: 0.85;
+        cursor: pointer;
+      }
+      .legend:hover, .legend.pinned {
+        max-height: 500px;
+        opacity: 1;
+      }
     "),
+    tags$script(HTML("
+      $(document).on('click', '.legend', function() {
+        $(this).toggleClass('pinned');
+      });
+    ")),
     class = "container-fluid h-100 d-flex flex-column apppanel",
     fluidRow(
       class = "mainrow h-100",
@@ -32,10 +50,11 @@ get_ui <- function(files, param) {
                           border-color: #48968B !important;
               }',),
         
-        h2(class = "plot_name", param$plot_name),
-        p(class = "plot_desc", param$plot_desc),
+        uiOutput("plot_name_ui"),
+        uiOutput("plot_desc_ui"),
         hr(),
-        p(class = "vars", param$label_var_name),
+        tags$style(HTML(".switch-label { color: white; }")),
+        p(class = "vars", textOutput("label_var_name", inline = TRUE)),
         div(
           class = "var_selec_group",
           # Seleciona variável do eixo x
@@ -50,7 +69,7 @@ get_ui <- function(files, param) {
         # espaço vazio
         div(class = "fakecheckbox", ),
         div(
-          class = "var_selec_group",
+          class = "var_selec_group slider-inline",
           # Seleciona variável do eixo de data
           sliderInput(inputId = "filter1",
                       label = param$label_year,
@@ -60,17 +79,30 @@ get_ui <- function(files, param) {
                       step = 1,
                       width = "100%",
                       animate = animationOptions(interval = 3000,
-                                                 playButton = "\u25B6",
-                                                 pauseButton = "\u23F8"),
+                                                 playButton = icon("play"),
+                                                 pauseButton = icon("pause")),
                       sep = "")
         ),
         # espaço vazio
         div(class = "fakecheckbox", ),
+        # Botão de troca de idioma e tela cheia
         div(
-          shiny::actionButton(inputId = 'ab1', label = "Fullscreen", 
-                              icon = icon("expand"), 
-                              class = "btn-primary",
-                              onclick = paste0("window.open('", param$link, "', '_blank')"))
+          actionButton(
+            inputId = "toggle_lang",
+            label   = "English",
+            icon    = icon("globe"),
+            class   = "btn-primary"
+          )
+        ),
+        div(style = "height: 6px;"),
+        div(
+          shiny::actionButton(
+            inputId = "ab1",
+            label   = param$i18n$pt$btn_fullscreen,
+            icon    = icon("expand"),
+            class   = "btn-primary",
+            onclick = paste0("window.open('", param$link, "', '_blank')")
+          )
         ),
       ),
       column(9,
@@ -82,7 +114,7 @@ get_ui <- function(files, param) {
           div(
             class = "plotdiv w-100 h-100",
             # Map
-            leafletOutput("map", width = "100%", height = "100%") # %>% withSpinner()
+            withSpinner(leafletOutput("map", width = "100%", height = "calc(100vh - 150px)"), type = 4, color = "#50A486")
           )
         )
       )

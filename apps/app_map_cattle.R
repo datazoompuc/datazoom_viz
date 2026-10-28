@@ -18,8 +18,8 @@ files$param_script <- "../scripts/map_cattle/db_params.R"
 files$CSS_script <- "../global/dza_lumen.css"
 files$param_file <- "../data/censoagro_mapbiomas_gado_dic.csv"
 files$db_file <- "../data/censoagro_mapbiomas_gado.rds"
-files$legal_amazon <- "../data/legal_amazon_boundary.rds"
-files$states_boundary <- "../data/states_boundary.rds"
+files$legal_amazon <- "../global/legal_amazon_boundary.rds"
+files$states_boundary <- "../global/states_boundary.rds"
 
 
 # Carrega scripts

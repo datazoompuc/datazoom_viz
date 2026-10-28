@@ -261,7 +261,7 @@ get_server <- function(files, param) {
     output$map <- renderLeaflet({
 
       fig <- leaflet() %>%
-        addProviderTiles(provider = "CartoDB.PositronNoLabels") %>%
+        addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
         setView(-58, -7, zoom = 5) # inicia figura com gráfico em branco
 
       # Define paleta de cores
@@ -331,14 +331,14 @@ get_server <- function(files, param) {
             lapply(htmltools::HTML)
 
           fig_p <- leaflet(data = dfr) %>%
-            addProviderTiles(provider = "CartoDB.PositronNoLabels") %>%
+            addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
             setView(-58, -7, zoom = 5) %>%
             addPolygons(
               data = dfr[!fora, ],
               label = labels[!fora],
               stroke = FALSE,
               smoothFactor = .5,
-              fillOpacity = 0.8,
+              fillOpacity = 1,
               fillColor = ~ pal(dfr[[xv]][!fora]),
               highlightOptions = highlightOptions(
                 weight = 5,
@@ -352,7 +352,7 @@ get_server <- function(files, param) {
               pal = pal,
               values = ~ dfr[[xv]],
               title = title_legend,
-              opacity = 0.8,
+              opacity = 1,
               labFormat = labFormat_bin_inf
             )
 
@@ -366,7 +366,7 @@ get_server <- function(files, param) {
                 label = labels[fora],
                 stroke = FALSE,
                 smoothFactor = .5,
-                fillOpacity = 0.9,
+                fillOpacity = 1,
                 fillColor = "#e8ded0",
                 highlightOptions = highlightOptions(
                   weight = 5,
@@ -379,7 +379,7 @@ get_server <- function(files, param) {
               addLegend("bottomright",
                 colors = "#e8ded0",
                 labels = i18n()$label_off_mask,
-                opacity = 0.9
+                opacity = 1
               )
           }
 

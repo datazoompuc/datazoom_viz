@@ -283,10 +283,10 @@ dic_mortalidade <- dic_mortalidade %>%
          size = FALSE,
          slider = FALSE,
          geometry = FALSE,
-         label = label,
+         unidade = "por 100 mil habitantes",
+         label = str_remove(label, " por 100 mil habitantes"),
          desc = var,
          var_group = var_group,
-         unidade = NA,
          categoria = "Social",
          subcategoria = "Saúde")
 
@@ -378,10 +378,11 @@ dic_mortalidade <- dic_mortalidade %>%
            size = FALSE,
            slider = FALSE,
            geometry = FALSE,
-           label = label,
+           unidade = "per 100,000 inhabitants",
+           label = str_remove(label, " per 100,000 inhabitants"),
+           label = str_remove(label, " per 100000 inhabitants"),
            desc = var,
            var_group = var_group,
-           unidade = NA,
            categoria = "Social",
            subcategoria = "Saúde")
 

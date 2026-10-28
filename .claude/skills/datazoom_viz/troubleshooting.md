@@ -39,6 +39,12 @@ fig_p <- fig_p %>%
   ")
 ```
 
+> **Atenção — `htmlwidgets::onRender` não funciona dentro de `leafletProxy`:**
+>
+> - **Sintoma:** Mesmo com o código JavaScript anti-tooltips acumulados, os tooltips continuam travados ao passar o mouse.
+> - **Causa:** O Shiny só executa o script `htmlwidgets::onRender` na criação inicial do widget em `renderLeaflet()`; chamá-lo dentro de `leafletProxy()` é silenciosamente ignorado pelo navegador.
+> - **Solução:** O `htmlwidgets::onRender` deve ser encadeado diretamente no objeto Leaflet retornado por `output$map <- renderLeaflet({...})`.
+
 > **Limitação aceita:** se o usuário sai da janela do navegador sem que o `mouseout` dispare (ex: clica em outro monitor), o último tooltip pode ficar visível até o próximo hover. Edge case raro — não vale o risco de regressão no hover normal para cobrir isso.
 
 ---

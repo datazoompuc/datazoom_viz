@@ -12,231 +12,251 @@ f2 <- list(family = "Roboto", size = 13, color = "rgb(0, 0, 0)")
 get_server <- function(files, param) {
   server <- function(input, output, session) {
     
-    # Carrega dados
-    df <- readRDS(files$db_file)
+    # --- LANG TOGGLE & LOCALIZATION ---
+    # Reativo de idioma
+    lang <- reactiveVal("pt")
     
-    # Cria opções para seleção de grupos
-    param$filter_choices <- reactive({
-      df$municipio[stringr::str_detect(df$municipio, purrr::reduce(input$uf, paste, sep = "|", .init = "_"))] # selecionar municipios dos estados escolhidos],
+    # Troca o idioma quando o botão é clicado
+    observeEvent(input$toggle_lang, {
+      lang(ifelse(lang() == "pt", "en", "pt"))
     })
     
-    # Funcão para preencher inputs com coluna/variável aleatória
-    random_inputs <- function() {
-      
-      selected_uf <- sample(param$uf_choices, 2)
-      updateSelectInput(session,
-        "uf",
-        choices = param$uf_choices,
-        selected = selected_uf
-      )
-      
-      updateSelectInput(session,
-        "filter1",
-        choices = param$filter_choices(),
-        selected = sample(param$filter_choices(), 2) # 2 significa o numero de parametros aleatórios que são escolhidos na geração do gráfico
-      )
+    # Atalho para traduções e tabela ativa
+    i18n <- reactive({ param$i18n[[lang()]] })
+    active_table <- reactive({ param$tables[[lang()]] })
+    
+    # Renderiza textos dinâmicos da UI
+    output$plot_name_ui  <- renderUI({ h2(class = "plot_name", param$plot_name) })
+    output$plot_desc_ui  <- renderUI({ p(class = "plot_desc", i18n()$plot_desc) })
+    output$label_var_name <- renderText({ i18n()$label_var_name })
+    output$label_scale_name <- renderText({ i18n()$label_scale_name })
+    output$label_prop_name  <- renderText({ i18n()$label_prop_name })
+    output$label_agg        <- renderText({ i18n()$label_agg })
+    output$label_geo_est    <- renderText({ i18n()$label_geo_est })
+    output$label_geo_munic  <- renderText({ i18n()$label_geo_munic })
 
-      selected <- sample(sample(param$y_choices, 1)[[1]], 1)
-      updateSelectInput(session,
+    # --- GEOGRAPHIC LEVEL (SEGMENTED CONTROL) ---
+    geo <- reactiveVal({
+      query <- parseQueryString(isolate(session$clientData$url_search))
+      if (identical(query[["geo"]], "est")) "est" else "munic"
+    })
+    
+    observeEvent(input$geo_est,   { geo("est") })
+    observeEvent(input$geo_munic, { geo("munic") })
+    
+    observeEvent(geo(), {
+      session$sendCustomMessage("setGeo", geo())
+      updateTextInput(session, "geo_hidden", value = geo())
+    }, ignoreInit = FALSE)
+
+    # Carrega dados
+    df <- readRDS(files$db_file)
+    all_municipios <- sort(unique(df$municipio))
+
+    # Atualiza choices e labels ao trocar idioma
+    observeEvent(lang(), {
+      tbl <- active_table()
+      y_sel <- isolate(input$y)
+      if (is.null(y_sel) || y_sel == "") y_sel <- param$y_def
+      
+      updateSelectInput(
+        session,
         "y",
-        choices = param$y_choices,
-        selected = selected
+        label    = i18n()$label_y_name,
+        choices  = setNames(tbl$var[tbl$y], tbl$label[tbl$y]),
+        selected = y_sel
       )
-    }
+      
+      updateSelectizeInput(
+        session,
+        "uf",
+        label = i18n()$label_uf_name
+      )
+      
+      updateSelectizeInput(
+        session,
+        "filter1",
+        label = i18n()$label_geo_name
+      )
+      
+      updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
+      updateActionButton(session, "ab1",         label = i18n()$btn_fullscreen)
+    }, ignoreInit = TRUE)
+
 
     # Função para atualizar url do app com parâmetros dos inputs
     update_my_queryString <- function() {
       q_string <- paste0(
-        "?", "y=", input$y,
+        "?", "lang=", lang(),
+        "&", "y=", input$y,
         "&", "ylog=", input$ylog,
-        "&", "y_index_base=", input$y_index_base
+        "&", "y_index_base=", input$y_index_base,
+        "&", "geo=", geo()
       )
 
-      for (i in input$uf) {
-        q_string <- paste0(
-          q_string,
-          "&", "uf=", i
-        )
+      if (geo() == "est") {
+        for (i in input$uf) {
+          q_string <- paste0(q_string, "&", "uf=", i)
+        }
+      } else {
+        for (i in input$filter1) {
+          q_string <- paste0(q_string, "&", "filter=", i)
+        }
       }
-
-      for (i in input$filter1) {
-        q_string <- paste0(
-          q_string,
-          "&", "filter=", i
-        )
-      }
-
 
       updateQueryString(q_string, mode = "replace")
     }
 
-    # Função para atualizar inputs a partir da URL
+    # Flag R simples — não reativa, portanto não cria dependências.
+    # Garante que update_my_inputs só processa a URL uma vez (no carregamento inicial).
+    .url_read <- FALSE
+
     update_my_inputs <- function() {
-      
-      # Pega parametros da url e atribui aos selectinputs
       query <- parseQueryString(session$clientData$url_search)
+
+      if (!is.null(query[["lang"]]) && query[["lang"]] %in% c("pt", "en")) {
+        lang(query[["lang"]])
+      }
+
+      if (!is.null(query[["geo"]]) && query[["geo"]] %in% c("munic", "est")) {
+        geo(query[["geo"]])
+      }
 
       if (!is.null(query[["y"]])) {
         updateSelectInput(session, "y",
-          choices = param$y_choices,
+          choices  = setNames(active_table()$var[active_table()$y],
+                              active_table()$label[active_table()$y]),
           selected = query[["y"]]
         )
       }
 
-      if (!is.null(query[["ylog"]])) {
-        updateCheckboxInput(session, "ylog",
-          value = (query[["ylog"]] == "TRUE")
-        )
-      }
+       if (!is.null(query[["ylog"]])) {
+         updateMaterialSwitch(session, "ylog",
+           value = (query[["ylog"]] == "TRUE")
+         )
+       }
 
       if (!is.null(query[["y_index_base"]])) {
-        updateCheckboxInput(session, "y_index_base",
+        updateMaterialSwitch(session, "y_index_base",
           value = (query[["y_index_base"]] == "TRUE")
         )
       }
 
-      selected <- unlist(query[names(query) == "uf"], use.names = FALSE)
+      selected_uf <- unlist(query[names(query) == "uf"], use.names = FALSE)
       if (!is.null(query[["uf"]])) {
-        updateSelectInput(session,
-          "uf",
-          choices = param$uf_choices,
-          selected = selected
-        )
-      }
-      
-      selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
-      if (!is.null(query[["filter"]])) {
-        updateSelectInput(session,
-          "filter1",
-          choices = param$filter_choices(),
-          selected = selected
+        updateSelectInput(session, "uf",
+          choices  = param$uf_choices,
+          selected = selected_uf
         )
       }
 
-      # Se query está vazia, preenche aleatório
-      if (is.null(query[["uf"]]) && is.null(query[["filter"]]) && is.null(query[["y"]])) {
-        #random_inputs() # preenche inputs se estiverem vazios
+      selected_filter <- unlist(query[names(query) == "filter"], use.names = FALSE)
+      if (!is.null(query[["filter"]])) {
+        updateSelectizeInput(session, "filter1",
+          choices  = all_municipios,
+          selected = selected_filter,
+          server   = TRUE
+        )
       }
     }
 
     # Output titulo do gráfico
     output$plot_title <- renderText({
-      
       text <- " "
-      # Se algum campo estiver vazio retorna texto vazio
       if (is.null(input$y) || input$y == "") {
         text <- " "
       } else {
-        # Monta titulo a partir de variáveis selecionadas nos inputs
-        y_col <- param$table[which(param$table$var == input$y), ]
-
+        y_col <- active_table()[which(active_table()$var == input$y), ]
         text <- paste0("", y_col$label)
         if (input$y_index_base) {
           text <- paste0("", y_col$label, "*")
         }
       }
-
       text
     })
     
     output$plot_subtitle <- renderText({
-        
         if (is.null(input$y) || input$y == "") return(" ")
         
         subtitles <- c()
         
         # Nível geográfico (municipal ou estadual)
-        level_text <- if (input$aggregate_state) {
-            param$label_state  # "estadual" ou "state"
+        level_text <- if (geo() == "est") {
+            i18n()$label_state
         } else {
-            param$label_municipal  # "municipal"
+            i18n()$label_municipal
         }
         
         subtitles <- c(subtitles, level_text)
         
-        # Botões ativos (podem coexistir)
+        # Botões ativos
         if (isTRUE(input$y_index_base)) {
-            subtitles <- c(subtitles, param$label_prop_name)
+            subtitles <- c(subtitles, i18n()$label_prop_name)
         }
-        
         if (isTRUE(input$ylog)) {
-            subtitles <- c(subtitles, param$label_log_name)
+            subtitles <- c(subtitles, i18n()$label_scale_name)
         }
         
-        # Se algum botão estiver ativo, junta os labels
         if (length(subtitles) > 0) {
-            return(paste(subtitles, collapse = param$label_and))
+            return(paste(subtitles, collapse = i18n()$label_and))
         }
         
-        # Caso padrão
-        param$stitle_init
+        i18n()$stitle_init
     })
     
+    # Atualiza a URL em observer separado para não criar loop com renderPlotly
     observe({
-      selected_filter <- input$filter1
-      updateSelectInput(session,
-                        "filter1",
-                        choices = param$filter_choices(),
-                        selected = selected_filter)
+      update_my_queryString()
     })
-    
+
     # Output gráfico
     output$plot <- renderPlotly({
       
-      update_my_queryString() # atualiza url com parametros dos inputs
-      
-      fig <- plotly_empty() # inicia figura com gráfico em branco
+      fig <- plotly_empty()
       tryCatch(
         {
-          # Se algum campo estiver vazio retorna gráfico vazio
           if (is.null(input$y) || input$y == "" ||
-              is.null(input$uf) || length(input$uf) < 1 ||
-              is.null(input$filter1) || length(input$filter1) < 1) {
+              (geo() == "est" && (is.null(input$uf) || length(input$uf) < 1)) ||
+              (geo() == "munic" && (is.null(input$filter1) || length(input$filter1) < 1))) {
             fig <- plotly_empty()
             stop()
           }
 
-          # Cria dataframe do gráfico a partir do arquivo de parâmetros e dos select inputs
-          x_col <- param$table[which(param$table$var == param$x_def), ]
-          y_col <- param$table[which(param$table$var == input$y), ]
-          id_col <- param$table[which(param$table$var == param$id_def), ]
-          color_col <- param$table[which(param$table$var == param$color_def), ]
+          x_col <- active_table()[which(active_table()$var == param$x_def), ]
+          y_col <- active_table()[which(active_table()$var == input$y), ]
+          id_col <- active_table()[which(active_table()$var == param$id_def), ]
+          color_col <- active_table()[which(active_table()$var == param$color_def), ]
 
-          # Filtra dataframe com grupos selecionados
+          # Filtra dataframe com base no nível geográfico selecionado
           df_filtered <- reactive({
-              if (input$aggregate_state) {
-                  # Modo agregado por estado: filtra por UF e agrega
+              if (geo() == "est") {
                   df_uf <- df[which(df$sigla_uf %in% input$uf), ]
-                  
-                  # Agrega por estado e ano
                   df_uf %>%
                       group_by(ano, sigla_uf) %>%
                       summarise(
                           across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),
-                          municipio = first(sigla_uf),  # Para manter compatibilidade com o código existente
-                          nome_uf = first(nome_uf),     # Mantém o nome do estado
-                          regiao = first(regiao),       # Mantém a região
+                          municipio = first(sigla_uf),
+                          nome_uf = first(nome_uf),
+                          regiao = first(regiao),
                           .groups = "drop"
                       )
               } else {
-                  # Modo normal: filtra por municípios selecionados
                   df[which(df$municipio %in% input$filter1), ]
               }
           })
 
           df_p <- data.frame(
-              df_filtered()[x_col$var],     
-              df_filtered()[y_col$var],
-              df_filtered()[color_col$var]
+              x       = as.numeric(df_filtered()[[x_col$var]]),
+              y       = df_filtered()[[y_col$var]],
+              color   = df_filtered()[[color_col$var]],
+              municipio = df_filtered()$municipio,
+              stringsAsFactors = FALSE
           )
-          colnames(df_p) <- c("x", "y", "color")
-          df_p$municipio <- df_filtered()$municipio  
           df_p$text <- df_p$municipio
 
-          # Filtra colunas onde x,y e size são NA (não serão exibidas no gráfico de qualquer forma)
+          # Filtra colunas onde x e y são NA
           df_p <- df_p[which(!is.na(df_p$x) & !is.na(df_p$y)), ]
 
-          # Se dataset estiver vazio, não monta o gráfico, retorna em branco
           if (nrow(df_p) < 1) {
             fig <- plotly_empty()
             stop()
@@ -253,27 +273,39 @@ get_server <- function(files, param) {
             df_p$y <- df_p$y_index_base
           }
 
-          # Se a coluna de cor for toda NA, preenche com strings em branco
           if (all(is.na(df_p$color))) {
             df_p$color <- " "
           }
+          
+          # Se o switch log estiver ativado, aplicamos log10 diretamente no R
+          if (isTRUE(input$ylog)) {
+            df_p <- df_p[which(df_p$y > 0), ]
+            df_p$original_y <- df_p$y
+            df_p$y <- log10(df_p$y)
+            y_axis_title <- paste0(y_col$label, " (Log)")
+          } else {
+            df_p$original_y <- df_p$y
+            y_axis_title <- y_col$label
+          }
 
-          # Monta html do tooltip
+          # Formatação conforme idioma
+          dec_mark <- if (lang() == "pt") "," else "."
+          big_mark <- if (lang() == "pt") "." else ","
+
+          # Monta html do tooltip usando os valores originais não transformados
           df_p$tooltip <- paste0(
             "<b>", df_p$text, "</b><br>",
             x_col$label, ": ", df_p$x, "<br>",
-            y_col$label, ": ", format(df_p$y, scientific = FALSE,
+            y_col$label, ": ", format(df_p$original_y, scientific = FALSE,
                                       digits = 2,
-                                      decimal.mark = ",", 
-                                      big.mark = "."), "<br>"
+                                      decimal.mark = dec_mark, 
+                                      big.mark = big_mark), "<br>"
           )
 
-          # Define paleta de cores
           pallete <- pallete_discrete
 
-          # Monta gráfico
           fig_p <- plot_ly(df_p,
-            x = ~factor(x),
+            x = ~x,
             y = ~y,
             color = ~municipio,
             type = "scatter",
@@ -282,9 +314,9 @@ get_server <- function(files, param) {
             hoverinfo = "text"
           )
 
-          # Layout eixos
           x_axis_layout <- list(
             title = x_col$label,
+            type = "linear",
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
@@ -292,8 +324,11 @@ get_server <- function(files, param) {
             showgrid = FALSE,
             zeroline = FALSE
           )
+          
+          # Configura eixo Y como linear (uma vez que os dados já foram calculados com log10 no R)
           y_axis_layout <- list(
-            title = y_col$label,
+            title = y_axis_title,
+            type = "linear",
             titlefont = f1,
             tickfont = f2,
             automargin = FALSE,
@@ -302,22 +337,26 @@ get_server <- function(files, param) {
             zeroline = FALSE
           )
 
-          if (input$ylog & is.numeric(df_p$y)) {
-            y_axis_layout$type <- "log"
+          # Se estiver em escala logarítmica, configuramos os ticks manualmente
+          # para exibirem os valores originais correspondentes às potências de 10.
+          if (isTRUE(input$ylog) && nrow(df_p) > 0) {
+            y_range <- range(df_p$y, na.rm = TRUE)
+            # Cria ticks a cada inteiro de potência de 10 (ex: 10^0, 10^1, 10^2)
+            tick_values <- seq(floor(y_range[1]), ceiling(y_range[2]), by = 1)
+            y_axis_layout$tickvals <- tick_values
+            y_axis_layout$ticktext <- format(10^tick_values, big.mark = big_mark, scientific = FALSE)
           }
 
           if (input$y_index_base) {
-            y_axis_layout$title <- paste0(y_col$label, "*")
+            y_axis_layout$title <- paste0(y_axis_title, "*")
           }
 
-          # Layout hover/tooltip
           tooltip <- list(
             bordercolor = "rgba(255, 255, 255, 1)",
             bgopacity = "0.5",
             font = f1
           )
 
-          # Aplica layout
           fig_p <- fig_p %>%
             layout(
               font = f1,
@@ -327,10 +366,8 @@ get_server <- function(files, param) {
               hoverlabel = tooltip
             )
 
-          #  Configura botões do plotly
           fig_p <- fig_p %>%
             config(
-              # toImageButtonOptions = list(format = "svg"),
               displaylogo = FALSE,
               modeBarButtonsToRemove = c(
                 "lasso2d",
@@ -339,10 +376,9 @@ get_server <- function(files, param) {
               )
             )
 
-          fig <- fig_p # retorna a figura do gráfico
+          fig <- fig_p
         },
         error = function(cond) {
-          # se encontrar erro retorna fig em branco
           print("plot error")
           fig <- plotly_empty()
         }
@@ -350,14 +386,15 @@ get_server <- function(files, param) {
       fig
     })
 
-    # Observa eventos
-    observe({
-      # Pega parametros da url e atribui aos selectinputs
-      query <- parseQueryString(session$clientData$url_search)
+    # Lê a URL uma única vez na inicialização.
+    # A flag .url_read (R simples, não reativa) bloqueia re-execuções causadas
+    # pelo próprio app ao escrever a queryString via update_my_queryString().
+    observeEvent(session$clientData$url_search, {
+      if (.url_read) return(invisible(NULL))
+      .url_read <<- TRUE
       update_my_inputs()
-    })
+    }, ignoreInit = FALSE)
   }
 
-  # Retorna objeto server
   server
 }
