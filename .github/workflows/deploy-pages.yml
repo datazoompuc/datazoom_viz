@@ -1,0 +1,95 @@
+name: Deploy web apps to GitHub Pages
+
+# Publica SÓ a pasta web/ no GitHub Pages, em vez de servir a raiz do
+# repositório. A diferença é grande: servindo da raiz, o site publicado
+# seria ~0,51 GB (quase tudo data/*.rds, que ninguém acessa pelo navegador)
+# contra ~15 MB publicando só os apps, e os .rds ficariam acessíveis por
+# HTTP. O limite do Pages é 1 GB de site publicado.
+#
+# Também deixa a URL mais limpa. Como o conteúdo de web/ vira a raiz do
+# site, os apps ficam em:
+#   https://datazoompuc.github.io/datazoom_viz/comex_exp_municipio/
+# em vez de .../datazoom_viz/web/comex_exp_municipio/
+#
+# PRÉ-REQUISITOS para isto funcionar:
+#   1. O repositório precisa ser PÚBLICO (Pages não roda em repo privado
+#      no plano free — é por isso que datazoom_viz não tem Pages hoje).
+#   2. Em Settings > Pages, "Source" precisa estar como "GitHub Actions".
+#      Enquanto estiver em "Deploy from a branch", este workflow falha no
+#      passo de deploy.
+#
+# Até lá o arquivo fica aqui inerte, e rodar manualmente só vai falhar no
+# último passo — o build funciona e serve para conferir o conteúdo.
+#
+# Enquanto isso, a publicação continua sendo o rsync manual para o repo
+# datazoompuc/datazoom_viz_web, descrito em data-raw/README_export_web.md.
+# Quando este workflow entrar em operação, aquela seção do runbook sai e o
+# datazoom_viz_web passa a ser só staging.
+
+on:
+  push:
+    branches: [main]
+    # Só republica quando os apps mudam de fato. Commit que mexe em
+    # apps/, scripts/ ou data/ não precisa redeployar o site.
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+# Permissões mínimas para publicar no Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Um deploy por vez. cancel-in-progress: false de propósito — cancelar um
+# deploy pela metade pode deixar o site num estado intermediário.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Conferir que há algo para publicar
+        # Falha cedo e com mensagem clara, em vez de publicar um site vazio
+        # se a pasta sumir ou o caminho mudar.
+        run: |
+          # find em vez de `ls -A`: não depende de como o ls formata saída
+          # vazia, que varia entre ambientes.
+          if [ ! -d web ] || [ -z "$(find web -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+            echo "::error::A pasta web/ não existe ou está vazia — nada a publicar."
+            exit 1
+          fi
+          echo "Apps encontrados:"
+          find web -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | sed 's/^/  - /'
+          echo "Tamanho total: $(du -sh web | cut -f1)"
+
+      - name: Impedir que o Jekyll processe o site
+        # Sem isto o Pages roda Jekyll e ignora qualquer arquivo ou pasta
+        # começada por underscore, quebrando o site de formas difíceis de
+        # diagnosticar. É a mesma pegadinha do .nojekyll no repo de staging.
+        run: touch web/.nojekyll
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Empacotar só a pasta web/
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4
