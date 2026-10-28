@@ -109,6 +109,7 @@
       prodrank_cat_industria: "Indústria e manufaturados",
       ranking_product_total_prefix: "Total exportado no ano: ",
       label_loading: "Carregando…",
+      year_partial: "parcial · {n} meses",
       combo_placeholder: "Buscar…",
       combo_no_match: "Nenhum resultado",
       combo_count: "{n} de {total}",
@@ -236,6 +237,7 @@
       prodrank_cat_industria: "Industry & manufactured goods",
       ranking_product_total_prefix: "Total exported that year: ",
       label_loading: "Loading…",
+      year_partial: "partial · {n} months",
       combo_placeholder: "Search…",
       combo_no_match: "No matches",
       combo_count: "{n} of {total}",
@@ -812,6 +814,41 @@
   // only has to include the placeholder to get it.
   function withYearRange(s) {
     return s.replace("{range}", `${dictionary.year_inicio}–${dictionary.year_final}`);
+  }
+
+  // ---- Anos parciais ----
+  //
+  // A base pode terminar num ano incompleto (2026 tem 9 meses). Mostrar
+  // isso sem avisar faz todo gráfico exibir uma queda que é artefato de
+  // calendário, não de comércio: 2026 com 9 meses fica 14% ABAIXO de 2025,
+  // enquanto os mesmos 9 meses anualizados ficam 14% ACIMA. Nada é
+  // anualizado aqui — só sinalizado, para quem lê saber o que está vendo.
+  function mesesDoAno(year) {
+    const p = dictionary.anos_parciais;
+    if (!p) return null;
+    const n = p[String(year)];
+    return typeof n === "number" ? n : null;
+  }
+
+  // Mantém o aviso de ano parcial ao lado do "Ano 20xx". Chamado de todo
+  // lugar que escreve year-value, para o rótulo nunca ficar defasado.
+  function syncAnoParcial(year) {
+    const el = document.getElementById("year-partial");
+    if (!el) return;
+    const meses = mesesDoAno(year);
+    el.classList.toggle("hidden", meses === null);
+    el.textContent = meses === null ? "" :
+      I18N[state.lang].year_partial.replace("{n}", meses);
+  }
+
+  function isAnoParcial(year) {
+    return mesesDoAno(year) !== null;
+  }
+
+  // Último ano com 12 meses. É onde o app abre, para a visão padrão nunca
+  // ser um ano pela metade.
+  function ultimoAnoCompleto() {
+    return dictionary.year_final_completo || dictionary.year_final;
   }
 
   // Explorar's log scale re-spaces the y-axis logarithmically but still
@@ -1448,7 +1485,7 @@
     state.lang = qLang === "en" ? "en" : "pt";
     state.year = Number.isFinite(qYear) && qYear >= dictionary.year_inicio && qYear <= dictionary.year_final
       ? qYear
-      : dictionary.year_final;
+      : ultimoAnoCompleto();
     state.view = ["ranking", "composition", "change", "trends", "explore", "map"].includes(qView) ? qView : "ranking";
     // null (not ufList[0]) if absent/invalid — "Todos os estados" is a
     // valid, common default for every view except Variação, which forces
@@ -2109,6 +2146,7 @@
     state.year = newYear;
     document.getElementById("year-slider").value = newYear;
     document.getElementById("year-value").textContent = newYear;
+    syncAnoParcial(newYear);
     updateUrl();
     if (state.view === "composition") {
       updateCompositionGuide();
@@ -2331,6 +2369,7 @@
     const slider = document.getElementById("year-slider");
     slider.value = state.year;
     document.getElementById("year-value").textContent = state.year;
+    syncAnoParcial(state.year);
 
     renderSparkline();
     if (state.view === "composition") {
@@ -3937,7 +3976,16 @@
 
     const pts = sparkSeries.map((d) => `${sparkXFor(d.year).toFixed(1)},${sparkYFor(d.value).toFixed(1)}`);
 
-    document.getElementById("spark-line").setAttribute("d", pts.length ? `M${pts.join(" L")}` : "");
+    // A linha sólida vai até o último ano completo; o que passa disso sai
+    // tracejado. Sem isso o desenho afirma uma queda que é só o ano em
+    // curso ter menos meses que os anteriores.
+    const corte = sparkSeries.findIndex((d) => isAnoParcial(d.year));
+    const solidos = corte === -1 ? pts : pts.slice(0, corte);
+    // O trecho tracejado começa no último ponto sólido, senão fica um vão.
+    const parciais = corte === -1 ? [] : pts.slice(Math.max(0, corte - 1));
+
+    document.getElementById("spark-line").setAttribute("d", solidos.length ? `M${solidos.join(" L")}` : "");
+    document.getElementById("spark-line-partial").setAttribute("d", parciais.length > 1 ? `M${parciais.join(" L")}` : "");
     document.getElementById("spark-area").setAttribute("d", pts.length
       ? `M${sparkXFor(sparkSeries[0].year).toFixed(1)},${SPARK_H} L${pts.join(" L")} L${sparkXFor(sparkSeries[sparkSeries.length - 1].year).toFixed(1)},${SPARK_H} Z`
       : "");

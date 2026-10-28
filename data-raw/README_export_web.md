@@ -2,14 +2,15 @@
 
 O app em `web/ts_comex_exp_municipio/` é estático: HTML, CSS e JavaScript lendo
 arquivos JSON. Não tem servidor, não tem R rodando em produção. Os JSON são
-gerados a partir dos `.rds` do repositório por três scripts em `data-raw/`.
+gerados a partir dos `.rds` do repositório por **dois** scripts em `data-raw/`:
+um lê a base longa do COMEX e gera quase tudo, o outro cuida só do mapa.
 
 **Quando usar este documento:** sempre que os `.rds` do COMEX forem atualizados.
 Enquanto ninguém rodar os passos abaixo, o site continua mostrando os dados
 antigos, mesmo que os `.rds` no repositório já estejam novos. Não existe nada
 automático hoje.
 
-Quem faz isso não precisa saber JavaScript. São três comandos de R e um
+Quem faz isso não precisa saber JavaScript. São um ou dois comandos de R e um
 `git push`.
 
 ---
@@ -19,12 +20,12 @@ Quem faz isso não precisa saber JavaScript. São três comandos de R e um
 R instalado, e estes pacotes:
 
 ```r
-install.packages(c("dplyr", "tidyr", "jsonlite", "data.table", "sf"))
+install.packages(c("dplyr", "tidyr", "jsonlite", "sf"))
 ```
 
-O `sf` só é necessário para o script do mapa (passo 2c) e é o mais chato de
+O `sf` só é necessário para o script do mapa (passo 2b) e é o mais chato de
 instalar, porque depende de bibliotecas de sistema (GDAL, GEOS, PROJ). Se você
-não mexeu em geometria, pule o 2c e você não precisa do `sf`.
+não mexeu em geometria, pule o 2b e você não precisa do `sf`.
 
 Todos os comandos abaixo rodam a partir da raiz do repositório.
 
@@ -32,36 +33,26 @@ Todos os comandos abaixo rodam a partir da raiz do repositório.
 
 ## 2. Regerar os JSON
 
-São três scripts independentes. Rode só os que correspondem ao que mudou.
-
-### 2a. Dados principais (quase sempre é só isso)
+### 2a. Tudo que sai da base do COMEX (quase sempre é só isso)
 
 ```sh
 Rscript data-raw/export_ts_comex_exp_municipio_web.R
 ```
 
-Lê:
-- `data/comex_exp_munic_sec.rds`
-- `data/comex_exp_munic_sh2.rds`
-- `data/comex_exp_sec_munic_dic.csv` e `data/comex_exp_sec_munic_en_dic.csv`
-- `data/comex_exp_sh2_munic_dic.csv` e `data/comex_exp_sh2_munic_en_dic.csv`
+Lê um arquivo só, `data/comex_exp_munic_base.rds` (a base longa gerada por
+`data-raw/comex.R`, descrita em `README_data.md`), mais
+`data/auxiliar_cod_municipais.rds` para o nome dos municípios.
 
 Escreve em `web/ts_comex_exp_municipio/data/`:
 `composition_sec.json`, `composition_sh2.json`,
 `municipality_composition_sec.json`, `municipality_composition_sh2.json`,
 `products_sec.json`, `products_sh2.json`, `municipality_totals.json`,
-`region_totals.json` e `dictionary.json`.
+`region_totals.json`, `product_ranking.json` e `dictionary.json`.
 
-### 2b. Ranking por produto SH4
+Esses dez arquivos são dez recortes diferentes da mesma base, por isso saem
+todos de um script só. O porquê está em `ARQUITETURA_dados_web.md`.
 
-```sh
-Rscript data-raw/export_ts_comex_exp_municipio_produtos_web.R
-```
-
-Lê `data/comex_exp_sh4_munic.rds` e `data/auxiliar_cod_sh4.rds`.
-Escreve `product_ranking.json` (~1,7 MB).
-
-### 2c. Mapa (só se a geometria mudar, o que é raro)
+### 2b. Mapa (só se a geometria mudar, o que é raro)
 
 ```sh
 Rscript data-raw/export_map_comex_exp_sh4_sel_web.R
@@ -71,11 +62,13 @@ Lê `global/munic_shapefile.rds`, `global/states_boundary.rds`,
 `global/legal_amazon_boundary.rds` e `data/comex_exp_munic_sh4_sel.rds`.
 Escreve a pasta `map/` (~6,4 MB, a maior parte é fronteira de estado).
 
-Os três scripts imprimem no final o que escreveram. Se algum terminar com erro
-de arquivo não encontrado, é porque o `.rds` correspondente não foi gerado ainda:
-rode `data-raw/comex.R` antes.
+Fica separado porque é o único que precisa do `sf` e porque fronteira
+municipal quase não muda: rodar junto a cada atualização de dado seria
+regerar 6,4 MB idênticos aos anteriores.
 
----
+Os scripts imprimem no final o que escreveram. Se algum terminar com erro de
+arquivo não encontrado, é porque o `.rds` correspondente não foi gerado ainda:
+rode `data-raw/comex.R` antes.
 
 ## 3. Conferir antes de publicar
 
@@ -89,9 +82,14 @@ Deve mostrar o primeiro e o último ano dos dados novos. O app lê esse arquivo
 para montar o slider e os textos dos gráficos, então se ele estiver velho o site
 inteiro fica velho junto.
 
-Atenção: `year_inicio` e `year_final` estão **fixos** no topo do
-`export_ts_comex_exp_municipio_web.R`. Se os dados passarem a cobrir um ano novo,
-edite essas duas variáveis no script, senão o app ignora o ano novo.
+O intervalo de anos agora sai da própria base, não há mais nada fixo no script
+para editar.
+
+Confira também `year_final_completo` e `anos_parciais`. A base pode terminar num
+ano incompleto (em 2026, 9 meses). O app abre no último ano completo e marca o
+parcial com "parcial · N meses" ao lado do ano, além de tracejar o último trecho
+da sparkline. Se `anos_parciais` vier vazio quando deveria ter algo, as séries
+vão mostrar uma queda no último ponto que é só calendário.
 
 ### 3b. Abrir o app localmente
 
@@ -179,10 +177,9 @@ minutos. Isso já gerou mais de um falso alarme.
 foi commitado. Confira se os três scripts do passo 2 rodaram sem erro e se o
 `git status` não mostra arquivo novo esquecido.
 
-**O slider não chega no ano novo.** É o `year_final` fixo no script, veja 3a.
-
-**Rodei só o 2a e o ranking por produto continua velho.** Os três scripts são
-independentes. O 2a não regenera o `product_ranking.json`.
+**O último ano parece ter despencado.** Provavelmente é ano parcial. Confira
+`anos_parciais` no `dictionary.json` (veja 3a). Em 2026, com 9 de 12 meses, o
+total fica 14% abaixo de 2025, mas anualizado está 14% acima.
 
 ---
 
@@ -190,10 +187,8 @@ independentes. O 2a não regenera o `product_ranking.json`.
 
 | `.rds` de origem | script | JSON gerado |
 |---|---|---|
-| `comex_exp_munic_sec.rds` | 2a | composição, totais, produtos (SEC) |
-| `comex_exp_munic_sh2.rds` | 2a | composição, produtos (SH2) |
-| `comex_exp_sh4_munic.rds` | 2b | `product_ranking.json` |
-| `comex_exp_munic_sh4_sel.rds` + `global/*.rds` | 2c | pasta `map/` |
+| `comex_exp_munic_base.rds` (+ `auxiliar_cod_municipais.rds`) | 2a | todos os dez, de SEC a `product_ranking.json` |
+| `comex_exp_munic_sh4_sel.rds` + `global/*.rds` | 2b | pasta `map/` |
 
 Os `.rds` acima são produzidos por `data-raw/comex.R` (os de COMEX) e vêm do
 `global/` (as geometrias). Este documento começa depois deles: se o `.rds` estiver
