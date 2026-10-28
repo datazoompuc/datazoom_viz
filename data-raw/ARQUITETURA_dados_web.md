@@ -8,7 +8,10 @@ gerar, em que formato, e em quantos scripts, de forma a não repetir a
 multiplicação de `.rds` que existe hoje.
 
 Não é um passo a passo de execução. Como rodar os scripts, conferir o resultado
-e publicar está em `README_export_web.md`, ao lado deste arquivo.
+e publicar está em `README_export_web.md`. O receituário de código para derivar
+os JSON de uma base longa, com as armadilhas que apareceram na migração do
+COMEX, está em `GUIA_base_long_para_json.md`. Os três ficam lado a lado em
+`data-raw/`: este diz por quê, o guia diz como, o runbook diz o que rodar.
 
 Os exemplos vêm do `web/ts_comex_exp_municipio/`, que é o app mais completo
 hoje, mas os princípios valem para qualquer um.
@@ -89,15 +92,19 @@ No app de COMEX hoje:
 
 | | tamanho | quando carrega |
 |---|---|---|
-| carga inicial | 1,2 MB | sempre |
-| sob demanda | 9,2 MB | só se o usuário abrir aquela visualização |
+| carga inicial | 0,9 MB | sempre |
+| sob demanda | 11,2 MB | só se o usuário abrir aquela visualização |
 
-São **89% do payload adiado**. Quem abre o app, olha o ranking e fecha baixou
-1,2 MB em vez de 10,4 MB. O que fica para depois:
+São **93% do payload adiado**. Quem abre o app, olha o ranking e fecha baixou
+0,9 MB em vez de 12 MB. O que fica para depois:
 
 - SH2 (281 KB + 594 KB + 33 KB) — só se trocar a agregação de produto
 - `product_ranking.json` (1,7 MB) — só se filtrar por produto SH4
+- país (225 KB + 1,8 MB + 31 KB) — só se abrir a orientação Países
 - o mapa (6,4 MB, quase tudo fronteira de estado) — só se abrir o Mapa
+
+A proporção melhorou quando país entrou: a dimensão nova acrescentou 2 MB ao
+total sem tocar num byte da carga inicial. É assim que tem que ser.
 
 Do lado do dado, isso exige que o recorte seja previsível: um arquivo por
 unidade que o usuário pode pedir. Do lado do app, cada um desses tem uma função
@@ -132,9 +139,9 @@ Densidade real no COMEX:
 
 | grade | células possíveis | preenchidas | densidade |
 |---|---|---|---|
-| município × categoria SEC × ano | 284.548 | 18.012 | 6,3% |
-| município × categoria SH2 × ano | 1.254.598 | 29.250 | 2,3% |
-| município × país × ano | 3.065.358 | 82.502 | 2,7% |
+| município × categoria SEC × ano | 297.000 | 18.978 | 6,4% |
+| município × categoria SH2 × ano | 1.309.500 | 31.060 | 2,4% |
+| município × país × ano | 3.199.500 | 86.763 | 2,7% |
 
 O formato usado em `municipality_composition_*.json` é:
 
@@ -153,8 +160,8 @@ município aparece uma vez, não uma vez por célula.
 O ganho medido, para SH2: **595 KB contra 16,8 MB** da mesma informação como
 objeto aninhado em grade cheia. Vinte e oito vezes menor.
 
-É esta técnica que torna viável acrescentar país como dimensão. A 2,7% de
-densidade, a grade cheia é inviável e a esparsa é confortável.
+Foi esta técnica que tornou viável acrescentar país. A 2,7% de densidade a
+grade cheia seria inviável; esparsa, são 1,8 MB carregados sob demanda.
 
 **Regra:** densidade abaixo de uns 30%, use esparso.
 
@@ -183,9 +190,10 @@ obriga quem só quer atualizar números a ter a pilha geoespacial instalada.
 
 ## 6. Várias medidas na mesma base
 
-Hoje a base tem uma medida: valor nominal em dólar. Já estão no horizonte pelo
-menos mais duas, quantidade física (`kg_liquido`) e, pelo nome da branch
-`comex-deflator-limpeza`, valor deflacionado.
+A base do COMEX já traz duas medidas lado a lado, `valor_fob` (US$ nominais) e
+`kg_liquido`. Valor deflacionado ficou de fora por decisão de out/2026, com a
+quantidade servindo de base para calcular valor real depois — ou seja, uma
+terceira medida é esperada.
 
 Isso muda o desenho da base, e vale decidir agora em vez de depois.
 
@@ -231,12 +239,12 @@ Separe por **dependência** e por **cadência**, nunca por visualização.
   quase nunca. Dado de COMEX muda a cada atualização. Rodar os dois juntos é
   regerar 6,4 MB idênticos a cada vez.
 
-Para o COMEX depois da base longa, isso dá **dois scripts**:
+No COMEX, depois da migração para a base longa, isso deu **dois scripts**:
 
 1. **Tudo que sai da base longa** — ranking, composição, tendências, variação,
    explorar. Mesma fonte, mesmas dependências (`dplyr`, `tidyr`, `jsonlite`),
-   muda só o `group_by`. Hoje são dois scripts só porque as fontes eram `.rds`
-   diferentes; com a base unificada isso deixa de ter razão de ser.
+   muda só o `group_by`. Eram dois scripts só porque as fontes eram `.rds`
+   diferentes; com a base unificada deixaram de ter razão de ser e viraram um.
 2. **Mapa** — precisa de `sf`, lê shapefiles de `global/`, roda raramente.
 
 Não faça um script por visualização. Cada um releria a mesma base e refaria
@@ -276,13 +284,19 @@ Na ordem:
 | Tendências | `municipality_totals.json` | município × ano | inicial |
 | Variação | `municipality_totals.json` | município × ano | inicial |
 | Explorar | `municipality_totals.json` | município × ano | inicial |
+| Ranking/Tendências/Variação/Explorar (orientação Países) | `municipality_composition_pais.json`, `composition_pais.json` | município × país × ano | sob demanda |
 | Mapa | `map/*.geojson`, `map/map_data.json` | município (geometria) | sob demanda |
 | todas | `dictionary.json` | metadado | inicial |
 
-Quatro das oito linhas lêem o mesmo arquivo. Isso não é coincidência: é o
+Quatro das nove linhas lêem o mesmo arquivo. Isso não é coincidência: é o
 princípio 2b funcionando. Se cada uma tivesse recebido o seu recorte pronto,
 seriam quatro arquivos com a mesma informação, e o número cresceria a cada
 filtro novo.
 
 A sparkline do topo e o total da região saem de `region_totals.json`, que é o
 único arquivo pequeno o bastante para não valer discussão.
+
+Repare na penúltima linha: quatro telas compartilham **um** par de arquivos para
+a orientação Países, porque as quatro querem o mesmo grão. Se cada uma tivesse
+ganho o seu recorte, seriam oito arquivos em vez de dois — e a dimensão seguinte
+custaria oito de novo.
