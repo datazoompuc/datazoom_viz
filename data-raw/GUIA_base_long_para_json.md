@@ -86,7 +86,7 @@ idênticos e os 4 novos entraram como adição. É assim que tem que ser.
 ## 2. O receituário
 
 Todo output é a mesma receita com um `group_by` diferente. O exemplo completo
-está em `export_ts_comex_exp_municipio_web.R`.
+está em `export_comex_exp_municipio_web.R`.
 
 ### Preparação, uma vez
 

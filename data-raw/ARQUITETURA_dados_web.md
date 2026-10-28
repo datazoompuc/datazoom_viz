@@ -13,7 +13,7 @@ os JSON de uma base longa, com as armadilhas que apareceram na migração do
 COMEX, está em `GUIA_base_long_para_json.md`. Os três ficam lado a lado em
 `data-raw/`: este diz por quê, o guia diz como, o runbook diz o que rodar.
 
-Os exemplos vêm do `web/ts_comex_exp_municipio/`, que é o app mais completo
+Os exemplos vêm do `web/comex_exp_municipio/`, que é o app mais completo
 hoje, mas os princípios valem para qualquer um.
 
 ---

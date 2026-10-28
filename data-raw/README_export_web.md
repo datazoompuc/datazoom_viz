@@ -1,6 +1,6 @@
 # Como regerar e publicar os dados do app web (ts_comex_exp_municipio)
 
-O app em `web/ts_comex_exp_municipio/` é estático: HTML, CSS e JavaScript lendo
+O app em `web/comex_exp_municipio/` é estático: HTML, CSS e JavaScript lendo
 arquivos JSON. Não tem servidor, não tem R rodando em produção. Os JSON são
 gerados a partir dos `.rds` do repositório por **dois** scripts em `data-raw/`:
 um lê a base longa do COMEX e gera quase tudo, o outro cuida só do mapa.
@@ -36,14 +36,14 @@ Todos os comandos abaixo rodam a partir da raiz do repositório.
 ### 2a. Tudo que sai da base do COMEX (quase sempre é só isso)
 
 ```sh
-Rscript data-raw/export_ts_comex_exp_municipio_web.R
+Rscript data-raw/export_comex_exp_municipio_web.R
 ```
 
 Lê um arquivo só, `data/comex_exp_munic_base.rds` (a base longa gerada por
 `data-raw/comex.R`, descrita em `README_data.md`), mais
 `data/auxiliar_cod_municipais.rds` para o nome dos municípios.
 
-Escreve em `web/ts_comex_exp_municipio/data/`:
+Escreve em `web/comex_exp_municipio/data/`:
 `composition_sec.json`, `composition_sh2.json`,
 `municipality_composition_sec.json`, `municipality_composition_sh2.json`,
 `products_sec.json`, `products_sh2.json`, `municipality_totals.json`,
@@ -75,7 +75,7 @@ rode `data-raw/comex.R` antes.
 ### 3a. O intervalo de anos bateu?
 
 ```sh
-cat web/ts_comex_exp_municipio/data/dictionary.json
+cat web/comex_exp_municipio/data/dictionary.json
 ```
 
 Deve mostrar o primeiro e o último ano dos dados novos. O app lê esse arquivo
@@ -94,7 +94,7 @@ vão mostrar uma queda no último ponto que é só calendário.
 ### 3b. Abrir o app localmente
 
 ```sh
-cd web/ts_comex_exp_municipio
+cd web/comex_exp_municipio
 python3 -m http.server 8000
 ```
 
@@ -108,7 +108,7 @@ Tendências, Mapa) e arrastar o slider de ano. Se alguma ficar presa em
 ### 3c. Commitar
 
 ```sh
-git add web/ts_comex_exp_municipio/data
+git add web/comex_exp_municipio/data
 git commit -m "atualiza dados do app web de COMEX"
 git push
 ```
@@ -159,7 +159,7 @@ gh api repos/datazoompuc/datazoom_viz_web/pages --jq '.status'
 
 Enquanto responder `building`, espere. Quando responder `built`, está no ar:
 
-<https://datazoom.com.br/datazoom_viz_web/ts_comex_exp_municipio/>
+<https://datazoom.com.br/datazoom_viz_web/comex_exp_municipio/>
 
 Costuma levar de um a três minutos.
 

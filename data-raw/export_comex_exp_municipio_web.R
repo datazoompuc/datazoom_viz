@@ -25,14 +25,14 @@
 # municipio name column instead (one column, consistent with how pais_pt
 # and sh4_pt already work).
 #
-# Run from repo root: Rscript data-raw/export_ts_comex_exp_municipio_web.R
+# Run from repo root: Rscript data-raw/export_comex_exp_municipio_web.R
 ############################################################
 
 library(dplyr)
 library(tidyr)
 library(jsonlite)
 
-out_dir <- "web/ts_comex_exp_municipio/data"
+out_dir <- "web/comex_exp_municipio/data"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 base <- readRDS("data/comex_exp_munic_base.rds")

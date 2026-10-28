@@ -26,7 +26,7 @@
 # is identical to the rest of the app's, so the map view reuses the
 # already-loaded dictionary/year slider instead of fetching its own.
 #
-# Output goes under web/ts_comex_exp_municipio/data/map/ — a subfolder,
+# Output goes under web/comex_exp_municipio/data/map/ — a subfolder,
 # not the app's main data/ dir, since app.js only fetches this ~6MB
 # (mostly state-boundary geometry) when the map view is actually opened.
 #
@@ -37,7 +37,7 @@ library(dplyr)
 library(sf)
 library(jsonlite)
 
-out_dir <- "web/ts_comex_exp_municipio/data/map"
+out_dir <- "web/comex_exp_municipio/data/map"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 # ---- Geometry: Legal Amazon municipalities + boundary overlays ----
