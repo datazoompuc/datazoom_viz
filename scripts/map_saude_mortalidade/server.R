@@ -158,13 +158,13 @@ get_server <- function(files, param) {
 
           fig_p <- df_sub %>%
             leaflet() %>%
-            addProviderTiles(provider = "Esri.WorldGrayCanvas") %>%
+            addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
             setView(-58, -7, zoom = 5) %>%
             addPolygons(
               label = labels,
               stroke = FALSE,
               smoothFactor = .5,
-              fillOpacity = ifelse(is.na(df_sub[[var_name]]), 1, 0.8),
+              fillOpacity = 1,
               fillColor = ~ pal(df_sub[[var_name]]),
               highlightOptions = highlightOptions(
                 weight = 5,
@@ -178,7 +178,7 @@ get_server <- function(files, param) {
               pal = pal,
               values = ~ df_sub[[var_name]],
               title = title_legend,
-              opacity = 0.8
+              opacity = 1
             )
 
           states_boundary <- readr::read_rds(files$states_boundary)
