@@ -1,7 +1,7 @@
 ############################################################
 #### COMEX: exportações municipais da Amazônia Legal (MDIC)
 #### Gera, em ./data/, a base longa comex_exp_munic_base.rds, já com os
-#### nomes de país e de produto (SH4/SH2/seção, em PT e EN). Não gera arquivos auxiliares.
+#### nomes de município, país e produto (SH4/SH2/seção, em PT e EN). Não gera arquivos auxiliares.
 ####
 #### Fonte: Comex Stat / MDIC, via datazoom.amazonia::load_br_trade
 #### (dataset "export_mun"). Valores em US$ FOB (nominais, sem deflator)
@@ -177,6 +177,35 @@ aux2 <- ncm_sh %>%
   distinct(CO_SH4, .keep_all = TRUE)
 
 
+# --- Municípios (aux3) ---
+# Nome com acento e UF no fim ("Abadiânia - GO"), da API de cidades do Comex Stat
+# (a mesma fonte da versão anterior do script). A API às vezes responde 503:
+# por isso tenta várias vezes, esperando mais a cada falha.
+municipios_api <- function(tentativas = 8) {
+  url <- "https://api-comexstat.mdic.gov.br/cities/filters/city?language=pt"
+  for (i in seq_len(tentativas)) {
+    d <- tryCatch(
+      jsonlite::fromJSON(url, simplifyDataFrame = TRUE)$data,
+      error = function(e) NULL,
+      warning = function(w) NULL
+    )
+    if (!is.null(d)) return(d)
+    message("Municípios: tentativa ", i, " de ", tentativas, " falhou; esperando...")
+    Sys.sleep(10 * i)
+  }
+  stop("API de municípios do Comex Stat indisponível depois de ", tentativas,
+       " tentativas. Rode o script de novo mais tarde.", call. = FALSE)
+}
+
+d_mun <- municipios_api()
+if (is.list(d_mun) && length(d_mun) == 1 && is.data.frame(d_mun[[1]])) d_mun <- d_mun[[1]]
+aux3 <- as_tibble(d_mun) %>%
+  transmute(cod_municipio = as.numeric(id), municipio = text) %>%
+  distinct(cod_municipio, .keep_all = TRUE)
+stopifnot(nrow(aux3) > 5000)
+
+
+
 # ================================================================
 # BASE CENTRAL
 # ================================================================
@@ -210,7 +239,9 @@ base <- dat %>%
               sec_pt = NO_SEC_PT, sec_en = NO_SEC_EN),
     by = "cod_sh4"
   ) %>%
-  mutate(cod_sh2 = substr(cod_sh4, 1, 2), .after = cod_sh4)
+  mutate(cod_sh2 = substr(cod_sh4, 1, 2), .after = cod_sh4) %>%
+  left_join(aux3, by = "cod_municipio") %>%
+  relocate(municipio, .after = cod_municipio)
 
 if (any(base$ano_parcial)) {
   message("Ano(s) parcial(is): ",
@@ -224,7 +255,7 @@ stopifnot(isTRUE(all.equal(sum(base$kg_liquido), sum(dat$kg_liquido, na.rm = TRU
 stopifnot("kg_liquido" %in% names(base))
 
 # Nenhum nome pode ficar vazio depois das juncoes
-rotulos <- c("pais_pt", "pais_en", "sh4_pt", "sh4_en",
+rotulos <- c("municipio", "pais_pt", "pais_en", "sh4_pt", "sh4_en",
              "sh2_pt", "sh2_en", "sec_pt", "sec_en")
 sem_rotulo <- vapply(rotulos, function(v) sum(is.na(base[[v]])), numeric(1))
 if (any(sem_rotulo > 0)) {

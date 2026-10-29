@@ -20,13 +20,14 @@ O script precisa do `datazoom.amazonia` com o dicionário do COMEX baixado por `
 
 ## Arquivo gerado
 
-`comex_exp_munic_base.rds` é a **base central**, em formato longo, com uma linha por ano × SH4 × município × país de destino. Os nomes de país e de produto já vêm juntados, então não há arquivos auxiliares.
+`comex_exp_munic_base.rds` é a **base central**, em formato longo, com uma linha por ano × SH4 × município × país de destino. Os nomes de município, país e produto já vêm juntados, então não há arquivos auxiliares.
 
 | Coluna | O que é |
 |---|---|
 | `ano` | Ano da exportação. |
 | `cod_sh4`, `cod_sh2` | Códigos do produto (posição SH4 e capítulo SH2, com zeros à esquerda). |
 | `cod_municipio`, `uf` | Município (código IBGE) e UF de origem. |
+| `municipio` | Nome do município com acento e a UF no fim (ex.: "Abadiânia - GO"), da API de cidades do Comex Stat. |
 | `cod_pais` | Código SISCOMEX do país de destino (3 dígitos). |
 | `valor_fob` | Valor exportado, US$ FOB nominais. |
 | `kg_liquido` | Quantidade, em kg líquido. |
@@ -36,7 +37,7 @@ O script precisa do `datazoom.amazonia` com o dicionário do COMEX baixado por `
 | `sh2_pt`, `sh2_en` | Nome do capítulo (SH2) em português e em inglês. |
 | `sec_pt`, `sec_en` | Nome da seção em português e em inglês. |
 
-Os nomes de produto vêm do `NCM_SH.csv` e os de país do `PAIS.csv`, os dois do mesmo servidor do MDIC. O script confere, antes de salvar, que não há chave duplicada, que os totais de `valor_fob` e `kg_liquido` são iguais aos do dado bruto e que nenhum nome ficou vazio.
+Os nomes de produto vêm do `NCM_SH.csv` e os de país do `PAIS.csv` (mesmo servidor do MDIC); os de município vêm da API de cidades do Comex Stat, que às vezes responde 503, então o script tenta de novo várias vezes. O script confere, antes de salvar, que não há chave duplicada, que os totais de `valor_fob` e `kg_liquido` são iguais aos do dado bruto e que nenhum nome ficou vazio.
 
 ## Sobre os dados
 
