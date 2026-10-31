@@ -14,7 +14,7 @@ source("data-raw/comex.R")
 
 O último ano vem do `available_time` do manifest do `datazoom.amazonia` (`ano_inicial` é o único parâmetro; use `ano_final_manual` para forçar outro) e o script sempre baixa os dados de novo.
 
-O servidor do MDIC (balanca.mdic.gov.br) tem a cadeia de certificado incompleta (visto no macOS) e costuma derrubar conexões em arquivos grandes. Por isso os downloads usam o curl do sistema sem verificar o certificado (só para esses arquivos públicos), retomam de onde caíram e repetem até 5 vezes por ano. Os anos já baixados ficam guardados, então, se o script parar em algum ano, basta rodar de novo na mesma sessão do R.
+O servidor do MDIC (balanca.mdic.gov.br) costuma derrubar conexões em arquivos grandes. Por isso os downloads usam o curl do sistema, que retoma de onde caiu e repete em caso de erro, e o script tenta cada ano até 5 vezes. Os anos já baixados ficam guardados, então, se o script parar em algum ano, basta rodar de novo na mesma sessão do R.
 
 O script precisa do `datazoom.amazonia` com o dicionário do COMEX baixado por `download.file()` (PR `comex-dicionario-download-file`). Enquanto o PR não for mergeado, rode antes `devtools::load_all("~/datazoom.amazonia")` na branch desse PR; depois do merge, basta instalar o pacote atualizado. O ano final e a URL do dicionário são lidos com funções internas do pacote (`:::`).
 
@@ -27,7 +27,7 @@ O script precisa do `datazoom.amazonia` com o dicionário do COMEX baixado por `
 | `ano` | Ano da exportação. |
 | `cod_sh4`, `cod_sh2` | Códigos do produto (posição SH4 e capítulo SH2, com zeros à esquerda). |
 | `cod_municipio`, `uf` | Município (código IBGE) e UF de origem. |
-| `municipio` | Nome do município com acento e a UF no fim (ex.: "Abadiânia - GO"), da API de cidades do Comex Stat. |
+| `municipio` | Nome do município com acento e a UF no fim (ex.: "Abadiânia - GO"), do `UF_MUN.csv` do MDIC. |
 | `cod_pais` | Código SISCOMEX do país de destino (3 dígitos). |
 | `valor_fob` | Valor exportado, US$ FOB nominais. |
 | `kg_liquido` | Quantidade, em kg líquido. |
@@ -37,7 +37,7 @@ O script precisa do `datazoom.amazonia` com o dicionário do COMEX baixado por `
 | `sh2_pt`, `sh2_en` | Nome do capítulo (SH2) em português e em inglês. |
 | `sec_pt`, `sec_en` | Nome da seção em português e em inglês. |
 
-Os nomes de produto vêm do `NCM_SH.csv` e os de país do `PAIS.csv` (mesmo servidor do MDIC); os de município vêm da API de cidades do Comex Stat, que às vezes responde 503, então o script tenta de novo várias vezes. O script confere, antes de salvar, que não há chave duplicada, que os totais de `valor_fob` e `kg_liquido` são iguais aos do dado bruto e que nenhum nome ficou vazio.
+Os nomes de produto vêm do `NCM_SH.csv`, os de país do `PAIS.csv` e os de município do `UF_MUN.csv`, todos do mesmo servidor do MDIC (a URL vem do manifest do pacote, trocando só o nome do arquivo). O script confere, antes de salvar, que não há chave duplicada, que os totais de `valor_fob` e `kg_liquido` são iguais aos do dado bruto e que nenhum nome ficou vazio.
 
 ## Sobre os dados
 

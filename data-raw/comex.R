@@ -48,15 +48,13 @@ options(timeout = max(1200, getOption("timeout")))
 # ----------------------------------------------------------------
 # Download dos arquivos do MDIC
 # ----------------------------------------------------------------
-# O certificado de balanca.mdic.gov.br vem com a cadeia incompleta e, em alguns
-# computadores (visto no macOS), o R não consegue verificá-lo. Por isso os
-# downloads do MDIC usam o curl do sistema sem verificar o certificado
-# (-k), só durante cada chamada e só para estes arquivos públicos (decisão
-# combinada com o Antônio). As demais opções fazem o curl retomar o download de
-# onde caiu, porque o servidor derruba conexões ao acaso em arquivos grandes.
+# O servidor do MDIC (balanca.mdic.gov.br) derruba conexões ao acaso em arquivos
+# grandes. Estas opções fazem o curl do sistema retomar o download de onde caiu
+# e repetir em caso de erro. O certificado do servidor é verificado normalmente:
+# o MDIC corrigiu a cadeia de certificado, então não é mais preciso ignorá-lo.
 opcoes_mdic <- list(
   download.file.method = "curl",
-  download.file.extra  = "-k -L -C - --retry 30 --retry-all-errors --retry-delay 3 --speed-limit 5000 --speed-time 60"
+  download.file.extra  = "-L -C - --retry 30 --retry-all-errors --retry-delay 3 --speed-limit 5000 --speed-time 60"
 )
 
 # Último ano disponível na fonte: vem do manifest do pacote (available_time das
@@ -120,8 +118,9 @@ dat <- dplyr::bind_rows(lapply(ano_inicial:ano_final, baixar_ano))
 
 
 # --- Países (aux1) ---
-# PAIS.csv do MDIC (mesmo servidor e mesma pasta do NCM_SH.csv): código e nomes
-# em PT e EN. Substitui a API do Comex Stat, que às vezes responde 503.
+# PAIS.csv: tabela de países do MDIC (código SISCOMEX e nome em português e em inglês).
+# Fica na mesma pasta do NCM_SH.csv; a URL vem do manifest do pacote, trocando
+# só o nome do arquivo.
 arq_pais <- tempfile(fileext = ".csv")
 withr::with_options(
   opcoes_mdic,
@@ -178,29 +177,28 @@ aux2 <- ncm_sh %>%
 
 
 # --- Municípios (aux3) ---
-# Nome com acento e UF no fim ("Abadiânia - GO"), da API de cidades do Comex Stat
-# (a mesma fonte da versão anterior do script). A API às vezes responde 503:
-# por isso tenta várias vezes, esperando mais a cada falha.
-municipios_api <- function(tentativas = 8) {
-  url <- "https://api-comexstat.mdic.gov.br/cities/filters/city?language=pt"
-  for (i in seq_len(tentativas)) {
-    d <- tryCatch(
-      jsonlite::fromJSON(url, simplifyDataFrame = TRUE)$data,
-      error = function(e) NULL,
-      warning = function(w) NULL
-    )
-    if (!is.null(d)) return(d)
-    message("Municípios: tentativa ", i, " de ", tentativas, " falhou; esperando...")
-    Sys.sleep(10 * i)
-  }
-  stop("API de municípios do Comex Stat indisponível depois de ", tentativas,
-       " tentativas. Rode o script de novo mais tarde.", call. = FALSE)
-}
-
-d_mun <- municipios_api()
-if (is.list(d_mun) && length(d_mun) == 1 && is.data.frame(d_mun[[1]])) d_mun <- d_mun[[1]]
-aux3 <- as_tibble(d_mun) %>%
-  transmute(cod_municipio = as.numeric(id), municipio = text) %>%
+# UF_MUN.csv: tabela de municípios do MDIC (código IBGE de 7 dígitos, nome e UF).
+# Fica na mesma pasta do NCM_SH.csv e do PAIS.csv; a URL vem do manifest do
+# pacote, trocando só o nome do arquivo. NO_MUN_MIN é o nome com acento; o rótulo
+# fica como "Abadiânia - GO" (nome e UF), o mesmo formato que a base já tinha.
+arq_mun <- tempfile(fileext = ".csv")
+withr::with_options(
+  opcoes_mdic,
+  utils::download.file(
+    sub("NCM_SH\\.csv$", "UF_MUN.csv",
+        datazoom.amazonia:::dataset_url("comex_dic", "hs_codes")),
+    arq_mun, mode = "wb", quiet = TRUE
+  )
+)
+aux3 <- readr::read_csv2(
+  arq_mun,
+  locale = readr::locale(encoding = "latin1"),
+  col_types = readr::cols(.default = "c")
+) %>%
+  transmute(
+    cod_municipio = as.numeric(CO_MUN_GEO),
+    municipio     = paste0(str_trim(NO_MUN_MIN), " - ", str_trim(SG_UF))
+  ) %>%
   distinct(cod_municipio, .keep_all = TRUE)
 stopifnot(nrow(aux3) > 5000)
 
