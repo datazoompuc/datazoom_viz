@@ -9,28 +9,28 @@ pallete_continuous <- rev(pallete_continuous)
 
 # Funcão para retornar objeto server
 get_server <- function(files, param) {
-
+  
   # Carrega dados
   df <- readRDS(files$db_file) %>%
     st_transform(crs = "+init=epsg:4326")
-
+  
   # Lookups de tradução PT -> EN
   aux <- readRDS(files$aux_file)
-
+  
   trunc_str <- function(x, n) {
     ifelse(!is.na(x) & nchar(x) > n, paste0(substr(x, 1, n - 1), "…"), x)
   }
-
+  
   # SH4: cod_sh4 (char, 4 díg.) -> nome EN, truncado a 60 (igual ao PT)
   sh4_map <- aux %>% distinct(CO_SH4, NO_SH4_EN)
   map_sh4_en <- setNames(trunc_str(sh4_map$NO_SH4_EN, 60), sh4_map$CO_SH4)
-
+  
   # SH2: código de 2 díg. -> nome EN, truncado a 50 (igual ao PT)
   sh2_map <- aux %>%
     mutate(CO_SH2 = substr(CO_SH4, 1, 2)) %>%
     distinct(CO_SH2, NO_SH2_EN)
   map_sh2_en <- setNames(trunc_str(sh2_map$NO_SH2_EN, 50), sh2_map$CO_SH2)
-
+  
   # Domínio de cores dos capítulos (SH2) em cada idioma — mantém legenda estável
   chapters <- df %>%
     st_drop_geometry() %>%
@@ -42,7 +42,7 @@ get_server <- function(files, param) {
     pt = sort(unique(chapters$nome_sh2)),
     en = sort(unique(chapters$nome_sh2_en))
   )
-
+  
   # Traduz produto_principal e nome_sh2 de um sf filtrado, se idioma = EN
   translate_names <- function(w, lg) {
     if (lg == "en") {
@@ -53,7 +53,7 @@ get_server <- function(files, param) {
     }
     w
   }
-
+  
   # --- Base para a visão "Razão: Floresta / Outros produtos" ---
   df_resto <- df %>%
     filter(!floresta) %>%
@@ -85,11 +85,12 @@ get_server <- function(files, param) {
       ),
       
       ratio_compat = if_else(same_prod, 1, ratio_compat),
-
+      
       # classe como chave idioma-independente (traduzida no server)
+      # "Mesmo produto principal" conta como compatível com a floresta:
+      # same_prod já força ratio_compat = 1, que cai em "sim" (>= 1)
       classe_ratio = case_when(
         is.na(ratio_compat) ~ NA_character_,
-        same_prod ~ "same",
         ratio_compat < 1 ~ "nao",
         ratio_compat >= 1 ~ "sim"
       ),
@@ -102,16 +103,16 @@ get_server <- function(files, param) {
   
   
   server <- function(input, output, session) {
-
+    
     # Lang toggle
     lang <- reactiveVal("pt")
-
+    
     observeEvent(input$toggle_lang, {
       lang(ifelse(lang() == "pt", "en", "pt"))
     })
-
+    
     i18n <- reactive({ param$i18n[[lang()]] })
-
+    
     # rótulo traduzido da opção x selecionada (p/ subtítulo)
     x_label <- reactive({
       switch(input$x,
@@ -120,11 +121,11 @@ get_server <- function(files, param) {
              razao  = i18n()$x_razao,
              "")
     })
-
+    
     # Textos dinâmicos da sidebar
     output$plot_desc <- renderText({ i18n()$plot_desc })
     output$topo      <- renderText({ i18n()$topo })
-
+    
     # Atualiza inputs e botões quando o idioma muda
     observeEvent(lang(), {
       updateSelectInput(
@@ -138,12 +139,12 @@ get_server <- function(files, param) {
       updateActionButton(session, "toggle_lang", label = i18n()$btn_lang)
       updateActionButton(session, "ab1",         label = i18n()$btn_fullscreen)
     }, ignoreInit = FALSE)
-
-
+    
+    
     # Dados reativos
     df_reactived <- reactive({
       lg <- lang()
-
+      
       if (input$x == "razao") {
         w <- df_ratio %>% filter(time == input$filter1)
         # traduz o produto principal (do grupo "outros") pelo código
@@ -152,14 +153,14 @@ get_server <- function(files, param) {
           w$produto_principal <- ifelse(is.na(en_prod), w$produto_principal, unname(en_prod))
         }
         # nome_sh2 = classe da razão, traduzida
-        lv <- c(i18n()$ratio_same, i18n()$ratio_nao, i18n()$ratio_sim)
-        key2lab <- setNames(lv, c("same", "nao", "sim"))
+        lv <- c(i18n()$ratio_nao, i18n()$ratio_sim)
+        key2lab <- setNames(lv, c("nao", "sim"))
         w$nome_sh2 <- factor(unname(key2lab[w$classe_ratio]), levels = lv)
         return(w)
       }
       
       w <- df %>% filter(time == input$filter1)
-
+      
       if (input$x == "forest") {
         w <- w %>% filter(floresta)
       } else {
@@ -190,10 +191,10 @@ get_server <- function(files, param) {
     # Função para atualizar inputs a partir da URL
     update_my_inputs <- function() {
       query <- parseQueryString(session$clientData$url_search)
-
+      
       # idioma via ?lang=en
       if (!is.null(query[["lang"]]) && query[["lang"]] == "en") lang("en")
-
+      
       selected <- unlist(query[names(query) == "filter"], use.names = FALSE)
       if (length(selected)) {
         updateSliderInput(session, "filter1", value = as.numeric(selected))
@@ -201,7 +202,7 @@ get_server <- function(files, param) {
         random_inputs()
       }
     }
-
+    
     output$plot_title <- renderText({
       if (is.null(input$filter1) || input$filter1 == "") " " else i18n()$titulo1
     })
@@ -212,21 +213,21 @@ get_server <- function(files, param) {
         paste0(i18n()$titulo3, x_label())
       }
     })
-
+    
     output$map <- renderLeaflet({
-
+      
       update_my_queryString()
-
+      
       fig <- leaflet() %>%
-        addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
+        addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
         setView(-58, -7, zoom = 5)
-
+      
       vals <- df_reactived()[["nome_sh2"]]
-
+      
       if (input$x == "razao") {
-        lv <- c(i18n()$ratio_same, i18n()$ratio_nao, i18n()$ratio_sim)
+        lv <- c(i18n()$ratio_nao, i18n()$ratio_sim)
         pal <- colorFactor(
-          palette  = pallete_discrete[1:3],
+          palette  = pallete_discrete[2:3],   # mantém as cores que "nao" e "sim" já tinham
           domain   = lv,
           na.color = "#cccccc"
         )
@@ -237,7 +238,7 @@ get_server <- function(files, param) {
         }
         pal <- colorFactor(palette = pal1, domain = domain_sh2[[lang()]])
       }
-
+      
       tryCatch(
         {
           labels <- paste0(
@@ -246,24 +247,24 @@ get_server <- function(files, param) {
             i18n()$tooltip3, " <b>", df_reactived()[["produto_principal"]], "</b> <br>",
             i18n()$tooltip4, " <b>", df_reactived()[["nome_sh2"]], "</b> <br>",
             i18n()$tooltip5, " <b>", format(df_reactived()$maximo_produto, scientific = FALSE,
-                                        digits = 2,
-                                        decimal.mark = ",",
-                                        big.mark = "."
+                                            digits = 2,
+                                            decimal.mark = ",",
+                                            big.mark = "."
             ), "<br>", "</b>",
             "<b>", i18n()$tooltip6, i18n()$tooltip7, "</b>"
           ) %>%
             lapply(htmltools::HTML)
-
+          
           fig_p <- df_reactived() %>%
             leaflet() %>%
-            addProviderTiles(provider = "CartoDB.VoyagerNoLabels") %>%
+            addProviderTiles(provider = "Esri.WorldShadedRelief") %>%
             setView(-58, -7, zoom = 5) %>%
             addPolygons(
               data = df_reactived(),
               label = labels,
               stroke = FALSE,
               smoothFactor = .5,
-              fillOpacity = 0.7,
+              fillOpacity = 1,
               fillColor = ~ pal(df_reactived()[["nome_sh2"]]),
               highlightOptions = highlightOptions(
                 weight = 5,
@@ -277,9 +278,9 @@ get_server <- function(files, param) {
                       pal = pal,
                       values = ~ df_reactived()[["nome_sh2"]],
                       title = i18n()$legend,
-                      opacity = 0.7
+                      opacity = 1
             )
-
+          
           fig <- fig_p
         },
         error = function(cond) {
@@ -288,11 +289,11 @@ get_server <- function(files, param) {
       )
       fig
     })
-
+    
     observe({
       update_my_inputs()
     })
   }
-
+  
   server
 }
