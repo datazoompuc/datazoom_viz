@@ -1,15 +1,33 @@
 ################################################################################
 # MapBiomas - Cobertura e Uso da Terra (Amazônia Legal)
-# Gera est e munic com schema consistente para os apps ts_mapbiomas_cobertura.
-# Classes em inglês (chave interna); rótulos PT/EN nos dicionários.
-# Requer a versão dev do pacote (Collection 9, até 2023):
-#   devtools::install_github("datazoompuc/datazoom.amazonia")
-# 2024 vem da Collection 10 na seção 2b. Não confundir com mapbiomas_cobertura.R (mapa).
+# Gera UMA base longa (uma linha por ano x município x classe), com rótulos PT/EN
+# e nível hierárquico dentro dela. Substitui mapbiomas_cobertura_ts_rk.R, que
+# gerava mapbiomas_cobertura_munic.rds, _est.rds e os dicionários por nível.
+# O nível estadual não é mais guardado: é a soma dos municípios
+# (global/mapbiomas_cobertura_larga.R monta as tabelas largas dos apps).
+#
+# Saídas:
+#   data/mapbiomas_cobertura_base.rds       base longa
+#   data/mapbiomas_cobertura_base_dic.csv   dicionário dos apps (PT)
+#   data/mapbiomas_cobertura_base_dic_en.csv  dicionário dos apps (EN)
+#   data/mapbiomas_legenda.csv              legenda EN/PT/nível (usada também
+#                                           pelos apps de transição)
+#
+# Fonte: MapBiomas Collection 10, série completa 1985-2024, via load_mapbiomas()
+# (versão dev do pacote: devtools::install_github("datazoompuc/datazoom.amazonia")).
+# Não confundir com mapbiomas_cobertura_map.R (mapa).
+# Rodar da raiz do datazoom_viz.
+#
+# Unidades: area_ha em hectares; area_municipio_km2 em km2.
+# Níveis (nivel 0 a 4) são cortes diferentes da MESMA área: não somar classes de
+# níveis diferentes. Os níveis 3 e 4 (tipos de lavoura) cobrem só uma parte.
 ################################################################################
 
 ################################################################################
 # 1. SETUP
 ################################################################################
+
+stopifnot(basename(getwd()) == "datazoom_viz")
 
 suppressPackageStartupMessages({
     library(datazoom.amazonia)
@@ -18,9 +36,7 @@ suppressPackageStartupMessages({
     library(readr)
     library(purrr)
     library(tibble)
-    library(readxl)     # ler o .xlsx de estatísticas da Coleção 10
-    library(janitor)    # clean_names(), igual ao pipeline do pacote
-    library(stringi)    # transliteração Latin-ASCII, igual ao pacote
+    library(stringi)    # ordenação com locale (dicionários)
     library(jsonlite)   # nomes de municípios acentuados (API do IBGE)
 })
 
@@ -36,60 +52,15 @@ dat <- load_mapbiomas(
 )
 
 ################################################################################
-# 2b. 2024 (Collection 10) — replica o tratamento do load_mapbiomas() no arquivo
-# de estatísticas da Col10 e empilha só 2024. (A Col10 reprocessou toda a série;
-# p/ série 100% consistente, tirar o filter(year=="2024") e comentar a seção 2.)
+# 2b. CONFERÊNCIA DA CARGA
+# O load_mapbiomas() atual já devolve a série completa da Collection 10
+# (1985-2024), então não é mais preciso baixar 2024 à parte. A Col10 reprocessou
+# toda a série: os valores de 1985-2023 podem diferir dos arquivos gerados antes
+# com a Collection 9.
 ################################################################################
 
-col10_url <- paste0(
-    "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/",
-    "collection_10/lulc/statistics/MAPBIOMAS_BRAZIL-COL.10-BIOME_STATE_MUNICIPALITY.xlsx"
-)
-
-tmp10 <- tempfile(fileext = ".xlsx")
-utils::download.file(col10_url, tmp10, mode = "wb", method = "curl")
-
-# planilha de cobertura: detecta pela que contém "cover"/"cobert"; senão, a 1ª
-sheets10 <- readxl::excel_sheets(tmp10)
-sheet10  <- sheets10[grepl("cover|cobert", sheets10, ignore.case = TRUE)][1]
-if (is.na(sheet10)) sheet10 <- sheets10[1]
-message("Collection 10 - planilhas: ", paste(sheets10, collapse = ", "),
-        " | usando: ", sheet10)
-
-dat_2024 <- readxl::read_xlsx(tmp10, sheet = sheet10) %>%
-    janitor::clean_names() %>%
-    dplyr::mutate_if(is.character, function(v) stringi::stri_trans_general(v, "Latin-ASCII")) %>%
-    dplyr::select(-dplyr::contains("id")) %>%
-    tidyr::pivot_longer(
-        dplyr::starts_with("x"),
-        names_to = "year", values_to = "value", names_prefix = "x"
-    ) %>%
-    tidyr::drop_na(value) %>%
-    dplyr::select(-dplyr::any_of(c(
-        "biome_municipality", "color", "category", "biome_state",
-        "to_color", "from_color", "from_class", "to_class", "class_lulc", "group"
-    ))) %>%
-    dplyr::rename_with(~ dplyr::case_match(.,
-        "city"          ~ "municipality",
-        "geocode"       ~ "municipality_code",
-        "state_acronym" ~ "state",
-        .default = .
-    )) %>%
-    dplyr::mutate(dplyr::across(
-        tidyselect::matches("^class_level_\\d+$"),
-        ~ sub("^\\s*\\d+(?:\\.\\d+)*\\.?\\s*", "", as.character(.))
-    )) %>%
-    dplyr::filter(year == "2024") %>%
-    # alinhar tipos com a base do pacote antes de empilhar
-    dplyr::mutate(
-        municipality_code = as.numeric(municipality_code),
-        year              = as.character(year),
-        value             = as.numeric(value)
-    )
-
-dat <- dplyr::bind_rows(dat, dat_2024)
-message("2024 (Col10) adicionado: ", nrow(dat_2024), " linhas | anos agora: ",
-        paste(range(dat$year), collapse = "-"))
+stopifnot("2024" %in% dat$year, "1985" %in% dat$year)
+message("Carga: anos ", paste(range(dat$year), collapse = "-"), " | linhas: ", nrow(dat))
 
 ################################################################################
 # 3. REFERÊNCIAS: municípios da Amazônia Legal (nome do estado) e áreas
@@ -130,12 +101,6 @@ muni_names <- tibble::tibble(
 # área municipal (km²) — mantida no repositório em global/
 areas_mun <- readr::read_rds("global/area_municipios.rds")   # cols: municipality_code, area_km2
 
-# área por estado (soma das áreas municipais da Amazônia Legal)
-areas_state <- areas_mun %>%
-    inner_join(municipios_amazonia, by = "municipality_code") %>%
-    group_by(uf) %>%
-    summarise(area_km2 = sum(area_km2, na.rm = TRUE), .groups = "drop")
-
 ################################################################################
 # 4. TABELA LONGA (todos os níveis hierárquicos de classe: level_0..level_4)
 #
@@ -149,12 +114,11 @@ class_levels <- paste0("class_level_", 0:4)
 # remove eventual prefixo numérico ("1. Forest" -> "Forest"); no-op no schema dev atual
 strip_prefix <- function(x) sub("^[0-9]+(\\.[0-9]+)*\\.?\\s*", "", x)
 
-
 long_by_level <- purrr::map_df(class_levels, function(lv) {
     dat %>%
         transmute(
             time              = as.integer(year),
-            municipality_code,
+            municipality_code = as.numeric(municipality_code),   # o pacote devolve texto
             aggregation       = strip_prefix(.data[[lv]]),
             area              = as.numeric(value)
         ) %>%
@@ -188,50 +152,13 @@ long <- long_by_level %>%
     distinct(time, municipality_code, uf, aggregation, .keep_all = TRUE) # colapsa repetições entre níveis (não soma)
 
 ################################################################################
-# 5. DATASET MUNICIPAL (group = "Município - Estado", mantém municipality_code)
-################################################################################
-
-munic_wide <- long %>%
-    left_join(muni_names, by = "municipality_code") %>%
-    mutate(group = paste(municipality, "-", uf)) %>%
-    pivot_wider(
-        id_cols     = c(time, municipality_code, group),
-        names_from  = aggregation,
-        values_from = area,
-        values_fill = 0
-    ) %>%
-    left_join(areas_mun, by = "municipality_code") %>%
-    arrange(group, time)
-
-saveRDS(munic_wide, "data/mapbiomas_cobertura_munic.rds")
-
-################################################################################
-# 6. DATASET ESTADUAL (group = estado; área somada por estado)
-################################################################################
-
-est_wide <- long %>%
-    group_by(time, uf, aggregation) %>%
-    summarise(area = sum(area, na.rm = TRUE), .groups = "drop") %>%
-    pivot_wider(
-        id_cols     = c(time, uf),
-        names_from  = aggregation,
-        values_from = area,
-        values_fill = 0
-    ) %>%
-    rename(group = uf) %>%
-    left_join(areas_state, by = c("group" = "uf")) %>%
-    arrange(group, time)
-
-saveRDS(est_wide, "data/mapbiomas_cobertura_est.rds")
-
-################################################################################
-# 7. LEGENDA (EN -> PT + NÍVEL HIERÁRQUICO)
+# 5. LEGENDA (EN -> PT + NÍVEL HIERÁRQUICO)
 # Nível: DINÂMICO — menor class_level onde cada classe aparece na carga (cobre
 #   inclusive as classes novas da Coleção 10, ex.: Photovoltaic Project).
 # Nomes PT: legenda OFICIAL do MapBiomas. O pacote não traduz os valores das
 #   classes (só metadados), então o PT vem dos Códigos de Legenda - Coleção 10:
 #   https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2025/08/Legenda-Colecao-10-Legend-Code.pdf
-# Salva como auxiliar em data/mapbiomas_legenda.csv.
+# Salva como auxiliar em data/mapbiomas_legenda.csv (os apps de transição leem).
 ################################################################################
 
 legenda_file <- "data/mapbiomas_legenda.csv"
@@ -304,9 +231,52 @@ legenda <- niveis %>%
 readr::write_csv(legenda, legenda_file)
 
 ################################################################################
-# 7b. DICIONÁRIOS (PT / EN)
+# 6. BASE LONGA: uma linha por ano x município x classe
+# Rótulos PT/EN de toda dimensão que aparece como texto e nível da classe.
+# Não guarda linhas de área zero: a ausência vale zero
+# (cobertura_larga() preenche com zero ao montar as tabelas largas).
+################################################################################
+
+base <- long %>%
+    left_join(muni_names, by = "municipality_code") %>%
+    left_join(areas_mun,  by = "municipality_code") %>%
+    left_join(dplyr::rename(legenda, classe_en = nome_en, classe_pt = nome_pt),
+              by = c("aggregation" = "classe_en")) %>%
+    transmute(
+        ano                = time,
+        cod_municipio      = municipality_code,
+        municipio          = municipality,
+        uf,
+        classe_en          = aggregation,
+        classe_pt,
+        nivel,
+        area_ha            = area,
+        area_municipio_km2 = area_km2
+    ) %>%
+    filter(area_ha > 0) %>%
+    arrange(cod_municipio, ano, nivel, classe_en)
+
+# falha alto se algum rótulo ou chave não fechou, em vez de gravar NA
+stopifnot(
+    !anyNA(base$municipio),
+    !anyNA(base$classe_pt),
+    !anyNA(base$nivel),
+    !anyNA(base$area_municipio_km2),
+    !anyDuplicated(base[c("ano", "cod_municipio", "classe_en")])
+)
+
+saveRDS(base, "data/mapbiomas_cobertura_base.rds")
+
+cat("BASE -> linhas:", nrow(base),
+    "| anos:", min(base$ano), "a", max(base$ano),
+    "| municípios:", dplyr::n_distinct(base$cod_municipio),
+    "| classes:", dplyr::n_distinct(base$classe_en), "\n")
+
+################################################################################
+# 7. DICIONÁRIO DOS APPS (PT / EN)
 # Rótulos vêm da legenda oficial; var_group = nível hierárquico (vira optgroup no
 # app); linhas ordenadas por nível e depois alfabeticamente pelo rótulo do idioma.
+# Um par só: estado e município têm as mesmas classes.
 ################################################################################
 
 grupo_nivel_pt <- c("0" = "Nível 0 — Categorias amplas",
@@ -320,17 +290,16 @@ grupo_nivel_en <- c("0" = "Level 0 — Broad categories",
                     "3" = "Level 3 — Detail",
                     "4" = "Level 4 — Specific classes")
 
-# Constrói e grava o par de dicionários (PT + EN) para um dataset.
-build_dics <- function(df, out_pt, out_en) {
-    cols     <- setdiff(colnames(df), "municipality_code")   # chave técnica fora do dic
+# Constrói e grava o par de dicionários (PT + EN).
+build_dics <- function(cols, out_pt, out_en) {
     is_class <- !(cols %in% c("group", "time", "area_km2"))
 
-    base <- tibble::tibble(var = cols, is_class = is_class) %>%
+    base_dic <- tibble::tibble(var = cols, is_class = is_class) %>%
         dplyr::left_join(legenda, by = c("var" = "nome_en"))
 
     make_dic <- function(idioma) {
         grupo_map <- if (idioma == "pt") grupo_nivel_pt else grupo_nivel_en
-        base %>%
+        base_dic %>%
             dplyr::mutate(
                 x = is_class, y = is_class,
                 color = var == "group", size = is_class, slider = is_class,
@@ -365,36 +334,117 @@ build_dics <- function(df, out_pt, out_en) {
                           var_group, tipo, unidade, categoria, subcategoria)
     }
 
-    faltando <- base$var[base$is_class & is.na(base$nome_pt)]
-    if (length(faltando) > 0) {
-        message("Classes sem correspondência na legenda oficial: ",
-                paste(faltando, collapse = " | "))
-    }
-
     readr::write_csv(make_dic("pt"), out_pt)
     readr::write_csv(make_dic("en"), out_en)
 }
 
-build_dics(est_wide,
-           "data/mapbiomas_cobertura_est_dic.csv",
-           "data/mapbiomas_cobertura_est_dic_en.csv")
-
-build_dics(munic_wide,
-           "data/mapbiomas_cobertura_munic_dic.csv",
-           "data/mapbiomas_cobertura_munic_dic_en.csv")
+build_dics(c("group", "time", sort(unique(base$classe_en)), "area_km2"),
+           "data/mapbiomas_cobertura_base_dic.csv",
+           "data/mapbiomas_cobertura_base_dic_en.csv")
 
 ################################################################################
-# 8. CHECAGENS RÁPIDAS (conferir antes da Fase 1)
+# 8. CONFERÊNCIA
+# (a) ida e volta: as tabelas largas montadas a partir da base (cobertura_larga)
+#     têm de ser idênticas às montadas direto da tabela longa, com o método antigo
+#     (pivot_wider em munic e est). Isto prova que a base não perdeu nada.
+# (b) contra os arquivos antigos (Collection 9 + 2024 da Col10): 2024 tem de
+#     ser igual; 1985-2023 são só informativos, porque a Col10 reprocessou a série.
 ################################################################################
 
-cat("EST  -> anos:", min(est_wide$time), "a", max(est_wide$time),
-    "| estados:", dplyr::n_distinct(est_wide$group),
-    "| colunas:", ncol(est_wide), "\n")
-cat("MUNIC-> anos:", min(munic_wide$time), "a", max(munic_wide$time),
-    "| municipios:", dplyr::n_distinct(munic_wide$group),
-    "| colunas:", ncol(munic_wide), "\n")
+source("global/mapbiomas_cobertura_larga.R")
 
-classes_est   <- setdiff(colnames(est_wide),   c("group", "time", "area_km2"))
-classes_munic <- setdiff(colnames(munic_wide), c("group", "time", "municipality_code", "area_km2"))
-cat("Classes so no EST  :", paste(setdiff(classes_est, classes_munic), collapse = ", "), "\n")
-cat("Classes so no MUNIC:", paste(setdiff(classes_munic, classes_est), collapse = ", "), "\n")
+comparar <- function(novo, velho, chaves, rotulo) {
+    novo  <- as.data.frame(dplyr::ungroup(novo))
+    velho <- as.data.frame(dplyr::ungroup(velho))
+    if (!setequal(names(novo), names(velho))) {
+        cat(rotulo, ": colunas diferentes.\n  só no novo :",
+            paste(setdiff(names(novo), names(velho)), collapse = " | "),
+            "\n  só no velho:", paste(setdiff(names(velho), names(novo)), collapse = " | "), "\n")
+        return(FALSE)
+    }
+    cn    <- sort(names(velho))
+    novo  <- novo[do.call(order, novo[chaves]), cn]
+    velho <- velho[do.call(order, velho[chaves]), cn]
+    rownames(novo) <- rownames(velho) <- NULL
+    r <- all.equal(novo, velho, check.attributes = FALSE)
+    cat(rotulo, ":", if (isTRUE(r)) "IGUAL" else "DIFERENTE", "\n")
+    if (!isTRUE(r)) print(utils::head(r, 10))
+    isTRUE(r)
+}
+
+# (a) método antigo, direto da tabela longa
+munic_ref <- long %>%
+    filter(area > 0) %>%     # a base não guarda zeros
+    left_join(muni_names, by = "municipality_code") %>%
+    mutate(group = paste(municipality, "-", uf)) %>%
+    pivot_wider(id_cols = c(time, municipality_code, group),
+                names_from = aggregation, values_from = area, values_fill = 0) %>%
+    left_join(areas_mun, by = "municipality_code") %>%
+    arrange(group, time)
+
+areas_state <- areas_mun %>%
+    inner_join(municipios_amazonia, by = "municipality_code") %>%
+    group_by(uf) %>%
+    summarise(area_km2 = sum(area_km2, na.rm = TRUE), .groups = "drop")
+
+est_ref <- long %>%
+    filter(area > 0) %>%
+    group_by(time, uf, aggregation) %>%
+    summarise(area = sum(area, na.rm = TRUE), .groups = "drop") %>%
+    pivot_wider(id_cols = c(time, uf), names_from = aggregation,
+                values_from = area, values_fill = 0) %>%
+    rename(group = uf) %>%
+    left_join(areas_state, by = c("group" = "uf")) %>%
+    arrange(group, time)
+
+cat("\n== (a) ida e volta, base -> tabelas largas\n")
+ok_munic <- comparar(cobertura_larga(base, "munic"), munic_ref, c("municipality_code", "time"), "munic")
+ok_est   <- comparar(cobertura_larga(base, "est"),   est_ref,   c("group", "time"), "est")
+
+# (b) contra os arquivos antigos
+cat("\n== (b) contra os .rds antigos\n")
+velho_m <- readRDS("data/mapbiomas_cobertura_munic.rds")
+velho_e <- readRDS("data/mapbiomas_cobertura_est.rds")
+novo_m  <- cobertura_larga(base, "munic")
+novo_e  <- cobertura_larga(base, "est")
+
+ok_2024_m <- comparar(dplyr::filter(novo_m, time == 2024), dplyr::filter(velho_m, time == 2024),
+                      c("municipality_code", "time"), "munic, só 2024")
+ok_2024_e <- comparar(dplyr::filter(novo_e, time == 2024), dplyr::filter(velho_e, time == 2024),
+                      c("group", "time"), "est, só 2024")
+
+cat("\nmunic: anos novo", paste(range(novo_m$time), collapse = "-"),
+    "| velho", paste(range(velho_m$time), collapse = "-"),
+    "| municípios novo", dplyr::n_distinct(novo_m$municipality_code),
+    "| velho", dplyr::n_distinct(velho_m$municipality_code), "\n")
+
+# diferença relativa por ano, em Floresta e Pastagem (informativo)
+dif <- dplyr::inner_join(
+    dplyr::select(novo_m,  time, municipality_code, Forest, Pasture),
+    dplyr::select(velho_m, time, municipality_code, Forest, Pasture),
+    by = c("time", "municipality_code"), suffix = c("_novo", "_velho")) %>%
+    dplyr::summarise(
+        forest_novo  = sum(Forest_novo),  forest_velho  = sum(Forest_velho),
+        pasture_novo = sum(Pasture_novo), pasture_velho = sum(Pasture_velho),
+        .by = time) %>%
+    dplyr::mutate(dif_forest_pct  = round(100 * (forest_novo  / forest_velho  - 1), 3),
+                  dif_pasture_pct = round(100 * (pasture_novo / pasture_velho - 1), 3)) %>%
+    dplyr::arrange(time)
+cat("Diferença da soma (novo vs velho), anos selecionados:\n")
+print(dif[dif$time %in% c(1985, 1995, 2005, 2015, 2022, 2023, 2024),
+          c("time", "dif_forest_pct", "dif_pasture_pct")])
+
+dic_antigo_pt <- utils::read.csv("data/mapbiomas_cobertura_est_dic.csv", fileEncoding = "UTF-8")
+dic_novo_pt   <- utils::read.csv("data/mapbiomas_cobertura_base_dic.csv", fileEncoding = "UTF-8")
+cat("\ndicionário PT novo x antigo:", if (isTRUE(all.equal(dic_novo_pt, dic_antigo_pt))) "IGUAL" else "DIFERENTE",
+    "| classes só no novo:", paste(setdiff(dic_novo_pt$var, dic_antigo_pt$var), collapse = " | "),
+    "| só no antigo:", paste(setdiff(dic_antigo_pt$var, dic_novo_pt$var), collapse = " | "), "\n")
+
+cat("\nTamanho da base:", format(file.size("data/mapbiomas_cobertura_base.rds") / 1e6, digits = 3), "MB\n")
+cat("Arquivos que ela substitui (MB):\n")
+antigos <- c("data/mapbiomas_cobertura_munic.rds", "data/mapbiomas_cobertura_est.rds",
+             "data/mapbiomas_cobertura_munic_pt.rds", "data/mapbiomas_cobertura_munic_en.rds")
+print(round(file.size(antigos) / 1e6, 2))
+
+stopifnot(ok_munic, ok_est)
+cat("\nIda e volta OK. Confira acima os itens da seção (b) antes de seguir.\n")
