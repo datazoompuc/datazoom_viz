@@ -401,7 +401,14 @@ cat("\n== (a) ida e volta, base -> tabelas largas\n")
 ok_munic <- comparar(cobertura_larga(base, "munic"), munic_ref, c("municipality_code", "time"), "munic")
 ok_est   <- comparar(cobertura_larga(base, "est"),   est_ref,   c("group", "time"), "est")
 
-# (b) contra os arquivos antigos
+# (b) contra os arquivos antigos. Só roda se eles ainda existirem: depois da
+# limpeza ficam apenas no histórico do Git, e esta parte é pulada.
+arquivos_antigos <- c("data/mapbiomas_cobertura_munic.rds", "data/mapbiomas_cobertura_est.rds",
+                      "data/mapbiomas_cobertura_est_dic.csv",
+                      "data/mapbiomas_cobertura_munic_pt.rds", "data/mapbiomas_cobertura_munic_en.rds")
+if (!all(file.exists(arquivos_antigos))) {
+cat("\n== (b) pulado: os arquivos antigos já foram removidos do repositório.\n")
+} else {
 cat("\n== (b) contra os .rds antigos\n")
 velho_m <- readRDS("data/mapbiomas_cobertura_munic.rds")
 velho_e <- readRDS("data/mapbiomas_cobertura_est.rds")
@@ -445,6 +452,7 @@ cat("Arquivos que ela substitui (MB):\n")
 antigos <- c("data/mapbiomas_cobertura_munic.rds", "data/mapbiomas_cobertura_est.rds",
              "data/mapbiomas_cobertura_munic_pt.rds", "data/mapbiomas_cobertura_munic_en.rds")
 print(round(file.size(antigos) / 1e6, 2))
+}
 
 stopifnot(ok_munic, ok_est)
-cat("\nIda e volta OK. Confira acima os itens da seção (b) antes de seguir.\n")
+cat("\nIda e volta OK.\n")
