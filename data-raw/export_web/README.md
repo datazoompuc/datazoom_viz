@@ -1,4 +1,4 @@
-# `data-raw/web/`
+# `data-raw/export_web/`
 
 Tudo que diz respeito aos **apps web estáticos** em `web/`: os scripts que
 transformam `.rds` em JSON, e a documentação de como e por quê.
@@ -11,7 +11,7 @@ diferentes do mesmo caminho:
 fonte (IBGE, MDIC, MapBiomas...)
    ↓  data-raw/*.R              <- constrói os .rds
 data/*.rds
-   ↓  data-raw/web/export_*.R   <- converte para JSON
+   ↓  data-raw/export_web/export_*.R   <- converte para JSON
 web/<app>/data/*.json
    ↓  GitHub Pages
 site
@@ -24,6 +24,7 @@ site
 | Atualizar os dados de um app que já existe | `RUNBOOK_*.md` do app |
 | Criar os dados de um app novo | `GUIA_base_long.md` |
 | Entender por que os dados estão assim | `ARQUITETURA.md` |
+| Começar um app web novo | `SHARED.md` |
 
 Em uma frase: **arquitetura diz por quê, guia diz como, runbook diz o que rodar.**
 
@@ -52,7 +53,7 @@ Em uma frase: **arquitetura diz por quê, guia diz como, runbook diz o que rodar
 Todos rodam a partir da **raiz do repositório**:
 
 ```sh
-Rscript data-raw/web/export_comex_exp_municipio.R
+Rscript data-raw/export_web/export_comex_exp_municipio.R
 ```
 
 ## Convenção para apps novos
@@ -65,4 +66,10 @@ Ao migrar um app novo para o formato estático, acrescente aqui:
 A arquitetura e o guia são gerais e não precisam de versão por app.
 
 O que é compartilhado entre os apps no lado do navegador (CSS e utilitários
-de JS) mora em `web/shared/`, não aqui.
+de JS) mora em `web/shared/`. A documentação daquela pasta é o `SHARED.md`
+aqui, e não lá dentro, porque **tudo que está em `web/` é publicado**: o
+workflow do Pages manda a pasta inteira para o ar, então um `.md` lá viraria
+URL do site.
+
+Pelo mesmo motivo os scripts de export ficam aqui e não em `web/`: script de
+build não é conteúdo de site, e ainda entraria no peso do que é publicado.

@@ -36,7 +36,7 @@ Todos os comandos abaixo rodam a partir da raiz do repositório.
 ### 2a. Tudo que sai da base do COMEX (quase sempre é só isso)
 
 ```sh
-Rscript data-raw/web/export_comex_exp_municipio.R
+Rscript data-raw/export_web/export_comex_exp_municipio.R
 ```
 
 Lê **um arquivo só**: `data/comex_exp_munic_base.rds`, a base longa gerada
@@ -64,7 +64,7 @@ buscar nada.
 ### 2b. Mapa (só se a geometria mudar, o que é raro)
 
 ```sh
-Rscript data-raw/web/export_comex_mapa.R
+Rscript data-raw/export_web/export_comex_mapa.R
 ```
 
 Lê `global/munic_shapefile.rds`, `global/states_boundary.rds`,

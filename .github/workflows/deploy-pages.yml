@@ -22,7 +22,7 @@ name: Deploy web apps to GitHub Pages
 # último passo — o build funciona e serve para conferir o conteúdo.
 #
 # Enquanto isso, a publicação continua sendo o rsync manual para o repo
-# datazoompuc/datazoom_viz_web, descrito em data-raw/web/RUNBOOK_comex.md.
+# datazoompuc/datazoom_viz_web, descrito em data-raw/export_web/RUNBOOK_comex.md.
 # Quando este workflow entrar em operação, aquela seção do runbook sai e o
 # datazoom_viz_web passa a ser só staging.
 
