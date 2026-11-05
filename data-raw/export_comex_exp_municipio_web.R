@@ -16,14 +16,14 @@
 # why the split is by dependency rather than by visualisation — the map
 # export stays separate because it needs `sf`.
 #
-# The one thing the base does NOT carry is the municipality NAME: it has
-# cod_municipio (IBGE code) and uf, while every other dimension (pais, SH4,
-# SH2, sec) ships its own PT/EN label. The app keys municipalities by the
-# "Nome - UF" string, so the name is joined from
-# data/auxiliar_cod_municipais.rds. That file is marked for deletion on the
-# comex-deflator-limpeza branch; if it goes away, the base needs a
-# municipio name column instead (one column, consistent with how pais_pt
-# and sh4_pt already work).
+# Two measures ride together: valor_fob (US$ FOB nominal) and kg_liquido
+# (quantity). Both are exported into the SAME sparse structure rather than
+# into parallel files, because a row exists in the base when there was a
+# transaction, so the two share a sparsity pattern almost exactly: at the
+# municipio x ano grain only 27 of 6534 cells carry value without weight,
+# and none the reverse. Sharing costs one extra number per cell instead of
+# duplicating every lookup array, and it makes the app's Valor/Quantidade
+# toggle instant, with no second fetch.
 #
 # Run from repo root: Rscript data-raw/export_comex_exp_municipio_web.R
 ############################################################
@@ -37,27 +37,19 @@ dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 base <- readRDS("data/comex_exp_munic_base.rds")
 
-# ---- Municipality names ----
-# Joined, not derived: datazoom.amazonia::municipalities carries only
-# accent-stripped names ("Acailandia"), which would silently rename 212 of
-# the 450 municipalities and break every saved URL that names one.
-municipios_aux <- readRDS("data/auxiliar_cod_municipais.rds") %>%
-  transmute(cod_municipio = as.character(codigo), municipio = nome)
-
-base <- base %>%
-  mutate(cod_municipio = as.character(cod_municipio)) %>%
-  left_join(municipios_aux, by = "cod_municipio")
-
+# A base traz o nome do município desde o merge de nov/2026, então não há
+# mais join com auxiliar nenhum. Falha alto se a coluna sumir, em vez de
+# exportar JSON com null.
+if (!"municipio" %in% names(base)) {
+  stop("a base nao tem a coluna `municipio` — o export depende dela para as chaves do app")
+}
 faltando <- sum(is.na(base$municipio))
 if (faltando > 0) {
-  stop(sprintf("%d linhas sem nome de municipio — auxiliar_cod_municipais.rds desatualizado?", faltando))
+  stop(sprintf("%d linhas sem nome de municipio na base", faltando))
 }
 
-# The measure every output below is built on. kg_liquido is already in the
-# base and the whole pipeline is written against this one name, so adding a
-# quantity version later is a parameter change here, not a rewrite.
-MEDIDA <- "valor_fob"
-base$valor <- base[[MEDIDA]]
+# As duas medidas, com os nomes curtos que os JSON usam.
+base <- base %>% mutate(valor = valor_fob, kg = kg_liquido)
 
 # ---- Year range and partial years ----
 # The base can end on an incomplete year (2026 has 9 months). Shipping that
@@ -95,13 +87,13 @@ export_aggregation <- function(level, col_pt, col_en) {
   # needs, so collapse to municipio x categoria x ano first.
   por_municipio <- base %>%
     group_by(municipio, produto = .data[[col_pt]], ano) %>%
-    summarise(valor = sum(valor), .groups = "drop") %>%
-    filter(valor > 0)
+    summarise(valor = sum(valor), kg = sum(kg), .groups = "drop") %>%
+    filter(valor > 0 | kg > 0)
 
   # Region-wide composition: one more collapse, over municipality.
   composition <- por_municipio %>%
     group_by(produto, ano) %>%
-    summarise(valor = round(sum(valor)), .groups = "drop") %>%
+    summarise(valor = round(sum(valor)), kg = round(sum(kg)), .groups = "drop") %>%
     arrange(produto, ano)
 
   write_json(composition, file.path(out_dir, sprintf("composition_%s.json", level)),
@@ -123,7 +115,8 @@ export_aggregation <- function(level, col_pt, col_en) {
         municipio_idx = match(municipio, municipios_idx) - 1L,
         produto_idx = match(produto, produtos_idx) - 1L,
         ano = as.integer(ano),
-        valor = round(valor)
+        valor = round(valor),
+        kg = round(kg)
       ) %>%
       as.matrix() %>%
       unname()
@@ -165,12 +158,12 @@ export_aggregation("sh2", "sh2_pt", "sh2_en")
 
 por_pais_municipio <- base %>%
   group_by(municipio, pais = pais_pt, ano) %>%
-  summarise(valor = sum(valor), .groups = "drop") %>%
-  filter(valor > 0)
+  summarise(valor = sum(valor), kg = sum(kg), .groups = "drop") %>%
+  filter(valor > 0 | kg > 0)
 
 composition_pais <- por_pais_municipio %>%
   group_by(pais, ano) %>%
-  summarise(valor = round(sum(valor)), .groups = "drop") %>%
+  summarise(valor = round(sum(valor)), kg = round(sum(kg)), .groups = "drop") %>%
   arrange(pais, ano)
 
 write_json(composition_pais, file.path(out_dir, "composition_pais.json"),
@@ -187,7 +180,8 @@ muni_pais <- list(
       municipio_idx = match(municipio, municipios_pais_idx) - 1L,
       pais_idx = match(pais, paises_idx) - 1L,
       ano = as.integer(ano),
-      valor = round(valor)
+      valor = round(valor),
+      kg = round(kg)
     ) %>%
     as.matrix() %>%
     unname()
@@ -212,7 +206,7 @@ cat(sprintf(" - %d paises, %d celulas nao-zero (pais)\n",
 
 munic_totals <- base %>%
   group_by(municipio, ano) %>%
-  summarise(valor = round(sum(valor)), .groups = "drop") %>%
+  summarise(valor = round(sum(valor)), kg = round(sum(kg)), .groups = "drop") %>%
   arrange(municipio, ano)
 
 write_json(munic_totals, file.path(out_dir, "municipality_totals.json"),
@@ -220,7 +214,7 @@ write_json(munic_totals, file.path(out_dir, "municipality_totals.json"),
 
 region_totals <- base %>%
   group_by(ano) %>%
-  summarise(valor = round(sum(valor)), .groups = "drop") %>%
+  summarise(valor = round(sum(valor)), kg = round(sum(kg)), .groups = "drop") %>%
   arrange(ano)
 
 write_json(region_totals, file.path(out_dir, "region_totals.json"),
@@ -233,8 +227,8 @@ write_json(region_totals, file.path(out_dir, "region_totals.json"),
 
 sh4_long <- base %>%
   group_by(municipio, produto_code = cod_sh4, ano) %>%
-  summarise(valor = sum(valor), .groups = "drop") %>%
-  filter(valor > 0)
+  summarise(valor = sum(valor), kg = sum(kg), .groups = "drop") %>%
+  filter(valor > 0 | kg > 0)
 
 sh4_municipios <- sort(unique(sh4_long$municipio))
 sh4_codes <- sort(unique(sh4_long$produto_code))
@@ -258,7 +252,8 @@ product_ranking <- list(
       produto_idx = match(produto_code, sh4_codes) - 1L,
       municipio_idx = match(municipio, sh4_municipios) - 1L,
       ano = as.integer(ano),
-      valor = round(valor)
+      valor = round(valor),
+      kg = round(kg)
     ) %>%
     as.matrix() %>%
     unname()
