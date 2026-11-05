@@ -79,7 +79,7 @@ html, body {
   margin-top: auto;
   padding-top: 24px;
   height: 64px;
-  background-image: url("img/logo_datazoom_branco_horizontal.png");
+  background-image: url("../shared/img/logo_datazoom_branco_horizontal.png");
   background-repeat: no-repeat;
   background-position: left bottom;
   background-size: contain;

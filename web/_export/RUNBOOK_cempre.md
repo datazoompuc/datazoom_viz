@@ -33,7 +33,7 @@ Todos os comandos rodam a partir da raiz do repositório.
 ## 2. Regerar os dados
 
 ```sh
-Rscript data-raw/export_web/export_cempre_mapa.R
+Rscript web/_export/export_cempre_mapa.R
 ```
 
 Lê:
@@ -53,12 +53,12 @@ constrói.
 
 ### A paleta não é regerada aqui
 
-`data-raw/export_web/build_sequential_ramp.mjs` gera a escala de 9 cores usada pelo mapa
+`web/_export/build_sequential_ramp.mjs` gera a escala de 9 cores usada pelo mapa
 e está **fixa** no `app.js` (`PALETTE_CONTINUOUS`). Não precisa rodar na
 atualização de dados; só se alguém quiser mudar a paleta. Nesse caso:
 
 ```sh
-node data-raw/export_web/build_sequential_ramp.mjs
+node web/_export/build_sequential_ramp.mjs
 ```
 
 e cole o resultado no `app.js`. O cabeçalho do script explica como validar o
@@ -98,69 +98,39 @@ git push
 
 ## 4. Publicar
 
-> Hoje o site é servido pelo repositório **`datazoompuc/datazoom_viz_web`**, que
-> é um espelho só da pasta `web/`. O plano é tornar o `datazoom_viz` público e
-> servir o GitHub Pages direto dele, o que elimina esta seção inteira. Enquanto
-> isso não acontece, siga os passos abaixo.
+**É só fazer merge na `main`.**
+
+O GitHub Pages serve este repositório direto, e o workflow
+`.github/workflows/deploy-pages.yml` republica a cada push na `main` que toque
+`web/`. Não há repositório de staging, nem `rsync`, nem passo manual.
 
 ```sh
-# 1. clonar o repositório do site
-git clone https://github.com/datazoompuc/datazoom_viz_web.git /tmp/dzweb
-
-# 2. copiar o conteúdo de web/ por cima
-rsync -a --delete --exclude ".git" web/ /tmp/dzweb/
-
-# 3. RESTAURAR os dois arquivos que só existem no repositório do site
-cd /tmp/dzweb
-git checkout -- .nojekyll README.md
-
-# 4. conferir que só mudou o que você esperava
-git status --short
-
-# 5. commitar e publicar
-git add -A
-git commit -m "atualiza dados do CEMPRE (sync from datazoompuc/datazoom_viz@<SHA>)"
-git push origin main
+git add web/map_dz_munic_cempre/data
+git commit -m "atualiza dados do mapa CEMPRE"
+git push
 ```
 
-**O passo 3 não é opcional.** O `rsync --delete` apaga `.nojekyll` e `README.md`
-do repositório do site, porque eles não existem dentro de `web/`. Sem o
-`.nojekyll`, o GitHub Pages processa o site com Jekyll e ignora qualquer pasta
-começada por underscore, quebrando o site de formas difíceis de diagnosticar.
+Abra um PR como de costume. O `web-check.yml` valida os JSON e o JS antes do
+merge; o `deploy-pages.yml` publica depois.
 
-Repare que o `rsync` sincroniza **toda** a pasta `web/`, não só este app. Se
-houver outro app com alterações não publicadas, elas vão junto.
+### O que vai ao ar, e o que não vai
+
+O workflow monta o site copiando `web/` **sem a pasta `_export/`**:
+
+```
+web/
+  map_dz_munic_cempre/   → vai ao ar
+  shared/                → vai ao ar
+  _export/               → NÃO vai: scripts e guias, inclusive este arquivo
+```
+
+Se você acrescentar um script ou um `.md` fora do `_export/`, o `web-check.yml`
+**falha** e diz onde.
 
 ### Acompanhar a publicação
 
-```sh
-gh api repos/datazoompuc/datazoom_viz_web/pages --jq '.status'
-```
-
-Enquanto responder `building`, espere. Quando responder `built`, está no ar:
-
-<https://datazoom.com.br/datazoom_viz_web/map_dz_munic_cempre/>
-
+Na aba **Actions** do repositório, o workflow *Deploy web apps to GitHub Pages*.
 Costuma levar de um a três minutos.
-
----
-
-## 4b. Pendência: a logo ainda é cópia própria
-
-`web/map_dz_munic_cempre/img/logo_datazoom_branco_horizontal.png` é
-byte a byte igual à de `web/shared/img/`, mas continua duplicada aqui.
-
-Não foi unificada ainda porque `web/shared/` só existe na branch do app de
-COMEX (PR #257). Apontar para `../shared/img/` agora deixaria a logo
-quebrada para quem fizesse checkout só desta branch.
-
-Depois que as duas mergearem, troque em `style.css`:
-
-```css
-background-image: url("../shared/img/logo_datazoom_branco_horizontal.png");
-```
-
-e apague a cópia local.
 
 ## 5. Armadilhas conhecidas
 

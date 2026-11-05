@@ -1,7 +1,7 @@
 // Data Zoom Amazônia — app_map_dz_munic_cempre, JS/Leaflet PoC
 //
 // Static rebuild of the Shiny app: data is pre-exported by
-// data-raw/export_web/export_cempre_mapa.R (which reuses the same join
+// web/_export/export_cempre_mapa.R (which reuses the same join
 // logic as scripts/map_dz_munic_cempre/server.R) into web/map_dz_munic_cempre/data/.
 // Everything below runs client-side against those static files — no R
 // server, no shinyapps.io.
@@ -76,7 +76,7 @@
   // discrete legend swatches, not a continuous gradient, so --ordinal is
   // the applicable check): monotone lightness, adjacent ΔL >= 0.06, single
   // hue, and light-end contrast 2.02:1 against a white legend surface (>=
-  // the 2:1 floor) — see data-raw/export_web/build_sequential_ramp.mjs for the
+  // the 2:1 floor) — see web/_export/build_sequential_ramp.mjs for the
   // generator.
   const PALETTE_CONTINUOUS = [
     "#c4b1bd", "#c691b3", "#c66dab", "#b8539b", "#a63c89",
