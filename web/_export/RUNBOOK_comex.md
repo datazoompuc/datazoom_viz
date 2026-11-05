@@ -36,7 +36,7 @@ Todos os comandos abaixo rodam a partir da raiz do repositório.
 ### 2a. Tudo que sai da base do COMEX (quase sempre é só isso)
 
 ```sh
-Rscript data-raw/export_web/export_comex_exp_municipio.R
+Rscript web/_export/export_comex_exp_municipio.R
 ```
 
 Lê **um arquivo só**: `data/comex_exp_munic_base.rds`, a base longa gerada
@@ -64,7 +64,7 @@ buscar nada.
 ### 2b. Mapa (só se a geometria mudar, o que é raro)
 
 ```sh
-Rscript data-raw/export_web/export_comex_mapa.R
+Rscript web/_export/export_comex_mapa.R
 ```
 
 Lê `global/munic_shapefile.rds`, `global/states_boundary.rds`,
@@ -126,82 +126,44 @@ git push
 
 ## 4. Publicar
 
-> Hoje o site é servido pelo repositório **`datazoompuc/datazoom_viz_web`**, que
-> é um espelho da pasta `web/`. O plano é tornar o `datazoom_viz` público e
-> servir o GitHub Pages direto dele, o que elimina esta seção inteira. Enquanto
-> isso não acontece, siga os passos abaixo.
+**É só fazer merge na `main`.**
 
-### ⚠️ Sincronize por app, não a pasta `web/` inteira
-
-O staging hospeda **todos** os apps, mas cada app em desenvolvimento vive na
-sua própria branch. Então a sua branch quase nunca tem a pasta `web/`
-completa: o app de COMEX está numa branch, o mapa do CEMPRE está em outra.
-
-Um `rsync --delete web/ ...` apaga do site tudo que não existe na sua branch.
-Na prática isso significa **derrubar os apps dos outros** sem perceber. Em
-novembro de 2026 esse comando teria apagado o `map_dz_munic_cempre` inteiro,
-dados e tudo.
-
-Por isso o `rsync` abaixo é feito **uma pasta por vez**, nomeando o que a sua
-branch de fato possui. O `--delete` continua valendo dentro de cada pasta, que
-é o que você quer (arquivo removido do app some do site), sem alcançar o que
-não é seu.
-
-Quando os PRs dos apps mergearem na main, a `web/` passa a ser completa em
-todo lugar e esse cuidado deixa de ser necessário. O workflow de publicação
-automática (PR #253) também não tem esse risco, porque roda a partir da main.
+O GitHub Pages serve este repositório direto, e o workflow
+`.github/workflows/deploy-pages.yml` republica a cada push na `main` que toque
+`web/`. Não há repositório de staging, nem `rsync`, nem passo manual.
 
 ```sh
-# 1. clonar o repositório do site
-git clone https://github.com/datazoompuc/datazoom_viz_web.git /tmp/dzweb
-
-# 2. VER o que seria apagado, antes de apagar
-rsync -a --delete --exclude ".git" --dry-run --itemize-changes \
-  web/ /tmp/dzweb/ | grep "^\*deleting"
-#    Se aparecer qualquer coisa de um app que não é o seu, NÃO use o
-#    comando acima para valer. Use o passo 3.
-
-# 3. copiar uma pasta por vez (ajuste a lista ao que a sua branch tem)
-rsync -a --delete --exclude ".git" web/comex_exp_municipio /tmp/dzweb/
-rsync -a --delete --exclude ".git" web/shared             /tmp/dzweb/
-
-# 4. RESTAURAR os dois arquivos que só existem no repositório do site
-cd /tmp/dzweb
-git checkout -- .nojekyll README.md
-
-# 5. conferir que só mudou o que você esperava
-git status --short
-
-# 6. commitar e publicar
-git add -A
-git commit -m "atualiza dados de COMEX (sync from datazoompuc/datazoom_viz@<SHA>)"
-git push origin main
+git add web/comex_exp_municipio/data
+git commit -m "atualiza dados do app de COMEX"
+git push
 ```
 
-No lugar de `<SHA>` use o hash do commit do passo 3c (`git rev-parse --short HEAD`
-no `datazoom_viz`). É o que permite descobrir depois qual versão do código gerou
-cada versão do site.
+Abra um PR como de costume. O `web-check.yml` valida os JSON e o JS antes do
+merge; o `deploy-pages.yml` publica depois.
 
-**O passo 4 não é opcional.** O `rsync --delete` apaga `.nojekyll` e `README.md`
-do repositório do site quando você sincroniza a raiz, porque eles não existem
-dentro de `web/`. Sem o `.nojekyll`, o GitHub Pages processa o site com Jekyll
-e ignora qualquer pasta começada por underscore, quebrando o site de formas
-difíceis de diagnosticar. Sincronizando por pasta eles não são tocados, mas o
-`git checkout` é barato e garante.
+### O que vai ao ar, e o que não vai
+
+O workflow monta o site copiando `web/` **sem a pasta `_export/`**:
+
+```
+web/
+  comex_exp_municipio/   → vai ao ar
+  shared/                → vai ao ar
+  _export/               → NÃO vai: scripts e guias, inclusive este arquivo
+```
+
+Por isso os scripts de export e a documentação moram em `web/_export/`: ficam
+junto do que descrevem, sem virar página do site.
+
+Se você acrescentar um script ou um `.md` fora do `_export/`, o `web-check.yml`
+**falha** e diz onde. É de propósito: lista de exclusão erra calada nas duas
+direções, enquanto o build falhando aponta o arquivo.
 
 ### Acompanhar a publicação
 
-```sh
-gh api repos/datazoompuc/datazoom_viz_web/pages --jq '.status'
-```
-
-Enquanto responder `building`, espere. Quando responder `built`, está no ar:
-
-<https://datazoom.com.br/datazoom_viz_web/comex_exp_municipio/>
-
-Costuma levar de um a três minutos.
-
----
+Na aba **Actions** do repositório, o workflow *Deploy web apps to GitHub Pages*.
+Costuma levar de um a três minutos. O endereço do app aparece no resumo da
+execução.
 
 ## 5. Armadilhas conhecidas
 
@@ -212,8 +174,13 @@ coisa, dê um reload forçado (Ctrl+Shift+R ou Cmd+Shift+R) e espere alguns
 minutos. Isso já gerou mais de um falso alarme.
 
 **Um gráfico ficou preso em "Carregando...".** Algum JSON não foi gerado ou não
-foi commitado. Confira se os três scripts do passo 2 rodaram sem erro e se o
+foi commitado. Confira se os scripts do passo 2 rodaram sem erro e se o
 `git status` não mostra arquivo novo esquecido.
+
+**O PR falhou em "Check web/ static apps".** Se a queixa for sobre script ou
+documento, você pôs um arquivo em `web/` fora do `_export/` e ele viraria
+página do site. A mensagem diz qual. Se for JSON ou JS, algum arquivo gerado
+saiu malformado: rode o export de novo.
 
 **O último ano parece ter despencado.** Provavelmente é ano parcial. Confira
 `anos_parciais` no `dictionary.json` (veja 3a). Em 2026, com 9 de 12 meses, o

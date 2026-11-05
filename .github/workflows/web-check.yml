@@ -3,12 +3,18 @@ name: Check web/ static apps
 # Valida os apps estáticos antes de publicar. Importa mais agora que o Pages
 # serve direto deste repositório: não há mais um repo de staging no meio, e
 # um JSON quebrado vai para o ar sem intermediário.
+#
+# A validação roda sobre o SITE MONTADO, não sobre web/ cru, pelo mesmo
+# recorte que o deploy-pages.yml usa. Assim o que é checado é exatamente o
+# que vai ao ar, em vez de uma convenção que os dois workflows teriam que
+# lembrar de respeitar separadamente.
 
 on:
   pull_request:
     branches: [main]
     paths:
       - "web/**"
+      - ".github/workflows/web-check.yml"
   # Também no push para a main: é o que o Pages publica, e nem toda mudança
   # chega por PR.
   push:
@@ -23,38 +29,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Montar o site (mesmo recorte do deploy)
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          rsync -a --exclude "_export/" web/ _site/
+          echo "Conteúdo a validar:"
+          find _site -maxdepth 1 -mindepth 1 -exec basename {} \; | sort | sed "s/^/  /"
+
       - name: Validate JSON files parse
         run: |
           set -e
-          find web -name "*.json" -print0 | while IFS= read -r -d "" f; do
+          find _site -name "*.json" -print0 | while IFS= read -r -d "" f; do
             python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f" || { echo "Invalid JSON: $f"; exit 1; }
           done
 
       - name: Validate JS syntax
         run: |
           set -e
-          find web -name "*.js" -print0 | while IFS= read -r -d "" f; do
+          find _site -name "*.js" -print0 | while IFS= read -r -d "" f; do
             node --check "$f" || { echo "Syntax error: $f"; exit 1; }
           done
 
-      - name: No build scripts or docs inside web/
-        # web/ é publicado inteiro pelo Pages, então tudo que está lá vira URL
-        # do site. Script de build e documentação não são conteúdo de site:
-        # pesam no que é publicado e ficam baixáveis sem querer. Já aconteceu
-        # com um README em web/shared/, que foi parar no ar.
+      - name: Nada de script ou documento no que vai ao ar
+        # Tudo em _site vira URL do site. Script de build e guia não são
+        # conteúdo: pesam no publicado e ficam baixáveis sem querer. Já
+        # aconteceu uma vez, com um README em web/shared/ que foi ao ar.
         #
-        # Isto falha em vez de depender de alguém lembrar de uma lista de
-        # exclusão, que erra calado nas duas direções: esquecer de excluir
-        # vaza o arquivo, excluir demais tira um app do ar.
+        # Falhar aqui é melhor que manter lista de exclusão, que erra calada
+        # nas duas direções: esquecer de excluir vaza o arquivo, excluir
+        # demais tira um app do ar.
         run: |
           set -e
-          achados=$(find web \( -name "*.R" -o -name "*.Rmd" -o -name "*.md" -o -name "*.mjs" \) -print)
+          achados=$(find _site \( -name "*.R" -o -name "*.Rmd" -o -name "*.md" -o -name "*.mjs" \) -print)
           if [ -n "$achados" ]; then
-            echo "::error::Arquivos que não deveriam ser publicados estão dentro de web/:"
-            echo "$achados" | sed 's/^/  /'
+            echo "::error::Arquivos que não deveriam ser publicados entraram no site:"
+            echo "$achados" | sed 's|^_site/|  web/|'
             echo ""
-            echo "web/ é servido pelo GitHub Pages, então cada um destes vira uma URL."
-            echo "Mova para data-raw/export_web/ (scripts e guias) ou renomeie."
+            echo "Mova para web/_export/, que fica de fora do que é publicado."
             exit 1
           fi
-          echo "Nenhum script ou documento dentro de web/."
+          echo "Nenhum script ou documento no site montado."

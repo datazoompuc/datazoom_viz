@@ -4,9 +4,9 @@ Documentação da pasta `web/shared/`, que guarda as peças reaproveitáveis
 entre os apps estáticos. Existe para um app novo não começar copiando 950
 linhas de CSS do app anterior.
 
-Este arquivo mora aqui, em `data-raw/export_web/`, e não dentro de
-`web/shared/`, porque tudo que está em `web/` é publicado pelo GitHub Pages.
-Um `.md` lá dentro viraria URL do site.
+Este arquivo mora em `web/_export/`, e não dentro de `web/shared/`, porque
+a pasta `shared/` é publicada e o `_export/` não. Um `.md` em `shared/`
+viraria URL do site, e o `web-check.yml` falharia o PR por isso.
 
 ## O que tem
 

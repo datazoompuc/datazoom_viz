@@ -69,19 +69,31 @@ jobs:
           find web -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | sed 's/^/  - /'
           echo "Tamanho total: $(du -sh web | cut -f1)"
 
-      - name: Impedir que o Jekyll processe o site
-        # Sem isto o Pages roda Jekyll e ignora qualquer arquivo ou pasta
-        # começada por underscore, quebrando o site de formas difíceis de
-        # diagnosticar. É a mesma pegadinha do .nojekyll no repo de staging.
-        run: touch web/.nojekyll
+      - name: Montar o site, sem as pastas que não são conteúdo
+        # web/_export/ tem os scripts de export e os guias. Eles moram em
+        # web/ porque dizem respeito aos apps, mas não são páginas: seriam
+        # baixáveis do site e ainda pesariam no que é publicado.
+        #
+        # O recorte é feito aqui, numa cópia, em vez de confiar numa lista
+        # de exclusão espalhada: o que sai daqui é exatamente o que vai ao
+        # ar, e é sobre isso que o web-check.yml valida.
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          rsync -a --exclude "_export/" web/ _site/
+          # Sem isto o Pages roda Jekyll e ignora qualquer pasta começada
+          # por underscore, quebrando o site de formas difíceis de achar.
+          touch _site/.nojekyll
+          echo "Vai ao ar ($(du -sh _site | cut -f1)):"
+          find _site -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort | sed "s/^/  /"
 
       - name: Configurar Pages
         uses: actions/configure-pages@v5
 
-      - name: Empacotar só a pasta web/
+      - name: Empacotar
         uses: actions/upload-pages-artifact@v3
         with:
-          path: web
+          path: _site
 
   deploy:
     needs: build
