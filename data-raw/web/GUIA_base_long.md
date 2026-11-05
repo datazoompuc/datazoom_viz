@@ -49,15 +49,20 @@ A base traz `pais_pt`, `pais_en`, `sh4_pt`, `sh4_en`, `sh2_pt`, `sh2_en`,
 antes, e com eles uma classe inteira de bug (dicionário fora de sincronia com
 os dados).
 
-**A exceção, e a lição:** o nome do município ficou de fora — a base tem só
-`cod_municipio` e `uf`. Como o app indexa municípios pela string
-`"Nome - UF"`, o export precisa de um `left_join` com
-`auxiliar_cod_municipais.rds`, que é justamente um dos auxiliares que a
-limpeza queria eliminar.
+**A lição veio de um esquecimento:** na primeira versão da base o nome do
+município ficou de fora, só `cod_municipio` e `uf`. Todas as outras dimensões
+traziam o rótulo, e justamente a principal não. Como o app indexa municípios
+pela string `"Nome - UF"`, o export teve que fazer um `left_join` com um
+auxiliar que a própria limpeza queria eliminar.
 
-Não dá para contornar pelo pacote: tanto `datazoom.amazonia::municipalities$name_muni`
-quanto `$municipality_mapbiomas` vêm **sem acento**, o que renomearia 212 dos
-450 municípios ("Açailândia" → "Acailandia") e quebraria toda URL salva.
+E não dava para contornar pelo pacote: tanto
+`datazoom.amazonia::municipalities$name_muni` quanto `$municipality_mapbiomas`
+vêm **sem acento**, o que deixaria 212 dos 450 municípios escritos errado em
+toda tela ("Açailândia" viraria "Acailandia").
+
+Foi resolvido acrescentando a coluna `municipio` à base, que é como deveria
+ter nascido. O custo de descobrir isso tarde foi uma rodada a mais entre quem
+gera os dados e quem os consome.
 
 > **Regra:** se uma dimensão aparece como rótulo em alguma tela, o rótulo vem
 > na base. Vale para a dimensão principal tanto quanto para as categóricas.
@@ -93,19 +98,17 @@ está em `web/export_comex_exp_municipio.R`.
 ```r
 base <- readRDS("data/comex_exp_munic_base.rds")
 
-# rótulos que não vieram na base
-base <- base %>%
-  mutate(cod_municipio = as.character(cod_municipio)) %>%
-  left_join(municipios_aux, by = "cod_municipio")
-
-# a medida, num nome só, para trocar depois sem reescrever nada
-MEDIDA <- "valor_fob"
-base$valor <- base[[MEDIDA]]
+# as medidas, com os nomes curtos que os JSON usam
+base <- base %>% mutate(valor = valor_fob, kg = kg_liquido)
 ```
 
-Vale falhar alto se o join não fechar, em vez de exportar JSON com `null`:
+Vale conferir a presença do que você depende, e falhar alto, em vez de
+exportar JSON com `null` que só vira bug na tela:
 
 ```r
+if (!"municipio" %in% names(base)) {
+  stop("a base nao tem a coluna `municipio` — o export depende dela para as chaves do app")
+}
 faltando <- sum(is.na(base$municipio))
 if (faltando > 0) stop(sprintf("%d linhas sem nome de municipio", faltando))
 ```
@@ -115,10 +118,14 @@ if (faltando > 0) stop(sprintf("%d linhas sem nome de municipio", faltando))
 ```r
 munic_totals <- base %>%
   group_by(municipio, ano) %>%
-  summarise(valor = round(sum(valor)), .groups = "drop")
+  summarise(valor = round(sum(valor)), kg = round(sum(kg)), .groups = "drop")
 ```
 
 Soma sobre **todas** as outras dimensões. Alimenta quatro telas sozinho.
+
+Repare que as duas medidas saem juntas, lado a lado. Ver 1c: medida é coluna,
+não arquivo. É isso que deixa o botão Valor/Quantidade do app trocar sem
+buscar nada do servidor.
 
 ### Composição regional por categoria
 
@@ -135,8 +142,8 @@ O caso que exige cuidado, porque a grade cheia é quase toda zero:
 ```r
 por_municipio <- base %>%
   group_by(municipio, produto = sec_pt, ano) %>%
-  summarise(valor = sum(valor), .groups = "drop") %>%
-  filter(valor > 0)                      # <- o que torna esparso
+  summarise(valor = sum(valor), kg = sum(kg), .groups = "drop") %>%
+  filter(valor > 0 | kg > 0)             # <- o que torna esparso
 
 municipios_idx <- sort(unique(por_municipio$municipio))
 produtos_idx   <- sort(unique(por_municipio$produto))
@@ -149,12 +156,20 @@ list(
       municipio_idx = match(municipio, municipios_idx) - 1L,
       produto_idx   = match(produto,   produtos_idx)   - 1L,
       ano = as.integer(ano),
-      valor = round(valor)
+      valor = round(valor),
+      kg = round(kg)
     ) %>% as.matrix() %>% unname()
 )
 ```
 
 Os índices são **0-based** (`- 1L`) porque quem lê é JavaScript.
+
+As duas medidas compartilham a mesma célula em vez de virarem dois arquivos.
+Dá para fazer isso porque existe linha na base quando houve transação, então
+a esparsidade é quase a mesma nas duas: no grão município × ano, só 27 de
+6.534 células têm valor sem peso, e nenhuma o contrário. Compartilhar custa
+um número a mais por célula; duplicar custaria todos os arrays de lookup de
+novo.
 
 Densidades reais, para calibrar quando isso vale a pena:
 

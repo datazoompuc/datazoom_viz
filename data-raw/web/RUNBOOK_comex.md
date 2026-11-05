@@ -39,18 +39,27 @@ Todos os comandos abaixo rodam a partir da raiz do repositório.
 Rscript data-raw/web/export_comex_exp_municipio.R
 ```
 
-Lê um arquivo só, `data/comex_exp_munic_base.rds` (a base longa gerada por
-`data-raw/comex.R`, descrita em `README_data.md`), mais
-`data/auxiliar_cod_municipais.rds` para o nome dos municípios.
+Lê **um arquivo só**: `data/comex_exp_munic_base.rds`, a base longa gerada
+por `data-raw/comex.R` e descrita em `../README_data.md`. Desde o merge de
+nov/2026 ela traz o nome do município, então não há mais auxiliar nenhum.
 
-Escreve em `web/comex_exp_municipio/data/`:
-`composition_sec.json`, `composition_sh2.json`,
-`municipality_composition_sec.json`, `municipality_composition_sh2.json`,
-`products_sec.json`, `products_sh2.json`, `municipality_totals.json`,
-`region_totals.json`, `product_ranking.json` e `dictionary.json`.
+Escreve 13 arquivos em `web/comex_exp_municipio/data/`:
 
-Esses dez arquivos são dez recortes diferentes da mesma base, por isso saem
-todos de um script só. O porquê está em `ARQUITETURA.md`.
+| Arquivo | O que é |
+|---|---|
+| `municipality_totals.json`, `region_totals.json` | totais por município e da região |
+| `composition_sec.json`, `composition_sh2.json`, `composition_pais.json` | composição da região por categoria e por destino |
+| `municipality_composition_{sec,sh2,pais}.json` | o cruzamento município × categoria, em formato esparso |
+| `products_sec.json`, `products_sh2.json`, `paises.json` | os rótulos pt/en |
+| `product_ranking.json` | ranking no nível SH4 |
+| `dictionary.json` | intervalo de anos e quais são parciais |
+
+São treze recortes diferentes da mesma base, por isso saem todos de um script
+só. O porquê está em `ARQUITETURA.md`.
+
+Cada arquivo de dados carrega **as duas medidas**, valor e quantidade, na
+mesma estrutura. É o que permite o botão Valor/Quantidade do app trocar sem
+buscar nada.
 
 ### 2b. Mapa (só se a geometria mudar, o que é raro)
 
@@ -118,38 +127,67 @@ git push
 ## 4. Publicar
 
 > Hoje o site é servido pelo repositório **`datazoompuc/datazoom_viz_web`**, que
-> é um espelho só da pasta `web/`. O plano é tornar o `datazoom_viz` público e
+> é um espelho da pasta `web/`. O plano é tornar o `datazoom_viz` público e
 > servir o GitHub Pages direto dele, o que elimina esta seção inteira. Enquanto
 > isso não acontece, siga os passos abaixo.
+
+### ⚠️ Sincronize por app, não a pasta `web/` inteira
+
+O staging hospeda **todos** os apps, mas cada app em desenvolvimento vive na
+sua própria branch. Então a sua branch quase nunca tem a pasta `web/`
+completa: o app de COMEX está numa branch, o mapa do CEMPRE está em outra.
+
+Um `rsync --delete web/ ...` apaga do site tudo que não existe na sua branch.
+Na prática isso significa **derrubar os apps dos outros** sem perceber. Em
+novembro de 2026 esse comando teria apagado o `map_dz_munic_cempre` inteiro,
+dados e tudo.
+
+Por isso o `rsync` abaixo é feito **uma pasta por vez**, nomeando o que a sua
+branch de fato possui. O `--delete` continua valendo dentro de cada pasta, que
+é o que você quer (arquivo removido do app some do site), sem alcançar o que
+não é seu.
+
+Quando os PRs dos apps mergearem na main, a `web/` passa a ser completa em
+todo lugar e esse cuidado deixa de ser necessário. O workflow de publicação
+automática (PR #253) também não tem esse risco, porque roda a partir da main.
 
 ```sh
 # 1. clonar o repositório do site
 git clone https://github.com/datazoompuc/datazoom_viz_web.git /tmp/dzweb
 
-# 2. copiar o conteúdo de web/ por cima
-rsync -a --delete --exclude ".git" web/ /tmp/dzweb/
+# 2. VER o que seria apagado, antes de apagar
+rsync -a --delete --exclude ".git" --dry-run --itemize-changes \
+  web/ /tmp/dzweb/ | grep "^\*deleting"
+#    Se aparecer qualquer coisa de um app que não é o seu, NÃO use o
+#    comando acima para valer. Use o passo 3.
 
-# 3. RESTAURAR os dois arquivos que só existem no repositório do site
+# 3. copiar uma pasta por vez (ajuste a lista ao que a sua branch tem)
+rsync -a --delete --exclude ".git" web/comex_exp_municipio /tmp/dzweb/
+rsync -a --delete --exclude ".git" web/shared             /tmp/dzweb/
+
+# 4. RESTAURAR os dois arquivos que só existem no repositório do site
 cd /tmp/dzweb
 git checkout -- .nojekyll README.md
 
-# 4. conferir que só mudou o que você esperava
+# 5. conferir que só mudou o que você esperava
 git status --short
 
-# 5. commitar e publicar
+# 6. commitar e publicar
 git add -A
 git commit -m "atualiza dados de COMEX (sync from datazoompuc/datazoom_viz@<SHA>)"
 git push origin main
 ```
 
 No lugar de `<SHA>` use o hash do commit do passo 3c (`git rev-parse --short HEAD`
-no `datazoom_viz`). Isso é o que permite descobrir depois qual versão do código
-gerou cada versão do site.
+no `datazoom_viz`). É o que permite descobrir depois qual versão do código gerou
+cada versão do site.
 
-**O passo 3 não é opcional.** O `rsync --delete` apaga `.nojekyll` e `README.md`
-do repositório do site, porque eles não existem dentro de `web/`. Sem o
-`.nojekyll`, o GitHub Pages processa o site com Jekyll e ignora qualquer pasta
-começada por underscore, quebrando o site de formas difíceis de diagnosticar.
+**O passo 4 não é opcional.** O `rsync --delete` apaga `.nojekyll` e `README.md`
+do repositório do site quando você sincroniza a raiz, porque eles não existem
+dentro de `web/`. Sem o `.nojekyll`, o GitHub Pages processa o site com Jekyll
+e ignora qualquer pasta começada por underscore, quebrando o site de formas
+difíceis de diagnosticar. Sincronizando por pasta eles não são tocados, mas o
+`git checkout` é barato e garante.
 
 ### Acompanhar a publicação
 
@@ -187,8 +225,8 @@ total fica 14% abaixo de 2025, mas anualizado está 14% acima.
 
 | `.rds` de origem | script | JSON gerado |
 |---|---|---|
-| `comex_exp_munic_base.rds` (+ `auxiliar_cod_municipais.rds`) | 2a | todos os dez, de SEC a `product_ranking.json` |
-| `comex_exp_munic_sh4_sel.rds` + `global/*.rds` | 2b | pasta `map/` |
+| `comex_exp_munic_base.rds` | 2a | os 13 da raiz de `data/` |
+| `comex_exp_munic_sh4_sel.rds` + `global/*.rds` | 2b | os 4 da pasta `map/` |
 
 Os `.rds` acima são produzidos por `data-raw/comex.R` (os de COMEX) e vêm do
 `global/` (as geometrias). Este documento começa depois deles: se o `.rds` estiver
