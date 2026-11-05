@@ -1,10 +1,21 @@
 name: Check web/ static apps
 
+# Valida os apps estáticos antes de publicar. Importa mais agora que o Pages
+# serve direto deste repositório: não há mais um repo de staging no meio, e
+# um JSON quebrado vai para o ar sem intermediário.
+
 on:
   pull_request:
     branches: [main]
     paths:
       - "web/**"
+  # Também no push para a main: é o que o Pages publica, e nem toda mudança
+  # chega por PR.
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -25,3 +36,25 @@ jobs:
           find web -name "*.js" -print0 | while IFS= read -r -d "" f; do
             node --check "$f" || { echo "Syntax error: $f"; exit 1; }
           done
+
+      - name: No build scripts or docs inside web/
+        # web/ é publicado inteiro pelo Pages, então tudo que está lá vira URL
+        # do site. Script de build e documentação não são conteúdo de site:
+        # pesam no que é publicado e ficam baixáveis sem querer. Já aconteceu
+        # com um README em web/shared/, que foi parar no ar.
+        #
+        # Isto falha em vez de depender de alguém lembrar de uma lista de
+        # exclusão, que erra calado nas duas direções: esquecer de excluir
+        # vaza o arquivo, excluir demais tira um app do ar.
+        run: |
+          set -e
+          achados=$(find web \( -name "*.R" -o -name "*.Rmd" -o -name "*.md" -o -name "*.mjs" \) -print)
+          if [ -n "$achados" ]; then
+            echo "::error::Arquivos que não deveriam ser publicados estão dentro de web/:"
+            echo "$achados" | sed 's/^/  /'
+            echo ""
+            echo "web/ é servido pelo GitHub Pages, então cada um destes vira uma URL."
+            echo "Mova para data-raw/export_web/ (scripts e guias) ou renomeie."
+            exit 1
+          fi
+          echo "Nenhum script ou documento dentro de web/."
