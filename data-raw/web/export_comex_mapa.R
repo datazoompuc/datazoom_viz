@@ -30,7 +30,7 @@
 # not the app's main data/ dir, since app.js only fetches this ~6MB
 # (mostly state-boundary geometry) when the map view is actually opened.
 #
-# Run from repo root: Rscript data-raw/export_map_comex_exp_sh4_sel_web.R
+# Run from repo root: Rscript data-raw/web/export_comex_mapa.R
 ############################################################
 
 library(dplyr)

@@ -8,9 +8,9 @@ gerar, em que formato, e em quantos scripts, de forma a não repetir a
 multiplicação de `.rds` que existe hoje.
 
 Não é um passo a passo de execução. Como rodar os scripts, conferir o resultado
-e publicar está em `README_export_web.md`. O receituário de código para derivar
+e publicar está em `RUNBOOK_comex.md`. O receituário de código para derivar
 os JSON de uma base longa, com as armadilhas que apareceram na migração do
-COMEX, está em `GUIA_base_long_para_json.md`. Os três ficam lado a lado em
+COMEX, está em `GUIA_base_long.md`. Os três ficam lado a lado em
 `data-raw/`: este diz por quê, o guia diz como, o runbook diz o que rodar.
 
 Os exemplos vêm do `web/comex_exp_municipio/`, que é o app mais completo

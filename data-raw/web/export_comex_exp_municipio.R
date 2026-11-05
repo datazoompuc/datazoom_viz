@@ -12,7 +12,7 @@
 # comex_exp_munic_sh2.rds, ...) plus four dictionary CSVs, and a second
 # script read comex_exp_sh4_munic.rds for the product ranking. Every one of
 # those outputs is a different group_by over this single base, so they are
-# all derived here in one pass. See data-raw/ARQUITETURA_dados_web.md for
+# all derived here in one pass. See data-raw/web/ARQUITETURA.md for
 # why the split is by dependency rather than by visualisation — the map
 # export stays separate because it needs `sf`.
 #
@@ -25,7 +25,7 @@
 # duplicating every lookup array, and it makes the app's Valor/Quantidade
 # toggle instant, with no second fetch.
 #
-# Run from repo root: Rscript data-raw/export_comex_exp_municipio_web.R
+# Run from repo root: Rscript data-raw/web/export_comex_exp_municipio.R
 ############################################################
 
 library(dplyr)
