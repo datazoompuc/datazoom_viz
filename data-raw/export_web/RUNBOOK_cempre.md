@@ -33,7 +33,7 @@ Todos os comandos rodam a partir da raiz do repositório.
 ## 2. Regerar os dados
 
 ```sh
-Rscript data-raw/export_map_dz_munic_cempre_web.R
+Rscript data-raw/export_web/export_cempre_mapa.R
 ```
 
 Lê:
@@ -53,12 +53,12 @@ constrói.
 
 ### A paleta não é regerada aqui
 
-`data-raw/build_sequential_ramp.mjs` gera a escala de 9 cores usada pelo mapa
+`data-raw/export_web/build_sequential_ramp.mjs` gera a escala de 9 cores usada pelo mapa
 e está **fixa** no `app.js` (`PALETTE_CONTINUOUS`). Não precisa rodar na
 atualização de dados; só se alguém quiser mudar a paleta. Nesse caso:
 
 ```sh
-node data-raw/build_sequential_ramp.mjs
+node data-raw/export_web/build_sequential_ramp.mjs
 ```
 
 e cole o resultado no `app.js`. O cabeçalho do script explica como validar o
@@ -144,6 +144,23 @@ Enquanto responder `building`, espere. Quando responder `built`, está no ar:
 Costuma levar de um a três minutos.
 
 ---
+
+## 4b. Pendência: a logo ainda é cópia própria
+
+`web/map_dz_munic_cempre/img/logo_datazoom_branco_horizontal.png` é
+byte a byte igual à de `web/shared/img/`, mas continua duplicada aqui.
+
+Não foi unificada ainda porque `web/shared/` só existe na branch do app de
+COMEX (PR #257). Apontar para `../shared/img/` agora deixaria a logo
+quebrada para quem fizesse checkout só desta branch.
+
+Depois que as duas mergearem, troque em `style.css`:
+
+```css
+background-image: url("../shared/img/logo_datazoom_branco_horizontal.png");
+```
+
+e apague a cópia local.
 
 ## 5. Armadilhas conhecidas
 

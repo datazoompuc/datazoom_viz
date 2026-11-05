@@ -6,7 +6,7 @@
 # but writes static files instead of feeding a Shiny session. Output
 # goes to web/map_dz_munic_cempre/data/, consumed by app.js.
 #
-# Run from repo root: Rscript data-raw/export_map_dz_munic_cempre_web.R
+# Run from repo root: Rscript data-raw/export_web/export_cempre_mapa.R
 ############################################################
 
 library(dplyr)

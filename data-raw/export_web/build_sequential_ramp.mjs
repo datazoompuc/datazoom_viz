@@ -1,7 +1,7 @@
 // Generates the 9-step sequential plum/berry ramp used by
 // web/map_dz_munic_cempre/app.js (PALETTE_CONTINUOUS), following the
 // dataviz skill's color formula: sequential = one hue, monotone lightness,
-// light -> dark. Run: node data-raw/build_sequential_ramp.mjs
+// light -> dark. Run: node data-raw/export_web/build_sequential_ramp.mjs
 //
 // Validate the output against the skill's own checker (from the skill's
 // base directory):
