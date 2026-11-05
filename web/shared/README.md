@@ -68,10 +68,12 @@ alternância binária), `.view-btn` (+ `.active`), `.icon-btn`, `.switch-row`
 
 **Utilitária:** `.hidden`
 
-## Os apps atuais não usam isto
+## Os apps atuais usam só a logo
 
-O `comex_exp_municipio` e o `map_dz_munic_cempre` nasceram antes e carregam
-as próprias cópias.
+O `comex_exp_municipio` e o `map_dz_munic_cempre` nasceram antes do
+`base.css` e carregam as próprias cópias do CSS. A única coisa daqui que o
+de COMEX já usa é a `img/`, porque a logo era idêntica nos dois e não fazia
+sentido manter três cópias do mesmo PNG no repositório.
 
 Tentei migrar o de COMEX recortando o CSS dele para cá e o layout quebrou:
 o recorte automático fundiu regras e o título herdou propriedades da área do
