@@ -51,20 +51,24 @@ jobs:
             node --check "$f" || { echo "Syntax error: $f"; exit 1; }
           done
 
-      - name: Fumaça do app de COMEX (navegador de verdade)
-        # As checagens acima provam que os arquivos são válidos, não que o app
-        # funciona. O bug que motivou este passo passou nas duas: JSON certo,
-        # JS com sintaxe certa, e a Composição em quantidade desenhando um
-        # gráfico vazio porque as somas viravam NaN.
+      - name: Fumaça dos apps (navegador de verdade)
+        # As checagens acima provam que os arquivos são válidos, não que os
+        # apps funcionam. O bug que motivou este passo passou nas duas: JSON
+        # certo, JS com sintaxe certa, e a Composição do COMEX em quantidade
+        # desenhando um gráfico vazio porque as somas viravam NaN.
         #
         # Roda contra _site/, o mesmo recorte que vai ao ar, pelo mesmo motivo
         # que as outras: validar o que é publicado, não o que está em web/.
+        #
+        # O script testa todo app que conhece e que esteja presente, e pula os
+        # ausentes: os apps vivem em branches diferentes até o merge, e cada
+        # uma monta um site com só o seu. Se nenhum for encontrado ele falha.
         #
         # A matriz e as asserções estão documentadas no cabeçalho do script.
         run: |
           pip install --quiet playwright
           python -m playwright install --with-deps chromium
-          python3 web/_export/smoke_comex.py _site/
+          python3 web/_export/smoke_web.py _site/
 
       - name: Nada de script ou documento no que vai ao ar
         # Tudo em _site vira URL do site. Script de build e guia não são

@@ -53,19 +53,26 @@ Em uma frase: **arquitetura diz por quê, guia diz como, runbook diz o que rodar
 
 ### Teste
 
-- **`smoke_comex.py`** — abre o app num navegador de verdade e percorre a
-  matriz de vista × medida × orientação × escopo, conferindo que o gráfico
-  saiu. Roda no `web-check.yml`, a cada PR. Existe porque validar JSON e
-  sintaxe de JS não prova que o app funciona: um bug real passou pelas duas e
-  deixou a Composição em quantidade desenhando um gráfico vazio. O cabeçalho
+- **`smoke_web.py`** — abre cada app num navegador de verdade e percorre a
+  matriz de controles, conferindo que o gráfico ou o mapa saiu. Roda no
+  `web-check.yml`, a cada PR. Existe porque validar JSON e sintaxe de JS não
+  prova que o app funciona: um bug real passou pelas duas e deixou a
+  Composição do COMEX em quantidade desenhando um gráfico vazio. O cabeçalho
   do arquivo explica a matriz e por que as asserções são as que são.
 
   Para rodar localmente:
 
   ```sh
   pip install playwright && python -m playwright install chromium
-  python3 web/_export/smoke_comex.py web/
+  python3 web/_export/smoke_web.py web/
   ```
+
+  **Para acrescentar um app**, some uma entrada ao dicionário `APPS` com
+  quatro peças: a sonda (um JS que devolve o que foi pintado), a lista de
+  casos, a verificação específica, e a assinatura. O resto (servidor, erros de
+  JS, parâmetro ignorado, assinatura repetida) é comum e você ganha de graça.
+  App que não está no site é pulado, porque cada branch monta um site só com o
+  seu app; se nenhum for encontrado o script falha.
 
 Todos rodam a partir da **raiz do repositório**:
 
