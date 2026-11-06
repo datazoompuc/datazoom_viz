@@ -165,6 +165,24 @@ Na aba **Actions** do repositório, o workflow *Deploy web apps to GitHub Pages*
 Costuma levar de um a três minutos. O endereço do app aparece no resumo da
 execução.
 
+## 4b. O app dentro do site
+
+A página <https://datazoom.com.br/amazonia/pt/viz/comercio-exterior/> embute o
+app num iframe. O endereço de lá leva `?embed=1`:
+
+```
+.../comex_exp_municipio/?embed=1
+.../comex_exp_municipio/?lang=en&embed=1
+```
+
+Esse parâmetro esconde o que a página já mostra: a marca e a descrição na
+barra lateral, a logo do rodapé dela, e o seletor de idioma. O seletor em
+especial não pode aparecer ali — ele trocaria só o conteúdo do iframe e
+deixaria a página em volta no idioma anterior. Quem manda no idioma é a nav
+bar do site.
+
+Aberto direto na própria URL, sem o parâmetro, o app continua completo.
+
 ## 5. Armadilhas conhecidas
 
 **O site não mudou depois do deploy.** O CDN guarda `index.html`, `app.js` e

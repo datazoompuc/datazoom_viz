@@ -401,6 +401,25 @@
     activeCompositionSeries = compositionSeriesSec;
   }
 
+  // ---- Modo embutido (?embed=1) ----
+  //
+  // A página do site que hospeda o app já traz nav bar com a logo e a troca
+  // de idioma, um título e um parágrafo de instrução. Dentro do iframe tudo
+  // isso aparece duas vezes.
+  //
+  // O seletor de idioma é pior que redundante: ele trocaria só o conteúdo do
+  // iframe, deixando a página em volta no idioma anterior. Quem manda no
+  // idioma ali é a nav bar, que troca a página inteira e recarrega o app com
+  // ?lang=.
+  //
+  // Nada disso é removido do app: aberto na própria URL ele continua
+  // completo. O parâmetro é que decide, e updateUrl() o preserva para o modo
+  // sobreviver a um reload dentro do iframe.
+  function lerEmbedDaUrl() {
+    state.embed = new URLSearchParams(location.search).get("embed") === "1";
+    document.documentElement.classList.toggle("embed", state.embed);
+  }
+
   function lerMedidaDaUrl() {
     const m = new URLSearchParams(location.search).get("medida");
     state.medida = MEDIDAS.includes(m) ? m : "valor";
@@ -420,6 +439,7 @@
     year: null,
     // "valor" (US$ FOB) ou "kg" (quantidade). Global: vale para todas as telas.
     medida: "valor",
+    embed: false,
     view: "ranking", // "ranking" | "composition" | "change" | "trends" | "explore"
     playing: false,
     playTimer: null,
@@ -660,6 +680,7 @@
     // buildMunicipioIndex. Abrir com ?medida=kg sem isto montava os índices
     // em valor e só o rótulo acompanhava — o total da região aparecia em
     // dólar com unidade de peso.
+    lerEmbedDaUrl();
     lerMedidaDaUrl();
     rebuildPorMedida();
 
@@ -1747,6 +1768,7 @@
     params.set("lang", state.lang);
     params.set("year", state.year);
     params.set("medida", state.medida);
+    if (state.embed) params.set("embed", "1");
     params.set("view", state.view);
     params.set("state", state.uf || "");
     params.set("yeara", state.yearA);
