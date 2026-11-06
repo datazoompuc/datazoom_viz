@@ -25,6 +25,7 @@ site
 | Criar os dados de um app novo | `GUIA_base_long.md` |
 | Entender por que os dados estão assim | `ARQUITETURA.md` |
 | Começar um app web novo | `SHARED.md` |
+| Saber por que o CI reprovou o app | `smoke_comex.py` |
 
 Em uma frase: **arquitetura diz por quê, guia diz como, runbook diz o que rodar.**
 
@@ -49,6 +50,22 @@ Em uma frase: **arquitetura diz por quê, guia diz como, runbook diz o que rodar
 - **`export_comex_mapa.R`** — gera a geometria do mapa do mesmo app. Fica
   separado porque é o único que precisa do `sf` (GDAL/GEOS/PROJ) e porque
   fronteira municipal quase não muda.
+
+### Teste
+
+- **`smoke_comex.py`** — abre o app num navegador de verdade e percorre a
+  matriz de vista × medida × orientação × escopo, conferindo que o gráfico
+  saiu. Roda no `web-check.yml`, a cada PR. Existe porque validar JSON e
+  sintaxe de JS não prova que o app funciona: um bug real passou pelas duas e
+  deixou a Composição em quantidade desenhando um gráfico vazio. O cabeçalho
+  do arquivo explica a matriz e por que as asserções são as que são.
+
+  Para rodar localmente:
+
+  ```sh
+  pip install playwright && python -m playwright install chromium
+  python3 web/_export/smoke_comex.py web/
+  ```
 
 Todos rodam a partir da **raiz do repositório**:
 
