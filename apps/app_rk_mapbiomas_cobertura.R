@@ -15,18 +15,19 @@ files$CSS_script    <- "../global/dza_lumen.css"
 
 # Dicionários (classes internas em inglês; rótulos PT/EN). As classes de est e
 # munic são idênticas, então usamos o dicionário do est para os rótulos do eixo X.
-files$param_file_pt <- "../data/mapbiomas_cobertura_est_dic.csv"
-files$param_file_en <- "../data/mapbiomas_cobertura_est_dic_en.csv"
+files$param_file_pt <- "../data/mapbiomas_cobertura_base_dic.csv"
+files$param_file_en <- "../data/mapbiomas_cobertura_base_dic_en.csv"
 
 # Duas bases: o toggle geográfico troca qual está ativa
-files$db_file_est   <- "../data/mapbiomas_cobertura_est.rds"
-files$db_file_munic <- "../data/mapbiomas_cobertura_munic.rds"
+files$db_file_base  <- "../data/mapbiomas_cobertura_base.rds"
+files$cobertura_larga <- "../global/mapbiomas_cobertura_larga.R"
 
 # db_file padrão (usado pelo get_db_param para montar as choices iniciais)
-files$db_file <- files$db_file_est
+files$db_file <- files$db_file_base
 
 # Carrega scripts
 source(files$param_script)
+source(files$cobertura_larga)
 source(files$ui_script)
 source(files$server_script)
 
