@@ -1,0 +1,782 @@
+{
+  "pt": [
+    {
+      "var": "Adubos (fertilizantes)",
+      "label": "Adubos (fertilizantes)"
+    },
+    {
+      "var": "Aeronaves e aparelhos espaciais, e suas partes",
+      "label": "Aeronaves e aparelhos espaciais, e suas partes"
+    },
+    {
+      "var": "Algodão",
+      "label": "Algodão"
+    },
+    {
+      "var": "Alumínio e suas obras",
+      "label": "Alumínio e suas obras"
+    },
+    {
+      "var": "Animais vivos",
+      "label": "Animais vivos"
+    },
+    {
+      "var": "Armas e munições; suas partes e acessórios",
+      "label": "Armas e munições; suas partes e acessórios"
+    },
+    {
+      "var": "Artigos de relojoaria",
+      "label": "Artigos de relojoaria"
+    },
+    {
+      "var": "Açúcares e produtos de confeitaria",
+      "label": "Açúcares e produtos de confeitaria"
+    },
+    {
+      "var": "Bebidas, líquidos alcoólicos e vinagres",
+      "label": "Bebidas, líquidos alcoólicos e vinagres"
+    },
+    {
+      "var": "Borracha e suas obras",
+      "label": "Borracha e suas obras"
+    },
+    {
+      "var": "Brinquedos, jogos, artigos para divertimento ou para esporte; suas partes e acessórios",
+      "label": "Brinquedos, jogos, artigos para divertimento ou para esporte; suas partes e acessórios"
+    },
+    {
+      "var": "Cacau e suas preparações",
+      "label": "Cacau e suas preparações"
+    },
+    {
+      "var": "Café, chá, mate e especiarias",
+      "label": "Café, chá, mate e especiarias"
+    },
+    {
+      "var": "Calçados, polainas e artefatos semelhantes; suas partes",
+      "label": "Calçados, polainas e artefatos semelhantes; suas partes"
+    },
+    {
+      "var": "Carnes e miudezas, comestíveis",
+      "label": "Carnes e miudezas, comestíveis"
+    },
+    {
+      "var": "Cereais",
+      "label": "Cereais"
+    },
+    {
+      "var": "Chapéus e artefatos de uso semelhante, e suas partes",
+      "label": "Chapéus e artefatos de uso semelhante, e suas partes"
+    },
+    {
+      "var": "Chumbo e suas obras",
+      "label": "Chumbo e suas obras"
+    },
+    {
+      "var": "Cobre e suas obras",
+      "label": "Cobre e suas obras"
+    },
+    {
+      "var": "Combustíveis minerais, óleos minerais e produtos da sua destilação; matérias betuminosas; ceras minerais",
+      "label": "Combustíveis minerais, óleos minerais e produtos da sua destilação; matérias betuminosas; ceras minerais"
+    },
+    {
+      "var": "Cortiça e suas obras",
+      "label": "Cortiça e suas obras"
+    },
+    {
+      "var": "Embarcações e estruturas flutuantes",
+      "label": "Embarcações e estruturas flutuantes"
+    },
+    {
+      "var": "Estanho e suas obras",
+      "label": "Estanho e suas obras"
+    },
+    {
+      "var": "Extratos tanantes e tintoriais; taninos e seus derivados; pigmentos e outras matérias corantes; tintas e vernizes; mástiques; tintas de escrever",
+      "label": "Extratos tanantes e tintoriais; taninos e seus derivados; pigmentos e outras matérias corantes; tintas e vernizes; mástiques; tintas de escrever"
+    },
+    {
+      "var": "Ferramentas, artefatos de cutelaria e talheres, e suas partes, de metais comuns",
+      "label": "Ferramentas, artefatos de cutelaria e talheres, e suas partes, de metais comuns"
+    },
+    {
+      "var": "Ferro fundido, ferro e aço",
+      "label": "Ferro fundido, ferro e aço"
+    },
+    {
+      "var": "Fibras sintéticas ou artificiais, descontínuas",
+      "label": "Fibras sintéticas ou artificiais, descontínuas"
+    },
+    {
+      "var": "Filamentos sintéticos ou artificiais",
+      "label": "Filamentos sintéticos ou artificiais"
+    },
+    {
+      "var": "Frutas; cascas de frutos cítricos e de melões",
+      "label": "Frutas; cascas de frutos cítricos e de melões"
+    },
+    {
+      "var": "Gomas, resinas e outros sucos e extratos vegetais",
+      "label": "Gomas, resinas e outros sucos e extratos vegetais"
+    },
+    {
+      "var": "Gorduras e óleos animais ou vegetais; produtos da sua dissociação; gorduras alimentares elaboradas; ceras de origem animal ou vegetal",
+      "label": "Gorduras e óleos animais ou vegetais; produtos da sua dissociação; gorduras alimentares elaboradas; ceras de origem animal ou vegetal"
+    },
+    {
+      "var": "Guarda-chuvas, sombrinhas, guarda-sóis, bengalas, bengalas-assentos, chicotes, pingalins, e suas partes",
+      "label": "Guarda-chuvas, sombrinhas, guarda-sóis, bengalas, bengalas-assentos, chicotes, pingalins, e suas partes"
+    },
+    {
+      "var": "Instrumentos e aparelhos de óptica, de fotografia, de cinematografia, de medida, de controle ou de precisão; instrumentos e aparelhos médico-cirúrgicos; suas partes e acessórios",
+      "label": "Instrumentos e aparelhos de óptica, de fotografia, de cinematografia, de medida, de controle ou de precisão; instrumentos e aparelhos médico-cirúrgicos; suas partes e acessórios"
+    },
+    {
+      "var": "Instrumentos musicais; suas partes e acessórios",
+      "label": "Instrumentos musicais; suas partes e acessórios"
+    },
+    {
+      "var": "Leite e lacticínios; ovos de aves; mel natural; produtos comestíveis de origem animal, não especificados nem compreendidos noutros Capítulos",
+      "label": "Leite e lacticínios; ovos de aves; mel natural; produtos comestíveis de origem animal, não especificados nem compreendidos noutros Capítulos"
+    },
+    {
+      "var": "Livros, jornais, gravuras e outros produtos das indústrias gráficas; textos manuscritos ou datilografados, planos e plantas",
+      "label": "Livros, jornais, gravuras e outros produtos das indústrias gráficas; textos manuscritos ou datilografados, planos e plantas"
+    },
+    {
+      "var": "Lã, pelos finos ou grosseiros; fios e tecidos de crina",
+      "label": "Lã, pelos finos ou grosseiros; fios e tecidos de crina"
+    },
+    {
+      "var": "Madeira, carvão vegetal e obras de madeira",
+      "label": "Madeira, carvão vegetal e obras de madeira"
+    },
+    {
+      "var": "Matérias albuminóides; produtos à base de amidos ou de féculas modificados; colas; enzimas",
+      "label": "Matérias albuminóides; produtos à base de amidos ou de féculas modificados; colas; enzimas"
+    },
+    {
+      "var": "Matérias para entrançar e outros produtos de origem vegetal, não especificados nem compreendidos noutros Capítulos",
+      "label": "Matérias para entrançar e outros produtos de origem vegetal, não especificados nem compreendidos noutros Capítulos"
+    },
+    {
+      "var": "Minerios, escórias e cinzas",
+      "label": "Minerios, escórias e cinzas"
+    },
+    {
+      "var": "Máquinas, aparelhos e materiais elétricos, e suas partes; aparelhos de gravação ou de reprodução de som, aparelhos de gravação ou de reprodução de imagens e de som em televisão, e suas partes e acessórios",
+      "label": "Máquinas, aparelhos e materiais elétricos, e suas partes; aparelhos de gravação ou de reprodução de som, aparelhos de gravação ou de reprodução de imagens e de som em televisão, e suas partes e acessórios"
+    },
+    {
+      "var": "Móveis; mobiliário médico-cirúrgico, colchões, almofadas e semelhantes; aparelhos de iluminação não especificados nem compreendidos em outros capítulos; anúncios, cartazes ou tabuletas e placas indicadoras luminosos, e artigos semelhantes; Construções Pré",
+      "label": "Móveis; mobiliário médico-cirúrgico, colchões, almofadas e semelhantes; aparelhos de iluminação não especificados nem compreendidos em outros capítulos; anúncios, cartazes ou tabuletas e placas indicadoras luminosos, e artigos semelhantes; Construções Pré"
+    },
+    {
+      "var": "Níquel e suas obras",
+      "label": "Níquel e suas obras"
+    },
+    {
+      "var": "Objetos de arte, de coleção e antiguidades",
+      "label": "Objetos de arte, de coleção e antiguidades"
+    },
+    {
+      "var": "Obras de couro; artigos de correeiro ou de seleiro; artigos de viagem, bolsas e artefatos semelhantes; obras de tripa",
+      "label": "Obras de couro; artigos de correeiro ou de seleiro; artigos de viagem, bolsas e artefatos semelhantes; obras de tripa"
+    },
+    {
+      "var": "Obras de espartaria ou de cestaria",
+      "label": "Obras de espartaria ou de cestaria"
+    },
+    {
+      "var": "Obras de ferro fundido, ferro ou aço",
+      "label": "Obras de ferro fundido, ferro ou aço"
+    },
+    {
+      "var": "Obras de pedra, gesso, cimento, amianto, mica ou de matérias semelhantes",
+      "label": "Obras de pedra, gesso, cimento, amianto, mica ou de matérias semelhantes"
+    },
+    {
+      "var": "Obras diversas",
+      "label": "Obras diversas"
+    },
+    {
+      "var": "Obras diversas de metais comuns",
+      "label": "Obras diversas de metais comuns"
+    },
+    {
+      "var": "Outras fibras têxteis vegetais; fios de papel e tecidos de fios de papel",
+      "label": "Outras fibras têxteis vegetais; fios de papel e tecidos de fios de papel"
+    },
+    {
+      "var": "Outros artefatos têxteis confeccionados; sortidos; artefatos de matérias têxteis, calçados, chapéus e artefatos de uso semelhante, usados; trapos",
+      "label": "Outros artefatos têxteis confeccionados; sortidos; artefatos de matérias têxteis, calçados, chapéus e artefatos de uso semelhante, usados; trapos"
+    },
+    {
+      "var": "Outros metais comuns; ceramais (cermets); obras dessas matérias",
+      "label": "Outros metais comuns; ceramais (cermets); obras dessas matérias"
+    },
+    {
+      "var": "Outros produtos de origem animal, não especificados nem compreendidos noutros Capítulos",
+      "label": "Outros produtos de origem animal, não especificados nem compreendidos noutros Capítulos"
+    },
+    {
+      "var": "Papel e cartão; obras de pasta de celulose, de papel ou de cartão",
+      "label": "Papel e cartão; obras de pasta de celulose, de papel ou de cartão"
+    },
+    {
+      "var": "Pastas (ouates), feltros e falsos tecidos; fios especiais; cordéis, cordas e cabos; artigos de cordoaria",
+      "label": "Pastas (ouates), feltros e falsos tecidos; fios especiais; cordéis, cordas e cabos; artigos de cordoaria"
+    },
+    {
+      "var": "Pastas de madeira ou de outras matérias fibrosas celulósicas; papel ou cartão para reciclar (desperdícios e aparas).",
+      "label": "Pastas de madeira ou de outras matérias fibrosas celulósicas; papel ou cartão para reciclar (desperdícios e aparas)."
+    },
+    {
+      "var": "Peixes e crustáceos, moluscos e outros invertebrados aquáticos",
+      "label": "Peixes e crustáceos, moluscos e outros invertebrados aquáticos"
+    },
+    {
+      "var": "Peles com pelo e suas obras; peles com pelo artificiais",
+      "label": "Peles com pelo e suas obras; peles com pelo artificiais"
+    },
+    {
+      "var": "Peles, exceto as peles com pelo, e couros",
+      "label": "Peles, exceto as peles com pelo, e couros"
+    },
+    {
+      "var": "Penas e penugem preparadas e suas obras; flores artificiais; obras de cabelo",
+      "label": "Penas e penugem preparadas e suas obras; flores artificiais; obras de cabelo"
+    },
+    {
+      "var": "Plantas vivas e produtos de floricultura",
+      "label": "Plantas vivas e produtos de floricultura"
+    },
+    {
+      "var": "Plásticos e suas obras",
+      "label": "Plásticos e suas obras"
+    },
+    {
+      "var": "Preparações alimentícias diversas",
+      "label": "Preparações alimentícias diversas"
+    },
+    {
+      "var": "Preparações de carne, de peixes ou de crustáceos, de moluscos ou de outros invertebrados aquáticos",
+      "label": "Preparações de carne, de peixes ou de crustáceos, de moluscos ou de outros invertebrados aquáticos"
+    },
+    {
+      "var": "Preparações de produtos hortícolas, de frutas ou de outras partes de plantas",
+      "label": "Preparações de produtos hortícolas, de frutas ou de outras partes de plantas"
+    },
+    {
+      "var": "Preparações à base de cereais, farinhas, amidos, féculas ou leite; produtos de pastelaria",
+      "label": "Preparações à base de cereais, farinhas, amidos, féculas ou leite; produtos de pastelaria"
+    },
+    {
+      "var": "Produtos cerâmicos",
+      "label": "Produtos cerâmicos"
+    },
+    {
+      "var": "Produtos da indústria de moagem; malte; amidos e féculas; inulina; glúten de trigo",
+      "label": "Produtos da indústria de moagem; malte; amidos e féculas; inulina; glúten de trigo"
+    },
+    {
+      "var": "Produtos diversos das indústrias químicas",
+      "label": "Produtos diversos das indústrias químicas"
+    },
+    {
+      "var": "Produtos farmacêuticos",
+      "label": "Produtos farmacêuticos"
+    },
+    {
+      "var": "Produtos hortícolas, plantas, raízes e tubérculos, comestíveis.",
+      "label": "Produtos hortícolas, plantas, raízes e tubérculos, comestíveis."
+    },
+    {
+      "var": "Produtos para fotografia e cinematografia",
+      "label": "Produtos para fotografia e cinematografia"
+    },
+    {
+      "var": "Produtos químicos inorgânicos; compostos inorgânicos ou orgânicos de metais preciosos, de elementos radioativos, de metais das terras raras ou de isótopos",
+      "label": "Produtos químicos inorgânicos; compostos inorgânicos ou orgânicos de metais preciosos, de elementos radioativos, de metais das terras raras ou de isótopos"
+    },
+    {
+      "var": "Produtos químicos orgânicos",
+      "label": "Produtos químicos orgânicos"
+    },
+    {
+      "var": "Pérolas naturais ou cultivadas, pedras preciosas ou semipreciosas e semelhantes, metais preciosos, metais folheados ou chapeados de metais preciosos (plaquê), e suas obras; bijuterias; moedas",
+      "label": "Pérolas naturais ou cultivadas, pedras preciosas ou semipreciosas e semelhantes, metais preciosos, metais folheados ou chapeados de metais preciosos (plaquê), e suas obras; bijuterias; moedas"
+    },
+    {
+      "var": "Pólvoras e explosivos; artigos de pirotecnia; fósforos; ligas pirofóricas; matérias inflamáveis",
+      "label": "Pólvoras e explosivos; artigos de pirotecnia; fósforos; ligas pirofóricas; matérias inflamáveis"
+    },
+    {
+      "var": "Reatores nucleares, caldeiras, máquinas, aparelhos e instrumentos mecânicos, e suas partes",
+      "label": "Reatores nucleares, caldeiras, máquinas, aparelhos e instrumentos mecânicos, e suas partes"
+    },
+    {
+      "var": "Resíduos e desperdícios das indústrias alimentares; alimentos preparados para animais",
+      "label": "Resíduos e desperdícios das indústrias alimentares; alimentos preparados para animais"
+    },
+    {
+      "var": "Sabões, agentes orgânicos de superfície, preparações para lavagem, preparações lubrificantes, ceras artificiais, ceras preparadas, produtos de conservação e limpeza, velas e artigos semelhantes, massas ou pastas para modelar, \"ceras\" para dentistas e Comp",
+      "label": "Sabões, agentes orgânicos de superfície, preparações para lavagem, preparações lubrificantes, ceras artificiais, ceras preparadas, produtos de conservação e limpeza, velas e artigos semelhantes, massas ou pastas para modelar, \"ceras\" para dentistas e Comp"
+    },
+    {
+      "var": "Sal; enxofre; terras e pedras; gesso, cal e cimento",
+      "label": "Sal; enxofre; terras e pedras; gesso, cal e cimento"
+    },
+    {
+      "var": "Seda",
+      "label": "Seda"
+    },
+    {
+      "var": "Sementes e frutos oleaginosos; grãos, sementes e frutos diversos; plantas industriais ou medicinais; palhas e forragens",
+      "label": "Sementes e frutos oleaginosos; grãos, sementes e frutos diversos; plantas industriais ou medicinais; palhas e forragens"
+    },
+    {
+      "var": "Tabaco e seus sucedâneos manufaturados",
+      "label": "Tabaco e seus sucedâneos manufaturados"
+    },
+    {
+      "var": "Tapetes e outros revestimentos para pisos (pavimentos), de matérias têxteis",
+      "label": "Tapetes e outros revestimentos para pisos (pavimentos), de matérias têxteis"
+    },
+    {
+      "var": "Tecidos de malha",
+      "label": "Tecidos de malha"
+    },
+    {
+      "var": "Tecidos especiais; tecidos tufados; rendas; tapeçarias; passamanarias; bordados.",
+      "label": "Tecidos especiais; tecidos tufados; rendas; tapeçarias; passamanarias; bordados."
+    },
+    {
+      "var": "Tecidos impregnados, revestidos, recobertos ou estratificados; artigos para usos técnicos de matérias têxteis",
+      "label": "Tecidos impregnados, revestidos, recobertos ou estratificados; artigos para usos técnicos de matérias têxteis"
+    },
+    {
+      "var": "Transações especiais",
+      "label": "Transações especiais"
+    },
+    {
+      "var": "Vestuário e seus acessórios, de malha",
+      "label": "Vestuário e seus acessórios, de malha"
+    },
+    {
+      "var": "Vestuário e seus acessórios, exceto de Malha",
+      "label": "Vestuário e seus acessórios, exceto de Malha"
+    },
+    {
+      "var": "Veículos automóveis, tratores, ciclos e outros veículos terrestres, suas partes e acessórios",
+      "label": "Veículos automóveis, tratores, ciclos e outros veículos terrestres, suas partes e acessórios"
+    },
+    {
+      "var": "Veículos e material para vias férreas ou semelhantes, e suas partes; aparelhos mecânicos (incluindo os eletromecânicos) de sinalização para vias de comunicação",
+      "label": "Veículos e material para vias férreas ou semelhantes, e suas partes; aparelhos mecânicos (incluindo os eletromecânicos) de sinalização para vias de comunicação"
+    },
+    {
+      "var": "Vidro e suas obras",
+      "label": "Vidro e suas obras"
+    },
+    {
+      "var": "Zinco e suas obras",
+      "label": "Zinco e suas obras"
+    },
+    {
+      "var": "Óleos essenciais e resinóides; produtos de perfumaria ou de toucador preparados e preparações cosméticas",
+      "label": "Óleos essenciais e resinóides; produtos de perfumaria ou de toucador preparados e preparações cosméticas"
+    }
+  ],
+  "en": [
+    {
+      "var": "Adubos (fertilizantes)",
+      "label": "Fertilisers"
+    },
+    {
+      "var": "Aeronaves e aparelhos espaciais, e suas partes",
+      "label": "Aircraft, spacecraft, and parts thereof"
+    },
+    {
+      "var": "Algodão",
+      "label": "Cotton"
+    },
+    {
+      "var": "Alumínio e suas obras",
+      "label": "Aluminium and articles thereof"
+    },
+    {
+      "var": "Animais vivos",
+      "label": "Live animals"
+    },
+    {
+      "var": "Armas e munições; suas partes e acessórios",
+      "label": "Arms and ammunition; parts and accessories thereof"
+    },
+    {
+      "var": "Artigos de relojoaria",
+      "label": "Clocks and watches and parts thereof"
+    },
+    {
+      "var": "Açúcares e produtos de confeitaria",
+      "label": "Sugars and sugar confectionery"
+    },
+    {
+      "var": "Bebidas, líquidos alcoólicos e vinagres",
+      "label": "Beverages, spirits and vinegar"
+    },
+    {
+      "var": "Borracha e suas obras",
+      "label": "Rubber and articles thereof"
+    },
+    {
+      "var": "Brinquedos, jogos, artigos para divertimento ou para esporte; suas partes e acessórios",
+      "label": "Toys, games and sports requisites; parts and accessories thereof"
+    },
+    {
+      "var": "Cacau e suas preparações",
+      "label": "Cocoa and cocoa preparations"
+    },
+    {
+      "var": "Café, chá, mate e especiarias",
+      "label": "Coffee, tea, maté and spices"
+    },
+    {
+      "var": "Calçados, polainas e artefatos semelhantes; suas partes",
+      "label": "Footwear, gaiters and the like; parts of such articles"
+    },
+    {
+      "var": "Carnes e miudezas, comestíveis",
+      "label": "Meat and edible meat offal"
+    },
+    {
+      "var": "Cereais",
+      "label": "Cereals"
+    },
+    {
+      "var": "Chapéus e artefatos de uso semelhante, e suas partes",
+      "label": "Headgear and parts thereof"
+    },
+    {
+      "var": "Chumbo e suas obras",
+      "label": "Lead and articles thereof"
+    },
+    {
+      "var": "Cobre e suas obras",
+      "label": "Copper and articles thereof"
+    },
+    {
+      "var": "Combustíveis minerais, óleos minerais e produtos da sua destilação; matérias betuminosas; ceras minerais",
+      "label": "Mineral fuels, mineral oils, bituminous substances; mineral waxes"
+    },
+    {
+      "var": "Cortiça e suas obras",
+      "label": "Cork and articles of cork"
+    },
+    {
+      "var": "Embarcações e estruturas flutuantes",
+      "label": "Ships, boats and floating structures"
+    },
+    {
+      "var": "Estanho e suas obras",
+      "label": "Tin and articles thereof"
+    },
+    {
+      "var": "Extratos tanantes e tintoriais; taninos e seus derivados; pigmentos e outras matérias corantes; tintas e vernizes; mástiques; tintas de escrever",
+      "label": "Tanning or dyeing extracts; tannins and their derivatives; others"
+    },
+    {
+      "var": "Ferramentas, artefatos de cutelaria e talheres, e suas partes, de metais comuns",
+      "label": "Tools, implements, cutlery, spoons and forks, of base metal; parts thereof of base metal"
+    },
+    {
+      "var": "Ferro fundido, ferro e aço",
+      "label": "Iron and steel"
+    },
+    {
+      "var": "Fibras sintéticas ou artificiais, descontínuas",
+      "label": "Man-made staple fibres"
+    },
+    {
+      "var": "Filamentos sintéticos ou artificiais",
+      "label": "Man-made filaments"
+    },
+    {
+      "var": "Frutas; cascas de frutos cítricos e de melões",
+      "label": "Edible fruit and nuts; peel of citrus fruits or melons"
+    },
+    {
+      "var": "Gomas, resinas e outros sucos e extratos vegetais",
+      "label": "Lac; gums, resins and other vegetable saps and extracts"
+    },
+    {
+      "var": "Gorduras e óleos animais ou vegetais; produtos da sua dissociação; gorduras alimentares elaboradas; ceras de origem animal ou vegetal",
+      "label": "Animal or vegetable fats and oils; Others"
+    },
+    {
+      "var": "Guarda-chuvas, sombrinhas, guarda-sóis, bengalas, bengalas-assentos, chicotes, pingalins, e suas partes",
+      "label": "Umbrellas, sun umbrellas, walking-sticks, seat-sticks, whips, riding-crops, others"
+    },
+    {
+      "var": "Instrumentos e aparelhos de óptica, de fotografia, de cinematografia, de medida, de controle ou de precisão; instrumentos e aparelhos médico-cirúrgicos; suas partes e acessórios",
+      "label": "Optical, photographic, cinematographic instruments; others"
+    },
+    {
+      "var": "Instrumentos musicais; suas partes e acessórios",
+      "label": "Musical instruments; parts and accessories of such articles"
+    },
+    {
+      "var": "Leite e lacticínios; ovos de aves; mel natural; produtos comestíveis de origem animal, não especificados nem compreendidos noutros Capítulos",
+      "label": "Dairy produce; birds' eggs; natural honey; others"
+    },
+    {
+      "var": "Livros, jornais, gravuras e outros produtos das indústrias gráficas; textos manuscritos ou datilografados, planos e plantas",
+      "label": "Books, newspapers, pictures and other products of the printing industry; others"
+    },
+    {
+      "var": "Lã, pelos finos ou grosseiros; fios e tecidos de crina",
+      "label": "Wool, fine or coarse animal hair; horsehair yarn and woven fabric"
+    },
+    {
+      "var": "Madeira, carvão vegetal e obras de madeira",
+      "label": "Wood and articles of wood; wood charcoal"
+    },
+    {
+      "var": "Matérias albuminóides; produtos à base de amidos ou de féculas modificados; colas; enzimas",
+      "label": "Albuminoidal substances; modified starches; glues; enzymes"
+    },
+    {
+      "var": "Matérias para entrançar e outros produtos de origem vegetal, não especificados nem compreendidos noutros Capítulos",
+      "label": "Vegetable plaiting materials; Vegetable products not elsewhere specified or included"
+    },
+    {
+      "var": "Minerios, escórias e cinzas",
+      "label": "Ores, slag and ash"
+    },
+    {
+      "var": "Máquinas, aparelhos e materiais elétricos, e suas partes; aparelhos de gravação ou de reprodução de som, aparelhos de gravação ou de reprodução de imagens e de som em televisão, e suas partes e acessórios",
+      "label": "Electrical machinery and equipment and parts thereof; others"
+    },
+    {
+      "var": "Móveis; mobiliário médico-cirúrgico, colchões, almofadas e semelhantes; aparelhos de iluminação não especificados nem compreendidos em outros capítulos; anúncios, cartazes ou tabuletas e placas indicadoras luminosos, e artigos semelhantes; Construções Pré",
+      "label": "Furniture; bedding, mattresses, cushions and similar stuffed furnishings; others"
+    },
+    {
+      "var": "Níquel e suas obras",
+      "label": "Nickel and articles thereof"
+    },
+    {
+      "var": "Objetos de arte, de coleção e antiguidades",
+      "label": "Works of art, collectors' pieces and antiques"
+    },
+    {
+      "var": "Obras de couro; artigos de correeiro ou de seleiro; artigos de viagem, bolsas e artefatos semelhantes; obras de tripa",
+      "label": "Articles of leather; articles of animal gut (other than silkworm gut), others"
+    },
+    {
+      "var": "Obras de espartaria ou de cestaria",
+      "label": "Manufactures of straw, of esparto or of other plaiting materials"
+    },
+    {
+      "var": "Obras de ferro fundido, ferro ou aço",
+      "label": "Articles of iron or steel"
+    },
+    {
+      "var": "Obras de pedra, gesso, cimento, amianto, mica ou de matérias semelhantes",
+      "label": "Articles of stone, plaster, cement, asbestos, mica or similar materials"
+    },
+    {
+      "var": "Obras diversas",
+      "label": "Miscellaneous manufactured articles"
+    },
+    {
+      "var": "Obras diversas de metais comuns",
+      "label": "Miscellaneous articles of base metal"
+    },
+    {
+      "var": "Outras fibras têxteis vegetais; fios de papel e tecidos de fios de papel",
+      "label": "Other vegetable textile fibres; paper yarn and woven fabrics of paper yarn"
+    },
+    {
+      "var": "Outros artefatos têxteis confeccionados; sortidos; artefatos de matérias têxteis, calçados, chapéus e artefatos de uso semelhante, usados; trapos",
+      "label": "Other made-up textile articles; sets; rags, others"
+    },
+    {
+      "var": "Outros metais comuns; ceramais (cermets); obras dessas matérias",
+      "label": "Other base metals; cermets; articles thereof"
+    },
+    {
+      "var": "Outros produtos de origem animal, não especificados nem compreendidos noutros Capítulos",
+      "label": "Products of animal origin, not specified or included elsewhere"
+    },
+    {
+      "var": "Papel e cartão; obras de pasta de celulose, de papel ou de cartão",
+      "label": "Paper and paperboard; articles of paper pulp, of paper or of paperboard"
+    },
+    {
+      "var": "Pastas (ouates), feltros e falsos tecidos; fios especiais; cordéis, cordas e cabos; artigos de cordoaria",
+      "label": "Wadding, felt and nonwovens; others"
+    },
+    {
+      "var": "Pastas de madeira ou de outras matérias fibrosas celulósicas; papel ou cartão para reciclar (desperdícios e aparas).",
+      "label": "Pulp of wood or of other fibrous cellulosic material, others,"
+    },
+    {
+      "var": "Peixes e crustáceos, moluscos e outros invertebrados aquáticos",
+      "label": "Fish and crustaceans, molluscs and other aquatic invertebrates"
+    },
+    {
+      "var": "Peles com pelo e suas obras; peles com pelo artificiais",
+      "label": "Furskins and artificial fur; manufactures thereof"
+    },
+    {
+      "var": "Peles, exceto as peles com pelo, e couros",
+      "label": "Raw hides and skins (other than furskins) and leather"
+    },
+    {
+      "var": "Penas e penugem preparadas e suas obras; flores artificiais; obras de cabelo",
+      "label": "Prepared feathers and articles made of feathers or of down; others"
+    },
+    {
+      "var": "Plantas vivas e produtos de floricultura",
+      "label": "Live trees and other plants; others"
+    },
+    {
+      "var": "Plásticos e suas obras",
+      "label": "Plastics and articles thereof"
+    },
+    {
+      "var": "Preparações alimentícias diversas",
+      "label": "Miscellaneous edible preparations"
+    },
+    {
+      "var": "Preparações de carne, de peixes ou de crustáceos, de moluscos ou de outros invertebrados aquáticos",
+      "label": "Preparations of meat, of fish or of crustaceans, others"
+    },
+    {
+      "var": "Preparações de produtos hortícolas, de frutas ou de outras partes de plantas",
+      "label": "Preparations of vegetables, fruit, nuts or other parts of plants"
+    },
+    {
+      "var": "Preparações à base de cereais, farinhas, amidos, féculas ou leite; produtos de pastelaria",
+      "label": "Preparations of cereals, flour, starch or milk; pastrycooks' products"
+    },
+    {
+      "var": "Produtos cerâmicos",
+      "label": "Ceramic products"
+    },
+    {
+      "var": "Produtos da indústria de moagem; malte; amidos e féculas; inulina; glúten de trigo",
+      "label": "Products of the milling industry; Malt; Starches; Inulin; Wheat gluten"
+    },
+    {
+      "var": "Produtos diversos das indústrias químicas",
+      "label": "Miscellaneous chemical products"
+    },
+    {
+      "var": "Produtos farmacêuticos",
+      "label": "Pharmaceutical products"
+    },
+    {
+      "var": "Produtos hortícolas, plantas, raízes e tubérculos, comestíveis.",
+      "label": "Edible vegetables and certain roots and tubers"
+    },
+    {
+      "var": "Produtos para fotografia e cinematografia",
+      "label": "Photographic or cinematographic goods"
+    },
+    {
+      "var": "Produtos químicos inorgânicos; compostos inorgânicos ou orgânicos de metais preciosos, de elementos radioativos, de metais das terras raras ou de isótopos",
+      "label": "Inorganic chemicals; organic or inorganic compounds of precious metals, others"
+    },
+    {
+      "var": "Produtos químicos orgânicos",
+      "label": "Organic chemicals"
+    },
+    {
+      "var": "Pérolas naturais ou cultivadas, pedras preciosas ou semipreciosas e semelhantes, metais preciosos, metais folheados ou chapeados de metais preciosos (plaquê), e suas obras; bijuterias; moedas",
+      "label": "Natural or cultured pearls, precious or semi-precious stones, others"
+    },
+    {
+      "var": "Pólvoras e explosivos; artigos de pirotecnia; fósforos; ligas pirofóricas; matérias inflamáveis",
+      "label": "Explosives; pyrotechnic products; matches; others"
+    },
+    {
+      "var": "Reatores nucleares, caldeiras, máquinas, aparelhos e instrumentos mecânicos, e suas partes",
+      "label": "Nuclear reactors, boilers, machinery and mechanical appliances; others"
+    },
+    {
+      "var": "Resíduos e desperdícios das indústrias alimentares; alimentos preparados para animais",
+      "label": "Residues and waste from the food industries; others"
+    },
+    {
+      "var": "Sabões, agentes orgânicos de superfície, preparações para lavagem, preparações lubrificantes, ceras artificiais, ceras preparadas, produtos de conservação e limpeza, velas e artigos semelhantes, massas ou pastas para modelar, \"ceras\" para dentistas e Comp",
+      "label": "Soap, organic surface-active agents, others"
+    },
+    {
+      "var": "Sal; enxofre; terras e pedras; gesso, cal e cimento",
+      "label": "Salt; sulphur; earths and stone; plastering materials, lime and cement"
+    },
+    {
+      "var": "Seda",
+      "label": "Silk"
+    },
+    {
+      "var": "Sementes e frutos oleaginosos; grãos, sementes e frutos diversos; plantas industriais ou medicinais; palhas e forragens",
+      "label": "Oil seeds and oleaginous fruits; Grains, Seeds, others"
+    },
+    {
+      "var": "Tabaco e seus sucedâneos manufaturados",
+      "label": "Tobacco and manufactured tobacco substitutes"
+    },
+    {
+      "var": "Tapetes e outros revestimentos para pisos (pavimentos), de matérias têxteis",
+      "label": "Carpets and other textile floor coverings"
+    },
+    {
+      "var": "Tecidos de malha",
+      "label": "Lnitted or crocheted fabrics"
+    },
+    {
+      "var": "Tecidos especiais; tecidos tufados; rendas; tapeçarias; passamanarias; bordados.",
+      "label": "Special woven fabrics; tufted textile fabrics; lace; tapestries; others"
+    },
+    {
+      "var": "Tecidos impregnados, revestidos, recobertos ou estratificados; artigos para usos técnicos de matérias têxteis",
+      "label": "Impregnated, coated, covered or laminated textile fabrics; others"
+    },
+    {
+      "var": "Transações especiais",
+      "label": "Special operations"
+    },
+    {
+      "var": "Vestuário e seus acessórios, de malha",
+      "label": "Articles of apparel and clothing accessories, knitted or crocheted"
+    },
+    {
+      "var": "Vestuário e seus acessórios, exceto de Malha",
+      "label": "Articles of apparel and clothing accessories, not knitted or crocheted"
+    },
+    {
+      "var": "Veículos automóveis, tratores, ciclos e outros veículos terrestres, suas partes e acessórios",
+      "label": "Vehicles other than railway or tramway rolling-stock, and parts and accessories thereof"
+    },
+    {
+      "var": "Veículos e material para vias férreas ou semelhantes, e suas partes; aparelhos mecânicos (incluindo os eletromecânicos) de sinalização para vias de comunicação",
+      "label": "Railway or tramway locomotives, rolling-stock and parts thereof; others"
+    },
+    {
+      "var": "Vidro e suas obras",
+      "label": "Glass and glassware"
+    },
+    {
+      "var": "Zinco e suas obras",
+      "label": "Zinc and articles thereof"
+    },
+    {
+      "var": "Óleos essenciais e resinóides; produtos de perfumaria ou de toucador preparados e preparações cosméticas",
+      "label": "Essential oils and resinoids; perfumery, cosmetic or toilet preparations"
+    }
+  ]
+}

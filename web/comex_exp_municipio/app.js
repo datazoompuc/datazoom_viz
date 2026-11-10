@@ -1,0 +1,4699 @@
+// Data Zoom Amazônia — app_ts_comex_exp_municipio, JS rebuild PoC
+//
+// Static rebuild of the Shiny app: data is pre-exported by
+// web/_export/export_comex_exp_municipio.R into web/comex_exp_municipio/data/.
+// Everything below runs client-side against those static files — no R
+// server, no shinyapps.io.
+//
+// Two views so far: a ranked bar chart (top-N municipalities by export
+// value for a selected year) and a region-wide composition view (stacked
+// area of export value by product category over the whole time range).
+// Per-entity trend small multiples and a year-over-year dumbbell view are
+// still follow-up work — see the brainstorm in the PR/conversation history
+// for the full plan.
+
+(function () {
+  "use strict";
+
+  const I18N = {
+    pt: {
+      plot_name: "Data Zoom Amazônia",
+      plot_desc: "Comércio exterior na Amazônia (COMEX): valor da exportação por município",
+      label_year: "Ano",
+      label_view_name: "Visualização",
+      view_ranking: "Ranking",
+      view_composition: "Composição",
+      title_ranking: "Ranking de municípios exportadores",
+      subtitle_ranking: "Valor exportado ({unit}), por município",
+      subtitle_ranking_kg: "Quantidade exportada ({unit}), por município",
+      title_composition: "Composição das exportações da Amazônia Legal",
+      subtitle_composition: "Valor exportado ({unit}) por categoria de produto, empilhado por ano — passe o mouse para ver o detalhamento",
+      subtitle_composition_kg: "Quantidade exportada ({unit}) por categoria de produto, empilhado por ano — passe o mouse para ver o detalhamento",
+      ranking_axis_label: "Valor exportado ({unit})",
+      ranking_axis_label_kg: "Quantidade exportada ({unit})",
+      region_total_prefix: "Total Amazônia Legal: ",
+      label_no_data: "Sem dado",
+      label_others: "Outros",
+      view_change: "Variação",
+      title_change: "Variação entre dois anos",
+      subtitle_change: "Municípios ordenados pela variação no valor exportado",
+      title_change_category: "Variação entre dois anos — {categoria}",
+      label_change_orientation: "Variação de",
+      title_change_produtos: "Variação de produtos entre dois anos",
+      title_change_produtos_scope: "Variação de produtos entre dois anos — {scope}",
+      subtitle_change_produtos: "Categorias de produto ordenadas pela variação no valor exportado",
+      label_uf_filter: "Estado",
+      uf_all: "Todos os estados",
+      title_composition_uf: "Composição das exportações — {uf}",
+      label_year_a: "Ano A",
+      label_year_b: "Ano B",
+      change_axis_label: "Valor exportado ({unit})",
+      change_axis_label_kg: "Quantidade exportada ({unit})",
+      view_trends: "Tendências",
+      title_trends: "Tendências por município",
+      title_trends_category: "Tendências por município — {categoria}",
+      subtitle_trends: "Top municípios por valor total exportado, {range}",
+      subtitle_trends_category: "Top municípios por valor exportado na categoria, {range}",
+      label_trends_orientation: "Tendências de",
+      title_trends_produtos: "Tendências por categoria",
+      title_trends_produtos_scope: "Tendências por categoria — {scope}",
+      subtitle_trends_produtos: "Top categorias por valor total exportado, {range}",
+      trends_hint: "Ordenado pelo valor total exportado no período ({range}), não pelo ano selecionado",
+      view_explore: "Explorar",
+      title_explore: "Comparar municípios",
+      title_explore_category: "Comparar municípios — {categoria}",
+      subtitle_explore: "Valor exportado ({unit}) ao longo do tempo, municípios selecionados",
+      subtitle_explore_kg: "Quantidade exportada ({unit}) ao longo do tempo, municípios selecionados",
+      subtitle_explore_category: "Valor exportado ({unit}) na categoria, ao longo do tempo, municípios selecionados",
+      subtitle_explore_category_kg: "Quantidade exportada ({unit}) na categoria, ao longo do tempo, municípios selecionados",
+      label_explore_munis: "Municípios (Ctrl/Cmd+clique para vários)",
+      explore_hint: "Ordenado por valor total exportado",
+      label_explore_orientation: "Explorar por",
+      title_explore_produtos: "Comparar categorias",
+      title_explore_produtos_scope: "Comparar categorias — {scope}",
+      subtitle_explore_produtos: "Valor exportado ({unit}) ao longo do tempo, categorias selecionadas",
+      subtitle_explore_produtos_kg: "Quantidade exportada ({unit}) ao longo do tempo, categorias selecionadas",
+      label_explore_produtos: "Categorias (Ctrl/Cmd+clique para várias)",
+      unit_explore_dollar: "US$",
+      unit_explore_log: "log US$",
+      unit_explore_index: "índice, ano inicial = 100",
+      label_log_scale: "Escala logarítmica",
+      label_index_first: "Indexado ao ano inicial (=100)",
+      label_fonte: "Fonte: ",
+      explore_log_index_hint: "Não é possível combinar escala logarítmica com indexação — desmarque uma para usar a outra",
+      explore_no_base: "sem exportação em {year}",
+      title_composition_muni: "Composição das exportações — {municipio}",
+      subtitle_composition_muni: "Categorias de produto exportadas, {range} — passe o mouse para ver o detalhamento",
+      label_composition_scope: "Escopo",
+      composition_scope_region: "Todos os municípios",
+      label_composition_orientation: "Composição por",
+      composition_orientation_estado: "Estado",
+      title_composition_estado: "Composição por estado — {categoria}",
+      title_composition_estado_uf: "Composição por estado — {categoria} ({uf})",
+      title_composition_estado_base: "Composição por estado",
+      subtitle_composition_estado: "Valor exportado ({unit}) por estado, empilhado por ano — passe o mouse para ver o detalhamento",
+      subtitle_composition_estado_kg: "Quantidade exportada ({unit}) por estado, empilhado por ano — passe o mouse para ver o detalhamento",
+      label_agg_level: "Nível de agregação",
+      agg_level_sec: "Seção (SEC)",
+      agg_level_sh2: "Capítulo (SH2)",
+      agg_level_sh4: "Produto específico (SH4)",
+      label_category: "Categoria",
+      title_ranking_product: "Ranking de municípios exportadores — {produto}",
+      label_ranking_orientation: "Ranking de",
+      ranking_orientation_municipio: "Municípios",
+      ranking_orientation_produto: "Produtos",
+      ranking_orientation_pais: "Países",
+      title_ranking_paises: "Ranking de países de destino",
+      title_ranking_paises_scope: "Ranking de países de destino — {scope}",
+      subtitle_ranking_paises: "Valor exportado ({unit}), por país de destino",
+      subtitle_ranking_paises_kg: "Quantidade exportada ({unit}), por país de destino",
+      title_change_paises: "Variação por país de destino",
+      title_change_paises_scope: "Variação por país de destino — {scope}",
+      subtitle_change_paises: "Países ordenados pela variação no valor exportado",
+      title_trends_paises: "Tendências por país de destino",
+      title_trends_paises_scope: "Tendências por país de destino — {scope}",
+      subtitle_trends_paises: "Top países por valor total exportado, {range}",
+      title_explore_paises: "Comparar países de destino",
+      title_explore_paises_scope: "Comparar países de destino — {scope}",
+      subtitle_explore_paises: "Valor exportado ({unit}) ao longo do tempo, países selecionados",
+      subtitle_explore_paises_kg: "Quantidade exportada ({unit}) ao longo do tempo, países selecionados",
+      label_explore_paises: "Países (Ctrl/Cmd+clique para vários)",
+      label_ranking_scope: "Escopo",
+      title_ranking_produtos: "Ranking de produtos exportados",
+      title_ranking_produtos_scope: "Ranking de produtos exportados — {scope}",
+      subtitle_ranking_produtos: "Valor exportado ({unit}), por produto/categoria",
+      subtitle_ranking_produtos_kg: "Quantidade exportada ({unit}), por produto/categoria",
+      label_ranking_product_select: "Produto",
+      label_ranking_product_search: "Ou busque outro produto (todos os SH4)",
+      ranking_product_all: "Todos os produtos",
+      ranking_product_custom: "(produto buscado)",
+      prodrank_cat_agro: "Agro e alimentos",
+      prodrank_cat_carnes: "Carnes e produtos de origem animal",
+      prodrank_cat_oleos: "Óleos e derivados",
+      prodrank_cat_florestais: "Florestais e madeira",
+      prodrank_cat_metais: "Metais e minerais",
+      prodrank_cat_industria: "Indústria e manufaturados",
+      ranking_product_total_prefix: "Total exportado no ano: ",
+      label_loading: "Carregando…",
+      label_medida: "Medida",
+      medida_valor: "Valor",
+      medida_kg: "Quantidade",
+      medida_hint_produto: "Somar quilos de produtos diferentes compara peso, não importância econômica",
+      unit_kg: "kg",
+      unit_t: "t",
+      unit_mil_t: "mil t",
+      unit_mi_t: "mi t",
+      year_partial: "parcial · {n} meses",
+      combo_placeholder: "Buscar…",
+      combo_no_match: "Nenhum resultado",
+      combo_count: "{n} de {total}",
+      label_load_error: "Não foi possível carregar os dados.",
+      label_retry: "Tentar novamente",
+      view_map: "Mapa",
+      label_map_mode: "VARIÁVEIS:",
+      map_mode_forest: "Compatíveis c/ Floresta",
+      map_mode_all: "Todos os Produtos",
+      map_mode_ratio: "Razão Floresta/Outros",
+      title_map_forest: "Principal produto compatível com a floresta",
+      title_map_all: "Principal produto exportado",
+      title_map_ratio: "Floresta vs. outros produtos",
+      subtitle_map_forest: "Município colorido pela categoria do seu principal produto compatível com a floresta, por ano",
+      subtitle_map_all: "Município colorido pela categoria do seu principal produto exportado, por ano",
+      subtitle_map_ratio: "Compara o produto mais exportado do município com seu produto mais exportado entre os compatíveis com a floresta — qual dos dois é mais característico da Amazônia Legal?",
+      map_hint: "Passe o mouse sobre um município para ver detalhes.",
+      map_loading: "Carregando mapa…",
+      tooltip_municipio: "Município:",
+      tooltip_estado: "Estado:",
+      tooltip_produto: "Principal produto:",
+      tooltip_produto_geral: "Produto mais exportado (geral):",
+      tooltip_produto_floresta: "Produto mais exportado (floresta):",
+      tooltip_categoria: "Categoria:",
+      tooltip_valor: "Valor:",
+      tooltip_valor_unidade: "% das exportações desse produto na Amazônia Legal vindas deste município",
+      tooltip_classe: "Classificação:",
+      ratio_same: "Mesmo produto principal",
+      ratio_nao: "Principal produto não é compatível com a floresta",
+      ratio_sim: "Principal produto é compatível com a floresta",
+      legend_title_category: "Categoria do principal produto",
+      legend_title_ratio: "Classificação",
+      btn_lang: "English"
+    },
+    en: {
+      plot_name: "Data Zoom Amazônia",
+      plot_desc: "External trade in the Amazon (COMEX): export value by municipality",
+      label_year: "Year",
+      label_view_name: "View",
+      view_ranking: "Ranking",
+      view_composition: "Composition",
+      title_ranking: "Ranking of exporting municipalities",
+      subtitle_ranking: "Export value ({unit}), by municipality",
+      subtitle_ranking_kg: "Export quantity ({unit}), by municipality",
+      title_composition: "Legal Amazon export composition",
+      subtitle_composition: "Export value ({unit}) by product category, stacked per year — hover to see the breakdown",
+      subtitle_composition_kg: "Export quantity ({unit}) by product category, stacked per year — hover to see the breakdown",
+      ranking_axis_label: "Export value ({unit})",
+      ranking_axis_label_kg: "Export quantity ({unit})",
+      region_total_prefix: "Legal Amazon total: ",
+      label_no_data: "No data",
+      label_others: "Other",
+      view_change: "Change",
+      title_change: "Change between two years",
+      subtitle_change: "Municipalities ranked by change in export value",
+      title_change_category: "Change between two years — {categoria}",
+      label_change_orientation: "Change in",
+      title_change_produtos: "Change in products between two years",
+      title_change_produtos_scope: "Change in products between two years — {scope}",
+      subtitle_change_produtos: "Product categories ranked by change in export value",
+      label_uf_filter: "State",
+      uf_all: "All states",
+      title_composition_uf: "Export composition — {uf}",
+      label_year_a: "Year A",
+      label_year_b: "Year B",
+      change_axis_label: "Export value ({unit})",
+      change_axis_label_kg: "Export quantity ({unit})",
+      view_trends: "Trends",
+      title_trends: "Trends by municipality",
+      title_trends_category: "Trends by municipality — {categoria}",
+      subtitle_trends: "Top municipalities by total export value, {range}",
+      subtitle_trends_category: "Top municipalities by export value in the category, {range}",
+      label_trends_orientation: "Trend by",
+      title_trends_produtos: "Trends by category",
+      title_trends_produtos_scope: "Trends by category — {scope}",
+      subtitle_trends_produtos: "Top categories by total export value, {range}",
+      trends_hint: "Ranked by total value exported over the period ({range}), not by the selected year",
+      view_explore: "Explore",
+      title_explore: "Compare municipalities",
+      title_explore_category: "Compare municipalities — {categoria}",
+      subtitle_explore: "Export value ({unit}) over time, selected municipalities",
+      subtitle_explore_kg: "Export quantity ({unit}) over time, selected municipalities",
+      subtitle_explore_category: "Export value ({unit}) in the category, over time, selected municipalities",
+      subtitle_explore_category_kg: "Export quantity ({unit}) in the category, over time, selected municipalities",
+      label_explore_munis: "Municipalities (Ctrl/Cmd+click for multiple)",
+      explore_hint: "Sorted by total export value",
+      label_explore_orientation: "Explore by",
+      title_explore_produtos: "Compare categories",
+      title_explore_produtos_scope: "Compare categories — {scope}",
+      subtitle_explore_produtos: "Export value ({unit}) over time, selected categories",
+      subtitle_explore_produtos_kg: "Export quantity ({unit}) over time, selected categories",
+      label_explore_produtos: "Categories (Ctrl/Cmd+click for multiple)",
+      unit_explore_dollar: "US$",
+      unit_explore_log: "log US$",
+      unit_explore_index: "index, first year = 100",
+      label_log_scale: "Log scale",
+      label_index_first: "Indexed to first year (=100)",
+      label_fonte: "Source: ",
+      explore_log_index_hint: "Log scale can't be combined with indexing — uncheck one to use the other",
+      explore_no_base: "no exports in {year}",
+      title_composition_muni: "Export composition — {municipio}",
+      subtitle_composition_muni: "Product categories exported, {range} — hover to see the breakdown",
+      label_composition_scope: "Scope",
+      composition_scope_region: "All municipalities",
+      label_composition_orientation: "Breakdown by",
+      composition_orientation_estado: "State",
+      title_composition_estado: "Composition by state — {categoria}",
+      title_composition_estado_uf: "Composition by state — {categoria} ({uf})",
+      title_composition_estado_base: "Composition by state",
+      subtitle_composition_estado: "Export value ({unit}) by state, stacked per year — hover to see the breakdown",
+      subtitle_composition_estado_kg: "Export quantity ({unit}) by state, stacked per year — hover to see the breakdown",
+      label_agg_level: "Aggregation level",
+      agg_level_sec: "Section (SEC)",
+      agg_level_sh2: "Chapter (SH2)",
+      agg_level_sh4: "Specific product (SH4)",
+      label_category: "Category",
+      title_ranking_product: "Ranking of exporting municipalities — {produto}",
+      label_ranking_orientation: "Rank by",
+      ranking_orientation_municipio: "Municipalities",
+      ranking_orientation_produto: "Products",
+      ranking_orientation_pais: "Countries",
+      title_ranking_paises: "Ranking of destination countries",
+      title_ranking_paises_scope: "Ranking of destination countries — {scope}",
+      subtitle_ranking_paises: "Export value ({unit}), by destination country",
+      subtitle_ranking_paises_kg: "Export quantity ({unit}), by destination country",
+      title_change_paises: "Change by destination country",
+      title_change_paises_scope: "Change by destination country — {scope}",
+      subtitle_change_paises: "Countries ranked by change in export value",
+      title_trends_paises: "Trends by destination country",
+      title_trends_paises_scope: "Trends by destination country — {scope}",
+      subtitle_trends_paises: "Top countries by total export value, {range}",
+      title_explore_paises: "Compare destination countries",
+      title_explore_paises_scope: "Compare destination countries — {scope}",
+      subtitle_explore_paises: "Export value ({unit}) over time, selected countries",
+      subtitle_explore_paises_kg: "Export quantity ({unit}) over time, selected countries",
+      label_explore_paises: "Countries (Ctrl/Cmd+click for multiple)",
+      label_ranking_scope: "Scope",
+      title_ranking_produtos: "Ranking of exported products",
+      title_ranking_produtos_scope: "Ranking of exported products — {scope}",
+      subtitle_ranking_produtos: "Export value ({unit}), by product/category",
+      subtitle_ranking_produtos_kg: "Export quantity ({unit}), by product/category",
+      label_ranking_product_select: "Product",
+      label_ranking_product_search: "Or search another product (all SH4)",
+      ranking_product_all: "All products",
+      ranking_product_custom: "(searched product)",
+      prodrank_cat_agro: "Agriculture & food",
+      prodrank_cat_carnes: "Meat & animal products",
+      prodrank_cat_oleos: "Oils & derivatives",
+      prodrank_cat_florestais: "Forestry & wood",
+      prodrank_cat_metais: "Metals & minerals",
+      prodrank_cat_industria: "Industry & manufactured goods",
+      ranking_product_total_prefix: "Total exported that year: ",
+      label_loading: "Loading…",
+      label_medida: "Measure",
+      medida_valor: "Value",
+      medida_kg: "Quantity",
+      medida_hint_produto: "Adding up kilos across different products compares weight, not economic importance",
+      unit_kg: "kg",
+      unit_t: "t",
+      unit_mil_t: "thousand t",
+      unit_mi_t: "million t",
+      year_partial: "partial · {n} months",
+      combo_placeholder: "Search…",
+      combo_no_match: "No matches",
+      combo_count: "{n} of {total}",
+      label_load_error: "Could not load the data.",
+      label_retry: "Try again",
+      view_map: "Map",
+      label_map_mode: "VARIABLES:",
+      map_mode_forest: "Forest Compatible",
+      map_mode_all: "All Products",
+      map_mode_ratio: "Forest/Other Ratio",
+      title_map_forest: "Main forest-compatible product",
+      title_map_all: "Main exported product",
+      title_map_ratio: "Forest vs. other products",
+      subtitle_map_forest: "Municipality colored by its main forest-compatible product's category, by year",
+      subtitle_map_all: "Municipality colored by its main exported product's category, by year",
+      subtitle_map_ratio: "Compares the municipality's overall top export with its top export among forest-compatible goods — which one is more distinctively theirs, region-wide?",
+      map_hint: "Hover over a municipality to see details.",
+      map_loading: "Loading map…",
+      tooltip_municipio: "Municipality:",
+      tooltip_estado: "State:",
+      tooltip_produto: "Main product:",
+      tooltip_produto_geral: "Top export (overall):",
+      tooltip_produto_floresta: "Top export (forest-compatible):",
+      tooltip_categoria: "Category:",
+      tooltip_valor: "Value:",
+      tooltip_valor_unidade: "% of that product's Legal Amazon exports that came from this municipality",
+      tooltip_classe: "Classification:",
+      ratio_same: "Same main product",
+      ratio_nao: "Main product is not forest-compatible",
+      ratio_sim: "Main product is forest-compatible",
+      legend_title_category: "Main product's category",
+      legend_title_ratio: "Classification",
+      btn_lang: "Português"
+    }
+  };
+
+  // Okabe-Ito — a published, colorblind-safe 8-hue categorical palette.
+  // Assigned once, in a fixed order, to the top-8 products by all-time
+  // total value; every other category folds into "Outros"/"Other" (a
+  // neutral gray, not a 9th hue). Order is fixed regardless of how a
+  // product's per-year rank moves — color follows the entity, never its
+  // rank in a given year.
+  const CATEGORY_COLORS = ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#666666"];
+  const OTHERS_COLOR = "#c9c4ba";
+
+  const DATA_DIR = "data";
+  const PLAY_INTERVAL_MS = 900;
+  const SPARK_W = 260;
+  const SPARK_H = 40;
+  const SPARK_PAD = 4;
+
+  // How many entries Ranking and Tendências show. This was a 10/15/20/30
+  // <select> in the sidebar; it was dropped because the choice cluttered
+  // the controls more than it helped — 15 reads well in both views, and
+  // nothing else about them depends on it being adjustable.
+  const TOP_N = 15;
+
+  // ---- Medidas: valor exportado (US$) e quantidade (kg) ----
+  //
+  // As duas viajam juntas em todo arquivo de dados, na mesma estrutura
+  // esparsa (ver o export). Trocar de medida não busca nada: só
+  // reconstrói os índices derivados a partir dos dados que já estão em
+  // memória, o que mantém o botão instantâneo.
+  const MEDIDAS = ["valor", "kg"];
+
+  // Nome do campo nas linhas de objeto ({municipio, ano, valor, kg}).
+  // Refaz todo índice derivado a partir dos dados crus que já estão em
+  // memória. Só o que foi carregado é reconstruído: se o usuário nunca
+  // abriu SH2, país ou o ranking SH4, esses continuam nulos e serão
+  // construídos na medida corrente quando forem buscados.
+  function rebuildPorMedida() {
+    totalsByYear = groupByYear(municipalityTotals);
+    regionTotalByYear = new Map(regionTotals.map((r) => [r.ano, r[campoMedida()]]));
+    ({ totalsByMunicipio, municipioMeta, ufList } = buildMunicipioIndex(municipalityTotals));
+    // A view vem antes da série: buildCompositionSeries consome linhas já
+    // projetadas, não as cruas.
+    compositionSecView = projetarMedida(compositionSec);
+    compositionSeriesSec = buildCompositionSeries(compositionSecView, dictionary);
+    compositionIndexSec = buildCompositionIndexes(muniCompositionSec);
+
+    if (compositionSh2) {
+      compositionSh2View = projetarMedida(compositionSh2);
+      compositionSeriesSh2 = buildCompositionSeries(compositionSh2View, dictionary);
+      compositionIndexSh2 = buildCompositionIndexes(muniCompositionSh2);
+    }
+    if (compositionPaisRaw) {
+      compositionPais = compositionPaisRaw.map((r) => ({ produto: r.pais, ano: r.ano, valor: r.valor, kg: r.kg }));
+      compositionIndexPais = buildCompositionIndexes(muniCompositionPaisRaw);
+      compositionPaisView = projetarMedida(compositionPais);
+    }
+    if (productRanking) {
+      productRankingRowsByCode = buildProductRankingIndex(productRanking);
+    }
+    // activeCompositionSeries aponta para uma das séries acima; render()
+    // o reatribui, mas deixá-lo apontando para a série antiga entre a
+    // reconstrução e o render é o tipo de coisa que vira bug sutil.
+    activeCompositionSeries = compositionSeriesSec;
+  }
+
+  // ---- Modo embutido (?embed=1) ----
+  //
+  // A página do site que hospeda o app já traz nav bar com a logo e a troca
+  // de idioma, um título e um parágrafo de instrução. Dentro do iframe tudo
+  // isso aparece duas vezes.
+  //
+  // O seletor de idioma é pior que redundante: ele trocaria só o conteúdo do
+  // iframe, deixando a página em volta no idioma anterior. Quem manda no
+  // idioma ali é a nav bar, que troca a página inteira e recarrega o app com
+  // ?lang=.
+  //
+  // Nada disso é removido do app: aberto na própria URL ele continua
+  // completo. O parâmetro é que decide, e updateUrl() o preserva para o modo
+  // sobreviver a um reload dentro do iframe.
+  function lerEmbedDaUrl() {
+    state.embed = new URLSearchParams(location.search).get("embed") === "1";
+    document.documentElement.classList.toggle("embed", state.embed);
+    if (state.embed) carregarFonteDoSite();
+  }
+
+  // A Inter só é buscada em modo embutido, para o app sozinho não pagar por
+  // uma fonte que não usa. Na prática costuma ser cache: a página de fora
+  // pediu a mesma fonte, do mesmo CDN, antes de montar o iframe.
+  function carregarFonteDoSite() {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap";
+    document.head.appendChild(link);
+  }
+
+  function lerMedidaDaUrl() {
+    const m = new URLSearchParams(location.search).get("medida");
+    state.medida = MEDIDAS.includes(m) ? m : "valor";
+  }
+
+  function campoMedida() {
+    return state.medida === "kg" ? "kg" : "valor";
+  }
+
+  // Posição nas células esparsas ([idx, idx, ano, valor, kg]).
+  function posMedida() {
+    return state.medida === "kg" ? 4 : 3;
+  }
+
+  const state = {
+    lang: "pt",
+    year: null,
+    // "valor" (US$ FOB) ou "kg" (quantidade). Global: vale para todas as telas.
+    medida: "valor",
+    embed: false,
+    view: "ranking", // "ranking" | "composition" | "change" | "trends" | "explore"
+    playing: false,
+    playTimer: null,
+    // Shared across every view (a single global filter, not one per
+    // view). null = "Todos os estados". Variação is the one
+    // exception: its dumbbell chart can't render all 446 municipalities
+    // at once, so it always needs one concrete state — if this is still
+    // null the first time Variação is opened, its own setView handling
+    // picks ufList[0] and writes it back here, so the choice stays
+    // visible and consistent everywhere else too.
+    uf: null,
+    yearA: null,
+    yearB: null,
+    // Variação's own axis swap: "municipio" (default) compares municípios
+    // (within the current state) for one product/category, or the
+    // aggregate total; "produto" instead compares product categories, for
+    // one município or the current state's whole aggregate — same 3-way
+    // scope Composição/Ranking already use. No SH4 tier here, same
+    // reasoning Tendências already gives for skipping it.
+    changeOrientation: "municipio", // "municipio" | "produto"
+    changeAggLevel: "all", // "all" | "sec" | "sh2" — municipio-orientation's own category filter
+    changeCategory: null, // selected SEC or SH2 category, used when changeAggLevel is "sec"/"sh2"
+    changeProdutoLevel: "sec", // "sec" | "sh2" — produto-orientation's taxonomy
+    changeScope: null, // municipio name, or null = the current state's whole aggregate, used when changeOrientation is "produto"
+    exploreMunis: [], // hand-picked municipalities for the explore view
+    exploreLog: false,
+    exploreIndex: false,
+    exploreAggLevel: "all", // "all" | "sec" | "sh2" — what Explorar's lines are filtered by
+    exploreCategory: null, // selected SEC or SH2 category name, used when exploreAggLevel is "sec"/"sh2"
+    // Explorar's own axis swap: "municipio" (default, above) plots
+    // hand-picked municípios as lines; "produto" instead plots hand-picked
+    // product categories, for one município or the current state/region —
+    // same 3-way scope Ranking/Variação/Tendências use, and the same
+    // hand-picked-multiple-entities idiom Explorar's own municipio mode
+    // already uses (not an automatic top-N, unlike Tendências' cards).
+    exploreOrientation: "municipio", // "municipio" | "produto"
+    exploreProdutoLevel: "sec", // "sec" | "sh2" — produto-orientation's taxonomy
+    exploreProdutos: [], // hand-picked categories for produto-orientation, mirrors exploreMunis
+    exploreScope: null, // municipio name, or null = state/region aggregate, used when exploreOrientation is "produto"
+    compositionScope: null, // null = whole-region composition; a municipio name = that place's own composition
+    compositionAgg: "sec", // "sec" | "sh2" — which product-category taxonomy the Composição chart uses
+    // Composição's own axis swap: "estado" (default, above) breaks one
+    // category down by the Legal Amazon's 9 states — deliberately no
+    // município tier here (9 states is a readable stacked area; ~450
+    // municipalities would not be); "produto" instead breaks one
+    // geographic scope down by product category. Same "Produtos" wording
+    // and button position (second) as every other view's own axis swap,
+    // even though what it pairs against ("Estado", not "Município") is
+    // necessarily different here. The global state.uf filter still applies
+    // in "estado" mode: it narrows the state axis down to one value (that
+    // state's own single trend), the same way compositionScope narrows
+    // "produto" mode down to one município.
+    compositionOrientation: "estado", // "estado" | "produto"
+    compositionProduto: null, // selected SEC or SH2 category, used when compositionOrientation is "estado"
+    rankingAggLevel: "all", // "all" | "sec" | "sh2" | "sh4" — what Ranking is filtered by
+    rankingCategory: null, // selected SEC or SH2 category name, used when rankingAggLevel is "sec"/"sh2"
+    rankingProduct: null, // selected SH4 code, used when rankingAggLevel is "sh4"
+    // Ranking's own axis swap: "municipio" (default, above) ranks
+    // municípios for one product/category; "produto" ranks products/
+    // categories instead, for one município — or the state/region, same
+    // 3-way scope Composição's own compositionScope + the global state.uf
+    // filter already provide.
+    rankingOrientation: "municipio", // "municipio" | "produto"
+    rankingProdutoLevel: "sec", // "sec" | "sh2" | "sh4" — taxonomy ranked when rankingOrientation is "produto" ("all" has no meaning here — there's nothing to rank within a single undifferentiated bucket)
+    rankingScope: null, // municipio name, or null = whole state/region (mirrors compositionScope)
+    trendsAggLevel: "all", // "all" | "sec" | "sh2" — what Tendências is filtered by
+    trendsCategory: null, // selected SEC or SH2 category name, used when trendsAggLevel is "sec"/"sh2"
+    // Tendências' own axis swap: "municipio" (default, above) shows top-N
+    // municípios by total (or by category); "produto" instead shows top-N
+    // product categories, for one município or the current state/region —
+    // same 3-way scope Ranking/Variação use.
+    trendsOrientation: "municipio", // "municipio" | "produto"
+    trendsProdutoLevel: "sec", // "sec" | "sh2" — produto-orientation's taxonomy
+    trendsScope: null, // municipio name, or null = state/region aggregate, used when trendsOrientation is "produto"
+    mapMode: "forest" // "forest" | "all" | "ratio" — shares state.year with the rest of the app
+  };
+
+  // SEC (22 broad sections) is the default product-category taxonomy, so
+  // its data loads eagerly at startup — matches the original Shiny app's
+  // own default (its "Selecione agregação do produto" toggle also opened
+  // on SEC). SH2 (97 finer chapters) is the same idea at a different
+  // granularity, offered as an equal alternative in Composição and as an
+  // additional filter tier in Ranking/Tendências — but it's fetched lazily
+  // (see ensureSh2Loaded), same rationale as the SH4 product-ranking data:
+  // most visits never pick it, so it shouldn't cost anything until they do.
+  let dictionary, municipalityTotals, regionTotals;
+  let compositionSec, productsSec, muniCompositionSec;
+  let compositionSeriesSec; // [{ produto, color, isOthers, values: Map(year -> valor) }], top-8 + Outros, fixed order
+  let compositionIndexSec; // { byMunicipio: Map(municipio -> [{produto,ano,valor}]), byProduto: Map(produto -> [{municipio,ano,valor}]) }
+  let sh2LoadPromise = null;
+  let compositionSh2, productsSh2, muniCompositionSh2;
+  // Destino: mesma forma dos níveis de produto, buscado sob demanda
+  // (1,8 MB — a grade município x país x ano tem só 2,7% de densidade).
+  let paisLoadPromise = null;
+  let compositionPais, productsPais, compositionIndexPais;
+  let compositionSecView, compositionSh2View, compositionPaisView; // projetadas na medida corrente
+  let compositionPaisRaw, muniCompositionPaisRaw; // crus, para reconstruir ao trocar de medida
+  let compositionSeriesSh2;
+  let compositionIndexSh2;
+  let totalsByYear; // year -> [{municipio, valor}], sorted descending
+  let regionTotalByYear; // year -> valor
+  let totalsByMunicipio; // municipio -> Map(year -> valor)
+  let municipioMeta; // municipio -> { uf }
+  let ufList; // sorted distinct UF codes
+  let activeCompositionSeries; // whichever series (region or a municipio) is currently rendered, for the hover handler
+
+  // Product-filtered ranking (SH4-level, ~1,142 specific products vs. the 22
+  // broad SEC categories used elsewhere) is fetched lazily — it's ~1MB, by
+  // far the heaviest dataset in the app, and most visits never pick a
+  // specific product (the default "Todos os produtos" needs none of this).
+  // Fetch is triggered by interacting with the product picker, not by
+  // landing on Ranking (its default view) — see ensureProductRankingLoaded.
+  let productRanking = null; // raw {municipios, produtos, cells} once loaded
+  let productRankingPromise = null;
+  let productRankingRowsByCode; // code -> [{municipio, ano, valor}]
+  let productsByCode; // code -> {code, label_pt, label_en}, once loaded
+  let rankingProductLabelToCode; // current-language short label -> code, for the datalist picker
+
+  // Map view (Leaflet): lazy-loaded on first visit, same rationale as the
+  // product ranking data — this is ~6MB (mostly state-boundary geometry)
+  // and most visits never open this view. Both the Leaflet library itself
+  // (CSS+JS, injected on demand — see ensureLeafletLoaded) and the map's
+  // own data stay out of every other view's cost entirely.
+  let leafletLoadPromise = null;
+  let mapDataPromise = null;
+  let mapData; // {municipios, categorias, produtos, cells}
+  let mapCellByKey; // "municipioIdx|ano|floresta" -> {categoriaIdx, produtoIdx, valor}
+  let leafletMap, mapLegendControl;
+  let mapLayersByCodIbge;
+  let mapBoundsByUf; // uf -> L.LatLngBounds, built once from the loaded geometry
+  let mapFittedUf; // uf (or null) the map view is currently zoomed to — avoids re-fitting on every renderMap() call (mode switch, lang toggle)
+  const MAP_NODATA_PATTERN_ID = "nodata-hatch";
+  const MAP_NODATA_BASE = "#deeaef";
+  const MAP_NODATA_LINE = "#a2adb1";
+  const MAP_OUTOFSTATE_FILL = "#e3e7e9";
+  const MAP_OUTOFSTATE_OPACITY = 0.35;
+  // 1, não 0.9: sobre o relevo sombreado qualquer transparência mistura a
+  // cor da categoria com o terreno e a legenda deixa de corresponder ao
+  // que está na tela.
+  const MAP_INSTATE_OPACITY = 1;
+  const MAP_RATIO_COLORS = { same: "#666666", nao: "#D55E00", sim: "#009E73" };
+
+  let sparkSeries = [];
+  let sparkXFor = null;
+  let sparkYFor = null;
+
+  // ---- Lazy-load failure handling ----
+  //
+  // Every dataset below the eagerly-loaded core (SH2, the SH4 product
+  // ranking, the map's Leaflet bundle + geometry) is fetched through a
+  // memoized ensure*Loaded() promise, and each render function paints a
+  // "Carregando…" placeholder while that promise is pending. Two things
+  // have to hold when one of those fetches fails, or the view is stuck on
+  // that placeholder forever with nothing explaining why:
+  //
+  //   1. The memo must be dropped, so the next attempt actually re-fetches.
+  //      Keeping a rejected promise cached means every later call returns
+  //      the same rejection and the feature stays broken for the rest of
+  //      the session even after the network recovers — only a page reload
+  //      would clear it. rememberUntilFailed() below wraps each memo
+  //      assignment to guarantee this.
+  //   2. The placeholder must turn into an error the user can act on.
+  //      loadFailed is a single flag rather than per-dataset state: only
+  //      one lazy load is ever in flight for the visible view, and the
+  //      placeholder it replaces is already view-specific.
+  //
+  // The retry button is wired once via delegation (see initControls) since
+  // the error can surface inside any of the per-view loading containers.
+  let loadFailed = false;
+
+  // Assigns `promise` to a memo slot, clearing that slot if it rejects so
+  // a later call re-fetches instead of replaying the failure. Returns the
+  // promise unchanged, so callers still see the rejection.
+  function rememberUntilFailed(promise, forget) {
+    promise.catch(() => { forget(); });
+    return promise;
+  }
+
+  // Attached at every ensure*Loaded() call site. Swaps the pending
+  // "Carregando…" placeholder for the error + retry state by re-rendering;
+  // the render functions read loadFailed via loadingMarkup() below.
+  //
+  // The early return matters: render() re-enters the same ensure*Loaded()
+  // path that just failed, so without it a failure would re-render, which
+  // would re-fetch (the memo having just been dropped), which would fail
+  // again — a tight request loop against an already-failing endpoint.
+  // suppressedLoad() below stops the re-fetch; this stops the re-render.
+  function onLazyLoadFailed(err) {
+    if (loadFailed) return;
+    console.error("Lazy load failed", err);
+    loadFailed = true;
+    render();
+  }
+
+  // What ensure*Loaded() returns while the error state is on screen: a
+  // promise that never settles, so the render painting that error doesn't
+  // kick off a fresh request and neither its .then nor its .catch runs.
+  // The view is waiting on the user (the retry button), not the network;
+  // clearing loadFailed is what re-opens this path.
+  function suppressedLoad() {
+    return new Promise(() => {});
+  }
+
+  // What a view's loading container should contain right now: the neutral
+  // "Carregando…" while a fetch is in flight, or an error plus a retry
+  // button once one has failed. Returned as HTML (not text) because of the
+  // button — every caller assigns it through innerHTML.
+  function loadingMarkup(pendingLabel) {
+    const t = I18N[state.lang];
+    if (!loadFailed) return escapeHtml(pendingLabel || t.label_loading);
+    return `<span class="load-error-text">${escapeHtml(t.label_load_error)}</span>` +
+      `<button type="button" class="retry-btn" data-role="retry-load">${escapeHtml(t.label_retry)}</button>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  Promise.all([
+    fetchJson(`${DATA_DIR}/dictionary.json`),
+    fetchJson(`${DATA_DIR}/municipality_totals.json`),
+    fetchJson(`${DATA_DIR}/region_totals.json`),
+    fetchJson(`${DATA_DIR}/composition_sec.json`),
+    fetchJson(`${DATA_DIR}/products_sec.json`),
+    fetchJson(`${DATA_DIR}/municipality_composition_sec.json`)
+  ]).then(([dict, munTotals, regTotals, comp, prod, muniComp]) => {
+    dictionary = dict;
+    municipalityTotals = munTotals;
+    regionTotals = regTotals;
+    compositionSec = comp;
+    productsSec = prod;
+    muniCompositionSec = muniComp;
+
+    // A medida sai da URL antes de qualquer índice, porque todos são
+    // construídos na medida corrente. initState() completo não serve aqui:
+    // ele valida state.uf contra ufList, que só existe depois de
+    // buildMunicipioIndex. Abrir com ?medida=kg sem isto montava os índices
+    // em valor e só o rótulo acompanhava — o total da região aparecia em
+    // dólar com unidade de peso.
+    lerEmbedDaUrl();
+    lerMedidaDaUrl();
+    rebuildPorMedida();
+
+    initState();
+    initControls();
+    initSearchablePickers();
+    initSparklineHover();
+    initCompositionHover();
+    initExploreHover();
+    setView(state.view);
+    document.getElementById("spinner").classList.add("hidden");
+  }).catch((err) => {
+    // The core datasets failed, so there is no app to show — unlike the
+    // lazy-load failures above, there's no partially-usable view to fall
+    // back to. This used to raise an alert() telling the reader to check
+    // the console and re-run the export script, which is a message for
+    // whoever is developing this, not for someone who opened the page on
+    // datazoom.com.br. The detail stays in the console; the page itself
+    // just says it couldn't load and offers a reload.
+    //
+    // initState() never ran, so state.lang is still its default — the
+    // language has to come straight off the URL here.
+    console.error("Failed to load data", err);
+    document.getElementById("spinner").classList.add("hidden");
+    const lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "pt";
+    const t = I18N[lang];
+    const panel = document.createElement("div");
+    panel.className = "fatal-error";
+    panel.innerHTML =
+      `<p class="fatal-error-text">${escapeHtml(t.label_load_error)}</p>` +
+      `<button type="button" class="retry-btn" id="fatal-reload">${escapeHtml(t.label_retry)}</button>`;
+    document.querySelector(".chart-wrap").appendChild(panel);
+    document.getElementById("fatal-reload").addEventListener("click", () => location.reload());
+  });
+
+  function fetchJson(url) {
+    return fetch(url).then((r) => {
+      if (!r.ok) throw new Error(`${url}: ${r.status}`);
+      return r.json();
+    });
+  }
+
+  function groupByYear(rows) {
+    // Projeta para a medida corrente em vez de devolver a linha crua: todo
+    // consumidor daqui lê `.valor`, então normalizar na origem evita ter
+    // que ensinar cada um deles sobre a troca de medida.
+    const campo = campoMedida();
+    const byYear = new Map();
+    for (const row of rows) {
+      if (!byYear.has(row.ano)) byYear.set(row.ano, []);
+      byYear.get(row.ano).push({ municipio: row.municipio, ano: row.ano, valor: row[campo] });
+    }
+    for (const list of byYear.values()) list.sort((a, b) => b.valor - a.valor);
+    return byYear;
+  }
+
+  // The source data keys municipalities by a "Nome - UF" string (the .rds
+  // pipeline discards the IBGE code in favor of this name early on — see
+  // the export script) — UF is parsed from that suffix rather than
+  // re-fetched from anywhere else, same pattern the CEMPRE map used for
+  // its own compare-mode state filter.
+  function buildMunicipioIndex(rows) {
+    const campo = campoMedida();
+    const byMuni = new Map();
+    const meta = new Map();
+    for (const row of rows) {
+      if (!byMuni.has(row.municipio)) {
+        byMuni.set(row.municipio, new Map());
+        const uf = row.municipio.slice(row.municipio.lastIndexOf(" - ") + 3);
+        meta.set(row.municipio, { uf });
+      }
+      byMuni.get(row.municipio).set(row.ano, row[campo]);
+    }
+    const ufs = Array.from(new Set(Array.from(meta.values()).map((m) => m.uf))).sort();
+    return { totalsByMunicipio: byMuni, municipioMeta: meta, ufList: ufs };
+  }
+
+  // Shared by the global uf-filter-select's change handler for every
+  // per-município scope picker (Composição/Ranking/Variação/Tendências/
+  // Explorar) — true only when scope is set AND (it no longer exists, or a
+  // specific state is selected that it doesn't belong to). uf === null
+  // ("Todos os estados") never invalidates a município scope on its own.
+  function isMunicipioScopeInvalid(scope, uf) {
+    if (!scope) return false;
+    const meta = municipioMeta.get(scope);
+    return !meta || (!!uf && meta.uf !== uf);
+  }
+
+  // municipality_composition_{sec,sh2}.json ship as index-referencing
+  // [municipio_idx, produto_idx, ano, valor] cells (zero-value cells
+  // dropped) rather than one JSON object per municipio x produto x year —
+  // the full grid is 89-93% zero, so this cuts the payload by an order of
+  // magnitude. Expanded once into two lookup directions from the same
+  // cells: byMunicipio (municipio -> [{produto,ano,valor}]) feeds
+  // Composição's per-municipality scope via buildCompositionSeries();
+  // byProduto (produto -> [{municipio,ano,valor}]) is the same cells read
+  // the other way, feeding Ranking's and Tendências' category filters.
+  function buildCompositionIndexes(data) {
+    const byMunicipio = new Map();
+    const byProduto = new Map();
+    const pos = posMedida();
+    for (const cell of data.cells) {
+      const [municipioIdx, produtoIdx, ano] = cell;
+      const valor = cell[pos];
+      const municipio = data.municipios[municipioIdx];
+      const produto = data.produtos[produtoIdx];
+      if (!byMunicipio.has(municipio)) byMunicipio.set(municipio, []);
+      byMunicipio.get(municipio).push({ produto, ano, valor });
+      if (!byProduto.has(produto)) byProduto.set(produto, []);
+      byProduto.get(produto).push({ municipio, ano, valor });
+    }
+    return { byMunicipio, byProduto };
+  }
+
+  // ---- SH2 aggregation: lazy-loaded the first time any view needs it
+  // (Composição's aggregation toggle, or Ranking's/Tendências' category
+  // filter set to "sh2") — same rationale as the SH4 product-ranking data:
+  // SEC is the default taxonomy everywhere, so SH2's ~900KB shouldn't cost
+  // anything until someone actually asks for the finer breakdown. ----
+
+  function ensureSh2Loaded() {
+    if (loadFailed) return suppressedLoad();
+    if (sh2LoadPromise) return sh2LoadPromise;
+    sh2LoadPromise = rememberUntilFailed(Promise.all([
+      fetchJson(`${DATA_DIR}/composition_sh2.json`),
+      fetchJson(`${DATA_DIR}/municipality_composition_sh2.json`),
+      fetchJson(`${DATA_DIR}/products_sh2.json`)
+    ]).then(([comp, muniComp, prod]) => {
+      compositionSh2 = comp;
+      muniCompositionSh2 = muniComp;
+      productsSh2 = prod;
+      compositionSh2View = projetarMedida(compositionSh2);
+      compositionSeriesSh2 = buildCompositionSeries(compositionSh2View, dictionary);
+      compositionIndexSh2 = buildCompositionIndexes(muniCompositionSh2);
+    }), () => { sh2LoadPromise = null; });
+    return sh2LoadPromise;
+  }
+
+  function ensurePaisLoaded() {
+    if (loadFailed) return suppressedLoad();
+    if (paisLoadPromise) return paisLoadPromise;
+    paisLoadPromise = rememberUntilFailed(Promise.all([
+      fetchJson(`${DATA_DIR}/composition_pais.json`),
+      fetchJson(`${DATA_DIR}/municipality_composition_pais.json`),
+      fetchJson(`${DATA_DIR}/paises.json`)
+    ]).then(([comp, muniComp, dic]) => {
+      // O JSON nomeia os campos pelo que eles são (pais/paises); aqui são
+      // remapeados para o nome genérico que todo o resto do app usa para
+      // "a dimensão categórica". Duas linhas aqui evitam um ramo paralelo
+      // em cada função de render.
+      compositionPaisRaw = comp;
+      compositionPais = comp.map((r) => ({ produto: r.pais, ano: r.ano, valor: r.valor, kg: r.kg }));
+      productsPais = dic;
+      muniCompositionPaisRaw = {
+        municipios: muniComp.municipios,
+        produtos: muniComp.paises,
+        cells: muniComp.cells
+      };
+      compositionIndexPais = buildCompositionIndexes(muniCompositionPaisRaw);
+      compositionPaisView = projetarMedida(compositionPais);
+    }), () => { paisLoadPromise = null; });
+    return paisLoadPromise;
+  }
+
+  // ---- Product ranking (SH4): lazy-loaded on first visit to that view ----
+
+  // The original app_rk_comex_exp_munic_produtosamz didn't expose all ~1,142
+  // SH4 codes either — its server.R hand-curated this ~35-item, 6-category
+  // "starter_choices" list (ported verbatim, codes only; labels come from
+  // our own bilingual productsByCode lookup instead of its PT-only custom
+  // strings, so the category picker stays correct under the lang toggle).
+  // The full catalog stays reachable via the separate search input for
+  // anyone looking for something outside this curated set.
+  const PRODRANK_CATEGORIES = [
+    { key: "agro", codes: ["1201", "1005", "0713", "0710", "0702", "0707", "1104", "1904", "2005", "2008", "2201", "2101"] },
+    { key: "carnes", codes: ["0202", "0201", "0206", "0504", "1502", "2301"] },
+    { key: "oleos", codes: ["1507"] },
+    { key: "florestais", codes: ["4407", "4409", "0801"] },
+    { key: "metais", codes: ["7108", "5201"] },
+    { key: "industria", codes: ["7318", "8482", "4818", "6204", "4202", "3006"] }
+  ];
+
+  // Hardcoded short labels for exactly the curated codes above (same
+  // clause-truncation rule as rankingProductShortLabel, pre-computed from
+  // auxiliar_cod_sh4.rds). This lets the curated dropdown render correctly
+  // on Ranking's default load with zero network cost — Ranking is the
+  // app's landing view, so eagerly fetching the 1MB product_ranking.json
+  // just to populate this list would defeat the whole point of it being
+  // lazy. SH4 nomenclature is a fixed international standard, not
+  // something that changes with each Comex data refresh, so this snapshot
+  // going stale is not a practical concern.
+  const PRODRANK_CURATED_LABELS = {
+    "1201": { pt: "Soja, mesmo triturada", en: "Soya beans, whether or not broken" },
+    "1005": { pt: "Milho", en: "Maize (corn)" },
+    "0713": { pt: "Legumes de vagem, secos, em grão, mesmo pelados ou partidos", en: "Dried leguminous vegetables, shelled, whether or not skin…" },
+    "0710": { pt: "Produtos hortícolas, não cozidos ou cozidos em água ou va…", en: "Vegetables (uncooked or cooked by steaming or boiling in …" },
+    "0702": { pt: "Tomates, frescos ou refrigerados", en: "Tomato, fresh or chilled" },
+    "0707": { pt: "Pepinos e pepininhos (cornichons), frescos ou refrigerados", en: "Cucumbers and gherkins, fresh or chilled" },
+    "1104": { pt: "Grãos de cereais trabalhados de outro modo (por exemplo: …", en: "Cereal grains otherwise worked (for example, hulled, roll…" },
+    "1904": { pt: "Produtos à base de cereais, obtidos por expansão ou por t…", en: "Prepared foods obtained by the swelling or roasting of ce…" },
+    "2005": { pt: "Outros produtos hortícolas preparados ou conservados, exc…", en: "Other vegetables prepared or preserved otherwise than by …" },
+    "2008": { pt: "Frutas e outras partes comestíveis de plantas, preparadas…", en: "Fruit, nuts and other edible parts of plants, otherwise p…" },
+    "2201": { pt: "Águas, incluídas as águas minerais, naturais ou artificia…", en: "Waters, including natural or artificial mineral waters an…" },
+    "2101": { pt: "Extractos, essências e concentrados de café, chá ou de ma…", en: "Extracts, essences and concentrates, of coffee, tea or ma…" },
+    "0202": { pt: "Carnes de animais da espécie bovina, congeladas", en: "Meat of bovine animals, frozen" },
+    "0201": { pt: "Carnes de animais da espécie bovina, frescas ou refrigeradas", en: "Meat of bovine animals, fresh or chilled" },
+    "0206": { pt: "Miudezas comestíveis de animais das espécies bovina, suín…", en: "Edible offal of bovine animals, swine, sheep, goats, hors…" },
+    "0504": { pt: "Tripas, bexigas e estômagos de animais, exceto peixes, in…", en: "Animal (not fish) guts, bladders, stomachs and parts" },
+    "1502": { pt: "Gorduras de animais das espécies bovina, ovina ou caprina…", en: "Fats of bovine animals, sheep or goats, other than those …" },
+    "2301": { pt: "Farinhas, pó e pellets, de carnes, miudezas, peixes ou cr…", en: "Flours, meals and pellets, of meat or meat offal, of fish…" },
+    "1507": { pt: "Óleo de soja e respectivas fracções, mesmo refinados, mas…", en: "Soya-bean oil and its fractions, whether or not refined, …" },
+    "4407": { pt: "Madeira serrada ou endireitada longitudinalmente, cortada…", en: "Wood sawn or chipped lengthwise, sliced or peeled, whethe…" },
+    "4409": { pt: "Madeira (incluídos os tacos e frisos para soalhos, não mo…", en: "Wood (including strips and friezes for parquet flooring, …" },
+    "0801": { pt: "Cocos, castanha do Brasil e castanha de caju, frescos ou …", en: "Coconuts, Brazil nuts and cashew nuts, fresh or dried, wh…" },
+    "7108": { pt: "Ouro (incluído o ouro platinado), em formas brutas ou sem…", en: "Gold (including gold plated with platinum), unwrought or …" },
+    "5201": { pt: "Algodão, não cardado nem penteado", en: "Cotton, not carded or combed" },
+    "7318": { pt: "Parafusos, pernos ou pinos, roscados, porcas, tira-fundos…", en: "Screws, bolts, nuts, coach screws, screw hooks, rivets, c…" },
+    "8482": { pt: "Rolamentos de esferas, de roletes ou de agulhas", en: "Ball or roller bearings" },
+    "4818": { pt: "Papel dos tipos utilizados para a fabricação de papéis hi…", en: "Toilet paper and similar paper, cellulose wadding or webs…" },
+    "6204": { pt: "Fatos de saia-casaco, conjuntos, casacos, vestidos, saias…", en: "Women's or girls' suits, ensembles, jackets, blazers, dre…" },
+    "4202": { pt: "Malas e maletas, incluídas as de toucador e as maletas e …", en: "Trunks, suit-cases, vanity-cases, executive-cases, brief-…" },
+    "3006": { pt: "Preparações e artigos farmacêuticos indicados na Nota 4 d…", en: "Pharmaceutical goods specified in note 4 to this chapter" }
+  };
+
+  function ensureProductRankingLoaded() {
+    if (loadFailed) return suppressedLoad();
+    if (productRankingPromise) return productRankingPromise;
+    productRankingPromise = rememberUntilFailed(fetchJson(`${DATA_DIR}/product_ranking.json`).then((data) => {
+      productRanking = data;
+      productsByCode = new Map(data.produtos.map((p) => [p.code, p]));
+      productRankingRowsByCode = buildProductRankingIndex(data);
+      if (state.rankingProduct && !productRankingRowsByCode.has(state.rankingProduct)) {
+        state.rankingProduct = null;
+        updateUrl();
+      }
+      populateRankingProductPicker();
+    }), () => { productRankingPromise = null; });
+    return productRankingPromise;
+  }
+
+  function buildProductRankingIndex(data) {
+    const byCode = new Map();
+    const pos = posMedida();
+    for (const cell of data.cells) {
+      const [produtoIdx, municipioIdx, ano] = cell;
+      const valor = cell[pos];
+      const code = data.produtos[produtoIdx].code;
+      const municipio = data.municipios[municipioIdx];
+      if (!byCode.has(code)) byCode.set(code, []);
+      byCode.get(code).push({ municipio, ano, valor });
+    }
+    return byCode;
+  }
+
+  // Full official name — only available once product_ranking.json has
+  // loaded (needed for the on-chart/tooltip display, not the picker).
+  function rankingProductLabel(code) {
+    const p = productsByCode && productsByCode.get(code);
+    if (!p) return code;
+    return state.lang === "en" ? p.label_en : p.label_pt;
+  }
+
+  // Short label for the picker: uses the hardcoded curated snapshot when
+  // the full dataset isn't loaded yet (so the dropdown works with zero
+  // fetch), the live official data once it is. Same clause-boundary
+  // truncation rule either way — official SH4 customs descriptions are
+  // long (median ~107 chars, max 255) and compound-clause-shaped, just
+  // like the SEC product names.
+  function rankingProductShortLabel(code) {
+    if (productsByCode) {
+      const full = rankingProductLabel(code);
+      const clause = full.split(";")[0].trim();
+      return clause.length > 60 ? clause.slice(0, 57).trimEnd() + "…" : clause;
+    }
+    const curated = PRODRANK_CURATED_LABELS[code];
+    return curated ? curated[state.lang] : code;
+  }
+
+  // Whatever's currently narrowing Ranking, across all three filterable
+  // tiers, as a display label for the title — or null when
+  // "Todos os produtos" applies and the title should stay generic.
+  //
+  // This and the four current*Label() helpers below deliberately use the
+  // FULL category/product name, not the clause-clipped categoryShortLabelFor
+  // version the sidebar pickers and chart legends use. Those are in tight
+  // fixed-width slots where an ellipsis is the right trade; a title has the
+  // width of the whole content column and is the one place that should say
+  // exactly which product is being shown, even when that wraps to several
+  // lines. Each of these feeds a title only — the two subtitles that
+  // mention them just test them for null, so lengthening them here has no
+  // effect there.
+  function currentRankingFilterLabel() {
+    if (state.rankingAggLevel === "sh4" && state.rankingProduct) return rankingProductLabel(state.rankingProduct);
+    if ((state.rankingAggLevel === "sec" || state.rankingAggLevel === "sh2") && state.rankingCategory) {
+      return categoryLabelFor(state.rankingAggLevel, state.rankingCategory);
+    }
+    return null;
+  }
+
+  // Same idea for Tendências' category filter (no SH4 tier there).
+  function currentTrendsFilterLabel() {
+    if ((state.trendsAggLevel === "sec" || state.trendsAggLevel === "sh2") && state.trendsCategory) {
+      return categoryLabelFor(state.trendsAggLevel, state.trendsCategory);
+    }
+    return null;
+  }
+
+  // Same idea for Explorar's category filter.
+  function currentExploreFilterLabel() {
+    if ((state.exploreAggLevel === "sec" || state.exploreAggLevel === "sh2") && state.exploreCategory) {
+      return categoryLabelFor(state.exploreAggLevel, state.exploreCategory);
+    }
+    return null;
+  }
+
+  // Fills the {range} placeholder a few subtitles and hints carry with the
+  // dataset's actual year span. Those strings used to spell "1997–2025" out
+  // literally, which silently went stale the moment the export script
+  // picked up a new year — everything else in the app (slider bounds, axis
+  // ticks, every computed total) already derives from dictionary.json, so
+  // the captions were the one place that could disagree with the data.
+  // Applied at the DOM-write sites rather than per-branch, so a new string
+  // only has to include the placeholder to get it.
+  function withYearRange(s) {
+    return s.replace("{range}", `${dictionary.year_inicio}–${dictionary.year_final}`);
+  }
+
+  // ---- Anos parciais ----
+  //
+  // A base pode terminar num ano incompleto (2026 tem 9 meses). Mostrar
+  // isso sem avisar faz todo gráfico exibir uma queda que é artefato de
+  // calendário, não de comércio: 2026 com 9 meses fica 14% ABAIXO de 2025,
+  // enquanto os mesmos 9 meses anualizados ficam 14% ACIMA. Nada é
+  // anualizado aqui — só sinalizado, para quem lê saber o que está vendo.
+  function mesesDoAno(year) {
+    const p = dictionary.anos_parciais;
+    if (!p) return null;
+    const n = p[String(year)];
+    return typeof n === "number" ? n : null;
+  }
+
+  // Mantém o aviso de ano parcial ao lado do "Ano 20xx". Chamado de todo
+  // lugar que escreve year-value, para o rótulo nunca ficar defasado.
+  function syncAnoParcial(year) {
+    const el = document.getElementById("year-partial");
+    if (!el) return;
+    const meses = mesesDoAno(year);
+    el.classList.toggle("hidden", meses === null);
+    el.textContent = meses === null ? "" :
+      I18N[state.lang].year_partial.replace("{n}", meses);
+  }
+
+  function isAnoParcial(year) {
+    return mesesDoAno(year) !== null;
+  }
+
+  // Último ano com 12 meses. É onde o app abre, para a visão padrão nunca
+  // ser um ano pela metade.
+  function ultimoAnoCompleto() {
+    return dictionary.year_final_completo || dictionary.year_final;
+  }
+
+  // Explorar's log scale re-spaces the y-axis logarithmically but still
+  // prints real dollar figures on it — indexing instead replaces those
+  // dollar figures with a relative (=100) number. Either way the subtitle's
+  // unit needs to say which one is actually on screen, not just "US$"
+  // unconditionally (the two are mutually exclusive — see the checkbox
+  // handlers below — so only one of these three ever applies).
+  // Unidade da medida corrente, para preencher {unit} em título, subtítulo
+  // e rótulo de eixo. O Explorar tem a sua própria (exploreUnitLabel),
+  // porque lá escala log e indexação mudam a unidade de novo.
+  function unidadeMedida(t) {
+    return state.medida === "kg" ? t.unit_kg : t.unit_explore_dollar;
+  }
+
+  // Escolhe a variante "_kg" da chave quando a medida é quantidade, caindo
+  // na original quando ela não existe. Evita ter que espelhar manualmente
+  // cada ponto de uso: quem acrescentar uma string nova só precisa criar a
+  // chave `_kg` correspondente para ela acompanhar o botão.
+  function tMedida(chave) {
+    const t = I18N[state.lang];
+    if (state.medida === "kg" && t[chave + "_kg"]) return t[chave + "_kg"];
+    return t[chave];
+  }
+
+  function withUnit(s) {
+    return typeof s === "string" ? s.replace("{unit}", unidadeMedida(I18N[state.lang])) : s;
+  }
+
+  function exploreUnitLabel(t) {
+    if (state.exploreIndex) return t.unit_explore_index;
+    const base = unidadeMedida(t);
+    if (state.exploreLog) return state.medida === "kg" ? `log ${base}` : t.unit_explore_log;
+    return base;
+  }
+
+  function exploreSubtitleText(t) {
+    const base = state.exploreOrientation === "pais"
+      ? tMedida("subtitle_explore_paises")
+      : state.exploreOrientation === "produto"
+      ? tMedida("subtitle_explore_produtos")
+      : (currentExploreFilterLabel() ? tMedida("subtitle_explore_category") : tMedida("subtitle_explore"));
+    return base.replace("{unit}", exploreUnitLabel(t));
+  }
+
+  // Same idea for Composição's "estado" orientation — null while nothing's
+  // selected yet (e.g. still loading SH2), so the title falls back to the
+  // generic title_composition_estado_base instead of interpolating "null".
+  function currentCompositionProdutoLabel() {
+    if (state.compositionOrientation === "estado" && state.compositionProduto) {
+      return categoryLabelFor(state.compositionAgg, state.compositionProduto);
+    }
+    return null;
+  }
+
+  // Same idea for Variação's municipio-orientation category filter.
+  function currentChangeFilterLabel() {
+    if (state.changeOrientation === "municipio" && (state.changeAggLevel === "sec" || state.changeAggLevel === "sh2") && state.changeCategory) {
+      return categoryLabelFor(state.changeAggLevel, state.changeCategory);
+    }
+    return null;
+  }
+
+  // Variação's own scope label for the produto-orientation title: a
+  // specific município, else the current state — state.uf is always set
+  // while on this view (see setView/renderChange), so this never actually
+  // falls through to null (whole region).
+  function currentChangeScopeLabel() {
+    if (state.changeOrientation !== "produto") return null;
+    return state.changeScope || state.uf || null;
+  }
+
+  // Curated dropdown works before the 1MB dataset loads (labels come from
+  // PRODRANK_CURATED_LABELS) — safe to call at init and again after load
+  // (rankingProductShortLabel switches to the live official data once
+  // productsByCode exists, so re-running this just refreshes to the same
+  // values plus whatever's needed for a lang change).
+  function populateCuratedSelect() {
+    const t = I18N[state.lang];
+    const select = document.getElementById("ranking-product-select");
+    select.innerHTML = "";
+    const allOpt = document.createElement("option");
+    allOpt.value = "";
+    allOpt.textContent = t.ranking_product_all;
+    select.appendChild(allOpt);
+    for (const cat of PRODRANK_CATEGORIES) {
+      const group = document.createElement("optgroup");
+      group.label = t[`prodrank_cat_${cat.key}`];
+      const items = cat.codes
+        .map((code) => ({ code, label: rankingProductShortLabel(code) }))
+        .sort((a, b) => a.label.localeCompare(b.label, state.lang));
+      for (const { code, label } of items) {
+        const opt = document.createElement("option");
+        opt.value = code;
+        opt.textContent = label;
+        group.appendChild(opt);
+      }
+      select.appendChild(group);
+    }
+    syncRankingProductControls();
+  }
+
+  // Full-catalog search — only possible once product_ranking.json is
+  // loaded, since it needs every code's label, not just the curated 30.
+  function populateRankingProductPicker() {
+    populateCuratedSelect();
+
+    const datalist = document.getElementById("ranking-product-datalist");
+    datalist.innerHTML = "";
+    rankingProductLabelToCode = new Map();
+    const sorted = Array.from(productsByCode.keys())
+      .map((code) => ({ code, label: rankingProductShortLabel(code) }))
+      .sort((a, b) => a.label.localeCompare(b.label, state.lang));
+    for (const { code, label } of sorted) {
+      rankingProductLabelToCode.set(label, code);
+      const opt = document.createElement("option");
+      opt.value = label;
+      datalist.appendChild(opt);
+    }
+
+    syncRankingProductControls();
+  }
+
+  function syncRankingProductControls() {
+    const select = document.getElementById("ranking-product-select");
+    const existingCustom = select.querySelector('option[value="__custom__"]');
+    if (existingCustom) existingCustom.remove();
+
+    if (!state.rankingProduct) {
+      select.value = "";
+    } else if (Array.from(select.options).some((o) => o.value === state.rankingProduct)) {
+      select.value = state.rankingProduct;
+    } else {
+      // A searched (non-curated) product, or a URL deep link to one — show
+      // a distinct marker instead of silently snapping to "Todos os produtos".
+      const custom = document.createElement("option");
+      custom.value = "__custom__";
+      custom.textContent = I18N[state.lang].ranking_product_custom;
+      // select.children[1] is the first <optgroup> (a direct child of
+      // <select>) — select.options[1] would instead be that optgroup's
+      // first nested <option>, which insertBefore rejects as not being a
+      // direct child of <select>.
+      select.insertBefore(custom, select.children[1] || null);
+      select.value = "__custom__";
+    }
+
+    const input = document.getElementById("ranking-product-input");
+    input.value = state.rankingProduct ? rankingProductShortLabel(state.rankingProduct) : "";
+    document.getElementById("ranking-product-full-label").textContent =
+      state.rankingProduct && productsByCode ? rankingProductLabel(state.rankingProduct) : "";
+  }
+
+  // Shows/hides Ranking's category-select vs. SH4 curated+search groups to
+  // match the currently chosen aggregation tier, and keeps the tier
+  // <select> itself in sync (needed after a URL-restored state, not just
+  // after a user click).
+  function syncRankingAggControls() {
+    document.getElementById("ranking-agg-level-select").value = state.rankingAggLevel;
+    document.getElementById("ranking-category-group").classList.toggle("hidden", state.rankingAggLevel !== "sec" && state.rankingAggLevel !== "sh2");
+    document.getElementById("ranking-sh4-group").classList.toggle("hidden", state.rankingAggLevel !== "sh4");
+    if (state.rankingAggLevel === "sh4") syncRankingProductControls();
+  }
+
+  // Populates ranking-category-select from productsSec/productsSh2 (whichever
+  // state.rankingAggLevel names) — a no-op if that dict isn't loaded yet
+  // (SH2 before its lazy fetch resolves); the caller re-invokes this once
+  // it has. Defaults to the alphabetically-first category if none is
+  // selected yet, or the previous selection no longer exists in this level.
+  // Sorted {value,label} category list for a level's <select> options —
+  // shared by Ranking's and Tendências' category pickers, since both list
+  // the exact same SEC/SH2 categories. Returns null if that level's dict
+  // isn't loaded yet (SH2 before its lazy fetch resolves).
+  function categoryOptionsFor(level) {
+    const dict = categoryDictFor(level);
+    if (!dict) return null;
+    const list = dict[state.lang] || dict.pt;
+    return list.map((p) => ({ value: p.var, label: p.label })).sort((a, b) => a.label.localeCompare(b.label, state.lang));
+  }
+
+  function populateRankingCategorySelect() {
+    const level = state.rankingAggLevel;
+    const select = document.getElementById("ranking-category-select");
+    select.innerHTML = "";
+    if (level !== "sec" && level !== "sh2") return;
+    const items = categoryOptionsFor(level);
+    if (!items) return;
+    for (const { value, label } of items) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      select.appendChild(opt);
+    }
+    if (!state.rankingCategory || !items.some((i) => i.value === state.rankingCategory)) {
+      state.rankingCategory = items.length ? items[0].value : null;
+    }
+    select.value = state.rankingCategory || "";
+  }
+
+  function populateTrendsCategorySelect() {
+    const level = state.trendsAggLevel;
+    const select = document.getElementById("trends-category-select");
+    select.innerHTML = "";
+    if (level !== "sec" && level !== "sh2") return;
+    const items = categoryOptionsFor(level);
+    if (!items) return;
+    for (const { value, label } of items) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      select.appendChild(opt);
+    }
+    if (!state.trendsCategory || !items.some((i) => i.value === state.trendsCategory)) {
+      state.trendsCategory = items.length ? items[0].value : null;
+    }
+    select.value = state.trendsCategory || "";
+  }
+
+  // Shows/hides Tendências' category-select to match the currently chosen
+  // aggregation tier, and keeps the tier <select> itself in sync (needed
+  // after a URL-restored state, not just after a user click).
+  function syncTrendsAggControls() {
+    document.getElementById("trends-agg-level-select").value = state.trendsAggLevel;
+    document.getElementById("trends-category-group").classList.toggle("hidden", state.trendsAggLevel !== "sec" && state.trendsAggLevel !== "sh2");
+  }
+
+  // Same idea, for Variação's own municipio-orientation category filter
+  // (no SH4 tier — same reasoning Tendências already gives for skipping it).
+  function populateChangeCategorySelect() {
+    const level = state.changeAggLevel;
+    const select = document.getElementById("change-category-select");
+    select.innerHTML = "";
+    if (level !== "sec" && level !== "sh2") return;
+    const items = categoryOptionsFor(level);
+    if (!items) return;
+    for (const { value, label } of items) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      select.appendChild(opt);
+    }
+    if (!state.changeCategory || !items.some((i) => i.value === state.changeCategory)) {
+      state.changeCategory = items.length ? items[0].value : null;
+    }
+    select.value = state.changeCategory || "";
+  }
+
+  function syncChangeAggControls() {
+    document.getElementById("change-agg-level-select").value = state.changeAggLevel;
+    document.getElementById("change-category-group").classList.toggle("hidden", state.changeAggLevel !== "sec" && state.changeAggLevel !== "sh2");
+  }
+
+  function populateExploreCategorySelect() {
+    const level = state.exploreAggLevel;
+    const select = document.getElementById("explore-category-select");
+    select.innerHTML = "";
+    if (level !== "sec" && level !== "sh2") return;
+    const items = categoryOptionsFor(level);
+    if (!items) return;
+    for (const { value, label } of items) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      select.appendChild(opt);
+    }
+    if (!state.exploreCategory || !items.some((i) => i.value === state.exploreCategory)) {
+      state.exploreCategory = items.length ? items[0].value : null;
+    }
+    select.value = state.exploreCategory || "";
+  }
+
+  // Same idea, for Composição's own "estado" orientation — the one
+  // category being broken down by state (see renderCompositionByEstado).
+  // Level is state.compositionAgg, the same SEC/SH2 toggle the "categoria"
+  // orientation already uses, not a separate tier of its own.
+  function populateCompositionProdutoSelect() {
+    const level = state.compositionAgg;
+    const select = document.getElementById("composition-produto-select");
+    select.innerHTML = "";
+    const items = categoryOptionsFor(level);
+    if (!items) return;
+    for (const { value, label } of items) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      select.appendChild(opt);
+    }
+    if (!state.compositionProduto || !items.some((i) => i.value === state.compositionProduto)) {
+      state.compositionProduto = items.length ? items[0].value : null;
+    }
+    select.value = state.compositionProduto || "";
+  }
+
+  // Same idea as syncTrendsAggControls, for Explorar's own tier.
+  function syncExploreAggControls() {
+    document.getElementById("explore-agg-level-select").value = state.exploreAggLevel;
+    document.getElementById("explore-category-group").classList.toggle("hidden", state.exploreAggLevel !== "sec" && state.exploreAggLevel !== "sh2");
+  }
+
+  // ---- Map (Leaflet, lazy-loaded): a serverless rebuild of the separate
+  // original app_map_comex_exp_sh4_sel, folded in here as a view since
+  // it's the same COMEX municipality data, just a different lens (top
+  // exported product per municipality, colored by category) instead of a
+  // ranking/composition/trend. Neither the Leaflet library nor this view's
+  // ~6MB dataset load until the view is actually opened. ----
+
+  function ensureLeafletLoaded() {
+    if (loadFailed) return suppressedLoad();
+    if (leafletLoadPromise) return leafletLoadPromise;
+    // Unlike the JSON fetches, this injects tags into <head>, so a failed
+    // attempt has to remove its own <script>/<link> before the retry adds
+    // a fresh pair — otherwise each retry leaves another dead tag behind
+    // and the browser may serve the still-failing cached entry.
+    leafletLoadPromise = rememberUntilFailed(new Promise((resolve, reject) => {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      document.head.appendChild(link);
+
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.onload = () => resolve();
+      script.onerror = () => {
+        link.remove();
+        script.remove();
+        reject(new Error("Failed to load Leaflet"));
+      };
+      document.head.appendChild(script);
+    }), () => { leafletLoadPromise = null; });
+    return leafletLoadPromise;
+  }
+
+  function ensureMapDataLoaded() {
+    if (loadFailed) return suppressedLoad();
+    if (mapDataPromise) return mapDataPromise;
+    mapDataPromise = rememberUntilFailed(Promise.all([
+      fetchJson(`${DATA_DIR}/map/map_data.json`),
+      fetchJson(`${DATA_DIR}/map/municipalities.geojson`),
+      fetchJson(`${DATA_DIR}/map/states_boundary.geojson`),
+      fetchJson(`${DATA_DIR}/map/legal_amazon_boundary.geojson`)
+    ]).then(([data, municGeo, statesGeo, legalAmazonGeo]) => {
+      mapData = data;
+      mapCellByKey = new Map();
+      for (const [municipioIdx, ano, floresta, categoriaIdx, produtoIdx, valor] of data.cells) {
+        mapCellByKey.set(`${municipioIdx}|${ano}|${floresta}`, { categoriaIdx, produtoIdx, valor });
+      }
+      return { municGeo, statesGeo, legalAmazonGeo };
+    }), () => { mapDataPromise = null; });
+    return mapDataPromise;
+  }
+
+  function ensureMapReady() {
+    return Promise.all([ensureLeafletLoaded(), ensureMapDataLoaded()]).then(([, geo]) => {
+      if (!leafletMap) initLeafletMap(geo.municGeo, geo.statesGeo, geo.legalAmazonGeo);
+    });
+  }
+
+  function getMapCell(municipioIdx, ano, floresta) {
+    return mapCellByKey.get(`${municipioIdx}|${ano}|${floresta}`);
+  }
+
+  // Ratio mode is derived client-side from the forest (floresta=1) and
+  // all-products (floresta=0) cells already loaded, mirroring the original
+  // app's classe_ratio logic exactly: if either side has no top product
+  // that year, there's not enough information to classify (no data) — a
+  // municipality with zero forest-compatible exports isn't "not
+  // forest-dominant", it's simply unclassifiable from this comparison.
+  function computeMapRatioClass(municipioIdx, ano) {
+    const cellAll = getMapCell(municipioIdx, ano, 0);
+    const cellForest = getMapCell(municipioIdx, ano, 1);
+    if (!cellAll || !cellForest || !(cellAll.valor > 0)) return null;
+    if (cellForest.produtoIdx === cellAll.produtoIdx) return "same";
+    return cellForest.valor / cellAll.valor < 1 ? "nao" : "sim";
+  }
+
+  function initLeafletMap(municGeo, statesGeo, legalAmazonGeo) {
+    leafletMap = L.map("map-container", { zoomControl: true }).setView([-7, -58], 5);
+
+    // Esri.WorldShadedRelief, o mesmo basemap que os mapas Shiny adotaram
+    // em nov/2026. Substitui o World_Light_Gray_Base, que era cinza e
+    // achatado. O relevo dá contexto geográfico ao coroplético.
+    //
+    // maxNativeZoom: o serviço só declara tiles até o nível 13, então o
+    // Leaflet amplia o último disponível em vez de pedir um que pode não
+    // existir. Sem isto, quem desse zoom além de 13 veria o mapa em branco.
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "Tiles &copy; Esri",
+      maxZoom: 16,
+      maxNativeZoom: 13
+    }).addTo(leafletMap);
+
+    leafletMap.createPane("paneMain");
+    leafletMap.getPane("paneMain").style.zIndex = 400;
+    leafletMap.createPane("paneBoundaries");
+    leafletMap.getPane("paneBoundaries").style.zIndex = 450;
+
+    L.geoJSON(statesGeo, { pane: "paneBoundaries", style: { color: "grey", weight: 1, fill: false }, interactive: false }).addTo(leafletMap);
+    L.geoJSON(legalAmazonGeo, { pane: "paneBoundaries", style: { color: "black", weight: 2, fill: false }, interactive: false }).addTo(leafletMap);
+
+    buildMapLayer(municGeo);
+
+    mapLegendControl = L.control({ position: "bottomright" });
+    mapLegendControl.onAdd = function () {
+      this._div = L.DomUtil.create("div", "legend");
+      return this._div;
+    };
+    mapLegendControl.addTo(leafletMap);
+  }
+
+  function mapStrokeColorFor(fillColor) {
+    return fillColor === "url(#" + MAP_NODATA_PATTERN_ID + ")" ? MAP_NODATA_LINE : fillColor;
+  }
+
+  function buildMapLayer(municGeo) {
+    mapLayersByCodIbge = new Map();
+    mapBoundsByUf = new Map();
+    // mapData is already loaded by this point (buildMapLayer only runs from
+    // initLeafletMap, itself only reached after ensureMapReady's Promise.all
+    // resolves) — geometry (municGeo) carries no uf attribute of its own,
+    // so it's looked up from the attributes dataset by cod_ibge instead.
+    const ufByCodIbge = new Map(mapData.municipios.map((m) => [m.cod_ibge, m.uf]));
+    let openTooltipLayer = null;
+
+    L.geoJSON(municGeo, {
+      pane: "paneMain",
+      style: () => ({
+        className: "muni-path",
+        stroke: true,
+        weight: 1,
+        fillOpacity: 1,
+        fillColor: "#cccccc",
+        color: "#cccccc"
+      }),
+      onEachFeature: (feature, layer) => {
+        const codIbge = String(feature.properties.cod_ibge);
+        mapLayersByCodIbge.set(codIbge, layer);
+        const uf = ufByCodIbge.get(codIbge);
+        if (uf) {
+          const bounds = layer.getBounds();
+          if (mapBoundsByUf.has(uf)) mapBoundsByUf.get(uf).extend(bounds);
+          else mapBoundsByUf.set(uf, bounds);
+        }
+        layer.bindTooltip("", { sticky: true });
+
+        layer.on("mouseover", () => {
+          if (openTooltipLayer && openTooltipLayer !== layer) openTooltipLayer.closeTooltip();
+          openTooltipLayer = layer;
+          layer.setStyle({ weight: 5, color: "black", opacity: 1, fillOpacity: 1 });
+          layer.bringToFront();
+        });
+        layer.on("mouseout", () => {
+          if (openTooltipLayer === layer) openTooltipLayer = null;
+          // Reverts to whatever updateMapColors last set (layer.options.fillOpacity),
+          // not a fixed 0.9 — an out-of-state municipality (dimmed to
+          // MAP_OUTOFSTATE_OPACITY) must stay dimmed after the hover ends.
+          layer.setStyle({ weight: 1, opacity: 1, fillOpacity: layer.options.fillOpacity, color: mapStrokeColorFor(layer.options.fillColor) });
+        });
+      }
+    }).addTo(leafletMap);
+
+    ensureNoDataPattern("map-container");
+  }
+
+  // Injects an SVG <pattern> for the "no data" fill into the map's own SVG
+  // renderer, so polygons can set fillColor to `url(#nodata-hatch)`. Must
+  // run after the first polygon layer exists (that's what makes Leaflet
+  // create its SVG root).
+  function ensureNoDataPattern(containerId) {
+    const svg = document.querySelector("#" + containerId + " svg");
+    if (!svg || svg.querySelector("#" + MAP_NODATA_PATTERN_ID)) return;
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.innerHTML =
+      '<pattern id="' + MAP_NODATA_PATTERN_ID + '" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+      '<rect width="6" height="6" fill="' + MAP_NODATA_BASE + '"></rect>' +
+      '<line x1="0" y1="0" x2="0" y2="6" stroke="' + MAP_NODATA_LINE + '" stroke-width="2"></line>' +
+      "</pattern>";
+    svg.insertBefore(defs, svg.firstChild);
+  }
+
+  function mapCategoryColor(categoriaIdx) {
+    if (categoriaIdx === -1) return OTHERS_COLOR;
+    return CATEGORY_COLORS[categoriaIdx] || OTHERS_COLOR;
+  }
+
+  function mapCategoryLabel(categoriaIdx, t) {
+    if (categoriaIdx === -1) return t.label_others;
+    return mapData.categorias[categoriaIdx] || t.label_others;
+  }
+
+  function fmtPct(v) {
+    return v.toLocaleString(numLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%";
+  }
+
+  // Ratio mode's classification compares two *different* calculations —
+  // top product by raw export value overall (cellAll) vs. top product by
+  // raw export value among only the 16 forest-compatible codes
+  // (cellForest) — then compares how distinctive (% of the Legal Amazon's
+  // total for that specific product) each one is. Showing only the
+  // classification label without both halves of that comparison is
+  // exactly what made this mode hard to read: the tooltip is where the
+  // "why" belongs, not just the "what".
+  function mapTooltipHtml(t, municipio, cellAll, cellForest, ratioClass) {
+    const rows = [
+      `${t.tooltip_municipio} <b>${municipio.nome}</b>`,
+      `${t.tooltip_estado} <b>${municipio.uf}</b>`
+    ];
+    if (state.mapMode === "ratio") {
+      if (!ratioClass) {
+        rows.push(`<i>${t.label_no_data}</i>`);
+        return rows.join("<br>");
+      }
+      const label = ratioClass === "same" ? t.ratio_same : ratioClass === "sim" ? t.ratio_sim : t.ratio_nao;
+      rows.push(`${t.tooltip_classe} <b>${label}</b>`);
+      rows.push(`${t.tooltip_produto_geral} <b>${mapData.produtos[cellAll.produtoIdx]}</b> (${fmtPct(cellAll.valor)})`);
+      rows.push(`${t.tooltip_produto_floresta} <b>${mapData.produtos[cellForest.produtoIdx]}</b> (${fmtPct(cellForest.valor)})`);
+      rows.push(`<span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
+    } else if (cellAll) {
+      rows.push(`${t.tooltip_produto} <b>${mapData.produtos[cellAll.produtoIdx]}</b>`);
+      rows.push(`${t.tooltip_categoria} <b>${mapCategoryLabel(cellAll.categoriaIdx, t)}</b>`);
+      rows.push(`${t.tooltip_valor} <b>${fmtPct(cellAll.valor)}</b>`);
+      rows.push(`<span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
+    } else {
+      rows.push(`<i>${t.label_no_data}</i>`);
+    }
+    return rows.join("<br>");
+  }
+
+  function renderMap() {
+    const t = I18N[state.lang];
+    const container = document.getElementById("map-container");
+
+    if (!leafletMap) {
+      let loadingDiv = document.getElementById("map-loading");
+      if (!loadingDiv) {
+        loadingDiv = document.createElement("div");
+        loadingDiv.id = "map-loading";
+        loadingDiv.className = "map-loading";
+        container.parentElement.appendChild(loadingDiv);
+      }
+      loadingDiv.innerHTML = loadingMarkup(t.map_loading);
+      ensureMapReady().then(() => {
+        loadingDiv.remove();
+        if (state.view === "map") { fitMapToUf(); updateMapColors(); }
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+
+    // The map's container was hidden (display:none) until this view was
+    // selected, so Leaflet's internally-cached container size is stale —
+    // without this it renders tiles into a zero-size viewport.
+    leafletMap.invalidateSize();
+    fitMapToUf();
+    updateMapColors();
+  }
+
+  // Only re-fits when the selected state actually changed (tracked via
+  // mapFittedUf) — renderMap() also runs on every map-mode switch and lang
+  // toggle, which shouldn't reset the user's own pan/zoom.
+  function fitMapToUf() {
+    if (mapFittedUf === state.uf) return;
+    mapFittedUf = state.uf;
+    if (state.uf && mapBoundsByUf && mapBoundsByUf.has(state.uf)) {
+      leafletMap.fitBounds(mapBoundsByUf.get(state.uf), { padding: [20, 20] });
+    } else {
+      leafletMap.setView([-7, -58], 5);
+    }
+  }
+
+  function updateMapColors() {
+    if (!leafletMap) return;
+    const t = I18N[state.lang];
+    mapData.municipios.forEach((municipio, municipioIdx) => {
+      const layer = mapLayersByCodIbge.get(municipio.cod_ibge);
+      if (!layer) return;
+
+      // Out-of-state municipalities are dimmed to a flat neutral fill,
+      // distinct from the no-data hatch pattern (which means "in scope, but
+      // nothing to show"), and skip both the category lookups and tooltip
+      // detail below — there's nothing state-specific to report for them.
+      if (state.uf && municipio.uf !== state.uf) {
+        layer.setStyle({ fillColor: MAP_OUTOFSTATE_FILL, color: MAP_OUTOFSTATE_FILL, fillOpacity: MAP_OUTOFSTATE_OPACITY });
+        layer.setTooltipContent(mapTooltipHtml(t, municipio, null, null, null));
+        return;
+      }
+
+      let fillColor, cellAll, cellForest, ratioClass;
+      if (state.mapMode === "ratio") {
+        ratioClass = computeMapRatioClass(municipioIdx, state.year);
+        cellAll = getMapCell(municipioIdx, state.year, 0);
+        cellForest = getMapCell(municipioIdx, state.year, 1);
+        fillColor = ratioClass ? MAP_RATIO_COLORS[ratioClass] : "url(#" + MAP_NODATA_PATTERN_ID + ")";
+      } else {
+        cellAll = getMapCell(municipioIdx, state.year, state.mapMode === "forest" ? 1 : 0);
+        fillColor = cellAll ? mapCategoryColor(cellAll.categoriaIdx) : "url(#" + MAP_NODATA_PATTERN_ID + ")";
+      }
+
+      layer.setStyle({ fillColor, color: mapStrokeColorFor(fillColor), fillOpacity: MAP_INSTATE_OPACITY });
+      layer.setTooltipContent(mapTooltipHtml(t, municipio, cellAll, cellForest, ratioClass));
+    });
+    renderMapLegend(t);
+  }
+
+  // Legend is a fixed set (top-8 categories, or the 3 ratio classes) shown
+  // in full every time — never trimmed to "only what's present this year"
+  // — so the same color always means the same thing as you scrub the
+  // year slider (color follows the entity, not its per-year presence).
+  function renderMapLegend(t) {
+    const div = mapLegendControl.getContainer();
+    let html = "";
+    if (state.mapMode === "ratio") {
+      html += `<div class="legend-title">${t.legend_title_ratio}</div>`;
+      html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.sim}"></span>${t.ratio_sim}</div>`;
+      html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.nao}"></span>${t.ratio_nao}</div>`;
+      html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.same}"></span>${t.ratio_same}</div>`;
+    } else {
+      html += `<div class="legend-title">${t.legend_title_category}</div>`;
+      mapData.categorias.forEach((nome, i) => {
+        html += `<div class="legend-row"><span class="swatch" style="background:${CATEGORY_COLORS[i]}"></span>${nome}</div>`;
+      });
+      html += `<div class="legend-row"><span class="swatch" style="background:${OTHERS_COLOR}"></span>${t.label_others}</div>`;
+    }
+    html += `<div class="legend-row"><span class="swatch swatch-nodata"></span>${t.label_no_data}</div>`;
+    div.innerHTML = html;
+  }
+
+  // ---- State init from query string ----
+
+  function initState() {
+    const params = new URLSearchParams(location.search);
+    const qLang = params.get("lang");
+    const qYear = parseInt(params.get("year"), 10);
+    const qView = params.get("view");
+    const qState = params.get("state");
+    const qYearA = parseInt(params.get("yeara"), 10);
+    const qYearB = parseInt(params.get("yearb"), 10);
+    const qMunis = params.get("munis");
+    const qLog = params.get("log");
+    const qIndex = params.get("index");
+    const qCompScope = params.get("compscope");
+    const qCompAgg = params.get("compagg");
+    const qCompOrientation = params.get("comporientation");
+    const qCompProduto = params.get("compproduto");
+    const qRankAggLevel = params.get("rankagglevel");
+    const qRankCategory = params.get("rankcategory");
+    const qRankProduct = params.get("rankproduct");
+    const qRankOrientation = params.get("rankorientation");
+    const qRankProdutoLevel = params.get("rankprodutolevel");
+    const qRankScope = params.get("rankscope");
+    const qTrendsAggLevel = params.get("trendsagglevel");
+    const qTrendsCategory = params.get("trendscategory");
+    const qTrendsOrientation = params.get("trendsorientation");
+    const qTrendsProdutoLevel = params.get("trendsprodutolevel");
+    const qTrendsScope = params.get("trendsscope");
+    const qExploreAggLevel = params.get("exploreagglevel");
+    const qExploreCategory = params.get("explorecategory");
+    const qExploreOrientation = params.get("exploreorientation");
+    const qExploreProdutoLevel = params.get("exploreprodutolevel");
+    const qExploreProdutos = params.get("exploreprodutos");
+    const qExploreScope = params.get("explorescope");
+    const qChangeOrientation = params.get("changeorientation");
+    const qChangeAggLevel = params.get("changeagglevel");
+    const qChangeCategory = params.get("changecategory");
+    const qChangeProdutoLevel = params.get("changeprodutolevel");
+    const qChangeScope = params.get("changescope");
+    const qMapMode = params.get("mapmode");
+
+    state.lang = qLang === "en" ? "en" : "pt";
+    state.year = Number.isFinite(qYear) && qYear >= dictionary.year_inicio && qYear <= dictionary.year_final
+      ? qYear
+      : ultimoAnoCompleto();
+    state.view = ["ranking", "composition", "change", "trends", "explore", "map"].includes(qView) ? qView : "ranking";
+    // null (not ufList[0]) if absent/invalid — "Todos os estados" is a
+    // valid, common default for every view except Variação, which forces
+    // a concrete state itself the first time it's opened (see setView).
+    state.uf = ufList.includes(qState) ? qState : null;
+    state.yearA = Number.isFinite(qYearA) && qYearA >= dictionary.year_inicio && qYearA <= dictionary.year_final
+      ? qYearA
+      : dictionary.year_inicio;
+    state.yearB = Number.isFinite(qYearB) && qYearB >= dictionary.year_inicio && qYearB <= dictionary.year_final
+      ? qYearB
+      : dictionary.year_final;
+    state.changeOrientation = ORIENTACOES.includes(qChangeOrientation) ? qChangeOrientation : "municipio";
+    state.changeAggLevel = ["all", "sec", "sh2"].includes(qChangeAggLevel) ? qChangeAggLevel : "all";
+    state.changeCategory = qChangeCategory || null;
+    state.changeProdutoLevel = ["sec", "sh2"].includes(qChangeProdutoLevel) ? qChangeProdutoLevel : "sec";
+    state.changeScope = qChangeScope && totalsByMunicipio.has(qChangeScope) ? qChangeScope : null;
+    const decodedMunis = qMunis ? qMunis.split("|").filter((m) => totalsByMunicipio.has(m)) : [];
+    state.exploreMunis = decodedMunis.length ? decodedMunis : computeTrendMunicipalities(5);
+    state.medida = MEDIDAS.includes(params.get("medida")) ? params.get("medida") : "valor";
+    state.exploreLog = qLog === "1";
+    // Mutually exclusive (see the checkbox handlers below) — a hand-built
+    // URL requesting both falls back to log, since that's the one most
+    // likely to have been intended when both flags are on.
+    state.exploreIndex = qIndex === "1" && !state.exploreLog;
+    state.compositionScope = qCompScope && compositionIndexSec.byMunicipio.has(qCompScope) ? qCompScope : null;
+    state.compositionAgg = qCompAgg === "sh2" ? "sh2" : "sec";
+    state.compositionOrientation = qCompOrientation === "produto" ? "produto" : "estado";
+    // Validated once its aggregation's data is loaded, same provisional
+    // pattern as rankingCategory/trendsCategory/exploreCategory.
+    state.compositionProduto = qCompProduto || null;
+    state.rankingAggLevel = ["all", "sec", "sh2", "sh4"].includes(qRankAggLevel) ? qRankAggLevel : "all";
+    // Category/product selections are validated once their aggregation's
+    // data is loaded (SH2: ensureSh2Loaded; SH4: ensureProductRankingLoaded)
+    // — the raw query value is kept provisionally so a shared URL still resolves.
+    state.rankingCategory = qRankCategory || null;
+    state.rankingProduct = qRankProduct || null;
+    state.rankingOrientation = ORIENTACOES.includes(qRankOrientation) ? qRankOrientation : "municipio";
+    state.rankingProdutoLevel = ["sec", "sh2", "sh4"].includes(qRankProdutoLevel) ? qRankProdutoLevel : "sec";
+    state.rankingScope = qRankScope && totalsByMunicipio.has(qRankScope) ? qRankScope : null;
+    state.trendsAggLevel = ["all", "sec", "sh2"].includes(qTrendsAggLevel) ? qTrendsAggLevel : "all";
+    state.trendsCategory = qTrendsCategory || null;
+    state.trendsOrientation = ORIENTACOES.includes(qTrendsOrientation) ? qTrendsOrientation : "municipio";
+    state.trendsProdutoLevel = ["sec", "sh2"].includes(qTrendsProdutoLevel) ? qTrendsProdutoLevel : "sec";
+    state.trendsScope = qTrendsScope && totalsByMunicipio.has(qTrendsScope) ? qTrendsScope : null;
+    state.exploreAggLevel = ["all", "sec", "sh2"].includes(qExploreAggLevel) ? qExploreAggLevel : "all";
+    state.exploreCategory = qExploreCategory || null;
+    state.exploreOrientation = ORIENTACOES.includes(qExploreOrientation) ? qExploreOrientation : "municipio";
+    state.exploreProdutoLevel = ["sec", "sh2"].includes(qExploreProdutoLevel) ? qExploreProdutoLevel : "sec";
+    state.exploreProdutos = qExploreProdutos ? qExploreProdutos.split("|").filter(Boolean) : [];
+    state.exploreScope = qExploreScope && totalsByMunicipio.has(qExploreScope) ? qExploreScope : null;
+    state.mapMode = ["forest", "all", "ratio"].includes(qMapMode) ? qMapMode : "forest";
+  }
+
+  function updateUrl() {
+    const params = new URLSearchParams();
+    params.set("lang", state.lang);
+    params.set("year", state.year);
+    params.set("medida", state.medida);
+    if (state.embed) params.set("embed", "1");
+    params.set("view", state.view);
+    params.set("state", state.uf || "");
+    params.set("yeara", state.yearA);
+    params.set("yearb", state.yearB);
+    params.set("munis", state.exploreMunis.join("|"));
+    params.set("log", state.exploreLog ? "1" : "0");
+    params.set("index", state.exploreIndex ? "1" : "0");
+    params.set("compscope", state.compositionScope || "");
+    params.set("compagg", state.compositionAgg);
+    params.set("comporientation", state.compositionOrientation);
+    params.set("compproduto", state.compositionProduto || "");
+    params.set("rankagglevel", state.rankingAggLevel);
+    params.set("rankcategory", state.rankingCategory || "");
+    params.set("rankproduct", state.rankingProduct || "");
+    params.set("rankorientation", state.rankingOrientation);
+    params.set("rankprodutolevel", state.rankingProdutoLevel);
+    params.set("rankscope", state.rankingScope || "");
+    params.set("trendsagglevel", state.trendsAggLevel);
+    params.set("trendscategory", state.trendsCategory || "");
+    params.set("trendsorientation", state.trendsOrientation);
+    params.set("trendsprodutolevel", state.trendsProdutoLevel);
+    params.set("trendsscope", state.trendsScope || "");
+    params.set("exploreagglevel", state.exploreAggLevel);
+    params.set("explorecategory", state.exploreCategory || "");
+    params.set("exploreorientation", state.exploreOrientation);
+    params.set("exploreprodutolevel", state.exploreProdutoLevel);
+    params.set("exploreprodutos", state.exploreProdutos.join("|"));
+    params.set("explorescope", state.exploreScope || "");
+    params.set("changeorientation", state.changeOrientation);
+    params.set("changeagglevel", state.changeAggLevel);
+    params.set("changecategory", state.changeCategory || "");
+    params.set("changeprodutolevel", state.changeProdutoLevel);
+    params.set("changescope", state.changeScope || "");
+    params.set("mapmode", state.mapMode);
+    history.replaceState(null, "", `?${params.toString()}`);
+  }
+
+  // ---- Controls ----
+
+  function initControls() {
+    const slider = document.getElementById("year-slider");
+    slider.min = dictionary.year_inicio;
+    slider.max = dictionary.year_final;
+    slider.addEventListener("input", () => {
+      jumpToYear(parseInt(slider.value, 10));
+    });
+
+    document.getElementById("year-sparkline").addEventListener("click", (e) => {
+      jumpToYear(yearFromPointerEvent(e));
+    });
+
+    document.getElementById("medida-valor").addEventListener("click", () => setMedida("valor"));
+    document.getElementById("medida-kg").addEventListener("click", () => setMedida("kg"));
+    aplicarMedida();
+
+    document.getElementById("play-btn").addEventListener("click", togglePlay);
+
+    // One delegated listener rather than one per container: the retry
+    // button is rendered by loadingMarkup() into whichever view's loading
+    // slot failed, and those slots are rebuilt on every render, so binding
+    // directly would mean re-binding each time. Clearing loadFailed and
+    // re-rendering re-enters the same ensure*Loaded() path, which now
+    // re-fetches because the rejected memo was dropped.
+    //
+    // Capture phase, and stopping propagation: Composição's and Explorar's
+    // loading overlays sit *inside* their chart areas, and those areas
+    // treat a click as "jump the year slider to this x-position". A retry
+    // click would otherwise both retry and silently move the year. Capture
+    // runs before those handlers, which bubble-phase stopPropagation would
+    // be too late to prevent.
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest('[data-role="retry-load"]');
+      if (!btn) return;
+      e.stopPropagation();
+      e.preventDefault();
+      loadFailed = false;
+      render();
+    }, true);
+
+    document.getElementById("lang-toggle").addEventListener("click", () => {
+      state.lang = state.lang === "pt" ? "en" : "pt";
+      updateUrl();
+      render();
+    });
+
+    document.getElementById("view-ranking").addEventListener("click", () => setView("ranking"));
+    document.getElementById("view-composition").addEventListener("click", () => setView("composition"));
+    document.getElementById("view-change").addEventListener("click", () => setView("change"));
+    document.getElementById("view-trends").addEventListener("click", () => setView("trends"));
+    document.getElementById("view-explore").addEventListener("click", () => setView("explore"));
+    document.getElementById("view-map").addEventListener("click", () => setView("map"));
+
+    document.getElementById("map-mode-forest").addEventListener("click", () => setMapMode("forest"));
+    document.getElementById("map-mode-all").addEventListener("click", () => setMapMode("all"));
+    document.getElementById("map-mode-ratio").addEventListener("click", () => setMapMode("ratio"));
+
+    // Curated dropdown renders immediately (hardcoded labels, see
+    // PRODRANK_CURATED_LABELS) — no fetch until an actual product is picked.
+    populateCuratedSelect();
+
+    const rankingProductInput = document.getElementById("ranking-product-input");
+    // Prefetch on focus so the full-catalog datalist is ready (or close to
+    // it) by the time the user picks something from it, without paying the
+    // cost just for landing on Ranking.
+    rankingProductInput.addEventListener("focus", () => ensureProductRankingLoaded());
+    rankingProductInput.addEventListener("change", (e) => {
+      const code = rankingProductLabelToCode && rankingProductLabelToCode.get(e.target.value);
+      if (!code) {
+        syncRankingProductControls(); // typed text didn't match a real option — revert
+        return;
+      }
+      state.rankingProduct = code;
+      updateUrl();
+      syncRankingProductControls();
+      ensureProductRankingLoaded().then(() => render()).catch(onLazyLoadFailed);
+    });
+
+    const rankingProductSelect = document.getElementById("ranking-product-select");
+    rankingProductSelect.addEventListener("change", (e) => {
+      if (e.target.value === "__custom__") return; // synthetic marker, not a real choice
+      state.rankingProduct = e.target.value || null;
+      updateUrl();
+      syncRankingProductControls();
+      if (state.rankingProduct) ensureProductRankingLoaded().then(() => render()).catch(onLazyLoadFailed);
+      else render();
+    });
+
+    // ---- Ranking's aggregation-level tier: "all" (existing default),
+    // "sec"/"sh2" (new — a category filter, same idea as the original
+    // Shiny app's SEC/SH2 toggle, applied to this bar-chart ranking
+    // instead of a line chart), "sh4" (existing specific-product picker
+    // above, just now nested under this tier instead of being the app's
+    // only alternative to "all"). ----
+
+    const rankingAggLevelSelect = document.getElementById("ranking-agg-level-select");
+    rankingAggLevelSelect.addEventListener("change", (e) => {
+      state.rankingAggLevel = e.target.value;
+      updateUrl();
+      syncRankingAggControls();
+      populateRankingCategorySelect(); // no-ops if SH2 isn't loaded yet — render()'s own dispatch path owns that fetch + shows the loading state
+      render();
+    });
+
+    const rankingCategorySelect = document.getElementById("ranking-category-select");
+    rankingCategorySelect.addEventListener("change", (e) => {
+      state.rankingCategory = e.target.value || null;
+      updateUrl();
+      render();
+    });
+
+    // SEC's category list can populate immediately (already loaded); SH2's
+    // stays empty until its own render path lazy-loads it — same
+    // self-healing pattern as Composição's aggregation toggle.
+    syncRankingAggControls();
+    populateRankingCategorySelect();
+
+    // ---- Ranking's axis swap: rank products/categories for one
+    // município/estado/região instead of municípios for one product. ----
+
+    document.getElementById("ranking-orientation-municipio").addEventListener("click", () => setRankingOrientation("municipio"));
+    document.getElementById("ranking-orientation-produto").addEventListener("click", () => setRankingOrientation("produto"));
+    document.getElementById("ranking-orientation-pais").addEventListener("click", () => setRankingOrientation("pais"));
+    aplicarOrientacao("ranking", state.rankingOrientation);
+
+    const rankingProdutoLevelSelect = document.getElementById("ranking-produto-level-select");
+    rankingProdutoLevelSelect.value = state.rankingProdutoLevel;
+    rankingProdutoLevelSelect.addEventListener("change", (e) => {
+      state.rankingProdutoLevel = e.target.value;
+      updateUrl();
+      render();
+    });
+
+    populateRankingScopeSelect();
+    document.getElementById("ranking-scope-select").addEventListener("change", (e) => {
+      state.rankingScope = e.target.value || null;
+      updateUrl();
+      render();
+    });
+
+    // ---- Tendências' aggregation-level tier: same idea as Ranking's,
+    // minus the SH4 tier (trending one specific product's top exporters
+    // is a bigger, more novel feature than what was asked for here). ----
+
+    const trendsAggLevelSelect = document.getElementById("trends-agg-level-select");
+    trendsAggLevelSelect.addEventListener("change", (e) => {
+      state.trendsAggLevel = e.target.value;
+      updateUrl();
+      syncTrendsAggControls();
+      populateTrendsCategorySelect(); // no-ops if SH2 isn't loaded yet — trendsDataSource()/renderTrends() own that fetch + the loading state
+      render();
+    });
+
+    const trendsCategorySelect = document.getElementById("trends-category-select");
+    trendsCategorySelect.addEventListener("change", (e) => {
+      state.trendsCategory = e.target.value || null;
+      updateUrl();
+      render();
+    });
+
+    syncTrendsAggControls();
+    populateTrendsCategorySelect();
+
+    // ---- Tendências' axis swap: top-N product categories, for one
+    // município/state, instead of top-N municípios for one category. ----
+
+    document.getElementById("trends-orientation-municipio").addEventListener("click", () => setTrendsOrientation("municipio"));
+    document.getElementById("trends-orientation-produto").addEventListener("click", () => setTrendsOrientation("produto"));
+    document.getElementById("trends-orientation-pais").addEventListener("click", () => setTrendsOrientation("pais"));
+    aplicarOrientacao("trends", state.trendsOrientation);
+
+    const trendsProdutoLevelSelect = document.getElementById("trends-produto-level-select");
+    trendsProdutoLevelSelect.value = state.trendsProdutoLevel;
+    trendsProdutoLevelSelect.addEventListener("change", (e) => {
+      state.trendsProdutoLevel = e.target.value;
+      updateUrl();
+      render();
+    });
+
+    populateTrendsScopeSelect();
+    document.getElementById("trends-scope-select").addEventListener("change", (e) => {
+      state.trendsScope = e.target.value || null;
+      updateUrl();
+      render();
+    });
+
+    // ---- Explorar's aggregation-level tier: same idea as Tendências',
+    // filtering the overlaid-line comparison to one SEC/SH2 category
+    // instead of only total export value. ----
+
+    const exploreAggLevelSelect = document.getElementById("explore-agg-level-select");
+    exploreAggLevelSelect.addEventListener("change", (e) => {
+      state.exploreAggLevel = e.target.value;
+      updateUrl();
+      syncExploreAggControls();
+      populateExploreCategorySelect(); // no-ops if SH2 isn't loaded yet — exploreDataSource()/renderExplore() own that fetch + the loading state
+      render();
+    });
+
+    const exploreCategorySelect = document.getElementById("explore-category-select");
+    exploreCategorySelect.addEventListener("change", (e) => {
+      state.exploreCategory = e.target.value || null;
+      updateUrl();
+      render();
+    });
+
+    syncExploreAggControls();
+    populateExploreCategorySelect();
+
+    // ---- Explorar's axis swap: hand-picked product categories, for one
+    // município/state, plotted as lines — instead of hand-picked
+    // municípios. ----
+
+    document.getElementById("explore-orientation-municipio").addEventListener("click", () => setExploreOrientation("municipio"));
+    document.getElementById("explore-orientation-produto").addEventListener("click", () => setExploreOrientation("produto"));
+    document.getElementById("explore-orientation-pais").addEventListener("click", () => setExploreOrientation("pais"));
+    aplicarOrientacao("explore", state.exploreOrientation);
+
+    const exploreProdutoLevelSelect = document.getElementById("explore-produto-level-select");
+    exploreProdutoLevelSelect.value = state.exploreProdutoLevel;
+    exploreProdutoLevelSelect.addEventListener("change", (e) => {
+      state.exploreProdutoLevel = e.target.value;
+      updateUrl();
+      state.exploreProdutos = []; // different taxonomy — let populateExploreProdutosSelect re-default
+      populateExploreProdutosSelect();
+      render();
+    });
+
+    populateExploreScopeSelect();
+    document.getElementById("explore-scope-select").addEventListener("change", (e) => {
+      state.exploreScope = e.target.value || null;
+      updateUrl();
+      render(); // title is scope-dependent, not just the chart
+    });
+
+    populateExploreProdutosSelect();
+    document.getElementById("explore-produtos-select").addEventListener("change", (e) => {
+      state.exploreProdutos = Array.from(e.target.selectedOptions).map((o) => o.value);
+      updateUrl();
+      renderExplore();
+    });
+
+    populateCompositionScopeSelect();
+    document.getElementById("composition-scope-select").addEventListener("change", (e) => {
+      state.compositionScope = e.target.value || null;
+      updateUrl();
+      render(); // title is scope-dependent ("Composição — {municipio}"), not just the chart
+    });
+
+    const compositionAggSelect = document.getElementById("composition-agg-select");
+    compositionAggSelect.value = state.compositionAgg;
+    compositionAggSelect.addEventListener("change", (e) => {
+      state.compositionAgg = e.target.value;
+      updateUrl();
+      populateCompositionProdutoSelect(); // no-ops if SH2 isn't loaded yet — renderCompositionByEstado() owns that fetch + the loading state
+      render(); // title/legend depend on the aggregation too, not just the chart
+    });
+
+    // ---- Composição's axis swap: break one category down by state
+    // (default) instead of one geographic scope down by category. ----
+
+    document.getElementById("composition-orientation-produto").addEventListener("click", () => setCompositionOrientation("produto"));
+    document.getElementById("composition-orientation-estado").addEventListener("click", () => setCompositionOrientation("estado"));
+    document.getElementById("composition-orientation-produto").classList.toggle("active", state.compositionOrientation === "produto");
+    document.getElementById("composition-orientation-estado").classList.toggle("active", state.compositionOrientation === "estado");
+    document.getElementById("composition-by-produto-group").classList.toggle("hidden", state.compositionOrientation !== "produto");
+    document.getElementById("composition-by-estado-group").classList.toggle("hidden", state.compositionOrientation !== "estado");
+
+    populateCompositionProdutoSelect();
+    document.getElementById("composition-produto-select").addEventListener("change", (e) => {
+      state.compositionProduto = e.target.value || null;
+      updateUrl();
+      render();
+    });
+
+    populateExploreMunisSelect();
+    document.getElementById("explore-munis-select").addEventListener("change", (e) => {
+      state.exploreMunis = Array.from(e.target.selectedOptions).map((o) => o.value);
+      updateUrl();
+      renderExplore();
+    });
+
+    // Log scale and indexing are mutually exclusive — a log axis re-spaces
+    // real dollar figures, while indexing replaces them with a relative
+    // (=100) number, and combining the two "perde um pouco de sentido"
+    // (loses a bit of meaning). Checking one disables the other rather
+    // than silently unchecking it later, so the restriction is visible
+    // up front instead of only discovered by trying it.
+    const logCheckbox = document.getElementById("explore-log");
+    const indexCheckbox = document.getElementById("explore-index");
+    logCheckbox.checked = state.exploreLog;
+    indexCheckbox.checked = state.exploreIndex;
+    indexCheckbox.disabled = state.exploreLog;
+    logCheckbox.disabled = state.exploreIndex;
+    logCheckbox.addEventListener("change", (e) => {
+      state.exploreLog = e.target.checked;
+      indexCheckbox.disabled = state.exploreLog;
+      indexCheckbox.closest("label").title = state.exploreLog ? I18N[state.lang].explore_log_index_hint : "";
+      updateUrl();
+      renderExplore();
+    });
+
+    indexCheckbox.addEventListener("change", (e) => {
+      state.exploreIndex = e.target.checked;
+      logCheckbox.disabled = state.exploreIndex;
+      logCheckbox.closest("label").title = state.exploreIndex ? I18N[state.lang].explore_log_index_hint : "";
+      updateUrl();
+      renderExplore();
+    });
+
+    const ufFilterSelect = document.getElementById("uf-filter-select");
+    for (const uf of ufList) {
+      const opt = document.createElement("option");
+      opt.value = uf;
+      opt.textContent = uf;
+      ufFilterSelect.appendChild(opt);
+    }
+    ufFilterSelect.value = state.uf || "";
+    ufFilterSelect.addEventListener("change", (e) => {
+      state.uf = e.target.value || null;
+      // Explorar's hand-picked municipalities must all belong to the newly
+      // selected state; if that empties the selection, fall back to that
+      // state's own top-5 by total export value (same convention initState
+      // uses for the app's very first default pick).
+      const validMunis = state.exploreMunis.filter((m) => !state.uf || (municipioMeta.get(m) && municipioMeta.get(m).uf === state.uf));
+      state.exploreMunis = validMunis.length ? validMunis : computeTrendMunicipalities(5);
+      // Composição's, Ranking's, Variação's, Tendências' and Explorar's own
+      // per-município scopes are meaningless once that place falls outside
+      // the newly selected state — but clearing the filter back to "Todos
+      // os estados" (uf === null) doesn't invalidate anything, since a
+      // município scope never depended on a state filter being set in the
+      // first place.
+      if (isMunicipioScopeInvalid(state.compositionScope, state.uf)) state.compositionScope = null;
+      if (isMunicipioScopeInvalid(state.rankingScope, state.uf)) state.rankingScope = null;
+      if (isMunicipioScopeInvalid(state.changeScope, state.uf)) state.changeScope = null;
+      if (isMunicipioScopeInvalid(state.trendsScope, state.uf)) state.trendsScope = null;
+      if (isMunicipioScopeInvalid(state.exploreScope, state.uf)) state.exploreScope = null;
+      updateUrl();
+      render();
+    });
+
+    const yearASelect = document.getElementById("change-year-a");
+    const yearBSelect = document.getElementById("change-year-b");
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) {
+      const optA = document.createElement("option");
+      optA.value = y; optA.textContent = y;
+      yearASelect.appendChild(optA);
+      const optB = document.createElement("option");
+      optB.value = y; optB.textContent = y;
+      yearBSelect.appendChild(optB);
+    }
+    yearASelect.value = state.yearA;
+    yearBSelect.value = state.yearB;
+    yearASelect.addEventListener("change", (e) => {
+      state.yearA = parseInt(e.target.value, 10);
+      updateUrl();
+      renderChange();
+    });
+    yearBSelect.addEventListener("change", (e) => {
+      state.yearB = parseInt(e.target.value, 10);
+      updateUrl();
+      renderChange();
+    });
+
+    // ---- Variação's axis swap: compare product categories for one
+    // município/state instead of comparing municípios for one category. ----
+
+    document.getElementById("change-orientation-municipio").addEventListener("click", () => setChangeOrientation("municipio"));
+    document.getElementById("change-orientation-produto").addEventListener("click", () => setChangeOrientation("produto"));
+    document.getElementById("change-orientation-pais").addEventListener("click", () => setChangeOrientation("pais"));
+    aplicarOrientacao("change", state.changeOrientation);
+
+    const changeAggLevelSelect = document.getElementById("change-agg-level-select");
+    changeAggLevelSelect.addEventListener("change", (e) => {
+      state.changeAggLevel = e.target.value;
+      updateUrl();
+      syncChangeAggControls();
+      populateChangeCategorySelect(); // no-ops if SH2 isn't loaded yet — changeDataSource()/renderChange() own that fetch + the loading state
+      render(); // title is category-dependent, not just the chart
+    });
+
+    const changeCategorySelect = document.getElementById("change-category-select");
+    changeCategorySelect.addEventListener("change", (e) => {
+      state.changeCategory = e.target.value || null;
+      updateUrl();
+      render(); // title is category-dependent, not just the chart
+    });
+
+    syncChangeAggControls();
+    populateChangeCategorySelect();
+
+    const changeProdutoLevelSelect = document.getElementById("change-produto-level-select");
+    changeProdutoLevelSelect.value = state.changeProdutoLevel;
+    changeProdutoLevelSelect.addEventListener("change", (e) => {
+      state.changeProdutoLevel = e.target.value;
+      updateUrl();
+      render(); // title/legend depend on the taxonomy too, not just the chart
+    });
+
+    populateChangeScopeSelect();
+    document.getElementById("change-scope-select").addEventListener("change", (e) => {
+      state.changeScope = e.target.value || null;
+      updateUrl();
+      render(); // title is scope-dependent, not just the chart
+    });
+  }
+
+  function setMedida(medida) {
+    if (!MEDIDAS.includes(medida) || medida === state.medida) return;
+    state.medida = medida;
+    // Reconstrói a partir do que já está em memória: sem fetch, sem
+    // esperar. Ver rebuildPorMedida.
+    rebuildPorMedida();
+    aplicarMedida();
+    updateUrl();
+    render();
+  }
+
+  function aplicarMedida() {
+    for (const m of MEDIDAS) {
+      const btn = document.getElementById(`medida-${m}`);
+      if (btn) btn.classList.toggle("active", state.medida === m);
+    }
+    // O aviso só aparece onde ele vale: somar quilos entre produtos
+    // diferentes compara peso, não relevância econômica. Nas telas
+    // orientadas por município a soma é de um lugar só, e aí não há
+    // ressalva a fazer.
+    const hint = document.getElementById("medida-hint");
+    if (hint) {
+      const orientacaoCategorica =
+        (state.view === "ranking" && state.rankingOrientation !== "municipio") ||
+        (state.view === "trends" && state.trendsOrientation !== "municipio") ||
+        (state.view === "change" && state.changeOrientation !== "municipio") ||
+        (state.view === "explore" && state.exploreOrientation !== "municipio") ||
+        state.view === "composition";
+      const mostrar = state.medida === "kg" && orientacaoCategorica;
+      hint.classList.toggle("hidden", !mostrar);
+      if (mostrar) hint.textContent = I18N[state.lang].medida_hint_produto;
+    }
+  }
+
+  function setView(view) {
+    stopPlaying();
+    // A failed load in the view being left shouldn't pre-empt the one being
+    // entered: loadFailed suppresses every ensure*Loaded() while set, so
+    // without this the next view would open straight into an error it never
+    // actually attempted. Leaving the view is itself a fresh attempt.
+    loadFailed = false;
+    state.view = view;
+    document.getElementById("view-ranking").classList.toggle("active", view === "ranking");
+    document.getElementById("view-composition").classList.toggle("active", view === "composition");
+    document.getElementById("view-change").classList.toggle("active", view === "change");
+    document.getElementById("view-trends").classList.toggle("active", view === "trends");
+    document.getElementById("view-explore").classList.toggle("active", view === "explore");
+    document.getElementById("view-map").classList.toggle("active", view === "map");
+    document.getElementById("ranking-panel").classList.toggle("hidden", view !== "ranking");
+    document.getElementById("composition-panel").classList.toggle("hidden", view !== "composition");
+    document.getElementById("change-panel").classList.toggle("hidden", view !== "change");
+    document.getElementById("trends-panel").classList.toggle("hidden", view !== "trends");
+    document.getElementById("explore-panel").classList.toggle("hidden", view !== "explore");
+    document.getElementById("map-panel").classList.toggle("hidden", view !== "map");
+    document.getElementById("change-group").classList.toggle("hidden", view !== "change");
+    document.getElementById("change-orientation-group").classList.toggle("hidden", view !== "change");
+    document.getElementById("explore-group").classList.toggle("hidden", view !== "explore");
+    document.getElementById("composition-scope-group").classList.toggle("hidden", view !== "composition");
+    document.getElementById("ranking-product-group").classList.toggle("hidden", view !== "ranking");
+    document.getElementById("trends-agg-group").classList.toggle("hidden", view !== "trends");
+    document.getElementById("map-group").classList.toggle("hidden", view !== "map");
+    document.querySelector(".slider-inline").classList.toggle("hidden", view === "change");
+    updateUrl();
+    render();
+  }
+
+  function setMapMode(mode) {
+    stopPlaying();
+    state.mapMode = mode;
+    document.getElementById("map-mode-forest").classList.toggle("active", mode === "forest");
+    document.getElementById("map-mode-all").classList.toggle("active", mode === "all");
+    document.getElementById("map-mode-ratio").classList.toggle("active", mode === "ratio");
+    updateUrl();
+    render();
+  }
+
+  // Ranking's axis-swap toggle — see renderRankingProdutos for the actual
+  // rendering. Just flips which of the two control subgroups is visible;
+  // state.rankingProdutoLevel/rankingScope keep their own values across the
+  // switch (no reset), so toggling back and forth doesn't lose a choice.
+  function setRankingOrientation(orientation) {
+    state.rankingOrientation = orientation;
+    aplicarOrientacao("ranking", orientation);
+    updateUrl();
+    render();
+  }
+
+  // Composição's own axis-swap toggle — see renderCompositionByEstado for
+  // the actual rendering. Same idiom as setRankingOrientation.
+  function setCompositionOrientation(orientation) {
+    state.compositionOrientation = orientation;
+    document.getElementById("composition-orientation-produto").classList.toggle("active", orientation === "produto");
+    document.getElementById("composition-orientation-estado").classList.toggle("active", orientation === "estado");
+    document.getElementById("composition-by-produto-group").classList.toggle("hidden", orientation !== "produto");
+    document.getElementById("composition-by-estado-group").classList.toggle("hidden", orientation !== "estado");
+    updateUrl();
+    render();
+  }
+
+  // Variação's own axis-swap toggle — see renderChangeByProduto for the
+  // actual rendering. Same idiom as setRankingOrientation/setCompositionOrientation.
+  // ---- Troca de eixo: Municípios | Produtos | Países ----
+  //
+  // As quatro telas com troca de eixo têm exatamente a mesma mecânica, daí
+  // um só aplicador. "Países" reusa o grupo de controles de "Produtos" —
+  // o escopo (município/estado/região) vale igual para os dois — escondendo
+  // apenas o seletor de nível, que não faz sentido quando a dimensão já é
+  // o país. Internamente país é só mais um nível (ver compositionIndexFor),
+  // então nada além disto precisou saber que a orientação existe.
+  const ORIENTACOES = ["municipio", "produto", "pais"];
+
+  function aplicarOrientacao(view, orientation) {
+    for (const o of ORIENTACOES) {
+      const btn = document.getElementById(`${view}-orientation-${o}`);
+      if (btn) btn.classList.toggle("active", orientation === o);
+    }
+    document.getElementById(`${view}-by-municipio-group`).classList.toggle("hidden", orientation !== "municipio");
+    document.getElementById(`${view}-by-produto-group`).classList.toggle("hidden", orientation === "municipio");
+    const wrap = document.getElementById(`${view}-produto-level-wrap`);
+    if (wrap) wrap.classList.toggle("hidden", orientation === "pais");
+  }
+
+  // Nível efetivo da dimensão categórica: "pais" quando a orientação é
+  // países, senão o nível escolhido no seletor. Mantido separado de
+  // state.*ProdutoLevel para que voltar de Países para Produtos lembre o
+  // nível que estava selecionado antes.
+  function nivelCategoria(orientation, produtoLevel) {
+    return orientation === "pais" ? "pais" : produtoLevel;
+  }
+
+  function setChangeOrientation(orientation) {
+    state.changeOrientation = orientation;
+    aplicarOrientacao("change", orientation);
+    updateUrl();
+    render();
+  }
+
+  function setTrendsOrientation(orientation) {
+    state.trendsOrientation = orientation;
+    aplicarOrientacao("trends", orientation);
+    updateUrl();
+    render();
+  }
+
+  function setExploreOrientation(orientation) {
+    state.exploreOrientation = orientation;
+    aplicarOrientacao("explore", orientation);
+    updateUrl();
+    render();
+  }
+
+  function yearFromPointerEvent(e) {
+    const rect = document.querySelector(".sparkline-wrap").getBoundingClientRect();
+    const frac = (e.clientX - rect.left) / rect.width;
+    const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+    return Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year));
+  }
+
+  function initSparklineHover() {
+    const wrap = document.querySelector(".sparkline-wrap");
+    const hoverLine = document.getElementById("spark-hover-line");
+    const hoverMarker = document.getElementById("spark-hover-marker");
+    const tooltip = document.getElementById("spark-tooltip");
+
+    wrap.addEventListener("pointermove", (e) => {
+      if (!sparkXFor) return;
+      const year = yearFromPointerEvent(e);
+      const d = sparkSeries.find((s) => s.year === year);
+      const svgX = sparkXFor(year);
+
+      hoverLine.setAttribute("x1", svgX);
+      hoverLine.setAttribute("x2", svgX);
+      hoverLine.style.opacity = "1";
+
+      const t = I18N[state.lang];
+
+      if (d && d.value !== null) {
+        hoverMarker.setAttribute("cx", svgX);
+        hoverMarker.setAttribute("cy", sparkYFor(d.value));
+        hoverMarker.style.opacity = "1";
+        tooltip.innerHTML = "<strong>" + fmtAbbrev(d.value) + "</strong><br>" + year;
+      } else {
+        hoverMarker.style.opacity = "0";
+        tooltip.innerHTML = "<strong>" + year + "</strong><br>" + t.label_no_data;
+      }
+
+      const rect = wrap.getBoundingClientRect();
+      const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      tooltip.style.left = Math.min(rect.width - 4, Math.max(4, frac * rect.width)) + "px";
+      tooltip.style.opacity = "1";
+    });
+
+    wrap.addEventListener("pointerleave", () => {
+      hoverLine.style.opacity = "0";
+      hoverMarker.style.opacity = "0";
+      tooltip.style.opacity = "0";
+    });
+  }
+
+  function applyYear(newYear) {
+    state.year = newYear;
+    document.getElementById("year-slider").value = newYear;
+    document.getElementById("year-value").textContent = newYear;
+    syncAnoParcial(newYear);
+    updateUrl();
+    if (state.view === "composition") {
+      updateCompositionGuide();
+    } else if (state.view === "trends") {
+      updateTrendsMarkers();
+    } else if (state.view === "explore") {
+      updateExploreGuide();
+    } else if (state.view === "map") {
+      updateMapColors();
+    } else {
+      renderRanking();
+    }
+    updateSparklineMarker();
+  }
+
+  function jumpToYear(newYear) {
+    stopPlaying();
+    applyYear(newYear);
+  }
+
+  function togglePlay() {
+    state.playing = !state.playing;
+    const btn = document.getElementById("play-btn");
+    btn.classList.toggle("playing", state.playing);
+    btn.innerHTML = state.playing ? PAUSE_ICON_SVG : PLAY_ICON_SVG;
+
+    if (state.playing) {
+      if (state.year >= dictionary.year_final) {
+        applyYear(dictionary.year_inicio);
+      }
+      state.playTimer = setInterval(() => {
+        if (state.year >= dictionary.year_final) {
+          stopPlaying();
+          return;
+        }
+        applyYear(state.year + 1);
+      }, PLAY_INTERVAL_MS);
+    } else {
+      clearInterval(state.playTimer);
+    }
+  }
+
+  function stopPlaying() {
+    if (!state.playing) return;
+    state.playing = false;
+    clearInterval(state.playTimer);
+    const btn = document.getElementById("play-btn");
+    btn.classList.remove("playing");
+    btn.innerHTML = PLAY_ICON_SVG;
+  }
+
+  const PLAY_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+  const PAUSE_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
+
+  // ---- Rendering ----
+
+  function render() {
+    const t = I18N[state.lang];
+
+    document.getElementById("plot_name").textContent = t.plot_name;
+    document.getElementById("plot_desc").textContent = t.plot_desc;
+    document.getElementById("label_year").textContent = t.label_year;
+    document.getElementById("label_view_name").textContent = t.label_view_name;
+    document.getElementById("view-ranking").textContent = t.view_ranking;
+    document.getElementById("view-composition").textContent = t.view_composition;
+    document.getElementById("view-change").textContent = t.view_change;
+    document.getElementById("view-trends").textContent = t.view_trends;
+    document.getElementById("view-explore").textContent = t.view_explore;
+    document.getElementById("view-map").textContent = t.view_map;
+    document.getElementById("ranking-axis-label").textContent = withUnit(tMedida("ranking_axis_label"));
+    document.getElementById("change-axis-label").textContent = withUnit(tMedida("change_axis_label"));
+    document.getElementById("label_uf_filter").textContent = t.label_uf_filter;
+    document.getElementById("uf-filter-select").options[0].textContent = t.uf_all;
+    document.getElementById("label_year_a").textContent = t.label_year_a;
+    document.getElementById("label_year_b").textContent = t.label_year_b;
+    document.getElementById("label_change_orientation").textContent = t.label_change_orientation;
+    document.getElementById("change-orientation-municipio").textContent = t.ranking_orientation_municipio;
+    document.getElementById("change-orientation-produto").textContent = t.ranking_orientation_produto;
+    document.getElementById("change-orientation-pais").textContent = t.ranking_orientation_pais;
+    document.getElementById("label_change_agg_level").textContent = t.label_agg_level;
+    document.getElementById("label_change_category").textContent = t.label_category;
+    document.getElementById("label_change_produto_level").textContent = t.label_agg_level;
+    document.getElementById("label_change_scope").textContent = t.label_ranking_scope;
+    document.getElementById("label_explore_munis").textContent = t.label_explore_munis;
+    document.getElementById("explore-hint").textContent = t.explore_hint;
+    document.getElementById("explore-produtos-hint").textContent = t.explore_hint;
+    document.getElementById("label_medida").textContent = t.label_medida;
+    document.getElementById("medida-valor").textContent = t.medida_valor;
+    document.getElementById("medida-kg").textContent = t.medida_kg;
+    aplicarMedida();
+    document.getElementById("label_log_scale").textContent = t.label_log_scale;
+    document.getElementById("label_index_first").textContent = t.label_index_first;
+    document.getElementById("label_fonte").textContent = t.label_fonte;
+    // O período sai do dicionário, não de uma constante: quando a base
+    // ganhar um ano novo o rodapé acompanha sem ninguém editar nada aqui.
+    document.getElementById("label_fonte_periodo").textContent =
+      ` · ${dictionary.year_inicio}–${dictionary.year_final}`;
+    document.getElementById("explore-log").closest("label").title = state.exploreIndex ? t.explore_log_index_hint : "";
+    document.getElementById("explore-index").closest("label").title = state.exploreLog ? t.explore_log_index_hint : "";
+    document.getElementById("label_composition_scope").textContent = t.label_composition_scope;
+    document.getElementById("label_composition_agg").textContent = t.label_agg_level;
+    document.getElementById("label_composition_orientation").textContent = t.label_composition_orientation;
+    document.getElementById("composition-orientation-produto").textContent = t.ranking_orientation_produto;
+    document.getElementById("composition-orientation-estado").textContent = t.composition_orientation_estado;
+    document.getElementById("label_composition_produto").textContent = t.label_category;
+    document.getElementById("label_ranking_agg_level").textContent = t.label_agg_level;
+    document.getElementById("label_ranking_category").textContent = t.label_category;
+    document.getElementById("label_ranking_product_select").textContent = t.label_ranking_product_select;
+    document.getElementById("label_ranking_product_search").textContent = t.label_ranking_product_search;
+    document.getElementById("label_trends_agg_level").textContent = t.label_agg_level;
+    document.getElementById("label_trends_category").textContent = t.label_category;
+    document.getElementById("label_trends_orientation").textContent = t.label_trends_orientation;
+    document.getElementById("trends-orientation-municipio").textContent = t.ranking_orientation_municipio;
+    document.getElementById("trends-orientation-produto").textContent = t.ranking_orientation_produto;
+    document.getElementById("trends-orientation-pais").textContent = t.ranking_orientation_pais;
+    document.getElementById("label_trends_produto_level").textContent = t.label_agg_level;
+    document.getElementById("label_trends_scope").textContent = t.label_ranking_scope;
+    document.getElementById("trends-hint").textContent = withYearRange(t.trends_hint);
+    document.getElementById("label_explore_agg_level").textContent = t.label_agg_level;
+    document.getElementById("label_explore_category").textContent = t.label_category;
+    document.getElementById("label_explore_orientation").textContent = t.label_explore_orientation;
+    document.getElementById("explore-orientation-municipio").textContent = t.ranking_orientation_municipio;
+    document.getElementById("explore-orientation-produto").textContent = t.ranking_orientation_produto;
+    document.getElementById("explore-orientation-pais").textContent = t.ranking_orientation_pais;
+    document.getElementById("label_explore_produto_level").textContent = t.label_agg_level;
+    document.getElementById("label_explore_scope").textContent = t.label_ranking_scope;
+    document.getElementById("label_explore_produtos").textContent =
+      state.exploreOrientation === "pais" ? t.label_explore_paises : t.label_explore_produtos;
+    document.getElementById("label_map_mode").textContent = t.label_map_mode;
+    document.getElementById("map-mode-forest").textContent = t.map_mode_forest;
+    document.getElementById("map-mode-all").textContent = t.map_mode_all;
+    document.getElementById("map-mode-ratio").textContent = t.map_mode_ratio;
+    document.getElementById("map-hint").textContent = t.map_hint;
+    document.getElementById("lang-toggle-label").textContent = t.btn_lang;
+    // index.html ships lang="pt-BR"; the toggle swaps the whole UI to
+    // English without this ever following, which leaves a screen reader
+    // pronouncing English copy with Portuguese phonetics. Set here rather
+    // than in the toggle handler so the initial ?lang=en load is covered
+    // too. Matches numLocale()'s tags.
+    document.documentElement.lang = numLocale();
+
+    // Aggregation-level <option> text is language-specific, set here rather
+    // than hardcoded in the HTML (same convention as the scope select's own
+    // first option, set inside populateCompositionScopeSelect below).
+    const setAggOptionLabels = (selectId) => {
+      const select = document.getElementById(selectId);
+      for (const opt of select.options) {
+        if (opt.value === "all") opt.textContent = t.ranking_product_all;
+        else if (opt.value === "sec") opt.textContent = t.agg_level_sec;
+        else if (opt.value === "sh2") opt.textContent = t.agg_level_sh2;
+        else if (opt.value === "sh4") opt.textContent = t.agg_level_sh4;
+      }
+    };
+    setAggOptionLabels("composition-agg-select");
+    setAggOptionLabels("ranking-agg-level-select");
+    setAggOptionLabels("ranking-produto-level-select");
+    setAggOptionLabels("trends-agg-level-select");
+    setAggOptionLabels("explore-agg-level-select");
+    setAggOptionLabels("change-agg-level-select");
+    setAggOptionLabels("change-produto-level-select");
+    setAggOptionLabels("trends-produto-level-select");
+    setAggOptionLabels("explore-produto-level-select");
+
+    document.getElementById("label_ranking_orientation").textContent = t.label_ranking_orientation;
+    document.getElementById("ranking-orientation-municipio").textContent = t.ranking_orientation_municipio;
+    document.getElementById("ranking-orientation-produto").textContent = t.ranking_orientation_produto;
+    document.getElementById("ranking-orientation-pais").textContent = t.ranking_orientation_pais;
+    document.getElementById("label_ranking_produto_level").textContent = t.label_agg_level;
+    document.getElementById("label_ranking_scope").textContent = t.label_ranking_scope;
+
+    // Repopulate the picker(s) too — option labels are language-specific.
+    if (productRanking) populateRankingProductPicker(); else populateCuratedSelect();
+    populateRankingCategorySelect();
+    populateTrendsCategorySelect();
+    populateExploreCategorySelect();
+    populateCompositionScopeSelect();
+    populateCompositionProdutoSelect();
+    populateRankingScopeSelect();
+    populateChangeCategorySelect();
+    populateChangeScopeSelect();
+    populateExploreMunisSelect();
+    populateTrendsScopeSelect();
+    populateExploreScopeSelect();
+    populateExploreProdutosSelect();
+
+    const rankingFilterLabel = currentRankingFilterLabel();
+    const trendsFilterLabel = currentTrendsFilterLabel();
+    const exploreFilterLabel = currentExploreFilterLabel();
+    const compositionProdutoLabel = currentCompositionProdutoLabel();
+    const changeFilterLabel = currentChangeFilterLabel();
+    const changeScopeLabel = currentChangeScopeLabel();
+    // Ranking's own scope label for the produto-orientation title: a
+    // specific município, else the selected state, else null (whole
+    // region) — same precedence Composição's title already uses. Same
+    // precedence for Tendências'/Explorar's own produto-orientation scope.
+    const rankingScopeLabel = state.rankingScope || state.uf || null;
+    const trendsScopeLabel = state.trendsOrientation !== "municipio" ? (state.trendsScope || state.uf || null) : null;
+    const exploreScopeLabel = state.exploreOrientation !== "municipio" ? (state.exploreScope || state.uf || null) : null;
+    // Escolhe o título conforme a orientação. "pais" tem a mesma forma de
+    // "produto" (genérico ou com escopo), só muda o conjunto de chaves.
+    const tituloOrientado = (orientation, scopeLabel, chaveBase, fallback) => {
+      if (orientation === "municipio") return fallback();
+      const sufixo = orientation === "pais" ? "paises" : "produtos";
+      const comEscopo = t[`title_${chaveBase}_${sufixo}_scope`];
+      const semEscopo = t[`title_${chaveBase}_${sufixo}`];
+      return scopeLabel ? comEscopo.replace("{scope}", scopeLabel) : semEscopo;
+    };
+
+    const titles = {
+      ranking: tituloOrientado(state.rankingOrientation, rankingScopeLabel, "ranking",
+        () => rankingFilterLabel ? t.title_ranking_product.replace("{produto}", rankingFilterLabel) : t.title_ranking),
+      composition: state.compositionOrientation === "estado"
+        ? (compositionProdutoLabel
+          ? (state.uf ? t.title_composition_estado_uf.replace("{categoria}", compositionProdutoLabel).replace("{uf}", state.uf) : t.title_composition_estado.replace("{categoria}", compositionProdutoLabel))
+          : t.title_composition_estado_base)
+        : (state.compositionScope
+          ? t.title_composition_muni.replace("{municipio}", state.compositionScope)
+          : (state.uf ? t.title_composition_uf.replace("{uf}", state.uf) : t.title_composition)),
+      change: tituloOrientado(state.changeOrientation, changeScopeLabel, "change",
+        () => changeFilterLabel ? t.title_change_category.replace("{categoria}", changeFilterLabel) : t.title_change),
+      trends: tituloOrientado(state.trendsOrientation, trendsScopeLabel, "trends",
+        () => trendsFilterLabel ? t.title_trends_category.replace("{categoria}", trendsFilterLabel) : t.title_trends),
+      explore: tituloOrientado(state.exploreOrientation, exploreScopeLabel, "explore",
+        () => exploreFilterLabel ? t.title_explore_category.replace("{categoria}", exploreFilterLabel) : t.title_explore),
+      map: t[`title_map_${state.mapMode}`]
+    };
+    const subtitles = {
+      ranking: state.rankingOrientation === "pais" ? tMedida("subtitle_ranking_paises") : (state.rankingOrientation === "produto" ? tMedida("subtitle_ranking_produtos") : tMedida("subtitle_ranking")),
+      composition: state.compositionOrientation === "estado"
+        ? tMedida("subtitle_composition_estado")
+        : (state.compositionScope ? t.subtitle_composition_muni : tMedida("subtitle_composition")),
+      change: state.changeOrientation === "pais" ? t.subtitle_change_paises : (state.changeOrientation === "produto" ? t.subtitle_change_produtos : t.subtitle_change),
+      trends: state.trendsOrientation === "pais" ? t.subtitle_trends_paises : (state.trendsOrientation === "produto" ? t.subtitle_trends_produtos : (trendsFilterLabel ? t.subtitle_trends_category : t.subtitle_trends)),
+      explore: exploreSubtitleText(t),
+      map: t[`subtitle_map_${state.mapMode}`]
+    };
+    document.getElementById("plot-title").textContent = titles[state.view];
+    document.getElementById("plot-subtitle").textContent = withUnit(withYearRange(subtitles[state.view]));
+
+    const slider = document.getElementById("year-slider");
+    slider.value = state.year;
+    document.getElementById("year-value").textContent = state.year;
+    syncAnoParcial(state.year);
+
+    renderSparkline();
+    if (state.view === "composition") {
+      renderComposition();
+    } else if (state.view === "change") {
+      renderChange();
+    } else if (state.view === "trends") {
+      renderTrends();
+    } else if (state.view === "explore") {
+      renderExplore();
+    } else if (state.view === "map") {
+      renderMap();
+    } else {
+      renderRanking();
+    }
+
+    // Last: the view renderers above can repopulate their own pickers
+    // (a lazily-loaded SH2 taxonomy arriving, a scope list re-filtered by
+    // state), and the comboboxes mirror those option lists.
+    syncSearchablePickers();
+  }
+
+  const RANKING_IDS = { rows: "ranking-rows", tooltip: "ranking-tooltip", panel: "ranking-panel" };
+
+  // Ranking is one chart (top-N municipalities for a year) fed by any of
+  // four measures: total value across all products (the default), a SEC
+  // or SH2 category's value (compositionIndexSec/Sh2's byProduto,
+  // inverted from the same data Composição uses), or one specific SH4
+  // product's value (the lazily-loaded productRankingRowsByCode). The
+  // first three share compositionIndex* with Composição; SH4 stays its
+  // own lazy fetch since it's a much larger, separate dataset.
+  function renderRanking() {
+    const t = I18N[state.lang];
+
+    // Axis swap: rank products/categories for one município/estado/região
+    // instead of ranking municípios for one product/category — see
+    // renderRankingProdutos.
+    if (state.rankingOrientation !== "municipio") {
+      renderRankingProdutos(t);
+      return;
+    }
+
+    if (state.rankingAggLevel === "sh4" && state.rankingProduct) {
+      renderRankingByProduct(t);
+      return;
+    }
+    // No "&& state.rankingCategory" guard here — dropped deliberately.
+    // Requiring a category to already be selected before dispatching here
+    // meant switching straight to "sec"/"sh2" without ever touching the
+    // category dropdown (e.g. a URL deep link, or picking "sh2" as your
+    // very first action) fell through to the "all products" branch below
+    // instead of loading anything. renderRankingByCategory() now owns
+    // assigning a default category itself once its data is available.
+    if (state.rankingAggLevel === "sec" || state.rankingAggLevel === "sh2") {
+      renderRankingByCategory(t, state.rankingAggLevel);
+      return;
+    }
+
+    const rows = (totalsByYear.get(state.year) || [])
+      .filter((r) => !state.uf || (municipioMeta.get(r.municipio) && municipioMeta.get(r.municipio).uf === state.uf));
+    const top = rows.slice(0, TOP_N);
+    const maxVal = top.length ? top[0].valor : 1;
+
+    // Region-wide total only makes sense unfiltered — once a state is
+    // selected, show that state's own total (same prefix Ranking's
+    // product/category filters already use for a "not the whole region"
+    // total) instead of "Total Amazônia Legal" next to a filtered list.
+    if (state.uf) {
+      const stateTotal = rows.reduce((sum, r) => sum + r.valor, 0);
+      document.getElementById("region-total-label").innerHTML =
+        rows.length ? t.ranking_product_total_prefix + "<b>" + fmtAbbrev(stateTotal) + "</b>" : "";
+    } else {
+      const regionTotal = regionTotalByYear.get(state.year);
+      document.getElementById("region-total-label").innerHTML =
+        regionTotal != null ? t.region_total_prefix + "<b>" + fmtAbbrev(regionTotal) + "</b>" : "";
+    }
+
+    const container = document.getElementById(RANKING_IDS.rows);
+    container.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    top.forEach((row, i) => frag.appendChild(buildRankRow(row, i, maxVal, RANKING_IDS)));
+    container.appendChild(frag);
+  }
+
+  // Shared by both filtered modes below: given every year's rows for one
+  // product/category, render the current year's top-N as ranked bars.
+  function renderRankingFromRows(t, allRows) {
+    const rows = allRows
+      .filter((r) => r.ano === state.year)
+      .filter((r) => !state.uf || (municipioMeta.get(r.municipio) && municipioMeta.get(r.municipio).uf === state.uf))
+      .map((r) => ({ municipio: r.municipio, valor: r.valor }))
+      .sort((a, b) => b.valor - a.valor);
+    const top = rows.slice(0, TOP_N);
+    const maxVal = top.length ? top[0].valor : 1;
+
+    const yearTotal = rows.reduce((sum, r) => sum + r.valor, 0);
+    document.getElementById("region-total-label").innerHTML =
+      rows.length ? t.ranking_product_total_prefix + "<b>" + fmtAbbrev(yearTotal) + "</b>" : "";
+
+    const container = document.getElementById(RANKING_IDS.rows);
+    container.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    top.forEach((row, i) => frag.appendChild(buildRankRow(row, i, maxVal, RANKING_IDS)));
+    container.appendChild(frag);
+  }
+
+  // Ranking filtered to one specific product — rows come from that
+  // product's municipality breakdown (lazily loaded) instead of the
+  // always-available cross-product totals.
+  function renderRankingByProduct(t) {
+    if (!productRanking) {
+      document.getElementById(RANKING_IDS.rows).innerHTML = `<div class="prodrank-loading">${loadingMarkup()}</div>`;
+      document.getElementById("region-total-label").textContent = "";
+      ensureProductRankingLoaded().then(() => {
+        if (state.view === "ranking" && state.rankingAggLevel === "sh4" && state.rankingProduct) render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+    renderRankingFromRows(t, productRankingRowsByCode.get(state.rankingProduct) || []);
+  }
+
+  // Ranking filtered to one SEC or SH2 category — rows come from the same
+  // per-municipality composition data Composição uses, read the other way
+  // (byProduto instead of byMunicipio). SEC is always already loaded; SH2
+  // lazy-loads the first time it's actually selected. Owns assigning a
+  // default category (via populateRankingCategorySelect) whenever
+  // state.rankingCategory is missing or doesn't exist in this level's
+  // taxonomy — not just the caller's job — so this is correct whether
+  // reached via a click (which already tries to populate first) or a cold
+  // URL deep link straight into "sec"/"sh2" with no category set.
+  function renderRankingByCategory(t, level) {
+    const index = compositionIndexFor(level);
+    if (!index) {
+      document.getElementById(RANKING_IDS.rows).innerHTML = `<div class="prodrank-loading">${loadingMarkup()}</div>`;
+      document.getElementById("region-total-label").textContent = "";
+      ensureSh2Loaded().then(() => {
+        populateRankingCategorySelect();
+        if (state.view === "ranking" && state.rankingAggLevel === level) render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+    if (!state.rankingCategory || !index.byProduto.has(state.rankingCategory)) {
+      populateRankingCategorySelect();
+    }
+    renderRankingFromRows(t, (state.rankingCategory && index.byProduto.get(state.rankingCategory)) || []);
+  }
+
+  // Ranking's axis swap: rank products/categories for one município, or the
+  // selected state/whole region (state.rankingScope + the global state.uf
+  // filter, same 3-way precedence Composição's own scope already uses —
+  // see buildStateCompositionRows), instead of ranking municípios for one
+  // product/category. SEC/SH2 reuse the exact same compositionIndex*/
+  // compositionSec/Sh2 data Composição and the municipio-orientation
+  // category filter already load; SH4 has its own path below since no
+  // region-wide or per-state SH4 total is shipped (only per-municipio
+  // rows), so it's summed client-side instead (see sh4ScopeRows).
+  function renderRankingProdutos(t) {
+    const nivel = nivelCategoria(state.rankingOrientation, state.rankingProdutoLevel);
+    if (nivel === "pais") {
+      renderRankingProdutosCategoria(t, "pais");
+      return;
+    }
+    if (state.rankingProdutoLevel === "sh4") {
+      renderRankingProdutosSh4(t);
+      return;
+    }
+    renderRankingProdutosCategoria(t, state.rankingProdutoLevel);
+  }
+
+  function renderRankingProdutosCategoria(t, level) {
+    const index = compositionIndexFor(level);
+    if (isLazyLevel(level) && !index) {
+      document.getElementById(RANKING_IDS.rows).innerHTML = `<div class="prodrank-loading">${loadingMarkup()}</div>`;
+      document.getElementById("region-total-label").textContent = "";
+      ensureLevelLoaded(level).then(() => {
+        if (state.view === "ranking" && nivelCategoria(state.rankingOrientation, state.rankingProdutoLevel) === level) render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+
+    const scopeRows = scopeCompositionRows(level, state.rankingScope, state.uf);
+    const rows = scopeRows.filter((r) => r.ano === state.year).sort((a, b) => b.valor - a.valor);
+    renderRankingProdutoRows(t, rows, (r) => categoryShortLabelFor(level, r.produto), (r) => categoryLabelFor(level, r.produto));
+  }
+
+  function renderRankingProdutosSh4(t) {
+    if (!productRanking) {
+      document.getElementById(RANKING_IDS.rows).innerHTML = `<div class="prodrank-loading">${loadingMarkup()}</div>`;
+      document.getElementById("region-total-label").textContent = "";
+      ensureProductRankingLoaded().then(() => {
+        if (state.view === "ranking" && state.rankingOrientation === "produto" && state.rankingProdutoLevel === "sh4") render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+    const rows = sh4ScopeRows(state.uf, state.rankingScope)
+      .filter((r) => r.ano === state.year)
+      .sort((a, b) => b.valor - a.valor);
+    renderRankingProdutoRows(t, rows, (r) => rankingProductShortLabel(r.code), (r) => rankingProductLabel(r.code));
+  }
+
+  // No region-wide or per-state SH4 total is shipped (product_ranking.json
+  // only carries per-municipio rows — see
+  // web/_export/export_comex_exp_municipio.R), so "whole
+  // region" or "whole state" scope is summed client-side from the raw
+  // cells instead, mirroring buildStateCompositionRows' same summing
+  // approach for SEC/SH2. A specific município still goes through this
+  // same pass (each of its own code+ano pairs is already unique, so
+  // summing is a no-op there) rather than a separate branch.
+  function sh4ScopeRows(uf, municipio) {
+    const sums = new Map(); // "code|ano" -> valor
+    for (const [produtoIdx, municipioIdx, ano, valor] of productRanking.cells) {
+      const m = productRanking.municipios[municipioIdx];
+      if (municipio) {
+        if (m !== municipio) continue;
+      } else if (uf) {
+        const meta = municipioMeta.get(m);
+        if (!meta || meta.uf !== uf) continue;
+      }
+      const code = productRanking.produtos[produtoIdx].code;
+      const key = code + "|" + ano;
+      sums.set(key, (sums.get(key) || 0) + valor);
+    }
+    const result = [];
+    for (const [key, valor] of sums) {
+      const sep = key.lastIndexOf("|");
+      result.push({ code: key.slice(0, sep), ano: parseInt(key.slice(sep + 1), 10), valor });
+    }
+    return result;
+  }
+
+  // Shared tail for both produto-orientation branches above: rows are
+  // already filtered to the current year and sorted — slice top-N, show
+  // the scope's own total (region-wide precomputed total when nothing
+  // narrows the scope, otherwise the filtered rows' own sum — same
+  // convention the municipio-orientation branches already use for a
+  // uf-filtered ranking), and render.
+  function renderRankingProdutoRows(t, rows, shortLabelFor, fullLabelFor) {
+    const top = rows.slice(0, TOP_N);
+    const maxVal = top.length ? top[0].valor : 1;
+
+    if (!state.rankingScope && !state.uf) {
+      const regionTotal = regionTotalByYear.get(state.year);
+      document.getElementById("region-total-label").innerHTML =
+        regionTotal != null ? t.region_total_prefix + "<b>" + fmtAbbrev(regionTotal) + "</b>" : "";
+    } else {
+      const scopeTotal = rows.reduce((sum, r) => sum + r.valor, 0);
+      document.getElementById("region-total-label").innerHTML =
+        rows.length ? t.ranking_product_total_prefix + "<b>" + fmtAbbrev(scopeTotal) + "</b>" : "";
+    }
+
+    const container = document.getElementById(RANKING_IDS.rows);
+    container.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    top.forEach((row, i) => frag.appendChild(buildRankRow(row, i, maxVal, RANKING_IDS, shortLabelFor, fullLabelFor)));
+    container.appendChild(frag);
+  }
+
+  // labelFor/fullLabelFor default to the municipio-orientation shape
+  // ({municipio, valor}, where the short and full label are the same
+  // string) — Ranking's produto-orientation (renderRankingProdutoRows)
+  // passes its own pair instead, since a SEC/SH2/SH4 name needs a short
+  // clause-truncated form in the row itself (long names would otherwise
+  // dominate the fixed-width label column) and the full official name in
+  // the hover tooltip/native title.
+  function buildRankRow(row, index, maxVal, ids, labelFor = (r) => r.municipio, fullLabelFor = labelFor) {
+    const el = document.createElement("div");
+    el.className = "rank-row";
+
+    const pos = document.createElement("div");
+    pos.className = "rank-position";
+    pos.textContent = (index + 1) + ".";
+    el.appendChild(pos);
+
+    const label = document.createElement("div");
+    label.className = "rank-label";
+    label.textContent = labelFor(row);
+    label.title = fullLabelFor(row);
+    el.appendChild(label);
+
+    const track = document.createElement("div");
+    track.className = "rank-track";
+    const bar = document.createElement("div");
+    bar.className = "rank-bar";
+    bar.style.width = (maxVal > 0 ? (row.valor / maxVal) * 100 : 0) + "%";
+    track.appendChild(bar);
+    el.appendChild(track);
+
+    const value = document.createElement("div");
+    value.className = "rank-value";
+    value.textContent = fmtAbbrev(row.valor);
+    el.appendChild(value);
+
+    el.addEventListener("pointerenter", (e) => showRankTooltip(e, row, index, ids, fullLabelFor));
+    el.addEventListener("pointermove", (e) => moveRankTooltip(e, ids));
+    el.addEventListener("pointerleave", () => hideRankTooltip(ids));
+
+    return el;
+  }
+
+  function showRankTooltip(e, row, index, ids, fullLabelFor = (r) => r.municipio) {
+    const tooltip = document.getElementById(ids.tooltip);
+    tooltip.innerHTML =
+      "<strong>" + fullLabelFor(row) + "</strong><br>" +
+      "#" + (index + 1) + " · " + fmtMedidaCheia(row.valor);
+    tooltip.style.opacity = "1";
+    moveRankTooltip(e, ids);
+  }
+
+  function moveRankTooltip(e, ids) {
+    const tooltip = document.getElementById(ids.tooltip);
+    const panelRect = document.getElementById(ids.panel).getBoundingClientRect();
+    tooltip.style.left = (e.clientX - panelRect.left + 12) + "px";
+    tooltip.style.top = (e.clientY - panelRect.top + 12) + "px";
+  }
+
+  function hideRankTooltip(ids) {
+    document.getElementById(ids.tooltip).style.opacity = "0";
+  }
+
+  // ---- Composition: stacked area of region-wide export value by product
+  // category (SEC level, 22 categories) over the full time range. Reduced
+  // to the top 8 by all-time total + an "Outros"/"Other" bucket, since 22
+  // stacked bands would be unreadable and the dataviz convention here is a
+  // 9th-plus series folds into Other rather than generating another hue. ----
+
+  const COMP_PAD_L = 60, COMP_PAD_R = 16, COMP_PAD_T = 12, COMP_PAD_B = 28;
+  const COMP_VB_W = 1000, COMP_VB_H = 520;
+
+  // Espera linhas JÁ PROJETADAS na medida corrente, isto é, com a medida em
+  // `.valor`, seja ela dólar ou quilo. É a mesma convenção de
+  // compositionRowsFor() e de groupByYear: projetar na origem, e todo
+  // consumidor lê um campo só.
+  //
+  // Isto já leu `r[campoMedida()]`, o que parecia mais explícito e era pior.
+  // Três dos cinco chamadores entregam linhas que passaram por
+  // projetarMedida() ou por buildCompositionIndexes(), e essas só têm
+  // `.valor`. Pedir `.kg` delas devolvia undefined, as somas viravam NaN e o
+  // gráfico sumia com o eixo caindo no domínio padrão. Em valor nada
+  // aparecia, porque aí campoMedida() devolve "valor" e acerta o campo
+  // projetado por acidente.
+  function buildCompositionSeries(rows, dict) {
+    const totalByProduct = new Map();
+    for (const r of rows) {
+      totalByProduct.set(r.produto, (totalByProduct.get(r.produto) || 0) + r.valor);
+    }
+    const ranked = Array.from(totalByProduct.entries()).sort((a, b) => b[1] - a[1]);
+    const topProducts = ranked.slice(0, 8).map(([produto]) => produto);
+    const topSet = new Set(topProducts);
+
+    const years = [];
+    for (let y = dict.year_inicio; y <= dict.year_final; y++) years.push(y);
+
+    const byProdYear = new Map(); // produto -> Map(year -> valor)
+    for (const p of topProducts) byProdYear.set(p, new Map());
+    const othersByYear = new Map(years.map((y) => [y, 0]));
+
+    for (const r of rows) {
+      if (topSet.has(r.produto)) {
+        byProdYear.get(r.produto).set(r.ano, r.valor);
+      } else {
+        othersByYear.set(r.ano, (othersByYear.get(r.ano) || 0) + r.valor);
+      }
+    }
+
+    const series = topProducts.map((produto, i) => ({
+      produto,
+      color: CATEGORY_COLORS[i],
+      isOthers: false,
+      values: byProdYear.get(produto)
+    }));
+    series.push({ produto: null, color: OTHERS_COLOR, isOthers: true, values: othersByYear });
+
+    return series;
+  }
+
+  // Both the region-wide series (built once at load/lazy-load time from
+  // composition_{sec,sh2}.json) and every per-municipality series (rebuilt
+  // client-side from municipality_composition_{sec,sh2}.json) store their
+  // categories as raw PT names, not display labels — categoryLabelFor()
+  // resolves the actual language/aggregation-specific label at render
+  // time, so a single series object works under a lang toggle without
+  // rebuilding it.
+  function categoryDictFor(level) {
+    if (level === "pais") return productsPais;
+    return level === "sh2" ? productsSh2 : productsSec;
+  }
+
+  function categoryLabelFor(level, produto) {
+    if (produto === null) return I18N[state.lang].label_others;
+    const dict = categoryDictFor(level);
+    const list = (dict && (dict[state.lang] || dict.pt)) || [];
+    const hit = list.find((p) => p.var === produto);
+    return hit ? hit.label : produto;
+  }
+
+  // Official SEC/SH2 category names are long compound clauses joined by ";"
+  // (e.g. "Madeira, carvão vegetal e obras de madeira; Cortiça e suas
+  // obras..."). Cutting at the first clause boundary reads as a clean short
+  // name instead of an arbitrary mid-word ellipsis.
+  function categoryShortLabelFor(level, produto) {
+    const full = categoryLabelFor(level, produto);
+    const clause = full.split(";")[0].trim();
+    return clause.length > 60 ? clause.slice(0, 57).trimEnd() + "…" : clause;
+  }
+
+  // Composição's own product-label helpers dispatch on state.compositionAgg
+  // — this view is the only consumer of renderStackedComposition/
+  // renderStackedLegend/initStackedHover, so reading the view's own current
+  // aggregation directly here (rather than threading a level parameter
+  // through all three) is safe and keeps that shared rendering code
+  // untouched. Ranking's and Tendências' own category filters have their
+  // own, independent aggregation choice — they call categoryLabelFor(level, …)
+  // directly instead, since "level" there isn't always state.compositionAgg.
+  function productLabel(produto) {
+    return categoryLabelFor(state.compositionAgg, produto);
+  }
+
+  function productShortLabel(produto) {
+    return categoryShortLabelFor(state.compositionAgg, produto);
+  }
+
+  // One view, two independent controls: scope (region-wide vs. a single
+  // municipality, recomputed from that place's own municipality_composition
+  // rows, since which categories rank in someone's own top-8 depends on
+  // that place, not the region) and aggregation (SEC's 22 broad sections vs.
+  // SH2's 97 finer chapters — a toggle the original Shiny app offered that
+  // the first pass of this rebuild dropped). Same stacked-area chart
+  // either way, via renderStackedComposition/updateStackedGuide/
+  // renderStackedLegend/initStackedHover.
+
+  function renderComposition() {
+    if (state.compositionAgg === "sh2" && !compositionIndexSh2) {
+      showCompositionLoading();
+      ensureSh2Loaded().then(() => {
+        if (state.view === "composition") render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+    hideCompositionLoading();
+
+    // Axis swap: instead of one geographic scope's value broken down by
+    // category, break one category down by state — see
+    // renderCompositionByEstado.
+    if (state.compositionOrientation === "estado") {
+      renderCompositionByEstado();
+      return;
+    }
+
+    const series = state.compositionAgg === "sh2" ? compositionSeriesSh2 : compositionSeriesSec;
+    const index = state.compositionAgg === "sh2" ? compositionIndexSh2 : compositionIndexSec;
+    // Three-way scope: one municipality's own composition (recomputed from
+    // its own rows, since its top-8 categories aren't the region's top-8) →
+    // the selected state's aggregate (same recompute, summed across that
+    // state's municipalities) → the whole-region precomputed series.
+    if (state.compositionScope) {
+      activeCompositionSeries = buildCompositionSeries(index.byMunicipio.get(state.compositionScope) || [], dictionary);
+    } else if (state.uf) {
+      activeCompositionSeries = buildCompositionSeries(buildStateCompositionRows(index, state.uf), dictionary);
+    } else {
+      activeCompositionSeries = series;
+    }
+    renderStackedComposition(activeCompositionSeries, { svg: "composition-svg", guide: "comp-guide", legend: "composition-legend" });
+  }
+
+  // Composição's axis swap: one product/category's value broken down by
+  // state instead of one geographic scope's value broken down by category.
+  // Reuses buildCompositionSeries unchanged — a UF code slotted into its
+  // "produto" field works fine, since that function only cares about the
+  // grouping key, and categoryLabelFor's existing graceful-degradation
+  // fallback (dictionary miss → raw value) then displays each UF code as
+  // itself, since it won't match any SEC/SH2 dictionary entry. Deliberately
+  // município-free (see state.compositionOrientation's comment) — but the
+  // global state.uf filter still applies, narrowing the state axis down to
+  // one value (that state's own single trend) exactly the way
+  // compositionScope narrows the "categoria" orientation down to one
+  // município's own trend.
+  function renderCompositionByEstado() {
+    const level = state.compositionAgg;
+    const index = compositionIndexFor(level);
+    if (!state.compositionProduto || !index.byProduto.has(state.compositionProduto)) {
+      populateCompositionProdutoSelect();
+    }
+    const rows = (state.compositionProduto && index.byProduto.get(state.compositionProduto)) || [];
+    activeCompositionSeries = buildCompositionSeries(buildUfRows(rows, state.uf), dictionary);
+    renderStackedComposition(activeCompositionSeries, { svg: "composition-svg", guide: "comp-guide", legend: "composition-legend" });
+  }
+
+  // Sums one category's per-municipio rows (already {municipio,ano,valor})
+  // into per-state+year totals, in the {produto,ano,valor} shape
+  // buildCompositionSeries expects — "produto" holds a UF code here instead
+  // of a category name (see renderCompositionByEstado). uf, when set,
+  // narrows this down to that one state's own rows — buildCompositionSeries
+  // still works unchanged on a single-key input, rendering as one band
+  // (that state's own trend) instead of a 9-state stack.
+  function buildUfRows(rows, uf) {
+    const sums = new Map(); // "uf|ano" -> valor
+    for (const r of rows) {
+      const meta = municipioMeta.get(r.municipio);
+      if (!meta) continue;
+      if (uf && meta.uf !== uf) continue;
+      const key = meta.uf + "|" + r.ano;
+      sums.set(key, (sums.get(key) || 0) + r.valor);
+    }
+    const result = [];
+    for (const [key, valor] of sums) {
+      const sep = key.lastIndexOf("|");
+      result.push({ produto: key.slice(0, sep), ano: parseInt(key.slice(sep + 1), 10), valor });
+    }
+    return result;
+  }
+
+  // Sums every municipality-in-uf's own {produto,ano,valor} rows down to one
+  // row per produto+ano pair before handing off to buildCompositionSeries —
+  // that function's byProdYear build does .set(), not +=, on the assumption
+  // that its input has at most one row per produto+ano (true for a single
+  // municipality's own rows, or the precomputed region-wide series, but NOT
+  // true for several municipalities' rows concatenated naively).
+  function buildStateCompositionRows(index, uf) {
+    const sums = new Map(); // "produto|ano" -> valor
+    for (const [municipio, rows] of index.byMunicipio) {
+      const meta = municipioMeta.get(municipio);
+      if (!meta || meta.uf !== uf) continue;
+      for (const r of rows) {
+        const key = r.produto + "|" + r.ano;
+        sums.set(key, (sums.get(key) || 0) + r.valor);
+      }
+    }
+    const result = [];
+    for (const [key, valor] of sums) {
+      const sep = key.lastIndexOf("|");
+      result.push({ produto: key.slice(0, sep), ano: parseInt(key.slice(sep + 1), 10), valor });
+    }
+    return result;
+  }
+
+  // Shared 3-way scope precedence for every "produto" orientation (Ranking,
+  // Variação, Tendências, Explorar): one município's own {produto,ano,valor}
+  // rows, the current state's aggregate (uf-filtered, summed via
+  // buildStateCompositionRows), or the whole-region precomputed series —
+  // in that order. One place for this rule means every view's scope picker
+  // behaves identically instead of four near-copies drifting apart.
+  // ---- Níveis da dimensão categórica ----
+  //
+  // "sec" e "sh2" são taxonomias de produto; "pais" é o destino. Os três
+  // têm exatamente a mesma forma (município x categoria x ano, esparso),
+  // então tudo que já existia para produto funciona para país sem ramo
+  // novo — só precisa que estes três despachos conheçam o nível. É por
+  // isso que a orientação "Países" custa tão pouco código.
+  function compositionIndexFor(level) {
+    if (level === "pais") return compositionIndexPais;
+    if (level === "sh2") return compositionIndexSh2;
+    return compositionIndexSec;
+  }
+
+  // Os arrays crus do JSON carregam as duas medidas ({produto, ano, valor,
+  // kg}), mas todo consumidor daqui lê `.valor`. Estas views projetam para
+  // a medida corrente, pela mesma razão que groupByYear projeta: normalizar
+  // na origem em vez de ensinar cada leitor sobre a troca.
+  function compositionRowsFor(level) {
+    if (level === "pais") return compositionPaisView || [];
+    if (level === "sh2") return compositionSh2View || [];
+    return compositionSecView || [];
+  }
+
+  function projetarMedida(rows) {
+    if (!rows) return null;
+    const campo = campoMedida();
+    return rows.map((r) => ({ produto: r.produto, ano: r.ano, valor: r[campo] }));
+  }
+
+  // Níveis que chegam por fetch tardio. "sec" já vem no carregamento.
+  function isLazyLevel(level) {
+    return level === "sh2" || level === "pais";
+  }
+
+  function ensureLevelLoaded(level) {
+    return level === "pais" ? ensurePaisLoaded() : ensureSh2Loaded();
+  }
+
+  function scopeCompositionRows(level, scope, uf) {
+    const index = compositionIndexFor(level);
+    if (scope) return index.byMunicipio.get(scope) || [];
+    if (uf) return buildStateCompositionRows(index, uf);
+    return compositionRowsFor(level);
+  }
+
+  function showCompositionLoading() {
+    const area = document.getElementById("composition-chart-area");
+    let loadingDiv = document.getElementById("composition-loading");
+    if (!loadingDiv) {
+      loadingDiv = document.createElement("div");
+      loadingDiv.id = "composition-loading";
+      loadingDiv.className = "map-loading";
+      area.appendChild(loadingDiv);
+    }
+    loadingDiv.innerHTML = loadingMarkup();
+  }
+
+  function hideCompositionLoading() {
+    const loadingDiv = document.getElementById("composition-loading");
+    if (loadingDiv) loadingDiv.remove();
+  }
+
+  function updateCompositionGuide() {
+    updateStackedGuide("comp-guide");
+  }
+
+  function renderStackedComposition(series, ids) {
+    const svg = document.getElementById(ids.svg);
+    svg.innerHTML = "";
+
+    const years = [];
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) years.push(y);
+
+    // Stacked cumulative bounds per year, in the fixed series order.
+    const cumByYear = new Map(years.map((y) => [y, 0]));
+    const bandBounds = series.map((s) => {
+      const bottoms = [], tops = [];
+      for (const y of years) {
+        const bottom = cumByYear.get(y);
+        const top = bottom + (s.values.get(y) || 0);
+        bottoms.push(bottom);
+        tops.push(top);
+        cumByYear.set(y, top);
+      }
+      return { bottoms, tops };
+    });
+
+    const maxTotal = Math.max(...years.map((y) => cumByYear.get(y)), 1);
+    const xFor = (year) => COMP_PAD_L + ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
+    const yFor = (value) => COMP_PAD_T + (1 - value / maxTotal) * (COMP_VB_H - COMP_PAD_T - COMP_PAD_B);
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const addEl = (tag, attrs) => {
+      const el = document.createElementNS(svgNS, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      svg.appendChild(el);
+      return el;
+    };
+
+    // Gridlines + Y labels (4 bands, recessive per the dataviz mark spec).
+    for (let i = 0; i <= 4; i++) {
+      const v = (maxTotal / 4) * i;
+      const y = yFor(v);
+      addEl("line", { class: "comp-gridline", x1: COMP_PAD_L, x2: COMP_VB_W - COMP_PAD_R, y1: y, y2: y });
+      addEl("text", { class: "comp-axis-label", x: COMP_PAD_L - 8, y: y + 3, "text-anchor": "end" }).textContent = fmtAbbrev(v);
+    }
+
+    // X labels every 4 years.
+    for (const y of years) {
+      if ((y - dictionary.year_inicio) % 4 !== 0 && y !== dictionary.year_final) continue;
+      addEl("text", { class: "comp-axis-label", x: xFor(y), y: COMP_VB_H - COMP_PAD_B + 16, "text-anchor": "middle" }).textContent = y;
+    }
+
+    // Stacked bands, in series order (largest all-time total at the
+    // bottom, Outros last/top).
+    series.forEach((s, i) => {
+      const { bottoms, tops } = bandBounds[i];
+      const topPts = years.map((y, j) => `${xFor(y).toFixed(1)},${yFor(tops[j]).toFixed(1)}`);
+      const botPts = years.map((y, j) => `${xFor(y).toFixed(1)},${yFor(bottoms[j]).toFixed(1)}`).reverse();
+      addEl("path", {
+        class: "comp-band",
+        fill: s.color,
+        d: `M${topPts.join(" L")} L${botPts.join(" L")} Z`,
+        "data-index": i
+      });
+    });
+
+    // Selected-year guide line.
+    const guideX = xFor(state.year);
+    addEl("line", { id: ids.guide, class: "comp-guide", x1: guideX, x2: guideX, y1: COMP_PAD_T, y2: COMP_VB_H - COMP_PAD_B });
+
+    renderStackedLegend(series, ids.legend);
+  }
+
+  function updateStackedGuide(guideId) {
+    const guide = document.getElementById(guideId);
+    if (!guide) return;
+    const x = COMP_PAD_L + ((state.year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
+    guide.setAttribute("x1", x);
+    guide.setAttribute("x2", x);
+  }
+
+  function renderStackedLegend(series, legendId) {
+    const legend = document.getElementById(legendId);
+    legend.innerHTML = "";
+    for (const s of series) {
+      const item = document.createElement("div");
+      item.className = "legend-item";
+      const swatch = document.createElement("span");
+      swatch.className = "swatch";
+      swatch.style.background = s.color;
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = productShortLabel(s.produto);
+      label.title = productLabel(s.produto);
+      item.appendChild(swatch);
+      item.appendChild(label);
+      legend.appendChild(item);
+    }
+  }
+
+  function initCompositionHover() {
+    initStackedHover({ svg: "composition-svg", area: "composition-chart-area", tooltip: "composition-tooltip", view: "composition" }, () => activeCompositionSeries);
+  }
+
+  function initStackedHover(ids, getSeries) {
+    const area = document.getElementById(ids.area);
+    const tooltip = document.getElementById(ids.tooltip);
+
+    area.addEventListener("pointermove", (e) => {
+      if (state.view !== ids.view) return;
+      const svg = document.getElementById(ids.svg);
+      const rect = svg.getBoundingClientRect();
+      const fracX = (e.clientX - rect.left) / rect.width;
+      const vbX = fracX * COMP_VB_W;
+      const frac = (vbX - COMP_PAD_L) / (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      if (year < dictionary.year_inicio || year > dictionary.year_final) {
+        tooltip.style.opacity = "0";
+        return;
+      }
+
+      const rowsHtml = getSeries()
+        .map((s) => ({ label: productShortLabel(s.produto), full: productLabel(s.produto), color: s.color, valor: s.values.get(year) || 0 }))
+        .sort((a, b) => b.valor - a.valor)
+        .map((r) => `<div title="${r.full.replace(/"/g, "&quot;")}" style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:2px;background:${r.color};display:inline-block;flex:0 0 auto;"></span><span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.label}</span><span style="flex:0 0 auto;padding-left:8px;">${fmtAbbrev(r.valor)}</span></div>`)
+        .join("");
+
+      tooltip.innerHTML = `<strong>${year}</strong>` + rowsHtml;
+      const areaRect = area.getBoundingClientRect();
+      const left = e.clientX - areaRect.left;
+      tooltip.style.left = Math.min(areaRect.width - 300, left + 14) + "px";
+      tooltip.style.top = (e.clientY - areaRect.top - 10) + "px";
+      tooltip.style.opacity = "1";
+    });
+
+    area.addEventListener("pointerleave", () => {
+      tooltip.style.opacity = "0";
+    });
+
+    area.addEventListener("click", (e) => {
+      const svg = document.getElementById(ids.svg);
+      const rect = svg.getBoundingClientRect();
+      const fracX = (e.clientX - rect.left) / rect.width;
+      const vbX = fracX * COMP_VB_W;
+      const frac = (vbX - COMP_PAD_L) / (COMP_VB_W - COMP_PAD_L - COMP_PAD_R);
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      jumpToYear(Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year)));
+    });
+  }
+
+  // ---- Change: ranked dumbbell chart, year A vs year B, filtered to one
+  // state — same pattern as the CEMPRE map rebuild's compare mode (446
+  // municipalities isn't readable as one ranked list; 13-115 per state is).
+  // Dot color is a fixed identity pair (year A = blue, year B = orange),
+  // not an encoding of which value is larger. ----
+
+  // dataSource defaults to the always-available cross-product totals, same
+  // convention computeTrendMunicipalities uses — Variação's own category
+  // filter (changeDataSource) passes an inverted per-category source
+  // instead. Guards each lookup (years && years.get(...)) since a
+  // category-filtered source won't have an entry for every município,
+  // unlike totalsByMunicipio. uf is optional — null means every município
+  // in the Legal Amazon (the same long-scrollable-list idiom the
+  // produto-orientation's own SH2 tier already uses at up to 97 rows).
+  function computeChangeRows(uf, yearA, yearB, dataSource = totalsByMunicipio) {
+    const rows = [];
+    for (const [municipio, meta] of municipioMeta) {
+      if (uf && meta.uf !== uf) continue;
+      const years = dataSource.get(municipio);
+      const valueA = (years && years.get(yearA)) || 0;
+      const valueB = (years && years.get(yearB)) || 0;
+      rows.push({ municipio, valueA, valueB, delta: valueB - valueA });
+    }
+    rows.sort((a, b) => b.delta - a.delta);
+    return rows;
+  }
+
+  // Mirrors trendsDataSource()/exploreDataSource() for Variação's own
+  // municipio-orientation category filter — the always-loaded
+  // totalsByMunicipio for "Todos os produtos", or one SEC/SH2 category's
+  // values (inverted from compositionIndex*.byProduto) otherwise. Returns
+  // null only when SH2 is selected but not loaded yet.
+  function changeDataSource() {
+    if (state.changeAggLevel !== "sec" && state.changeAggLevel !== "sh2") return totalsByMunicipio;
+    const index = state.changeAggLevel === "sh2" ? compositionIndexSh2 : compositionIndexSec;
+    if (!index) return null;
+    if (!state.changeCategory || !index.byProduto.has(state.changeCategory)) {
+      populateChangeCategorySelect();
+    }
+    if (!state.changeCategory) return totalsByMunicipio;
+    return categoryRowsToMunicipioMap(index.byProduto.get(state.changeCategory) || []);
+  }
+
+  function changeDomain(rows) {
+    if (!rows.length) return { min: 0, max: 1 };
+    let min = Infinity, max = -Infinity;
+    for (const r of rows) {
+      min = Math.min(min, r.valueA, r.valueB);
+      max = Math.max(max, r.valueA, r.valueB);
+    }
+    if (min === max) { min -= 1; max += 1; }
+    const pad = (max - min) * 0.05;
+    return { min: min - pad, max: max + pad };
+  }
+
+  function pctForChange(value, domain) {
+    return ((value - domain.min) / (domain.max - domain.min)) * 100;
+  }
+
+  function renderChange() {
+    document.getElementById("change-legend-a-label").textContent = state.yearA;
+    document.getElementById("change-legend-b-label").textContent = state.yearB;
+
+    // Axis swap: instead of comparing municípios for one product/category,
+    // compare product categories for one município/state — see
+    // renderChangeByProduto.
+    if (state.changeOrientation !== "municipio") {
+      renderChangeByProduto();
+      return;
+    }
+
+    const dataSource = changeDataSource();
+    if (!dataSource) {
+      document.getElementById("change-rows").innerHTML = `<div class="prodrank-loading">${loadingMarkup()}</div>`;
+      const level = state.changeAggLevel;
+      ensureSh2Loaded().then(() => {
+        populateChangeCategorySelect();
+        if (state.view === "change" && state.changeAggLevel === level) render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+
+    const rows = computeChangeRows(state.uf, state.yearA, state.yearB, dataSource);
+    renderChangeRows(rows);
+  }
+
+  // Variação's axis swap: one município's (or the current state's whole
+  // aggregate's — see state.changeScope) product categories, compared year
+  // A vs year B, instead of municípios compared for one category. Reuses
+  // the exact same compositionIndex*/compositionSec/Sh2 data and 3-way
+  // scope precedence Composição/Ranking already use.
+  function renderChangeByProduto() {
+    const level = nivelCategoria(state.changeOrientation, state.changeProdutoLevel);
+    const index = compositionIndexFor(level);
+    if (isLazyLevel(level) && !index) {
+      document.getElementById("change-rows").innerHTML = `<div class="prodrank-loading">${loadingMarkup()}</div>`;
+      ensureLevelLoaded(level).then(() => {
+        if (state.view === "change" && nivelCategoria(state.changeOrientation, state.changeProdutoLevel) === level) render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+    const rows = computeChangeProdutoRows(level, state.changeScope, state.uf, state.yearA, state.yearB);
+    renderChangeRows(rows, (r) => categoryShortLabelFor(level, r.produto), (r) => categoryLabelFor(level, r.produto));
+  }
+
+  // Same {municipio,ano,valor} rows Composição/Ranking's category filters
+  // already read (one município's own rows, the current state's aggregate
+  // via buildStateCompositionRows, or the whole-region precomputed series),
+  // regrouped by category into one {produto,valueA,valueB,delta} row per
+  // category instead of by year.
+  function computeChangeProdutoRows(level, scope, uf, yearA, yearB) {
+    const scopeRows = scopeCompositionRows(level, scope, uf);
+    const byProduto = new Map(); // produto -> {valueA, valueB}
+    for (const r of scopeRows) {
+      if (r.ano !== yearA && r.ano !== yearB) continue;
+      if (!byProduto.has(r.produto)) byProduto.set(r.produto, { valueA: 0, valueB: 0 });
+      const entry = byProduto.get(r.produto);
+      if (r.ano === yearA) entry.valueA += r.valor;
+      else entry.valueB += r.valor;
+    }
+    const rows = Array.from(byProduto.entries()).map(([produto, { valueA, valueB }]) => ({ produto, valueA, valueB, delta: valueB - valueA }));
+    rows.sort((a, b) => b.delta - a.delta);
+    return rows;
+  }
+
+  // Shared tail for both orientations above.
+  function renderChangeRows(rows, labelFor = (r) => r.municipio, fullLabelFor = labelFor) {
+    // domain still drives each dot/line's horizontal position within its
+    // row (see pctForChange) — only the padded min/max numbers themselves
+    // are no longer displayed above the chart (confusing on their own,
+    // since they're a padded domain, not any município's actual value).
+    const domain = changeDomain(rows);
+
+    const container = document.getElementById("change-rows");
+    container.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    for (const r of rows) frag.appendChild(buildChangeRowEl(r, domain, labelFor, fullLabelFor));
+    container.appendChild(frag);
+  }
+
+  // labelFor/fullLabelFor default to the municipio-orientation shape
+  // ({municipio, valueA, valueB, delta}) — Variação's produto-orientation
+  // passes its own pair instead, same idiom as buildRankRow.
+  function buildChangeRowEl(r, domain, labelFor = (rr) => rr.municipio, fullLabelFor = labelFor) {
+    const pctA = pctForChange(r.valueA, domain);
+    const pctB = pctForChange(r.valueB, domain);
+    const lo = Math.min(pctA, pctB);
+    const hi = Math.max(pctA, pctB);
+
+    const row = document.createElement("div");
+    row.className = "change-row";
+
+    const label = document.createElement("div");
+    label.className = "change-col-label";
+    label.textContent = labelFor(r);
+    label.title = fullLabelFor(r);
+    row.appendChild(label);
+
+    const track = document.createElement("div");
+    track.className = "change-col-track";
+    const line = document.createElement("div");
+    line.className = "change-line";
+    line.style.left = lo + "%";
+    line.style.width = (hi - lo) + "%";
+    track.appendChild(line);
+    const dotA = document.createElement("div");
+    dotA.className = "change-dot change-dot-a";
+    dotA.style.left = pctA + "%";
+    track.appendChild(dotA);
+    const dotB = document.createElement("div");
+    dotB.className = "change-dot change-dot-b";
+    dotB.style.left = pctB + "%";
+    track.appendChild(dotB);
+    row.appendChild(track);
+
+    const delta = document.createElement("div");
+    delta.className = "change-col-delta";
+    delta.textContent = (r.delta > 0 ? "+" : "") + fmtAbbrev(r.delta);
+    row.appendChild(delta);
+
+    row.addEventListener("pointerenter", (e) => showChangeTooltip(e, r, fullLabelFor));
+    row.addEventListener("pointermove", moveChangeTooltip);
+    row.addEventListener("pointerleave", hideChangeTooltip);
+
+    return row;
+  }
+
+  function showChangeTooltip(e, r, fullLabelFor = (rr) => rr.municipio) {
+    const tooltip = document.getElementById("change-tooltip");
+    const pct = r.valueA !== 0 ? (r.delta / Math.abs(r.valueA)) * 100 : null;
+    tooltip.innerHTML =
+      "<strong>" + fullLabelFor(r) + "</strong><br>" +
+      state.yearA + ": " + fmtMedidaCheia(r.valueA) + "<br>" +
+      state.yearB + ": " + fmtMedidaCheia(r.valueB) + "<br>" +
+      (r.delta >= 0 ? "+" : "") + fmtNumber(r.delta) +
+      (pct !== null ? " (" + (pct >= 0 ? "+" : "") + pct.toFixed(1) + "%)" : "");
+    tooltip.style.opacity = "1";
+    moveChangeTooltip(e);
+  }
+
+  function moveChangeTooltip(e) {
+    const tooltip = document.getElementById("change-tooltip");
+    const panelRect = document.getElementById("change-panel").getBoundingClientRect();
+    tooltip.style.left = (e.clientX - panelRect.left + 12) + "px";
+    tooltip.style.top = (e.clientY - panelRect.top + 12) + "px";
+  }
+
+  function hideChangeTooltip() {
+    document.getElementById("change-tooltip").style.opacity = "0";
+  }
+
+  // ---- Trends: small multiples, one sparkline per top-N municipality by
+  // all-time total value (independent of the ranking view's per-year
+  // top-N, since a sparkline shows the whole range at once — there's no
+  // single year to rank by). Both use the same fixed TOP_N. ----
+
+  const TREND_SPARK_W = 200, TREND_SPARK_H = 44, TREND_SPARK_PAD = 4;
+
+  // dataSource defaults to the always-available cross-product totals, so
+  // Explore's default selection and Composição's scope-select population
+  // (both call this with just topN) are unaffected by Tendências' own
+  // category filter — only renderTrends() itself passes a filtered source.
+  // uf defaults to the current global filter so every caller (Tendências'
+  // own top-N, and the Composição-scope/Explorar-munis picker population
+  // below) automatically respects it without threading it through by hand.
+  function computeTrendMunicipalities(topN, dataSource = totalsByMunicipio, uf = state.uf) {
+    const totals = Array.from(dataSource.entries())
+      .filter(([municipio]) => !uf || (municipioMeta.get(municipio) && municipioMeta.get(municipio).uf === uf))
+      .map(([municipio, years]) => {
+        let sum = 0;
+        for (const v of years.values()) sum += v;
+        return { municipio, total: sum };
+      });
+    totals.sort((a, b) => b.total - a.total);
+    return totals.slice(0, topN).map((d) => d.municipio);
+  }
+
+  // Rebuilt on every render() (language change, uf filter change, etc.) —
+  // same idiom as populateRankingCategorySelect/populateTrendsCategorySelect/
+  // populateExploreCategorySelect. The list of municipios is uf-filtered via
+  // computeTrendMunicipalities' own default; the "whole region" option (value
+  // "") stays first and its own label follows the uf filter too (see render()
+  // and title_composition_uf) rather than needing a second option.
+  function populateCompositionScopeSelect() {
+    const select = document.getElementById("composition-scope-select");
+    select.innerHTML = "";
+    const regionOpt = document.createElement("option");
+    regionOpt.value = "";
+    regionOpt.textContent = I18N[state.lang].composition_scope_region;
+    select.appendChild(regionOpt);
+    const munis = computeTrendMunicipalities(municipioMeta.size).filter((m) => compositionIndexSec.byMunicipio.has(m));
+    for (const municipio of munis) {
+      const opt = document.createElement("option");
+      opt.value = municipio;
+      opt.textContent = municipio;
+      select.appendChild(opt);
+    }
+    select.value = state.compositionScope && munis.includes(state.compositionScope) ? state.compositionScope : "";
+  }
+
+  // Same idiom, for Ranking's own produto-orientation scope picker (see
+  // renderRankingProdutos) — município, or "Todos os municípios" for the
+  // uf-filtered whole state/region, mirroring compositionScope exactly.
+  function populateRankingScopeSelect() {
+    const select = document.getElementById("ranking-scope-select");
+    select.innerHTML = "";
+    const regionOpt = document.createElement("option");
+    regionOpt.value = "";
+    regionOpt.textContent = I18N[state.lang].composition_scope_region;
+    select.appendChild(regionOpt);
+    const munis = computeTrendMunicipalities(municipioMeta.size).filter((m) => compositionIndexSec.byMunicipio.has(m));
+    for (const municipio of munis) {
+      const opt = document.createElement("option");
+      opt.value = municipio;
+      opt.textContent = municipio;
+      select.appendChild(opt);
+    }
+    select.value = state.rankingScope && munis.includes(state.rankingScope) ? state.rankingScope : "";
+  }
+
+  // Same idiom, for Variação's own produto-orientation scope picker (see
+  // renderChangeByProduto) — município, or "Todos os municípios" for the
+  // current state's whole aggregate (state.uf is always set while on this
+  // view, so this never actually resolves to the whole region — see
+  // state.changeScope's own comment).
+  function populateChangeScopeSelect() {
+    const select = document.getElementById("change-scope-select");
+    select.innerHTML = "";
+    const regionOpt = document.createElement("option");
+    regionOpt.value = "";
+    regionOpt.textContent = I18N[state.lang].composition_scope_region;
+    select.appendChild(regionOpt);
+    const munis = computeTrendMunicipalities(municipioMeta.size).filter((m) => compositionIndexSec.byMunicipio.has(m));
+    for (const municipio of munis) {
+      const opt = document.createElement("option");
+      opt.value = municipio;
+      opt.textContent = municipio;
+      select.appendChild(opt);
+    }
+    select.value = state.changeScope && munis.includes(state.changeScope) ? state.changeScope : "";
+  }
+
+  // Same idiom, for Tendências' own produto-orientation scope picker.
+  function populateTrendsScopeSelect() {
+    const select = document.getElementById("trends-scope-select");
+    select.innerHTML = "";
+    const regionOpt = document.createElement("option");
+    regionOpt.value = "";
+    regionOpt.textContent = I18N[state.lang].composition_scope_region;
+    select.appendChild(regionOpt);
+    const munis = computeTrendMunicipalities(municipioMeta.size).filter((m) => compositionIndexSec.byMunicipio.has(m));
+    for (const municipio of munis) {
+      const opt = document.createElement("option");
+      opt.value = municipio;
+      opt.textContent = municipio;
+      select.appendChild(opt);
+    }
+    select.value = state.trendsScope && munis.includes(state.trendsScope) ? state.trendsScope : "";
+  }
+
+  // Same idiom, for Explorar's produto-orientation scope picker (its own
+  // hand-picked-categories multi-select is separate — see
+  // populateExploreProdutosSelect).
+  function populateExploreScopeSelect() {
+    const select = document.getElementById("explore-scope-select");
+    select.innerHTML = "";
+    const regionOpt = document.createElement("option");
+    regionOpt.value = "";
+    regionOpt.textContent = I18N[state.lang].composition_scope_region;
+    select.appendChild(regionOpt);
+    const munis = computeTrendMunicipalities(municipioMeta.size).filter((m) => compositionIndexSec.byMunicipio.has(m));
+    for (const municipio of munis) {
+      const opt = document.createElement("option");
+      opt.value = municipio;
+      opt.textContent = municipio;
+      select.appendChild(opt);
+    }
+    select.value = state.exploreScope && munis.includes(state.exploreScope) ? state.exploreScope : "";
+  }
+
+  // Same idiom, for Explorar's municipality multi-select — uf-filtered via
+  // computeTrendMunicipalities' own default. Selection (state.exploreMunis)
+  // is applied via each option's `selected`, not select.value, since this is
+  // a multi-select.
+  function populateExploreMunisSelect() {
+    const select = document.getElementById("explore-munis-select");
+    select.innerHTML = "";
+    const munis = computeTrendMunicipalities(municipioMeta.size);
+    for (const municipio of munis) {
+      const opt = document.createElement("option");
+      opt.value = municipio;
+      opt.textContent = municipio;
+      opt.selected = state.exploreMunis.includes(municipio);
+      select.appendChild(opt);
+    }
+  }
+
+  // Same idiom, for Explorar's produto-orientation category multi-select —
+  // hand-picked, mirroring exploreMunis exactly (not an automatic top-N,
+  // unlike Tendências' cards). Self-heals to the current scope's top-5 by
+  // total value when nothing's picked yet or the picks don't exist in the
+  // newly chosen level's taxonomy (e.g. switching SEC -> SH2) — same
+  // self-healing rationale as the single-category populate*Select
+  // functions, just defaulting to several values instead of one.
+  function populateExploreProdutosSelect() {
+    const level = nivelCategoria(state.exploreOrientation, state.exploreProdutoLevel);
+    const select = document.getElementById("explore-produtos-select");
+    select.innerHTML = "";
+    const items = categoryOptionsFor(level);
+    if (!items) return;
+    const validValues = new Set(items.map((i) => i.value));
+    const produtoMap = categoryRowsToProdutoMap(scopeCompositionRows(level, state.exploreScope, state.uf));
+    let selected = state.exploreProdutos.filter((p) => validValues.has(p));
+    if (!selected.length) {
+      selected = topKeysByTotal(produtoMap, 5);
+      state.exploreProdutos = selected;
+    }
+    // Ordered by total exported value, descending — same "biggest first"
+    // criterion the município list uses (computeTrendMunicipalities), not
+    // the plain alphabetical order categoryOptionsFor returns by default.
+    // Categories with no data in this scope have no entry in produtoMap and
+    // sort as 0, falling back to their original alphabetical relative order
+    // (Array#sort is stable) since none of them out-rank each other.
+    const totalFor = (value) => {
+      const years = produtoMap.get(value);
+      if (!years) return 0;
+      let sum = 0;
+      for (const v of years.values()) sum += v;
+      return sum;
+    };
+    const orderedItems = items.slice().sort((a, b) => totalFor(b.value) - totalFor(a.value));
+    for (const { value, label } of orderedItems) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      opt.selected = selected.includes(value);
+      select.appendChild(opt);
+    }
+  }
+
+  // Inverts a byProduto row list (already the other-direction read of the
+  // same compositionIndex* data) into the municipio -> Map(year -> valor)
+  // shape totalsByMunicipio itself uses — shared by Tendências' and
+  // Explorar's category filters below.
+  function categoryRowsToMunicipioMap(rows) {
+    const byMunicipio = new Map();
+    for (const r of rows) {
+      if (!byMunicipio.has(r.municipio)) byMunicipio.set(r.municipio, new Map());
+      byMunicipio.get(r.municipio).set(r.ano, r.valor);
+    }
+    return byMunicipio;
+  }
+
+  // Same idea, the other direction — a scope's own {produto,ano,valor}
+  // rows (from scopeCompositionRows) inverted into a produto -> Map(year ->
+  // valor) shape, for Tendências' and Explorar's own produto-orientation
+  // (comparing categories over time for one município/estado/região,
+  // instead of comparing municípios).
+  function categoryRowsToProdutoMap(rows) {
+    const byProduto = new Map();
+    for (const r of rows) {
+      if (!byProduto.has(r.produto)) byProduto.set(r.produto, new Map());
+      byProduto.get(r.produto).set(r.ano, r.valor);
+    }
+    return byProduto;
+  }
+
+  // Generic top-N-by-all-time-total over any key -> Map(year -> valor)
+  // source — computeTrendMunicipalities does the same thing but with
+  // município-specific uf-filtering baked in; this is the plain version for
+  // sources whose keys aren't municípios (e.g. product categories).
+  function topKeysByTotal(dataSource, topN) {
+    const totals = Array.from(dataSource.entries()).map(([key, years]) => {
+      let sum = 0;
+      for (const v of years.values()) sum += v;
+      return { key, total: sum };
+    });
+    totals.sort((a, b) => b.total - a.total);
+    return totals.slice(0, topN).map((d) => d.key);
+  }
+
+  // Returns a municipio -> Map(year -> valor) source matching Tendências'
+  // current filter: the always-loaded totalsByMunicipio for "Todos os
+  // produtos", or one SEC/SH2 category's values (inverted from
+  // compositionIndex*.byProduto — the same per-municipality composition
+  // data Composição and Ranking's category filter already use) otherwise.
+  // Returns null only when SH2 is selected but not loaded yet — the
+  // caller (renderTrends) is responsible for triggering the fetch.
+  // Assigns a default category itself (via populateTrendsCategorySelect)
+  // whenever state.trendsCategory is missing or invalid for this level —
+  // same self-healing rationale as renderRankingByCategory, needed for a
+  // cold URL deep link straight into "sec"/"sh2" with no category set.
+  function trendsDataSource() {
+    if (state.trendsAggLevel !== "sec" && state.trendsAggLevel !== "sh2") return totalsByMunicipio;
+    const index = state.trendsAggLevel === "sh2" ? compositionIndexSh2 : compositionIndexSec;
+    if (!index) return null;
+    if (!state.trendsCategory || !index.byProduto.has(state.trendsCategory)) {
+      populateTrendsCategorySelect();
+    }
+    if (!state.trendsCategory) return totalsByMunicipio; // no categories at all — shouldn't happen
+    return categoryRowsToMunicipioMap(index.byProduto.get(state.trendsCategory) || []);
+  }
+
+  // Tendências' axis swap: a produto -> Map(year -> valor) source, scoped
+  // to one município/estado/região (see scopeCompositionRows), for
+  // comparing product categories instead of municípios. Returns null only
+  // when SH2 is selected but not loaded yet.
+  function trendsProdutoDataSource() {
+    const level = nivelCategoria(state.trendsOrientation, state.trendsProdutoLevel);
+    if (isLazyLevel(level) && !compositionIndexFor(level)) return null;
+    return categoryRowsToProdutoMap(scopeCompositionRows(level, state.trendsScope, state.uf));
+  }
+
+  // Same idea, for Explorar's own independent category filter.
+  function exploreDataSource() {
+    if (state.exploreAggLevel !== "sec" && state.exploreAggLevel !== "sh2") return totalsByMunicipio;
+    const index = state.exploreAggLevel === "sh2" ? compositionIndexSh2 : compositionIndexSec;
+    if (!index) return null;
+    if (!state.exploreCategory || !index.byProduto.has(state.exploreCategory)) {
+      populateExploreCategorySelect();
+    }
+    if (!state.exploreCategory) return totalsByMunicipio;
+    return categoryRowsToMunicipioMap(index.byProduto.get(state.exploreCategory) || []);
+  }
+
+  function renderTrends() {
+    const t = I18N[state.lang];
+    const grid = document.getElementById("trends-grid");
+
+    // Axis swap: instead of top-N municípios (for one product/category),
+    // show top-N product categories, for one município/estado/região.
+    if (state.trendsOrientation !== "municipio") {
+      const level = nivelCategoria(state.trendsOrientation, state.trendsProdutoLevel);
+      const dataSource = trendsProdutoDataSource();
+      if (!dataSource) {
+        grid.innerHTML = `<div class="prodrank-loading">${loadingMarkup()}</div>`;
+        ensureLevelLoaded(level).then(() => {
+          if (state.view === "trends" && nivelCategoria(state.trendsOrientation, state.trendsProdutoLevel) === level) render();
+        }).catch(onLazyLoadFailed);
+        return;
+      }
+      const produtos = topKeysByTotal(dataSource, TOP_N);
+      grid.innerHTML = "";
+      const frag = document.createDocumentFragment();
+      for (const produto of produtos) {
+        frag.appendChild(buildTrendCard(produto, dataSource, (k) => categoryShortLabelFor(level, k), (k) => categoryLabelFor(level, k)));
+      }
+      grid.appendChild(frag);
+      return;
+    }
+
+    const dataSource = trendsDataSource();
+    if (!dataSource) {
+      grid.innerHTML = `<div class="prodrank-loading">${loadingMarkup()}</div>`;
+      const level = state.trendsAggLevel;
+      ensureSh2Loaded().then(() => {
+        populateTrendsCategorySelect();
+        if (state.view === "trends" && state.trendsAggLevel === level) render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+
+    const munis = computeTrendMunicipalities(TOP_N, dataSource);
+    grid.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    for (const municipio of munis) frag.appendChild(buildTrendCard(municipio, dataSource));
+    grid.appendChild(frag);
+  }
+
+  // labelFor/fullLabelFor default to the municipio-orientation shape (key
+  // is a municipio name, used as its own label) — Tendências'
+  // produto-orientation passes its own pair instead, same idiom as
+  // buildRankRow/buildChangeRowEl.
+  function buildTrendCard(key, dataSource, labelFor = (k) => k, fullLabelFor = labelFor) {
+    const years = dataSource.get(key);
+    const series = [];
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) {
+      series.push({ year: y, value: years.get(y) || 0 });
+    }
+    const values = series.map((d) => d.value);
+    const minV = Math.min(...values);
+    const maxV = Math.max(...values);
+    const xFor = (year) => ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * TREND_SPARK_W;
+    const yFor = (value) => (maxV === minV
+      ? TREND_SPARK_H / 2
+      : TREND_SPARK_PAD + (1 - (value - minV) / (maxV - minV)) * (TREND_SPARK_H - 2 * TREND_SPARK_PAD));
+
+    const card = document.createElement("div");
+    card.className = "trend-card";
+    card.dataset.key = key;
+
+    const header = document.createElement("div");
+    header.className = "trend-card-header";
+    const name = document.createElement("span");
+    name.className = "trend-card-name";
+    name.textContent = labelFor(key);
+    name.title = fullLabelFor(key);
+    const latest = document.createElement("span");
+    latest.className = "trend-card-value";
+    latest.dataset.role = "value";
+    latest.textContent = fmtAbbrev(years.get(state.year) || 0);
+    header.appendChild(name);
+    header.appendChild(latest);
+    card.appendChild(header);
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "trend-sparkline");
+    svg.setAttribute("viewBox", `0 0 ${TREND_SPARK_W} ${TREND_SPARK_H}`);
+    svg.setAttribute("preserveAspectRatio", "none");
+
+    const pts = series.map((d) => `${xFor(d.year).toFixed(1)},${yFor(d.value).toFixed(1)}`);
+    const areaPath = document.createElementNS(svgNS, "path");
+    areaPath.setAttribute("class", "trend-spark-area");
+    areaPath.setAttribute("d", `M${xFor(series[0].year).toFixed(1)},${TREND_SPARK_H} L${pts.join(" L")} L${xFor(series[series.length - 1].year).toFixed(1)},${TREND_SPARK_H} Z`);
+    svg.appendChild(areaPath);
+
+    const linePath = document.createElementNS(svgNS, "path");
+    linePath.setAttribute("class", "trend-spark-line");
+    linePath.setAttribute("d", `M${pts.join(" L")}`);
+    svg.appendChild(linePath);
+
+    const marker = document.createElementNS(svgNS, "circle");
+    marker.setAttribute("class", "trend-spark-marker");
+    marker.setAttribute("r", "3");
+    marker.dataset.role = "marker";
+    svg.appendChild(marker);
+
+    card.appendChild(svg);
+
+    positionTrendMarker(card, series, xFor, yFor);
+    return card;
+  }
+
+  function positionTrendMarker(card, series, xFor, yFor) {
+    const marker = card.querySelector('[data-role="marker"]');
+    if (!marker) return;
+    const d = series.find((s) => s.year === state.year);
+    if (!d) { marker.setAttribute("opacity", "0"); return; }
+    marker.setAttribute("cx", xFor(d.year));
+    marker.setAttribute("cy", yFor(d.value));
+    marker.setAttribute("opacity", "1");
+  }
+
+  // Repositions each card's selected-year marker without rebuilding the
+  // grid — called on every autoplay tick, so it needs to be cheap.
+  function updateTrendsMarkers() {
+    const dataSource = state.trendsOrientation !== "municipio" ? trendsProdutoDataSource() : trendsDataSource();
+    if (!dataSource) return; // SH2 mid-load — renderTrends() owns showing the loading state
+    const grid = document.getElementById("trends-grid");
+    for (const card of grid.children) {
+      const key = card.dataset.key;
+      const years = dataSource.get(key);
+      if (!years) continue;
+      const valueEl = card.querySelector('[data-role="value"]');
+      if (valueEl) valueEl.textContent = fmtAbbrev(years.get(state.year) || 0);
+      const value = years.get(state.year);
+      const marker = card.querySelector('[data-role="marker"]');
+      if (!marker) continue;
+      if (value === undefined) { marker.setAttribute("opacity", "0"); continue; }
+      const series = [];
+      for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) series.push(years.get(y) || 0);
+      const minV = Math.min(...series);
+      const maxV = Math.max(...series);
+      const xFor = (year) => ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * TREND_SPARK_W;
+      const yFor = (v) => (maxV === minV
+        ? TREND_SPARK_H / 2
+        : TREND_SPARK_PAD + (1 - (v - minV) / (maxV - minV)) * (TREND_SPARK_H - 2 * TREND_SPARK_PAD));
+      marker.setAttribute("cx", xFor(state.year));
+      marker.setAttribute("cy", yFor(value));
+      marker.setAttribute("opacity", "1");
+    }
+  }
+
+  // ---- Explore: hand-picked municipalities plotted directly as lines —
+  // the "advanced" view, trimmed down from the original Shiny app's full
+  // any-entity-vs-any-product flexibility. Scoped to municipality-vs-
+  // municipality comparison only, since that's what the already-exported
+  // data (municipality_totals.json) supports without a new, much larger
+  // muni x product x year export; defaults to the top 5 by all-time total
+  // rather than an empty picker, so there's always something on screen.
+
+  const EXPLORE_PAD_L = 60, EXPLORE_PAD_R = 16, EXPLORE_PAD_T = 12, EXPLORE_PAD_B = 28;
+  const EXPLORE_VB_W = 1000, EXPLORE_VB_H = 520;
+
+  // Returns null when the data source isn't ready (SH2 selected but not
+  // loaded yet) — renderExplore() shows a loading state and re-invokes in
+  // that case, rather than this function silently building an empty/wrong
+  // series against undefined data. Dispatches on exploreOrientation; each
+  // series object carries its own resolved `label` (and `fullLabel` for the
+  // produto-orientation, since a category's short and full names differ) so
+  // every downstream consumer (legend, hover tooltip) reads a plain string
+  // instead of needing to know which orientation built the series.
+  function buildExploreSeries() {
+    if (state.exploreOrientation !== "municipio") return buildExploreProdutoSeries();
+
+    const dataSource = exploreDataSource();
+    if (!dataSource) return null;
+
+    const years = [];
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) years.push(y);
+
+    return state.exploreMunis.map((municipio, i) => {
+      const yearMap = dataSource.get(municipio);
+      const raw = years.map((y) => (yearMap ? yearMap.get(y) || 0 : 0));
+      const first = raw[0];
+      // Indexing to a zero base is undefined (not "no growth" — the flat
+      // 0/0=0 fallback would misrepresent a municipality that grew from
+      // nothing into a real exporter as having never changed at all).
+      // Flagged so the line is skipped rather than drawn wrong.
+      const undefinedIndex = state.exploreIndex && first === 0;
+      const values = state.exploreIndex && !undefinedIndex
+        ? raw.map((v) => (v / first) * 100)
+        : raw;
+      return { key: municipio, label: municipio, color: CATEGORY_COLORS[i % CATEGORY_COLORS.length], years, values, undefinedIndex };
+    });
+  }
+
+  // Explorar's axis swap: hand-picked product categories (for one
+  // município/estado/região — see scopeCompositionRows) plotted as
+  // independent lines, instead of hand-picked municípios.
+  function buildExploreProdutoSeries() {
+    const level = nivelCategoria(state.exploreOrientation, state.exploreProdutoLevel);
+    if (isLazyLevel(level) && !compositionIndexFor(level)) return null;
+    const dataSource = categoryRowsToProdutoMap(scopeCompositionRows(level, state.exploreScope, state.uf));
+
+    const years = [];
+    for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) years.push(y);
+
+    return state.exploreProdutos.map((produto, i) => {
+      const yearMap = dataSource.get(produto);
+      const raw = years.map((y) => (yearMap ? yearMap.get(y) || 0 : 0));
+      const first = raw[0];
+      const undefinedIndex = state.exploreIndex && first === 0;
+      const values = state.exploreIndex && !undefinedIndex
+        ? raw.map((v) => (v / first) * 100)
+        : raw;
+      return {
+        key: produto,
+        label: categoryShortLabelFor(level, produto),
+        fullLabel: categoryLabelFor(level, produto),
+        color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+        years, values, undefinedIndex
+      };
+    });
+  }
+
+  function renderExplore() {
+    const svg = document.getElementById("explore-svg");
+    const t = I18N[state.lang];
+    document.getElementById("plot-subtitle").textContent = withYearRange(exploreSubtitleText(t));
+    const series = buildExploreSeries();
+
+    if (series === null) {
+      svg.innerHTML = "";
+      let loadingDiv = document.getElementById("explore-loading");
+      if (!loadingDiv) {
+        loadingDiv = document.createElement("div");
+        loadingDiv.id = "explore-loading";
+        loadingDiv.className = "map-loading";
+        document.getElementById("explore-chart-area").appendChild(loadingDiv);
+      }
+      loadingDiv.innerHTML = loadingMarkup();
+      const orientation = state.exploreOrientation;
+      const level = orientation !== "municipio"
+        ? nivelCategoria(orientation, state.exploreProdutoLevel)
+        : state.exploreAggLevel;
+      ensureLevelLoaded(level).then(() => {
+        if (orientation === "municipio") populateExploreCategorySelect();
+        const stillSameContext = state.view === "explore" && state.exploreOrientation === orientation &&
+          (orientation !== "municipio"
+            ? nivelCategoria(orientation, state.exploreProdutoLevel) === level
+            : state.exploreAggLevel === level);
+        if (stillSameContext) render();
+      }).catch(onLazyLoadFailed);
+      return;
+    }
+    const existingLoading = document.getElementById("explore-loading");
+    if (existingLoading) existingLoading.remove();
+
+    svg.innerHTML = "";
+
+    if (!series.length) {
+      renderExploreLegend(series);
+      return;
+    }
+
+    const years = series[0].years;
+    const logScale = state.exploreLog;
+    const allValues = series.filter((s) => !s.undefinedIndex).flatMap((s) => s.values);
+    const rawMax = Math.max(...allValues, 1);
+    const rawMin = logScale ? Math.min(...allValues.filter((v) => v > 0), 1) : Math.min(0, ...allValues);
+
+    const xFor = (year) => EXPLORE_PAD_L + ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (EXPLORE_VB_W - EXPLORE_PAD_L - EXPLORE_PAD_R);
+    const yFor = (value) => {
+      const innerH = EXPLORE_VB_H - EXPLORE_PAD_T - EXPLORE_PAD_B;
+      if (logScale) {
+        const v = Math.max(value, rawMin);
+        const frac = (Math.log(v) - Math.log(rawMin)) / (Math.log(rawMax) - Math.log(rawMin) || 1);
+        return EXPLORE_PAD_T + (1 - frac) * innerH;
+      }
+      const frac = (value - rawMin) / (rawMax - rawMin || 1);
+      return EXPLORE_PAD_T + (1 - frac) * innerH;
+    };
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const addEl = (tag, attrs) => {
+      const el = document.createElementNS(svgNS, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      svg.appendChild(el);
+      return el;
+    };
+
+    for (let i = 0; i <= 4; i++) {
+      const v = logScale
+        ? rawMin * Math.pow(rawMax / rawMin, i / 4)
+        : rawMin + ((rawMax - rawMin) / 4) * i;
+      const y = yFor(v);
+      addEl("line", { class: "comp-gridline", x1: EXPLORE_PAD_L, x2: EXPLORE_VB_W - EXPLORE_PAD_R, y1: y, y2: y });
+      addEl("text", { class: "comp-axis-label", x: EXPLORE_PAD_L - 8, y: y + 3, "text-anchor": "end" }).textContent =
+        state.exploreIndex ? Math.round(v) : fmtAbbrev(v);
+    }
+
+    for (const y of years) {
+      if ((y - dictionary.year_inicio) % 4 !== 0 && y !== dictionary.year_final) continue;
+      addEl("text", { class: "comp-axis-label", x: xFor(y), y: EXPLORE_VB_H - EXPLORE_PAD_B + 16, "text-anchor": "middle" }).textContent = y;
+    }
+
+    for (const s of series) {
+      if (s.undefinedIndex) continue;
+      if (logScale) {
+        // log(0) is undefined — a real zero-export year has to break the
+        // line into a gap, not get clamped to the chart's floor by yFor,
+        // which would otherwise draw that year as if it were a small
+        // nonzero export.
+        let segment = [];
+        const flushSegment = () => {
+          if (segment.length > 1) {
+            addEl("path", { class: "explore-line", stroke: s.color, d: `M${segment.join(" L")}` });
+          }
+          segment = [];
+        };
+        s.years.forEach((y, j) => {
+          if (s.values[j] > 0) segment.push(`${xFor(y).toFixed(1)},${yFor(s.values[j]).toFixed(1)}`);
+          else flushSegment();
+        });
+        flushSegment();
+      } else {
+        const pts = s.years.map((y, j) => `${xFor(y).toFixed(1)},${yFor(s.values[j]).toFixed(1)}`);
+        // Mesmo tratamento da sparkline: o trecho que cai num ano
+        // incompleto sai tracejado, senão o desenho afirma uma queda que é
+        // só o ano ter menos meses. O trecho tracejado recomeça no último
+        // ponto sólido para não abrir vão.
+        const corte = s.years.findIndex((y) => isAnoParcial(y));
+        const solidos = corte === -1 ? pts : pts.slice(0, corte);
+        const parciais = corte === -1 ? [] : pts.slice(Math.max(0, corte - 1));
+        if (solidos.length > 1) {
+          addEl("path", { class: "explore-line", stroke: s.color, d: `M${solidos.join(" L")}` });
+        }
+        if (parciais.length > 1) {
+          addEl("path", { class: "explore-line explore-line-partial", stroke: s.color, d: `M${parciais.join(" L")}` });
+        }
+      }
+    }
+
+    const guideX = xFor(state.year);
+    addEl("line", { id: "explore-guide", class: "explore-guide", x1: guideX, x2: guideX, y1: EXPLORE_PAD_T, y2: EXPLORE_VB_H - EXPLORE_PAD_B });
+
+    renderExploreLegend(series);
+  }
+
+  function renderExploreLegend(series) {
+    const t = I18N[state.lang];
+    const legend = document.getElementById("explore-legend");
+    legend.innerHTML = "";
+    for (const s of series) {
+      const item = document.createElement("div");
+      item.className = "legend-item";
+      if (s.undefinedIndex) item.classList.add("legend-item-muted");
+      const swatch = document.createElement("span");
+      swatch.className = "swatch";
+      swatch.style.background = s.undefinedIndex ? "transparent" : s.color;
+      swatch.style.borderColor = s.color;
+      const label = document.createElement("span");
+      label.className = "label";
+      const noBaseSuffix = s.undefinedIndex ? ` (${t.explore_no_base.replace("{year}", dictionary.year_inicio)})` : "";
+      label.textContent = s.label + noBaseSuffix;
+      label.title = (s.fullLabel || s.label) + noBaseSuffix;
+      item.appendChild(swatch);
+      item.appendChild(label);
+      legend.appendChild(item);
+    }
+  }
+
+  function updateExploreGuide() {
+    const guide = document.getElementById("explore-guide");
+    if (!guide) return;
+    const x = EXPLORE_PAD_L + ((state.year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * (EXPLORE_VB_W - EXPLORE_PAD_L - EXPLORE_PAD_R);
+    guide.setAttribute("x1", x);
+    guide.setAttribute("x2", x);
+  }
+
+  function initExploreHover() {
+    const area = document.getElementById("explore-chart-area");
+    const tooltip = document.getElementById("explore-tooltip");
+
+    area.addEventListener("pointermove", (e) => {
+      const pickedCount = state.exploreOrientation !== "municipio" ? state.exploreProdutos.length : state.exploreMunis.length;
+      if (state.view !== "explore" || !pickedCount) return;
+      const svg = document.getElementById("explore-svg");
+      const rect = svg.getBoundingClientRect();
+      const fracX = (e.clientX - rect.left) / rect.width;
+      const vbX = fracX * EXPLORE_VB_W;
+      const frac = (vbX - EXPLORE_PAD_L) / (EXPLORE_VB_W - EXPLORE_PAD_L - EXPLORE_PAD_R);
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      if (year < dictionary.year_inicio || year > dictionary.year_final) {
+        tooltip.style.opacity = "0";
+        return;
+      }
+
+      const series = buildExploreSeries();
+      const idx = year - dictionary.year_inicio;
+      const rowsHtml = series
+        .map((s) => ({ label: s.label, color: s.color, valor: s.values[idx] }))
+        .sort((a, b) => b.valor - a.valor)
+        .map((r) => `<div style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:2px;background:${r.color};display:inline-block;flex:0 0 auto;"></span><span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.label}</span><span style="flex:0 0 auto;padding-left:8px;">${state.exploreIndex ? r.valor.toFixed(0) : fmtAbbrev(r.valor)}</span></div>`)
+        .join("");
+
+      tooltip.innerHTML = `<strong>${year}</strong>` + rowsHtml;
+      const areaRect = area.getBoundingClientRect();
+      const left = e.clientX - areaRect.left;
+      tooltip.style.left = Math.min(areaRect.width - 260, left + 14) + "px";
+      tooltip.style.top = (e.clientY - areaRect.top - 10) + "px";
+      tooltip.style.opacity = "1";
+    });
+
+    area.addEventListener("pointerleave", () => {
+      tooltip.style.opacity = "0";
+    });
+
+    area.addEventListener("click", (e) => {
+      const svg = document.getElementById("explore-svg");
+      const rect = svg.getBoundingClientRect();
+      const fracX = (e.clientX - rect.left) / rect.width;
+      const vbX = fracX * EXPLORE_VB_W;
+      const frac = (vbX - EXPLORE_PAD_L) / (EXPLORE_VB_W - EXPLORE_PAD_L - EXPLORE_PAD_R);
+      const year = Math.round(dictionary.year_inicio + frac * (dictionary.year_final - dictionary.year_inicio));
+      jumpToYear(Math.min(dictionary.year_final, Math.max(dictionary.year_inicio, year)));
+    });
+  }
+
+  // ---- Sparkline: region-wide total export value per year ----
+
+  function renderSparkline() {
+    sparkSeries = regionTotals.map((r) => ({ year: r.ano, value: r.valor }));
+    const values = sparkSeries.map((d) => d.value);
+    const minV = Math.min(...values);
+    const maxV = Math.max(...values);
+
+    sparkXFor = (year) => ((year - dictionary.year_inicio) / (dictionary.year_final - dictionary.year_inicio)) * SPARK_W;
+    sparkYFor = (value) => (maxV === minV
+      ? SPARK_H / 2
+      : SPARK_PAD + (1 - (value - minV) / (maxV - minV)) * (SPARK_H - 2 * SPARK_PAD));
+
+    const pts = sparkSeries.map((d) => `${sparkXFor(d.year).toFixed(1)},${sparkYFor(d.value).toFixed(1)}`);
+
+    // A linha sólida vai até o último ano completo; o que passa disso sai
+    // tracejado. Sem isso o desenho afirma uma queda que é só o ano em
+    // curso ter menos meses que os anteriores.
+    const corte = sparkSeries.findIndex((d) => isAnoParcial(d.year));
+    const solidos = corte === -1 ? pts : pts.slice(0, corte);
+    // O trecho tracejado começa no último ponto sólido, senão fica um vão.
+    const parciais = corte === -1 ? [] : pts.slice(Math.max(0, corte - 1));
+
+    document.getElementById("spark-line").setAttribute("d", solidos.length ? `M${solidos.join(" L")}` : "");
+    document.getElementById("spark-line-partial").setAttribute("d", parciais.length > 1 ? `M${parciais.join(" L")}` : "");
+    document.getElementById("spark-area").setAttribute("d", pts.length
+      ? `M${sparkXFor(sparkSeries[0].year).toFixed(1)},${SPARK_H} L${pts.join(" L")} L${sparkXFor(sparkSeries[sparkSeries.length - 1].year).toFixed(1)},${SPARK_H} Z`
+      : "");
+
+    updateSparklineMarker();
+  }
+
+  function updateSparklineMarker() {
+    if (!sparkXFor) return;
+    const x = sparkXFor(state.year);
+    const guide = document.getElementById("spark-guide");
+    guide.setAttribute("x1", x);
+    guide.setAttribute("x2", x);
+
+    const d = sparkSeries.find((d) => d.year === state.year);
+    const marker = document.getElementById("spark-marker");
+    if (d && d.value !== null) {
+      marker.setAttribute("cx", x);
+      marker.setAttribute("cy", sparkYFor(d.value));
+      marker.setAttribute("opacity", "1");
+    } else {
+      marker.setAttribute("opacity", "0");
+    }
+  }
+
+  // ---- Searchable pickers ----
+  //
+  // The município scopes carry ~450 options each and the SH2 taxonomy ~97,
+  // which a plain <select> makes genuinely hard to get through. Two shapes
+  // are needed, so there are two helpers below:
+  //
+  //   comboboxify()  — single-choice <select> becomes a type-to-filter
+  //                    combobox (the picker itself is the search field).
+  //   filterify()    — multi-select listbox keeps its Ctrl/Cmd+click
+  //                    semantics and gains a filter field above it.
+  //
+  // Both deliberately keep the original <select> as the model: it stays in
+  // the DOM, every populate*Select() still writes to it, and selections are
+  // committed by setting select.value and dispatching a real "change"
+  // event. So none of the existing option-building or change-handling code
+  // has to know these exist — they are a presentation layer over controls
+  // that still work exactly as before.
+  //
+  // The panel is laid out in normal flow rather than absolutely positioned:
+  // .menucol is itself a scroll container (overflow-y: auto), which would
+  // clip a floating panel near the bottom of the sidebar.
+
+  const comboboxes = [];
+
+  // Accent- and case-insensitive, so "belem"/"canaa" find "Belém"/"Canaã" —
+  // nobody types the diacritics when searching a long list.
+  function searchKey(s) {
+    return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  }
+
+  function comboboxify(select) {
+    const wrap = document.createElement("div");
+    wrap.className = "combo";
+    select.parentNode.insertBefore(wrap, select);
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "sidebar-field combo-input";
+    input.autocomplete = "off";
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-expanded", "false");
+    input.setAttribute("aria-autocomplete", "list");
+    if (select.id) {
+      input.id = select.id + "-combo";
+      // The <label for> in the HTML points at the select, which is now
+      // hidden; move the association to the control that takes focus.
+      const label = document.querySelector(`label[for="${select.id}"]`);
+      if (label) label.setAttribute("for", input.id);
+    }
+
+    const panel = document.createElement("div");
+    panel.className = "combo-panel hidden";
+    panel.setAttribute("role", "listbox");
+    if (input.id) {
+      panel.id = input.id + "-panel";
+      input.setAttribute("aria-controls", panel.id);
+    }
+
+    wrap.appendChild(input);
+    wrap.appendChild(panel);
+    wrap.appendChild(select); // keep the model inside the wrapper
+    select.classList.add("combo-native");
+
+    const entry = { select, input, panel, open: false, active: -1, matches: [] };
+    comboboxes.push(entry);
+
+    function selectedText() {
+      const o = select.options[select.selectedIndex];
+      return o ? o.textContent : "";
+    }
+
+    function close(revert) {
+      entry.open = false;
+      entry.active = -1;
+      panel.classList.add("hidden");
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+      if (revert) input.value = selectedText();
+    }
+
+    function renderPanel(query) {
+      const q = searchKey(query);
+      // An empty box lists everything, so clicking the field still works as
+      // a plain dropdown for anyone who would rather browse than type.
+      entry.matches = Array.from(select.options)
+        .filter((o) => !q || searchKey(o.textContent).includes(q));
+      panel.innerHTML = "";
+      if (!entry.matches.length) {
+        const empty = document.createElement("div");
+        empty.className = "combo-empty";
+        empty.textContent = I18N[state.lang].combo_no_match;
+        panel.appendChild(empty);
+        return;
+      }
+      entry.matches.forEach((o, i) => {
+        const el = document.createElement("div");
+        el.className = "combo-option" + (i === entry.active ? " active" : "");
+        el.id = `${panel.id}-opt-${i}`;
+        el.setAttribute("role", "option");
+        el.setAttribute("aria-selected", String(o.value === select.value));
+        el.textContent = o.textContent;
+        el.title = o.textContent;
+        // mousedown, not click: the input's blur would otherwise close the
+        // panel and remove this element before a click could land on it.
+        el.addEventListener("mousedown", (ev) => { ev.preventDefault(); commit(i); });
+        panel.appendChild(el);
+      });
+      if (entry.matches.length < select.options.length) {
+        const count = document.createElement("div");
+        count.className = "combo-count";
+        count.textContent = I18N[state.lang].combo_count
+          .replace("{n}", entry.matches.length)
+          .replace("{total}", select.options.length);
+        panel.appendChild(count);
+      }
+    }
+
+    function highlight(i) {
+      entry.active = i;
+      const opts = panel.querySelectorAll(".combo-option");
+      opts.forEach((el, j) => el.classList.toggle("active", j === i));
+      if (i >= 0 && opts[i]) {
+        opts[i].scrollIntoView({ block: "nearest" });
+        input.setAttribute("aria-activedescendant", opts[i].id);
+      }
+    }
+
+    function open() {
+      entry.open = true;
+      panel.classList.remove("hidden");
+      input.setAttribute("aria-expanded", "true");
+      renderPanel("");
+      const cur = entry.matches.findIndex((o) => o.value === select.value);
+      highlight(cur >= 0 ? cur : -1);
+      if (cur >= 0) {
+        const el = panel.querySelectorAll(".combo-option")[cur];
+        if (el) el.scrollIntoView({ block: "nearest" });
+      }
+    }
+
+    function commit(i) {
+      const opt = entry.matches[i];
+      if (!opt) return;
+      select.value = opt.value;
+      input.value = opt.textContent;
+      close(false);
+      // Hand off to whatever already listened to this select.
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    input.addEventListener("focus", () => { if (!entry.open) open(); input.select(); });
+    input.addEventListener("mousedown", () => { if (!entry.open) setTimeout(open, 0); });
+
+    input.addEventListener("input", () => {
+      if (!entry.open) { entry.open = true; panel.classList.remove("hidden"); input.setAttribute("aria-expanded", "true"); }
+      renderPanel(input.value);
+      highlight(entry.matches.length ? 0 : -1);
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        if (!entry.open) { open(); return; }
+        if (!entry.matches.length) return;
+        const d = e.key === "ArrowDown" ? 1 : -1;
+        highlight((entry.active + d + entry.matches.length) % entry.matches.length);
+      } else if (e.key === "Enter") {
+        if (entry.open && entry.active >= 0) { e.preventDefault(); commit(entry.active); }
+      } else if (e.key === "Escape") {
+        if (entry.open) { e.preventDefault(); close(true); }
+      } else if (e.key === "Tab") {
+        if (entry.open) close(true);
+      }
+    });
+
+    // Typed text that was never committed must not linger as if it were the
+    // current selection.
+    input.addEventListener("blur", () => { if (entry.open) close(true); });
+
+    input.value = selectedText();
+  }
+
+  // Keeps a multi-select's own listbox (and its Ctrl/Cmd+click multi-pick)
+  // and puts a filter above it that hides non-matching options. Options
+  // already selected are never hidden, so a filter can't make part of the
+  // current selection invisible — and therefore look lost — while the user
+  // narrows the list to add something else.
+  function filterify(select) {
+    const wrap = document.createElement("div");
+    wrap.className = "listfilter-wrap";
+    select.parentNode.insertBefore(wrap, select);
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "sidebar-field listfilter";
+    input.autocomplete = "off";
+    if (select.id) input.id = select.id + "-filter";
+
+    wrap.appendChild(input);
+    wrap.appendChild(select);
+
+    function apply() {
+      const q = searchKey(input.value);
+      for (const o of select.options) {
+        o.hidden = !!q && !o.selected && !searchKey(o.textContent).includes(q);
+      }
+    }
+    input.addEventListener("input", apply);
+    comboboxes.push({ select, input, filterOnly: true, apply });
+  }
+
+  // populate*Select() rebuilds options on every render, which can change
+  // both the selected value and the option labels (language switch). The
+  // combobox mirrors that text, so it has to be re-read afterwards.
+  function syncSearchablePickers() {
+    for (const c of comboboxes) {
+      if (c.filterOnly) {
+        c.input.placeholder = I18N[state.lang].combo_placeholder;
+        c.apply();
+        continue;
+      }
+      if (document.activeElement === c.input) continue; // mid-typing; don't yank it
+      const o = c.select.options[c.select.selectedIndex];
+      c.input.value = o ? o.textContent : "";
+      c.input.placeholder = I18N[state.lang].combo_placeholder;
+    }
+  }
+
+  // Long pickers only. The state/aggregation/top-N selects are short enough
+  // to scan, and the SH4 product picker already has its own search field.
+  const COMBOBOX_SELECT_IDS = [
+    "change-scope-select", "composition-scope-select", "ranking-scope-select",
+    "trends-scope-select", "explore-scope-select",
+    "change-category-select", "composition-produto-select",
+    "ranking-category-select", "trends-category-select", "explore-category-select"
+  ];
+  const FILTER_SELECT_IDS = ["explore-munis-select", "explore-produtos-select"];
+
+  function initSearchablePickers() {
+    for (const id of COMBOBOX_SELECT_IDS) {
+      const el = document.getElementById(id);
+      if (el) comboboxify(el);
+    }
+    for (const id of FILTER_SELECT_IDS) {
+      const el = document.getElementById(id);
+      if (el) filterify(el);
+    }
+  }
+
+  // ---- Formatting ----
+
+  // The locale every number in the app is formatted against. PT-BR and
+  // en-US disagree on both separators (1.234.567,8 vs 1,234,567.8), so a
+  // number rendered in the wrong one is not merely styled oddly — "64,3"
+  // reads as 64.3 to one audience and as 643 (or an error) to the other.
+  // Previously only fmtPct switched on the language while fmtNumber and
+  // fmtAbbrev were pinned to pt-BR, so the same view mixed conventions.
+  function numLocale() {
+    return state.lang === "en" ? "en-US" : "pt-BR";
+  }
+
+  function fmtNumber(x) {
+    if (x === null || x === undefined || Number.isNaN(x)) return "";
+    return Number(x).toLocaleString(numLocale(), { maximumFractionDigits: 0 });
+  }
+
+  // Abbreviated US$ value for dense displays (ranking rows, sparkline
+  // tooltip, region total) — full precision is one hover away in the row
+  // tooltip. The separators follow the active language (see numLocale),
+  // but the bi/mi/mil magnitude words stay as they are in both: they label
+  // a bilingual figure the way the source data presents it, rather than
+  // being UI copy to translate.
+  function fmtAbbrev(x) {
+    if (x === null || x === undefined || Number.isNaN(x)) return "";
+    return state.medida === "kg" ? fmtAbbrevKg(x) : fmtAbbrevValor(x);
+  }
+
+  function fmtAbbrevValor(x) {
+    const abs = Math.abs(x);
+    const fmt1 = (v) => v.toLocaleString(numLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    if (abs >= 1e9) return "US$ " + fmt1(x / 1e9) + " bi";
+    if (abs >= 1e6) return "US$ " + fmt1(x / 1e6) + " mi";
+    if (abs >= 1e3) return "US$ " + fmt1(x / 1e3) + " mil";
+    return "US$ " + fmtNumber(x);
+  }
+
+  // Quantidade vem em kg, mas a região exporta ~277 bilhões de kg por ano,
+  // então o número cru é ilegível. Sobe para toneladas a partir de mil kg,
+  // que é como o comércio exterior fala.
+  function fmtAbbrevKg(x) {
+    const abs = Math.abs(x);
+    const t = I18N[state.lang];
+    const fmt1 = (v) => v.toLocaleString(numLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    if (abs >= 1e9) return fmt1(x / 1e9) + " " + t.unit_mi_t;
+    if (abs >= 1e6) return fmt1(x / 1e6) + " " + t.unit_mil_t;
+    if (abs >= 1e3) return fmt1(x / 1e3) + " " + t.unit_t;
+    return fmtNumber(x) + " " + t.unit_kg;
+  }
+
+  // Valor por extenso, para tooltips que mostram o número cheio.
+  function fmtMedidaCheia(x) {
+    const t = I18N[state.lang];
+    return state.medida === "kg"
+      ? fmtNumber(x) + " " + t.unit_kg
+      : "US$ " + fmtNumber(x);
+  }
+})();
