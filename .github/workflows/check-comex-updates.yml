@@ -1,11 +1,10 @@
 name: Check and Update COMEX
 
 on:
-  workflow_dispatch:
   schedule:
-    # O MDIC divulga os dados consolidados do mês anterior entre o 1º e o 5º dia útil do mês subsequente (15h–18h30).
-    # Rodar no dia 7 de cada mês às 21:00 UTC (18:00 horário de Brasília) garante que os 5 primeiros dias úteis já transcorreram.
-    - cron: '0 21 7 * *'
+    # Roda todo dia 8 de cada mês às 09:00 UTC (06:00 BRT)
+    - cron: '0 9 8 * *'
+  workflow_dispatch:
 
 jobs:
   check-comex:
