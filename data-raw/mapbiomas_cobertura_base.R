@@ -1,5 +1,7 @@
 ################################################################################
-# MapBiomas - Cobertura e Uso da Terra (Amazônia Legal)
+# MapBiomas - Cobertura e Uso da Terra (Brasil inteiro)
+# A coluna amazonia_legal marca os municípios da Amazônia Legal: os apps de
+# cobertura filtram por ela ao carregar a base.
 # Gera UMA base longa (uma linha por ano x município x classe), com rótulos PT/EN
 # e nível hierárquico dentro dela. Substitui mapbiomas_cobertura_ts_rk.R, que
 # gerava mapbiomas_cobertura_munic.rds, _est.rds e os dicionários por nível.
@@ -69,24 +71,49 @@ message("Carga: anos ", paste(range(dat$year), collapse = "-"), " | linhas: ", n
 # Nomes acentuados/Title Case (a carga e a tabela do pacote vêm em ASCII minúsculo):
 # mapa fixo para os 9 estados e API do IBGE para os municípios.
 
-estados_amz <- c(
-    "acre"        = "Acre",
-    "amapa"       = "Amapá",
-    "amazonas"    = "Amazonas",
-    "maranhao"    = "Maranhão",
-    "mato grosso" = "Mato Grosso",
-    "para"        = "Pará",
-    "rondonia"    = "Rondônia",
-    "roraima"     = "Roraima",
-    "tocantins"   = "Tocantins"
+estados_br <- c(
+    "acre"                = "Acre",
+    "alagoas"             = "Alagoas",
+    "amapa"               = "Amapá",
+    "amazonas"            = "Amazonas",
+    "bahia"               = "Bahia",
+    "ceara"               = "Ceará",
+    "distrito federal"    = "Distrito Federal",
+    "espirito santo"      = "Espírito Santo",
+    "goias"               = "Goiás",
+    "maranhao"            = "Maranhão",
+    "mato grosso"         = "Mato Grosso",
+    "mato grosso do sul"  = "Mato Grosso do Sul",
+    "minas gerais"        = "Minas Gerais",
+    "para"                = "Pará",
+    "paraiba"             = "Paraíba",
+    "parana"              = "Paraná",
+    "pernambuco"          = "Pernambuco",
+    "piaui"               = "Piauí",
+    "rio de janeiro"      = "Rio de Janeiro",
+    "rio grande do norte" = "Rio Grande do Norte",
+    "rio grande do sul"   = "Rio Grande do Sul",
+    "rondonia"            = "Rondônia",
+    "roraima"             = "Roraima",
+    "santa catarina"      = "Santa Catarina",
+    "sao paulo"           = "São Paulo",
+    "sergipe"             = "Sergipe",
+    "tocantins"           = "Tocantins"
 )
 
-municipios_amazonia <- datazoom.amazonia::municipalities %>%
-    filter(legal_amazon == 1) %>%
+# Brasil inteiro; amazonia_legal marca os 772 municípios da Amazônia Legal,
+# que os apps de cobertura usam para filtrar.
+municipios_br <- datazoom.amazonia::municipalities %>%
     transmute(
         municipality_code = code_muni,
-        uf = dplyr::recode(name_state, !!!estados_amz)
+        uf = unname(estados_br[stringi::stri_trans_general(tolower(name_state), "Latin-ASCII")]),
+        amazonia_legal = legal_amazon == 1
     )
+
+# falha alto se algum estado não casou com o mapa acima
+stopifnot(!anyNA(municipios_br$uf))
+message("Municípios (tabela do pacote): ", nrow(municipios_br),
+        " | Amazônia Legal: ", sum(municipios_br$amazonia_legal))
 
 # Nome dos municípios com acento e Title Case, via API de localidades do IBGE
 # (a coluna 'municipality' da carga vem sem acento). 'id' do IBGE = municipality_code.
@@ -123,7 +150,8 @@ long_by_level <- purrr::map_df(class_levels, function(lv) {
             area              = as.numeric(value)
         ) %>%
         filter(!is.na(aggregation), aggregation != "") %>%
-        inner_join(municipios_amazonia, by = "municipality_code") %>%   # traz uf + filtra Amazônia Legal
+        inner_join(dplyr::select(municipios_br, municipality_code, uf),
+                   by = "municipality_code") %>%                          # traz uf (Brasil inteiro)
         reframe(area = sum(area, na.rm = TRUE),                          # soma DENTRO do nível
                 .by = c(time, municipality_code, uf, aggregation))
 })
@@ -240,6 +268,8 @@ readr::write_csv(legenda, legenda_file)
 base <- long %>%
     left_join(muni_names, by = "municipality_code") %>%
     left_join(areas_mun,  by = "municipality_code") %>%
+    left_join(dplyr::select(municipios_br, municipality_code, amazonia_legal),
+              by = "municipality_code") %>%
     left_join(dplyr::rename(legenda, classe_en = nome_en, classe_pt = nome_pt),
               by = c("aggregation" = "classe_en")) %>%
     transmute(
@@ -247,6 +277,7 @@ base <- long %>%
         cod_municipio      = municipality_code,
         municipio          = municipality,
         uf,
+        amazonia_legal,
         classe_en          = aggregation,
         classe_pt,
         nivel,
@@ -262,6 +293,7 @@ stopifnot(
     !anyNA(base$classe_pt),
     !anyNA(base$nivel),
     !anyNA(base$area_municipio_km2),
+    !anyNA(base$amazonia_legal),
     !anyDuplicated(base[c("ano", "cod_municipio", "classe_en")])
 )
 
@@ -271,6 +303,14 @@ cat("BASE -> linhas:", nrow(base),
     "| anos:", min(base$ano), "a", max(base$ano),
     "| municípios:", dplyr::n_distinct(base$cod_municipio),
     "| classes:", dplyr::n_distinct(base$classe_en), "\n")
+sem_dado <- setdiff(municipios_br$municipality_code, base$cod_municipio)
+if (length(sem_dado)) message("Municípios sem nenhuma linha na carga (ficam fora da base): ",
+                              paste(sem_dado, collapse = ", "))
+amz <- base[base$amazonia_legal, ]
+cat("Só Amazônia Legal -> linhas:", nrow(amz),
+    "| municípios:", dplyr::n_distinct(amz$cod_municipio),
+    "(a base anterior tinha 682.926 linhas e 772 municípios)\n")
+cat("Tamanho do rds (MB):", round(file.size("data/mapbiomas_cobertura_base.rds") / 1e6, 1), "\n")
 
 ################################################################################
 # 7. DICIONÁRIO DOS APPS (PT / EN)
@@ -338,7 +378,10 @@ build_dics <- function(cols, out_pt, out_en) {
     readr::write_csv(make_dic("en"), out_en)
 }
 
-build_dics(c("group", "time", sort(unique(base$classe_en)), "area_km2"),
+# Dicionário dos apps de cobertura (ts e rk): só as classes que existem na
+# Amazônia Legal, pois esses apps filtram a base por amazonia_legal. Classes que
+# só ocorrem fora dela apareceriam no menu com gráfico vazio.
+build_dics(c("group", "time", sort(unique(base$classe_en[base$amazonia_legal])), "area_km2"),
            "data/mapbiomas_cobertura_base_dic.csv",
            "data/mapbiomas_cobertura_base_dic_en.csv")
 
@@ -382,8 +425,10 @@ munic_ref <- long %>%
     left_join(areas_mun, by = "municipality_code") %>%
     arrange(group, time)
 
+# Só municípios que aparecem na base: o MapBiomas não traz cobertura para
+# Fernando de Noronha (PE), que não entra na base nem na área do estado.
 areas_state <- areas_mun %>%
-    inner_join(municipios_amazonia, by = "municipality_code") %>%
+    inner_join(dplyr::distinct(long, municipality_code, uf), by = "municipality_code") %>%
     group_by(uf) %>%
     summarise(area_km2 = sum(area_km2, na.rm = TRUE), .groups = "drop")
 
