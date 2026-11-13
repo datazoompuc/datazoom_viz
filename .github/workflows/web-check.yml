@@ -1,0 +1,91 @@
+name: Check web/ static apps
+
+# Valida os apps estáticos antes de publicar. Importa mais agora que o Pages
+# serve direto deste repositório: não há mais um repo de staging no meio, e
+# um JSON quebrado vai para o ar sem intermediário.
+#
+# A validação roda sobre o SITE MONTADO, não sobre web/ cru, pelo mesmo
+# recorte que o deploy-pages.yml usa. Assim o que é checado é exatamente o
+# que vai ao ar, em vez de uma convenção que os dois workflows teriam que
+# lembrar de respeitar separadamente.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "web/**"
+      - ".github/workflows/web-check.yml"
+  # Também no push para a main: é o que o Pages publica, e nem toda mudança
+  # chega por PR.
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Montar o site (mesmo recorte do deploy)
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          rsync -a --exclude "_export/" web/ _site/
+          echo "Conteúdo a validar:"
+          find _site -maxdepth 1 -mindepth 1 -exec basename {} \; | sort | sed "s/^/  /"
+
+      - name: Validate JSON files parse
+        run: |
+          set -e
+          find _site -name "*.json" -print0 | while IFS= read -r -d "" f; do
+            python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f" || { echo "Invalid JSON: $f"; exit 1; }
+          done
+
+      - name: Validate JS syntax
+        run: |
+          set -e
+          find _site -name "*.js" -print0 | while IFS= read -r -d "" f; do
+            node --check "$f" || { echo "Syntax error: $f"; exit 1; }
+          done
+
+      - name: Fumaça dos apps (navegador de verdade)
+        # As checagens acima provam que os arquivos são válidos, não que os
+        # apps funcionam. O bug que motivou este passo passou nas duas: JSON
+        # certo, JS com sintaxe certa, e a Composição do COMEX em quantidade
+        # desenhando um gráfico vazio porque as somas viravam NaN.
+        #
+        # Roda contra _site/, o mesmo recorte que vai ao ar, pelo mesmo motivo
+        # que as outras: validar o que é publicado, não o que está em web/.
+        #
+        # O script testa todo app que conhece e que esteja presente, e pula os
+        # ausentes: os apps vivem em branches diferentes até o merge, e cada
+        # uma monta um site com só o seu. Se nenhum for encontrado ele falha.
+        #
+        # A matriz e as asserções estão documentadas no cabeçalho do script.
+        run: |
+          pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+          python3 web/_export/smoke_web.py _site/
+
+      - name: Nada de script ou documento no que vai ao ar
+        # Tudo em _site vira URL do site. Script de build e guia não são
+        # conteúdo: pesam no publicado e ficam baixáveis sem querer. Já
+        # aconteceu uma vez, com um README em web/shared/ que foi ao ar.
+        #
+        # Falhar aqui é melhor que manter lista de exclusão, que erra calada
+        # nas duas direções: esquecer de excluir vaza o arquivo, excluir
+        # demais tira um app do ar.
+        run: |
+          set -e
+          achados=$(find _site \( -name "*.R" -o -name "*.Rmd" -o -name "*.md" -o -name "*.mjs" \) -print)
+          if [ -n "$achados" ]; then
+            echo "::error::Arquivos que não deveriam ser publicados entraram no site:"
+            echo "$achados" | sed 's|^_site/|  web/|'
+            echo ""
+            echo "Mova para web/_export/, que fica de fora do que é publicado."
+            exit 1
+          fi
+          echo "Nenhum script ou documento no site montado."
