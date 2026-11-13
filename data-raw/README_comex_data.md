@@ -12,7 +12,11 @@ setwd("~/datazoom_viz")
 source("data-raw/comex.R")
 ```
 
-O último ano vem do `available_time` do manifest do `datazoom.amazonia` (`ano_inicial` é o único parâmetro; use `ano_final_manual` para forçar outro) e o script sempre baixa os dados de novo.
+O script possui checagem automática integrada: antes de iniciar o reprocessamento de todos os anos, ele baixa a amostra do ano mais recente via `datazoom.amazonia::load_br_trade(dataset = "export_mun", time_period = ano_final)` e compara o último mês e ano disponíveis com os registrados na base local `data/comex_exp_munic_base.rds`. Se os dados forem iguais (sem novos meses ou anos na fonte oficial), o script encerra imediatamente com status 0 sem baixar a série histórica novamente. Havendo dado novo ou caso a base local não exista, o processamento completo de todos os anos prossegue normalmente.
+
+Além da execução manual, a verificação e atualização é executada automaticamente todo dia 8 de cada mês às 09:00 UTC (06:00 BRT) via GitHub Actions (`.github/workflows/check-comex-updates.yml`).
+
+O último ano vem do `available_time` do manifest do `datazoom.amazonia` (`ano_inicial` é o único parâmetro; use `ano_final_manual` para forçar outro).
 
 O servidor do MDIC (balanca.mdic.gov.br) costuma derrubar conexões em arquivos grandes. Por isso os downloads usam o curl do sistema, que retoma de onde caiu e repete em caso de erro, e o script tenta cada ano até 5 vezes. Os anos já baixados ficam guardados, então, se o script parar em algum ano, basta rodar de novo na mesma sessão do R.
 
@@ -45,9 +49,11 @@ Os nomes de produto vêm do `NCM_SH.csv`, os de país do `PAIS.csv` e os de muni
 - **Ano parcial.** O ano mais recente pode ter menos de 12 meses (em 2026, só parte do ano). `n_meses` e `ano_parcial` marcam isso. Nas séries, o último ponto cai por esse motivo.
 - **País de destino.** A base não soma sobre países: para obter o total por município e produto, some `valor_fob` e `kg_liquido` agrupando por `ano`, `cod_sh4`, `cod_municipio` e `uf`.
 
-## Arquivos antigos em `data/`
+## Arquivos legados em `data/`
 
-Os arquivos `comex_exp_*` (bases largas, transpostas, mapa, % mundial e dicionários) **não são mais gerados** por este script. Ficam no repositório só porque apps ativos ainda os leem (ver `config/app_manifest.csv`). A exportação para JSON fica com a Fernanda; os arquivos antigos podem sair quando os apps migrarem. O `comex_munic_raw.rds` (dado bruto do MDIC) também fica, pois o script não o grava mais; confirmar se a exportação para JSON o usa antes de apagar.
+Os arquivos pré-agregados antigos `comex_exp_*` (bases largas, transpostas, % mundial e dicionários CSV) foram removidos de `data/`. Apenas dois arquivos são mantidos:
+- `comex_exp_munic_base.rds`: a base central longa gerada por este script.
+- `comex_exp_munic_sh4_sel.rds`: base de produtos selecionados utilizada pelo mapa da aplicação web (`web/_export/export_comex_mapa.R`).
 
 ## Pendências
 

@@ -1,0 +1,76 @@
+name: Check and Update COMEX
+
+on:
+  schedule:
+    # Roda todo dia 8 de cada mês às 09:00 UTC (06:00 BRT)
+    - cron: '0 9 8 * *'
+  workflow_dispatch:
+
+jobs:
+  check-comex:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libssl-dev \
+            libcurl4-openssl-dev \
+            libxml2-dev \
+            libgdal-dev \
+            libgeos-dev \
+            libproj-dev \
+            libudunits2-dev
+
+      - name: Install R packages
+        run: |
+          Rscript -e "install.packages(c('remotes'), repos = 'https://cloud.r-project.org')"
+          Rscript -e "remotes::install_github('datazoompuc/datazoom.amazonia')"
+          Rscript -e "install.packages(c('magrittr', 'tidyverse', 'stringr', 'jsonlite', 'sf', 'withr', 'readr'), repos = 'https://cloud.r-project.org')"
+
+      - name: Run COMEX update check
+        run: Rscript data-raw/comex.R
+
+      - name: Detect dataset changes
+        id: detect_changes
+        run: |
+          CHANGED=$(git status --porcelain data/comex_exp_munic_base.rds | awk '{print $NF}')
+          if [ -n "$CHANGED" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push updated dataset
+        if: steps.detect_changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/comex_exp_munic_base.rds
+          git commit -m "data(comex): atualizacao automatica da base comex_exp_munic_base.rds"
+          git push
+
+      - name: Notify Slack if updated
+        if: steps.detect_changes.outputs.has_changes == 'true' && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "*COMEX atualizado*\n\nNovos dados mensais foram detectados e a base `data/comex_exp_munic_base.rds` foi atualizada com sucesso via GitHub Actions.\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Ver execucao>_"
+            }

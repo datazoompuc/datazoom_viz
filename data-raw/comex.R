@@ -109,6 +109,44 @@ baixar_ano <- function(a, tentativas = 5) {
        "Rode o script de novo (os anos já baixados são reaproveitados).", call. = FALSE)
 }
 
+# ----------------------------------------------------------------
+# Checagem de atualizacao do COMEX via datazoom.amazonia
+# ----------------------------------------------------------------
+# Baixa o ano mais recente via load_br_trade e compara o ultimo mes/ano
+# retornado com a base local ja salva em data/comex_exp_munic_base.rds.
+# - Se nao houver dado novo (mesmo ano e mes): encerra o script sem reprocessar.
+# - Se houver dado novo ou base inexistente: prossegue com a atualizacao.
+arquivo_base_destino <- "data/comex_exp_munic_base.rds"
+if (file.exists(arquivo_base_destino)) {
+  message("Verificando se ha novos dados do COMEX para o ano ", ano_final, "...")
+  amostra_ano_recente <- baixar_ano(ano_final)
+
+  max_ano_novo <- as.integer(max(amostra_ano_recente[["ano"]], na.rm = TRUE))
+  max_mes_novo <- as.integer(max(amostra_ano_recente[["mes"]][amostra_ano_recente[["ano"]] == max_ano_novo], na.rm = TRUE))
+
+  base_salva <- readRDS(arquivo_base_destino)
+  max_ano_salvo <- as.integer(max(base_salva[["ano"]], na.rm = TRUE))
+  max_mes_salvo <- if ("n_meses" %in% names(base_salva)) {
+    as.integer(max(base_salva[["n_meses"]][base_salva[["ano"]] == max_ano_salvo], na.rm = TRUE))
+  } else if ("mes" %in% names(base_salva)) {
+    as.integer(max(base_salva[["mes"]][base_salva[["ano"]] == max_ano_salvo], na.rm = TRUE))
+  } else {
+    NA_integer_
+  }
+
+  message(sprintf("COMEX - Base salva: %02d/%d | Dado baixado: %02d/%d",
+                  max_mes_salvo, max_ano_salvo, max_mes_novo, max_ano_novo))
+
+  if (!is.na(max_mes_salvo) &&
+      identical(max_ano_novo, max_ano_salvo) &&
+      identical(max_mes_novo, max_mes_salvo)) {
+    message("Nenhum dado novo encontrado na COMEX. Encerrando o script.")
+    quit(save = "no", status = 0)
+  }
+
+  message("Novo periodo disponivel na COMEX. Prosseguindo com o processamento da base...")
+}
+
 dat <- dplyr::bind_rows(lapply(ano_inicial:ano_final, baixar_ano))
 
 
