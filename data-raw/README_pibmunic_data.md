@@ -20,7 +20,7 @@ Mesma checagem de `data-raw/population.R` (ver `README_population_data.md`), fei
 
 Se for idêntico, o script avisa e para sem baixar os municípios. Qualquer diferença (ano novo, valor revisado, coluna nova) refaz a base inteira; `forcar_atualizacao <- TRUE` refaz mesmo sem diferença. O script para sem gravar se a nova base tiver menos anos que a salva, se a soma do PIB dos municípios de alguma UF não bater com o PIB da UF (download incompleto; cada ano é tentado 3 vezes), se faltar UF ou ano, ou se houver PIB vazio.
 
-O download municipal é o mais lento do repositório depois da COMEX: 27 consultas por ano, com as 46 variáveis da tabela em cada uma (cerca de 2 minutos por ano).
+O download municipal é o mais lento do repositório depois da COMEX: 27 consultas por ano, com as 46 variáveis da tabela em cada uma (cerca de 4 minutos por ano).
 
 O script precisa do `datazoom.amazonia` de nov/2026 em diante (PR "Update pibmunic", #375).
 
