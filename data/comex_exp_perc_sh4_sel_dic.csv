@@ -1,7 +1,0 @@
-"","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","time",FALSE,FALSE,FALSE,FALSE,TRUE,"Ano","Ano","Comex",1,"% das exportações mundiais","Economia","Comércio exterior"
-"2","group",FALSE,FALSE,TRUE,FALSE,FALSE,"Produto (SH4)","Produto (SH4)","Comex",1,"% das exportações mundiais","Economia","Comércio exterior"
-"3","group_en",FALSE,FALSE,FALSE,FALSE,FALSE,"Produto EN (SH4)","Produto EN (SH4)","Comex",1,"% das exportações mundiais","Economia","Comércio exterior"
-"4","value",TRUE,TRUE,FALSE,TRUE,FALSE,"Valor","Valor","Comex",1,"% das exportações mundiais","Economia","Comércio exterior"
-"5","uf",TRUE,TRUE,FALSE,FALSE,FALSE,"uf","uf","Comex",1,"% das exportações mundiais","Economia","Comércio exterior"
-"6","floresta",FALSE,FALSE,FALSE,FALSE,FALSE,"Floresta","Produtos Compatíveis com a Floresta","Comex",1,"% das exportações mundiais","Economia","Comércio exterior"
