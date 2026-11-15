@@ -40,6 +40,13 @@ Outros arquivos:
 - `mapbiomas_legenda.csv`: legenda EN/PT/nível, lida também pelos apps de transição.
 - `global/mapbiomas_cobertura_larga.R`: função `cobertura_larga(base, "munic" | "est")`, que monta a tabela larga (uma coluna por classe) usada pelos apps.
 
+## Outros arquivos do MapBiomas em `data/` (não gerados por este script)
+
+- **Transição** (`mapbiomas_transicao_*`): `est`, `est_tab`, `munic`, `munic_5`, `rk_est`, `rk_munic`, `sankey_est`, `sankey_munic` e os dicionários `_dic` e `_dic_en` de cada um. Vêm da Collection 9 e não podem ser regerados por município (ver Pendências).
+- **Mapa de cobertura**: `map_mapbiomas_cover_dic.csv` e `_dic_en.csv`.
+- **Gado** (`censoagro_mapbiomas_gado.rds`) e **PPM** (`dz_munic_ppm_mapbiomas.rds`), com dicionários `_dic` e `_dic_en`: cruzam o MapBiomas com o Censo Agropecuário e com a PPM.
+- `mapbiomas_cobertura.parquet`: base antiga em parquet, mantida a pedido do Antonio.
+
 ## Sobre os dados
 
 - **Níveis.** Os níveis 0 a 4 são cortes diferentes da **mesma** área (ex.: "Forest" no nível 1, "Forest Formation" no 2). **Não somar classes de níveis diferentes.** Os níveis 3 e 4 (tipos de lavoura) cobrem só parte da área.
@@ -53,6 +60,7 @@ Outros arquivos:
 
 - **Transição por município.** Os dados de transição dependiam da Collection 9, cujo link hoje retorna 403. A Collection 10 só traz a transição por **bioma**, e o MapBiomas informou que não vai republicar a série por município. É preciso decidir o que fazer com os apps de transição.
 - **Sem atualização automática.** Falta um bloco de checagem no script e um `.yml` no GitHub Actions, como no COMEX.
+- **Scripts dos outros arquivos.** Não identifiquei, para cada arquivo de transição, gado e mapa de cobertura listados acima, qual script os gera; conferir e documentar aqui.
 - **Outros produtos derivados da base.** O mapa de cobertura (`mapbiomas_cobertura_map.R`), o mapa do gado e o script de PPM não foram ligados à base nova. O script de PPM usa um link de bucket da Collection 10 que retorna 403, e a origem exata do `.rds` do mapa do gado (provavelmente Collection 9) precisa ser confirmada.
 - **Peso nos apps.** A base nacional faz o app carregar mais memória na abertura (pico de ~655 MB, contra ~242 MB com a base só da Amazônia; o limite do shinyapps.io é 1 GB). Vale reavaliar no app novo de cobertura.
 - **App novo de cobertura.** Os apps atuais filtram a Amazônia Legal; o desenho do app novo, com o Brasil inteiro, ainda não foi feito.
