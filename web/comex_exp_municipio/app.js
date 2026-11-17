@@ -595,7 +595,7 @@
   // cor da categoria com o terreno e a legenda deixa de corresponder ao
   // que está na tela.
   const MAP_INSTATE_OPACITY = 1;
-  const MAP_RATIO_COLORS = { same: "#666666", nao: "#D55E00", sim: "#009E73" };
+  const MAP_RATIO_COLORS = { nao: "#D55E00", sim: "#009E73" };
 
   let sparkSeries = [];
   let sparkXFor = null;
@@ -1418,15 +1418,13 @@
 
   // Ratio mode is derived client-side from the forest (floresta=1) and
   // all-products (floresta=0) cells already loaded, mirroring the original
-  // app's classe_ratio logic exactly: if either side has no top product
-  // that year, there's not enough information to classify (no data) — a
-  // municipality with zero forest-compatible exports isn't "not
-  // forest-dominant", it's simply unclassifiable from this comparison.
+  // app's classe_ratio logic: se o produto principal geral do município já
+  // for florestal (mesmo produto), ele é compatível ("sim").
   function computeMapRatioClass(municipioIdx, ano) {
     const cellAll = getMapCell(municipioIdx, ano, 0);
     const cellForest = getMapCell(municipioIdx, ano, 1);
     if (!cellAll || !cellForest || !(cellAll.valor > 0)) return null;
-    if (cellForest.produtoIdx === cellAll.produtoIdx) return "same";
+    if (cellForest.produtoIdx === cellAll.produtoIdx) return "sim";
     return cellForest.valor / cellAll.valor < 1 ? "nao" : "sim";
   }
 
@@ -1566,7 +1564,7 @@
         rows.push(`<i>${t.label_no_data}</i>`);
         return rows.join("<br>");
       }
-      const label = ratioClass === "same" ? t.ratio_same : ratioClass === "sim" ? t.ratio_sim : t.ratio_nao;
+      const label = ratioClass === "sim" ? t.ratio_sim : t.ratio_nao;
       rows.push(`${t.tooltip_classe} <b>${label}</b>`);
       rows.push(`${t.tooltip_produto_geral} <b>${mapData.produtos[cellAll.produtoIdx]}</b> (${fmtPct(cellAll.valor)})`);
       rows.push(`${t.tooltip_produto_floresta} <b>${mapData.produtos[cellForest.produtoIdx]}</b> (${fmtPct(cellForest.valor)})`);
@@ -1657,7 +1655,7 @@
     renderMapLegend(t);
   }
 
-  // Legend is a fixed set (top-8 categories, or the 3 ratio classes) shown
+  // Legend is a fixed set (top-8 categories, or the 2 ratio classes) shown
   // in full every time — never trimmed to "only what's present this year"
   // — so the same color always means the same thing as you scrub the
   // year slider (color follows the entity, not its per-year presence).
@@ -1668,7 +1666,6 @@
       html += `<div class="legend-title">${t.legend_title_ratio}</div>`;
       html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.sim}"></span>${t.ratio_sim}</div>`;
       html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.nao}"></span>${t.ratio_nao}</div>`;
-      html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.same}"></span>${t.ratio_same}</div>`;
     } else {
       html += `<div class="legend-title">${t.legend_title_category}</div>`;
       mapData.categorias.forEach((nome, i) => {
