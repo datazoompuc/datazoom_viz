@@ -20,7 +20,7 @@ O último ano vem do `available_time` do manifest do `datazoom.amazonia` (`ano_i
 
 O servidor do MDIC (balanca.mdic.gov.br) costuma derrubar conexões em arquivos grandes. Por isso os downloads usam o curl do sistema, que retoma de onde caiu e repete em caso de erro, e o script tenta cada ano até 5 vezes. Os anos já baixados ficam guardados, então, se o script parar em algum ano, basta rodar de novo na mesma sessão do R.
 
-O script precisa do `datazoom.amazonia` com o dicionário do COMEX baixado por `download.file()` (PR `comex-dicionario-download-file`). Enquanto o PR não for mergeado, rode antes `devtools::load_all("~/datazoom.amazonia")` na branch desse PR; depois do merge, basta instalar o pacote atualizado. O ano final e a URL do dicionário são lidos com funções internas do pacote (`:::`).
+O script precisa do `datazoom.amazonia` com o PR "Comex resolver migration" (#354), já no master: o ano final e a URL dos arquivos de nomes do MDIC (linha `comex_dic` do manifest) são lidos com funções internas do pacote (`:::`).
 
 ## Arquivo gerado
 
@@ -51,10 +51,12 @@ Os nomes de produto vêm do `NCM_SH.csv`, os de país do `PAIS.csv` e os de muni
 
 ## Arquivos legados em `data/`
 
-Os arquivos pré-agregados antigos `comex_exp_*` (bases largas, transpostas, % mundial e dicionários CSV) foram removidos de `data/`. Apenas dois arquivos são mantidos:
+Os arquivos pré-agregados antigos `comex_exp_*` (bases largas, transpostas, % mundial e dicionários CSV) foram removidos de `data/`. Ficam três arquivos:
 - `comex_exp_munic_base.rds`: a base central longa gerada por este script.
-- `comex_exp_munic_sh4_sel.rds`: base de produtos selecionados utilizada pelo mapa da aplicação web (`web/_export/export_comex_mapa.R`).
+- `comex_exp_munic_sh4_sel.rds`: produtos selecionados, lido pelo app Shiny `apps/app_map_comex_exp_sh4_sel.R`. Nenhum script de `data-raw/` o gera hoje.
+- `comex_munic_raw.rds`: dado bruto antigo. Nenhum app ou script o lê.
 
 ## Pendências
 
 - `paises_traducao.csv` é lido pelo `app_rk_comex_exp_paises.R`; script que o gera não identificado.
+- `apps/app_map_comex_exp_sh4_sel.R` ainda lê `comex_exp_munic_sh4_sel_dic.csv` e `_dic_en.csv`, que foram removidos de `data/`.
