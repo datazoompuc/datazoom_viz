@@ -14,7 +14,7 @@ source("data-raw/pibmunic.R")
 
 Mesma checagem de `data-raw/population.R` (ver `README_population_data.md`), feita antes do download municipal:
 
-1. pergunta direto à API de dados do SIDRA qual é o último ano publicado na tabela 5938 (uma consulta);
+1. lê os anos disponíveis no `available_time` do manifest do `datazoom.amazonia`; `ano_final_manual` no topo do script força outro último ano;
 2. baixa o nível estadual de todos os anos com `load_pibmunic()` (uma consulta por ano);
 3. compara esse nível estadual, linha a linha, com o da base salva.
 
@@ -51,5 +51,5 @@ As outras 39 variáveis da tabela são participações percentuais (no PIB da UF
 - **Só nominal.** O IBGE não publica PIB real (a preços constantes) por município. Para estados, as Contas Regionais publicam a variação em volume do PIB, mas isso não está na tabela 5938 nem no `load_pibmunic()` (e volumes encadeados não são aditivos: não dá para chegar ao PIB real de um estado somando partes). Para valores reais, deflacionar na visualização (como fazia o antigo `dz_munic.R`).
 - **2022 e 2023 só têm o PIB.** O IBGE suspendeu a abertura por atividade até a nova série das Contas Nacionais (ano-base 2021): nesses anos, `impostos_liquidos` e as colunas `vab_*` ficam `NA`. De 2002 a 2021 tudo está preenchido.
 - **PIB per capita** não está na tabela: juntar com `data/population.rds` (`pib * 1000 / populacao` dá R$ por habitante).
-- **Próxima atualização: 2027.** Pela Nota técnica 01/2026 do IBGE, o PIB dos Municípios de 2024 foi adiado para 2027, junto com o de 2025 e a série desde 2002, só com o PIB a preços de mercado. O IBGE diz que, na divulgação da nova série (ano-base 2021), os resultados serão reapresentados de forma definitiva. Se saírem na própria tabela 5938, a checagem pega tanto os anos novos quanto a revisão da série. Se saírem numa tabela nova, a 5938 para em 2023 e o script avisa (warning) quando passar de três anos sem ano novo: aí é preciso apontar o pacote e o script para a tabela nova.
+- **Próxima atualização: 2027.** Pela Nota técnica 01/2026 do IBGE, o PIB dos Municípios de 2024 foi adiado para 2027, junto com o de 2025 e a série desde 2002, só com o PIB a preços de mercado. O IBGE diz que, na divulgação da nova série (ano-base 2021), os resultados serão reapresentados de forma definitiva. Se saírem na própria tabela 5938, a checagem pega tanto os anos novos (assim que o `available_time` do pacote for atualizado) quanto a revisão da série. Se saírem numa tabela nova, a 5938 para em 2023 e o script avisa (warning) quando o manifest passar de três anos sem ano novo: aí é preciso apontar o pacote e o script para a tabela nova.
 - **Série mais longa.** 2002 é o início da série de referência 2010. A série antiga (referência 2002, tabela 21, 1999-2012) tem outra metodologia e não é comparável em nível.

@@ -13,7 +13,8 @@
 #### Censo 2022 e a estimativa de 2024.
 ####
 #### Checagem de atualização (feita antes do download municipal, que é o lento):
-####   1. pergunta ao SIDRA qual é o último ano publicado na tabela 6579;
+####   1. lê os anos disponíveis no available_time do manifest do pacote (use
+####      ano_final_manual para forçar outro último ano);
 ####   2. baixa o nível estadual de todos os anos (rápido: uma consulta por ano);
 ####   3. compara com o nível estadual da base salva. Se for idêntico, não há ano
 ####      novo nem revisão, e o script para aí, sem tocar em data/population.rds.
@@ -23,10 +24,10 @@
 #### Para atualizar: rodar o script inteiro a partir da raiz do repositório.
 ####   setwd("~/datazoom_viz"); source("data-raw/population.R")
 ####
-#### Requer o datazoom.amazonia com o PR update-population (tabela do Censo 2022 e
-#### consultas que não passam pela página do SIDRA bloqueada pelo Cloudflare).
-#### Enquanto o PR não for mergeado, antes de rodar:
-####   devtools::load_all("~/datazoom.amazonia")   # na branch update-population
+#### Requer o datazoom.amazonia com o PR #381, "Update population" (tabela do Censo
+#### 2022 e consultas que não passam pela página do SIDRA bloqueada pelo
+#### Cloudflare), já no master:
+####   remotes::install_github("datazoompuc/datazoom.amazonia")
 ####
 #### Seções:
 ####   1. Checagem: o IBGE publicou algo novo?
@@ -39,7 +40,7 @@ library(dplyr)
 
 # Parâmetros
 ano_inicial        <- 2001     # primeiro ano da tabela 6579
-anos_sem_dado      <- 2023     # anos que nenhuma tabela do IBGE cobre
+ano_final_manual   <- NULL     # use só para forçar um ano final diferente do manifest
 forcar_atualizacao <- FALSE    # TRUE refaz a base mesmo sem dado novo
 arquivo_saida      <- "data/population.rds"
 
@@ -49,14 +50,14 @@ if (!dir.exists("data")) {
        ". Rode setwd() para a raiz do repositório e tente de novo.")
 }
 
-# Sem o PR update-population, load_population() não conhece a tabela do Censo
+# Sem o PR #381 (Update population), load_population() não conhece a tabela do Censo
 # 2022 (o ano 2022 falha) e ainda passa pela página bloqueada do SIDRA. A checagem
 # usa um objeto interno que o PR criou; pode sair depois que todos atualizarem.
 if (!exists("population_special_tables",
             envir = asNamespace("datazoom.amazonia"), inherits = FALSE)) {
-  stop("O datazoom.amazonia instalado não tem o PR update-population: ",
-       "load_population() não sabe baixar 2022 (Censo). Instale a versão ",
-       "atualizada ou rode antes devtools::load_all() na branch update-population.",
+  stop("O datazoom.amazonia instalado é anterior ao PR #381 (Update population): ",
+       "load_population() não sabe baixar 2022 (Censo). Atualize com ",
+       "remotes::install_github(\"datazoompuc/datazoom.amazonia\").",
        call. = FALSE)
 }
 
@@ -92,32 +93,17 @@ faixa_de_anos <- function(anos) {
   paste(partes, collapse = ", ")
 }
 
-# Último ano com valor publicado numa tabela do SIDRA, perguntado direto à API de
-# dados (uma consulta, nível Brasil). Não usa o available_time do manifest do
-# pacote de propósito: ele é atualizado por uma rotina do pacote que hoje não
-# consegue falar com a API de metadados do IBGE a partir do GitHub Actions, e
-# pode ficar para trás. Um ano novo publicado pelo IBGE aparece aqui no mesmo dia.
-ultimo_ano_publicado <- function(tabela, variavel) {
-  resposta <- com_tentativas(function() {
-    suppressMessages(sidrar::get_sidra(
-      api = paste0("/t/", tabela, "/n1/all/v/", variavel, "/p/all/f/a/h/y/d/s")
-    ))
-  }, rotulo = paste("SIDRA, tabela", tabela))
-
-  resposta <- janitor::clean_names(resposta)
-  if (!all(c("ano_codigo", "valor") %in% names(resposta))) {
-    stop("A resposta do SIDRA para a tabela ", tabela, " não tem as colunas ",
-         "esperadas (veio: ", paste(names(resposta), collapse = ", "), ").",
-         call. = FALSE)
-  }
-
-  # "..." (não disponível) e "-" viram NA em valor: só conta ano com número.
-  anos <- suppressWarnings(as.integer(resposta$ano_codigo[!is.na(resposta$valor)]))
-  anos <- anos[!is.na(anos)]
+# Anos disponíveis na fonte: vêm do manifest do pacote (available_time da linha
+# do dataset), que o pacote mantém atualizado, com as lacunas da série (2023).
+anos_do_manifest <- function(fonte, dataset) {
+  anos <- datazoom.amazonia:::parse_years(
+    datazoom.amazonia:::dataset_meta(fonte, dataset, "available_time")
+  )
   if (length(anos) == 0) {
-    stop("A tabela ", tabela, " não tem nenhum ano com valor no SIDRA.", call. = FALSE)
+    stop("O manifest do pacote não traz o available_time de ", fonte, "/", dataset,
+         ". Defina ano_final_manual no topo do script.", call. = FALSE)
   }
-  max(anos)
+  sort(unique(as.integer(anos)))
 }
 
 # A coluna de uma variável do SIDRA na saída do load_population(), achada pelo
@@ -404,19 +390,22 @@ checar_base <- function(base, anos) {
 # 1. CHECAGEM: O IBGE PUBLICOU ALGO NOVO?
 # ================================================================
 
-ultimo_ano <- ultimo_ano_publicado(tabela = 6579, variavel = 9324)
+anos_fonte <- anos_do_manifest("population", "population")
+ultimo_ano <- if (is.null(ano_final_manual)) max(anos_fonte) else ano_final_manual
 
 # A estimativa de um ano sai por volta de agosto do mesmo ano. Mais de dois anos
-# sem estimativa nova é sinal de que o IBGE mudou de tabela.
+# sem ano novo no manifest é sinal de que o IBGE mudou de tabela ou de que o
+# manifest do pacote ficou para trás.
 ano_corrente <- as.integer(format(Sys.Date(), "%Y"))
 if (ano_corrente - ultimo_ano > 2) {
-  warning("A tabela 6579 não tem estimativa nova desde ", ultimo_ano,
-          ". Conferir se o IBGE passou a publicar em outra tabela.", call. = FALSE)
+  warning("O manifest do pacote não tem população nova desde ", ultimo_ano,
+          ". Conferir se o IBGE passou a publicar em outra tabela ou se o ",
+          "available_time do pacote está desatualizado.", call. = FALSE)
 }
 
-anos <- setdiff(ano_inicial:ultimo_ano, anos_sem_dado)
+anos <- anos_fonte[anos_fonte >= ano_inicial & anos_fonte <= ultimo_ano]
 message("População: anos ", faixa_de_anos(anos),
-        " (último publicado na tabela 6579: ", ultimo_ano, ")")
+        " (available_time do manifest: ", faixa_de_anos(anos_fonte), ")")
 
 message("Baixando o nível estadual para comparar com a base salva...")
 estados <- bind_rows(lapply(anos, baixar_estados)) %>%

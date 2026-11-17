@@ -18,7 +18,8 @@
 #### tabela nova; a checagem abaixo avisa nos dois casos.
 ####
 #### Checagem de atualização (feita antes do download municipal, que é o lento):
-####   1. pergunta ao SIDRA qual é o último ano publicado na tabela 5938;
+####   1. lê os anos disponíveis no available_time do manifest do pacote (use
+####      ano_final_manual para forçar outro último ano);
 ####   2. baixa o nível estadual de todos os anos (rápido: uma consulta por ano);
 ####   3. compara com o nível estadual da base salva. Se for idêntico, não há ano
 ####      novo nem revisão, e o script para aí, sem tocar em data/pibmunic.rds.
@@ -42,6 +43,7 @@ library(dplyr)
 
 # Parâmetros
 ano_inicial        <- 2002     # primeiro ano da tabela 5938 (referência 2010)
+ano_final_manual   <- NULL     # use só para forçar um ano final diferente do manifest
 forcar_atualizacao <- FALSE    # TRUE refaz a base mesmo sem dado novo
 arquivo_saida      <- "data/pibmunic.rds"
 
@@ -104,32 +106,17 @@ faixa_de_anos <- function(anos) {
   paste(partes, collapse = ", ")
 }
 
-# Último ano com valor publicado numa tabela do SIDRA, perguntado direto à API de
-# dados (uma consulta, nível Brasil). Não usa o available_time do manifest do
-# pacote de propósito: ele é atualizado por uma rotina do pacote que hoje não
-# consegue falar com a API de metadados do IBGE a partir do GitHub Actions, e
-# pode ficar para trás. Um ano novo publicado pelo IBGE aparece aqui no mesmo dia.
-ultimo_ano_publicado <- function(tabela, variavel) {
-  resposta <- com_tentativas(function() {
-    suppressMessages(sidrar::get_sidra(
-      api = paste0("/t/", tabela, "/n1/all/v/", variavel, "/p/all/f/a/h/y/d/s")
-    ))
-  }, rotulo = paste("SIDRA, tabela", tabela))
-
-  resposta <- janitor::clean_names(resposta)
-  if (!all(c("ano_codigo", "valor") %in% names(resposta))) {
-    stop("A resposta do SIDRA para a tabela ", tabela, " não tem as colunas ",
-         "esperadas (veio: ", paste(names(resposta), collapse = ", "), ").",
-         call. = FALSE)
-  }
-
-  # "..." (não disponível) e "-" viram NA em valor: só conta ano com número.
-  anos <- suppressWarnings(as.integer(resposta$ano_codigo[!is.na(resposta$valor)]))
-  anos <- anos[!is.na(anos)]
+# Anos disponíveis na fonte: vêm do manifest do pacote (available_time da linha
+# do dataset), que o pacote mantém atualizado.
+anos_do_manifest <- function(fonte, dataset) {
+  anos <- datazoom.amazonia:::parse_years(
+    datazoom.amazonia:::dataset_meta(fonte, dataset, "available_time")
+  )
   if (length(anos) == 0) {
-    stop("A tabela ", tabela, " não tem nenhum ano com valor no SIDRA.", call. = FALSE)
+    stop("O manifest do pacote não traz o available_time de ", fonte, "/", dataset,
+         ". Defina ano_final_manual no topo do script.", call. = FALSE)
   }
-  max(anos)
+  sort(unique(as.integer(anos)))
 }
 
 # A coluna de uma variável do SIDRA na saída do load_pibmunic(), achada pelo
@@ -402,22 +389,25 @@ checar_base <- function(base, anos) {
 # 1. CHECAGEM: O IBGE PUBLICOU ALGO NOVO?
 # ================================================================
 
-ultimo_ano <- ultimo_ano_publicado(tabela = 5938, variavel = 37)
+anos_fonte <- anos_do_manifest("pibmunic", "pibmunic")
+ultimo_ano <- if (is.null(ano_final_manual)) max(anos_fonte) else ano_final_manual
 
 # O PIB de um ano costuma sair uns dois anos depois (2023 saiu em dez/2025).
-# Mais de três anos de atraso quer dizer que a 5938 parou: o IBGE prometeu para
-# 2027 o PIB de 2024-2025 e a série refeita na nova base (ano-base 2021), que pode
-# vir numa tabela nova do SIDRA. Nesse caso, apontar o script para ela.
+# Mais de três anos de atraso quer dizer que a 5938 parou ou que o manifest do
+# pacote ficou para trás: o IBGE prometeu para 2027 o PIB de 2024-2025 e a série
+# refeita na nova base (ano-base 2021), que pode vir numa tabela nova do SIDRA.
+# Nesse caso, apontar o pacote e o script para ela.
 ano_corrente <- as.integer(format(Sys.Date(), "%Y"))
 if (ano_corrente - ultimo_ano > 3) {
-  warning("A tabela 5938 não tem ano novo desde ", ultimo_ano, ". Conferir se ",
-          "o IBGE publicou a nova série do PIB dos Municípios (ano-base 2021) ",
-          "em outra tabela do SIDRA.", call. = FALSE)
+  warning("O manifest do pacote não tem PIB municipal novo desde ", ultimo_ano,
+          ". Conferir se o IBGE publicou a nova série do PIB dos Municípios ",
+          "(ano-base 2021) em outra tabela do SIDRA, ou se o available_time do ",
+          "pacote está desatualizado.", call. = FALSE)
 }
 
-anos <- ano_inicial:ultimo_ano
+anos <- anos_fonte[anos_fonte >= ano_inicial & anos_fonte <= ultimo_ano]
 message("PIB municipal: anos ", faixa_de_anos(anos),
-        " (último publicado na tabela 5938: ", ultimo_ano, ")")
+        " (available_time do manifest: ", faixa_de_anos(anos_fonte), ")")
 
 message("Baixando o nível estadual para comparar com a base salva...")
 estados <- bind_rows(lapply(anos, baixar_estados)) %>%
