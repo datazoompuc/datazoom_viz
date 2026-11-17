@@ -390,8 +390,6 @@ build_dics(c("group", "time", sort(unique(base$classe_en[base$amazonia_legal])),
 # (a) ida e volta: as tabelas largas montadas a partir da base (cobertura_larga)
 #     têm de ser idênticas às montadas direto da tabela longa, com o método antigo
 #     (pivot_wider em munic e est). Isto prova que a base não perdeu nada.
-# (b) contra os arquivos antigos (Collection 9 + 2024 da Col10): 2024 tem de
-#     ser igual; 1985-2023 são só informativos, porque a Col10 reprocessou a série.
 ################################################################################
 
 source("global/mapbiomas_cobertura_larga.R")
@@ -446,58 +444,6 @@ cat("\n== (a) ida e volta, base -> tabelas largas\n")
 ok_munic <- comparar(cobertura_larga(base, "munic"), munic_ref, c("municipality_code", "time"), "munic")
 ok_est   <- comparar(cobertura_larga(base, "est"),   est_ref,   c("group", "time"), "est")
 
-# (b) contra os arquivos antigos. Só roda se eles ainda existirem: depois da
-# limpeza ficam apenas no histórico do Git, e esta parte é pulada.
-arquivos_antigos <- c("data/mapbiomas_cobertura_munic.rds", "data/mapbiomas_cobertura_est.rds",
-                      "data/mapbiomas_cobertura_est_dic.csv",
-                      "data/mapbiomas_cobertura_munic_pt.rds", "data/mapbiomas_cobertura_munic_en.rds")
-if (!all(file.exists(arquivos_antigos))) {
-cat("\n== (b) pulado: os arquivos antigos já foram removidos do repositório.\n")
-} else {
-cat("\n== (b) contra os .rds antigos\n")
-velho_m <- readRDS("data/mapbiomas_cobertura_munic.rds")
-velho_e <- readRDS("data/mapbiomas_cobertura_est.rds")
-novo_m  <- cobertura_larga(base, "munic")
-novo_e  <- cobertura_larga(base, "est")
-
-ok_2024_m <- comparar(dplyr::filter(novo_m, time == 2024), dplyr::filter(velho_m, time == 2024),
-                      c("municipality_code", "time"), "munic, só 2024")
-ok_2024_e <- comparar(dplyr::filter(novo_e, time == 2024), dplyr::filter(velho_e, time == 2024),
-                      c("group", "time"), "est, só 2024")
-
-cat("\nmunic: anos novo", paste(range(novo_m$time), collapse = "-"),
-    "| velho", paste(range(velho_m$time), collapse = "-"),
-    "| municípios novo", dplyr::n_distinct(novo_m$municipality_code),
-    "| velho", dplyr::n_distinct(velho_m$municipality_code), "\n")
-
-# diferença relativa por ano, em Floresta e Pastagem (informativo)
-dif <- dplyr::inner_join(
-    dplyr::select(novo_m,  time, municipality_code, Forest, Pasture),
-    dplyr::select(velho_m, time, municipality_code, Forest, Pasture),
-    by = c("time", "municipality_code"), suffix = c("_novo", "_velho")) %>%
-    dplyr::summarise(
-        forest_novo  = sum(Forest_novo),  forest_velho  = sum(Forest_velho),
-        pasture_novo = sum(Pasture_novo), pasture_velho = sum(Pasture_velho),
-        .by = time) %>%
-    dplyr::mutate(dif_forest_pct  = round(100 * (forest_novo  / forest_velho  - 1), 3),
-                  dif_pasture_pct = round(100 * (pasture_novo / pasture_velho - 1), 3)) %>%
-    dplyr::arrange(time)
-cat("Diferença da soma (novo vs velho), anos selecionados:\n")
-print(dif[dif$time %in% c(1985, 1995, 2005, 2015, 2022, 2023, 2024),
-          c("time", "dif_forest_pct", "dif_pasture_pct")])
-
-dic_antigo_pt <- utils::read.csv("data/mapbiomas_cobertura_est_dic.csv", fileEncoding = "UTF-8")
-dic_novo_pt   <- utils::read.csv("data/mapbiomas_cobertura_base_dic.csv", fileEncoding = "UTF-8")
-cat("\ndicionário PT novo x antigo:", if (isTRUE(all.equal(dic_novo_pt, dic_antigo_pt))) "IGUAL" else "DIFERENTE",
-    "| classes só no novo:", paste(setdiff(dic_novo_pt$var, dic_antigo_pt$var), collapse = " | "),
-    "| só no antigo:", paste(setdiff(dic_antigo_pt$var, dic_novo_pt$var), collapse = " | "), "\n")
-
-cat("\nTamanho da base:", format(file.size("data/mapbiomas_cobertura_base.rds") / 1e6, digits = 3), "MB\n")
-cat("Arquivos que ela substitui (MB):\n")
-antigos <- c("data/mapbiomas_cobertura_munic.rds", "data/mapbiomas_cobertura_est.rds",
-             "data/mapbiomas_cobertura_munic_pt.rds", "data/mapbiomas_cobertura_munic_en.rds")
-print(round(file.size(antigos) / 1e6, 2))
-}
 
 stopifnot(ok_munic, ok_est)
 cat("\nIda e volta OK.\n")
