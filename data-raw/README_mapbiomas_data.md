@@ -16,7 +16,7 @@ O script precisa da versão de desenvolvimento do pacote (`devtools::install_git
 
 Ao final, o script confere que as tabelas largas montadas a partir da base (`cobertura_larga()`) são idênticas às montadas direto da tabela longa, e para se algo não fechar. A conferência contra os arquivos antigos (Collection 9) só roda se eles ainda existirem; hoje ficam só no histórico do Git.
 
-Não há checagem automática de atualização nem workflow no GitHub Actions para o MapBiomas (ver Pendências).
+Não há checagem de atualização no script nem workflow no GitHub Actions, e não precisa: a cada coleção nova o MapBiomas publica um arquivo novo no Dataverse, e o resolver do `datazoom.amazonia` troca o link no manifest do pacote (com um PR lá). Quando esse link mudar, rode o script de novo.
 
 ## Arquivos gerados
 
@@ -59,7 +59,6 @@ Outros arquivos:
 ## Pendências
 
 - **Transição por município.** Os dados de transição dependiam da Collection 9, cujo link hoje retorna 403. A Collection 10 só traz a transição por **bioma**, e o MapBiomas informou que não vai republicar a série por município. É preciso decidir o que fazer com os apps de transição.
-- **Sem atualização automática.** Falta um bloco de checagem no script e um `.yml` no GitHub Actions, como no COMEX.
 - **Scripts dos outros arquivos.** Não identifiquei, para cada arquivo de transição, gado e mapa de cobertura listados acima, qual script os gera; conferir e documentar aqui.
 - **Outros produtos derivados da base.** O mapa de cobertura (`mapbiomas_cobertura_map.R`), o mapa do gado e o script de PPM não foram ligados à base nova. O script de PPM usa um link de bucket da Collection 10 que retorna 403, e a origem exata do `.rds` do mapa do gado (provavelmente Collection 9) precisa ser confirmada.
 - **Peso nos apps.** A base nacional faz o app carregar mais memória na abertura (pico de ~655 MB, contra ~242 MB com a base só da Amazônia; o limite do shinyapps.io é 1 GB). Vale reavaliar no app novo de cobertura.
