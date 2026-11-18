@@ -426,10 +426,8 @@ write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic.csv", fileEncod
 
 # ── SEÇÃO 3 — DATASETS CNAE / COD / ATIVIDADES ───────────────────────────────
 #
-#  Gera três arquivos:
+#  Gera o arquivo:
 #    ibge_pnadc_atividades_ocupacoes.rds — dataset completo (CNAE + COD + setor)
-#    ibge_pnadc_cnae.rds                 — filtro: id %in% c("All", "CNAE")
-#    ibge_pnadc_cod.rds                  — filtro: id %in% c("All", "COD")
 #
 #  As funções describe_brazil / describe_region / describe_amazon / describe_states
 #  são REDEFINIDAS aqui (versões CNAE/COD). describe_quarter() é reaproveitada
