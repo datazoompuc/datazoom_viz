@@ -70,7 +70,7 @@ deploy_shiny_script("app_id")
 For example:
 
 ```r
-deploy_shiny_script("ts_ibge_pnadc_cnae")
+deploy_shiny_script("ts_ibge_pnadc_atividades_ocupacoes")
 ```
 
 If an error occurs, check the console log to identify missing dependencies or configuration issues.
@@ -362,10 +362,6 @@ PNAD was an annual research focused on brazilian households, which revealed gene
 - `app_rk_ibge_pnadc_atividades_ocupacoes`: ranking of economic activities and type of work occupation generated from the quarterly continuous pnad. (PT/EN toggle)
 
 - `app_ts_ibge_pnadc_atividades_ocupacoes`: graphic of compiled data about economic activities and type of work occupation generated from the quarterly continuous pnad. (PT/EN toggle)
-
-- `app_ts_ibge_pnadc_cnae`: graphic of compiled data about economic activities generated from the quarterly continuous pnad. (english version: `app_ts_ibge_pnadc_cnae_en`)
-
-- `app_ts_ibge_pnadc_cod`: graphic of compiled data about type of work occupation generated from the quarterly continuous pnad. (english version: `app_ts_ibge_pnadc_cod_en`)
 
 - `app_ts_ibge_pnadc_trabalho`: graphic of labor market. (PT/EN toggle)
 
