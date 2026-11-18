@@ -26,7 +26,7 @@ App updates are being monitored in this [sheet](https://docs.google.com/spreadsh
 
  - "./data": contains all the .rds databases and .csv files that are used in the generation of the visualizations. The files' names are organized in order to follow a pattern: xxxx.rds for the databases and xxxx_dic for the .csv dictionaries that correspond to the same database.
  
- - "./data-raw": contains .R scripts that generates both the .rds databases and the .csv files that are recorded in the "./data" directory. In order to generate the databases, the scripts use the datazoom.amazonia R package, developed by the Datazoom team. Each .R script is responsible for generating the .rds and .csv files for specific geographic aggregation of the researches. Some datasets have their own README with the update steps (for now, [`data-raw/README_comex_data.md`](data-raw/README_comex_data.md)).
+ - "./data-raw": contains .R scripts that generates both the .rds databases and the .csv files that are recorded in the "./data" directory. In order to generate the databases, the scripts use the datazoom.amazonia R package, developed by the Datazoom team. Each .R script is responsible for generating the .rds and .csv files for specific geographic aggregation of the researches. Some datasets have their own README with the update steps: [COMEX](data-raw/README_comex_data.md), [MapBiomas](data-raw/README_mapbiomas_data.md), [PIB municipal](data-raw/README_pibmunic_data.md) and [population](data-raw/README_population_data.md).
  
 
 ## Directory Structure
@@ -266,6 +266,8 @@ The data has yearly frequency and is available starting from the year
 - `app_ts_mapbiomas_transicao`: graphic of transition/ change of land cover and use, at state and municipality level. (PT/EN toggle)
 
 The land cover apps (`app_rk_mapbiomas_cobertura` and `app_ts_mapbiomas_cobertura`) read a single national long base, `data/mapbiomas_cobertura_base.rds`, built by `data-raw/mapbiomas_cobertura_base.R`. It has one row per year, municipality and land cover class.
+
+How the base is built and updated is described in [`data-raw/README_mapbiomas_data.md`](data-raw/README_mapbiomas_data.md).
 
 
 ## SEEG
