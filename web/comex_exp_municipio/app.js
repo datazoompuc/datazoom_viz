@@ -419,20 +419,16 @@
   // Nada disso é removido do app: aberto na própria URL ele continua
   // completo. O parâmetro é que decide, e updateUrl() o preserva para o modo
   // sobreviver a um reload dentro do iframe.
+  // Só lê o estado. Quem aplica a classe e pede a fonte é o script inline do
+  // <head>, e tem que ser ele: isto roda depois de todos os JSON carregarem,
+  // tarde demais para decidir o que a página mostra. Quando era aqui, a marca
+  // e o logo ficavam visíveis quase 8s num 4G lento antes de sumir.
+  //
+  // A leitura continua aqui porque updateUrl() precisa de state.embed para
+  // preservar o parâmetro, e porque duas fontes de verdade para "estamos
+  // embutidos?" seria pior que a repetição da linha.
   function lerEmbedDaUrl() {
     state.embed = new URLSearchParams(location.search).get("embed") === "1";
-    document.documentElement.classList.toggle("embed", state.embed);
-    if (state.embed) carregarFonteDoSite();
-  }
-
-  // A Inter só é buscada em modo embutido, para o app sozinho não pagar por
-  // uma fonte que não usa. Na prática costuma ser cache: a página de fora
-  // pediu a mesma fonte, do mesmo CDN, antes de montar o iframe.
-  function carregarFonteDoSite() {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap";
-    document.head.appendChild(link);
   }
 
   function lerMedidaDaUrl() {

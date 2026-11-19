@@ -7,6 +7,30 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  // Modo embutido, decidido ANTES da primeira pintura.
+  //
+  // Isto já morava no app.js, e o app.js roda no fim do <body> e só aplicava a
+  // classe depois que todos os JSON carregavam. A página pintava inteira
+  // primeiro, então a marca, o logo e o seletor de idioma apareciam e sumiam
+  // quando os dados chegavam: 0,3s em rede local, quase 8s num 4G lento.
+  //
+  // A fonte vem junto pelo mesmo motivo. Pedida depois dos dados, o app
+  // aparecia em Source Sans Pro e trocava para Inter no meio do caminho.
+  // Só em modo embutido, para o app sozinho não pagar por uma fonte que não
+  // usa; na prática costuma ser cache, porque a página de fora pediu a mesma
+  // fonte, do mesmo CDN, antes de montar o iframe.
+  //
+  // Inline e sem `defer` de propósito: qualquer uma das duas coisas devolve o
+  // piscar. O app.js continua lendo o mesmo parâmetro para o state.
+  if (new URLSearchParams(location.search).get("embed") === "1") {
+    document.documentElement.classList.add("embed");
+    var fonte = document.createElement("link");
+    fonte.rel = "stylesheet";
+    fonte.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap";
+    document.head.appendChild(fonte);
+  }
+</script>
 </head>
 <body>
 <div class="apppanel">
