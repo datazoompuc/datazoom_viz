@@ -24,8 +24,6 @@ dz_varias_amazonias_cross_section,data/dz_varias_amazonias_cross_section.rds,dat
 energia_amz_exporta,data/energia_amz_exporta.rds,data-raw/epe_energia_amz_exporta.R,,,
 energia_sistemas_isolados,data/energia_sistemas_isolados.rds,data-raw/epe_energia_sistemas_isolados.R,,,
 ibge_pnadc_atividades_ocupacoes,data/ibge_pnadc_atividades_ocupacoes.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
-ibge_pnadc_cnae,data/ibge_pnadc_cnae.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
-ibge_pnadc_cod,data/ibge_pnadc_cod.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
 ibge_pnadc_trabalho,data/ibge_pnadc_trabalho.rds,data-raw/ibge_pnadc.R,load_pnadc(),datazoom.social,
 ips_2021,data/ips_2021.rds,data-raw/dz_varias_amazonias_cross_section.R;data-raw/ips.R,,,MULTIPLE_MATCHES
 mapbiomas_cobertura,data/mapbiomas_cobertura.parquet,data-raw/mapbiomas_cobertura_map.R,load_mapbiomas(),datazoom.amazonia,
