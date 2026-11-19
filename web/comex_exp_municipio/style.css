@@ -1,0 +1,1022 @@
+* { box-sizing: border-box; }
+
+:root {
+  --font-ui: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ink: #221d17;
+  --muted: #6b6156;
+  --border: #e4ded3;
+  --shadow: rgba(34, 29, 23, 0.12);
+  --sidebar-a: #4a9aa0;
+  --sidebar-b: #2c5f64;
+  --bar: #d9622b;
+  --bar-soft: #f7e3d6;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.apppanel {
+  display: flex;
+  height: 100vh;
+}
+
+/* Language toggle in the upper-right corner of the content column — same
+   convention as the map app, kept separate from the sidebar's controls. */
+.lang-toggle-corner {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 7px 14px;
+  border-radius: 999px;
+  box-shadow: 0 2px 10px var(--shadow);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+.lang-toggle-corner svg { display: block; }
+.lang-toggle-corner:hover { background: #f6f2ea; }
+
+/* ---- Sidebar ---- */
+
+.menucol {
+  flex: 0 0 300px;
+  background: linear-gradient(165deg, var(--sidebar-a), var(--sidebar-b));
+  color: #fff;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Procedência, e a âncora visual da base da barra lateral.
+ *
+ * O `margin-top: auto` mora aqui, e não no logo, porque esta é a primeira
+ * das duas peças de rodapé: o auto empurra o par todo para baixo. Dois
+ * `auto` na mesma coluna repartiriam a sobra em vez de somar.
+ *
+ * É também o que impede a barra de terminar em gradiente vazio no modo
+ * embutido, onde o logo sai de cena porque a página de fora já tem um.
+ */
+.menucol-fonte {
+  margin: auto 0 0;
+  padding-top: 24px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.72);
+  flex: 0 0 auto;
+}
+.menucol-fonte a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.menucol-fonte a:hover { color: #fff; }
+
+.menucol-logo {
+  padding-top: 14px;
+  height: 64px;
+  background-image: url("../shared/img/logo_datazoom_branco_horizontal.png");
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: contain;
+  pointer-events: none;
+  opacity: 0.95;
+  flex: 0 0 auto;
+}
+
+.plot_name {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+
+.plot_desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #eafbfc;
+}
+
+.menucol hr {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  margin: 16px 0;
+}
+
+.view-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+/* Variante de duas colunas, para alternâncias binárias como Valor/Quantidade.
+   Sem isto os dois botões ficariam com 1/3 da largura cada e um vão à direita. */
+.view-toggle-2 { grid-template-columns: repeat(2, 1fr); }
+.view-btn {
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 8px 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.view-btn.active {
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.5);
+}
+
+.vars {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.var_selec_group { margin-bottom: 16px; }
+.var_selec_group label { display: block; margin-bottom: 6px; font-weight: 400; }
+
+/* Shared by every single-line sidebar control (selects + the product search
+   input) — one rule instead of a per-ID list, so a new control picks up the
+   sizing/overflow behavior automatically just by carrying the class. Long
+   option text (SEC/SH2 category names in particular) used to force these
+   selects wider than the 300px sidebar itself, "leaking" past its edge —
+   width: 100% + min-width: 0 caps the box at the sidebar's width regardless
+   of content, and the overflow/ellipsis trio truncates the closed box's own
+   label instead of stretching to fit it (native <select> popups also follow
+   the closed box's own width in every browser this app targets). */
+.sidebar-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 1rem;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.prodrank-full-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 4px 0 0;
+}
+
+.prodrank-search-label {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.prodrank-loading {
+  padding: 24px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Lazy-load failure state (see loadingMarkup in app.js). The same markup is
+   injected into whichever view's loading slot the failed fetch belonged to,
+   so it has to read correctly both inside .map-loading (a centered flex
+   overlay) and .prodrank-loading (a plain padded block) — hence the column
+   direction above and the block-level button here. */
+.map-loading { flex-direction: column; gap: 10px; }
+.load-error-text { color: var(--muted); }
+
+.retry-btn {
+  display: block;
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.retry-btn:hover { background: #f6f2ea; }
+.map-loading .retry-btn { margin-top: 0; }
+
+/* Core-data failure: nothing rendered at all, so this covers the whole
+   chart area rather than sitting inside one view's panel. */
+.fatal-error {
+  position: absolute;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.fatal-error-text { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.fatal-error .retry-btn { margin-top: 0; }
+
+/* Variação replaces the sparkline/slider block (.slider-inline, ~96px
+   tall) with this Ano A/B row instead — without a matching min-height,
+   this row's own shorter natural height (~59px) leaves every control
+   below it (starting with the global Estado selector) sitting ~37px
+   higher here than in every other view, an inconsistency that's easy to
+   notice when flipping between views. */
+#change-group { min-height: 96px; }
+.change-years-row { display: flex; gap: 10px; }
+.change-year-field { flex: 1 1 0; min-width: 0; }
+.change-year-field label { font-size: 0.85rem; }
+
+/* Shared by every hand-picked multi-select in Explorar (municípios and,
+   since the axis swap, categories too) — min-width: 0 caps it to the
+   sidebar's width the same way .sidebar-field does for single-line
+   controls; a multi-select can't also use that class since its
+   white-space: nowrap/ellipsis rules only make sense for a single closed
+   value, not a scrollable option list. */
+.sidebar-multiselect {
+  width: 100%;
+  min-width: 0;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--ink);
+}
+.sidebar-multiselect option { padding: 3px 6px; }
+
+/* ---- Searchable pickers (see comboboxify/filterify in app.js) ---- */
+
+.combo { position: relative; }
+
+/* The real <select> stays in the DOM as the model — every populate*Select()
+   still writes to it and selections are committed through it — so it is
+   hidden rather than removed. Not display:none: that would also drop it
+   from the form/accessibility tree, and it still carries the value. */
+.combo-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.combo-input { cursor: text; }
+
+/* In normal flow, not absolutely positioned: .menucol is a scroll
+   container, which would clip a floating panel opened near its bottom. */
+.combo-panel {
+  margin-top: 2px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(34, 29, 23, 0.18);
+}
+.combo-panel.hidden { display: none; }
+
+.combo-option {
+  padding: 6px 8px;
+  font-size: 0.92rem;
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.combo-option:hover,
+.combo-option.active { background: #e4f0f1; }
+.combo-option[aria-selected="true"] { font-weight: 700; }
+
+.combo-empty,
+.combo-count {
+  padding: 6px 8px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.combo-count { border-top: 1px solid var(--border); }
+
+.listfilter { margin-bottom: 4px; font-size: 0.9rem; }
+
+.explore-hint {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 4px 0 0;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.switch-row input { accent-color: #2c5f64; width: 16px; height: 16px; }
+.switch-row:has(input:disabled) { opacity: 0.5; cursor: not-allowed; }
+
+.sparkline-wrap { position: relative; }
+
+#year-sparkline {
+  width: 100%;
+  height: 40px;
+  display: block;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.spark-area { fill: rgba(255, 255, 255, 0.14); stroke: none; }
+
+.spark-line {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.spark-guide {
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.spark-hover-line {
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spark-marker {
+  fill: #fff;
+  stroke: #4a9aa0;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  transition: cx 150ms linear, cy 250ms ease;
+}
+
+.spark-hover-marker {
+  fill: #fff;
+  stroke: #4a9aa0;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spark-tooltip {
+  position: absolute;
+  top: -4px;
+  transform: translate(-50%, -100%);
+  background: #1f3b3d;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.3;
+  padding: 4px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+.spark-tooltip strong { font-weight: 700; }
+
+/* margin: 0 overrides the browser default (2px left/right on
+   input[type=range] in Chrome/Safari) that would otherwise throw the
+   slider's track a couple pixels out of alignment with the sparkline
+   above it, despite both spanning the same 100% width. */
+.year-slider-full { display: block; width: 100%; margin: 2px 0 0; accent-color: #2c5f64; }
+
+/* Two grid rows sharing one set of column tracks: row 1 is the sparkline
+   flanked by two invisible spacer cells, row 2 is play-btn/slider/caption.
+   Column 1 and column 3's widths are each set by their tallest/widest
+   occupant (play-btn, year-caption) since the spacers have no intrinsic
+   size — so the sparkline (column 2) ends up inset to exactly match the
+   slider's width without hand-tuned padding. Each row is sized to its own
+   content, so play-btn/caption sit centered against the slider's own
+   (short) row height, not against the sparkline+slider combined height. */
+.spark-slider-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 4px;
+}
+.spark-slider-spacer { width: 100%; }
+.year-caption { display: flex; align-items: baseline; gap: 5px; }
+.year-caption label { margin-bottom: 0; }
+
+.year-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Aviso de ano parcial ao lado do "Ano 20xx". Discreto de propósito: é
+   ressalva, não alarme, e some por completo nos anos fechados. */
+.year-partial {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+}
+.year-partial.hidden { display: none; }
+
+/* Trecho da sparkline que cai num ano incompleto. Tracejado para o
+   desenho não afirmar uma queda que é só calendário. */
+.spark-line-partial {
+  stroke-dasharray: 3 2;
+  opacity: 0.85;
+}
+
+/* Mesmo tratamento nas linhas do Explorar. */
+.explore-line-partial {
+  stroke-dasharray: 5 3;
+  opacity: 0.85;
+}
+
+.icon-btn {
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn:hover { background: rgba(255, 255, 255, 0.35); }
+.icon-btn.playing { background: #2c5f64; }
+.icon-btn svg { display: block; }
+
+/* flex-shrink: 0 is load-bearing here, not decorative — .menucol is a flex
+   column, and an empty div has zero content-based minimum size, so
+   whenever a view's sidebar content is tall enough to overflow, flexbox
+   squashes these gaps to 0px first (before anything with actual content
+   has to shrink at all). That's what was actually causing the "missing
+   padding above the sparkline" in some views but not others — it tracked
+   each view's own content height, not the sparkline itself. .menucol's own
+   overflow-y: auto handles genuine overflow by scrolling instead. */
+.spacer { height: 6px; flex-shrink: 0; }
+
+/* ---- Main column ---- */
+
+.plotcol {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  min-width: 0;
+}
+
+.plot-title,
+.plot-subtitle {
+  padding-right: 140px;
+  /* A filtered title carries the product's full name and can run to
+     several lines. .plotcol is a flex column, so without this these would
+     be shrinkable and a long title could be squeezed by the chart below
+     instead of taking the room it needs. */
+  flex-shrink: 0;
+}
+
+.plot-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+}
+
+.plot-subtitle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.chart-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 4px solid rgba(74, 154, 160, 0.2);
+  border-top-color: #2c5f64;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  pointer-events: none;
+  z-index: 1000;
+}
+.spinner.hidden { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- Ranking (bar chart) view ---- */
+
+.ranking-panel {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ranking-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 20px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.ranking-axis-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-weight: 700;
+}
+.region-total-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.region-total-label b { color: var(--ink); }
+
+.ranking-rows {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 10px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rank-row {
+  display: grid;
+  grid-template-columns: 28px minmax(140px, 220px) 1fr auto;
+  align-items: center;
+  gap: 10px;
+  height: 30px;
+}
+.rank-position {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: right;
+}
+.rank-label {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rank-track {
+  position: relative;
+  height: 18px;
+  background: var(--bar-soft);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rank-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--bar);
+  border-radius: 3px;
+  transition: width 400ms ease;
+}
+.rank-value {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  min-width: 90px;
+  text-align: right;
+}
+
+.chart-tooltip {
+  position: absolute;
+  background: #1f3b3d;
+  color: #fff;
+  font-size: 12.5px;
+  line-height: 1.35;
+  padding: 6px 9px;
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-variant-numeric: tabular-nums;
+  max-width: 300px;
+  z-index: 10;
+}
+
+/* ---- Composition (stacked area) view ---- */
+
+.composition-panel {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 16px 20px 12px;
+}
+
+.composition-chart-area {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.composition-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.comp-axis-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  fill: var(--muted);
+}
+.comp-gridline { stroke: var(--border); stroke-width: 1; }
+.comp-band { stroke: #fff; stroke-width: 0.5; }
+.comp-guide {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
+.explore-line { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.explore-guide {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
+.composition-legend {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--ink);
+  max-width: 280px;
+  cursor: default;
+}
+.legend-item span.swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  flex: 0 0 auto;
+}
+.legend-item span.label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.legend-item-muted {
+  opacity: 0.6;
+}
+.legend-item-muted span.swatch {
+  border-width: 1.5px;
+  border-style: dashed;
+}
+.legend-item-muted span.label {
+  font-style: italic;
+}
+
+/* ---- Change (dumbbell) view — same pattern as the CEMPRE map rebuild's
+   compare mode: year A (blue) / year B (orange) dots per entity, connected
+   by a line, ranked by change, filtered by state to keep row count sane
+   (13 to 115 municipalities per state here). ---- */
+
+.change-panel {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.change-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.change-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.change-legend-chip { display: flex; align-items: center; gap: 6px; }
+.change-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.change-legend-dot-a { background: #2a78d6; }
+.change-legend-dot-b { background: #eb6834; }
+
+.change-row {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 20px;
+}
+.change-row:hover { background: rgba(74, 154, 160, 0.08); }
+
+.change-col-label {
+  flex: 0 0 200px;
+  padding-right: 10px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.change-col-track {
+  flex: 1 1 auto;
+  position: relative;
+  height: 24px;
+}
+.change-col-delta {
+  flex: 0 0 100px;
+  padding-left: 8px;
+  text-align: right;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.change-scroll { flex: 1 1 auto; overflow-y: auto; padding: 10px 0 12px; }
+#change-rows { display: flex; flex-direction: column; }
+
+.change-line {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  background: #c7c7c7;
+  transform: translateY(-50%);
+}
+.change-dot {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1.5px #fff;
+}
+.change-dot-a { background: #2a78d6; }
+.change-dot-b { background: #eb6834; }
+
+/* ---- Trends (small multiples) view — one sparkline per top-N
+   municipality (all-time total, independent of the ranking view's
+   per-year top-N), so the shape of each one's own trajectory is scannable
+   at once without needing to already know which one to search for. ---- */
+
+.trends-panel {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px var(--shadow);
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.trends-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.trend-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px 10px;
+}
+
+.trend-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.trend-card-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.trend-card-value {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+.trend-sparkline { width: 100%; height: 44px; display: block; overflow: visible; }
+.trend-spark-area { fill: rgba(217, 98, 43, 0.12); stroke: none; }
+.trend-spark-line { fill: none; stroke: var(--bar); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.trend-spark-marker { fill: var(--bar); stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+
+/* ---- Map (Leaflet, lazy-loaded) view ---- */
+
+.map-hint {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
+  margin-top: 6px;
+}
+
+.map-panel {
+  position: absolute;
+  inset: 0;
+}
+
+#map-container {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.map-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* ---- Leaflet legend ---- */
+
+.legend {
+  background: #fff;
+  padding: 10px 12px 8px;
+  border-radius: 2px 2px 8px 8px;
+  border-top: 3px solid var(--sidebar-b);
+  box-shadow: 0 4px 14px var(--shadow);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  max-width: 240px;
+  color: var(--ink);
+}
+.legend .legend-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.legend .legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+.legend .swatch {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  display: inline-block;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* Matches the SVG hatch pattern used for "no data" polygons on the map
+   (ensureNoDataPattern in app.js) — same base/line colors, same 45deg
+   angle, so the legend swatch and the map fill read as the same thing. */
+.legend .swatch-nodata {
+  background-color: #deeaef;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #a2adb1 0, #a2adb1 1.5px,
+    transparent 1.5px, transparent 6px
+  );
+}
+
+.leaflet-tooltip b { color: inherit; }
+
+/* Municipality fill animates between years instead of jump-cutting. */
+.muni-path {
+  transition: fill 300ms ease, fill-opacity 180ms ease;
+}
+
+.hidden { display: none; }
+
+
+/* ---- Modo embutido (?embed=1) ---- */
+/*
+   Tipografia do site hospedeiro. A página usa Inter em tudo; o app usa Source
+   Sans Pro com JetBrains Mono nos títulos. Dentro do iframe essa diferença
+   lê como "dois sites colados", então em modo embutido o app adota a fonte
+   da página. Sozinho, mantém a identidade própria.
+
+   O `lerEmbedDaUrl` em app.js carrega a Inter — o navegador costuma já ter a
+   fonte em cache, porque a página de fora pediu a mesma do mesmo CDN.
+*/
+.embed {
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Sem a monoespaçada, o título caixa-alta com espaçamento negativo vira um
+   corpo estranho. Em Inter ele funciona melhor como subtítulo da página:
+   caixa normal, peso 600, que é o mesmo do h1 do site. */
+.embed .plot-title {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: normal;
+  font-size: 1.35rem;
+}
+
+/* A numeração do ranking dependia da monoespaçada para alinhar. */
+.embed .rank-position { font-variant-numeric: tabular-nums; }
+
+
+/*
+   Esconde o que a página hospedeira já mostra: a marca e a descrição (ela tem
+   nav bar e um h1), a logo do rodapé da barra lateral (ela tem logo na nav bar
+   e no footer) e o seletor de idioma (quem manda ali é a nav bar, que troca a
+   página inteira — o do app trocaria só o iframe).
+
+   Ver lerEmbedDaUrl em app.js. Aberto na própria URL, o app continua completo.
+*/
+.embed .plot_name,
+.embed .plot_desc,
+.embed .menucol > hr,
+.embed .menucol-logo,
+.embed .lang-toggle-corner { display: none; }
+
+/* O padding à direita existia para o título não passar por baixo do seletor
+   de idioma. Sem ele, é espaço morto. */
+.embed .plot-title,
+.embed .plot-subtitle { padding-right: 0; }
