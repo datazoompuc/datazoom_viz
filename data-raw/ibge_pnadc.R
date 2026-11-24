@@ -433,7 +433,7 @@ dat %<>% mutate(across(where(is.character), enc2utf8))
 
 # saving data file
 
-readr::write_rds(dat, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds", compress = "gz")
+readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##
