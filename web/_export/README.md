@@ -46,7 +46,8 @@ Em uma frase: **arquitetura diz por quê, guia diz como, runbook diz o que rodar
 
 - **`export_comex_exp_municipio.R`** — gera todos os dados do app de COMEX
   (JSONs tabulares e GeoJSONs/JSON do mapa) a partir de `data/comex_exp_munic_base.rds`
-  e das geometrias em `global/`. Recortes unificados num script só.
+  e das geometrias em `global/`. Recortes unificados num script só. No `map_data.json`,
+  as células carregam `[municipio_idx, ano, floresta, categoria_idx, produto_idx, valor, fob, kg]`.
 
 ### Teste
 

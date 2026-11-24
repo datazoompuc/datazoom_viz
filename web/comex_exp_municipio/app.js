@@ -33,6 +33,7 @@
       ranking_axis_label_kg: "Quantidade exportada ({unit})",
       region_total_prefix: "Total Amazônia Legal: ",
       label_no_data: "Sem dado",
+      label_map_no_data: "Nenhum produto exportado",
       label_others: "Outros",
       view_change: "Variação",
       title_change: "Variação entre dois anos",
@@ -169,7 +170,9 @@
       tooltip_produto_floresta: "Produto mais exportado (floresta):",
       tooltip_categoria: "Categoria:",
       tooltip_valor: "Valor:",
-      tooltip_valor_unidade: "% das exportações desse produto na Amazônia Legal vindas deste município",
+      tooltip_quantidade: "Quantidade:",
+      tooltip_participacao: "Participação:",
+      tooltip_valor_unidade: "das exportações desse produto na Amazônia Legal",
       tooltip_classe: "Classificação:",
       ratio_same: "Mesmo produto principal",
       ratio_nao: "Principal produto não é compatível com a floresta",
@@ -195,6 +198,7 @@
       ranking_axis_label_kg: "Export quantity ({unit})",
       region_total_prefix: "Legal Amazon total: ",
       label_no_data: "No data",
+      label_map_no_data: "No products exported",
       label_others: "Other",
       view_change: "Change",
       title_change: "Change between two years",
@@ -331,7 +335,9 @@
       tooltip_produto_floresta: "Top export (forest-compatible):",
       tooltip_categoria: "Category:",
       tooltip_valor: "Value:",
-      tooltip_valor_unidade: "% of that product's Legal Amazon exports that came from this municipality",
+      tooltip_quantidade: "Quantity:",
+      tooltip_participacao: "Share:",
+      tooltip_valor_unidade: "of that product's Legal Amazon exports",
       tooltip_classe: "Classification:",
       ratio_same: "Same main product",
       ratio_nao: "Main product is not forest-compatible",
@@ -1394,8 +1400,8 @@
     ]).then(([data, municGeo, statesGeo, legalAmazonGeo]) => {
       mapData = data;
       mapCellByKey = new Map();
-      for (const [municipioIdx, ano, floresta, categoriaIdx, produtoIdx, valor] of data.cells) {
-        mapCellByKey.set(`${municipioIdx}|${ano}|${floresta}`, { categoriaIdx, produtoIdx, valor });
+      for (const [municipioIdx, ano, floresta, categoriaIdx, produtoIdx, valor, fob, kg] of data.cells) {
+        mapCellByKey.set(`${municipioIdx}|${ano}|${floresta}`, { categoriaIdx, produtoIdx, valor, fob, kg });
       }
       return { municGeo, statesGeo, legalAmazonGeo };
     }), () => { mapDataPromise = null; });
@@ -1539,7 +1545,8 @@
   }
 
   function fmtPct(v) {
-    return v.toLocaleString(numLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%";
+    const digits = v < 0.1 && v > 0 ? 2 : 1;
+    return v.toLocaleString(numLocale(), { minimumFractionDigits: digits, maximumFractionDigits: digits }) + "%";
   }
 
   // Ratio mode's classification compares two *different* calculations —
@@ -1557,23 +1564,29 @@
     ];
     if (state.mapMode === "ratio") {
       if (!ratioClass) {
-        rows.push(`<i>${t.label_no_data}</i>`);
+        rows.push(`<i>${t.label_map_no_data}</i>`);
         return rows.join("<br>");
       }
       const label = ratioClass === "sim" ? t.ratio_sim : t.ratio_nao;
       rows.push(`${t.tooltip_classe} <b>${label}</b>`);
-      rows.push(`${t.tooltip_produto_geral} <b>${mapData.produtos[cellAll.produtoIdx]}</b> (${fmtPct(cellAll.valor)})`);
+      rows.push(`<hr style="border:0;border-top:1px solid rgba(255,255,255,0.2);margin:4px 0;">`);
+      rows.push(`${t.tooltip_produto_geral} <b>${mapData.produtos[cellAll.produtoIdx]}</b>`);
+      rows.push(`${t.tooltip_valor} <b>${fmtAbbrevValor(cellAll.fob)}</b> &nbsp; ${t.tooltip_quantidade} <b>${fmtAbbrevKg(cellAll.kg)}</b>`);
+      rows.push(`${t.tooltip_participacao} <b>${fmtPct(cellAll.valor)}</b> <span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
       if (cellForest) {
-        rows.push(`${t.tooltip_produto_floresta} <b>${mapData.produtos[cellForest.produtoIdx]}</b> (${fmtPct(cellForest.valor)})`);
+        rows.push(`<hr style="border:0;border-top:1px solid rgba(255,255,255,0.2);margin:4px 0;">`);
+        rows.push(`${t.tooltip_produto_floresta} <b>${mapData.produtos[cellForest.produtoIdx]}</b>`);
+        rows.push(`${t.tooltip_valor} <b>${fmtAbbrevValor(cellForest.fob)}</b> &nbsp; ${t.tooltip_quantidade} <b>${fmtAbbrevKg(cellForest.kg)}</b>`);
+        rows.push(`${t.tooltip_participacao} <b>${fmtPct(cellForest.valor)}</b> <span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
       }
-      rows.push(`<span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
     } else if (cellAll) {
       rows.push(`${t.tooltip_produto} <b>${mapData.produtos[cellAll.produtoIdx]}</b>`);
       rows.push(`${t.tooltip_categoria} <b>${mapCategoryLabel(cellAll.categoriaIdx, t)}</b>`);
-      rows.push(`${t.tooltip_valor} <b>${fmtPct(cellAll.valor)}</b>`);
-      rows.push(`<span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
+      rows.push(`${t.tooltip_valor} <b>${fmtAbbrevValor(cellAll.fob)}</b>`);
+      rows.push(`${t.tooltip_quantidade} <b>${fmtAbbrevKg(cellAll.kg)}</b>`);
+      rows.push(`${t.tooltip_participacao} <b>${fmtPct(cellAll.valor)}</b> <span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
     } else {
-      rows.push(`<i>${t.label_no_data}</i>`);
+      rows.push(`<i>${t.label_map_no_data}</i>`);
     }
     return rows.join("<br>");
   }
@@ -1671,7 +1684,7 @@
       });
       html += `<div class="legend-row"><span class="swatch" style="background:${OTHERS_COLOR}"></span>${t.label_others}</div>`;
     }
-    html += `<div class="legend-row"><span class="swatch swatch-nodata"></span>${t.label_no_data}</div>`;
+    html += `<div class="legend-row"><span class="swatch swatch-nodata"></span>${t.label_map_no_data}</div>`;
     div.innerHTML = html;
   }
 

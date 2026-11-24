@@ -61,6 +61,8 @@ Cada arquivo de dados carrega **as duas medidas**, valor e quantidade, na
 mesma estrutura. É o que permite o botão Valor/Quantidade do app trocar sem
 buscar nada. O script também exporta todos os arquivos do mapa (GeoJSONs e
 `map_data.json`) para a pasta `map/` a partir das geometrias em `global/` e da base longa.
+No `map_data.json`, `cells` traz o produto principal por município/ano ordenado por
+valor FOB: `[municipio_idx, ano, floresta, categoria_idx, produto_idx, valor, fob, kg]`.
 
 O script imprime no final o que escreveu. Se terminar com erro de
 arquivo não encontrado, é porque `data/comex_exp_munic_base.rds` não foi gerado ainda:

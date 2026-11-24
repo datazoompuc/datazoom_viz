@@ -270,8 +270,8 @@ write_json(dictionary, file.path(out_dir, "dictionary.json"),
 #
 # Derived directly from `base` and global/*.rds geometry.
 # Attributes represent each municipality's top exported product (overall and among
-# forest-compatible products) and its relative percentage against Legal Amazon's
-# total exports of that product.
+# forest-compatible products), its FOB value, net weight in kg, and its relative
+# percentage against Legal Amazon's total exports of that product.
 map_out_dir <- file.path(out_dir, "map")
 dir.create(map_out_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -315,7 +315,11 @@ tot_prod_ano <- base %>%
 
 mun_prod_ano <- base %>%
   group_by(ano, cod_ibge = as.character(cod_municipio), cod_sh4, sh4_pt, sh2_pt) %>%
-  summarise(valor_fob_mun = sum(valor_fob), .groups = "drop") %>%
+  summarise(
+    valor_fob_mun = sum(valor_fob),
+    kg_mun = sum(kg_liquido),
+    .groups = "drop"
+  ) %>%
   left_join(tot_prod_ano, by = c("ano", "cod_sh4")) %>%
   mutate(pct = (valor_fob_mun / tot_fob_amazonia) * 100)
 
@@ -338,10 +342,12 @@ top_comb <- bind_rows(top_all, top_flor) %>%
     nome_sh2 = ifelse(nchar(sh2_pt) > 50, paste0(substr(sh2_pt, 1, 49), "…"), sh2_pt)
   )
 
-categoria_counts <- top_comb %>%
+categoria_fob <- top_comb %>%
   filter(!is.na(nome_sh2)) %>%
-  count(nome_sh2, sort = TRUE)
-categorias_idx <- head(categoria_counts$nome_sh2, 8)
+  group_by(nome_sh2) %>%
+  summarise(fob = sum(valor_fob_mun), .groups = "drop") %>%
+  arrange(desc(fob))
+categorias_idx <- head(categoria_fob$nome_sh2, 8)
 
 produtos_idx <- top_comb %>%
   filter(!is.na(lab)) %>%
@@ -356,7 +362,9 @@ cells <- top_comb %>%
     floresta = as.integer(floresta),
     categoria_idx = ifelse(nome_sh2 %in% categorias_idx, match(nome_sh2, categorias_idx) - 1L, -1L),
     produto_idx = match(lab, produtos_idx) - 1L,
-    valor = round(pct, 2)
+    valor = round(pct, 4),
+    fob = round(valor_fob_mun),
+    kg = round(kg_mun)
   )
 
 map_data <- list(
