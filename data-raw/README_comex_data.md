@@ -45,9 +45,9 @@ Os nomes de produto vêm do `NCM_SH.csv`, os de país do `PAIS.csv` e os de muni
 - **Ano parcial.** O ano mais recente pode ter menos de 12 meses (em 2026, só parte do ano). `n_meses` e `ano_parcial` marcam isso. Nas séries, o último ponto cai por esse motivo.
 - **País de destino.** A base não soma sobre países: para obter o total por município e produto, some `valor_fob` e `kg_liquido` agrupando por `ano`, `cod_sh4`, `cod_municipio` e `uf`.
 
-## Arquivos antigos em `data/`
+## Arquivos em `data/`
 
-Os arquivos `comex_exp_*` (bases largas, transpostas, mapa, % mundial e dicionários) **não são mais gerados** por este script. Ficam no repositório só porque apps ativos ainda os leem (ver `config/app_manifest.csv`). A exportação para JSON fica com a Fernanda; os arquivos antigos podem sair quando os apps migrarem. O `comex_munic_raw.rds` (dado bruto do MDIC) também fica, pois o script não o grava mais; confirmar se a exportação para JSON o usa antes de apagar.
+Apenas `data/comex_exp_munic_base.rds` é mantido em `data/`. Todos os arquivos legados `comex_exp_*` (bases largas, matrizes transpostas, mapa `comex_exp_munic_sh4_sel.rds` e dicionários CSV) e `comex_munic_raw.rds` foram removidos. Toda a geração de JSONs e GeoJSONs para a visualização web (`web/comex_exp_municipio/`) é derivada diretamente desta base longa via `web/_export/export_comex_exp_municipio.R`.
 
 ## Pendências
 

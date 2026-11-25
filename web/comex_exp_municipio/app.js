@@ -33,6 +33,7 @@
       ranking_axis_label_kg: "Quantidade exportada ({unit})",
       region_total_prefix: "Total Amazônia Legal: ",
       label_no_data: "Sem dado",
+      label_map_no_data: "Nenhum produto exportado",
       label_others: "Outros",
       view_change: "Variação",
       title_change: "Variação entre dois anos",
@@ -153,13 +154,13 @@
       label_map_mode: "VARIÁVEIS:",
       map_mode_forest: "Compatíveis c/ Floresta",
       map_mode_all: "Todos os Produtos",
-      map_mode_ratio: "Razão Floresta/Outros",
+      map_mode_ratio: "Compatível c/ Floresta?",
       title_map_forest: "Principal produto compatível com a floresta",
       title_map_all: "Principal produto exportado",
-      title_map_ratio: "Floresta vs. outros produtos",
+      title_map_ratio: "O produto principal é compatível com a floresta?",
       subtitle_map_forest: "Município colorido pela categoria do seu principal produto compatível com a floresta, por ano",
       subtitle_map_all: "Município colorido pela categoria do seu principal produto exportado, por ano",
-      subtitle_map_ratio: "Compara o produto mais exportado do município com seu produto mais exportado entre os compatíveis com a floresta — qual dos dois é mais característico da Amazônia Legal?",
+      subtitle_map_ratio: "Indica se o produto mais exportado pelo município pertence à lista de produtos compatíveis com a floresta",
       map_hint: "Passe o mouse sobre um município para ver detalhes.",
       map_loading: "Carregando mapa…",
       tooltip_municipio: "Município:",
@@ -169,7 +170,9 @@
       tooltip_produto_floresta: "Produto mais exportado (floresta):",
       tooltip_categoria: "Categoria:",
       tooltip_valor: "Valor:",
-      tooltip_valor_unidade: "% das exportações desse produto na Amazônia Legal vindas deste município",
+      tooltip_quantidade: "Quantidade:",
+      tooltip_participacao: "Participação:",
+      tooltip_valor_unidade: "das exportações desse produto na Amazônia Legal",
       tooltip_classe: "Classificação:",
       ratio_same: "Mesmo produto principal",
       ratio_nao: "Principal produto não é compatível com a floresta",
@@ -195,6 +198,7 @@
       ranking_axis_label_kg: "Export quantity ({unit})",
       region_total_prefix: "Legal Amazon total: ",
       label_no_data: "No data",
+      label_map_no_data: "No products exported",
       label_others: "Other",
       view_change: "Change",
       title_change: "Change between two years",
@@ -315,13 +319,13 @@
       label_map_mode: "VARIABLES:",
       map_mode_forest: "Forest Compatible",
       map_mode_all: "All Products",
-      map_mode_ratio: "Forest/Other Ratio",
+      map_mode_ratio: "Forest Compatible?",
       title_map_forest: "Main forest-compatible product",
       title_map_all: "Main exported product",
-      title_map_ratio: "Forest vs. other products",
+      title_map_ratio: "Is the main export forest-compatible?",
       subtitle_map_forest: "Municipality colored by its main forest-compatible product's category, by year",
       subtitle_map_all: "Municipality colored by its main exported product's category, by year",
-      subtitle_map_ratio: "Compares the municipality's overall top export with its top export among forest-compatible goods — which one is more distinctively theirs, region-wide?",
+      subtitle_map_ratio: "Shows whether the municipality's top exported product is forest-compatible",
       map_hint: "Hover over a municipality to see details.",
       map_loading: "Loading map…",
       tooltip_municipio: "Municipality:",
@@ -331,7 +335,9 @@
       tooltip_produto_floresta: "Top export (forest-compatible):",
       tooltip_categoria: "Category:",
       tooltip_valor: "Value:",
-      tooltip_valor_unidade: "% of that product's Legal Amazon exports that came from this municipality",
+      tooltip_quantidade: "Quantity:",
+      tooltip_participacao: "Share:",
+      tooltip_valor_unidade: "of that product's Legal Amazon exports",
       tooltip_classe: "Classification:",
       ratio_same: "Same main product",
       ratio_nao: "Main product is not forest-compatible",
@@ -591,7 +597,7 @@
   // cor da categoria com o terreno e a legenda deixa de corresponder ao
   // que está na tela.
   const MAP_INSTATE_OPACITY = 1;
-  const MAP_RATIO_COLORS = { same: "#666666", nao: "#D55E00", sim: "#009E73" };
+  const MAP_RATIO_COLORS = { nao: "#D55E00", sim: "#009E73" };
 
   let sparkSeries = [];
   let sparkXFor = null;
@@ -1394,8 +1400,8 @@
     ]).then(([data, municGeo, statesGeo, legalAmazonGeo]) => {
       mapData = data;
       mapCellByKey = new Map();
-      for (const [municipioIdx, ano, floresta, categoriaIdx, produtoIdx, valor] of data.cells) {
-        mapCellByKey.set(`${municipioIdx}|${ano}|${floresta}`, { categoriaIdx, produtoIdx, valor });
+      for (const [municipioIdx, ano, floresta, categoriaIdx, produtoIdx, valor, fob, kg] of data.cells) {
+        mapCellByKey.set(`${municipioIdx}|${ano}|${floresta}`, { categoriaIdx, produtoIdx, valor, fob, kg });
       }
       return { municGeo, statesGeo, legalAmazonGeo };
     }), () => { mapDataPromise = null; });
@@ -1412,18 +1418,16 @@
     return mapCellByKey.get(`${municipioIdx}|${ano}|${floresta}`);
   }
 
-  // Ratio mode is derived client-side from the forest (floresta=1) and
-  // all-products (floresta=0) cells already loaded, mirroring the original
-  // app's classe_ratio logic exactly: if either side has no top product
-  // that year, there's not enough information to classify (no data) — a
-  // municipality with zero forest-compatible exports isn't "not
-  // forest-dominant", it's simply unclassifiable from this comparison.
+  // Modo de compatibilidade florestal: se o município exportou algo (cellAll existe),
+  // verifica se o produto principal geral (cellAll) coincide com o produto florestal
+  // (cellForest). Se cellForest existir e for o mesmo produto, é "sim". Se não for,
+  // ou se o município não exporta produto florestal nenhum, é "nao".
+  // Se o município não tem nenhuma exportação no ano, retorna null (sem dado).
   function computeMapRatioClass(municipioIdx, ano) {
     const cellAll = getMapCell(municipioIdx, ano, 0);
+    if (!cellAll) return null;
     const cellForest = getMapCell(municipioIdx, ano, 1);
-    if (!cellAll || !cellForest || !(cellAll.valor > 0)) return null;
-    if (cellForest.produtoIdx === cellAll.produtoIdx) return "same";
-    return cellForest.valor / cellAll.valor < 1 ? "nao" : "sim";
+    return cellForest && cellForest.produtoIdx === cellAll.produtoIdx ? "sim" : "nao";
   }
 
   function initLeafletMap(municGeo, statesGeo, legalAmazonGeo) {
@@ -1541,7 +1545,8 @@
   }
 
   function fmtPct(v) {
-    return v.toLocaleString(numLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%";
+    const digits = v < 0.1 && v > 0 ? 2 : 1;
+    return v.toLocaleString(numLocale(), { minimumFractionDigits: digits, maximumFractionDigits: digits }) + "%";
   }
 
   // Ratio mode's classification compares two *different* calculations —
@@ -1559,21 +1564,29 @@
     ];
     if (state.mapMode === "ratio") {
       if (!ratioClass) {
-        rows.push(`<i>${t.label_no_data}</i>`);
+        rows.push(`<i>${t.label_map_no_data}</i>`);
         return rows.join("<br>");
       }
-      const label = ratioClass === "same" ? t.ratio_same : ratioClass === "sim" ? t.ratio_sim : t.ratio_nao;
+      const label = ratioClass === "sim" ? t.ratio_sim : t.ratio_nao;
       rows.push(`${t.tooltip_classe} <b>${label}</b>`);
-      rows.push(`${t.tooltip_produto_geral} <b>${mapData.produtos[cellAll.produtoIdx]}</b> (${fmtPct(cellAll.valor)})`);
-      rows.push(`${t.tooltip_produto_floresta} <b>${mapData.produtos[cellForest.produtoIdx]}</b> (${fmtPct(cellForest.valor)})`);
-      rows.push(`<span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
+      rows.push(`<hr style="border:0;border-top:1px solid rgba(255,255,255,0.2);margin:4px 0;">`);
+      rows.push(`${t.tooltip_produto_geral} <b>${mapData.produtos[cellAll.produtoIdx]}</b>`);
+      rows.push(`${t.tooltip_valor} <b>${fmtAbbrevValor(cellAll.fob)}</b> &nbsp; ${t.tooltip_quantidade} <b>${fmtAbbrevKg(cellAll.kg)}</b>`);
+      rows.push(`${t.tooltip_participacao} <b>${fmtPct(cellAll.valor)}</b> <span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
+      if (cellForest) {
+        rows.push(`<hr style="border:0;border-top:1px solid rgba(255,255,255,0.2);margin:4px 0;">`);
+        rows.push(`${t.tooltip_produto_floresta} <b>${mapData.produtos[cellForest.produtoIdx]}</b>`);
+        rows.push(`${t.tooltip_valor} <b>${fmtAbbrevValor(cellForest.fob)}</b> &nbsp; ${t.tooltip_quantidade} <b>${fmtAbbrevKg(cellForest.kg)}</b>`);
+        rows.push(`${t.tooltip_participacao} <b>${fmtPct(cellForest.valor)}</b> <span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
+      }
     } else if (cellAll) {
       rows.push(`${t.tooltip_produto} <b>${mapData.produtos[cellAll.produtoIdx]}</b>`);
       rows.push(`${t.tooltip_categoria} <b>${mapCategoryLabel(cellAll.categoriaIdx, t)}</b>`);
-      rows.push(`${t.tooltip_valor} <b>${fmtPct(cellAll.valor)}</b>`);
-      rows.push(`<span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
+      rows.push(`${t.tooltip_valor} <b>${fmtAbbrevValor(cellAll.fob)}</b>`);
+      rows.push(`${t.tooltip_quantidade} <b>${fmtAbbrevKg(cellAll.kg)}</b>`);
+      rows.push(`${t.tooltip_participacao} <b>${fmtPct(cellAll.valor)}</b> <span style="font-size:0.85em;color:var(--muted);">${t.tooltip_valor_unidade}</span>`);
     } else {
-      rows.push(`<i>${t.label_no_data}</i>`);
+      rows.push(`<i>${t.label_map_no_data}</i>`);
     }
     return rows.join("<br>");
   }
@@ -1653,7 +1666,7 @@
     renderMapLegend(t);
   }
 
-  // Legend is a fixed set (top-8 categories, or the 3 ratio classes) shown
+  // Legend is a fixed set (top-8 categories, or the 2 ratio classes) shown
   // in full every time — never trimmed to "only what's present this year"
   // — so the same color always means the same thing as you scrub the
   // year slider (color follows the entity, not its per-year presence).
@@ -1664,7 +1677,6 @@
       html += `<div class="legend-title">${t.legend_title_ratio}</div>`;
       html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.sim}"></span>${t.ratio_sim}</div>`;
       html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.nao}"></span>${t.ratio_nao}</div>`;
-      html += `<div class="legend-row"><span class="swatch" style="background:${MAP_RATIO_COLORS.same}"></span>${t.ratio_same}</div>`;
     } else {
       html += `<div class="legend-title">${t.legend_title_category}</div>`;
       mapData.categorias.forEach((nome, i) => {
@@ -1672,7 +1684,7 @@
       });
       html += `<div class="legend-row"><span class="swatch" style="background:${OTHERS_COLOR}"></span>${t.label_others}</div>`;
     }
-    html += `<div class="legend-row"><span class="swatch swatch-nodata"></span>${t.label_no_data}</div>`;
+    html += `<div class="legend-row"><span class="swatch swatch-nodata"></span>${t.label_map_no_data}</div>`;
     div.innerHTML = html;
   }
 

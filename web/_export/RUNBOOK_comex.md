@@ -59,24 +59,13 @@ só. O porquê está em `ARQUITETURA.md`.
 
 Cada arquivo de dados carrega **as duas medidas**, valor e quantidade, na
 mesma estrutura. É o que permite o botão Valor/Quantidade do app trocar sem
-buscar nada.
+buscar nada. O script também exporta todos os arquivos do mapa (GeoJSONs e
+`map_data.json`) para a pasta `map/` a partir das geometrias em `global/` e da base longa.
+No `map_data.json`, `cells` traz o produto principal por município/ano ordenado por
+valor FOB: `[municipio_idx, ano, floresta, categoria_idx, produto_idx, valor, fob, kg]`.
 
-### 2b. Mapa (só se a geometria mudar, o que é raro)
-
-```sh
-Rscript web/_export/export_comex_mapa.R
-```
-
-Lê `global/munic_shapefile.rds`, `global/states_boundary.rds`,
-`global/legal_amazon_boundary.rds` e `data/comex_exp_munic_sh4_sel.rds`.
-Escreve a pasta `map/` (~6,4 MB, a maior parte é fronteira de estado).
-
-Fica separado porque é o único que precisa do `sf` e porque fronteira
-municipal quase não muda: rodar junto a cada atualização de dado seria
-regerar 6,4 MB idênticos aos anteriores.
-
-Os scripts imprimem no final o que escreveram. Se algum terminar com erro de
-arquivo não encontrado, é porque o `.rds` correspondente não foi gerado ainda:
+O script imprime no final o que escreveu. Se terminar com erro de
+arquivo não encontrado, é porque `data/comex_exp_munic_base.rds` não foi gerado ainda:
 rode `data-raw/comex.R` antes.
 
 ## 3. Conferir antes de publicar
@@ -259,11 +248,10 @@ total fica 14% abaixo de 2025, mas anualizado está 14% acima.
 
 ## 6. O que alimenta o quê
 
-| `.rds` de origem | script | JSON gerado |
+| Fonte de origem | script | Arquivos gerados |
 |---|---|---|
-| `comex_exp_munic_base.rds` | 2a | os 13 da raiz de `data/` |
-| `comex_exp_munic_sh4_sel.rds` + `global/*.rds` | 2b | os 4 da pasta `map/` |
+| `data/comex_exp_munic_base.rds` + `global/*.rds` | `export_comex_exp_municipio.R` | os 13 da raiz de `data/` e os 4 da pasta `map/` |
 
-Os `.rds` acima são produzidos por `data-raw/comex.R` (os de COMEX) e vêm do
-`global/` (as geometrias). Este documento começa depois deles: se o `.rds` estiver
+A base longa é produzida por `data-raw/comex.R` e as geometrias vêm de
+`global/`. Este documento começa depois deles: se o `.rds` estiver
 velho, regerar os JSON não adianta.

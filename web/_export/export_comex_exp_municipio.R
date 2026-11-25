@@ -1,29 +1,18 @@
 ############################################################
-# Export static JSON for the JS rebuild of app_ts_comex_exp_municipio
+# Export static JSON and GeoJSON for the JS rebuild of app_ts_comex_exp_municipio
 #
-# Reads ONE source: data/comex_exp_munic_base.rds, the long-format COMEX
-# base built by data-raw/comex.R (see data-raw/README_data.md). One row per
+# Reads ONE source for trade data: data/comex_exp_munic_base.rds, the long-format COMEX
+# base built by data-raw/comex.R (see data-raw/README_comex_data.md). One row per
 # ano x SH4 x municipio x pais de destino, carrying valor_fob (US$ FOB
 # nominal) and kg_liquido, with the PT/EN labels for product, chapter,
 # section and country already joined in.
 #
-# This replaces the previous arrangement, where this script read several
-# pre-aggregated wide matrices (comex_exp_munic_sec.rds,
-# comex_exp_munic_sh2.rds, ...) plus four dictionary CSVs, and a second
-# script read comex_exp_sh4_munic.rds for the product ranking. Every one of
-# those outputs is a different group_by over this single base, so they are
-# all derived here in one pass. See web/_export/ARQUITETURA.md for
-# why the split is by dependency rather than by visualisation — the map
-# export stays separate because it needs `sf`.
+# Geometry for the map view comes from global/*.rds shapefiles (munic_shapefile.rds,
+# states_boundary.rds, legal_amazon_boundary.rds) and municipality metadata from
+# datazoom.amazonia::municipalities.
 #
-# Two measures ride together: valor_fob (US$ FOB nominal) and kg_liquido
-# (quantity). Both are exported into the SAME sparse structure rather than
-# into parallel files, because a row exists in the base when there was a
-# transaction, so the two share a sparsity pattern almost exactly: at the
-# municipio x ano grain only 27 of 6534 cells carry value without weight,
-# and none the reverse. Sharing costs one extra number per cell instead of
-# duplicating every lookup array, and it makes the app's Valor/Quantidade
-# toggle instant, with no second fetch.
+# All views (Ranking, Composição, Tendências, Explorar, Variação e Mapa) are derived
+# here in one pass directly from the single long base.
 #
 # Run from repo root: Rscript web/_export/export_comex_exp_municipio.R
 ############################################################
@@ -31,6 +20,7 @@
 library(dplyr)
 library(tidyr)
 library(jsonlite)
+library(sf)
 
 out_dir <- "web/comex_exp_municipio/data"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
@@ -276,6 +266,116 @@ dictionary <- list(
 write_json(dictionary, file.path(out_dir, "dictionary.json"),
            auto_unbox = TRUE, pretty = TRUE)
 
+# ---- Map view export (GeoJSON + map_data.json) ----
+#
+# Derived directly from `base` and global/*.rds geometry.
+# Attributes represent each municipality's top exported product (overall and among
+# forest-compatible products), its FOB value, net weight in kg, and its relative
+# percentage against Legal Amazon's total exports of that product.
+map_out_dir <- file.path(out_dir, "map")
+dir.create(map_out_dir, recursive = TRUE, showWarnings = FALSE)
+
+munic_geo <- readr::read_rds("global/munic_shapefile.rds") %>%
+  filter(legal_amazon == 1) %>%
+  st_make_valid() %>%
+  transmute(cod_ibge = as.character(municipality_code), geometry = geom) %>%
+  st_transform(crs = 4326)
+
+sf::write_sf(munic_geo, file.path(map_out_dir, "municipalities.geojson"),
+             driver = "GeoJSON", delete_dsn = TRUE)
+
+states_boundary <- readr::read_rds("global/states_boundary.rds") %>%
+  st_transform(crs = 4326)
+sf::write_sf(states_boundary, file.path(map_out_dir, "states_boundary.geojson"),
+             driver = "GeoJSON", delete_dsn = TRUE)
+
+legal_amazon_boundary <- readr::read_rds("global/legal_amazon_boundary.rds") %>%
+  st_transform(crs = 4326)
+sf::write_sf(legal_amazon_boundary, file.path(map_out_dir, "legal_amazon_boundary.geojson"),
+             driver = "GeoJSON", delete_dsn = TRUE)
+
+municipios_idx <- munic_geo$cod_ibge
+
+muni_dz <- datazoom.amazonia::municipalities %>%
+  filter(legal_amazon == 1) %>%
+  transmute(cod_ibge = as.character(code_muni),
+            nome = toupper(name_muni),
+            uf = abbrev_state)
+
+municipio_meta <- data.frame(cod_ibge = municipios_idx) %>%
+  left_join(muni_dz, by = "cod_ibge")
+
+sh4_floresta <- c("0301", "0302", "0303", "0304", "0305", "0306",
+                  "0801", "0811", "0904", "1207", "1301", "1511",
+                  "1515", "1801", "2008", "2009")
+
+tot_prod_ano <- base %>%
+  group_by(ano, cod_sh4) %>%
+  summarise(tot_fob_amazonia = sum(valor_fob), .groups = "drop")
+
+mun_prod_ano <- base %>%
+  group_by(ano, cod_ibge = as.character(cod_municipio), cod_sh4, sh4_pt, sh2_pt) %>%
+  summarise(
+    valor_fob_mun = sum(valor_fob),
+    kg_mun = sum(kg_liquido),
+    .groups = "drop"
+  ) %>%
+  left_join(tot_prod_ano, by = c("ano", "cod_sh4")) %>%
+  mutate(pct = (valor_fob_mun / tot_fob_amazonia) * 100)
+
+top_all <- mun_prod_ano %>%
+  group_by(ano, cod_ibge) %>%
+  slice_max(order_by = valor_fob_mun, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(floresta = FALSE)
+
+top_flor <- mun_prod_ano %>%
+  filter(cod_sh4 %in% sh4_floresta) %>%
+  group_by(ano, cod_ibge) %>%
+  slice_max(order_by = valor_fob_mun, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(floresta = TRUE)
+
+top_comb <- bind_rows(top_all, top_flor) %>%
+  mutate(
+    lab = ifelse(nchar(sh4_pt) > 60, paste0(substr(sh4_pt, 1, 59), "…"), sh4_pt),
+    nome_sh2 = ifelse(nchar(sh2_pt) > 50, paste0(substr(sh2_pt, 1, 49), "…"), sh2_pt)
+  )
+
+categoria_fob <- top_comb %>%
+  filter(!is.na(nome_sh2)) %>%
+  group_by(nome_sh2) %>%
+  summarise(fob = sum(valor_fob_mun), .groups = "drop") %>%
+  arrange(desc(fob))
+categorias_idx <- head(categoria_fob$nome_sh2, 8)
+
+produtos_idx <- top_comb %>%
+  filter(!is.na(lab)) %>%
+  distinct(lab) %>%
+  pull(lab) %>%
+  sort()
+
+cells <- top_comb %>%
+  transmute(
+    municipio_idx = match(cod_ibge, municipios_idx) - 1L,
+    ano = as.integer(ano),
+    floresta = as.integer(floresta),
+    categoria_idx = ifelse(nome_sh2 %in% categorias_idx, match(nome_sh2, categorias_idx) - 1L, -1L),
+    produto_idx = match(lab, produtos_idx) - 1L,
+    valor = round(pct, 4),
+    fob = round(valor_fob_mun),
+    kg = round(kg_mun)
+  )
+
+map_data <- list(
+  municipios = municipio_meta,
+  categorias = categorias_idx,
+  produtos = produtos_idx,
+  cells = cells %>% as.matrix() %>% unname()
+)
+
+write_json(map_data, file.path(map_out_dir, "map_data.json"), auto_unbox = TRUE)
+
 cat("Exported:\n",
     " -", file.path(out_dir, "municipality_totals.json"), "\n",
     " -", file.path(out_dir, "region_totals.json"), "\n",
@@ -289,7 +389,11 @@ cat("Exported:\n",
     " -", file.path(out_dir, "composition_pais.json"), "\n",
     " -", file.path(out_dir, "municipality_composition_pais.json"), "\n",
     " -", file.path(out_dir, "paises.json"), "\n",
-    " -", file.path(out_dir, "dictionary.json"), "\n")
+    " -", file.path(out_dir, "dictionary.json"), "\n",
+    " -", file.path(map_out_dir, "municipalities.geojson"), "\n",
+    " -", file.path(map_out_dir, "states_boundary.geojson"), "\n",
+    " -", file.path(map_out_dir, "legal_amazon_boundary.geojson"), "\n",
+    " -", file.path(map_out_dir, "map_data.json"), "\n")
 cat(sprintf("\nAnos: %d-%d (ultimo completo: %d)\n", year_inicio, year_final, year_final_completo))
 if (length(anos_parciais)) {
   for (a in names(anos_parciais)) cat(sprintf(" - %s e parcial: %d meses\n", a, anos_parciais[[a]]))

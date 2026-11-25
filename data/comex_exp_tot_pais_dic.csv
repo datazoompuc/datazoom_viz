@@ -1,4 +1,0 @@
-"","var","x","y","color","size","slider","label","desc","var_group","tipo","unidade","categoria","subcategoria"
-"1","time",FALSE,FALSE,FALSE,FALSE,FALSE,"Ano","Ano","Comex",1,"US$","Economia","Comércio exterior"
-"2","group",FALSE,FALSE,TRUE,FALSE,FALSE,"País","País","Comex",1,"US$","Economia","Comércio exterior"
-"3","value",TRUE,TRUE,FALSE,TRUE,TRUE,"Valor","Valor","Comex",1,"US$","Economia","Comércio exterior"
