@@ -229,6 +229,23 @@ Receita real, do dia em que país entrou. Levou um commit.
 O que torna isso barato é a forma ser a mesma. Se a dimensão nova precisar de
 um formato próprio, provavelmente o recorte está errado.
 
+### Dimensão nova vs. cruzar duas que já existem
+
+Acrescentar país foi barato porque ele entrou como *mais um nível* ao lado de
+SEC e SH2, no mesmo formato. Cruzar duas dimensões que já existem é outra
+conta, e o custo cresce com o nível:
+
+```
+municipio x SEC     x pais x ano    133 mil células   3,8 MB   (1,3 MB comprimido)
+municipio x SH2     x pais x ano    173 mil           5,0 MB   (1,7 MB)
+municipio x SH4     x pais x ano    302 mil           8,6 MB   (2,9 MB)
+```
+
+O Pages serve comprimido e esses arquivos esparsos encolhem cerca de 3x, então
+o número que importa é o da direita. Mesmo assim, pare no nível em que a
+combinação ainda tem densidade: em SH4 a lista de países por produto fica tão
+esparsa que a tela mostra poucas barras e o arquivo triplica.
+
 ---
 
 ## 4. Armadilhas que custaram tempo
@@ -253,6 +270,32 @@ procurando o bug no export.
 **Rótulos mudam quando a fonte muda.** Ao trocar os CSVs à mão pelos nomes
 oficiais, 91 dos 97 rótulos em inglês mudaram. Foram melhorias, mas vale
 conferir um punhado antes de publicar.
+
+**Denominador externo acaba antes da série.** Medida normalizada (per capita,
+% do PIB, % das exportações mundiais) depende de uma base que não é a sua, e
+que tem cobertura própria. No COMEX, que vai de 1997 a 2026, os três
+denominadores disponíveis terminam em lugares diferentes, e um tem buraco no
+meio:
+
+| denominador | cobre | o que falta |
+|---|---|---|
+| `population.rds` | 2001-2026 | **2023 inteiro**, porque o IBGE não estimou no ano do Censo |
+| `pibmunic.rds` | 2002-2023 | 2024 em diante, 24% do valor exportado |
+| BACI (mundial) | 1995-2024 | 2025 e 2026, 14% do valor exportado |
+
+Ou seja, 2023 tem PIB e não tem população, e 2024 tem BACI e não tem PIB.
+**Confira o buraco antes de prometer o indicador**, e lembre que o app abre no
+último ano completo: um indicador que termina antes nasce vazio na primeira
+tela. Extrapolar fica igual a medido e ninguém distingue; preferimos mostrar só
+onde há denominador, como já é feito com ano parcial.
+
+**Moeda, antes de deflator.** O PIB municipal do IBGE vem em **R$ mil
+correntes** e a exportação do Comex Stat em **US$ FOB**. Para a razão entre os
+dois o que falta é câmbio, não deflator, e o câmbio foi de 1,10 a 5,50 no
+período do app. Com numerador e denominador no mesmo ano e na mesma moeda, a
+inflação se cancela na divisão. Deflator volta a importar para comparar US$ por
+habitante entre anos distantes, e aí por índice americano, porque o numerador é
+dólar.
 
 ---
 

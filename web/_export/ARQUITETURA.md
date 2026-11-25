@@ -226,6 +226,32 @@ Do lado do app, acrescentar medida é barato porque o código já separa "qual
 coluna estou lendo" de "como eu desenho". Foi assim que a escala logarítmica e
 a indexação entraram no Explorar sem tocar no resto.
 
+### Medida normalizada é uma terceira categoria
+
+Valor e quilo vêm da mesma linha da mesma base: onde existe um, existe o
+outro. Medida *normalizada* por um denominador externo (per capita, % do PIB,
+% das exportações mundiais) não é só mais uma coluna, e tratá-la como se fosse
+é o erro a evitar. Ela tem três propriedades que as outras não têm:
+
+- **Cobertura própria.** O denominador vem de outra base, com outro calendário,
+  e pode acabar antes ou ter buraco no meio. Uma medida que existe em 1997-2026
+  dividida por outra que existe em 2002-2023 dá um indicador 2002-2023. O app
+  abre no último ano completo, então um indicador que termina antes nasce vazio
+  na primeira tela.
+- **Unidade própria, e às vezes moeda própria.** Se numerador e denominador
+  estão em moedas diferentes, falta câmbio antes de qualquer discussão sobre
+  deflator.
+- **Domínio de validade.** Algumas só fazem sentido com uma dimensão fixa. % do
+  PIB e per capita dividem por um denominador da própria entidade, então valem
+  em qualquer tela. % das exportações mundiais divide pelo mundo *por produto*,
+  então só é definido onde o produto está fixo: num ranking de municípios com
+  "todos os produtos" não existe denominador. Isso torna o controle assimétrico
+  com os outros, o que é aceitável desde que seja decisão consciente.
+
+Na prática: antes de prometer uma medida normalizada, confira o intervalo do
+denominador, a unidade, e em quais telas ela é definida. As três armadilhas
+estão documentadas com números reais em `GUIA_base_long.md` §4.
+
 ---
 
 ## 7. Decidindo o recorte dos scripts
