@@ -12,11 +12,15 @@ setwd("~/datazoom_viz")
 source("data-raw/comex.R")
 ```
 
-O último ano vem do `available_time` do manifest do `datazoom.amazonia` (`ano_inicial` é o único parâmetro; use `ano_final_manual` para forçar outro) e o script sempre baixa os dados de novo.
+O script possui checagem automática integrada: antes de iniciar o reprocessamento de todos os anos, ele baixa a amostra do ano mais recente via `datazoom.amazonia::load_br_trade(dataset = "export_mun", time_period = ano_final)` e compara o último mês e ano disponíveis com os registrados na base local `data/comex_exp_munic_base.rds`. Se os dados forem iguais (sem novos meses ou anos na fonte oficial), o script encerra imediatamente com status 0 sem baixar a série histórica novamente. Havendo dado novo ou caso a base local não exista, o processamento completo de todos os anos prossegue normalmente.
+
+Além da execução manual, a verificação e atualização é executada automaticamente todo dia 8 de cada mês às 09:00 UTC (06:00 BRT) via GitHub Actions (`.github/workflows/check-comex-updates.yml`).
+
+O último ano vem do `available_time` do manifest do `datazoom.amazonia` (`ano_inicial` é o único parâmetro; use `ano_final_manual` para forçar outro).
 
 O servidor do MDIC (balanca.mdic.gov.br) costuma derrubar conexões em arquivos grandes. Por isso os downloads usam o curl do sistema, que retoma de onde caiu e repete em caso de erro, e o script tenta cada ano até 5 vezes. Os anos já baixados ficam guardados, então, se o script parar em algum ano, basta rodar de novo na mesma sessão do R.
 
-O script precisa do `datazoom.amazonia` com o dicionário do COMEX baixado por `download.file()` (PR `comex-dicionario-download-file`). Enquanto o PR não for mergeado, rode antes `devtools::load_all("~/datazoom.amazonia")` na branch desse PR; depois do merge, basta instalar o pacote atualizado. O ano final e a URL do dicionário são lidos com funções internas do pacote (`:::`).
+O script precisa do `datazoom.amazonia` com o PR "Comex resolver migration" (#354), já no master: o ano final e a URL dos arquivos de nomes do MDIC (linha `comex_dic` do manifest) são lidos com funções internas do pacote (`:::`).
 
 ## Arquivo gerado
 
@@ -47,8 +51,42 @@ Os nomes de produto vêm do `NCM_SH.csv`, os de país do `PAIS.csv` e os de muni
 
 ## Arquivos em `data/`
 
-Apenas `data/comex_exp_munic_base.rds` é mantido em `data/`. Todos os arquivos legados `comex_exp_*` (bases largas, matrizes transpostas, mapa `comex_exp_munic_sh4_sel.rds` e dicionários CSV) e `comex_munic_raw.rds` foram removidos. Toda a geração de JSONs e GeoJSONs para a visualização web (`web/comex_exp_municipio/`) é derivada diretamente desta base longa via `web/_export/export_comex_exp_municipio.R`.
+Sobra **um arquivo**: `data/comex_exp_munic_base.rds`, a base central longa gerada por
+este script. Todos os `comex_exp_*` antigos (bases largas, matrizes transpostas, % mundial
+e os dicionários CSV), o `comex_exp_munic_sh4_sel.rds` do mapa e o `comex_munic_raw.rds`
+foram removidos.
+
+Toda a geração de JSON e GeoJSON da visualização web (`web/comex_exp_municipio/`) sai
+dessa base, por `web/_export/export_comex_exp_municipio.R`. O mapa deixou de ter script
+próprio: era `export_comex_mapa.R`, hoje faz parte do mesmo export.
+
+Os apps Shiny que liam os arquivos removidos continuam no repositório e **vão quebrar se
+forem redeployados**, porque o `config/app_manifest.csv` ainda resolve as dependências
+pelos nomes antigos. Estão listados nas Pendências.
 
 ## Pendências
+
+**Oito apps Shiny leem arquivos que não existem mais.** Eles continuam no repositório e no
+`config/app_manifest.csv`, que resolve dependências pelos nomes antigos, então um
+`deploy_shiny_script()` falha sem dizer o motivo:
+
+| App | O que falta |
+|---|---|
+| `app_ts_comex_exp_municipio` | `comex_exp_munic_sec/sh2.rds`, `comex_exp_sec/sh2_munic.rds` e dicionários |
+| `app_map_comex_exp_sh4_sel` | `comex_exp_munic_sh4_sel.rds` e dicionários |
+| `app_rk_comex_exp_munic_produtosamz` | `comex_exp_sh4_munic.rds` e dicionários |
+| `app_rk_comex_exp_paises` | `comex_exp_tot_pais.rds`, dicionários, `indice_precos_anual.csv` |
+| `app_ts_comex_exp_tot_pais` | idem |
+| `app_rk_comex_exp_perc_sh4_sel` | `comex_exp_perc_sh4_sel.rds` e dicionários |
+| `app_sankey_comex_exp_pais_sec` | `comex_exp_pais_sec.rds` e dicionários |
+| `app_ts_comex_exp_pais_sec` | `comex_exp_pais_sec.rds`, `comex_exp_sec_pais.rds` e dicionários |
+
+Sete dos oito vão ser aposentados: três são substituídos pelo app web novo
+(`web/comex_exp_municipio/`) e quatro saíram da página do site por decisão de nov/2026.
+**A exceção é o `app_rk_comex_exp_munic_produtosamz`**, que não está em nenhuma lista de
+aposentadoria e não é coberto pelo app novo.
+
+A ordem importa: ou os apps e o manifest saem junto com os `.rds`, ou os `.rds` ficam até
+a limpeza dos Shiny acontecer. O estado intermediário é o que quebra calado.
 
 - `paises_traducao.csv` é lido pelo `app_rk_comex_exp_paises.R`; script que o gera não identificado.

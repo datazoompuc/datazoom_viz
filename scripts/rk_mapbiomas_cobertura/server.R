@@ -14,8 +14,12 @@ iv <- function(x) if (is.null(x)) FALSE else isTRUE(x)
 get_server <- function(files, param) {
 
   # Carrega as duas bases (o toggle geográfico decide qual está ativa)
-  df_est   <- readRDS(files$db_file_est)   %>% dplyr::ungroup()
-  df_munic <- readRDS(files$db_file_munic) %>% dplyr::ungroup()
+  # uma base longa; as tabelas largas (uma coluna por classe) saem dela
+  base_cobertura <- readRDS(files$db_file_base)
+  # a base é nacional: estes apps mostram só a Amazônia Legal
+  base_cobertura <- base_cobertura[base_cobertura$amazonia_legal, ]
+  df_est   <- cobertura_larga(base_cobertura, "est")   %>% dplyr::ungroup()
+  df_munic <- cobertura_larga(base_cobertura, "munic") %>% dplyr::ungroup()
 
   server <- function(input, output, session) {
 

@@ -26,7 +26,7 @@ App updates are being monitored in this [sheet](https://docs.google.com/spreadsh
 
  - "./data": contains all the .rds databases and .csv files that are used in the generation of the visualizations. The files' names are organized in order to follow a pattern: xxxx.rds for the databases and xxxx_dic for the .csv dictionaries that correspond to the same database.
  
- - "./data-raw": contains .R scripts that generates both the .rds databases and the .csv files that are recorded in the "./data" directory. In order to generate the databases, the scripts use the datazoom.amazonia R package, developed by the Datazoom team. Each .R script is responsible for generating the .rds and .csv files for specific geographic aggregation of the researches. 
+ - "./data-raw": contains .R scripts that generates both the .rds databases and the .csv files that are recorded in the "./data" directory. In order to generate the databases, the scripts use the datazoom.amazonia R package, developed by the Datazoom team. Each .R script is responsible for generating the .rds and .csv files for specific geographic aggregation of the researches. Some datasets have their own README with the update steps: [COMEX](data-raw/README_comex_data.md), [MapBiomas](data-raw/README_mapbiomas_data.md), [PIB municipal](data-raw/README_pibmunic_data.md) and [population](data-raw/README_population_data.md).
  
 
 ## Directory Structure
@@ -70,7 +70,7 @@ deploy_shiny_script("app_id")
 For example:
 
 ```r
-deploy_shiny_script("ts_ibge_pnadc_cnae")
+deploy_shiny_script("ts_ibge_pnadc_atividades_ocupacoes")
 ```
 
 If an error occurs, check the console log to identify missing dependencies or configuration issues.
@@ -247,26 +247,27 @@ The data has yearly frequency and is available starting from the year
 
 **Files:**
 
-- `app_hist_mapbiomas_bovinos`: histogram graphic about the distribution of municipalities according to cattle per hectares of grazing areas. (english version: `app_hist_mapbiomas_bovinos_en`)
-  
+- `app_hist_mapbiomas_bovinos`: histogram graphic about the distribution of municipalities according to cattle per hectares of grazing areas. (PT/EN toggle)
+
 - `app_map_cattle`: map of heads of cattle and pasture area data. (english version: `app_map_cattle_en`)
 
-- `app_map_mapbiomas_cover`: map of annual land use and land cover in brazil. (english version: `app_map_mapbiomas_cover_en`)
+- `app_map_mapbiomas_cover`: map of annual land use and land cover in brazil. (PT/EN toggle)
 
-- `app_rk_mapbiomas_cobertura`: ranking of annual land use and cover, with toggles for state/municipality level and absolute (ha) / percentual of area. Single app with PT/EN lang toggle (merged from the former `app_rk_mapbiomas_cobertura_est` and `app_rk_mapbiomas_cobertura_munic_percentual` + their `_en` versions).
+- `app_rk_mapbiomas_cobertura`: ranking of annual land use and cover, with toggles for state/municipality level and absolute (ha) / percentual of area. Single app with PT/EN lang toggle.
 
-- `app_rk_mapbiomas_transicao_est`: ranking of transition/change of soil cover and use at state level through the years. (english version: `app_rk_mapbiomas_transicao_est_en`)
+- `app_ts_mapbiomas_cobertura`: graphic of annual land use and cover. Single app with PT/EN lang toggle; it uses the same data as `app_rk_mapbiomas_cobertura`.
 
-- `app_rk_mapbiomas_transicao_munic_5`: ranking of transition/change of soil cover and use at the municipality level through the years. (english version: `app_rk_mapbiomas_transicao_munic_5_en`)
+- `app_rk_mapbiomas_transicao`: ranking of transition/change of land cover and use through the years, at state and municipality level. (PT/EN toggle)
+
+- `app_sankey_mapbiomas_transicao`: sankey graphic of transitions between land cover and use classes, at state and municipality level. (PT/EN toggle)
 
 - `app_tab_mapbiomas_transicao_est`: table of transition/change of soil cover and use at state level through the years.
 
-- `app_ts_mapbiomas_cobertura_est`: graphic of annual mapping of land use and coverage at state level. (english version: `app_ts_mapbiomas_cobertura_est_en`)
+- `app_ts_mapbiomas_transicao`: graphic of transition/ change of land cover and use, at state and municipality level. (PT/EN toggle)
 
-- `app_ts_mapbiomas_cobertura_munic`: graphic of annual mapping of land use and coverage at the municipality level. (english version: `app_ts_mapbiomas_cobertura_munic_en`)
+The land cover apps (`app_rk_mapbiomas_cobertura` and `app_ts_mapbiomas_cobertura`) read a single national long base, `data/mapbiomas_cobertura_base.rds`, built by `data-raw/mapbiomas_cobertura_base.R`. It has one row per year, municipality and land cover class.
 
-- `app_ts_mapbiomas_transicao_est`: graphic of transition/ change of land cover and use at state level. (english version: `app_ts_mapbiomas_transicao_est_en`)
-
+How the base is built and updated is described in [`data-raw/README_mapbiomas_data.md`](data-raw/README_mapbiomas_data.md).
 
 
 ## SEEG
@@ -358,15 +359,11 @@ PNAD was an annual research focused on brazilian households, which revealed gene
 
 **Files:**
 
-- `app_rk_ibge_pnadc_cnae`: ranking of economic activities in the legal amazon at municipality level. (english version: `app_rk_ibge_pnadc_cnae_en`)
+- `app_rk_ibge_pnadc_atividades_ocupacoes`: ranking of economic activities and type of work occupation generated from the quarterly continuous pnad. (PT/EN toggle)
 
-- `app_rk_ibge_pnadc_cod`: ranking of ocupation type in the legal amazon at municipality level. (english version: `app_rk_ibge_pnadc_cod_en`)
+- `app_ts_ibge_pnadc_atividades_ocupacoes`: graphic of compiled data about economic activities and type of work occupation generated from the quarterly continuous pnad. (PT/EN toggle)
 
-- `app_ts_ibge_pnadc_atividades_ocupacoes`: graphic of compiled data about economic activities and type of work occupation generated from the quarterly continuous pnad.
-
-- `app_ts_ibge_pnadc_trabalho`: graphic of labor market. (english version: `app_ts_ibge_pnadc_trabalho_en`)
-
-- `app_ts_ibge_pnadc_trabalho_insercao`: graphic of insertion of employed persons in the labor market. (english version: `app_ts_ibge_pnadc_trabalho_insercao_en`)
+- `app_ts_ibge_pnadc_trabalho`: graphic of labor market. (PT/EN toggle)
 
 **Automated update check:** A [workflow](.github/workflows/check-pnadc-updates.yml) runs every Monday at 09:00 (Brasília time). It executes `scripts/check_pnadc_updates.R`, which:
 
@@ -403,35 +400,27 @@ Systems of nomenclature vary in the degree of detail in terms of the
 product involved, as well as other characteristics, such as unit and
 granularity of location.
 
+How the data is built and updated is described in [`data-raw/README_comex_data.md`](data-raw/README_comex_data.md). A [workflow](.github/workflows/check-comex-updates.yml) checks for COMEX updates.
+
 ------------------------------------------------------------------------
 
 **Files:**
 
-- `app_map_comex_exp_sh4_sel`: map of foreign trade in the amazon: value of the product's export. (english version: `app_map_comex_exp_sh4_sel_en`)
+- `app_map_comex_exp_sh4_sel`: map of foreign trade in the amazon: value of the product's export. (PT/EN toggle)
 
-- `app_rk_comex_exp_munic_produtosamz`: ranking of biggest product exporters municipalities in the legal amazon. (english version: `app_rk_comex_exp_munic_produtosamz_en`)
+- `app_rk_comex_exp_munic_produtosamz`: ranking of biggest product exporters municipalities in the legal amazon. (PT/EN toggle)
 
-- `app_rk_comex_exp_paises`: ranking of countries that import the most from the legal amazon. (english version: `app_rk_comex_exp_paises_en`)
+- `app_rk_comex_exp_paises`: ranking of countries that import the most from the legal amazon. (PT/EN toggle)
 
-- `app_rk_comex_exp_perc_sh4_sel`: ranking of foreign trade in the amazon compared to internacional commerce (BACI): proportion of products export values. (english version: `app_rk_comex_exp_perc_sh4_sel_en`)
+- `app_rk_comex_exp_perc_sh4_sel`: ranking of foreign trade in the amazon compared to internacional commerce (BACI): proportion of products export values. (PT/EN toggle)
 
-- `app_sankey_comex_exp_pais_sec`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_sankey_comex_exp_pais_sec_en`)
+- `app_sankey_comex_exp_pais_sec`: graphic of external trade in the amazon: products export value per destination country. (PT/EN toggle)
 
-- `app_ts_comex_exp_munic_sec`: graphic of external trade in the amazon: products export value per municipality. (english version: `app_ts_comex_exp_munic_sec_en`)
+- `app_ts_comex_exp_municipio`: graphic of external trade in the amazon: export value per municipality, by product group.
 
-- `app_ts_comex_exp_munic_sh2`: ????não sei diferenciar do de cima????. (english version: `app_ts_comex_exp_munic_sh2_en`)
+- `app_ts_comex_exp_pais_sec`: graphic of external trade in the amazon: export value per destination country and sector.
 
-- `app_ts_comex_exp_pais_sec`: OUTRA VERSÃO DE app_sankey_comex_exp_pais_sec*** graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_pais_sec_en`)
-
-- `app_ts_comex_exp_sec_munic`: graphic of external trade in the amazon: products export value per municipality. (english version: `app_ts_comex_exp_sec_munic_en`)
-
-- `app_ts_comex_exp_sec_pais`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_sec_pais_en`)
-
-- `app_ts_comex_exp_sh2_munic`: graphic of external trade in the amazon: products export value per destination country. (english version: `app_ts_comex_exp_sh2_munic_en`)
-
-- `app_ts_comex_exp_tot_pais`: graphic of external trade in the amazon: total products export value of amazonia legal per destination country. (english version: `app_ts_comex_exp_tot_pais_en`)
-
-- `app_ts_comex_exp_tot_sh2`: graphic of external trade in the amazon: products export value per type of product. (english version: `app_ts_comex_exp_tot_sh2_en`)
+- `app_ts_comex_exp_tot_pais`: graphic of external trade in the amazon: total products export value of amazonia legal per destination country. (PT/EN toggle)
 
 
 
@@ -451,7 +440,9 @@ national, regional, state and Legal Amazon levels.
 
 **Files:**
 
-- `app_ts_rais`: graphic of compiled data on the Brazilian formal labor market, with breakdowns by economic sector, occupation, education, sex, age group and race/color at state level.
+- `app_ts_rais`: graphic of compiled data on the Brazilian formal labor market, with breakdowns by economic sector, occupation, education, sex, age group and race/color at state level. (PT/EN toggle)
+
+The RAIS microdata is confidential: the raw data and the variable dictionary are **not** in this repository. `data/rais_groups.rds` is an aggregated base (year x state x group).
 
 
 
@@ -570,7 +561,9 @@ infrastructure planning.
 
 - `app_ts_dz_munic`: graphic of compilation of data at the municipality level. (english version: `app_ts_dz_munic_en`)
 
-- `app_ts_sistemas_isolados`: graphic of data from isolated sistems of energy. (english version: `app_ts_sistemas_isolados_en`)
+- `app_ts_sistemas_isolados`: graphic of data from isolated sistems of energy. (PT/EN toggle)
+
+- `app_abya_yala`: app on indigenous lands (data: `data/abya_yala_terras_indigenas.rds`), with its own stylesheet. Portuguese only.
 
   
 

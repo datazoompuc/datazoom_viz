@@ -158,7 +158,7 @@ Ambos são atualizados automaticamente pelo workflow `.github/workflows/update-m
 
 ```r
 source("scripts/deploy_shiny_script.R")
-deploy_shiny_script("app_id")  # ex: deploy_shiny_script("ts_ibge_pnadc_cnae")
+deploy_shiny_script("app_id")  # ex: deploy_shiny_script("ts_ibge_pnadc_atividades_ocupacoes")
 ```
 
 Para ver logs de erro:
