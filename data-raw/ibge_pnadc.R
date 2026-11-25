@@ -42,9 +42,72 @@ library(tidyverse)
 library(haven)
 library(tibble)
 library(zoo)
+library(httr)
 library(tidyr)
 library(magrittr)
 library(datazoom.social)  # instalar do GitHub se não estiver atualizado com devtools::install_github("datazoompuc/datazoom.social")
+# ── CHECAGEM DE ATUALIZAÇÃO ──────────────────────────────────────────────────
+#
+#  Compara o último trimestre já salvo em data/ibge_pnadc_atividades_ocupacoes.rds
+#  com o último trimestre de microdados publicado no FTP do IBGE.
+#  Se não houver trimestre novo, encerra o script sem baixar nada.
+#
+#  Para rodar mesmo sem trimestre novo (ex.: revisão de deflator),
+#  mude `forcar_atualizacao` para TRUE.
+
+forcar_atualizacao <- FALSE
+
+arquivo_base_destino <- "data/ibge_pnadc_atividades_ocupacoes.rds"
+
+url_ftp_pnadc <- paste0(
+    "https://ftp.ibge.gov.br/Trabalho_e_Rendimento/",
+    "Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados"
+)
+
+# existe o zip do trimestre no FTP? (pede só o primeiro byte, não baixa nada)
+pnadc_existe_no_ftp <- function(ano, tri) {
+    url <- sprintf("%s/%d/PNADC_%02d%d.zip", url_ftp_pnadc, ano, tri, ano)
+    resp <- tryCatch(
+        httr::GET(url, httr::add_headers(Range = "bytes=0-0"), httr::timeout(30)),
+        error = function(e) NULL
+    )
+    !is.null(resp) && httr::status_code(resp) %in% c(200, 206)
+}
+
+# último trimestre publicado, como ano*10 + trimestre (ex.: 20262)
+pnadc_ultimo_no_ftp <- function() {
+    for (ano in as.integer(format(Sys.Date(), "%Y")):2012) {
+        for (tri in 4:1) {
+            if (pnadc_existe_no_ftp(ano, tri)) return(ano * 10L + tri)
+        }
+    }
+    NA_integer_
+}
+
+if (!forcar_atualizacao && file.exists(arquivo_base_destino)) {
+    base_salva <- readRDS(arquivo_base_destino)
+    ano_salvo  <- max(base_salva$Ano, na.rm = TRUE)
+    tri_salvo  <- max(base_salva$Trimestre[base_salva$Ano == ano_salvo], na.rm = TRUE)
+    ultimo_salvo <- as.integer(ano_salvo) * 10L + as.integer(tri_salvo)
+    rm(base_salva)
+
+    ultimo_ftp <- pnadc_ultimo_no_ftp()
+
+    if (is.na(ultimo_ftp)) {
+        stop("Não foi possível consultar o FTP do IBGE. Nada foi processado.")
+    }
+
+    message("PNADC salva: ", ano_salvo, "-", tri_salvo,
+            " | FTP do IBGE: ", ultimo_ftp %/% 10L, "-", ultimo_ftp %% 10L)
+
+    if (ultimo_ftp <= ultimo_salvo) {
+        message("Nenhum trimestre novo da PNADC. Encerrando o script.")
+        quit(save = "no", status = 0)
+    }
+
+    message("Novo trimestre disponível na PNADC. Prosseguindo com o processamento...")
+}
+
 
 # ── SEÇÃO 1 — DOWNLOAD ───────────────────────────────────────────────────────
 #
@@ -370,7 +433,7 @@ dat %<>% mutate(across(where(is.character), enc2utf8))
 
 # saving data file
 
-readr::write_rds(dat, "ts_ibge_pnadc_trabalho/ibge_pnadc_trabalho.rds", compress = "gz")
+readr::write_rds(dat, "data/ibge_pnadc_trabalho.rds", compress = "gz")
 
 ############################
 ## Dictionary -- Trabalho ##
@@ -426,10 +489,8 @@ write.csv(temp_param_table, file = "data/ibge_pnadc_trabalho_dic.csv", fileEncod
 
 # ── SEÇÃO 3 — DATASETS CNAE / COD / ATIVIDADES ───────────────────────────────
 #
-#  Gera três arquivos:
+#  Gera o arquivo:
 #    ibge_pnadc_atividades_ocupacoes.rds — dataset completo (CNAE + COD + setor)
-#    ibge_pnadc_cnae.rds                 — filtro: id %in% c("All", "CNAE")
-#    ibge_pnadc_cod.rds                  — filtro: id %in% c("All", "COD")
 #
 #  As funções describe_brazil / describe_region / describe_amazon / describe_states
 #  são REDEFINIDAS aqui (versões CNAE/COD). describe_quarter() é reaproveitada

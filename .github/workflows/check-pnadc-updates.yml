@@ -3,7 +3,7 @@ name: Check PNADC updates
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 12 * * 1' # 09:00 horário de Brasília toda segunda-feira
+    - cron: '0 12 10-28 2,4,5,8,11 *' # 09:00 de Brasília, diariamente nos dias 10 a 28 de fev, abr, mai, ago e nov (divulgação da PNADC)
 
 jobs:
   check-pnadc:
