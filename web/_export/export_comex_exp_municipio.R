@@ -342,12 +342,26 @@ top_comb <- bind_rows(top_all, top_flor) %>%
     nome_sh2 = ifelse(nchar(sh2_pt) > 50, paste0(substr(sh2_pt, 1, 49), "…"), sh2_pt)
   )
 
-categoria_fob <- top_comb %>%
+# As 8 categorias da legenda saem da FREQUENCIA com que a categoria e o produto
+# principal de um municipio, nao do valor exportado.
+#
+# Por valor parece mais coerente, ja que o produto principal e escolhido por FOB,
+# e foi assim por um tempo. Mas o mapa colore MUNICIPIOS, entao as 8 cores
+# precisam cobrir o maior numero de municipios possivel, e valor otimiza outra
+# coisa: minerio de ferro domina em dolares (US$ 199 bi) sendo principal em so 74
+# municipio-anos, enquanto madeira serrada sao 1023 municipio-anos e US$ 3,1 bi.
+# Por valor, o modo "compativel com a floresta" ia de 11% para 84% dos
+# municipio-anos em cinza, que e o que sobra para quem fica fora das 8.
+#
+#   por valor       cobre 30% das celulas, 86% do valor
+#   por frequencia  cobre 57% das celulas, 36% do valor
+#
+# Se um dia o mapa passar a codificar valor no visual (circulo por municipio,
+# tamanho pelo FOB), a conta muda e vale reavaliar.
+categoria_counts <- top_comb %>%
   filter(!is.na(nome_sh2)) %>%
-  group_by(nome_sh2) %>%
-  summarise(fob = sum(valor_fob_mun), .groups = "drop") %>%
-  arrange(desc(fob))
-categorias_idx <- head(categoria_fob$nome_sh2, 8)
+  count(nome_sh2, sort = TRUE)
+categorias_idx <- head(categoria_counts$nome_sh2, 8)
 
 produtos_idx <- top_comb %>%
   filter(!is.na(lab)) %>%

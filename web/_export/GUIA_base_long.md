@@ -289,6 +289,33 @@ Ou seja, 2023 tem PIB e não tem população, e 2024 tem BACI e não tem PIB.
 tela. Extrapolar fica igual a medido e ninguém distingue; preferimos mostrar só
 onde há denominador, como já é feito com ano parcial.
 
+**O export não é reprodutível entre máquinas, e o diff mente.** Rodar o mesmo
+script em outro computador reescreve arquivos que não mudaram de dado, por duas
+razões independentes:
+
+- **Locale.** O `sort()` do R usa a collation do sistema, então a ordem dos
+  arrays de lookup (`municipios`, `produtos`, `paises`) muda com o
+  `LC_COLLATE`. Num locale, `Igarapé-Açu` vem antes de `Igarapé do Meio`;
+  noutro, depois. Os índices das células acompanham, e o arquivo inteiro fica
+  diferente com os mesmos dados.
+- **Versão do `sf`.** As coordenadas da geojson mudam entre versões de
+  GEOS/PROJ, com os mesmos municípios na mesma ordem.
+
+**Antes de commitar um export, confira se o dado mudou de verdade**, resolvendo
+as células pelos nomes em vez de pelos índices:
+
+```python
+def resolver(d):
+    m, p = d["municipios"], d["produtos"]
+    return sorted((m[c[0]], p[c[1]], c[2], c[3], c[4]) for c in d["cells"])
+resolver(antes) == resolver(depois)   # True = só mudou a ordem, descarte o diff
+```
+
+Se der `True`, use `git checkout --` nesses arquivos e commite só o que mudou
+de fato. Dá para tornar determinístico (`sort(method = "radix")`, ou
+`LC_COLLATE=C`), mas isso reordena tudo de uma vez, então vale fazer quando não
+houver PR grande em revisão.
+
 **Moeda, antes de deflator.** O PIB municipal do IBGE vem em **R$ mil
 correntes** e a exportação do Comex Stat em **US$ FOB**. Para a razão entre os
 dois o que falta é câmbio, não deflator, e o câmbio foi de 1,10 a 5,50 no
