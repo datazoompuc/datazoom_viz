@@ -222,6 +222,19 @@ def casos_cempre():
     for ano in [2006, 2013, 2020]:
         c.append({"nome": f"ano/{ano}", "grupo": "anos",
                   "query": f"lang=pt&x={VARS_CEMPRE[0]}&filter={ano}"})
+    # As medidas derivadas: por habitante vale para as quatro variáveis, % do
+    # PIB só para salários, que é a única em R$. Agrupadas para a assinatura,
+    # porque trocar a medida tem que mudar o mapa.
+    for m in ["abs", "pc"]:
+        c.append({"nome": f"medida/{m}", "grupo": "medidas",
+                  "query": f"lang=pt&x={VARS_CEMPRE[0]}&filter=2015&medida={m}"})
+    c.append({"nome": "medida/pib (salários)", "grupo": None,
+              "query": "lang=pt&x=cempre_salarios_remuneracoes&filter=2015&medida=pib"})
+    # Combinação inválida: o app tem que cair para "abs", não quebrar nem
+    # mostrar um mapa vazio.
+    c.append({"nome": "medida/pib inválida", "grupo": None,
+              "query": f"lang=pt&x={VARS_CEMPRE[0]}&filter=2015&medida=pib"})
+
     # Inglês, que troca rótulos e formatação de número.
     c.append({"nome": "en", "grupo": None,
               "query": f"lang=en&x={VARS_CEMPRE[0]}&filter=2015"})
@@ -261,9 +274,10 @@ APPS = {
         "casos": casos_cempre,
         "verifica": verifica_cempre,
         "assinatura": lambda r: r["assinatura"],
-        # O app escreve o ano como `filter`, e o lê do mesmo nome, mas a
-        # comparação de anos reescreve para o par corrente.
-        "normaliza": {"filter"},
+        # `filter` porque a comparação de anos reescreve o ano para o par
+        # corrente. `medida` porque uma combinação inválida cai para "abs" de
+        # propósito, e esse é justamente um dos casos testados.
+        "normaliza": {"filter", "medida"},
     },
 }
 

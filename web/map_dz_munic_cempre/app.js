@@ -22,6 +22,13 @@
       label_munic_name: "Nome do Município <b>",
       label_state_name: "Estado: <b>",
       label_measurement_unit: "Unidade de medida: <b>",
+      label_medida: "Como medir",
+      medida_abs: "Total",
+      medida_pc: "Por habitante",
+      medida_pib: "% do PIB",
+      medida_hint_pib: "Só para salários: é a única variável em R$, e as outras não têm sentido divididas pelo PIB.",
+      unidade_pc: (u) => `${u} por habitante`,
+      unidade_pib: "% do PIB municipal",
       label_no_data: "Sem dado",
       label_compare_state: "Estado",
       btn_compare: "Comparar anos",
@@ -44,6 +51,13 @@
       label_munic_name: "Municipality name: <b>",
       label_state_name: "State: <b>",
       label_measurement_unit: "Measurement unit: <b>",
+      label_medida: "How to measure",
+      medida_abs: "Total",
+      medida_pc: "Per inhabitant",
+      medida_pib: "% of GDP",
+      medida_hint_pib: "Wages only: it is the only variable in R$, and the others make no sense divided by GDP.",
+      unidade_pc: (u) => `${u} per inhabitant`,
+      unidade_pib: "% of municipal GDP",
       label_no_data: "No data",
       label_compare_state: "State",
       btn_compare: "Compare years",
@@ -138,6 +152,7 @@
   const state = {
     lang: "pt",
     x: null,
+    medida: "abs", // "abs" | "pc" (por habitante) | "pib" (% do PIB municipal)
     year: null,
     playing: false,
     playTimer: null,
@@ -239,18 +254,75 @@
     return byYear;
   }
 
+  // ---- Medidas derivadas ----
+  //
+  // O attributes.json guarda os DENOMINADORES (`populacao`, `pib`), nao as
+  // medidas prontas: per capita e % do PIB sao divisoes, calculadas aqui.
+  //
+  // Todo consumidor de valor passa por valorDe(), pelo mesmo motivo que o app
+  // de COMEX projeta a medida na origem: normalizar num lugar so, em vez de
+  // ensinar cada funcao de render sobre a troca.
+  const MEDIDAS = ["abs", "pc", "pib"];
+
+  // % do PIB divide R$ por R$. As outras tres variaveis do CEMPRE sao
+  // contagens (estabelecimentos, pessoas), e contagem dividida por PIB nao e
+  // indicador de nada. Por habitante vale para as quatro.
+  function medidaVale(varName, medida) {
+    if (medida !== "pib") return true;
+    return varName === "cempre_salarios_remuneracoes";
+  }
+
+  function denominadorDe(row, medida) {
+    if (medida === "pc") return row.populacao;
+    if (medida === "pib") return row.pib;
+    return 1;
+  }
+
+  // Devolve null quando nao da para calcular, inclusive quando o denominador
+  // falta: Mojui dos Campos (PA) nao tem populacao nem PIB antes de 2012,
+  // porque o municipio foi criado naquele ano. Null vira "sem dado" no mapa,
+  // que e a resposta certa.
+  function valorDe(row, varName) {
+    if (!row) return null;
+    const v = row[varName];
+    if (v === null || v === undefined || Number.isNaN(v)) return null;
+    if (state.medida === "abs") return v;
+    const d = denominadorDe(row, state.medida);
+    if (!d) return null;
+    return state.medida === "pib" ? (v / d) * 100 : v / d;
+  }
+
+  // Unidade do eixo e do tooltip, que muda com a medida.
+  function unidadeDe(varMeta, t) {
+    if (state.medida === "pc") return t.unidade_pc(varMeta.unidade);
+    if (state.medida === "pib") return t.unidade_pib;
+    return varMeta.unidade;
+  }
+
+
+  // Mirrors `domain = df[[input$x]]` in server.R: the color scale is fit
+  // against values across ALL years, so bins stay stable while scrubbing the
+  // year slider.
+  //
+  // Uma entrada por variavel E medida ("var|medida"): por habitante e % do PIB
+  // tem ordens de grandeza completamente diferentes do total, entao reusar as
+  // faixas do absoluto jogaria o mapa inteiro na primeira cor.
   function computeFullDomains(rows, vars) {
-    // Mirrors `domain = df[[input$x]]` in server.R: the color scale is
-    // fit against values across ALL years, so bins stay stable while
-    // scrubbing the year slider.
     const domains = {};
-    for (const v of vars) domains[v] = [];
-    for (const row of rows) {
-      for (const v of vars) {
-        const val = row[v];
-        if (val !== null && val !== undefined && !Number.isNaN(val)) domains[v].push(val);
+    const medidaOriginal = state.medida;
+    for (const v of vars) {
+      for (const m of MEDIDAS) {
+        if (!medidaVale(v, m)) continue;
+        state.medida = m;
+        const vals = [];
+        for (const row of rows) {
+          const val = valorDe(row, v);
+          if (val !== null && !Number.isNaN(val)) vals.push(val);
+        }
+        domains[`${v}|${m}`] = vals;
       }
     }
+    state.medida = medidaOriginal;
     return domains;
   }
 
@@ -264,6 +336,11 @@
 
     state.lang = qLang === "en" ? "en" : "pt";
     state.x = dictionary.pt.some((d) => d.var === qX) ? qX : dictionary.pt[0].var;
+
+    // A medida vem da URL, mas cai para "abs" se nao valer para a variavel
+    // escolhida: ?x=cempre_n_ocupados&medida=pib nao existe.
+    const qMedida = params.get("medida");
+    state.medida = MEDIDAS.includes(qMedida) && medidaVale(state.x, qMedida) ? qMedida : "abs";
     const qYear = qFilter ? parseInt(qFilter, 10) : NaN;
     state.year = Number.isFinite(qYear) && qYear >= dictionary.year_inicio && qYear <= dictionary.year_final
       ? qYear
@@ -274,6 +351,7 @@
     const params = new URLSearchParams();
     params.set("lang", state.lang);
     params.set("x", state.x);
+    params.set("medida", state.medida);
     params.set("filter", state.year);
     history.replaceState(null, "", `?${params.toString()}`);
   }
@@ -340,10 +418,40 @@
 
   // ---- Controls ----
 
+  // Reflete state.medida nos botoes, e desabilita o que nao vale para a
+  // variavel corrente. Desabilitar, e nao esconder: um botao que some sem
+  // explicacao parece bug. O aviso embaixo diz por que.
+  function aplicarMedida() {
+    const t = I18N[state.lang];
+    for (const m of MEDIDAS) {
+      const btn = document.getElementById(`medida-${m}`);
+      if (!btn) continue;
+      const vale = medidaVale(state.x, m);
+      btn.disabled = !vale;
+      btn.title = vale ? "" : t.medida_hint_pib;
+      btn.classList.toggle("active", state.medida === m);
+    }
+    const hint = document.getElementById("medida-hint");
+    if (hint) hint.textContent = medidaVale(state.x, "pib") ? "" : t.medida_hint_pib;
+  }
+
   function initControls() {
     const xSelect = document.getElementById("x-select");
     xSelect.addEventListener("change", () => {
       state.x = xSelect.value;
+      // Trocar para uma variavel que nao aceita a medida corrente volta para o
+      // total, em vez de deixar o mapa numa medida invalida.
+      if (!medidaVale(state.x, state.medida)) state.medida = "abs";
+      aplicarMedida();
+      updateUrl();
+      render();
+    });
+
+    document.getElementById("medida-toggle").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-medida]");
+      if (!btn || btn.disabled) return;
+      state.medida = btn.dataset.medida;
+      aplicarMedida();
       updateUrl();
       render();
     });
@@ -424,7 +532,7 @@
         hoverMarker.setAttribute("cx", svgX);
         hoverMarker.setAttribute("cy", sparkYFor(d.value));
         hoverMarker.style.opacity = "1";
-        tooltip.innerHTML = "<strong>" + fmtNumber(d.value) + "</strong> " + varMeta.unidade + "<br>" + year;
+        tooltip.innerHTML = "<strong>" + fmtNumber(d.value) + "</strong> " + unidadeDe(varMeta, I18N[state.lang]) + "<br>" + year;
       } else {
         hoverMarker.style.opacity = "0";
         tooltip.innerHTML = "<strong>" + year + "</strong><br>" + t.label_no_data;
@@ -528,7 +636,7 @@
     const yearData = attributesByYear.get(year) || new Map();
     for (const [codIbge, layer] of layersMap) {
       const row = yearData.get(codIbge);
-      const value = row ? row[state.x] : null;
+      const value = valorDe(row, state.x);
       const color = value === null || value === undefined || Number.isNaN(value)
         ? "url(#" + NODATA_PATTERN_ID + ")"
         : colors[binIndex(value, breaks)];
@@ -543,7 +651,7 @@
       t.label_munic_name, row ? escapeHtml(row.nm_municip) : "—", "</b><br>",
       t.label_state_name, row ? row.estado : "—", "</b><br>",
       varMeta.label, ": <b>", fmtNumber(value), "</b><br>",
-      t.label_measurement_unit, varMeta.unidade, "</b>"
+      t.label_measurement_unit, unidadeDe(varMeta, t), "</b>"
     ].join("");
   }
 
@@ -564,8 +672,8 @@
       if (meta.estado !== uf) continue;
       const rowA = dataA.get(codIbge);
       const rowB = dataB.get(codIbge);
-      const valueA = rowA ? rowA[varName] : null;
-      const valueB = rowB ? rowB[varName] : null;
+      const valueA = valorDe(rowA, varName);
+      const valueB = valorDe(rowB, varName);
       if (valueA === null || valueA === undefined || Number.isNaN(valueA) ||
           valueB === null || valueB === undefined || Number.isNaN(valueB)) {
         missing++;
@@ -894,7 +1002,7 @@
 
     drawLogoWatermark(ctx, logo, width - 14, SNAPSHOT_TITLE_BAND_H / 2, 22);
 
-    drawLegendOnCanvas(ctx, fontUi, width, height, breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
+    drawLegendOnCanvas(ctx, fontUi, width, height, breaks, colors, `${varMeta.label} (${unidadeDe(varMeta, t)})`, t.label_no_data);
 
     ctx.font = `400 10px ${fontUi}`;
     ctx.fillStyle = "rgba(0,0,0,0.55)";
@@ -1155,6 +1263,11 @@
     document.getElementById("plot_desc").textContent = t.plot_desc;
     document.getElementById("label_var_name").textContent = t.label_var_name;
     document.getElementById("label_x_name").textContent = t.label_x_name;
+    document.getElementById("label_medida").textContent = t.label_medida;
+    document.getElementById("medida-abs").textContent = t.medida_abs;
+    document.getElementById("medida-pc").textContent = t.medida_pc;
+    document.getElementById("medida-pib").textContent = t.medida_pib;
+    aplicarMedida();
     document.getElementById("label_year").textContent = t.label_year;
     document.getElementById("plot-title").textContent = t.label_title;
     document.getElementById("lang-toggle-label").textContent = t.btn_lang;
@@ -1272,13 +1385,43 @@
     ensureNoDataPattern("map");
   }
 
+  function percentil(vals, p) {
+    const s = [...vals].sort((a, b) => a - b);
+    return s[Math.min(s.length - 1, Math.floor(p * (s.length - 1)))];
+  }
+
+  // prettyBreaks usa min e max, entao um punhado de extremos define a escala
+  // inteira. No total isso e aceitavel, e o comportamento que o app sempre teve.
+  // Nas medidas derivadas nao e: massa salarial sobre PIB tem mediana de 9%, p90
+  // de 16% e maximo de 150%, porque o CEMPRE registra o estabelecimento pelo
+  // CNPJ e a folha da administracao estadual inteira cai na capital (Palmas
+  // passa de 100% de 2006 a 2011). Com a escala indo ate 160, 96% dos
+  // municipio-anos caiam na primeira faixa e o mapa ficava de uma cor so.
+  //
+  // Entao as faixas saem do percentil 98, e o maximo real entra como ultimo
+  // corte. A ultima faixa fica larga e a legenda diz isso ("35 - 150"), em vez
+  // de esconder que existem extremos. binIndex ja grampeia no ultimo bin.
+  //
+  // So nas derivadas: mexer no total mudaria um mapa que ninguem reclamou.
   function getBreaksAndColors(varName) {
-    if (!breaksCache[varName]) {
-      const breaks = prettyBreaks(fullDomainByVar[varName], N_BINS);
+    const chave = `${varName}|${state.medida}`;
+    if (!breaksCache[chave]) {
+      const dom = fullDomainByVar[chave] || [];
+      let breaks;
+      if (state.medida === "abs" || dom.length < 20) {
+        breaks = prettyBreaks(dom, N_BINS);
+      } else {
+        const corte = percentil(dom, 0.98);
+        breaks = prettyBreaks(dom.filter((v) => v <= corte), N_BINS);
+        // Arredondado para cima: "26 - 150" numa legenda le melhor que
+        // "26 - 149,79", e para cima para nao deixar o maximo de fora do bin.
+        const maxReal = Math.ceil(dom.reduce((m, v) => (v > m ? v : m), -Infinity));
+        if (maxReal > breaks[breaks.length - 1]) breaks = breaks.concat(maxReal);
+      }
       const colors = samplePalette(PALETTE_CONTINUOUS, breaks.length - 1);
-      breaksCache[varName] = { breaks, colors };
+      breaksCache[chave] = { breaks, colors };
     }
-    return breaksCache[varName];
+    return breaksCache[chave];
   }
 
   // Re-colors and re-tooltips the existing polygons for the current
@@ -1293,29 +1436,48 @@
 
     paintYear(layersByCodIbge, state.year, breaks, colors, varMeta, t);
 
-    renderLegend(breaks, colors, `${varMeta.label} (${varMeta.unidade})`, t.label_no_data);
+    renderLegend(breaks, colors, `${varMeta.label} (${unidadeDe(varMeta, t)})`, t.label_no_data);
   }
 
   // ---- Sparkline: total value per year for the selected variable, above
   // the slider. Lets you see the shape of the series before scrubbing, and
   // click any point on it to jump straight there. ----
 
+  // Serie da regiao inteira, por ano, para a sparkline.
+  //
+  // Numa medida derivada NAO da para somar valorDe() de cada municipio: a soma
+  // de razoes nao e a razao da soma. A media de "R$ por habitante" de 772
+  // municipios daria o mesmo peso a Manaus e a um municipio de 3 mil pessoas.
+  // Entao soma-se numerador e denominador separados, e divide-se no fim, que e
+  // o valor da regiao como um todo.
+  //
+  // Um municipio sem denominador fica de fora das DUAS somas, para nao inflar
+  // o numerador com um municipio que nao entra no denominador.
   function computeYearSeries(varName) {
     const series = [];
     for (let y = dictionary.year_inicio; y <= dictionary.year_final; y++) {
       const yearData = attributesByYear.get(y);
-      let sum = 0;
+      let num = 0;
+      let den = 0;
       let has = false;
       if (yearData) {
         for (const row of yearData.values()) {
           const v = row[varName];
-          if (v !== null && v !== undefined && !Number.isNaN(v)) {
-            sum += v;
-            has = true;
-          }
+          if (v === null || v === undefined || Number.isNaN(v)) continue;
+          const d = denominadorDe(row, state.medida);
+          if (!d) continue;
+          num += v;
+          den += d;
+          has = true;
         }
       }
-      series.push({ year: y, value: has ? sum : null });
+      let value = null;
+      if (has) {
+        value = state.medida === "abs" ? num
+              : state.medida === "pib" ? (num / den) * 100
+              : num / den;
+      }
+      series.push({ year: y, value });
     }
     return series;
   }
