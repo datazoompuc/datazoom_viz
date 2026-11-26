@@ -66,27 +66,12 @@ pelos nomes antigos. Estão listados nas Pendências.
 
 ## Pendências
 
-**Oito apps Shiny leem arquivos que não existem mais.** Eles continuam no repositório e no
-`config/app_manifest.csv`, que resolve dependências pelos nomes antigos, então um
-`deploy_shiny_script()` falha sem dizer o motivo:
+Os oito apps Shiny do COMEX foram **removidos** em nov/2026, junto com os
+`scripts/` e as entradas em `config/`. Três viraram o app estático em
+`web/comex_exp_municipio/` (a série temporal original, o ranking de produtos
+SH4 e o mapa, hoje a vista Mapa) e cinco saíram da página do site.
 
-| App | O que falta |
-|---|---|
-| `app_ts_comex_exp_municipio` | `comex_exp_munic_sec/sh2.rds`, `comex_exp_sec/sh2_munic.rds` e dicionários |
-| `app_map_comex_exp_sh4_sel` | `comex_exp_munic_sh4_sel.rds` e dicionários |
-| `app_rk_comex_exp_munic_produtosamz` | `comex_exp_sh4_munic.rds` e dicionários |
-| `app_rk_comex_exp_paises` | `comex_exp_tot_pais.rds`, dicionários, `indice_precos_anual.csv` |
-| `app_ts_comex_exp_tot_pais` | idem |
-| `app_rk_comex_exp_perc_sh4_sel` | `comex_exp_perc_sh4_sel.rds` e dicionários |
-| `app_sankey_comex_exp_pais_sec` | `comex_exp_pais_sec.rds` e dicionários |
-| `app_ts_comex_exp_pais_sec` | `comex_exp_pais_sec.rds`, `comex_exp_sec_pais.rds` e dicionários |
+Eles continuam publicados no shinyapps.io até alguém encerrar por lá, e as
+páginas dos cinco continuam no repositório do site.
 
-Sete dos oito vão ser aposentados: três são substituídos pelo app web novo
-(`web/comex_exp_municipio/`) e quatro saíram da página do site por decisão de nov/2026.
-**A exceção é o `app_rk_comex_exp_munic_produtosamz`**, que não está em nenhuma lista de
-aposentadoria e não é coberto pelo app novo.
-
-A ordem importa: ou os apps e o manifest saem junto com os `.rds`, ou os `.rds` ficam até
-a limpeza dos Shiny acontecer. O estado intermediário é o que quebra calado.
-
-- `paises_traducao.csv` é lido pelo `app_rk_comex_exp_paises.R`; script que o gera não identificado.
+- `data/paises_traducao.csv` ficou órfão: era lido pelo `app_rk_comex_exp_paises.R`, que foi removido, e nenhum script de `data-raw/` o gera. Pode sair numa limpeza.
