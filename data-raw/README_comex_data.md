@@ -49,14 +49,29 @@ Os nomes de produto vêm do `NCM_SH.csv`, os de país do `PAIS.csv` e os de muni
 - **Ano parcial.** O ano mais recente pode ter menos de 12 meses (em 2026, só parte do ano). `n_meses` e `ano_parcial` marcam isso. Nas séries, o último ponto cai por esse motivo.
 - **País de destino.** A base não soma sobre países: para obter o total por município e produto, some `valor_fob` e `kg_liquido` agrupando por `ano`, `cod_sh4`, `cod_municipio` e `uf`.
 
-## Arquivos legados em `data/`
+## Arquivos em `data/`
 
-Os arquivos pré-agregados antigos `comex_exp_*` (bases largas, transpostas, % mundial e dicionários CSV) foram removidos de `data/`. Ficam três arquivos:
-- `comex_exp_munic_base.rds`: a base central longa gerada por este script.
-- `comex_exp_munic_sh4_sel.rds`: produtos selecionados, lido pelo app Shiny `apps/app_map_comex_exp_sh4_sel.R`. Nenhum script de `data-raw/` o gera hoje.
-- `comex_munic_raw.rds`: dado bruto antigo. Nenhum app ou script o lê.
+Sobra **um arquivo**: `data/comex_exp_munic_base.rds`, a base central longa gerada por
+este script. Todos os `comex_exp_*` antigos (bases largas, matrizes transpostas, % mundial
+e os dicionários CSV), o `comex_exp_munic_sh4_sel.rds` do mapa e o `comex_munic_raw.rds`
+foram removidos.
+
+Toda a geração de JSON e GeoJSON da visualização web (`web/comex_exp_municipio/`) sai
+dessa base, por `web/_export/export_comex_exp_municipio.R`. O mapa deixou de ter script
+próprio: era `export_comex_mapa.R`, hoje faz parte do mesmo export.
+
+Os apps Shiny que liam os arquivos removidos continuam no repositório e **vão quebrar se
+forem redeployados**, porque o `config/app_manifest.csv` ainda resolve as dependências
+pelos nomes antigos. Estão listados nas Pendências.
 
 ## Pendências
 
-- `paises_traducao.csv` é lido pelo `app_rk_comex_exp_paises.R`; script que o gera não identificado.
-- `apps/app_map_comex_exp_sh4_sel.R` ainda lê `comex_exp_munic_sh4_sel_dic.csv` e `_dic_en.csv`, que foram removidos de `data/`.
+Os oito apps Shiny do COMEX foram **removidos** em nov/2026, junto com os
+`scripts/` e as entradas em `config/`. Três viraram o app estático em
+`web/comex_exp_municipio/` (a série temporal original, o ranking de produtos
+SH4 e o mapa, hoje a vista Mapa) e cinco saíram da página do site.
+
+Eles continuam publicados no shinyapps.io até alguém encerrar por lá, e as
+páginas dos cinco continuam no repositório do site.
+
+- `data/paises_traducao.csv` ficou órfão: era lido pelo `app_rk_comex_exp_paises.R`, que foi removido, e nenhum script de `data-raw/` o gera. Pode sair numa limpeza.

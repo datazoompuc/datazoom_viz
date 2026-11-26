@@ -406,21 +406,16 @@ How the data is built and updated is described in [`data-raw/README_comex_data.m
 
 **Files:**
 
-- `app_map_comex_exp_sh4_sel`: map of foreign trade in the amazon: value of the product's export. (PT/EN toggle)
+The eight Shiny apps that used to read this dataset were removed in
+Nov/2026. Three were rebuilt as the static app in `web/comex_exp_municipio/`
+(the original time series, the SH4 product ranking and the map, now its Mapa
+view), and five were dropped from the site: the destination-country sankey,
+the world-export-share ranking, the two destination-country time series and
+the importing-countries ranking. The last three of those are covered by the
+new app's Países orientation; the first two are tracked in
+[#270](https://github.com/datazoompuc/datazoom_viz/issues/270).
 
-- `app_rk_comex_exp_munic_produtosamz`: ranking of biggest product exporters municipalities in the legal amazon. (PT/EN toggle)
-
-- `app_rk_comex_exp_paises`: ranking of countries that import the most from the legal amazon. (PT/EN toggle)
-
-- `app_rk_comex_exp_perc_sh4_sel`: ranking of foreign trade in the amazon compared to internacional commerce (BACI): proportion of products export values. (PT/EN toggle)
-
-- `app_sankey_comex_exp_pais_sec`: graphic of external trade in the amazon: products export value per destination country. (PT/EN toggle)
-
-- `app_ts_comex_exp_municipio`: graphic of external trade in the amazon: export value per municipality, by product group.
-
-- `app_ts_comex_exp_pais_sec`: graphic of external trade in the amazon: export value per destination country and sector.
-
-- `app_ts_comex_exp_tot_pais`: graphic of external trade in the amazon: total products export value of amazonia legal per destination country. (PT/EN toggle)
+They are still deployed on shinyapps.io until someone terminates them there.
 
 
 
