@@ -8,6 +8,27 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  // Modo embutido, decidido ANTES da primeira pintura.
+  //
+  // Mesmo padrão do app de COMEX, e pelo mesmo motivo: o app.js roda no fim do
+  // <body>, então aplicar a classe de lá deixaria a marca, o logo e o seletor
+  // de idioma aparecerem e sumirem quando os dados chegassem. No COMEX isso
+  // durava quase 8s num 4G lento.
+  //
+  // A fonte vem junto. Pedida depois, o app apareceria em Source Sans Pro e
+  // trocaria para Inter no meio do caminho. Só em modo embutido, para o app
+  // sozinho não pagar por uma fonte que não usa.
+  //
+  // Inline e sem `defer` de propósito: qualquer uma das duas devolve o piscar.
+  if (new URLSearchParams(location.search).get("embed") === "1") {
+    document.documentElement.classList.add("embed");
+    var fonte = document.createElement("link");
+    fonte.rel = "stylesheet";
+    fonte.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap";
+    document.head.appendChild(fonte);
+  }
+</script>
 </head>
 <body>
 <div class="apppanel">
