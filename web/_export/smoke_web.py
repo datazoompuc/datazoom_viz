@@ -147,6 +147,9 @@ def casos_comex():
         c.append((f"Variacao/{orient}",
                   f"view=change&changeorientation={orient}&yeara=2000&yearb=2020"))
     c.append(("Mapa", "view=map"))
+    # Modo embutido, que a página do site usa. Esconde marca, logo e seletor de
+    # idioma, então o risco é esconder demais e sobrar um app sem gráfico.
+    c.append(("Ranking embutido", "view=ranking&embed=1"))
 
     # Cada caso roda nas duas medidas, agrupado para a comparação de assinatura:
     # dólar e quilo não podem produzir o mesmo eixo. Se produzirem, a troca de
@@ -238,6 +241,10 @@ def casos_cempre():
     # Inglês, que troca rótulos e formatação de número.
     c.append({"nome": "en", "grupo": None,
               "query": f"lang=en&x={VARS_CEMPRE[0]}&filter=2015"})
+    # Modo embutido, que a página do site vai usar.
+    c.append({"nome": "embutido", "grupo": None,
+              "query": f"lang=pt&x={VARS_CEMPRE[0]}&filter=2015&embed=1"})
+
     # Comparação de anos não tem parâmetro de URL, só o botão.
     c.append({"nome": "comparar anos", "grupo": None,
               "query": f"lang=pt&x={VARS_CEMPRE[0]}&filter=2015",
@@ -267,7 +274,7 @@ APPS = {
         # vazio já é pulado na própria comparação, então `state` não precisa
         # estar aqui, e não deve: é assim que os casos com UF verificam que o
         # filtro pegou.
-        "normaliza": {"compproduto", "year"},
+        "normaliza": {"compproduto", "year", "embed"},
     },
     "map_dz_munic_cempre": {
         "sonda": SONDA_CEMPRE,
@@ -277,7 +284,7 @@ APPS = {
         # `filter` porque a comparação de anos reescreve o ano para o par
         # corrente. `medida` porque uma combinação inválida cai para "abs" de
         # propósito, e esse é justamente um dos casos testados.
-        "normaliza": {"filter", "medida"},
+        "normaliza": {"filter", "medida", "embed"},
     },
 }
 

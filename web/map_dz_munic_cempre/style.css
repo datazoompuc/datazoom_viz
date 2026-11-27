@@ -11,12 +11,17 @@
   --legend-accent: #a63c89; /* mid-tone step of PALETTE_CONTINUOUS (app.js) */
   --sidebar-a: #50A486;
   --sidebar-b: #2f6e5c;
+
+  /* Em variável, e não fixas em cada regra, para o modo embutido trocar as
+     duas num lugar só. Mesmo arranjo do app de COMEX. */
+  --font-ui: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 html, body {
   margin: 0;
   height: 100%;
-  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-ui);
   /* Base size for every rem-sized element in this file — bumped from
      0.875rem (14px) since the whole app read small on an average screen. */
   font-size: 1rem;
@@ -50,7 +55,7 @@ html, body {
   box-shadow: 0 2px 10px var(--shadow);
   font-size: 0.82rem;
   font-weight: 600;
-  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-ui);
   cursor: pointer;
 }
 .lang-toggle-corner svg { display: block; }
@@ -95,7 +100,7 @@ html, body {
      rather than a new typeface, so this brand name still reads as *the*
      Data Zoom brand mark, not a redesign of it. Controls and body copy
      stay on Source Sans Pro. */
-  font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 400;
   text-transform: uppercase;
@@ -345,7 +350,7 @@ html, body {
 .plot-title {
   /* Same treatment as .plot_name (JetBrains Mono, uppercase, tight
      tracking) — matches the original Shiny app's #plot_title. */
-  font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 400;
   text-transform: uppercase;
@@ -688,3 +693,38 @@ html, body {
   color: #eafbfc;
   opacity: 0.8;
 }
+
+/* ---- Modo embutido (?embed=1) ----
+ *
+ * Dentro da página do site, o app repete o que ela já tem: marca, descrição,
+ * logo e seletor de idioma. O seletor é o que mais importa, porque o do app
+ * trocaria só o conteúdo do iframe e deixaria a página em volta no idioma
+ * anterior. Quem manda no idioma ali é a nav bar.
+ *
+ * A tipografia também muda: o site é todo Inter, e a diferença dentro do
+ * iframe lê como dois sites colados. Sozinho, o app mantém a identidade.
+ */
+.embed {
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.embed .plot_name,
+.embed .plot_desc,
+.embed .menucol > hr,
+.embed .menucol-logo,
+.embed .lang-toggle-corner { display: none; }
+
+/* Sem a monoespaçada, o título em caixa-alta com espaçamento negativo fica
+   estranho. Em Inter funciona melhor como subtítulo da página. */
+.embed .plot-title {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: normal;
+  font-size: 1.35rem;
+}
+
+/* O padding à direita existia para o título não passar por baixo do seletor
+   de idioma. Sem ele, é espaço morto. */
+.embed .plot-title,
+.embed .plot-subtitle { padding-right: 0; }

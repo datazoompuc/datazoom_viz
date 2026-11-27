@@ -1391,24 +1391,34 @@
   }
 
   // prettyBreaks usa min e max, entao um punhado de extremos define a escala
-  // inteira. No total isso e aceitavel, e o comportamento que o app sempre teve.
-  // Nas medidas derivadas nao e: massa salarial sobre PIB tem mediana de 9%, p90
-  // de 16% e maximo de 150%, porque o CEMPRE registra o estabelecimento pelo
-  // CNPJ e a folha da administracao estadual inteira cai na capital (Palmas
-  // passa de 100% de 2006 a 2011). Com a escala indo ate 160, 96% dos
-  // municipio-anos caiam na primeira faixa e o mapa ficava de uma cor so.
+  // inteira, e nestes dados isso achata o mapa inteiro:
+  //
+  //   numero de empresas, 2020   mediana    98   maximo 25.979 (Manaus)
+  //                              98,3% dos municipios na primeira faixa
+  //   massa salarial / PIB       mediana   9%    maximo    150% (Palmas)
+  //                              96% dos municipio-anos na primeira faixa
+  //
+  // O caso do PIB tem causa conhecida: o CEMPRE registra o estabelecimento pelo
+  // CNPJ, entao a folha da administracao estadual inteira cai na capital. O do
+  // total e so a concentracao economica real.
   //
   // Entao as faixas saem do percentil 98, e o maximo real entra como ultimo
-  // corte. A ultima faixa fica larga e a legenda diz isso ("35 - 150"), em vez
-  // de esconder que existem extremos. binIndex ja grampeia no ultimo bin.
+  // corte. A ultima faixa fica larga e a legenda diz isso ("3.500 - 25.979"),
+  // em vez de esconder que existem extremos. binIndex ja grampeia no ultimo bin.
   //
-  // So nas derivadas: mexer no total mudaria um mapa que ninguem reclamou.
+  // O que se perde: os maiores deixam de ser distinguiveis entre si, Manaus e
+  // Belem ficam na mesma cor. O que se ganha: os outros 759 municipios deixam
+  // de ser uma mancha unica. Num mapa de 772, distinguir os dois maiores e a
+  // informacao menos util, e era a unica que a escala antiga privilegiava.
+  //
+  // Valia so para as derivadas ate nov/2026, quando o mapa virou uma aba do
+  // site e essa vista passou a ser a primeira coisa que alguem ve.
   function getBreaksAndColors(varName) {
     const chave = `${varName}|${state.medida}`;
     if (!breaksCache[chave]) {
       const dom = fullDomainByVar[chave] || [];
       let breaks;
-      if (state.medida === "abs" || dom.length < 20) {
+      if (dom.length < 20) {
         breaks = prettyBreaks(dom, N_BINS);
       } else {
         const corte = percentil(dom, 0.98);
