@@ -679,3 +679,16 @@ dat <- dat %>%
 
 readr::write_rds(dat, "data/ibge_pnadc_atividades_ocupacoes.rds", compress = "gz")
 
+# separando a base combinada em duas: atividades (CNAE) e ocupações (COD)
+# a linha "All" (total) fica nas duas
+dat_atividades <- dat %>%
+    filter(id %in% c("All", "CNAE")) %>%
+    select(-cod_2dig)
+
+dat_ocupacoes <- dat %>%
+    filter(id %in% c("All", "COD")) %>%
+    select(-cnae_2dig)
+
+readr::write_rds(dat_atividades, "data/ibge_pnadc_atividades.rds", compress = "gz")
+readr::write_rds(dat_ocupacoes, "data/ibge_pnadc_ocupacoes.rds", compress = "gz")
+
